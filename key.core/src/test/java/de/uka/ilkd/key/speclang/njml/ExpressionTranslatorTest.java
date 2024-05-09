@@ -34,9 +34,7 @@ public class ExpressionTranslatorTest {
 
     @BeforeEach
     public void setup() {
-        if (services != null) {
-            return;
-        }
+        if (services != null) { return; }
         services = TacletForTests.services();
         JavaService r2k = services.getJavaService();
         r2k.parseSpecialClasses();

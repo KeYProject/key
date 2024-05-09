@@ -11,7 +11,8 @@ import org.key_project.logic.Name;
 /**
  * Label attached to a symbolic execution thread.
  *
- * @param id The unique ID of this term label in the {@link Sequent}.
+ * @param id
+ *        The unique ID of this term label in the {@link Sequent}.
  */
 public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
@@ -27,10 +28,10 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
      * Constructor.
      *
-     * @param id The unique ID of this term label in the {@link Sequent}.
+     * @param id
+     *        The unique ID of this term label in the {@link Sequent}.
      */
-    public SymbolicExecutionTermLabel {
-    }
+    public SymbolicExecutionTermLabel {}
 
     /**
      * {@inheritDoc}
@@ -51,9 +52,7 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      */
     @Override
     public Object getChild(int i) {
-        if (i == 0) {
-            return id();
-        }
+        if (i == 0) { return id(); }
         return null;
     }
 

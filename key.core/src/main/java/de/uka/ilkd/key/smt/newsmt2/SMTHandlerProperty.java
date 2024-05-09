@@ -15,7 +15,8 @@ import de.uka.ilkd.key.java.Services;
  *
  * SMT handler properties have a limited system for type safety to avoid nasty exceptions.
  *
- * @param <T> type of the stored data.
+ * @param <T>
+ *        type of the stored data.
  *
  * @author Mattias Ulbrich
  */
@@ -46,7 +47,8 @@ public abstract class SMTHandlerProperty<T> {
     /**
      * Verify that the given string value can be converted to a value of the stored data type
      *
-     * @param value potential string representation of a property, not null.
+     * @param value
+     *        potential string representation of a property, not null.
      * @return true iff the argument is a valid representation.
      */
     public abstract boolean verify(String value);
@@ -58,7 +60,8 @@ public abstract class SMTHandlerProperty<T> {
      * Precondition: {@code verify(s) == true}
      * </p>
      *
-     * @param s String to parse into a value
+     * @param s
+     *        String to parse into a value
      * @return the value represented by s.
      */
     public abstract T fromString(String s);
@@ -95,28 +98,26 @@ public abstract class SMTHandlerProperty<T> {
      * It uses the current proof (that must exist!), accesses its settings and there the new
      * smtsetting.
      *
-     * @param services non-null services object
+     * @param services
+     *        non-null services object
      * @return the value read from the services.
      */
     public T get(Services services) {
         String val = services.getProof().getSettings().getNewSMTSettings().get(getIdentifier());
-        if (val == null) {
-            return defaultValue();
-        }
+        if (val == null) { return defaultValue(); }
         return fromString(val);
     }
 
     /**
      * Extract a value of this property from a string property table.
      *
-     * @param properties non-null map to look up the value
+     * @param properties
+     *        non-null map to look up the value
      * @return the value read from the table.
      */
     public T get(Map<String, Object> properties) {
         Object val = properties.get(getIdentifier());
-        if (val == null) {
-            return defaultValue();
-        }
+        if (val == null) { return defaultValue(); }
         return fromString(val.toString());
     }
 
@@ -244,7 +245,8 @@ public abstract class SMTHandlerProperty<T> {
      * A property for an enum type. The allowed strings are the names of the enum constants of the
      * type. Default value is the first constant of E.
      *
-     * @param <E> an enum class that is wrapped here. Must contain at least one constant.
+     * @param <E>
+     *        an enum class that is wrapped here. Must contain at least one constant.
      */
     public static class EnumProperty<E extends Enum<E>> extends SMTHandlerProperty<E> {
         private final Class<E> enumType;
@@ -257,9 +259,7 @@ public abstract class SMTHandlerProperty<T> {
 
         public E fromString(String value) {
             for (E enumConstant : enumType.getEnumConstants()) {
-                if (value.equalsIgnoreCase(enumConstant.toString())) {
-                    return enumConstant;
-                }
+                if (value.equalsIgnoreCase(enumConstant.toString())) { return enumConstant; }
             }
             return null;
         }

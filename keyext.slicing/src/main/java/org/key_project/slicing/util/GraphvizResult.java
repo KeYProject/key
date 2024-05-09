@@ -9,8 +9,10 @@ import java.awt.image.BufferedImage;
  * Result of running an external graph renderer.
  * Either an image or an error.
  *
- * @param image The image.
- * @param error The error message.
+ * @param image
+ *        The image.
+ * @param error
+ *        The error message.
  * @author Arne Keller
  */
 public record GraphvizResult(BufferedImage image, String error) {
@@ -21,7 +23,8 @@ public record GraphvizResult(BufferedImage image, String error) {
     }
 
     /**
-     * @param image rendered image
+     * @param image
+     *        rendered image
      * @return new result object with that image attached
      */
     public static GraphvizResult makeImage(BufferedImage image) {
@@ -29,7 +32,8 @@ public record GraphvizResult(BufferedImage image, String error) {
     }
 
     /**
-     * @param error error text
+     * @param error
+     *        error text
      * @return new result object with that error attached
      */
     public static GraphvizResult makeError(String error) {

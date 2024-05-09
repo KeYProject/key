@@ -25,9 +25,12 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /**
      * creates new Goaldescription
      *
-     * @param addedSeq new Sequent to be added
-     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
-     * @param replacewith the Sequent that replaces another one
+     * @param addedSeq
+     *        new Sequent to be added
+     * @param addedRules
+     *        IList<Taclet> contains the new allowed rules at this branch
+     * @param replacewith
+     *        the Sequent that replaces another one
      */
     public AntecSuccTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
             Sequent replacewith, ImmutableSet<SchemaVariable> pvs) {
@@ -73,9 +76,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
-        }
+        if (!super.equals(o)) { return false; }
         final AntecSuccTacletGoalTemplate other = (AntecSuccTacletGoalTemplate) o;
         return replacewith.equals(other.replacewith);
     }

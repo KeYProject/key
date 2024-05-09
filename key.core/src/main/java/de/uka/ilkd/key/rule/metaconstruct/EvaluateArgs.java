@@ -41,7 +41,8 @@ public class EvaluateArgs extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe the instance of expression contained by the meta construct
+     * @param pe
+     *        the instance of expression contained by the meta construct
      */
     public EvaluateArgs(ProgramElement pe) {
         super("#evaluate-arguments", pe);
@@ -50,10 +51,14 @@ public class EvaluateArgs extends ProgramTransformer {
     /**
      * TODO Comment.
      *
-     * @param e TODO
-     * @param l TODO
-     * @param services TODO
-     * @param ec TODO
+     * @param e
+     *        TODO
+     * @param l
+     *        TODO
+     * @param services
+     *        TODO
+     * @param ec
+     *        TODO
      * @return TODO
      */
     public static ProgramVariable evaluate(Expression e, List<? super LocalVariableDeclaration> l,
@@ -93,15 +98,11 @@ public class EvaluateArgs extends ProgramTransformer {
 
         ImmutableArray<? extends Expression> args = mr.getArguments();
         Expression[] newArgs = new Expression[args.size()];
-        for (int i = 0; i < args.size(); i++) {
-            newArgs[i] = evaluate(args.get(i), evalstat, services, ec);
-        }
+        for (int i = 0; i < args.size(); i++) { newArgs[i] = evaluate(args.get(i), evalstat, services, ec); }
 
         Statement[] res = new Statement[1 + evalstat.size()];
         final Iterator<Statement> it = evalstat.iterator();
-        for (int i = 0; i < evalstat.size(); i++) {
-            res[i] = it.next();
-        }
+        for (int i = 0; i < evalstat.size(); i++) { res[i] = it.next(); }
 
         final MethodOrConstructorReference resMR;
         if (mr instanceof MethodReference) {

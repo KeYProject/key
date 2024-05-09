@@ -19,7 +19,8 @@ public class TermReplacementMap extends ReplacementMap<Term> {
     /**
      * constructs a replacement map with the given term factory
      *
-     * @param tf a term factory
+     * @param tf
+     *        a term factory
      */
     public TermReplacementMap(TermFactory tf) {
         super(tf);
@@ -28,13 +29,13 @@ public class TermReplacementMap extends ReplacementMap<Term> {
     /**
      * adds a replacement of heap with newHeap
      *
-     * @param newHeap the heap that should be used
-     * @param services services
+     * @param newHeap
+     *        the heap that should be used
+     * @param services
+     *        services
      */
     public void replaceHeap(final Term newHeap, final Services services) {
-        if (newHeap == null) {
-            throw new IllegalArgumentException("newHeap can't be null");
-        }
+        if (newHeap == null) { throw new IllegalArgumentException("newHeap can't be null"); }
         if (!newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
             throw new IllegalArgumentException("newHeap has to be a heap");
         }

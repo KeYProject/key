@@ -74,18 +74,12 @@ public final class JmlAssertRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
-        if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
-            return false;
-        }
+        if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) { return false; }
         // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) {
-            return false;
-        }
+        if (Transformer.inTransformer(occurrence)) { return false; }
 
         Term target = occurrence.subTerm();
-        if (target.op() instanceof UpdateApplication) {
-            target = UpdateApplication.getTarget(target);
-        }
+        if (target.op() instanceof UpdateApplication) { target = UpdateApplication.getTarget(target); }
         final SourceElement activeStatement = JavaTools.getActiveStatement(target.javaBlock());
         return activeStatement instanceof JmlAssert
                 && ((JmlAssert) activeStatement).getKind() == kind;
@@ -101,9 +95,8 @@ public final class JmlAssertRule implements BuiltInRule {
         return new JmlAssertBuiltInRuleApp(this, occurrence);
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof JmlAssertBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply JmlAssertBuiltInRuleApp");
@@ -115,9 +108,7 @@ public final class JmlAssertRule implements BuiltInRule {
         final Term update = UpdateApplication.getUpdate(formula);
 
         Term target = formula;
-        if (formula.op() instanceof UpdateApplication) {
-            target = UpdateApplication.getTarget(formula);
-        }
+        if (formula.op() instanceof UpdateApplication) { target = UpdateApplication.getTarget(formula); }
 
         final JmlAssert jmlAssert =
             Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))

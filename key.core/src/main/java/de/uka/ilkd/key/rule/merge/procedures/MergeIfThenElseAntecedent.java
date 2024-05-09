@@ -36,9 +36,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
     private static MergeIfThenElseAntecedent INSTANCE = null;
 
     public static MergeIfThenElseAntecedent instance() {
-        if (INSTANCE == null) {
-            INSTANCE = new MergeIfThenElseAntecedent();
-        }
+        if (INSTANCE == null) { INSTANCE = new MergeIfThenElseAntecedent(); }
         return INSTANCE;
     }
 
@@ -84,14 +82,21 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
      * Returns a list of if-then-else constraints for the given constrained term, states and if/else
      * terms.
      *
-     * @param constrained The constrained term.
-     * @param ifTerm The value for the if case.
-     * @param elseTerm The value for the else case.
-     * @param state1 First SE state ("if").
-     * @param state2 Second SE state ("else").
-     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
+     * @param constrained
+     *        The constrained term.
+     * @param ifTerm
+     *        The value for the if case.
+     * @param elseTerm
+     *        The value for the else case.
+     * @param state1
+     *        First SE state ("if").
+     * @param state2
+     *        Second SE state ("else").
+     * @param distinguishingFormula
+     *        The user-specified distinguishing formula. May be null (for
      *        automatic generation).
-     * @param services The services object.
+     * @param services
+     *        The services object.
      * @return A list of if-then-else constraints for the given constrained term, states and if/else
      *         terms.
      */

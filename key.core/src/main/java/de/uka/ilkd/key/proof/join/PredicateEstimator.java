@@ -22,8 +22,10 @@ public interface PredicateEstimator {
     PredicateEstimator STD_ESTIMATOR = new StdPredicateEstimator();
 
     /**
-     * @param partner Structure comprising the partners of a join.
-     * @param proof The underlying proof.
+     * @param partner
+     *        Structure comprising the partners of a join.
+     * @param proof
+     *        The underlying proof.
      * @return A decision predicate for the two nodes in partner. The predicate should be true in
      *         the sequent of the first node and false in the sequent of the second node.
      */
@@ -64,9 +66,7 @@ class StdPredicateEstimator implements PredicateEstimator {
             int index = branchLabel.lastIndexOf(suffix);
             branchLabel = branchLabel.substring(0, index);
 
-            if (branchLabel.startsWith(CUT_LABEL)) {
-                branchLabel = branchLabel.substring(CUT_LABEL.length());
-            }
+            if (branchLabel.startsWith(CUT_LABEL)) { branchLabel = branchLabel.substring(CUT_LABEL.length()); }
 
             final Term term = translate(branchLabel, proof.getServices());
 
@@ -75,9 +75,7 @@ class StdPredicateEstimator implements PredicateEstimator {
 
                     @Override
                     public Term getPredicate() {
-                        if (!positive) {
-                            return proof.getServices().getTermBuilder().not(term);
-                        }
+                        if (!positive) { return proof.getServices().getTermBuilder().not(term); }
                         return term;
                     }
 
@@ -111,34 +109,23 @@ class StdPredicateEstimator implements PredicateEstimator {
      * Goes up to the common node of partner.getNode(0) and partner.getNode(1) and returns the next
      * node on the path to partner.getNode(0).
      *
-     * @param partner The prospective partner object.
+     * @param partner
+     *        The prospective partner object.
      * @return The next node on the path to partner.getNode(0).
      */
     private Node getFirstDifferentNode(ProspectivePartner partner) {
         TreeSet<Node> set = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
 
         Node node = partner.getNode(0);
-        while (!node.root()) {
-            set.add(node);
-            node = node.parent();
-        }
-        if (node.root()) {
-            set.add(node);
-        }
+        while (!node.root()) { set.add(node); node = node.parent(); }
+        if (node.root()) { set.add(node); }
 
         node = partner.getNode(1);
-        while (node.parent() != null && !set.contains(node)) {
-            node = node.parent();
-        }
+        while (node.parent() != null && !set.contains(node)) { node = node.parent(); }
 
         if (set.contains(node)) {
             Iterator<Node> it = node.childrenIterator();
-            while (it.hasNext()) {
-                Node child = it.next();
-                if (set.contains(child)) {
-                    return child;
-                }
-            }
+            while (it.hasNext()) { Node child = it.next(); if (set.contains(child)) { return child; } }
         }
 
         return null;
@@ -147,8 +134,10 @@ class StdPredicateEstimator implements PredicateEstimator {
     /**
      * Translates a branch label (without common prefixes such as "CUT:" etc.) to a term.
      *
-     * @param estimation The branch label without prefix.
-     * @param services The services object.
+     * @param estimation
+     *        The branch label without prefix.
+     * @param services
+     *        The services object.
      * @return A term corresponding to the branch label.
      */
     private Term translate(String estimation, Services services) {

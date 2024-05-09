@@ -19,7 +19,8 @@ public interface ProofTreeListener {
      * traversed (e.g. in order to free the nodes in caches). The method proofPruned is called, when
      * the nodes are disconnect from node.
      *
-     * @param e proof tree event specifying the node to be pruned
+     * @param e
+     *        proof tree event specifying the node to be pruned
      */
     default void proofIsBeingPruned(ProofTreeEvent e) {
 
@@ -30,7 +31,8 @@ public interface ProofTreeListener {
      * words, that node should no longer have any children now. Any nodes that were not descendants
      * of that node are unaffected.
      *
-     * @param e proof tree event specifying the pruned node
+     * @param e
+     *        proof tree event specifying the pruned node
      */
     default void proofPruned(ProofTreeEvent e) {
 
@@ -77,7 +79,8 @@ public interface ProofTreeListener {
     /**
      * If the notes of a {@link NodeInfo} of a proof tree {@link Node} have changed.
      *
-     * @param e The {@link ProofTreeEvent}.
+     * @param e
+     *        The {@link ProofTreeEvent}.
      */
     default void notesChanged(ProofTreeEvent e) {
 

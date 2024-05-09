@@ -36,9 +36,12 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a
      * ClassDeclaration but has memory about which fields have been declared as enum constants.
      *
-     * @param children children in the ast (members)
-     * @param fullName of the class/enum
-     * @param isLibrary see class constructor
+     * @param children
+     *        children in the ast (members)
+     * @param fullName
+     *        of the class/enum
+     * @param isLibrary
+     *        see class constructor
      */
     // TODO javaparser
     public EnumClassDeclaration(
@@ -64,9 +67,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i) instanceof FieldDeclaration fd) {
                 FieldSpecification fs = fd.getFieldSpecifications().get(0);
-                if (fs.getName().equals(completeName)) {
-                    return fs.getProgramVariable();
-                }
+                if (fs.getName().equals(completeName)) { return fs.getProgramVariable(); }
             }
         }
         throw new IllegalStateException(
@@ -77,26 +78,19 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * is pv a enum constant of THIS enum?
      */
     private boolean isLocalEnumConstant(IProgramVariable pv) {
-        for (IProgramVariable cnst : constants) {
-            if (cnst.equals(pv)) {
-                return true;
-            }
-        }
+        for (IProgramVariable cnst : constants) { if (cnst.equals(pv)) { return true; } }
         return false;
     }
 
     /**
      * get the index of the program variable amongst the enumconstants of THIS enum.
      *
-     * @param pv PV to look up
+     * @param pv
+     *        PV to look up
      * @return -1 if not found, otherwise the 0-based index.
      */
     private int localIndexOf(ProgramVariable pv) {
-        for (int i = 0; i < constants.size(); i++) {
-            if (constants.get(i).equals(pv)) {
-                return i;
-            }
-        }
+        for (int i = 0; i < constants.size(); i++) { if (constants.get(i).equals(pv)) { return i; } }
         return -1;
     }
 
@@ -112,7 +106,8 @@ public class EnumClassDeclaration extends ClassDeclaration {
     /**
      * check whether a PV is an enum constant of any enum type.
      *
-     * @param attribute ProgramVariable to check.
+     * @param attribute
+     *        ProgramVariable to check.
      * @return true iff attribute is an enum constant.
      */
     public static boolean isEnumConstant(IProgramVariable attribute) {

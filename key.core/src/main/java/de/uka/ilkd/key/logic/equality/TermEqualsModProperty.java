@@ -15,8 +15,10 @@ public interface TermEqualsModProperty {
      * Checks whether this object is equal to {@code o} modulo the property described by
      * {@code property}.
      *
-     * @param o the object that is checked for equality
-     * @param property the property to be ignored in the equality check
+     * @param o
+     *        the object that is checked for equality
+     * @param property
+     *        the property to be ignored in the equality check
      * @return whether this object is equal to <code>o</code>
      */
     boolean equalsModProperty(Object o, TermProperty property);
@@ -24,7 +26,8 @@ public interface TermEqualsModProperty {
     /**
      * Computes the hash code according to the given ignored {@code property}.
      *
-     * @param property the ignored property according to which the hash code is computed
+     * @param property
+     *        the ignored property according to which the hash code is computed
      * @return the hash code of this object
      */
     int hashCodeModProperty(TermProperty property);

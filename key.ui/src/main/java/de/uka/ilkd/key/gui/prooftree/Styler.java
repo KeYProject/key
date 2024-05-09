@@ -10,7 +10,8 @@ import org.jspecify.annotations.NonNull;
  * of elements. For example, the proof tree uses a list of {@code Styler}s to determine the look of
  * proof nodes in the JTree.
  *
- * @param <T> is an arbitrary type specifying the argument to judge on
+ * @param <T>
+ *        is an arbitrary type specifying the argument to judge on
  * @author Alexander Weigl
  * @version 1 (20.05.19)
  */

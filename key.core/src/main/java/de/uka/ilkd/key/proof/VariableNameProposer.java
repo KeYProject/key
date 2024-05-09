@@ -72,9 +72,7 @@ public class VariableNameProposer implements InstantiationProposer {
         if (name == null || namespaces.lookup(name) != null) {
             int i = 0;
 
-            do {
-                name = new Name(baseName + "_" + i++);
-            } while (namespaces.lookup(name) != null);
+            do { name = new Name(baseName + "_" + i++); } while (namespaces.lookup(name) != null);
 
         }
 
@@ -173,15 +171,11 @@ public class VariableNameProposer implements InstantiationProposer {
             TermServices services, ImmutableList<String> previousProposals) {
 
         String baseName = var.name().toString();
-        if (previousProposals == null || !previousProposals.contains(baseName)) {
-            return baseName;
-        }
+        if (previousProposals == null || !previousProposals.contains(baseName)) { return baseName; }
 
         for (int i = 1; i < Integer.MAX_VALUE; i++) {
             String name = baseName + "_" + i;
-            if (!previousProposals.contains(name)) {
-                return name;
-            }
+            if (!previousProposals.contains(name)) { return name; }
         }
 
         throw new Error("name proposer for " + baseName + " has run into infinite loop");
@@ -201,9 +195,7 @@ public class VariableNameProposer implements InstantiationProposer {
         ProgramElement contextProgram =
             app.matchConditions().getInstantiations().getContextInstantiation().contextProgram();
 
-        if (contextProgram == null) {
-            contextProgram = new StatementBlock();
-        }
+        if (contextProgram == null) { contextProgram = new StatementBlock(); }
 
         final LabelCollector lc = new LabelCollector(contextProgram, services);
 

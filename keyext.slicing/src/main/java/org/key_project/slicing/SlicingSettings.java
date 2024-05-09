@@ -68,7 +68,8 @@ public class SlicingSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * @param proof proof
+     * @param proof
+     *        proof
      * @return whether aggressive deduplication is turned on for this proof
      */
     public boolean getAggressiveDeduplicate(Proof proof) {
@@ -82,14 +83,16 @@ public class SlicingSettings extends AbstractPropertiesSettings {
     /**
      * Disable aggressive de-duplication for a particular proof.
      *
-     * @param proof proof to disable aggressive de-duplication for
+     * @param proof
+     *        proof to disable aggressive de-duplication for
      */
     public void deactivateAggressiveDeduplicate(Proof proof) {
         aggressiveDeduplicateOverride.put(proof, false);
     }
 
     /**
-     * @param value whether to enable or disable this option
+     * @param value
+     *        whether to enable or disable this option
      */
     void setAggressiveDeduplicate(boolean value) {
         aggressiveDeduplicate.set(value);
@@ -100,19 +103,16 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     public String getDotExecutable() {
         String path = dotExecutable.get();
-        if (path != null) {
-            return path;
-        }
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            return "dot.exe";
-        }
+        if (path != null) { return path; }
+        if (System.getProperty("os.name").startsWith("Windows")) { return "dot.exe"; }
         return "dot";
     }
 
     /**
      * Set the path to the dot executable.
      *
-     * @param path dot executable
+     * @param path
+     *        dot executable
      */
     public void setDotExecutable(String path) {
         dotExecutable.set(path);

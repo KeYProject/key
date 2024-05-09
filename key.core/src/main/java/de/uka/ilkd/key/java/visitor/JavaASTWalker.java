@@ -26,7 +26,8 @@ public abstract class JavaASTWalker {
     /**
      * create the JavaASTWalker
      *
-     * @param root the ProgramElement where to begin
+     * @param root
+     *        the ProgramElement where to begin
      */
     public JavaASTWalker(ProgramElement root) {
         this.root = root;
@@ -58,15 +59,14 @@ public abstract class JavaASTWalker {
     /**
      * walks through the AST. While keeping track of the current node
      *
-     * @param node the JavaProgramElement the walker is at
+     * @param node
+     *        the JavaProgramElement the walker is at
      */
     protected void walk(ProgramElement node) {
         if (node instanceof NonTerminalProgramElement nonTerminalNode) {
             depth++;
             for (int i = 0; i < nonTerminalNode.getChildCount(); i++) {
-                if (nonTerminalNode.getChildAt(i) != null) {
-                    walk(nonTerminalNode.getChildAt(i));
-                }
+                if (nonTerminalNode.getChildAt(i) != null) { walk(nonTerminalNode.getChildAt(i)); }
             }
             depth--;
         }

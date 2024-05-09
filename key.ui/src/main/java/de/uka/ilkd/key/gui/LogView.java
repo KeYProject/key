@@ -69,9 +69,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                     final WatchKey wk = watchService.take();
                     for (WatchEvent<?> event : wk.pollEvents()) {
                         // final Path changed = (Path) event.context()
-                        if (wk == watchKey) {
-                            callback.run();
-                        }
+                        if (wk == watchKey) { callback.run(); }
                     }
                     // reset the key
                     wk.reset();
@@ -217,9 +215,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
 
         public void refresh() {
-            if (pause) {
-                return;
-            }
+            if (pause) { return; }
             txtView.setText("");
 
             String pkgFilter = txtPackageSearch.getText().trim();
@@ -235,9 +231,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             try (var reader = Files.newBufferedReader(logFile)) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.isEmpty() || line.charAt(0) == '#') {
-                        continue;
-                    }
+                    if (line.isEmpty() || line.charAt(0) == '#') { continue; }
                     String[] fields = line.split("[|]", STYLES.length);
                     boolean skipByMsgFilter = msgFilterApply && !fields[5].contains(msgFilter);
                     boolean skipByPkgFilter = pkgFilterApply && !fields[4].startsWith(pkgFilter);

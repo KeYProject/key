@@ -79,9 +79,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
         //
         for (StrategyFactory s : profile.supportedStrategies()) {
-            if (state.getProof().getActiveStrategy().name().equals(s.name())) {
-                return s.create(proof, properties);
-            }
+            if (state.getProof().getActiveStrategy().name().equals(s.name())) { return s.create(proof, properties); }
         }
 
         // (DS, 2020-04-08) This should not happen -- we already have a proof with that

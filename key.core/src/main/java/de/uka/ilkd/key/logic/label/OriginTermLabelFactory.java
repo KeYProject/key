@@ -30,8 +30,10 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param origin the term's origin.
-     * @param subtermOrigins the origins of the term's (former) subterms.
+     * @param origin
+     *        the term's origin.
+     * @param subtermOrigins
+     *        the origins of the term's (former) subterms.
      */
     public OriginTermLabel createOriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
         return new OriginTermLabel(origin, subtermOrigins);
@@ -40,7 +42,8 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param subtermOrigins the origins of the term's (former) subterms.
+     * @param subtermOrigins
+     *        the origins of the term's (former) subterms.
      */
     public OriginTermLabel createOriginTermLabel(Set<Origin> subtermOrigins) {
         return new OriginTermLabel(subtermOrigins);
@@ -51,7 +54,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
             throws TermLabelException {
         if (arguments.size() != OriginTermLabel.CHILD_COUNT) {
             throw new TermLabelException("OriginTermLabel has " + arguments.size()
-                + " children, but should have " + OriginTermLabel.CHILD_COUNT);
+                    + " children, but should have " + OriginTermLabel.CHILD_COUNT);
         }
 
         Origin origin = parseOrigin(arguments.get(0));
@@ -63,23 +66,23 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     /**
      * Parses a set of origins.
      *
-     * @param str the string to parse.
+     * @param str
+     *        the string to parse.
      * @return the parsed set of origins.
-     * @throws TermLabelException if a parsing error occurs.
+     * @throws TermLabelException
+     *         if a parsing error occurs.
      */
     private Set<Origin> parseSubtermOrigins(String str) throws TermLabelException {
         if (!str.startsWith("[") || !str.endsWith("]")) {
             throw new TermLabelException("Malformed set of origins: \"" + str + "\"\n"
-                + "(Should be a comma-separated set of of origins, "
-                + "delimited by \"[\" and \"]\"");
+                    + "(Should be a comma-separated set of of origins, "
+                    + "delimited by \"[\" and \"]\"");
         }
 
         Set<Origin> result = new LinkedHashSet<>();
 
         for (String s : str.substring(1, str.length() - 1).split("\\s*,\\s*")) {
-            if (s.isEmpty()) {
-                break;
-            }
+            if (s.isEmpty()) { break; }
 
             result.add(parseOrigin(s));
         }
@@ -90,9 +93,11 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     /**
      * Parses an origin.
      *
-     * @param str the string to parse.
+     * @param str
+     *        the string to parse.
      * @return the parsed origin.
-     * @throws TermLabelException if a parsing error occurs.
+     * @throws TermLabelException
+     *         if a parsing error occurs.
      */
     private Origin parseOrigin(String str) throws TermLabelException {
         try {
@@ -127,9 +132,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
 
                     if (ruleName.startsWith("(")) {
                         ruleName = ruleName.substring(1);
-                        while (!ruleName.endsWith(")")) {
-                            ruleName += tokenizer.nextToken();
-                        }
+                        while (!ruleName.endsWith(")")) { ruleName += tokenizer.nextToken(); }
                         ruleName = ruleName.substring(0, ruleName.length() - 1);
                     } else {
                         throw new IllegalArgumentException();
@@ -144,23 +147,22 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
             }
         } catch (NoSuchElementException | IllegalArgumentException e) {
             throw new TermLabelException("Malformed origin string: \"" + str + "\"\n"
-                + "(Well-formed origins have one of the following formats: \""
-                + "spec_type @ file <file name> @ line <line number>\")\n"
-                + "spec_type @ node <node number> (<rule name>)\")\n"
-                + "spec_type (implicit)\")\n");
+                    + "(Well-formed origins have one of the following formats: \""
+                    + "spec_type @ file <file name> @ line <line number>\")\n"
+                    + "spec_type @ node <node number> (<rule name>)\")\n"
+                    + "spec_type (implicit)\")\n");
         }
     }
 
     /**
      * Parses a spec type.
      *
-     * @param str the string to parse.
+     * @param str
+     *        the string to parse.
      * @return the parsed spec type.
      */
     private SpecType parseSpecType(String str) {
-        if (str.toLowerCase().equals(SpecType.NONE.toString())) {
-            str = "none";
-        }
+        if (str.toLowerCase().equals(SpecType.NONE.toString())) { str = "none"; }
 
         return SpecType.valueOf(str.toUpperCase());
     }
@@ -168,16 +170,20 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     /**
      * Throws an exception if {@code !expected.equals(actual)}
      *
-     * @param actual a token.
-     * @param line the current line.
-     * @param expected the expected token.
+     * @param actual
+     *        a token.
+     * @param line
+     *        the current line.
+     * @param expected
+     *        the expected token.
      * @return the token.
-     * @throws TermLabelException if {@code !expected.equals(actual)}
+     * @throws TermLabelException
+     *         if {@code !expected.equals(actual)}
      */
     private String matchId(String actual, String line, String expected) throws TermLabelException {
         if (!expected.equals(actual)) {
             throw new TermLabelException("Unexpected token \"" + actual + "\", " + "expected: \""
-                + expected + "\"" + "\nin line \"" + line + "\"");
+                    + expected + "\"" + "\nin line \"" + line + "\"");
         }
 
         return expected;
@@ -187,17 +193,21 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      * Throws an exception if the token is not a single character, or it does not occur in
      * {@code expected.}
      *
-     * @param actual a token.
-     * @param line the current line.
-     * @param expected a string containing the expected characters.
+     * @param actual
+     *        a token.
+     * @param line
+     *        the current line.
+     * @param expected
+     *        a string containing the expected characters.
      * @return the token as a single character.
-     * @throws TermLabelException if the token is not a single character, or it does not occur in
+     * @throws TermLabelException
+     *         if the token is not a single character, or it does not occur in
      *         {@code expected.}
      */
     private char matchChar(String actual, String line, String expected) throws TermLabelException {
         if (actual.length() != 1 || !expected.contains(actual)) {
             throw new TermLabelException("Unexpected token \"" + actual + "\", "
-                + "expected any of: " + expected + "\nin line \"" + line + "\"");
+                    + "expected any of: " + expected + "\nin line \"" + line + "\"");
         }
 
         return actual.charAt(0);
@@ -206,14 +216,17 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     /**
      * Throws an exception if the tokenizer has more tokens.
      *
-     * @param tokenizer the tokenizer.
-     * @param line the current line.
-     * @throws TermLabelException if the tokenizer has more tokens.
+     * @param tokenizer
+     *        the tokenizer.
+     * @param line
+     *        the current line.
+     * @throws TermLabelException
+     *         if the tokenizer has more tokens.
      */
     private void matchEnd(StringTokenizer tokenizer, String line) throws TermLabelException {
         if (tokenizer.hasMoreTokens()) {
             throw new TermLabelException("Unexpected token '" + tokenizer.nextToken() + "', "
-                + "expected: '\"'" + "\nin line \"" + line + "\"");
+                    + "expected: '\"'" + "\nin line \"" + line + "\"");
         }
     }
 }

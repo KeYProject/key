@@ -41,8 +41,10 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
     /**
      * Catch.
      *
-     * @param e a parameter declaration.
-     * @param body a statement.
+     * @param e
+     *        a parameter declaration.
+     * @param body
+     *        a statement.
      */
     public Catch(ParameterDeclaration e, StatementBlock body) {
         super();
@@ -53,7 +55,8 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments, a
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments, a
      *        ParameterDeclaration (declaring the catched exceptions) a StatementBlock (as the
      *        action to do when catching)
      */
@@ -81,33 +84,27 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      */
     public int getChildCount() {
         int result = 0;
-        if (parameter != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (parameter != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (parameter != null) {
-            if (index == 0) {
-                return parameter;
-            }
+            if (index == 0) { return parameter; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -132,9 +129,7 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -158,9 +153,7 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (parameter != null && index == 0) {
-            return parameter;
-        }
+        if (parameter != null && index == 0) { return parameter; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -186,7 +179,8 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnCatch(this);

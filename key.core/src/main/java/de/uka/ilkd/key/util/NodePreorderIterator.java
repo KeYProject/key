@@ -5,6 +5,8 @@ package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Iterates preorder over the whole sub tree of a given {@link Node}.
@@ -32,7 +34,7 @@ public class NodePreorderIterator {
     /**
      * The next element or {@code null} if no more elements exists.
      */
-    private Node next;
+    private @Nullable Node next;
 
     /**
      * The child index of {@link #next} on its parent.
@@ -47,19 +49,16 @@ public class NodePreorderIterator {
     /**
      * Constructor.
      *
-     * @param start The {@link Node} to iterate over its sub tree.
+     * @param start
+     *        The {@link Node} to iterate over its sub tree.
      */
     public NodePreorderIterator(Node start) {
         this.start = start;
         this.next = start;
         this.returnedParents = 0;
-        if (start != null) {
-            Node parent = start.parent();
-            if (parent != null) {
-                this.childIndexOnParent = parent.getChildNr(start);
-            } else {
-                this.childIndexOnParent = -1;
-            }
+        Node parent = start.parent();
+        if (parent != null) {
+            this.childIndexOnParent = parent.getChildNr(start);
         } else {
             this.childIndexOnParent = -1;
         }
@@ -79,7 +78,7 @@ public class NodePreorderIterator {
      *
      * @return The next {@link Node}.
      */
-    public Node next() {
+    public @Nullable Node next() {
         Node oldNext = next;
         updateNext();
         return oldNext;
@@ -127,10 +126,11 @@ public class NodePreorderIterator {
     /**
      * Returns the next element to select if all children of the given {@link Node} are visited.
      *
-     * @param node The visited {@link Node}.
+     * @param node
+     *        The visited {@link Node}.
      * @return The next {@link Node} to visit.
      */
-    protected Node getNextOnParent(Node node) {
+    protected @Nullable Node getNextOnParent(Node node) {
         Node parent = node.parent();
         while (parent != null) {
             boolean nodeFound = false; // Indicates that node was found on the parent.
@@ -146,9 +146,7 @@ public class NodePreorderIterator {
                     childIndexOnParent = i;
                     return nextChildOnParent;
                 }
-                if (nextChildOnParent == node) {
-                    nodeFound = true;
-                }
+                if (nextChildOnParent == node) { nodeFound = true; }
             }
             if (nextChildOnParent != start) {
                 node = parent; // Continue search on parent without recursive call!

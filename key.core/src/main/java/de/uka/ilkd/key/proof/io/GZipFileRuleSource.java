@@ -27,7 +27,8 @@ public class GZipFileRuleSource extends FileRuleSource {
      *
      * This is only instantiated from {@link RuleSourceFactory#initRuleFile(File, boolean)}.
      *
-     * @param ruleFile the file to read from.
+     * @param ruleFile
+     *        the file to read from.
      */
     GZipFileRuleSource(Path ruleFile) {
         super(ruleFile);

@@ -137,20 +137,14 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
                 }
             }
 
-
-            @Nullable
-            private static String findJConsole() {
+            private static @Nullable String findJConsole() {
                 var executableLinux = Paths.get(System.getProperty("java.home"), "bin", "jconsole");
                 var executableWindows =
                     Paths.get(System.getProperty("java.home"), "bin", "jconsole.exe");
 
-                if (Files.exists(executableLinux)) {
-                    return executableLinux.toString();
-                }
+                if (Files.exists(executableLinux)) { return executableLinux.toString(); }
 
-                if (Files.exists(executableWindows)) {
-                    return executableWindows.toString();
-                }
+                if (Files.exists(executableWindows)) { return executableWindows.toString(); }
                 return null;
             }
         }

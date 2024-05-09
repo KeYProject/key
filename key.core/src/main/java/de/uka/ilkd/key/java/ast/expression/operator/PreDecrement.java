@@ -23,7 +23,8 @@ public class PreDecrement extends Assignment {
     /**
      * Pre decrement.
      *
-     * @param children an ExtList with all children of this node
+     * @param children
+     *        an ExtList with all children of this node
      */
 
     public PreDecrement(ExtList children) {
@@ -68,7 +69,8 @@ public class PreDecrement extends Assignment {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnPreDecrement(this);

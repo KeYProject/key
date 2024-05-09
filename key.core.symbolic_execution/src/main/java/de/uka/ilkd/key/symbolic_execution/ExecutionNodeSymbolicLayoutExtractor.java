@@ -21,7 +21,8 @@ public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtracto
     /**
      * Constructor.
      *
-     * @param executionNode The {@link IExecutionNode} to extract memory layouts from.
+     * @param executionNode
+     *        The {@link IExecutionNode} to extract memory layouts from.
      */
     public ExecutionNodeSymbolicLayoutExtractor(IExecutionNode<?> executionNode) {
         super(executionNode.getProofNode(), executionNode.getModalityPIO(),
@@ -38,7 +39,7 @@ public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtracto
     protected String computeInitialStateName() {
         try {
             return SymbolicExecutionUtil.getRoot(executionNode).getName() + " resulting in "
-                + computeCurrentStateName();
+                    + computeCurrentStateName();
         } catch (ProofInputException e) {
             return e.getMessage();
         }

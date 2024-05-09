@@ -109,40 +109,29 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         // focus must be top level succedent
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-            return false;
-        }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) { return false; }
 
         // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) {
-            return false;
-        }
+        if (Transformer.inTransformer(pio)) { return false; }
 
         // instantiation must succeed
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate(pio.subTerm(), goal.proof().getServices());
-        if (inst == null) {
-            return false;
-        }
+        if (inst == null) { return false; }
 
         if (inst.isFirst()) {
             // additional checks for method calls.
             // currently only applicable to strictly pure methods
-            if (!inst.getFirst().pm.isModel() || inst.getFirst().pm.getStateCount() > 1) {
-                return false;
-            }
+            if (!inst.getFirst().pm.isModel() || inst.getFirst().pm.getStateCount() > 1) { return false; }
 
-            if (!(inst.getFirst().actualResult instanceof ProgramVariable)) {
-                return false;
-            }
+            if (!(inst.getFirst().actualResult instanceof ProgramVariable)) { return false; }
         }
 
         return true;
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate(ruleApp.posInOccurrence().subTerm(), services);
         assert inst != null : "If isApplicable has been checked, this must not be null";
@@ -283,13 +272,9 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             args[idx++] = services.getTermBuilder().getBaseHeap();
         }
 
-        if (!op.isStatic()) {
-            args[idx++] = receiver;
-        }
+        if (!op.isStatic()) { args[idx++] = receiver; }
 
-        for (int i = 0; i < methodArgs.size(); i++) {
-            args[idx++] = methodArgs.get(i);
-        }
+        for (int i = 0; i < methodArgs.size(); i++) { args[idx++] = methodArgs.get(i); }
 
         return services.getTermFactory().createTerm(op, args);
     }
@@ -333,34 +318,24 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (!(mainFml.op() instanceof Modality)) {
-            return null;
-        }
+        if (!(mainFml.op() instanceof Modality)) { return null; }
         result.modality = mainFml;
 
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
-        if (!(activeStatement instanceof CopyAssignment ca)) {
-            return null;
-        }
+        if (!(activeStatement instanceof CopyAssignment ca)) { return null; }
 
         final Expression lhs = ca.getExpressionAt(0);
         final Expression rhs = ca.getExpressionAt(1);
 
-        if (!(lhs instanceof LocationVariable)) {
-            return null;
-        }
+        if (!(lhs instanceof LocationVariable)) { return null; }
         result.assignmentTarget = (LocationVariable) lhs;
 
-        if (!(rhs instanceof FieldReference)) {
-            return null;
-        }
+        if (!(rhs instanceof FieldReference)) { return null; }
         result.fieldReference = (FieldReference) rhs;
         result.modelField = result.fieldReference.getProgramVariable();
 
-        if (!result.modelField.isModel()) {
-            return null;
-        }
+        if (!result.modelField.isModel()) { return null; }
 
         // find receiver term
         final ExecutionContext ec =
@@ -393,9 +368,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     private static Union<Instantiation, ModelFieldInstantiation> instantiate(Term focusTerm,
             Services services) {
         // result cached?
-        if (focusTerm == lastFocusTerm) {
-            return lastInstantiation;
-        }
+        if (focusTerm == lastFocusTerm) { return lastInstantiation; }
 
         // compute
         Instantiation inst = UseOperationContractRule.computeInstantiation(focusTerm, services);

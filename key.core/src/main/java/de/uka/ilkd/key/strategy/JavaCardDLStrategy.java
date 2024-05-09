@@ -143,9 +143,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         case StrategyProperties.QUERY_ON -> queryF =
             querySpecFeature(new QueryExpandCost(200, 1, 1, false));
         case StrategyProperties.QUERY_RESTRICTED ->
-            // All tests in the example directory pass with this strategy.
-            // Hence, the old query_on strategy is obsolete.
-            queryF = querySpecFeature(new QueryExpandCost(500, 0, 1, true));
+                // All tests in the example directory pass with this strategy.
+                // Hence, the old query_on strategy is obsolete.
+                queryF = querySpecFeature(new QueryExpandCost(500, 0, 1, true));
         case StrategyProperties.QUERY_OFF -> queryF = querySpecFeature(inftyConst());
         default -> {
             queryF = null;
@@ -386,12 +386,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         switch (methProp) {
         case StrategyProperties.METHOD_CONTRACT ->
-            /*
-             * If method treatment by contracts is chosen, this does not mean that method expansion
-             * is disabled. The original cost was 200 and is now increased to 2000 in order to
-             * repress method expansion stronger when method treatment by contracts is chosen.
-             */
-            bindRuleSet(d, "method_expand", longConst(2000));
+                /*
+                 * If method treatment by contracts is chosen, this does not mean that method expansion
+                 * is disabled. The original cost was 200 and is now increased to 2000 in order to
+                 * repress method expansion stronger when method treatment by contracts is chosen.
+                 */
+                bindRuleSet(d, "method_expand", longConst(2000));
         case StrategyProperties.METHOD_EXPAND -> bindRuleSet(d, "method_expand", longConst(100));
         case StrategyProperties.METHOD_NONE -> bindRuleSet(d, "method_expand", inftyConst());
         default -> throw new RuntimeException("Unexpected strategy property " + methProp);
@@ -401,11 +401,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         switch (mpsProp) {
         case StrategyProperties.MPS_MERGE ->
-            /*
-             * For this case, we use a special feature, since deleting merge points should only be
-             * done after a merge rule application.
-             */
-            bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
+                /*
+                 * For this case, we use a special feature, since deleting merge points should only be
+                 * done after a merge rule application.
+                 */
+                bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
         case StrategyProperties.MPS_SKIP -> bindRuleSet(d, "merge_point", longConst(-5000));
         case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
         default -> throw new RuntimeException("Unexpected strategy property " + methProp);
@@ -773,9 +773,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private Feature allowSplitting(ProjectionToTerm focus) {
-        if (normalSplitting()) {
-            return longConst(0);
-        }
+        if (normalSplitting()) { return longConst(0); }
         if (StrategyProperties.SPLITTING_DELAYED
                 .equals(strategyProperties.getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY))) {
             return or(applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS),
@@ -1546,9 +1544,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSquaresAreNonNegative(d);
 
-        if (arithNonLinInferences()) {
-            setupInEqCaseDistinctions(d);
-        }
+        if (arithNonLinInferences()) { setupInEqCaseDistinctions(d); }
     }
 
     // For taclets that need instantiation, but where the instantiation is
@@ -1880,9 +1876,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
 
-        if (arithNonLinInferences()) {
-            setupMultiplyInequations(d, inftyConst());
-        }
+        if (arithNonLinInferences()) { setupMultiplyInequations(d, inftyConst()); }
 
         // these taclets are not supposed to be applied with metavariable
         // instantiations
@@ -1905,9 +1899,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "defOps_div", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "defOps_jdiv", NonDuplicateAppModPositionFeature.INSTANCE);
 
-        if (arithNonLinInferences()) {
-            setupInEqCaseDistinctionsApproval(d);
-        }
+        if (arithNonLinInferences()) { setupInEqCaseDistinctionsApproval(d); }
 
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
@@ -2041,10 +2033,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
      *
-     * @param app rule application
-     * @param pio corresponding {@link PosInOccurrence}
-     * @param goal corresponding goal
-     * @param mState the {@link MutableState} to query for information like current value of
+     * @param app
+     *        rule application
+     * @param pio
+     *        corresponding {@link PosInOccurrence}
+     * @param goal
+     *        corresponding goal
+     * @param mState
+     *        the {@link MutableState} to query for information like current value of
      *        {@link TermBuffer}s or
      *        {@link de.uka.ilkd.key.strategy.feature.instantiator.ChoicePoint}s
      * @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
@@ -2066,9 +2062,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * Re-Evaluate a <code>RuleApp</code>. This method is called immediately before a rule is really
      * applied
      *
-     * @param app the rule application
-     * @param pio the position in occurrence
-     * @param goal the goal
+     * @param app
+     *        the rule application
+     * @param pio
+     *        the position in occurrence
+     * @param goal
+     *        the goal
      * @return true iff the rule should be applied, false otherwise
      */
     @Override

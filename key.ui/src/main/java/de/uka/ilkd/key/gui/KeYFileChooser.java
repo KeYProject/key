@@ -125,9 +125,7 @@ public final class KeYFileChooser extends JFileChooser {
     @Override
     public void approveSelection() {
         File file = getSelectedFile();
-        if (saveDialog && file.exists() && showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
-            return;
-        }
+        if (saveDialog && file.exists() && showOverwriteDialog(file) != JOptionPane.YES_OPTION) { return; }
         super.approveSelection();
     }
 
@@ -135,17 +133,11 @@ public final class KeYFileChooser extends JFileChooser {
         File selFile = getSelectedFile();
 
         if (selFile == null) {
-            if (getCurrentDirectory() == null) {
-                setCurrentDirectory(HOME_DIR);
-            }
+            if (getCurrentDirectory() == null) { setCurrentDirectory(HOME_DIR); }
         } else if (selFile.isFile()) { // present & not dir.
             String filename = selFile.getAbsolutePath();
-            if (!filename.endsWith(".proof")) {
-                setSelectedFile(new File(filename + ".proof"));
-            }
-        } else if (selFile.isDirectory()) {
-            setCurrentDirectory(selFile);
-        }
+            if (!filename.endsWith(".proof")) { setSelectedFile(new File(filename + ".proof")); }
+        } else if (selFile.isDirectory()) { setCurrentDirectory(selFile); }
     }
 
     @Override
@@ -170,10 +162,13 @@ public final class KeYFileChooser extends JFileChooser {
     /**
      * Show a file dialog for saving a file. The dialog will provide a naming suggestion.
      *
-     * @param parent the main window
-     * @param originalFile the original file to be saved, if it exists and is a proof, this will be
+     * @param parent
+     *        the main window
+     * @param originalFile
+     *        the original file to be saved, if it exists and is a proof, this will be
      *        the suggestion
-     * @param extension the desired file name extension (usually ".proof")
+     * @param extension
+     *        the desired file name extension (usually ".proof")
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
     public int showSaveDialog(Component parent, File originalFile, String extension) {
@@ -221,8 +216,10 @@ public final class KeYFileChooser extends JFileChooser {
     /**
      * Shows the dialog with the given file/directory as currently selected.
      *
-     * @param parent the Component the dialog is over
-     * @param selectedFile the file or directory that shall be currently selected
+     * @param parent
+     *        the Component the dialog is over
+     * @param selectedFile
+     *        the file or directory that shall be currently selected
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
     public int showSaveDialog(Component parent, File selectedFile) {
@@ -236,15 +233,11 @@ public final class KeYFileChooser extends JFileChooser {
             }
         }
 
-        if (resetFile == null) {
-            resetFile = getCurrentDirectory();
-        }
+        if (resetFile == null) { resetFile = getCurrentDirectory(); }
 
         setSaveDialog(true);
         int result = super.showSaveDialog(parent);
-        if (result != APPROVE_OPTION) {
-            resetPath();
-        }
+        if (result != APPROVE_OPTION) { resetPath(); }
         return result;
     }
 
@@ -295,7 +288,8 @@ public final class KeYFileChooser extends JFileChooser {
      * The chooser is created lazily when first requested. It points to the directory of the command
      * line argument (if present), otherwise to the user's home directory.
      *
-     * @param title the title of the key file chooser
+     * @param title
+     *        the title of the key file chooser
      *
      * @return the key file chooser
      */

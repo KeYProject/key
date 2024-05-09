@@ -36,9 +36,7 @@ public final class IsThisReference extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
             Services services) {
-        if (var != this.var) {
-            return true;
-        }
+        if (var != this.var) { return true; }
         // boolean isThisRef = instMap.getInstantiation(var) instanceof ThisReference;
         boolean isThisRef = instCandidate instanceof ThisReference;
         return negated != isThisRef;

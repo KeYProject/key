@@ -35,7 +35,8 @@ public class InfFlowSpec {
     /**
      * Applies a unary operator to every list of terms in this InfFlow specification element.
      *
-     * @param op the operator to apply.
+     * @param op
+     *        the operator to apply.
      * @return this InfFlow specification element with the operator applied.
      */
     public InfFlowSpec map(UnaryOperator<Term> op) {

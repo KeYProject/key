@@ -56,16 +56,12 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             throw new ScriptException("One of 'var' or 'formula' must be specified");
         }
 
-        if (params.var != null) {
-            computeFormula(params, goal);
-        }
+        if (params.var != null) { computeFormula(params, goal); }
 
         assert params.formula != null;
 
         TacletApp theApp = findTacletApp(params, state);
-        if (theApp == null) {
-            throw new ScriptException("No taclet application found");
-        }
+        if (theApp == null) { throw new ScriptException("No taclet application found"); }
 
         SchemaVariable sv = theApp.uninstantiatedVars().iterator().next();
 
@@ -82,9 +78,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         TacletApp matchingApp = filterList(p, allApps);
 
-        if (matchingApp == null) {
-            throw new ScriptException("No matching applications.");
-        }
+        if (matchingApp == null) { throw new ScriptException("No matching applications."); }
 
         return matchingApp;
     }
@@ -111,18 +105,14 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) {
-                continue;
-            }
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) { continue; }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) {
-                continue;
-            }
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) { continue; }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
         }
@@ -137,9 +127,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,
-                    RENAMING_PROPERTY)) {
-                    return pta;
-                }
+                    RENAMING_PROPERTY)) { return pta; }
             }
         }
         return null;
@@ -184,9 +172,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     }
 
     private Term stripUpdates(Term term) {
-        while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
-            term = term.sub(1);
-        }
+        while (term.op() == UpdateApplication.UPDATE_APPLICATION) { term = term.sub(1); }
         return term;
     }
 

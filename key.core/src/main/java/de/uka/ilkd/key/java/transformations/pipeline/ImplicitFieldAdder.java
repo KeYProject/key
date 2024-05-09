@@ -51,7 +51,8 @@ public class ImplicitFieldAdder extends JavaTransformer {
      * <code>&lt;initialized&gt;</code> and
      * <code>&lt;nextToCreate&gt;</code> etc.
      *
-     * @param services the CrossReferenceServiceConfiguration to access
+     * @param services
+     *        the CrossReferenceServiceConfiguration to access
      *        model information
      */
     public ImplicitFieldAdder(TransformationPipelineServices services) {
@@ -61,9 +62,12 @@ public class ImplicitFieldAdder extends JavaTransformer {
     /**
      * creates an implicit field of the given type and name
      *
-     * @param typeName the name of the type of the new field to create
-     * @param fieldName the name of the field
-     * @param isStatic a boolean that is true if the field has to be
+     * @param typeName
+     *        the name of the type of the new field to create
+     * @param fieldName
+     *        the name of the field
+     * @param isStatic
+     *        a boolean that is true if the field has to be
      *        created as static (class) field
      * @return the new created field declaration
      */
@@ -75,18 +79,14 @@ public class ImplicitFieldAdder extends JavaTransformer {
     public static FieldDeclaration createImplicitField(
             Type type, String fieldName, boolean isStatic, boolean isPrivate, boolean isFinal) {
         NodeList<Modifier> modifiers = new NodeList<>();
-        if (isStatic) {
-            modifiers.add(new Modifier(Modifier.Keyword.STATIC));
-        }
+        if (isStatic) { modifiers.add(new Modifier(Modifier.Keyword.STATIC)); }
         if (isPrivate) {
             modifiers.add(new Modifier(Modifier.Keyword.PRIVATE));
         } else {
             modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
         }
 
-        if (isFinal) {
-            modifiers.add(new Modifier(Modifier.Keyword.FINAL));
-        }
+        if (isFinal) { modifiers.add(new Modifier(Modifier.Keyword.FINAL)); }
 
         VariableDeclarator variable = new VariableDeclarator(type, fieldName);
         FieldDeclaration fd = new FieldDeclaration(modifiers, variable);
@@ -116,7 +116,8 @@ public class ImplicitFieldAdder extends JavaTransformer {
     /**
      * adds implicit fields to the given type declaration
      *
-     * @param td the recoder.java.TypeDeclaration to be enriched with
+     * @param td
+     *        the recoder.java.TypeDeclaration to be enriched with
      *        implicit fields
      */
     private void addImplicitFields(TypeDeclaration<?> td) {

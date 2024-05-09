@@ -32,15 +32,11 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
     @Override
     public void execute(Parameters args) throws ScriptException, InterruptedException {
 
-        if (args.type == null || args.var == null) {
-            throw new ScriptException("Missing argument: type var");
-        }
+        if (args.type == null || args.var == null) { throw new ScriptException("Missing argument: type var"); }
 
         AbbrevMap abbrMap = state.getAbbreviations();
 
-        if (!args.var.matches("@[a-zA-Z0-9_]")) {
-            throw new ScriptException("Illegal variable name: " + args.var);
-        }
+        if (!args.var.matches("@[a-zA-Z0-9_]")) { throw new ScriptException("Illegal variable name: " + args.var); }
 
         Name schemaVar = new Name("_SCHEMA_" + args.var.substring(1));
 

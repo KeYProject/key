@@ -103,7 +103,8 @@ public class NodeInfo {
      * Copies {@link #interactiveApplication}, {@link #scriptingApplication},
      * {@link #uselessApplication} and {@link #notes}.
      *
-     * @param node a proof node
+     * @param node
+     *        a proof node
      */
     public void copyFrom(Node node) {
         interactiveApplication = node.getNodeInfo().interactiveApplication;
@@ -117,9 +118,7 @@ public class NodeInfo {
      * determines the first and active statement if the applied taclet worked on a modality
      */
     private void determineFirstAndActiveStatement() {
-        if (determinedFstAndActiveStatement) {
-            return;
-        }
+        if (determinedFstAndActiveStatement) { return; }
         final RuleApp ruleApp = node.getAppliedRuleApp();
         if (ruleApp instanceof PosTacletApp) {
             firstStatement = computeFirstStatement(ruleApp);
@@ -138,7 +137,8 @@ public class NodeInfo {
      * the symbolic execution tree extraction.
      * </p>
      *
-     * @param ruleApp The given {@link RuleApp}.
+     * @param ruleApp
+     *        The given {@link RuleApp}.
      * @return The active statement or {@code null} if no one is provided.
      */
     public static SourceElement computeActiveStatement(RuleApp ruleApp) {
@@ -155,21 +155,18 @@ public class NodeInfo {
      * the symbolic execution tree extraction.
      * </p>
      *
-     * @param ruleApp The given {@link RuleApp}.
+     * @param ruleApp
+     *        The given {@link RuleApp}.
      * @return The first statement or {@code null} if no one is provided.
      */
     public static SourceElement computeFirstStatement(RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
         if (ruleApp instanceof PosTacletApp pta) {
-            if (!isSymbolicExecution(pta.taclet())) {
-                return null;
-            }
+            if (!isSymbolicExecution(pta.taclet())) { return null; }
             Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
-            if (pe != null) {
-                firstStatement = pe.getFirstElement();
-            }
+            if (pe != null) { firstStatement = pe.getFirstElement(); }
         }
         return firstStatement;
     }
@@ -183,7 +180,8 @@ public class NodeInfo {
      * the symbolic execution tree extraction.
      * </p>
      *
-     * @param firstStatement The given {@link SourceElement}.
+     * @param firstStatement
+     *        The given {@link SourceElement}.
      * @return The active statement or {@code null} if no one is provided.
      */
     public static SourceElement computeActiveStatement(SourceElement firstStatement) {
@@ -210,7 +208,8 @@ public class NodeInfo {
     /**
      * Checks if a rule is applied on the given {@link Node} which performs symbolic execution.
      *
-     * @param node The {@link Node} to check.
+     * @param node
+     *        The {@link Node} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
     public static boolean isSymbolicExecutionRuleApplied(Node node) {
@@ -224,7 +223,8 @@ public class NodeInfo {
     /**
      * Checks if the given {@link RuleApp} performs symbolic execution.
      *
-     * @param app The {@link RuleApp} to check.
+     * @param app
+     *        The {@link RuleApp} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
     public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
@@ -240,9 +240,7 @@ public class NodeInfo {
         while (!list.isEmpty()) {
             rs = list.head();
             Name name = rs.name();
-            if (symbolicExecNames.contains(name)) {
-                return true;
-            }
+            if (symbolicExecNames.contains(name)) { return true; }
             list = list.tail();
         }
         return false;
@@ -287,9 +285,7 @@ public class NodeInfo {
     public String getFirstStatementString() {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
-            if (firstStatementString == null) {
-                firstStatementString = String.valueOf(firstStatement);
-            }
+            if (firstStatementString == null) { firstStatementString = String.valueOf(firstStatement); }
             firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }
@@ -300,16 +296,13 @@ public class NodeInfo {
      * sets the branch label of a node. Schema variables occurring in string <tt>s</tt> are replaced
      * by their instantiations if possible
      *
-     * @param s the String to be set
+     * @param s
+     *        the String to be set
      */
     public void setBranchLabel(String s) {
         determineFirstAndActiveStatement();
-        if (s == null) {
-            return;
-        }
-        if (node.parent() == null) {
-            return;
-        }
+        if (s == null) { return; }
+        if (node.parent() == null) { return; }
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp tacletApp) {
             Pattern p = Pattern.compile("#\\w+");
@@ -367,7 +360,8 @@ public class NodeInfo {
     /**
      * parameter indicated if the rule has been applied interactively or not
      *
-     * @param b a boolean indicating interactive application
+     * @param b
+     *        a boolean indicating interactive application
      */
     public void setInteractiveRuleApplication(boolean b) {
         interactiveApplication = b;
@@ -376,7 +370,8 @@ public class NodeInfo {
     /**
      * parameter indicated if the rule has been applied by a proof script or not
      *
-     * @param b a boolean indicating scripting application
+     * @param b
+     *        a boolean indicating scripting application
      */
     public void setScriptRuleApplication(boolean b) {
         scriptingApplication = b;
@@ -404,14 +399,13 @@ public class NodeInfo {
     /**
      * Add user-provided plain-text annotations.
      *
-     * @param newNotes annotations as described above
+     * @param newNotes
+     *        annotations as described above
      */
     public void setNotes(String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
-        if (!Objects.equals(oldNotes, newNotes)) {
-            node.proof().fireNotesChanged(node);
-        }
+        if (!Objects.equals(oldNotes, newNotes)) { node.proof().fireNotesChanged(node); }
     }
 
     /**
@@ -441,7 +435,8 @@ public class NodeInfo {
     /**
      * Mark this node as useless or useful.
      *
-     * @param uselessApplication whether this node should be marked as useless
+     * @param uselessApplication
+     *        whether this node should be marked as useless
      */
     public void setUselessApplication(boolean uselessApplication) {
         this.uselessApplication = uselessApplication;

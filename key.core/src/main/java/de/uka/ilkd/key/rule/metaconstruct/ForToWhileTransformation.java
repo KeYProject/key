@@ -49,31 +49,23 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
         if (replaceBreakWithNoLabel == 0) {
             // most outer for loop
 
-            if (changeList.getFirst() == CHANGED) {
-                changeList.removeFirst();
-            }
+            if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
 
             ILoopInit inits = null;
             IForUpdates updates = null;
             Statement body = null;
 
-            if (changeList.get(0) instanceof ILoopInit) {
-                inits = (ILoopInit) changeList.removeFirst();
-            }
+            if (changeList.get(0) instanceof ILoopInit) { inits = (ILoopInit) changeList.removeFirst(); }
 
             Guard guard;
             if (x.getGuard() != null) {
                 guard = (Guard) changeList.removeFirst();
-                if (guard.getExpression() == null) {
-                    guard = KeYJavaASTFactory.trueGuard();
-                }
+                if (guard.getExpression() == null) { guard = KeYJavaASTFactory.trueGuard(); }
             } else {
                 guard = KeYJavaASTFactory.trueGuard();
             }
 
-            if (changeList.get(0) instanceof IForUpdates) {
-                updates = (IForUpdates) changeList.removeFirst();
-            }
+            if (changeList.get(0) instanceof IForUpdates) { updates = (IForUpdates) changeList.removeFirst(); }
 
             body = (Statement) changeList.removeFirst();
 

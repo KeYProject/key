@@ -51,35 +51,27 @@ public class SchematicFieldReference extends FieldReference
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) {
-            result++;
-        }
-        if (schemaVariable != null) {
-            result++;
-        }
+        if (prefix != null) { result++; }
+        if (schemaVariable != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) {
-                return prefix;
-            }
+            if (index == 0) { return prefix; }
             index--;
         }
-        if (schemaVariable != null) {
-            if (index == 0) {
-                return (ProgramSV) schemaVariable;
-            }
-        }
+        if (schemaVariable != null) { if (index == 0) { return (ProgramSV) schemaVariable; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -107,28 +99,28 @@ public class SchematicFieldReference extends FieldReference
      * Return the type reference at the specified index in this node's "virtual" type reference
      * array.
      *
-     * @param index an index for a type reference.
+     * @param index
+     *        an index for a type reference.
      * @return the type reference with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference) prefix;
-        }
+        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
      * Return the expression at the specified index in this node's "virtual" expression array.
      *
-     * @param index an index for an expression.
+     * @param index
+     *        an index for an expression.
      * @return the expression with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression && index == 0) {
-            return (Expression) prefix;
-        }
+        if (prefix instanceof Expression && index == 0) { return (Expression) prefix; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -150,7 +142,8 @@ public class SchematicFieldReference extends FieldReference
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnSchematicFieldReference(this);
@@ -159,17 +152,13 @@ public class SchematicFieldReference extends FieldReference
 
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         ProgramElement src = source.getSource();
-        if (!(src instanceof FieldReference)) {
-            return null;
-        }
+        if (!(src instanceof FieldReference)) { return null; }
 
         final SourceData newSource = new SourceData(src, 0, source.getServices());
 
         matchCond = super.matchChildren(newSource, matchCond, 0);
 
-        if (matchCond == null) {
-            return null;
-        }
+        if (matchCond == null) { return null; }
         source.next();
         return matchCond;
     }

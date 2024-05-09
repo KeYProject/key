@@ -36,9 +36,12 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     /**
      * Creates a new {@link AbstractHitCountBreakpoint}.
      *
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-     * @param proof the {@link Proof} that will be executed and should stop
-     * @param enabled flag if the Breakpoint is enabled
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
+     * @param enabled
+     *        flag if the Breakpoint is enabled
      */
     public AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled) {
         super(proof, enabled);
@@ -92,7 +95,8 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     /**
      * Set the hitCount to the new value
      *
-     * @param hitCount the new value
+     * @param hitCount
+     *        the new value
      */
     public void setHitCount(int hitCount) {
         if (this.hitCount != hitCount) {

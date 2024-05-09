@@ -35,7 +35,8 @@ public class Default extends BranchImp {
     /**
      * Default.
      *
-     * @param body a statement array.
+     * @param body
+     *        a statement array.
      */
 
     public Default(Statement[] body) {
@@ -45,7 +46,8 @@ public class Default extends BranchImp {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments,
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments,
      *        several of Statement (as the statements for Default)
      */
     public Default(ExtList children) {
@@ -65,26 +67,24 @@ public class Default extends BranchImp {
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result += body.size();
-        }
+        if (body != null) { result += body.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
         if (body != null) {
             len = body.size();
-            if (len > index) {
-                return body.get(index);
-            }
+            if (len > index) { return body.get(index); }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -108,9 +108,7 @@ public class Default extends BranchImp {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null) {
-            return body.get(index);
-        }
+        if (body != null) { return body.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -126,7 +124,8 @@ public class Default extends BranchImp {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnDefault(this);

@@ -48,6 +48,13 @@ import org.slf4j.LoggerFactory;
  * Responsible for program variable naming issues.
  */
 public abstract class VariableNamer implements InstantiationProposer {
+    /**
+     * Separator used for {@link TempIndProgramElementName} instances.
+     * This will separate the name and the index of the "temporary"
+     * program element name.
+     */
+    public static final char TEMP_INDEX_SEPARATOR = '#';
+
     private static final Logger LOGGER = LoggerFactory.getLogger(VariableNamer.class);
 
     // -------------------------------------------------------------------------
@@ -88,7 +95,8 @@ public abstract class VariableNamer implements InstantiationProposer {
     // -------------------------------------------------------------------------
 
     /**
-     * @param services pointer to services object
+     * @param services
+     *        pointer to services object
      */
     public VariableNamer(Services services) {
         this.services = services;
@@ -129,14 +137,10 @@ public abstract class VariableNamer implements InstantiationProposer {
      * returns the subterm containing a java block, or null (helper for getProgramFromPIO())
      */
     private Term findProgramInTerm(Term term) {
-        if (!term.javaBlock().isEmpty()) {
-            return term;
-        }
+        if (!term.javaBlock().isEmpty()) { return term; }
         for (int i = 0; i < term.arity(); i++) {
             Term subterm = findProgramInTerm(term.sub(i));
-            if (subterm != null) {
-                return subterm;
-            }
+            if (subterm != null) { return subterm; }
         }
         return null;
     }
@@ -178,9 +182,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         for (ProgramElementName name : globals) {
             BasenameAndIndex bai = getBasenameAndIndex(name);
-            if (bai.basename.equals(basename) && bai.index > result) {
-                result = bai.index;
-            }
+            if (bai.basename.equals(basename) && bai.index > result) { result = bai.index; }
         }
 
         return result;
@@ -206,9 +208,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                     ProgramElementName name = var.getProgramElementName();
                     if (!(name instanceof TempIndProgramElementName)) {
                         BasenameAndIndex bai = getBasenameAndIndex(name);
-                        if (bai.basename.equals(basename) && bai.index > maxCounter) {
-                            maxCounter = bai.index;
-                        }
+                        if (bai.basename.equals(basename) && bai.index > maxCounter) { maxCounter = bai.index; }
                     }
                 }
             }
@@ -231,11 +231,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * tells whether a name is unique in the passed list of global variables
      */
     protected boolean isUniqueInGlobals(String name, Iterable<ProgramElementName> globals) {
-        for (ProgramElementName n : globals) {
-            if (n.toString().equals(name)) {
-                return false;
-            }
-        }
+        for (ProgramElementName n : globals) { if (n.toString().equals(name)) { return false; } }
         return true;
     }
 
@@ -256,9 +252,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             protected void doAction(ProgramElement node) {
                 if (node instanceof ProgramVariable var) {
                     ProgramElementName varname = var.getProgramElementName();
-                    if (varname.getProgramName().equals(nameToFind)) {
-                        foundIt = true;
-                    }
+                    if (varname.getProgramName().equals(nameToFind)) { foundIt = true; }
                 }
             }
         }
@@ -281,9 +275,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected Iterable<ProgramElementName> wrapGlobals(Iterable<? extends Named> globals) {
         List<ProgramElementName> result = new ArrayList<>();
-        for (Named named : globals) {
-            result.add((ProgramElementName) named.name());
-        }
+        for (Named named : globals) { result.add((ProgramElementName) named.name()); }
         return result;
     }
 
@@ -296,9 +288,12 @@ public abstract class VariableNamer implements InstantiationProposer {
      * conflicts between the new variable and other global variables by renaming the new variable
      * and / or other variables
      *
-     * @param var the new program variable
-     * @param goal the goal
-     * @param posOfFind the PosInOccurrence of the currently executed program
+     * @param var
+     *        the new program variable
+     * @param goal
+     *        the goal
+     * @param posOfFind
+     *        the PosInOccurrence of the currently executed program
      * @return the renamed version of the var parameter
      */
     public abstract ProgramVariable rename(ProgramVariable var, Goal goal,
@@ -337,12 +332,17 @@ public abstract class VariableNamer implements InstantiationProposer {
      * proposes a unique name for the instantiation of a schema variable (like getProposal(), but
      * somewhat less nicely)
      *
-     * @param basename desired base name, or null to use default
-     * @param sv the schema variable
-     * @param posOfFind the PosInOccurrence containing the name's target program
-     * @param posOfDeclaration the PosInProgram where the name will be declared (or null to just be
+     * @param basename
+     *        desired base name, or null to use default
+     * @param sv
+     *        the schema variable
+     * @param posOfFind
+     *        the PosInOccurrence containing the name's target program
+     * @param posOfDeclaration
+     *        the PosInProgram where the name will be declared (or null to just be
      *        pessimistic about the scope)
-     * @param previousProposals list of names which should be considered taken, or null
+     * @param previousProposals
+     *        list of names which should be considered taken, or null
      * @return the name proposal, or null if no proposal is available
      */
     protected ProgramElementName getNameProposalForSchemaVariable(String basename,
@@ -353,9 +353,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         if (sv instanceof ProgramSV psv) {
             Sort svSort = psv.sort();
             if (svSort == ProgramSVSort.VARIABLE) {
-                if (basename == null || basename.isEmpty()) {
-                    basename = DEFAULT_BASENAME;
-                }
+                if (basename == null || basename.isEmpty()) { basename = DEFAULT_BASENAME; }
                 int cnt =
                     getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
                             + 1;
@@ -399,13 +397,12 @@ public abstract class VariableNamer implements InstantiationProposer {
      * proposes a unique name; intended for use in places where the information required by
      * getProposal() is not available
      *
-     * @param basename desired base name, or null to use default
+     * @param basename
+     *        desired base name, or null to use default
      * @return the name proposal
      */
     public ProgramElementName getTemporaryNameProposal(String basename) {
-        if (basename == null || basename.isEmpty()) {
-            basename = DEFAULT_BASENAME;
-        }
+        if (basename == null || basename.isEmpty()) { basename = DEFAULT_BASENAME; }
         int cnt = services.getCounter(TEMPCOUNTER_NAME).getCountPlusPlus();
         // using null as undo anchor should be okay, since the name which the
         // the counter is used for is only temporary and will be changed
@@ -418,11 +415,16 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * proposes a unique name for the instantiation of a schema variable
      *
-     * @param app the taclet app
-     * @param var the schema variable to be instantiated
-     * @param services not used
-     * @param undoAnchor not used
-     * @param previousProposals list of names which should be considered taken, or null
+     * @param app
+     *        the taclet app
+     * @param var
+     *        the schema variable to be instantiated
+     * @param services
+     *        not used
+     * @param undoAnchor
+     *        not used
+     * @param previousProposals
+     *        list of names which should be considered taken, or null
      * @return the name proposal, or null if no proposal is available
      */
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
@@ -471,10 +473,14 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * tells whether a name for instantiating a schema variable is unique within its scope
      *
-     * @param name the name to be checked
-     * @param sv the schema variable
-     * @param posOfFind the PosInOccurrence of the name's target program
-     * @param posOfDeclaration the PosInProgram where the name will be declared
+     * @param name
+     *        the name to be checked
+     * @param sv
+     *        the schema variable
+     * @param posOfFind
+     *        the PosInOccurrence of the name's target program
+     * @param posOfDeclaration
+     *        the PosInProgram where the name will be declared
      * @return true if the name is unique or if its uniqueness cannot be checked, else false
      */
     public boolean isUniqueNameForSchemaVariable(String name, SchemaVariable sv,
@@ -500,16 +506,19 @@ public abstract class VariableNamer implements InstantiationProposer {
      * the name unique - if that is necessary, use either getTemporaryNameProposal() or
      * getProposal())
      *
-     * @param name the name as a string
-     * @param creationInfo optional name creation info the name should carry
-     * @param comments any comments the name should carry
+     * @param name
+     *        the name as a string
+     * @param creationInfo
+     *        optional name creation info the name should carry
+     * @param comments
+     *        any comments the name should carry
      * @return the name as a ProgramElementName
      */
     public static ProgramElementName parseName(String name, NameCreationInfo creationInfo,
             Comment[] comments) {
         ProgramElementName result;
 
-        int sepPos = name.lastIndexOf(TempIndProgramElementName.SEPARATOR);
+        int sepPos = name.lastIndexOf(TEMP_INDEX_SEPARATOR);
         if (sepPos > 0) {
             String basename = name.substring(0, sepPos);
             int index = Integer.parseInt(name.substring(sepPos + 1));
@@ -563,9 +572,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     public String getSuggestiveNameProposalForProgramVariable(SchemaVariable sv, TacletApp app,
             Services services, ImmutableList<String> previousProposals) {
 
-        if (suggestive_off) {
-            return getProposal(app, sv, services, null, previousProposals);
-        }
+        if (suggestive_off) { return getProposal(app, sv, services, null, previousProposals); }
 
         String proposal;
         try {
@@ -596,9 +603,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                 }
 
             }
-            if ("".equals(name)) {
-                throw new Exception();
-            }
+            if ("".equals(name)) { throw new Exception(); }
             proposal = "[" + name + "]";
         } catch (Exception e) {
             LOGGER.info("", e);
@@ -609,9 +614,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     public String getSuggestiveNameProposalForSchemaVariable(Expression e) {
-        if (suggestive_off) {
-            return getTemporaryNameProposal(DEFAULT_BASENAME).toString();
-        }
+        if (suggestive_off) { return getTemporaryNameProposal(DEFAULT_BASENAME).toString(); }
         return "[" + ProofSaver.printProgramElement(e) + "]";
     }
 
@@ -665,15 +668,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      * temporary indexed ProgramElementName
      */
     private static class TempIndProgramElementName extends IndProgramElementName {
-        static final char SEPARATOR = '#';
-
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
-            super(basename + SEPARATOR + index, basename, index, creationInfo);
+            super(basename + TEMP_INDEX_SEPARATOR + index, basename, index, creationInfo);
         }
 
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo,
                 Comment[] comments) {
-            super(basename + SEPARATOR + index, basename, index, creationInfo, comments);
+            super(basename + TEMP_INDEX_SEPARATOR + index, basename, index, creationInfo,
+                comments);
         }
     }
 
@@ -706,9 +708,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         CustomJavaASTWalker(ProgramElement program, PosInProgram posOfDeclaration) {
             super(program);
-            if (posOfDeclaration != null) {
-                declarationNode = PosInProgram.getProgramAt(posOfDeclaration, program);
-            }
+            if (posOfDeclaration != null) { declarationNode = PosInProgram.getProgramAt(posOfDeclaration, program); }
         }
 
         protected void walk(ProgramElement node) {
@@ -722,9 +722,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                 currentScopeDepth = depth();
             } else if (node == declarationNode) {
                 declarationScopeDepth = currentScopeDepth;
-            } else if (depth() <= declarationScopeDepth) {
-                return;
-            }
+            } else if (depth() <= declarationScopeDepth) { return; }
 
             super.walk(node);
         }
@@ -740,9 +738,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
     public static Name getBasename(Name name) {
-        if (name instanceof IndProgramElementName) {
-            return new Name(((IndProgramElementName) name).getBaseName());
-        }
+        if (name instanceof IndProgramElementName) { return new Name(((IndProgramElementName) name).getBaseName()); }
         return name;
     }
 }

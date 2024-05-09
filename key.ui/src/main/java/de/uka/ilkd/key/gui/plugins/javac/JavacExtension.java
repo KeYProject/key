@@ -169,7 +169,8 @@ public class JavacExtension
     /**
      * Set the label text, icon and enabled status based on the provided data.
      *
-     * @param data data to use
+     * @param data
+     *        data to use
      */
     private void updateLabel(JavacData data) {
         if (data == null || data.issues == null) {

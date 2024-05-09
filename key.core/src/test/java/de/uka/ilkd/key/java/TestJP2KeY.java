@@ -103,7 +103,7 @@ public class TestJP2KeY {
         "public class B extends Object {class E  { public E(Object s) {super();} }}",
         " class circ_A {   static int a = circ_B.b;   } class circ_B {   static int b = circ_A.a;   }",
         " class circ2_A {   static final int a = circ2_B.b;   } " +
-            "class circ2_B {   static final int b = circ2_A.a;   }",
+                "class circ2_B {   static final int b = circ2_A.a;   }",
         "class Cycle1 { void m(Cycle2 c) {} } class Cycle2 { void m(Cycle1 c) {} }",
         "class EmptyConstr { EmptyConstr(); } "
     };

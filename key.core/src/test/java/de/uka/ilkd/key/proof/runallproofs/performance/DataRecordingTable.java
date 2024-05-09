@@ -16,7 +16,8 @@ import java.nio.charset.StandardCharsets;
 public class DataRecordingTable implements AutoCloseable {
 
     /**
-     * @param description A description of the data stored in the table.
+     * @param description
+     *        A description of the data stored in the table.
      */
     DataRecordingTable(File location, String[] columns, String description) {
         this.location = location;
@@ -32,9 +33,7 @@ public class DataRecordingTable implements AutoCloseable {
                 w.println("# " + description);
                 // Second line will be a list of columns.
                 StringBuilder sb = new StringBuilder("#");
-                for (String s : columns) {
-                    sb.append(" ").append(s);
-                }
+                for (String s : columns) { sb.append(" ").append(s); }
                 w.println(sb);
             }
         } catch (FileNotFoundException e) {
@@ -71,7 +70,7 @@ public class DataRecordingTable implements AutoCloseable {
         if (lineData.length != columns.length) {
             throw new RuntimeException(
                 "Incorrect number of column values specified.\n" + "Expected: " + columns.length
-                    + "\n" + "Actual number of columns specified: " + lineData.length);
+                        + "\n" + "Actual number of columns specified: " + lineData.length);
         }
 
         /*

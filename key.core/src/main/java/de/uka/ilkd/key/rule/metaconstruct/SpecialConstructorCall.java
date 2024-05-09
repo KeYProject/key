@@ -30,7 +30,8 @@ public class SpecialConstructorCall extends ProgramTransformer {
         new ProgramElementName(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
 
     /**
-     * @param consRef The constructor reference.
+     * @param consRef
+     *        The constructor reference.
      */
     public SpecialConstructorCall(ProgramElement consRef) {
         super(new Name("special-constructor-call"), consRef);

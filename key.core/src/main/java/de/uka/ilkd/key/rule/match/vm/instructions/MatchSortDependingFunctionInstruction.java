@@ -32,8 +32,10 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      * sort. If a match is possible the resulting match conditions are returned otherwise
      * {@code null} is returned.
      *
-     * @param dependingSortToMatch the depending {@link Sort} of the concrete function to be matched
-     * @param matchConditions the {@link MatchConditions} accumulated so far
+     * @param dependingSortToMatch
+     *        the depending {@link Sort} of the concrete function to be matched
+     * @param matchConditions
+     *        the {@link MatchConditions} accumulated so far
      * @return <code>null</code> if failed the resulting match conditions otherwise the resulting
      *         {@link MatchConditions}
      */
@@ -54,9 +56,7 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
                     result = null;
                 }
             }
-        } else if (op.getSortDependingOn() == dependingSortToMatch) {
-            result = matchConditions;
-        }
+        } else if (op.getSortDependingOn() == dependingSortToMatch) { result = matchConditions; }
         return result;
     }
 
@@ -67,19 +67,20 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      * match is possible because the top level operator is not a sort depending function or the
      * resulting constraints on the sorts are unsatisfiable.
      *
-     * @param instantiationCandidate the {@link Term} to be matched
-     * @param matchConditions the {@link MatchConditions} specifying the constraints to be
+     * @param instantiationCandidate
+     *        the {@link Term} to be matched
+     * @param matchConditions
+     *        the {@link MatchConditions} specifying the constraints to be
      *        considered
-     * @param services the {@link Services}
+     * @param services
+     *        the {@link Services}
      */
     @Override
     public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
             Services services) {
         MatchConditions result = null;
         if (instantiationCandidate.op() instanceof SortDependingFunction sdp) {
-            if (op.isSimilar(sdp)) {
-                result = matchSorts(sdp.getSortDependingOn(), matchConditions, services);
-            }
+            if (op.isSimilar(sdp)) { result = matchSorts(sdp.getSortDependingOn(), matchConditions, services); }
         }
         return result;
     }
@@ -92,9 +93,7 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) {
-            termPosition.gotoNext();
-        }
+        if (result != null) { termPosition.gotoNext(); }
         return result;
     }
 

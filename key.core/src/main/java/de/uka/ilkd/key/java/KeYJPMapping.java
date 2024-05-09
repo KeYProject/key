@@ -73,7 +73,8 @@ public class KeYJPMapping {
      * creates a KeYRecoderMapping object.
      * Used for cloning and testing.
      *
-     * @param o what to clone
+     * @param o
+     *        what to clone
      */
     KeYJPMapping(KeYJPMapping o) {
         this.map = new IdentityHashMap<>(o.map);
@@ -89,7 +90,8 @@ public class KeYJPMapping {
     /**
      * returns a matching ModelElement (KeY) to a given recoder.ModelElement
      *
-     * @param pe a recoder.ModelElement
+     * @param pe
+     *        a recoder.ModelElement
      */
     @Nullable
     public KeYJavaType resolvedTypeToKeY(ResolvedType pe) {
@@ -173,9 +175,7 @@ public class KeYJPMapping {
             int end = dot == -1 ? name.length() : dot;
             packageNames.add(name.substring(0, end));
             onePastLastDot = dot + 1;
-            if (dot == -1) {
-                break;
-            }
+            if (dot == -1) { break; }
         }
     }
 
@@ -207,7 +207,8 @@ public class KeYJPMapping {
      * this method sets a flag whether the special have been parsed in or
      * not
      *
-     * @param b boolean indicating if the special classes have been
+     * @param b
+     *        boolean indicating if the special classes have been
      *        parsed in
      */
     public void setParsedSpecial(boolean b) {

@@ -81,9 +81,7 @@ public final class CommandLine {
         @Override
         protected void print(PrintStream stream, int descriptionCol) {
             String s = image;
-            if (parameter != null) {
-                s += " " + parameter;
-            }
+            if (parameter != null) { s += " " + parameter; }
 
             indent(stream, indentSize);
             stream.print(s);
@@ -125,9 +123,7 @@ public final class CommandLine {
         @Override
         protected void print(PrintStream ps, int descriptionCol) {
             int indent = indentSize;
-            if (indentToDescriptionColumn) {
-                indent += descriptionCol;
-            }
+            if (indentToDescriptionColumn) { indent += descriptionCol; }
             indent(ps, indent);
             printIndentedMessage(ps, description, indent);
         }
@@ -185,8 +181,7 @@ public final class CommandLine {
     /**
      * Instantiates a new command line handling object.
      */
-    public CommandLine() {
-    }
+    public CommandLine() {}
 
     /**
      * It is sufficient to store a single subcommand here, since only one can be active at a time.
@@ -211,7 +206,8 @@ public final class CommandLine {
      * Adds a new subcommand with the given name. To be able to configure this subcommand (e.g., by
      * adding options to the subcommand), the method returns the newly created CommandLine.
      *
-     * @param name The name of the subcommand name to add. Must not start with '--' and must not
+     * @param name
+     *        The name of the subcommand name to add. Must not start with '--' and must not
      *        already be registered as a subcommand.
      * @return the CommandLine of the newly created subcommand.
      */
@@ -231,7 +227,8 @@ public final class CommandLine {
     /**
      * Returns the CommandLine for the given subcommand name if existing.
      *
-     * @param name the name of the subcommand
+     * @param name
+     *        the name of the subcommand
      * @return the CommandLine for the subcommand with the given name or null
      */
     public CommandLine getSubCommand(String name) {
@@ -241,7 +238,8 @@ public final class CommandLine {
     /**
      * Check if a subcommand with the given name has been used.
      *
-     * @param name the name of the subcommand
+     * @param name
+     *        the name of the subcommand
      * @return true iff the subcommand was the one given
      */
     public boolean subCommandUsed(String name) {
@@ -251,10 +249,13 @@ public final class CommandLine {
     /**
      * Adds a command line option to this handler.
      *
-     * @param image the image of the option (e.g. {@code -help})
-     * @param parameter simple description/name of the argument, null if there is no argument for
+     * @param image
+     *        the image of the option (e.g. {@code -help})
+     * @param parameter
+     *        simple description/name of the argument, null if there is no argument for
      *        this option (e.g. {@code <file>, time, path}, ...
-     * @param description the description of the option
+     * @param description
+     *        the description of the option
      */
     public void addOption(String image, String parameter, String description) {
 
@@ -263,9 +264,7 @@ public final class CommandLine {
                 "Parameters need to start with '" + MINUS + "': " + image);
         }
 
-        if (options.containsKey(image)) {
-            throw new IllegalArgumentException(image + " has already been registered");
-        }
+        if (options.containsKey(image)) { throw new IllegalArgumentException(image + " has already been registered"); }
 
         Option o = new Option();
         o.image = image;
@@ -280,8 +279,10 @@ public final class CommandLine {
      *
      * Calling this method has no influence of the parsing of command line arguments.
      *
-     * @param description the text to be displayed
-     * @param identToDescriptionColumn if <code>true</code>, the code is printed underneath the
+     * @param description
+     *        the text to be displayed
+     * @param identToDescriptionColumn
+     *        if <code>true</code>, the code is printed underneath the
      *        remaining descriptions, otherwise it has the full length.
      */
     public void addText(String description, boolean identToDescriptionColumn) {
@@ -322,9 +323,11 @@ public final class CommandLine {
     /**
      * Parses the command line.
      *
-     * @param args typically the array of command line arguments passed to the main method.
+     * @param args
+     *        typically the array of command line arguments passed to the main method.
      *
-     * @throws CommandLineException If a option is unknown or badly formatted.
+     * @throws CommandLineException
+     *         If a option is unknown or badly formatted.
      */
     public void parse(String[] args) throws CommandLineException {
         int cnt = 0;
@@ -359,14 +362,12 @@ public final class CommandLine {
             String current = args[cnt];
             Option option = options.get(current);
 
-            if (option == null) {
-                throw new CommandLineException("Unknown command line option: " + current);
-            }
+            if (option == null) { throw new CommandLineException("Unknown command line option: " + current); }
 
             if (option.parameter != null) {
                 if (cnt == args.length - 1) {
                     throw new CommandLineException("Command line option " + current
-                        + " expects a parameter but did not receive one");
+                            + " expects a parameter but did not receive one");
                 }
                 cnt++;
                 option.value = args[cnt];
@@ -377,10 +378,7 @@ public final class CommandLine {
             cnt++;
         }
 
-        while (cnt < args.length) {
-            arguments.add(args[cnt]);
-            cnt++;
-        }
+        while (cnt < args.length) { arguments.add(args[cnt]); cnt++; }
     }
 
     public List<String> getArguments() {
@@ -413,7 +411,8 @@ public final class CommandLine {
     /**
      * Checks if a boolean command line option is set.
      *
-     * @param param the image of the command line option to be checked
+     * @param param
+     *        the image of the command line option to be checked
      *
      * @return true if the option is set, false otherwise
      */
@@ -430,8 +429,10 @@ public final class CommandLine {
      *
      * If the parameter has not been specified, return the default value.
      *
-     * @param param the command line option. Needs to take an argument
-     * @param defaultValue the default value to return if option is not set
+     * @param param
+     *        the command line option. Needs to take an argument
+     * @param defaultValue
+     *        the default value to return if option is not set
      *
      * @return either the set option or defaultValue if not set.
      */
@@ -451,21 +452,22 @@ public final class CommandLine {
      * If not present, a default value is returned. If the argument cannot be parsed as a (positive
      * or negative) integer, a {@link CommandLineException} is thrown.
      *
-     * @param param the option to retrieve
-     * @param defaultValue the default value to use if no value specified
+     * @param param
+     *        the option to retrieve
+     * @param defaultValue
+     *        the default value to use if no value specified
      *
      * @return either the set option or defaultValue if not set.
      *
-     * @throws CommandLineException if the argument is ill-formatted.
+     * @throws CommandLineException
+     *         if the argument is ill-formatted.
      */
     public int getInteger(String param, int defaultValue) throws CommandLineException {
         Option option = options.get(param);
         assert option != null : param + " is unknown option";
 
         String value = option.value;
-        if (value == null) {
-            return defaultValue;
-        }
+        if (value == null) { return defaultValue; }
 
         try {
             return Integer.decode(value);
@@ -481,21 +483,22 @@ public final class CommandLine {
      * If not present, a default value is returned. If the argument cannot be parsed as a (positive
      * or negative) integer, a {@link CommandLineException} is thrown.
      *
-     * @param param the option to retrieve
-     * @param defaultValue the default value to use if no value specified
+     * @param param
+     *        the option to retrieve
+     * @param defaultValue
+     *        the default value to use if no value specified
      *
      * @return either the set option or defaultValue if not set.
      *
-     * @throws CommandLineException if the argument is ill-formatted.
+     * @throws CommandLineException
+     *         if the argument is ill-formatted.
      */
     public long getLong(String param, long defaultValue) throws CommandLineException {
         Option option = options.get(param);
         assert option != null : param + " is unknown option";
 
         String value = option.value;
-        if (value == null) {
-            return defaultValue;
-        }
+        if (value == null) { return defaultValue; }
 
         try {
             return Long.decode(value);
@@ -518,24 +521,21 @@ public final class CommandLine {
      * Descriptions which would result in lines longer than {@link #getLineLength()} characters are
      * broken at spaces (if that is possible).
      *
-     * @param stream the stream to print to (typically System.out)
+     * @param stream
+     *        the stream to print to (typically System.out)
      */
     public void printUsage(PrintStream stream) {
         int descriptionCol = 0;
 
         for (Option option : options.values()) {
             int len = option.image.length();
-            if (option.parameter != null) {
-                len += 1 + option.parameter.length();
-            }
+            if (option.parameter != null) { len += 1 + option.parameter.length(); }
             descriptionCol = Math.max(len, descriptionCol);
         }
 
         descriptionCol += 2;
 
-        for (HelpElement element : helpElements) {
-            element.print(stream, descriptionCol);
-        }
+        for (HelpElement element : helpElements) { element.print(stream, descriptionCol); }
 
         stream.flush();
     }
@@ -544,9 +544,7 @@ public final class CommandLine {
      * insert a number of spaces to the output stream
      */
     private void indent(PrintStream stream, int len) {
-        for (int i = len; i > 0; i--) {
-            stream.print(" ");
-        }
+        for (int i = len; i > 0; i--) { stream.print(" "); }
     }
 
     /*
@@ -592,7 +590,8 @@ public final class CommandLine {
      * This is the number of spaces which is put in front of the options when printing the usage
      * page.
      *
-     * @param indentSize a non-negative number
+     * @param indentSize
+     *        a non-negative number
      */
     public void setIndentation(int indentSize) {
         this.indentSize = indentSize;

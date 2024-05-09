@@ -34,7 +34,8 @@ public class Comment extends JavaSourceElement {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnComment(this);
@@ -64,12 +65,8 @@ public class Comment extends JavaSourceElement {
     }
 
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof Comment cmp)) {
-            return false;
-        }
+        if (o == this) { return true; }
+        if (!(o instanceof Comment cmp)) { return false; }
         return (getText().equals(cmp.getText()));
     }
 }

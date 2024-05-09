@@ -42,9 +42,7 @@ public final class MainFrame extends JPanel {
             scrollPane.setViewportView(component);
         }
 
-        if (oldContent instanceof SequentView) {
-            ((SequentView) oldContent).removeUserSelectionHighlight();
-        }
+        if (oldContent instanceof SequentView) { ((SequentView) oldContent).removeUserSelectionHighlight(); }
 
         return oldContent;
     }
@@ -60,9 +58,7 @@ public final class MainFrame extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (content != null) {
                     for (MouseListener listener : content.getMouseListeners()) {
-                        if (listener instanceof SequentViewInputListener) {
-                            listener.mouseClicked(e);
-                        }
+                        if (listener instanceof SequentViewInputListener) { listener.mouseClicked(e); }
                     }
                 }
             }
@@ -72,9 +68,7 @@ public final class MainFrame extends JPanel {
 
             @Override
             public void ancestorRemoved(AncestorEvent event) {
-                if (content instanceof SequentView) {
-                    ((SequentView) content).removeUserSelectionHighlight();
-                }
+                if (content instanceof SequentView) { ((SequentView) content).removeUserSelectionHighlight(); }
             }
 
             @Override
@@ -96,9 +90,7 @@ public final class MainFrame extends JPanel {
     public void setShowTacletInfo(boolean showTacletInfo) {
         this.showTacletInfo = showTacletInfo;
 
-        if (content instanceof InnerNodeView view) {
-            view.tacletInfo.setVisible(this.showTacletInfo);
-        }
+        if (content instanceof InnerNodeView view) { view.tacletInfo.setVisible(this.showTacletInfo); }
     }
 
     public boolean isShowTacletInfo() {
@@ -108,7 +100,8 @@ public final class MainFrame extends JPanel {
     /**
      * Scroll the sequent view to the specified y coordinate.
      *
-     * @param y coordinate in pixels
+     * @param y
+     *        coordinate in pixels
      */
     public void scrollTo(int y) {
         scrollPane.getVerticalScrollBar().setValue(y);

@@ -49,9 +49,7 @@ public class InnerVariableNamer extends VariableNamer {
         // Name proposal = services.getProof().getNameRecorder().getProposal();
         Name proposal = services.getNameRecorder().getProposal();
 
-        if (proposal != null) {
-            newname = new ProgramElementName(proposal.toString(), nci);
-        }
+        if (proposal != null) { newname = new ProgramElementName(proposal.toString(), nci); }
         if (newname == null || !isUniqueInGlobals(newname.toString(), globals)
                 || services.getNamespaces().lookupLogicSymbol(newname) != null) {
             newname = createName(bai.basename, bai.index, nci);

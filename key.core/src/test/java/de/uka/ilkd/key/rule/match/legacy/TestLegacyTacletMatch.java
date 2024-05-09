@@ -99,7 +99,7 @@ public class TestLegacyTacletMatch {
     @Test
     public void testStatementListMatch() {
         Term match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break; "
-            + "int k=1; {int j = 1; j++;} int c = 56;}}} }\\> true");
+                + "int k=1; {int j = 1; j++;} int c = 56;}}} }\\> true");
 
         FindTaclet break_while =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_break_while").taclet();
@@ -232,7 +232,7 @@ public class TestLegacyTacletMatch {
     @Test
     public void testProgramMatch2() {
         Term match = TacletForTests.parseTerm("\\<{int i; int k;}\\>(\\<{for (int i=0;"
-            + " i<2; i++) {break;} " + "int k=1; }\\> true)");
+                + " i<2; i++) {break;} " + "int k=1; }\\> true)");
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_for_right").taclet();
         MatchConditions svi = new LegacyTacletMatcher(taclet).matchJavaBlock(match.sub(0),

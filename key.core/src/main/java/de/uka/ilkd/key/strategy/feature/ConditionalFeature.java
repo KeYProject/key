@@ -32,17 +32,22 @@ public class ConditionalFeature implements Feature {
     }
 
     /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenValue the value of the feature, if <code>filter</code> returns true
+     * @param cond
+     *        the filter that decides which value is to be returned
+     * @param thenValue
+     *        the value of the feature, if <code>filter</code> returns true
      */
     public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue) {
         return createConditional(cond, ConstFeature.createConst(thenValue));
     }
 
     /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenValue the value of the feature, if <code>filter</code> returns true
-     * @param elseValue the value of the feature, if <code>filter</code> returns false
+     * @param cond
+     *        the filter that decides which value is to be returned
+     * @param thenValue
+     *        the value of the feature, if <code>filter</code> returns true
+     * @param elseValue
+     *        the value of the feature, if <code>filter</code> returns false
      */
     public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue,
             RuleAppCost elseValue) {
@@ -51,8 +56,10 @@ public class ConditionalFeature implements Feature {
     }
 
     /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true returns
+     * @param cond
+     *        the filter that decides which value is to be returned
+     * @param thenFeature
+     *        the feature that is evaluted, if <code>filter</code> returns true returns
      *        false
      */
     public static Feature createConditional(RuleFilter cond, Feature thenFeature) {
@@ -60,9 +67,12 @@ public class ConditionalFeature implements Feature {
     }
 
     /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
-     * @param elseValue the value of the feature, if <code>filter</code> returns false
+     * @param cond
+     *        the filter that decides which value is to be returned
+     * @param thenFeature
+     *        the feature that is evaluted, if <code>filter</code> returns true
+     * @param elseValue
+     *        the value of the feature, if <code>filter</code> returns false
      */
     public static Feature createConditional(RuleFilter cond, Feature thenFeature,
             RuleAppCost elseValue) {
@@ -70,9 +80,12 @@ public class ConditionalFeature implements Feature {
     }
 
     /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
-     * @param elseFeature the feature that is evaluted, if <code>filter</code> returns false
+     * @param cond
+     *        the filter that decides which value is to be returned
+     * @param thenFeature
+     *        the feature that is evaluted, if <code>filter</code> returns true
+     * @param elseFeature
+     *        the feature that is evaluted, if <code>filter</code> returns false
      */
     public static Feature createConditional(RuleFilter cond, Feature thenFeature,
             Feature elseFeature) {

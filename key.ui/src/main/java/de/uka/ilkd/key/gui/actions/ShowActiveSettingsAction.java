@@ -145,9 +145,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
         }
 
         private JPanel getOptionPanel() {
-            if (optionPanel == null) {
-                optionPanel = new JPanel();
-            }
+            if (optionPanel == null) { optionPanel = new JPanel(); }
             return optionPanel;
         }
     }

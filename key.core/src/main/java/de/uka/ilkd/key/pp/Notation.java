@@ -518,9 +518,7 @@ public abstract class Notation {
                             } else {
                                 sp.printConstant(o.toString());
                             }
-                            if (it.hasNext()) {
-                                sp.layouter.print(",");
-                            }
+                            if (it.hasNext()) { sp.layouter.print(","); }
                         }
                         sp.layouter().print("}");
                     } else {
@@ -548,9 +546,7 @@ public abstract class Notation {
             // skip number symbol /as this method may be called
             // e.g. by char literal we do not fail if the first is
             // not the number symbol
-            if (t.op().name().equals(IntegerLDT.NUMBERS_NAME)) {
-                t = t.sub(0);
-            }
+            if (t.op().name().equals(IntegerLDT.NUMBERS_NAME)) { t = t.sub(0); }
 
             final StringBuilder number = new StringBuilder();
             int offset = 0;
@@ -604,9 +600,7 @@ public abstract class Notation {
 
             String result = NumLiteral.printNumberTerm(t.sub(0));
 
-            if (result == null) {
-                return null;
-            }
+            if (result == null) { return null; }
 
             try {
                 intVal = Integer.parseInt(result);
@@ -646,9 +640,7 @@ public abstract class Notation {
 
         public static String printFloatTerm(Term floatTerm) {
 
-            if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) {
-                return null;
-            }
+            if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) { return null; }
 
             try {
                 int bits = extractValue(floatTerm.sub(0));
@@ -696,9 +688,7 @@ public abstract class Notation {
 
         public static String printDoubleTerm(Term doubleTerm) {
 
-            if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) {
-                return null;
-            }
+            if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) { return null; }
 
             try {
                 long bits = extractValue(doubleTerm.sub(0));

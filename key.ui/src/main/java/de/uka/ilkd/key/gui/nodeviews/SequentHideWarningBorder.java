@@ -48,8 +48,10 @@ public class SequentHideWarningBorder extends TitledBorder {
     /**
      * Instantiates a new sequent border.
      *
-     * @param title the title to display
-     * @param sequentView the sequent view which will be wrapped by the component
+     * @param title
+     *        the title to display
+     * @param sequentView
+     *        the sequent view which will be wrapped by the component
      */
     public SequentHideWarningBorder(String title, SequentView sequentView) {
         super(title);
@@ -61,17 +63,13 @@ public class SequentHideWarningBorder extends TitledBorder {
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 
         super.paintBorder(c, g, x, y, width, height);
-        if (!sequentView.isHiding()) {
-            return;
-        }
+        if (!sequentView.isHiding()) { return; }
 
         Map<?, ?> desktopHints =
             (Map<?, ?>) Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
 
         Graphics2D g2d = (Graphics2D) g;
-        if (desktopHints != null) {
-            g2d.setRenderingHints(desktopHints);
-        }
+        if (desktopHints != null) { g2d.setRenderingHints(desktopHints); }
 
         g2d.setFont(FONT);
         int strWidth = SwingUtilities.computeStringWidth(g2d.getFontMetrics(), WARNING);

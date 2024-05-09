@@ -16,7 +16,8 @@ import javax.swing.event.PopupMenuListener;
  * Reacts on mouse events to highlight the selected part of the sequent and it pops up a menu
  * showing all applicable actions at the highlighted position.
  *
- * @param <T> the type of the object this listener is listening to.
+ * @param <T>
+ *        the type of the object this listener is listening to.
  */
 abstract class SequentViewListener<T extends SequentView> implements MouseListener {
 
@@ -32,7 +33,8 @@ abstract class SequentViewListener<T extends SequentView> implements MouseListen
     /**
      * Creates a new listener.
      *
-     * @param sequentView a {@code SequentView}
+     * @param sequentView
+     *        a {@code SequentView}
      */
     SequentViewListener(T sequentView) {
         this.sequentView = sequentView;
@@ -49,7 +51,8 @@ abstract class SequentViewListener<T extends SequentView> implements MouseListen
     /**
      * Hides the specified menu.
      *
-     * @param menu the menu to hide.
+     * @param menu
+     *        the menu to hide.
      */
     void hideMenu(JMenu menu) {
         menu.setPopupMenuVisible(false);
@@ -67,8 +70,10 @@ abstract class SequentViewListener<T extends SequentView> implements MouseListen
     /**
      * Shows a new popup menu at the specified mouse event's position.
      *
-     * @param me a mouse event.
-     * @param menu the menu to show.
+     * @param me
+     *        a mouse event.
+     * @param menu
+     *        the menu to show.
      */
     void showPopup(MouseEvent me, JMenu menu) {
         sequentView.refreshHighlightning = false;

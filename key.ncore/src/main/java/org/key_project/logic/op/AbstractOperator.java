@@ -8,18 +8,20 @@ import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Abstract operator class offering some common functionality.
  */
 public abstract class AbstractOperator implements Operator {
     private final Name name;
     private final int arity;
-    private final ImmutableArray<Boolean> whereToBind;
+    private final @Nullable ImmutableArray<Boolean> whereToBind;
     private final Modifier modifier;
 
-    protected AbstractOperator(Name name, int arity, ImmutableArray<Boolean> whereToBind,
+    protected AbstractOperator(Name name, int arity,
+            @Nullable ImmutableArray<Boolean> whereToBind,
             Modifier modifier) {
-        assert name != null;
         assert arity >= 0;
         assert whereToBind == null || whereToBind.size() == arity;
         this.name = name;
@@ -28,7 +30,7 @@ public abstract class AbstractOperator implements Operator {
         this.modifier = modifier;
     }
 
-    protected AbstractOperator(Name name, int arity, ImmutableArray<Boolean> whereToBind,
+    protected AbstractOperator(Name name, int arity, @Nullable ImmutableArray<Boolean> whereToBind,
             boolean isRigid) {
         this(name, arity, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
@@ -41,7 +43,7 @@ public abstract class AbstractOperator implements Operator {
         this(name, arity, (ImmutableArray<Boolean>) null, isRigid);
     }
 
-    public final ImmutableArray<Boolean> whereToBind() {
+    public final @Nullable ImmutableArray<Boolean> whereToBind() {
         return whereToBind;
     }
 
@@ -80,27 +82,18 @@ public abstract class AbstractOperator implements Operator {
      * the assumption that the top level operator of the term is the same as this Operator. The
      * assumption that the top level operator and the term are equal is NOT checked.
      *
-     * @throws TermCreationException if a construction error was recognised
+     * @throws TermCreationException
+     *         if a construction error was recognised
      */
     @Override
     public <T extends Term> void validTopLevelException(T term) throws TermCreationException {
-        if (arity != term.arity()) {
-            throw new TermCreationException(this, term);
-        }
+        if (arity != term.arity()) { throw new TermCreationException(this, term); }
 
-        if (arity != term.subs().size()) {
-            throw new TermCreationException(this, term);
-        }
+        if (arity != term.subs().size()) { throw new TermCreationException(this, term); }
 
-        if ((whereToBind == null) != term.boundVars().isEmpty()) {
-            throw new TermCreationException(this, term);
-        }
+        if ((whereToBind == null) != term.boundVars().isEmpty()) { throw new TermCreationException(this, term); }
 
-        for (int i = 0; i < arity; i++) {
-            if (term.sub(i) == null) {
-                throw new TermCreationException(this, term);
-            }
-        }
+        for (int i = 0; i < arity; i++) { if (term.sub(i) == null) { throw new TermCreationException(this, term); } }
     }
 
 }

@@ -36,7 +36,8 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Meta class reference.
      *
-     * @param reference a type reference.
+     * @param reference
+     *        a type reference.
      */
     public MetaClassReference(TypeReference reference) {
         typeReference = reference;
@@ -50,7 +51,8 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: a TypeReference
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: a TypeReference
      *        (as reference for the meta class), Comments
      */
     public MetaClassReference(ExtList children) {
@@ -70,16 +72,14 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
-        }
+        if (typeReference != null) { if (index == 0) { return typeReference; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -113,9 +113,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) {
-            return typeReference;
-        }
+        if (typeReference != null && index == 0) { return typeReference; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -141,7 +139,8 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnMetaClassReference(this);
@@ -154,7 +153,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         throw new IllegalStateException("Metaclass references are not supported by KeY as"
-            + "'java.lang.Class' is not part of the Java Card standard");
+                + "'java.lang.Class' is not part of the Java Card standard");
     }
 
 }

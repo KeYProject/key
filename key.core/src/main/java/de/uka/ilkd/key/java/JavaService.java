@@ -201,9 +201,7 @@ public class JavaService {
         }
 
         var errors = new ArrayList<BuildingIssue>(result.getProblems().size());
-        for (Problem problem : result.getProblems()) {
-            errors.add(buildingIssueFromProblem(source, problem));
-        }
+        for (Problem problem : result.getProblems()) { errors.add(buildingIssueFromProblem(source, problem)); }
 
         throw new BuildingExceptions(errors);
     }
@@ -218,9 +216,7 @@ public class JavaService {
         }
         try (BufferedReader br = new BufferedReader(is)) {
             ParseResult<CompilationUnit> cu = programFactory.parseCompilationUnit(br);
-            if (cu.getResult().isPresent()) {
-                cu.getResult().get().setStorage(filename);
-            }
+            if (cu.getResult().isPresent()) { cu.getResult().get().setStorage(filename); }
             return cu;
         }
     }
@@ -228,8 +224,10 @@ public class JavaService {
     /**
      * read a compilation unit, given as a string.
      *
-     * @param files where to read from
-     * @param repo the repo to use for reading
+     * @param files
+     *        where to read from
+     * @param repo
+     *        the repo to use for reading
      * @return a KeY structured compilation unit.
      */
     public <E extends Throwable> List<de.uka.ilkd.key.java.ast.CompilationUnit> readCompilationUnits(
@@ -253,16 +251,15 @@ public class JavaService {
         programFactory.addUserClasses(cus);
         transformModel(Collections.unmodifiableList(cus));
         var result = new ArrayList<de.uka.ilkd.key.java.ast.CompilationUnit>(cus.size());
-        for (CompilationUnit cu : cus) {
-            result.add(converter.processCompilationUnit(cu));
-        }
+        for (CompilationUnit cu : cus) { result.add(converter.processCompilationUnit(cu)); }
         return result;
     }
 
     /**
      * read a compilation unit, given as a string.
      *
-     * @param text a string represents a compilation unit
+     * @param text
+     *        a string represents a compilation unit
      * @return a KeY structured compilation unit.
      */
     public de.uka.ilkd.key.java.ast.CompilationUnit readCompilationUnit(String text) {
@@ -279,28 +276,20 @@ public class JavaService {
     // ----- parsing libraries
 
     private static void fixupPackageDeclaration(CompilationUnit cu, String relativePath) {
-        if (cu.getPackageDeclaration().isPresent()) {
-            return;
-        }
-        if (relativePath == null) {
-            throw new NullPointerException();
-        }
+        if (cu.getPackageDeclaration().isPresent()) { return; }
+        if (relativePath == null) { throw new NullPointerException(); }
         var pkg = relativePath;
-        if (pkg.endsWith(".java")) {
-            pkg = pkg.substring(0, pkg.length() - 5);
-        }
+        if (pkg.endsWith(".java")) { pkg = pkg.substring(0, pkg.length() - 5); }
         pkg = pkg.replace('\\', '.').replace('/', '.');
         var lastDot = pkg.lastIndexOf('.');
-        if (lastDot == -1) {
-            return;
-        }
+        if (lastDot == -1) { return; }
         pkg = pkg.substring(0, lastDot);
         try {
             cu.setPackageDeclaration(pkg);
         } catch (ParseProblemException ignored) {
             LOGGER.warn("Failed to construct a package name for the java file " + relativePath
-                + ", it might contain invalid characters. "
-                + "Add a package declaration to the file or rename its folder");
+                    + ", it might contain invalid characters. "
+                    + "Add a package declaration to the file or rename its folder");
         }
     }
 
@@ -316,7 +305,8 @@ public class JavaService {
      * directory are read in. This is done using a
      * {@link DirectoryFileCollection}.
      *
-     * @param fileRepo the FileRepo that provides the InputStream to resources
+     * @param fileRepo
+     *        the FileRepo that provides the InputStream to resources
      * @return the compilation units
      */
     private List<CompilationUnit> parseBootClasses(FileRepo fileRepo) throws IOException {
@@ -372,8 +362,10 @@ public class JavaService {
      * <li>else read a special collection of classes that is stored internally
      * </ol>
      *
-     * @param fileRepo the FileRepo for obtaining InputStreams
-     * @throws IOException an exception
+     * @param fileRepo
+     *        the FileRepo for obtaining InputStreams
+     * @throws IOException
+     *         an exception
      * @author mulbrich
      */
     private List<CompilationUnit> parseLibraryClasses(FileRepo fileRepo) throws IOException {
@@ -476,7 +468,8 @@ public class JavaService {
      * If not parsed yet, the special classes are read in and converted.
      * This method throws only runtime exceptions for historical reasons.
      *
-     * @param fileRepo the fileRepo which will store the files
+     * @param fileRepo
+     *        the fileRepo which will store the files
      */
     public void parseSpecialClasses(FileRepo fileRepo) {
         if (mapping.setParsedSpecial())
@@ -487,9 +480,7 @@ public class JavaService {
             parseLibraryPaths(fileRepo);
 
             // Make sure some required types are registered
-            for (var type : ResolvedPrimitiveType.values()) {
-                typeConverter.getKeYJavaType(type);
-            }
+            for (var type : ResolvedPrimitiveType.values()) { typeConverter.getKeYJavaType(type); }
             typeConverter.getKeYJavaType(NullType.INSTANCE);
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
         } catch (IOException e) {
@@ -510,9 +501,7 @@ public class JavaService {
          * specialClasses.addAll(dynamicallyCreatedCompilationUnits);
          */
 
-        for (CompilationUnit cu : libraryClasses) {
-            converter.processCompilationUnit(cu);
-        }
+        for (CompilationUnit cu : libraryClasses) { converter.processCompilationUnit(cu); }
         LOGGER.debug("Finished processing library classes");
     }
 
@@ -540,20 +529,12 @@ public class JavaService {
                         .orElse(false))
                 .findFirst()
                 .orElse(null);
-        if (object != null) {
-            converter.processCompilationUnit(object);
-        }
+        if (object != null) { converter.processCompilationUnit(object); }
 
         var obj = typeConverter.getObjectType();
-        assert obj != null && obj.getJavaType() != null
-                : "java.lang.Object has to be available";
+        assert obj != null && obj.getJavaType() != null : "java.lang.Object has to be available";
 
-        for (CompilationUnit cu : bootClasses) {
-            if (cu == object) {
-                continue;
-            }
-            converter.processCompilationUnit(cu);
-        }
+        for (CompilationUnit cu : bootClasses) { if (cu == object) { continue; } converter.processCompilationUnit(cu); }
         LOGGER.debug("Finished processing internal classes");
     }
 
@@ -566,7 +547,8 @@ public class JavaService {
      * You can add your own Transformation here. Make sure it is in the correct
      * order.
      *
-     * @param cUnits a list of compilation units, not null.
+     * @param cUnits
+     *        a list of compilation units, not null.
      */
     protected void transformModel(List<CompilationUnit> cUnits) {
         // weigl: Exclude java fragments for speed-up:
@@ -588,7 +570,8 @@ public class JavaService {
      * it is wrapped in a method called
      * <code>&lt;virtual_method_for_parsing&gt;</code>.
      *
-     * @param block the StatementBlock to wrap
+     * @param block
+     *        the StatementBlock to wrap
      * @return the enclosing MethodDeclaration
      */
     protected MethodDeclaration embedBlock(BlockStmt block) {
@@ -601,8 +584,10 @@ public class JavaService {
     /**
      * wraps a RECODER MethodDeclaration in a class
      *
-     * @param mdecl the declaration.MethodDeclaration to wrap
-     * @param context the declaration.ClassDeclaration where the method
+     * @param mdecl
+     *        the declaration.MethodDeclaration to wrap
+     * @param context
+     *        the declaration.ClassDeclaration where the method
      *        has to be embedded
      * @return the enclosing declaration.ClassDeclaration
      */
@@ -640,7 +625,8 @@ public class JavaService {
      * create a new Context with a temporary name and make a list of variables
      * visible from within.
      *
-     * @param vars a list of variables
+     * @param vars
+     *        a list of variables
      * @return a newly created context.
      */
     protected TypeScope.JPContext createContext(Iterable<ProgramVariable> vars) {
@@ -654,17 +640,17 @@ public class JavaService {
     /**
      * add a list of variables to a context
      *
-     * @param classContext context to add to
-     * @param vars vars to add
+     * @param classContext
+     *        context to add to
+     * @param vars
+     *        vars to add
      */
     private void addProgramVariablesToClassContext(ClassOrInterfaceDeclaration classContext,
             Iterable<ProgramVariable> vars) {
         Set<String> names = new HashSet<>();
 
         for (ProgramVariable var : vars) {
-            if (names.contains(var.name().toString())) {
-                continue;
-            }
+            if (names.contains(var.name().toString())) { continue; }
             names.add(var.name().toString());
 
             if (var.getKeYJavaType() == null) {
@@ -678,9 +664,7 @@ public class JavaService {
             }
 
             Type javaType = var.getKeYJavaType().getJavaType();
-            if (javaType == null) {
-                continue;
-            }
+            if (javaType == null) { continue; }
 
             var existingSpec = lookupVarSpec(var);
             FieldSpecification keySpec;
@@ -727,7 +711,8 @@ public class JavaService {
     /**
      * given a name as string, construct a recoder type reference from it.
      *
-     * @param typeName non-null type name as string
+     * @param typeName
+     *        non-null type name as string
      * @return a freshly created type reference to the given type.
      */
     private com.github.javaparser.ast.type.Type name2typeReference(String typeName) {
@@ -743,8 +728,10 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references and returns a statement block of recoder.
      *
-     * @param input a String describing a java block
-     * @param context CompilationUnit in which the block has to be
+     * @param input
+     *        a String describing a java block
+     * @param context
+     *        CompilationUnit in which the block has to be
      *        interpreted
      * @return the parsed and resolved recoder statement block
      */
@@ -790,10 +777,13 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references
      *
-     * @param block a String describing a java block
-     * @param context CompilationUnit in which the block has to be
+     * @param block
+     *        a String describing a java block
+     * @param context
+     *        CompilationUnit in which the block has to be
      *        interprested
-     * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is
+     * @param allowSchemaJava
+     *        if parameter is non-null SchemaJava is allowed and the namespace is
      *        used to resolve symbols
      * @return the parsed and resolved JavaBlock
      */
@@ -815,7 +805,8 @@ public class JavaService {
      * A SchemaJava node is a node that represents a schema variable,e.g., {@code #s}.
      * We exploit the naming convention inside key-javaparser.
      *
-     * @param node the node
+     * @param node
+     *        the node
      * @return true if type name of the node matches "Key*SV".
      */
     private boolean isSchemaJavaNode(@NonNull Node node) {
@@ -827,8 +818,10 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references using an empty context
      *
-     * @param block a String describing a java block
-     * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is
+     * @param block
+     *        a String describing a java block
+     * @param allowSchemaJava
+     *        if parameter is non-null SchemaJava is allowed and the namespace is
      *        used to resolve symbols
      * @return the parsed and resolved JavaBlock
      */
@@ -842,9 +835,11 @@ public class JavaService {
      * references using an empty context. The variables of the namespace are
      * used to create a new class context
      *
-     * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is
+     * @param allowSchemaJava
+     *        if parameter is non-null SchemaJava is allowed and the namespace is
      *        used to resolve symbols
-     * @param s a String describing a java block
+     * @param s
+     *        a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> variables, String s,

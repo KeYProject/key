@@ -24,8 +24,10 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionLoopInvariant(ITreeSettings settings, Node proofNode) {
@@ -88,9 +90,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
     @Override
     public boolean isInitiallyValid() {
         boolean initiallyValid = false;
-        if (getProofNode().childrenCount() >= 1) {
-            initiallyValid = getProofNode().child(0).isClosed();
-        }
+        if (getProofNode().childrenCount() >= 1) { initiallyValid = getProofNode().child(0).isClosed(); }
         return initiallyValid;
     }
 }

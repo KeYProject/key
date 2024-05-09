@@ -45,17 +45,13 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         int count = 0;
         Node n = getNode();
 
-        if (n == null) {
-            return;
-        }
+        if (n == null) { return; }
 
         while (true) {
             childrenCache.add(count, getProofTreeModel().getProofTreeNode(n));
             count++;
             final Node nextN = findChild(n);
-            if (nextN == null) {
-                break;
-            }
+            if (nextN == null) { break; }
             n = nextN;
         }
 
@@ -72,31 +68,24 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         childrenCache = null;
     }
 
-    @NonNull
     @Override
-    public String getSearchString() {
+    public @NonNull String getSearchString() {
         return toString();
     }
 
     public int getChildCount() {
-        if (childrenCache == null) {
-            ensureChildrenCacheExists();
-        }
+        if (childrenCache == null) { ensureChildrenCacheExists(); }
         return childrenCache.size();
     }
 
     public TreeNode getParent() {
         Node self = getNode();
-        if (self == null) {
-            return null;
-        }
+        if (self == null) { return null; }
         Node n = self.parent();
         if (n == null) {
             return null;
         } else {
-            while (n.parent() != null && findChild(n.parent()) != null) {
-                n = n.parent();
-            }
+            while (n.parent() != null && findChild(n.parent()) != null) { n = n.parent(); }
             return findBranch(n);
         }
     }
@@ -104,9 +93,7 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
     // signalled by GUIProofTreeModel when the user has altered the value
     public void setLabel(String s) {
         Node n = getNode();
-        if (n != null) {
-            n.getNodeInfo().setBranchLabel(s);
-        }
+        if (n != null) { n.getNodeInfo().setBranchLabel(s); }
     }
 
     public boolean isLeaf() {
@@ -118,9 +105,7 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         String res;
         if (n != null) {
             res = n.getNodeInfo().getBranchLabel();
-            if (res == null) {
-                return label.toString();
-            }
+            if (res == null) { return label.toString(); }
         } else {
             res = "null";
         }

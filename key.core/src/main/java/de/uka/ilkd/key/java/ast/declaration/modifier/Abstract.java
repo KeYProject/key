@@ -24,7 +24,8 @@ public class Abstract extends Modifier {
     /**
      * Abstract.
      *
-     * @param children list of children. May contain: Comments
+     * @param children
+     *        list of children. May contain: Comments
      */
     public Abstract(PositionInfo pi, List<Comment> c) {
         super(pi, c);

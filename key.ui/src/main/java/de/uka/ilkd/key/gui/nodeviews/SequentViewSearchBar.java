@@ -22,8 +22,6 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
-
-
 /*
  * Search bar implementing search function for SequentView.
  */
@@ -125,10 +123,10 @@ public class SequentViewSearchBar extends SearchBar {
         });
         searchModeBox.setToolTipText(
             "<html>Determines search behaviour: <b>" + SearchMode.HIDE.displayName
-                + "</b> only shows sequent formulas that match the search. <b>"
-                + SearchMode.REGROUP.displayName
-                + "</b> arranges the matching formulas around the sequence arrow. <b>"
-                + SearchMode.HIGHLIGHT.displayName + "</b> leaves the sequent unchanged.</html>");
+                    + "</b> only shows sequent formulas that match the search. <b>"
+                    + SearchMode.REGROUP.displayName
+                    + "</b> arranges the matching formulas around the sequence arrow. <b>"
+                    + SearchMode.HIGHLIGHT.displayName + "</b> leaves the sequent unchanged.</html>");
         add(searchModeBox);
     }
 
@@ -196,9 +194,7 @@ public class SequentViewSearchBar extends SearchBar {
             return false;
         }
 
-        if (p == null) {
-            return false;
-        }
+        if (p == null) { return false; }
 
         Matcher m = p.matcher(sequentView.getText().replace("\u00A0", " "));
 
@@ -216,7 +212,8 @@ public class SequentViewSearchBar extends SearchBar {
     /**
      * searches for the given string and displays the search-bar.
      *
-     * @param searchTerm string to search for. If regex is enabled, the string will be escaped
+     * @param searchTerm
+     *        string to search for. If regex is enabled, the string will be escaped
      */
     public void searchFor(String searchTerm) {
         if (regExpCheckBox.isSelected()) {
@@ -249,9 +246,7 @@ public class SequentViewSearchBar extends SearchBar {
     }
 
     private void clearSearchResults() {
-        for (Pair<Integer, Object> result : searchResults) {
-            sequentView.removeHighlight(result.second);
-        }
+        for (Pair<Integer, Object> result : searchResults) { sequentView.removeHighlight(result.second); }
         searchResults.clear();
     }
 }

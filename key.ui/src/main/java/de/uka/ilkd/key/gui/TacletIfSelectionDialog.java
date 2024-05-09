@@ -38,7 +38,8 @@ public class TacletIfSelectionDialog extends JPanel {
     /**
      * creates a new dialog
      *
-     * @param model the model to be displayed
+     * @param model
+     *        the model to be displayed
      */
     public TacletIfSelectionDialog(TacletInstantiationModel model,
             TacletMatchCompletionDialog owner) {
@@ -125,9 +126,7 @@ public class TacletIfSelectionDialog extends JPanel {
         ifPanel.requestFocus();
 
         JTextField tf = (JTextField) ((JPanel) ifPanel.getComponent(field)).getComponent(2);
-        if (tf == null) {
-            LOGGER.debug("None existing field requested");
-        }
+        if (tf == null) { LOGGER.debug("None existing field requested"); }
         if (tf != null && col >= 0 && col < tf.getColumns()) {
             try {
                 tf.setCaretPosition(col - 1);
@@ -161,9 +160,7 @@ public class TacletIfSelectionDialog extends JPanel {
             parent.add(inp);
             inp.setEnabled(true);
         }
-        if (!icm.isManualInputSelected() && nr == 3) {
-            parent.remove(parent.getComponent(2));
-        }
+        if (!icm.isManualInputSelected() && nr == 3) { parent.remove(parent.getComponent(2)); }
         parent.revalidate();
         pushAllInputToModel();
         owner.setStatus();
@@ -202,9 +199,7 @@ public class TacletIfSelectionDialog extends JPanel {
                 IfFormulaInstantiation value, int index, boolean isSelected, boolean cellHasFocus) {
             cellRenderer.setOpaque(true);
             final String valStr = value.toString(services);
-            if (isSelected) {
-                list.setToolTipText(valStr);
-            }
+            if (isSelected) { list.setToolTipText(valStr); }
             return cellRenderer.getListCellRendererComponent(list, valStr, index, isSelected,
                 cellHasFocus);
         }

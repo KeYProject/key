@@ -48,7 +48,8 @@ public class Main {
     /**
      * The program entry point.
      *
-     * @param args The start parameters.
+     * @param args
+     *        The start parameters.
      */
     public static void main(String[] args) {
         Path location = Paths.get("example"); // Path to the source code folder/file or to a *.proof
@@ -143,8 +144,10 @@ public class Main {
     /**
      * Prints the symbolic execution tree as flat list into the console.
      *
-     * @param title The title.
-     * @param builder The {@link SymbolicExecutionTreeBuilder} providing the root of the symbolic
+     * @param title
+     *        The title.
+     * @param builder
+     *        The {@link SymbolicExecutionTreeBuilder} providing the root of the symbolic
      *        execution tree.
      */
     protected static void printSymbolicExecutionTree(String title,

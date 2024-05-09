@@ -16,15 +16,14 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
      * filters the sequent, creating SequentPrintFilterEntries from the sequent formulae.
      */
     protected void filterSequent() {
-        if (antec != null) {
-            return;
-        }
+        if (antec != null) { return; }
         filterIdentity();
     }
 
     /**
      *
-     * @param sequentFormula the formula to filter
+     * @param sequentFormula
+     *        the formula to filter
      * @return the FilterEntry from the formula
      */
     protected SequentPrintFilterEntry filterFormula(SequentFormula sequentFormula) {
@@ -65,7 +64,8 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
         /**
          * constructor
          *
-         * @param originalFormula the original formula to be filtered
+         * @param originalFormula
+         *        the original formula to be filtered
          */
         IdentityFilterEntry(SequentFormula originalFormula) {
             this.originalFormula = originalFormula;

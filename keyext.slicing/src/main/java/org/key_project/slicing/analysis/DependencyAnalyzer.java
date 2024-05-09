@@ -151,10 +151,14 @@ public final class DependencyAnalyzer {
      * Construct and configure a new dependency analyzer.
      * At least one analysis algorithm needs to be activated.
      *
-     * @param proof the proof to analyze
-     * @param graph the dependency graph of that proof
-     * @param doDependencyAnalysis whether to perform dependency analysis
-     * @param doDeduplicateRuleApps whether to de-duplicate rule applications
+     * @param proof
+     *        the proof to analyze
+     * @param graph
+     *        the dependency graph of that proof
+     * @param doDependencyAnalysis
+     *        whether to perform dependency analysis
+     * @param doDeduplicateRuleApps
+     *        whether to de-duplicate rule applications
      */
     public DependencyAnalyzer(
             Proof proof,
@@ -164,9 +168,7 @@ public final class DependencyAnalyzer {
         if (!doDependencyAnalysis && !doDeduplicateRuleApps) {
             throw new IllegalArgumentException("analyzer needs at least one activated algorithm");
         }
-        if (proof == null) {
-            throw new IllegalArgumentException("cannot analyze null proof");
-        }
+        if (proof == null) { throw new IllegalArgumentException("cannot analyze null proof"); }
         this.proof = proof;
         this.graph = graph;
         this.doDependencyAnalysis = doDependencyAnalysis;
@@ -181,7 +183,7 @@ public final class DependencyAnalyzer {
     public AnalysisResults analyze() {
         if (GeneralSettings.noPruningClosed) {
             throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, "
-                + "try disabling GeneralSettings.noPruningClosed");
+                    + "try disabling GeneralSettings.noPruningClosed");
         }
         // first check that all goals are closed without proof caching references
         if (!proof.closedGoals().stream()
@@ -205,16 +207,12 @@ public final class DependencyAnalyzer {
             // mark everything as 'useful' to evaluate the second algorithm in isolation
             proof.breadthFirstSearch(proof.root(), ((proof1, visitedNode) -> {
                 if (visitedNode.getAppliedRuleApp() == null) {
-                    if (!visitedNode.isClosed()) {
-                        usefulSteps.add(visitedNode);
-                    }
+                    if (!visitedNode.isClosed()) { usefulSteps.add(visitedNode); }
                     return;
                 }
                 usefulSteps.add(visitedNode);
                 DependencyNodeData data = visitedNode.lookup(DependencyNodeData.class);
-                if (data == null) {
-                    return;
-                }
+                if (data == null) { return; }
                 data.inputs.stream().map(it -> it.first).forEach(usefulFormulas::add);
                 usefulFormulas.addAll(data.outputs);
             }));
@@ -263,9 +261,7 @@ public final class DependencyAnalyzer {
     private RuleStatistics getRuleStatistics() {
         RuleStatistics rules = new RuleStatistics();
         proof.breadthFirstSearch(proof.root(), (theProof, node) -> {
-            if (node.getAppliedRuleApp() == null) {
-                return;
-            }
+            if (node.getAppliedRuleApp() == null) { return; }
             boolean branches = node.childrenCount() > 1;
             Rule rule = node.getAppliedRuleApp().rule();
             if (usefulSteps.contains(node)) {
@@ -302,9 +298,7 @@ public final class DependencyAnalyzer {
                 node = node.parent();
                 considerOutputs = true;
             }
-            if (usefulSteps.contains(node)) {
-                continue;
-            }
+            if (usefulSteps.contains(node)) { continue; }
             usefulSteps.add(node);
             DependencyNodeData data = node.lookup(DependencyNodeData.class);
             data.inputs.forEach(it -> usefulFormulas.add(it.first));
@@ -331,9 +325,7 @@ public final class DependencyAnalyzer {
         // unmark all 'useful' steps in useless branches
         executionTime.start(DEPENDENCY_ANALYSIS4);
         proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
-            if (!usefulSteps.contains(node)) {
-                return;
-            }
+            if (!usefulSteps.contains(node)) { return; }
             for (BranchLocation prefix : uselessBranches) {
                 if (node.getBranchLocation().hasPrefix(prefix)) {
                     usefulSteps.remove(node);
@@ -354,9 +346,7 @@ public final class DependencyAnalyzer {
      */
     private Deque<Node> analyzeDependenciesUsefulRoots() {
         Deque<Node> queue = new ArrayDeque<>();
-        for (Goal e : proof.closedGoals()) {
-            queue.add(e.node());
-        }
+        for (Goal e : proof.closedGoals()) { queue.add(e.node()); }
         // for each open goals, get the sequent at that point in the proof
         for (Goal goal : proof.openGoals()) {
             usefulSteps.add(goal.node());
@@ -381,9 +371,7 @@ public final class DependencyAnalyzer {
     private void analyzeDependenciesBranches() {
         // analyze branching proof steps: they are only useful if all of their outputs were used
         proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
-            if (node.childrenCount() <= 1) {
-                return;
-            }
+            if (node.childrenCount() <= 1) { return; }
             DependencyNodeData data = node.lookup(DependencyNodeData.class);
             Map<BranchLocation, Collection<GraphNode>> groupedOutputs = new HashMap<>();
             node.childrenIterator().forEachRemaining(
@@ -398,9 +386,7 @@ public final class DependencyAnalyzer {
             });
             boolean cutWasUseful = groupedOutputs.values().stream()
                     .allMatch(l -> l.stream().anyMatch(usefulFormulas::contains));
-            if (cutWasUseful) {
-                return;
-            }
+            if (cutWasUseful) { return; }
             usefulSteps.remove(node);
             // mark sub-proof as useless, if necessary
             Set<BranchLocation> branchesToSkip = data.outputs.stream()
@@ -437,9 +423,7 @@ public final class DependencyAnalyzer {
 
         // search for duplicate rule applications
         graph.nodes().forEach(node -> {
-            if (mergedAnything) {
-                return;
-            }
+            if (mergedAnything) { return; }
             // groups proof steps that act upon this graph node by their rule app
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
             Map<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> foundDupes = new HashMap<>();
@@ -455,20 +439,14 @@ public final class DependencyAnalyzer {
                 }
 
                 // do not deduplicate branching steps
-                if (proofNode.childrenCount() > 1) {
-                    return;
-                }
+                if (proofNode.childrenCount() > 1) { return; }
                 // In combination with the dependency analysis algorithm:
                 // only deduplicate useful steps
-                if (!usefulSteps.contains(proofNode)) {
-                    return;
-                }
+                if (!usefulSteps.contains(proofNode)) { return; }
                 // Only try to deduplicate the addition of new formulas.
                 // It is unlikely that two closed goals are derived using the same formula.
                 GraphNode produced = t.second;
-                if (!(produced instanceof TrackedFormula)) {
-                    return;
-                }
+                if (!(produced instanceof TrackedFormula)) { return; }
                 foundDupes
                         .computeIfAbsent(
                             new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp()),
@@ -479,13 +457,9 @@ public final class DependencyAnalyzer {
             // scan dupes, try to find a set of mergable rule applications
             for (Map.Entry<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> entry : foundDupes
                     .entrySet()) {
-                if (mergedAnything) {
-                    continue;
-                }
+                if (mergedAnything) { continue; }
                 List<Node> steps = new ArrayList<>(entry.getValue());
-                if (steps.size() <= 1) {
-                    continue;
-                }
+                if (steps.size() <= 1) { continue; }
                 // try merging "adjacent" rule apps
                 // (rule apps are sorted by step index = linear location in the proof tree)
                 steps.sort(Comparator.comparing(Node::getStepIndex));
@@ -497,21 +471,13 @@ public final class DependencyAnalyzer {
                         .map(Node::getBranchLocation)
                         .collect(Collectors.toList());
                 for (int idxA = 0; idxA < apps.size() - 1; idxA++) {
-                    if (mergedAnything) {
-                        continue;
-                    }
+                    if (mergedAnything) { continue; }
                     Node stepA = apps.get(idxA);
-                    if (stepA == null) {
-                        continue;
-                    }
+                    if (stepA == null) { continue; }
                     for (int idxB = idxA + 1; idxB < apps.size(); idxB++) {
-                        if (mergedAnything) {
-                            continue;
-                        }
+                        if (mergedAnything) { continue; }
                         Node stepB = apps.get(idxB);
-                        if (stepB == null) {
-                            continue;
-                        }
+                        if (stepB == null) { continue; }
                         // To combine step A and step B, the same rule must be applied
                         // earlier in the proof. This new location (the "merge base") is simply the
                         // longest common prefix of the tw steps' branch locations.
@@ -573,9 +539,7 @@ public final class DependencyAnalyzer {
                             _node -> new ArrayList<>())
                                 .add(steps.get(i));
                     }
-                    if (!keep) {
-                        usefulSteps.remove(steps.get(i));
-                    }
+                    if (!keep) { usefulSteps.remove(steps.get(i)); }
                 }
             }
         });
@@ -584,13 +548,20 @@ public final class DependencyAnalyzer {
     /**
      * Checks whether the two provided nodes can be merged into a single node.
      *
-     * @param apps list of all similar rule applications
-     * @param idxA index of first node in <code>apps</code>
-     * @param stepA first node
-     * @param stepB second node
-     * @param locA branch location of first node
-     * @param locB branch location of second node
-     * @param mergeBase common prefix of <code>locA</code> and <code>locB</code>
+     * @param apps
+     *        list of all similar rule applications
+     * @param idxA
+     *        index of first node in <code>apps</code>
+     * @param stepA
+     *        first node
+     * @param stepB
+     *        second node
+     * @param locA
+     *        branch location of first node
+     * @param locB
+     *        branch location of second node
+     * @param mergeBase
+     *        common prefix of <code>locA</code> and <code>locB</code>
      * @return whether a merge is valid
      */
     private boolean canMergeStepsInto(List<Node> apps, int idxA, Node stepA, Node stepB,
@@ -608,15 +579,11 @@ public final class DependencyAnalyzer {
         // verify that they actually use the same inputs...
         Set<GraphNode> inputsA = graph.inputsOf(stepA).collect(Collectors.toSet());
         Set<GraphNode> inputsB = graph.inputsOf(stepB).collect(Collectors.toSet());
-        if (!(inputsA.containsAll(inputsB) && inputsB.containsAll(inputsA))) {
-            return false;
-        }
+        if (!(inputsA.containsAll(inputsB) && inputsB.containsAll(inputsA))) { return false; }
         // search for conflicting rule apps
         // (only relevant if the rule apps consume the input)
         // (see condition 2 above)
-        if (otherStepsRequireConsumedInputs(apps, idxA, stepA, stepB, mergeBase)) {
-            return false;
-        }
+        if (otherStepsRequireConsumedInputs(apps, idxA, stepA, stepB, mergeBase)) { return false; }
         // search for conflicts concerning multiple derivations of the same formula in a branch
         // (see condition 3 above)
         return !mergeWouldBreakOtherSteps(stepA, stepB, newStepIdx);
@@ -628,9 +595,12 @@ public final class DependencyAnalyzer {
      * This method only checks that the new formulas introduced by the merged step are available
      * for the further proof steps that require them.
      *
-     * @param stepA first proof step
-     * @param stepB second proof step
-     * @param newStepIdx step index of the potential merged step
+     * @param stepA
+     *        first proof step
+     * @param stepB
+     *        second proof step
+     * @param newStepIdx
+     *        step index of the potential merged step
      * @return whether the merge is obstructed
      */
     private boolean mergeWouldBreakOtherSteps(Node stepA, Node stepB, int newStepIdx) {
@@ -658,9 +628,7 @@ public final class DependencyAnalyzer {
                                 && edge.getProofStep().getBranchLocation()
                                         .hasPrefix(stepAB.getBranchLocation()))
                         .findFirst();
-                if (lastConsumer.isPresent()) {
-                    consumers = Stream.concat(consumers, Stream.of(lastConsumer.get()));
-                }
+                if (lastConsumer.isPresent()) { consumers = Stream.concat(consumers, Stream.of(lastConsumer.get())); }
                 // list of (step index, produces / consumes)
                 Comparator<Pair<Integer, Boolean>> byStepIndex =
                     Comparator.comparingInt(x -> x.first);
@@ -697,9 +665,7 @@ public final class DependencyAnalyzer {
                 list.add(new Pair<>(newStepIdx, true));
                 list.sort(byStepIndex);
                 // if the new list is not correct: merge would break one of the listed steps
-                if (!isCorrect.test(list)) {
-                    hasConflictOut.set(true);
-                }
+                if (!isCorrect.test(list)) { hasConflictOut.set(true); }
             });
         }
         return hasConflictOut.get();
@@ -709,11 +675,16 @@ public final class DependencyAnalyzer {
      * Checks whether any proof steps use an input formula consumed by <code>stepA</code> or
      * <code>stepB</code>. In that case, the two steps may not be merged.
      *
-     * @param apps list of all similar apps
-     * @param idxA index of stepA
-     * @param stepA first proof step
-     * @param stepB second proof step
-     * @param mergeBase merge base of stepA and stepB
+     * @param apps
+     *        list of all similar apps
+     * @param idxA
+     *        index of stepA
+     * @param stepA
+     *        first proof step
+     * @param stepB
+     *        second proof step
+     * @param mergeBase
+     *        merge base of stepA and stepB
      * @return whether the merge is obstructed
      */
     private boolean otherStepsRequireConsumedInputs(List<Node> apps, int idxA, Node stepA,

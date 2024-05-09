@@ -84,7 +84,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * creates a new SVInstantions object using the given map
      *
-     * @param map the ImmMap<SchemaVariable,InstantiationEntry<?>> with the instantiations
+     * @param map
+     *        the ImmMap<SchemaVariable,InstantiationEntry<?>> with the instantiations
      */
     private SVInstantiations(ImmutableMap<SchemaVariable, InstantiationEntry<?>> map,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
@@ -120,8 +121,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param subst the Term the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param subst
+     *        the Term the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, Term subst, Services services) {
@@ -153,8 +156,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      */
     public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind,
             Services services) throws SortException {
-        return add(sv, new InstantiationEntry<>(kind) {
-        }, services);
+        return add(sv, new InstantiationEntry<>(kind) {}, services);
     }
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
@@ -168,8 +170,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pe
+     *        the ProgramElement the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, ProgramElement pe, Services services) {
@@ -194,10 +198,14 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * adds the given pair to the instantiations for the context.If the context has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param prefix the PosInProgram describing the prefix
-     * @param postfix the PosInProgram describing the postfix
-     * @param activeStatementContext the ExecutionContext of the first active statement
-     * @param pe the ProgramElement the context positions are related to
+     * @param prefix
+     *        the PosInProgram describing the prefix
+     * @param postfix
+     *        the PosInProgram describing the postfix
+     * @param activeStatementContext
+     *        the ExecutionContext of the first active statement
+     * @param pe
+     *        the ProgramElement the context positions are related to
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
@@ -210,11 +218,11 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     // the following two exceptions are created statically for performance
     private static final SortException INCOMPATIBLE_INSTANTIATION_EXCEPTION =
         new SortException("Sort of SV " + "is not compatible with its " + "instantiation's sort\n"
-            + "(This exception object is static)");
+                + "(This exception object is static)");
 
     private static final IllegalInstantiationException CONVERT_INSTANTIATION_EXCEPTION =
         new SortException("Instantiation of SV " + "cannot be converted to logic\n"
-            + "(This exception object is static)");
+                + "(This exception object is static)");
 
     private static final SortException UNSOLVABLE_SORT_CONDITIONS_EXCEPTION = new SortException(
         "Conditions for sorts" + " cannot be satisfied\n" + "(This exception object is static)");
@@ -225,12 +233,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
         if (b == null) {
             return rebuildSorts(services);
-        } else if (!b) {
-            throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
-        }
-        if (p_forceRebuild) {
-            return rebuildSorts(services);
-        }
+        } else if (!b) { throw INCOMPATIBLE_INSTANTIATION_EXCEPTION; }
+        if (p_forceRebuild) { return rebuildSorts(services); }
         return this;
     }
 
@@ -240,12 +244,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
         if (b == null) {
             return rebuildSorts(services);
-        } else if (!b) {
-            throw UNSOLVABLE_SORT_CONDITIONS_EXCEPTION;
-        }
-        if (p_forceRebuild) {
-            return rebuildSorts(services);
-        }
+        } else if (!b) { throw UNSOLVABLE_SORT_CONDITIONS_EXCEPTION; }
+        if (p_forceRebuild) { return rebuildSorts(services); }
         return this;
     }
 
@@ -259,8 +259,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param entry
+     *        the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, Services services) {
@@ -296,8 +298,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param entry
+     *        the InstantiationEntry the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
             Services services) {
@@ -308,7 +312,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * adds the schemvariable to the set of interesting ones
      *
-     * @throws IllegalInstantiationException, if sv has not yet been instantiated
+     * @throws IllegalInstantiationException,
+     *         if sv has not yet been instantiated
      */
     public SVInstantiations makeInteresting(SchemaVariable sv, Services services) {
         final InstantiationEntry<?> entry = getInstantiationEntry(sv);
@@ -328,8 +333,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param term the Term the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param term
+     *        the Term the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, Term term, Services services) {
         return replace(sv, new TermInstantiation(sv, term), services);
@@ -339,8 +346,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pe
+     *        the ProgramElement the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ProgramElement pe, Services services) {
         return replace(sv, new ProgramInstantiation(pe), services);
@@ -350,8 +359,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pes the ArrayOf<t> the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pes
+     *        the ArrayOf<t> the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes,
             Services services) {
@@ -362,12 +373,16 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the context has been instantiated already,
      * the new pair is taken without a warning.
      *
-     * @param prefix the PosInProgram describing the position of the first statement after the
+     * @param prefix
+     *        the PosInProgram describing the position of the first statement after the
      *        prefix
-     * @param postfix the PosInProgram describing the position of the statement just before the
+     * @param postfix
+     *        the PosInProgram describing the position of the statement just before the
      *        postfix
-     * @param activeStatementContext the ExecutionContext of the first active statement
-     * @param pe the ProgramElement the context positions are related to
+     * @param activeStatementContext
+     *        the ExecutionContext of the first active statement
+     * @param pe
+     *        the ProgramElement the context positions are related to
      */
     public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
             ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
@@ -430,7 +445,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * adds an update to the update context
      *
-     * @param updateApplicationlabels the TermLabels attached to the application operator term
+     * @param updateApplicationlabels
+     *        the TermLabels attached to the application operator term
      */
     public SVInstantiations addUpdate(Term update,
             ImmutableArray<TermLabel> updateApplicationlabels) {
@@ -453,7 +469,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
         @Override
         public int hashCode() {
-            return update.hashCode() + 13*updateApplicationlabels.hashCode();
+            return update.hashCode() + 13 * updateApplicationlabels.hashCode();
         }
     }
 
@@ -541,9 +557,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         } else {
             cmp = (SVInstantiations) obj;
         }
-        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) {
-            return false;
-        }
+        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) { return false; }
 
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             pairIterator();
@@ -556,9 +570,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
                     IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     return false;
                 }
-            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
-                return false;
-            }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) { return false; }
         }
         return true;
 
@@ -572,9 +584,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         } else {
             cmp = (SVInstantiations) obj;
         }
-        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) {
-            return false;
-        }
+        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) { return false; }
 
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             pairIterator();
@@ -587,9 +597,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
                     cmp.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY)) {
                     return false;
                 }
-            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
-                return false;
-            }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) { return false; }
         }
         return true;
 
@@ -602,9 +610,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
             if (e.value().getInstantiation() instanceof TermLabel termLabel) {
-                if (!termLabel.isProofRelevant()) {
-                    continue;
-                }
+                if (!termLabel.isProofRelevant()) { continue; }
             }
             result = 37 * result + e.value().getInstantiation().hashCode() + e.key().hashCode();
         }
@@ -670,9 +676,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     public ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(Name name) {
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e : map) {
-            if (e.key().name().equals(name)) {
-                return e;
-            }
+            if (e.key().name().equals(name)) { return e; }
         }
         return null; // handle this better!
     }

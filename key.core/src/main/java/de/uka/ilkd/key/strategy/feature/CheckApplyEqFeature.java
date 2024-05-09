@@ -52,16 +52,9 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         it.next();
 
         // leading updates are not interesting
-        while (it.getSubTerm().op() instanceof UpdateApplication) {
-            if (!it.hasNext()) {
-                return true;
-            }
-            it.next();
-        }
+        while (it.getSubTerm().op() instanceof UpdateApplication) { if (!it.hasNext()) { return true; } it.next(); }
 
-        if (!(it.getSubTerm().op() instanceof Equality) || !it.hasNext()) {
-            return true;
-        }
+        if (!(it.getSubTerm().op() instanceof Equality) || !it.hasNext()) { return true; }
 
         // we don't allow rewriting in the left term of the equation
         return it.getChild() != 0;

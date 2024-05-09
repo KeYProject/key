@@ -20,8 +20,10 @@ public class InnerNodeViewMenu extends SequentViewMenu<InnerNodeView> {
     /**
      * Creates a new menu that displays all applicable actions at the given position
      *
-     * @param sequentView the SequentView that is the parent of this menu
-     * @param pos the PosInSequent
+     * @param sequentView
+     *        the SequentView that is the parent of this menu
+     * @param pos
+     *        the PosInSequent
      */
     InnerNodeViewMenu(InnerNodeView sequentView, PosInSequent pos) {
         super(sequentView, pos);
@@ -32,7 +34,8 @@ public class InnerNodeViewMenu extends SequentViewMenu<InnerNodeView> {
     /**
      * Creates the menu by adding all sub-menus and items.
      *
-     * @param control the action listener.
+     * @param control
+     *        the action listener.
      */
     private void createMenu(MenuControl control) {
         addActionListener(control);

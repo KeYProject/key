@@ -43,9 +43,7 @@ public abstract class InitArray extends ProgramTransformer {
 
         if (aInit == null)
         // nothing to do for us
-        {
-            return null;
-        }
+        { return null; }
 
         return aInit.getArguments();
     }
@@ -69,9 +67,7 @@ public abstract class InitArray extends ProgramTransformer {
 
         ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
 
-        if (initializers == null) {
-            return p_creationExpression;
-        }
+        if (initializers == null) { return p_creationExpression; }
 
         KeYJavaType arrayType = p_creationExpression.getKeYJavaType();
 
@@ -91,9 +87,7 @@ public abstract class InitArray extends ProgramTransformer {
 
         ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
 
-        if (initializers == null) {
-            return new ProgramVariable[0];
-        }
+        if (initializers == null) { return new ProgramVariable[0]; }
 
         KeYJavaType elementType = getElementType(p_creationExpression);
 
@@ -119,9 +113,7 @@ public abstract class InitArray extends ProgramTransformer {
             ProgramVariable[] p_initializers, ReferencePrefix p_array,
             NewArray p_creationExpression) {
 
-        if (p_initializers == null || p_initializers.length == 0) {
-            return;
-        }
+        if (p_initializers == null || p_initializers.length == 0) { return; }
 
         KeYJavaType elementType = p_initializers[0].getKeYJavaType();
         TypeReference baseType = p_creationExpression.getTypeReference();

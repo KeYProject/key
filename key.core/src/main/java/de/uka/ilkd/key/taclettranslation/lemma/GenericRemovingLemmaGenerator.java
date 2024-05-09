@@ -46,9 +46,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
         if (op instanceof SortDependingFunction sdf) {
             Sort sort = sdf.getSortDependingOn();
             Sort repSort = replaceSort(sort, services);
-            if (sort != repSort) {
-                op = sdf.getInstanceFor(repSort, services);
-            }
+            if (sort != repSort) { op = sdf.getInstanceFor(repSort, services); }
         }
 
         return op;
@@ -65,9 +63,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
         if (sort instanceof GenericSort) {
 
             Sort cached = sortMap.get(sort);
-            if (cached != null) {
-                return cached;
-            }
+            if (cached != null) { return cached; }
 
             ImmutableSet<Sort> extSorts = replaceSorts(sort.extendsSorts(), services);
             ProxySort result = new ProxySort(sort.name(), extSorts, "", "");
@@ -82,16 +78,16 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     /**
      * Replace sorts.
      *
-     * @param extendsSorts the extends sorts
-     * @param services the services
+     * @param extendsSorts
+     *        the extends sorts
+     * @param services
+     *        the services
      * @return the immutable set
      */
     private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts,
             TermServices services) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
-        for (Sort sort : extendsSorts) {
-            result = result.add(replaceSort(sort, services));
-        }
+        for (Sort sort : extendsSorts) { result = result.add(replaceSort(sort, services)); }
         return result;
     }
 }

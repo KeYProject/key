@@ -50,11 +50,7 @@ public class OverloadedOperatorHandler {
         }
 
         public static JMLOperator get(String image) {
-            for (JMLOperator value : JMLOperator.values()) {
-                if (value.image.equals(image)) {
-                    return value;
-                }
-            }
+            for (JMLOperator value : JMLOperator.values()) { if (value.image.equals(image)) { return value; } }
             throw new NoSuchElementException("There is no JML operator for " + image);
         }
 
@@ -83,11 +79,15 @@ public class OverloadedOperatorHandler {
         /**
          * Apply the provided arguments to the operator which corresponds to the given JML operator.
          *
-         * @param op the JML operator
-         * @param left left side of the binary expression
-         * @param right right side of the binary expression, null if op is unary.
+         * @param op
+         *        the JML operator
+         * @param left
+         *        left side of the binary expression
+         * @param right
+         *        right side of the binary expression, null if op is unary.
          * @return null if this handler is not able to do the translation.
-         * @throws SLTranslationException if translation fails (incompatible types e.g.)
+         * @throws SLTranslationException
+         *         if translation fails (incompatible types e.g.)
          */
         @Nullable
         SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
@@ -112,7 +112,8 @@ public class OverloadedOperatorHandler {
     /**
      * Sets the spec math mode and returns the previous mode
      *
-     * @param specMathMode new spec math mode
+     * @param specMathMode
+     *        new spec math mode
      * @return old spec math mode
      */
     public SpecMathMode replaceSpecMathMode(SpecMathMode specMathMode) {
@@ -126,14 +127,11 @@ public class OverloadedOperatorHandler {
         return integerHandler.getSpecMathMode();
     }
 
-    @Nullable
-    public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+    public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
             throws SLTranslationException {
         for (JMLOperatorHandler handler : handlers) {
             var term = handler.build(op, left, right);
-            if (term != null) {
-                return term;
-            }
+            if (term != null) { return term; }
         }
         return null;
     }
@@ -148,18 +146,13 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
-            if (right == null) {
-                return null;
-            }
+            if (right == null) { return null; }
             if (left.getTerm().sort() == ldtSequence.targetSort()
                     && right.getTerm().sort() == ldtSequence.targetSort()) {
-                if (op == JMLOperator.ADD) {
-                    return new SLExpression(tb.seqConcat(left.getTerm(), right.getTerm()));
-                }
+                if (op == JMLOperator.ADD) { return new SLExpression(tb.seqConcat(left.getTerm(), right.getTerm())); }
             }
             return null;
         }
@@ -174,13 +167,10 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
-            if (right == null) {
-                return null;
-            }
+            if (right == null) { return null; }
             final var l = left.getTerm();
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
@@ -208,9 +198,8 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
             if ((left.getTerm().sort() == sortBoolean
                     || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean

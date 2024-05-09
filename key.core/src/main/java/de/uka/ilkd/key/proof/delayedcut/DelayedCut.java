@@ -68,9 +68,7 @@ public class DelayedCut {
     }
 
     void setHideApp(NoPosTacletApp hideApp) {
-        if (this.hideApp != null) {
-            throw new IllegalArgumentException("There already exists an app.");
-        }
+        if (this.hideApp != null) { throw new IllegalArgumentException("There already exists an app."); }
         this.hideApp = hideApp;
     }
 

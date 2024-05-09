@@ -227,7 +227,8 @@ public class Services implements TermServices, LogicServices {
      * TypeConverter (shallow copy) The copy does not belong to a {@link Proof} object and can hence
      * be used for a new proof.
      *
-     * @param shareCaches {@code true} The created {@link Services} will use the same
+     * @param shareCaches
+     *        {@code true} The created {@link Services} will use the same
      *        {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
      *        will use a new empty {@link ServiceCaches} instance.
      * @return the copy
@@ -240,8 +241,10 @@ public class Services implements TermServices, LogicServices {
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced. The copy
      * does not belong to a {@link Proof} object and can hence be used for a new proof.
      *
-     * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
-     * @param shareCaches {@code true} The created {@link Services} will use the same
+     * @param profile
+     *        The new {@link Profile} to use in the copy of this {@link Services}.
+     * @param shareCaches
+     *        {@code true} The created {@link Services} will use the same
      *        {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
      *        will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
@@ -293,7 +296,8 @@ public class Services implements TermServices, LogicServices {
      * copy the {@link InitConfig} via {@link InitConfig#deepCopy()} or one of the other copy
      * methods first.
      *
-     * @param p_proof the Proof to which this {@link Services} instance belongs
+     * @param p_proof
+     *        the Proof to which this {@link Services} instance belongs
      */
     public void setProof(Proof p_proof) {
         if (this.proof != null) {
@@ -309,9 +313,7 @@ public class Services implements TermServices, LogicServices {
      */
     public Counter getCounter(String name) {
         Counter c = counters.get(name);
-        if (c != null) {
-            return c;
-        }
+        if (c != null) { return c; }
         c = new Counter(name);
         counters.put(name, c);
         return c;
@@ -341,7 +343,8 @@ public class Services implements TermServices, LogicServices {
     /**
      * sets the namespaces of known predicates, functions, variables
      *
-     * @param namespaces the NamespaceSet with the proof specific namespaces
+     * @param namespaces
+     *        the NamespaceSet with the proof specific namespaces
      */
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
@@ -445,7 +448,8 @@ public class Services implements TermServices, LogicServices {
     /**
      * sets the factory for origin term labels
      *
-     * @param originFactory the {@OriginTermLabelFactory} to use, if null is passed, origin labels
+     * @param originFactory
+     *        the {@OriginTermLabelFactory} to use, if null is passed, origin labels
      *        should not be created
      */
     public void setOriginFactory(OriginTermLabelFactory originFactory) {

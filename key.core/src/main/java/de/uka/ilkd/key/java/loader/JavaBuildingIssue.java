@@ -49,9 +49,9 @@ public class JavaBuildingIssue {
     @Override
     public String toString() {
         return "JavaBuildingIssue{" +
-            "node=" + node +
-            "range=" + node.getRange() +
-            ", message='" + message + '\'' +
-            '}';
+                "node=" + node +
+                "range=" + node.getRange() +
+                ", message='" + message + '\'' +
+                '}';
     }
 }

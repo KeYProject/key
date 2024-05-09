@@ -10,6 +10,8 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Program;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class is used to represent a dynamic logic modality like diamond and box for a target
  * language.
@@ -26,7 +28,8 @@ public abstract class Modality extends AbstractSortedOperator {
      * The kind of this modality, e.g., box, diamond.
      *
      * @return The kind of the modality.
-     * @param <K> Restricts the expected type of the kind.
+     * @param <K>
+     *        Restricts the expected type of the kind.
      */
     public final <K extends Kind> K kind() {
         return (K) kind;
@@ -60,7 +63,7 @@ public abstract class Modality extends AbstractSortedOperator {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o)
                 return true;
             if (!(o instanceof Kind kind))

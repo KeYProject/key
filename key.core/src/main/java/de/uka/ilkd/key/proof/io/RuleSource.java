@@ -23,7 +23,8 @@ public abstract class RuleSource {
      * "jar:file:///...").
      *
      * @return the location of the RuleSource as url
-     * @throws IOException on I/O errors
+     * @throws IOException
+     *         on I/O errors
      */
     public abstract URL url() throws IOException;
 

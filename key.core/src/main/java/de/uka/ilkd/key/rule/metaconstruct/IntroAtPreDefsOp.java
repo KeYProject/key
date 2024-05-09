@@ -67,10 +67,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * of all block contracts for blocks in {@code blocks} by {@code atPreVars} and
      * {@code atPreHeapVars}
      *
-     * @param statements the blocks and loops whose contracts to update.
-     * @param atPreVars all remembrance variables.
-     * @param atPreHeapVars all remembrance heaps.
-     * @param services services.
+     * @param statements
+     *        the blocks and loops whose contracts to update.
+     * @param atPreVars
+     *        all remembrance variables.
+     * @param atPreHeapVars
+     *        all remembrance heaps.
+     * @param services
+     *        services.
      */
     public void updateBlockAndLoopContracts(final ImmutableSet<? extends JavaStatement> statements,
             Map<LocationVariable, LocationVariable> atPreVars,
@@ -227,12 +231,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, self, atPres, services);
                     final Term inv = spec.getInvariant(heap, self, atPres, services);
-                    if (inv != null) {
-                        newInvariants.put(heap, inv);
-                    }
-                    if (m != null) {
-                        newMods.put(heap, m);
-                    }
+                    if (inv != null) { newInvariants.put(heap, inv); }
+                    if (m != null) { newMods.put(heap, m); }
                     newInfFlowSpecs.put(heap, infFlowSpecs);
                 }
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
@@ -242,12 +242,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
                     final Term freeInv = spec.getFreeInvariant(heap, self, atPres, services);
-                    if (freeInv != null) {
-                        newFreeInvariants.put(heap, freeInv);
-                    }
-                    if (m != null) {
-                        newFreeMods.put(heap, m);
-                    }
+                    if (freeInv != null) { newFreeInvariants.put(heap, freeInv); }
+                    if (m != null) { newFreeMods.put(heap, m); }
                     newInfFlowSpecs.put(heap, infFlowSpecs);
                 }
 
@@ -267,9 +263,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             vars.sort(LOCVAR_COMPARATOR);
             for (LocationVariable var : vars) {
 
-                if (atPres.containsKey(var)) {
-                    continue;
-                }
+                if (atPres.containsKey(var)) { continue; }
                 final LocationVariable l = tb.locationVariable(var.name() + "Before_" + methodName,
                     var.getKeYJavaType(), true);
                 services.getNamespaces().programVariables().addSafely(l);
@@ -286,9 +280,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             List<LocationVariable> vars = new ArrayList<>(heapVariables);
             vars.sort(LOCVAR_COMPARATOR);
             for (LocationVariable var : vars) {
-                if (atPres.containsKey(var)) {
-                    continue;
-                }
+                if (atPres.containsKey(var)) { continue; }
                 final LocationVariable l =
                     tb.locationVariable(var.name() + "Before_" + methodName, var.sort(), true);
                 services.getNamespaces().programVariables().addSafely(l);
@@ -335,9 +327,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             // why does the saved heap just get ignored here?
-            if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
-                continue;
-            }
+            if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) { continue; }
 
             newPreconditions.put(heap, contract.getPrecondition(heap, newVariables, services));
             newFreePreconditions.put(heap,

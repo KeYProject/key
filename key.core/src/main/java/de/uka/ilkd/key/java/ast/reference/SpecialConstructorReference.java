@@ -32,7 +32,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Special constructor reference.
      *
-     * @param arguments an expression mutable list.
+     * @param arguments
+     *        an expression mutable list.
      */
     public SpecialConstructorReference(Expression[] arguments) {
         this.arguments = new ImmutableArray<>(arguments);
@@ -42,7 +43,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Special constructor reference.
      *
-     * @param arguments an expression mutable list.
+     * @param arguments
+     *        an expression mutable list.
      */
     public SpecialConstructorReference(ImmutableArray<Expression> arguments) {
         this.arguments = arguments;
@@ -52,7 +54,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: several of
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: several of
      *        Expression (as initializers of the array), Comments
      */
     public SpecialConstructorReference(ExtList children) {
@@ -63,7 +66,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: several of
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: several of
      *        Expression (as initializers of the array), Comments
      */
     public SpecialConstructorReference(ExtList children, PositionInfo pi) {
@@ -90,14 +94,14 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -121,9 +125,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (arguments != null) { return arguments.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 

@@ -57,9 +57,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
         var initializers = services.getInitializers(cd);
         int i = 0;
-        for (Statement initializer : initializers) {
-            body.addStatement(i++, initializer.clone());
-        }
+        for (Statement initializer : initializers) { body.addStatement(i++, initializer.clone()); }
         MethodDeclaration def =
             cd.addMethod(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
                 Modifier.Keyword.PUBLIC);
@@ -71,8 +69,10 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
      * in class cd. For a detailed description of the normalform to be
      * built see the KeY Manual.
      *
-     * @param cd the TypeDeclaration<?> where the cons is declared
-     * @param cons the Constructor to be transformed
+     * @param cd
+     *        the TypeDeclaration<?> where the cons is declared
+     * @param cons
+     *        the Constructor to be transformed
      */
     private void normalform(@NonNull ClassOrInterfaceDeclaration cd,
             @NonNull ConstructorDeclaration cons) {
@@ -120,19 +120,13 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         // transfer constructor body
         BlockStmt origBody = cons.getBody();
         if (origBody != null) {
-            for (Statement statement : origBody.getStatements()) {
-                body.addStatement(statement.clone());
-            }
+            for (Statement statement : origBody.getStatements()) { body.addStatement(statement.clone()); }
         }
 
         if (outerVars != null && !outerVars.isEmpty()) {
-            if (parameters.isEmpty()) {
-                attachDefaultConstructor(cd);
-            }
+            if (parameters.isEmpty()) { attachDefaultConstructor(cd); }
 
-            for (var v : outerVars) {
-                parameters.add(new Parameter(services.getType(v.getType()), v.getName()));
-            }
+            for (var v : outerVars) { parameters.add(new Parameter(services.getType(v.getType()), v.getName())); }
         }
 
         if (!cd.resolve().isJavaLangObject()) {
@@ -226,9 +220,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
 
     private Optional<ClassOrInterfaceDeclaration> getEnclosingClass(
             ClassOrInterfaceDeclaration cd) {
-        if (cd.isNestedType()) {
-            return cd.getParentNode().map(ClassOrInterfaceDeclaration.class::cast);
-        }
+        if (cd.isNestedType()) { return cd.getParentNode().map(ClassOrInterfaceDeclaration.class::cast); }
         return Optional.empty();
     }
 
@@ -258,29 +250,22 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
         if (td instanceof ClassOrInterfaceDeclaration) {
             var cd = (ClassOrInterfaceDeclaration) td;
-            if (cd.isInterface()) {
-                return;
-            }
+            if (cd.isInterface()) { return; }
             var constructors = td.getConstructors();
             ConstructorDeclaration anonConstr = null;
-            if (cd.getName() == null) {
-                anonConstr = attachConstructorDecl(td);
-            }
+            if (cd.getName() == null) { anonConstr = attachConstructorDecl(td); }
             if (anonConstr != null)
                 constructors.add(anonConstr);
 
-            if (constructors.isEmpty()) {
-                attachDefaultConstructor(cd);
-            }
+            if (constructors.isEmpty()) { attachDefaultConstructor(cd); }
 
-            for (ConstructorDeclaration constructor : constructors) {
-                normalform(cd, constructor);
-            }
+            for (ConstructorDeclaration constructor : constructors) { normalform(cd, constructor); }
         }
     }
 }

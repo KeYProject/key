@@ -79,17 +79,22 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      */
     private Instantiation lastInstantiation;
 
-    private LoopContractExternalRule() {
-    }
+    private LoopContractExternalRule() {}
 
     /**
      *
-     * @param contextUpdate the context update.
-     * @param heaps the heaps.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param variables the variables.
-     * @param modifiesClauses the modifies clauses.
-     * @param services services.
+     * @param contextUpdate
+     *        the context update.
+     * @param heaps
+     *        the heaps.
+     * @param anonymisationHeaps
+     *        the anonymization heaps.
+     * @param variables
+     *        the variables.
+     * @param modifiesClauses
+     *        the modifies clauses.
+     * @param services
+     *        services.
      * @return the updates for the usage branch.
      */
     private static Term[] createUpdates(final Term contextUpdate,
@@ -106,12 +111,18 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     /**
      *
-     * @param selfTerm the self term.
-     * @param contract the loop contract being applied.
-     * @param heaps the heaps.
-     * @param localInVariables all free program variables in the block.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
-     * @param services services.
+     * @param selfTerm
+     *        the self term.
+     * @param contract
+     *        the loop contract being applied.
+     * @param heaps
+     *        the heaps.
+     * @param localInVariables
+     *        all free program variables in the block.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder.
+     * @param services
+     *        services.
      * @return the preconditions.
      */
     private static Term[] createPreconditions(final Term selfTerm, final LoopContract contract,
@@ -132,9 +143,12 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     /**
      *
-     * @param localOutVariables all free program variables modified by the block.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param localOutVariables
+     *        all free program variables modified by the block.
+     * @param anonymisationHeaps
+     *        the anonymization heaps.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder.
      * @return preconditions for the usage branch.
      */
     private static Term[] createUsageAssumptions(
@@ -194,25 +208,20 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             final Instantiation instantiation =
                 instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
 
-            if (instantiation == null) {
-                return false;
-            }
+            if (instantiation == null) { return false; }
 
             final ImmutableSet<LoopContract> contracts =
                 getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
             for (LoopContract contract : contracts) {
-                if (contract.getHead() == null && !contract.isInternalOnly()) {
-                    return true;
-                }
+                if (contract.getHead() == null && !contract.isInternalOnly()) { return true; }
             }
             return false;
         }
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractExternalBuiltInRuleApp;
         LoopContractExternalBuiltInRuleApp application =
@@ -265,9 +274,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
                 .getInitConfig().getJustifInfo().getJustification(this);
 
-        for (Contract c : contract.getFunctionalContracts()) {
-            cjust.add(application, new RuleJustificationBySpec(c));
-        }
+        for (Contract c : contract.getFunctionalContracts()) { cjust.add(application, new RuleJustificationBySpec(c)); }
 
         return result;
     }

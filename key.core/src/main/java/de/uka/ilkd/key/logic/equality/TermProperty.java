@@ -19,8 +19,10 @@ public interface TermProperty {
     /**
      * Checks {@code term1} and {@code term2} for equality ignoring a certain property.
      *
-     * @param term1 the first term to check for equality with {@code term2}
-     * @param term2 the second term to check for equality with {@code term1}
+     * @param term1
+     *        the first term to check for equality with {@code term2}
+     * @param term2
+     *        the second term to check for equality with {@code term1}
      * @return whether {@code term1} and {@code term2} are equal ignoring a certain property
      */
     Boolean equalsModThisProperty(Term term1, Term term2);
@@ -30,7 +32,8 @@ public interface TermProperty {
      * {@link this#equalsModThisProperty(Term, Term)} is used as an equality check, so that it can
      * be used in, e.g., a HashMap.
      *
-     * @param term the term to compute the hash code for
+     * @param term
+     *        the term to compute the hash code for
      * @return the hash code of {@code term} ignoring a certain property
      */
     int hashCodeModThisProperty(Term term);

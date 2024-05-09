@@ -9,6 +9,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import org.checkerframework.checker.initialization.qual.Initialized;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class handles the management of services and implementations.
  * <p>
@@ -21,10 +25,11 @@ import java.util.*;
  * @author Alexander Weigl
  * @version 1 (15.03.19)
  */
+@NullMarked
 public class Lookup {
-    public static Lookup DEFAULT = new Lookup();
+    public static final Lookup DEFAULT = new Lookup();
 
-    private final Lookup parent;
+    private final @Nullable Lookup parent;
 
     /**
      * Registered services. The first service in the list is the default.
@@ -45,10 +50,13 @@ public class Lookup {
         this(null);
     }
 
-    public Lookup(Lookup parent) {
+    public Lookup(@Nullable Lookup parent) {
         this.parent = parent;
         if (parent != null) {
-            parent.children.add(new WeakReference<>(this));
+            @SuppressWarnings("nullness") // WeakReference to this
+            @Initialized
+            WeakReference<Lookup> weakthis = new WeakReference<>(this);
+            parent.children.add(weakthis);
         }
     }
 
@@ -70,9 +78,7 @@ public class Lookup {
      */
     public <T> Collection<T> lookupAll(Class<T> service) {
         ArrayList<T> t = new ArrayList<>(getList(service));
-        if (parent != null) {
-            t.addAll(parent.lookupAll(service));
-        }
+        if (parent != null) { t.addAll(parent.lookupAll(service)); }
         return t;
     }
 
@@ -83,7 +89,7 @@ public class Lookup {
      * @param <T>
      * @return
      */
-    public <T> T get(Class<T> service) {
+    public <T extends @Nullable Object> T get(Class<T> service) {
         List<? extends T> t = getList(service);
         if (t.isEmpty()) {
             if (parent != null) {
@@ -111,30 +117,22 @@ public class Lookup {
 
     public <T> void deregister(T obj, Class<T> service) {
         boolean b = getList(service).remove(obj);
-        if (b) {
-            firePropertyChange(service);
-        }
-        if (parent != null) {
-            parent.deregister(obj, service);
-        }
+        if (b) { firePropertyChange(service); }
+        if (parent != null) { parent.deregister(obj, service); }
     }
 
     public <T> void deregister(Class<T> service) {
         getList(service).clear();
         firePropertyChange(service);
-        if (parent != null) {
-            parent.deregister(service);
-        }
+        if (parent != null) { parent.deregister(service); }
     }
 
 
     public void dispose() {
-        if (parent != null) {
-            parent.children.remove(this);
-        }
+        if (parent != null) { parent.children.remove(this); }
     }
 
-    public <T> List<LookupListener> getListeners(Class<?> name) {
+    public List<LookupListener> getListeners(Class<?> name) {
         return propertyListener.computeIfAbsent(name, a -> new LinkedList<>());
     }
 
@@ -142,11 +140,11 @@ public class Lookup {
         addChangeListener(ALL.class, listener);
     }
 
-    public <T> void addChangeListener(Class<T> name, LookupListener listener) {
+    public void addChangeListener(Class<?> name, LookupListener listener) {
         getListeners(name).add(listener);
     }
 
-    public <T> void removeChangeListener(Class<?> name, LookupListener listener) {
+    public void removeChangeListener(Class<?> name, LookupListener listener) {
         getListeners(name).remove(listener);
     }
 
@@ -158,16 +156,12 @@ public class Lookup {
         getListeners(name).forEach(it -> it.update(name, this));
         children.forEach(it -> {
             Lookup child = it.get();
-            if (child != null) {
-                child.firePropertyChange(name);
-            }
+            if (child != null) { child.firePropertyChange(name); }
         });
         getListeners(ALL.class).forEach(it -> it.update(name, this));
         children.forEach(it -> {
             Lookup child = it.get();
-            if (child != null) {
-                child.firePropertyChange(ALL.class);
-            }
+            if (child != null) { child.firePropertyChange(ALL.class); }
         });
     }
 
@@ -178,7 +172,7 @@ public class Lookup {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> List<T> getList(Class<T> service) {
+    private <T extends @Nullable Object> List<T> getList(Class<T> service) {
         return (List<T>) serviceMap.computeIfAbsent(service, (k -> new LinkedList<>()));
     }
 
@@ -189,16 +183,17 @@ public class Lookup {
      * @param clazz
      * @param <T>
      * @return
-     * @throws InjectionException if non suitable constructors could be found.
+     * @throws InjectionException
+     *         if non suitable constructors could be found.
      */
-    @SuppressWarnings("unchecked")
-    public <T> T createInstance(Class<T> clazz) throws InjectionException {
+    @SuppressWarnings({ "unchecked",
+        "keyfor", "nullness", // KeyFor and type variable bounds
+    })
+    public <T> @Nullable T createInstance(Class<T> clazz) throws InjectionException {
         for (Constructor<?> ctor : clazz.getConstructors()) {
             if (ctor.getAnnotation(Inject.class) != null) {
                 T instance = (T) tryToInject(ctor);
-                if (instance != null) {
-                    return instance;
-                }
+                if (instance != null) { return instance; }
             }
         }
         return null;
@@ -210,13 +205,15 @@ public class Lookup {
      * @return
      * @throws InjectionException
      */
-    protected <T> T tryToInject(Constructor<T> ctor) throws InjectionException {
+    protected <T> @Nullable T tryToInject(Constructor<T> ctor) throws InjectionException {
         List<?> services =
             Arrays.stream(ctor.getParameterTypes()).map(this::get).toList();
 
         if (services.stream().allMatch(Objects::nonNull)) {
             try {
-                return ctor.newInstance(services.toArray());
+                @SuppressWarnings("nullness") // connection to allMatch lost
+                T res = ctor.newInstance(services.toArray());
+                return res;
             } catch (InstantiationException | IllegalAccessException
                     | InvocationTargetException e) {
                 throw new InjectionException(e);
@@ -231,16 +228,16 @@ public class Lookup {
      * This method searchs for methods single argument methods, that are annotated with
      * {@link Inject}, and calls it with the service implementation.
      *
-     * @param instance arbitrary non-null method
-     * @throws InjectionException is thrown iff a service is unknown but needed for an
+     * @param instance
+     *        arbitrary non-null method
+     * @throws InjectionException
+     *         is thrown iff a service is unknown but needed for an
      *         {@link Inject} method.
      */
     public void inject(Object instance) throws InjectionException {
         Class<?> clazz = instance.getClass();
         for (Method setter : clazz.getMethods()) {
-            if (setter.getAnnotation(Inject.class) != null) {
-                inject(instance, setter);
-            }
+            if (setter.getAnnotation(Inject.class) != null) { inject(instance, setter); }
         }
     }
 
@@ -250,15 +247,11 @@ public class Lookup {
      * @throws InjectionException
      */
     protected void inject(Object instance, Method setter) throws InjectionException {
-        if (setter.getParameterCount() != 1) {
-            throw new IllegalStateException();
-        }
+        if (setter.getParameterCount() != 1) { throw new IllegalStateException(); }
 
         Class<?> pClazz = setter.getParameters()[0].getType();
         Object o = get(pClazz);
-        if (o == null) {
-            throw new IllegalStateException("Implementation for X not registered.");
-        }
+        if (o == null) { throw new IllegalStateException("Implementation for X not registered."); }
         try {
             setter.invoke(instance, o);
         } catch (IllegalAccessException | InvocationTargetException e) {

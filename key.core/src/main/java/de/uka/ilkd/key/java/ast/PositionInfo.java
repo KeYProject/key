@@ -46,15 +46,13 @@ public class PositionInfo {
     /**
      * The URI of the resource this location refers to. Either a meaningful value or null.
      */
-    @Nullable
-    private final URI fileURI;
+    private final @Nullable URI fileURI;
 
     /**
      * The URI of the parent class of this location (the class the statement originates from). May
      * be null.
      */
-    @Nullable
-    private URI parentClassURI;
+    private @Nullable URI parentClassURI;
 
     private PositionInfo() {
         this.startPos = Position.UNDEFINED;
@@ -65,8 +63,10 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo without resource information but only with positions.
      *
-     * @param startPos the start position
-     * @param endPos the end position
+     * @param startPos
+     *        the start position
+     * @param endPos
+     *        the end position
      */
     public PositionInfo(Position startPos, Position endPos) {
         this.startPos = startPos;
@@ -77,9 +77,12 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo without the given resource information.
      *
-     * @param startPos the start position
-     * @param endPos the end position
-     * @param fileURI the resource the PositionInfo refers to
+     * @param startPos
+     *        the start position
+     * @param endPos
+     *        the end position
+     * @param fileURI
+     *        the resource the PositionInfo refers to
      */
     public PositionInfo(Position startPos, Position endPos, URI fileURI) {
         this.startPos = startPos;
@@ -95,7 +98,8 @@ public class PositionInfo {
      * this violates immutability, but the method is only called right after the object is
      * created...
      *
-     * @param parent the parent class of this PositionInfo
+     * @param parent
+     *        the parent class of this PositionInfo
      */
     void setParentClassURI(URI parent) {
         parentClassURI = (parent == null ? null : parent.normalize());
@@ -124,14 +128,11 @@ public class PositionInfo {
      */
     @Deprecated // only kept for compatibility reasons
     public String getFileName() {
-        if (fileURI != null && fileURI.getScheme().equals("file")) {
-            return Paths.get(fileURI).toString();
-        }
+        if (fileURI != null && fileURI.getScheme().equals("file")) { return Paths.get(fileURI).toString(); }
         return null;
     }
 
-    @Nullable
-    public URI getParentClassURI() {
+    public @Nullable URI getParentClassURI() {
         return parentClassURI;
     }
 
@@ -155,8 +156,10 @@ public class PositionInfo {
      * Creates a new PositionInfo from joining the intervals of the given PositionInfos. The file
      * information have to match, otherwise null is returned.
      *
-     * @param p1 the first PositionInfo
-     * @param p2 the second PositionInfo
+     * @param p1
+     *        the first PositionInfo
+     * @param p2
+     *        the second PositionInfo
      * @return a new PositionInfo starting at the minimum of the two start positions and ending at
      *         the maximum of the two end positions.
      */
@@ -165,16 +168,12 @@ public class PositionInfo {
             return null;
         } else if (p1 == null) {
             return p2;
-        } else if (p2 == null) {
-            return p1;
-        }
+        } else if (p2 == null) { return p1; }
 
         // -> p1 and p2 not null
         if (p1 == UNDEFINED) {
             return p2;
-        } else if (p2 == UNDEFINED) {
-            return p1;
-        }
+        } else if (p2 == UNDEFINED) { return p1; }
 
         // -> p1 and p2 != UNDEFINED
         Position start;
@@ -211,7 +210,7 @@ public class PositionInfo {
             return "UNDEFINED";
         } else {
             return ((fileURI == null ? "" : fileURI) + " start Pos: " + startPos
-                + " end Pos: " + endPos);
+                    + " end Pos: " + endPos);
         }
     }
 

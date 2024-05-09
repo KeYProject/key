@@ -25,7 +25,8 @@ public class Implements extends InheritanceSpecification {
     /**
      * Implements.
      *
-     * @param supertype a type reference.
+     * @param supertype
+     *        a type reference.
      */
 
     public Implements(TypeReference supertype) {
@@ -35,7 +36,8 @@ public class Implements extends InheritanceSpecification {
     /**
      * Implements.
      *
-     * @param typeRefs a type reference array.
+     * @param typeRefs
+     *        a type reference array.
      */
 
     public Implements(TypeReference[] typeRefs) {
@@ -45,7 +47,8 @@ public class Implements extends InheritanceSpecification {
     /**
      * Implements.
      *
-     * @param children containing the children. May include: a Comment, several TypeReference (as
+     * @param children
+     *        containing the children. May include: a Comment, several TypeReference (as
      *        references to the supertypes)
      *
      */
@@ -61,7 +64,8 @@ public class Implements extends InheritanceSpecification {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnImplements(this);

@@ -45,9 +45,7 @@ public class MacroKeyBinding extends AbstractAction {
 
         if (isGoal) {
             PosInSequent mousePos = sequentView.getLastPosInSequent();
-            if (mousePos != null) {
-                posInOcc = mousePos.getPosInOccurrence();
-            }
+            if (mousePos != null) { posInOcc = mousePos.getPosInOccurrence(); }
         }
 
         if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
@@ -60,9 +58,12 @@ public class MacroKeyBinding extends AbstractAction {
      * Register the key bindings for all macros that are already configured in the
      * {@link KeyStrokeManager}.
      *
-     * @param mediator KeY mediator
-     * @param sequentView sequent view
-     * @param comp component to register key bindings in
+     * @param mediator
+     *        KeY mediator
+     * @param sequentView
+     *        sequent view
+     * @param comp
+     *        component to register key bindings in
      */
     public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView,
             JComponent comp) {

@@ -32,9 +32,7 @@ public abstract class GenericSortCondition {
     public static GenericSortCondition createCondition(SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
-        if (!(p_entry instanceof TermInstantiation ti)) {
-            return null;
-        }
+        if (!(p_entry instanceof TermInstantiation ti)) { return null; }
 
         return createCondition(sv.sort(), ti.getInstantiation().sort(), !subSortsAllowed(sv));
     }
@@ -48,9 +46,7 @@ public abstract class GenericSortCondition {
     public static GenericSortCondition createCondition(SortDependingFunction p0,
             SortDependingFunction p1) {
 
-        if (!p0.isSimilar(p1)) {
-            return null;
-        }
+        if (!p0.isSimilar(p1)) { return null; }
 
         return createCondition(p0.getSortDependingOn(), p1.getSortDependingOn(), true);
     }
@@ -68,7 +64,8 @@ public abstract class GenericSortCondition {
      * Create the condition to make a generic sort (s0) (or a collection sort of a generic sort) and
      * a concrete sort (s1) equal
      *
-     * @param p_identity true iff an identity condition should be generated (otherwise: a supersort
+     * @param p_identity
+     *        true iff an identity condition should be generated (otherwise: a supersort
      *        condition is generated)
      * @return the resulting condition, if "s0" is of generic sort; null, if the sorts are either
      *         always compatible (no generic sorts) or never compatible (e.g. non generic sorts that
@@ -80,18 +77,14 @@ public abstract class GenericSortCondition {
             // collection sorts; therefore identity has to be ensured
             p_identity = true;
 
-            if (!s0.getClass().equals(s1.getClass())) {
-                return null;
-            }
+            if (!s0.getClass().equals(s1.getClass())) { return null; }
 
             s0 = ((ArraySort) s0).elementSort();
             s1 = ((ArraySort) s1).elementSort();
         }
 
         if (!(s0 instanceof GenericSort gs) || s1 == JavaDLTheory.FORMULA
-                || s1 == JavaDLTheory.UPDATE) {
-            return null;
-        }
+                || s1 == JavaDLTheory.UPDATE) { return null; }
 
         if (p_identity) {
             return createIdentityCondition(gs, s1);
@@ -103,7 +96,8 @@ public abstract class GenericSortCondition {
     /**
      * Create the condition to force the instantiation of a given (possibly generic) sort
      *
-     * @param p_maximum hint whether the generic sort should be instantiated with the maximum or
+     * @param p_maximum
+     *        hint whether the generic sort should be instantiated with the maximum or
      *        mimimum possible concrete sort (this hint is currently not used by
      *        GenericSortInstantiations)
      * @return the resulting condition, or null if "p_s" is not generic
@@ -112,9 +106,7 @@ public abstract class GenericSortCondition {
 
         if (p_s instanceof GenericSort) {
             return createForceInstantiationCondition((GenericSort) p_s, p_maximum);
-        } else if (p_s instanceof ArraySort) {
-            return forceInstantiation(((ArraySort) p_s).elementSort(), p_maximum);
-        }
+        } else if (p_s instanceof ArraySort) { return forceInstantiation(((ArraySort) p_s).elementSort(), p_maximum); }
 
         return null;
     }
@@ -137,7 +129,8 @@ public abstract class GenericSortCondition {
 
     /**
      * @return a condition that specifies the given generic sort to be instantiated
-     * @param p_maximum hint whether the generic sort should be instantiated with the maximum or
+     * @param p_maximum
+     *        hint whether the generic sort should be instantiated with the maximum or
      *        mimimum possible concrete sort (this hint is currently not used by
      *        GenericSortInstantiations)
      */
@@ -159,8 +152,10 @@ public abstract class GenericSortCondition {
     /**
      * returns true if the given sort <code>s</code> satisfies this generic sort condition
      *
-     * @param s the Sort to check
-     * @param insts a map containing already found instantiations
+     * @param s
+     *        the Sort to check
+     * @param insts
+     *        a map containing already found instantiations
      * @return true if the given sort <code>s</code> satisfies this generic sort condition
      */
     public abstract boolean check(Sort s, GenericSortInstantiations insts);
@@ -243,7 +238,7 @@ public abstract class GenericSortCondition {
         /** toString */
         public String toString() {
             return "Force instantiation: " + getGenericSort() + ", "
-                + (getMaximum() ? "maximum" : "minimum");
+                    + (getMaximum() ? "maximum" : "minimum");
         }
 
 

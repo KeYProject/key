@@ -136,7 +136,7 @@ public class TestMatchTaclet {
             NoPosTacletApp.createNoPosTacletApp(if_addrule_conflict)
                     .findIfFormulaInstantiations(seq, services).size(),
             "An area conflict should happen because there is a free"
-                + " variable and the matching part is in the if and addrule");
+                    + " variable and the matching part is in the if and addrule");
 
         // we bind the free variable now a match should be found
         seq = Sequent.createSequent(
@@ -168,8 +168,8 @@ public class TestMatchTaclet {
 
         assertNull(app,
             "A match has been found but there is a free variable in"
-                + " the term that has been matched and therefore an area"
-                + " conflict with find and addrule should have happened.");
+                    + " the term that has been matched and therefore an area"
+                    + " conflict with find and addrule should have happened.");
 
         // var is not free, match should be found
         app = PosTacletApp.createPosTacletApp(find_addrule_conflict,
@@ -179,7 +179,7 @@ public class TestMatchTaclet {
             new PosInOccurrence(new SequentFormula(match), PosInTerm.getTopLevel(), true),
             services);
         assertNotNull(app, "A match should have been found,"
-            + " because here there formerly free variable is bound.");
+                + " because here there formerly free variable is bound.");
     }
 
 
@@ -202,7 +202,7 @@ public class TestMatchTaclet {
                     services);
 
         assertNull(app, "Match found but match term contains free var and"
-            + "matching var occurs in two instantiation areas" + " (if and find)");
+                + "matching var occurs in two instantiation areas" + " (if and find)");
 
 
         assertNotNull(if_find_clash.getMatcher().matchFind(match,
@@ -288,8 +288,8 @@ public class TestMatchTaclet {
         assertNotNull(
             all_left.getMatcher().matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services),
             "Instantiations should be found as updates can be ignored if "
-                + "only the term that is matched has an update and the "
-                + "template it is matched to has none.");
+                    + "only the term that is matched has an update and the "
+                    + "template it is matched to has none.");
 
         Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
         match2 = match2.sub(0);
@@ -411,11 +411,11 @@ public class TestMatchTaclet {
 
         assertNull(mc,
             "The reason for this bug was related to the introduction of "
-                + "statementlist schemavariables and that we could not end the "
-                + "match if the size of nonterminalelements was unequal "
-                + "The solution was to weaken the check for statement blocks but NOT "
-                + "for other statement or expressions containers. The bug occured because "
-                + "the weaker test was also " + "performed for expressions.");
+                    + "statementlist schemavariables and that we could not end the "
+                    + "match if the size of nonterminalelements was unequal "
+                    + "The solution was to weaken the check for statement blocks but NOT "
+                    + "for other statement or expressions containers. The bug occured because "
+                    + "the weaker test was also " + "performed for expressions.");
 
         match = TacletForTests.parseTerm("\\<{ {{throw null;} int i = 0;} }\\>true ");
         taclet = (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_throw_in_block").taclet();
@@ -442,7 +442,7 @@ public class TestMatchTaclet {
         mc = (taclet.getMatcher().matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS,
             services));
         assertNotNull(mc, "Bug originally failed to match the first empty block,"
-            + " because of he was not able to match two succeeding empty lists.");
+                + " because of he was not able to match two succeeding empty lists.");
 
         match = TacletForTests.parseTerm("\\<{ {{}} {} }\\> true");
         taclet =

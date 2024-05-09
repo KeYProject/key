@@ -31,19 +31,19 @@ public class LabelCollection {
      * any change to its content afterwards will cause method {@link #isModified()} to return true
      * </p>
      *
-     * @param p_labels the list of {@link TermLabel}s for this collections
+     * @param p_labels
+     *        the list of {@link TermLabel}s for this collections
      */
     public LabelCollection(ImmutableArray<TermLabel> p_labels) {
-        for (int i = 0, sz = p_labels.size(); i < sz; i++) {
-            labels.add(p_labels.get(i));
-        }
+        for (int i = 0, sz = p_labels.size(); i < sz; i++) { labels.add(p_labels.get(i)); }
         modified = false;
     }
 
     /**
      * adds the given label to the collection and marks it as modified
      *
-     * @param label the {@link TermLabel} to be added
+     * @param label
+     *        the {@link TermLabel} to be added
      */
     public void add(TermLabel label) {
         modified |= labels.add(label);
@@ -52,7 +52,8 @@ public class LabelCollection {
     /**
      * removes the given label from the collection and marks it as modified
      *
-     * @param label the {@link TermLabel} to be added
+     * @param label
+     *        the {@link TermLabel} to be added
      */
     public void remove(TermLabel label) {
         modified |= labels.remove(label);
@@ -68,7 +69,8 @@ public class LabelCollection {
     /**
      * checks wether a label is contained in the collection
      *
-     * @param label the {@link TermLabel} to be checked
+     * @param label
+     *        the {@link TermLabel} to be checked
      * @return true iff the label is contained
      */
     public boolean contains(TermLabel label) {
@@ -87,7 +89,8 @@ public class LabelCollection {
      * removes labels that satisfy the predicate and marks the set as modified
      * if a label has been removed
      *
-     * @param p the {@link Predicate} used for testing
+     * @param p
+     *        the {@link Predicate} used for testing
      */
     public void removeIf(Predicate<TermLabel> p) {
         modified |= labels.removeIf(p);
@@ -99,17 +102,15 @@ public class LabelCollection {
      * The method uses instanceof as check, so if subtypes are possible, any of those will be
      * returned.
      *
-     * @param termLabelClass the Class specifying the kind of termlabel to be retrieved
+     * @param termLabelClass
+     *        the Class specifying the kind of termlabel to be retrieved
      * @return the {@link TermLabel} of the specified type or <code>null</code>, if no such label is
      *         present
-     * @param <S> the type of the label to be retrieved
+     * @param <S>
+     *        the type of the label to be retrieved
      */
     public <S> S getFirst(Class<S> termLabelClass) {
-        for (var label : labels) {
-            if (termLabelClass.isInstance(label)) {
-                return (S) label;
-            }
-        }
+        for (var label : labels) { if (termLabelClass.isInstance(label)) { return (S) label; } }
         return null;
     }
 

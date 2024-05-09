@@ -35,7 +35,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: a TypeReference
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: a TypeReference
      *        (the referred type) 2 of Expression (the first Expression as left hand side, the
      *        second as right hand side), Comments
      */
@@ -47,7 +48,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: a TypeReference
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: a TypeReference
      *        (the referred type) 2 of Expression (the first Expression as left hand side, the
      *        second as right hand side), Comments
      */
@@ -97,9 +99,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) {
-            return typeReference;
-        }
+        if (typeReference != null && index == 0) { return typeReference; }
         throw new ArrayIndexOutOfBoundsException();
     }
 

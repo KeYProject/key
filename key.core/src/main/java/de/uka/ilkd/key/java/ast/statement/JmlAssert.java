@@ -35,9 +35,12 @@ public class JmlAssert extends JavaStatement {
     private KeyAst.Expression condition;
 
     /**
-     * @param kind assert or assume
-     * @param condition the condition of this statement
-     * @param positionInfo the position information for this statement
+     * @param kind
+     *        assert or assume
+     * @param condition
+     *        the condition of this statement
+     * @param positionInfo
+     *        the position information for this statement
      */
     public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
             PositionInfo positionInfo) {
@@ -47,7 +50,8 @@ public class JmlAssert extends JavaStatement {
     }
 
     /**
-     * @param children the children of this element
+     * @param children
+     *        the children of this element
      */
     public JmlAssert(ExtList children) {
         super(children);
@@ -130,12 +134,8 @@ public class JmlAssert extends JavaStatement {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (!super.equals(o)) { return false; }
         // super.equals() check classes
         final JmlAssert jmlAssert = (JmlAssert) o;
         return kind == jmlAssert.kind && Objects.equals(condition, jmlAssert.condition);

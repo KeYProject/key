@@ -14,45 +14,45 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     private static final long serialVersionUID = -2170118134719823425L;
     private static final String INFO_APPLY_SYMBOLIC_EX =
         "Performs bounded symbolic execution on the current proof tree."
-            + " More precisely, the TestGen Macro is executed which the user can also manually execute by right-clicking "
-            + "on the proof tree and selecting Strategy Macros->TestGen.";
+                + " More precisely, the TestGen Macro is executed which the user can also manually execute by right-clicking "
+                + "on the proof tree and selecting Strategy Macros->TestGen.";
     private static final String INFO_SAVE_TO =
         "Choose the folder where the test case files will be written.";
     private static final String INFO_MAX_PROCESSES =
         "Maximal number of SMT processes that are allowed to " + "run concurrently.";
     private static final String INFO_USE_JUNIT = "Generate a JUnit 4 test suite and a test oracle "
-        + "from the postcondition. Disable this option when using a JML runtime checker since the "
-        + "generated code may be too complicated for the runtime checker or may not comply with JML requirements.";
+            + "from the postcondition. Disable this option when using a JML runtime checker since the "
+            + "generated code may be too complicated for the runtime checker or may not comply with JML requirements.";
     private static final String INFO_INVARIANT_FOR_ALL =
         "Includes class invariants in the test data constraints. "
-            + "I.e., require the class invariant of all created objects to be true in the initial state.";
+                + "I.e., require the class invariant of all created objects to be true in the initial state.";
     private static final String INFO_MAX_UNWINDS =
         "Maximal number of loop unwinds or method calls on a branch that "
-            + "is symbolically executed when using the Strategy Macro \"TestGen\". The Strategy Macro is available"
-            + " by right-click on the proof tree.";
+                + "is symbolically executed when using the Strategy Macro \"TestGen\". The Strategy Macro is available"
+                + " by right-click on the proof tree.";
     private static final String INFO_REMOVE_DUPLICATES =
         "Generate a single testcase for two or more nodes which "
-            + "represent the same test data constraint. Two different nodes may represent the same test data constraint, "
-            + "because some formulas from the nodes which cannot be translated into a test case may be filtered out from "
-            + "the test data constraint.";
+                + "represent the same test data constraint. Two different nodes may represent the same test data constraint, "
+                + "because some formulas from the nodes which cannot be translated into a test case may be filtered out from "
+                + "the test data constraint.";
     private static final String INFO_RFL_SELECTION =
         "Enables initialization of protected, private, and ghost fields " + "with test data, "
-            + "as well as creation of objects from classes which have no default constructor "
-            + "(requires the Objenesis library)."
-            + "This functionality is enabled by RFL.java which is generated along the test suite. Please note, "
-            + "a runtime checker may not be able to handle the generated code.";
+                + "as well as creation of objects from classes which have no default constructor "
+                + "(requires the Objenesis library)."
+                + "This functionality is enabled by RFL.java which is generated along the test suite. Please note, "
+                + "a runtime checker may not be able to handle the generated code.";
     private static final String INFO_OPEN_JML_PATH =
         "Set location of openjml.jar. OpenJML is a third-party "
-            + "runtime checker. KeYTestGen generates the shell scripts compileWithOpenJML.sh and executeWithOpenJML.sh "
-            + "in the test output directory to simplify compilation and execution of the tests. The user should visit "
-            + "the OpenJML's website for additional instructions.";
+                + "runtime checker. KeYTestGen generates the shell scripts compileWithOpenJML.sh and executeWithOpenJML.sh "
+                + "in the test output directory to simplify compilation and execution of the tests. The user should visit "
+                + "the OpenJML's website for additional instructions.";
     private static final String INFO_OBJENESIS_PATH =
         "Set location of objenesis.jar. Objenesis is a thrid-party "
-            + "library allows easy object creation from classes which do not have a (public) default constructur.";
+                + "library allows easy object creation from classes which do not have a (public) default constructur.";
     private static final String INFO_INCLUDE_POSTCONDITION =
         "Includes the negated post condition in the test data "
-            + "constraint when generating test data. The post condition can only be included for paths (branches)"
-            + " where symbolic execution has finished.";
+                + "constraint when generating test data. The post condition can only be included for paths (branches)"
+                + " where symbolic execution has finished.";
     private final JTextField saveToFilePanel;
     private final JTextField openJMLPanel;
     private final JTextField objenesisPanel;

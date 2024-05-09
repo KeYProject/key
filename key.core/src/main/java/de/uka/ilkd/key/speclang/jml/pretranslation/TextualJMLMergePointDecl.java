@@ -9,43 +9,42 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A JML merge point declaration in textual form.
- *
+ * <p>
  * TODO: Adapt this to the specific needs of merge point declarations.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
-    private final JmlParser.@NonNull Merge_point_statementContext mergeProc;
 
-    public TextualJMLMergePointDecl(@NonNull ImmutableList<JMLModifier> mods,
-            JmlParser.@NonNull Merge_point_statementContext mergeProc) {
+    private final JmlParser.Merge_point_statementContext mergeProc;
+
+    public TextualJMLMergePointDecl(ImmutableList<JMLModifier> mods,
+            JmlParser.Merge_point_statementContext mergeProc) {
         super(mods);
         this.mergeProc = mergeProc;
         setPosition(mergeProc);
     }
 
-    public JmlParser.@NonNull Merge_point_statementContext getMergeProc() {
+    public JmlParser.Merge_point_statementContext getMergeProc() {
         return mergeProc;
     }
 
     @Override
     public String toString() {
         return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", mods=" + mods
-            + ", name='" + name + '\'' + '}';
+                + ", name='" + name + '\'' + '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof TextualJMLMergePointDecl that)) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (!(o instanceof TextualJMLMergePointDecl that)) { return false; }
         return getMergeProc().equals(that.getMergeProc());
     }
 

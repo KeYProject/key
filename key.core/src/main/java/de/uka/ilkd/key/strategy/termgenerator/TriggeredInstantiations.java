@@ -55,7 +55,8 @@ public class TriggeredInstantiations implements TermGenerator {
 
     /**
      *
-     * @param checkConditions boolean indicating if conditions should be checked
+     * @param checkConditions
+     *        boolean indicating if conditions should be checked
      */
     public TriggeredInstantiations(boolean checkConditions) {
         this.checkConditions = checkConditions;
@@ -82,9 +83,7 @@ public class TriggeredInstantiations implements TermGenerator {
                 terms = new HashSet<>();
                 axiomSet = new HashSet<>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
-                for (Term axiom : axiomSet) {
-                    axioms = axioms.add(axiom);
-                }
+                for (Term axiom : axiomSet) { axioms = axioms.add(axiom); }
 
                 synchronized (this) {
                     last = seq;
@@ -199,9 +198,7 @@ public class TriggeredInstantiations implements TermGenerator {
                             }
                         }
                     }
-                    if (addToInstances) {
-                        instances.add(middle);
-                    }
+                    if (addToInstances) { instances.add(middle); }
                 }
             }
         }

@@ -51,7 +51,8 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * preparation method is created and added for all classes,
      * which are declared in one of the given compilation units.
      *
-     * @param services the CrossReferenceServiceConfiguration with the
+     * @param services
+     *        the CrossReferenceServiceConfiguration with the
      *        information about the recoder model
      */
     public ClassInitializeMethodBuilder(TransformationPipelineServices services) {
@@ -70,9 +71,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      */
     private boolean isConstantField(FieldDeclaration spec, VariableDeclarator decl) {
         boolean result = spec.isStatic() && spec.isFinal();
-        if (!result) {
-            return false;
-        }
+        if (!result) { return false; }
         ConstantExpressionEvaluator ce = services.getConstantEvaluator();
         try {
             Optional<Expression> init = decl.getInitializer();
@@ -117,7 +116,8 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * <p>
      * some special settings for implicit fields are performed here as well
      *
-     * @param typeDeclaration the TypeDeclaration<?> whose fields have to be prepared
+     * @param typeDeclaration
+     *        the TypeDeclaration<?> whose fields have to be prepared
      * @return the list of copy assignments
      */
     @NonNull
@@ -126,9 +126,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         for (Node childNode : typeDeclaration.getChildNodes()) {
             if (childNode instanceof InitializerDeclaration) {
                 var init = (InitializerDeclaration) childNode;
-                if (init.isStatic()) {
-                    result.add(init.getBody().clone());
-                }
+                if (init.isStatic()) { result.add(init.getBody().clone()); }
             } else if (childNode instanceof FieldDeclaration) {
                 result.addAll(fieldInitializersToAssignments((FieldDeclaration) childNode));
             }
@@ -269,7 +267,8 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      *     }
      * </pre></code>
      *
-     * @param td the TypeDeclaration to which the new created method
+     * @param td
+     *        the TypeDeclaration to which the new created method
      *        will be attached
      * @return the created class preparation method
      * @see #createInitializeMethod(TypeDeclaration)
@@ -286,7 +285,8 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     @Override
     public void apply(TypeDeclaration<?> td) {

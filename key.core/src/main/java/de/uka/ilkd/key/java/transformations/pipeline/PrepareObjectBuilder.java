@@ -71,9 +71,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
      * @return the same list body that has been handed over as parameter
      */
     private NodeList<Statement> defaultSettings(List<FieldDeclaration> fields) {
-        if (fields == null) {
-            return new NodeList<>();
-        }
+        if (fields == null) { return new NodeList<>(); }
         NodeList<Statement> result = new NodeList<Statement>();
         for (FieldDeclaration field : fields) {
             if (!field.isStatic()) {
@@ -115,7 +113,8 @@ public class PrepareObjectBuilder extends JavaTransformer {
      * creates the implicit <code>&lt;prepare&gt;</code> method that
      * sets the fields of the given type to its default values
      *
-     * @param type the TypeDeclaration for which the
+     * @param type
+     *        the TypeDeclaration for which the
      *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
@@ -133,7 +132,8 @@ public class PrepareObjectBuilder extends JavaTransformer {
      * creates the implicit <code>&lt;prepareEnter&gt;</code> method that
      * sets the fields of the given type to its default values
      *
-     * @param type the TypeDeclaration for which the
+     * @param type
+     *        the TypeDeclaration for which the
      *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
@@ -150,7 +150,8 @@ public class PrepareObjectBuilder extends JavaTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
         if (td instanceof ClassOrInterfaceDeclaration

@@ -22,13 +22,14 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
     /**
      * Creates a new EnsureSourceConsistencyToggleAction.
      *
-     * @param mainWindow the main window of the program
+     * @param mainWindow
+     *        the main window of the program
      */
     public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Ensure Source Consistency");
         setTooltip("If ticked, consistency between source and proof is ensured"
-            + " (by caching files at first use in a temporary directory).");
+                + " (by caching files at first use in a temporary directory).");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
                 .isEnsureSourceConsistency());
     }

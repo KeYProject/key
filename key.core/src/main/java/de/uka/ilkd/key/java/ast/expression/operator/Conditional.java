@@ -26,7 +26,8 @@ public class Conditional extends Operator {
     /**
      * Conditional.
      *
-     * @param children list of children the first one is the guard expression, the second one the
+     * @param children
+     *        list of children the first one is the guard expression, the second one the
      *        then expression and the last one the else expr.
      */
 
@@ -85,7 +86,8 @@ public class Conditional extends Operator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnConditional(this);
@@ -95,9 +97,7 @@ public class Conditional extends Operator {
         final TypeConverter tc = javaServ.getTypeConverter();
         final KeYJavaType type1 = tc.getKeYJavaType(getExpressionAt(1), ec);
         final KeYJavaType type2 = tc.getKeYJavaType(getExpressionAt(2), ec);
-        if (tc.isIdentical(type1, type2)) {
-            return type1;
-        }
+        if (tc.isIdentical(type1, type2)) { return type1; }
 
         // numeric types
         if (tc.isNumericalType(type1) && tc.isNumericalType(type2)) {
@@ -107,32 +107,20 @@ public class Conditional extends Operator {
                             && type2.getJavaType() == PrimitiveType.JAVA_BYTE) {
                 return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SHORT);
             }
-            if (tc.isImplicitNarrowing(getExpressionAt(1), (PrimitiveType) type2.getJavaType())) {
-                return type2;
-            }
-            if (tc.isImplicitNarrowing(getExpressionAt(2), (PrimitiveType) type1.getJavaType())) {
-                return type1;
-            }
+            if (tc.isImplicitNarrowing(getExpressionAt(1), (PrimitiveType) type2.getJavaType())) { return type2; }
+            if (tc.isImplicitNarrowing(getExpressionAt(2), (PrimitiveType) type1.getJavaType())) { return type1; }
             return tc.getPromotedType(type1, type2);
         }
 
 
         // reference types
-        if (tc.isNullType(type1) && tc.isReferenceType(type2)) {
-            return type2;
-        }
-        if (tc.isNullType(type2) && tc.isReferenceType(type1)) {
-            return type1;
-        }
-        if (tc.isAssignableTo(type1, type2)) {
-            return type2;
-        }
-        if (tc.isAssignableTo(type2, type1)) {
-            return type1;
-        }
+        if (tc.isNullType(type1) && tc.isReferenceType(type2)) { return type2; }
+        if (tc.isNullType(type2) && tc.isReferenceType(type1)) { return type1; }
+        if (tc.isAssignableTo(type1, type2)) { return type2; }
+        if (tc.isAssignableTo(type2, type1)) { return type1; }
 
         throw new RuntimeException("Could not determine type of conditional " + "expression\n"
-            + this + ". This usually means that " + "the Java program is not compilable.");
+                + this + ". This usually means that " + "the Java program is not compilable.");
     }
 
 }

@@ -50,9 +50,7 @@ public abstract class SchemaVariableModifierSet {
             return addStrict();
         } else if ("rigid".equals(option)) {
             return addRigid();
-        } else if ("list".equals(option)) {
-            return addList();
-        }
+        } else if ("list".equals(option)) { return addList(); }
 
         return false;
     }

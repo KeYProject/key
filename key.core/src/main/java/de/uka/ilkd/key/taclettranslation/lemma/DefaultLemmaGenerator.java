@@ -38,15 +38,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     @Override
     public TacletFormula translate(Taclet taclet, TermServices services) {
         String result = checkTaclet(taclet);
-        if (result != null) {
-            throw new IllegalTacletException(result);
-        }
+        if (result != null) { throw new IllegalTacletException(result); }
         Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
         formula = rebuild(taclet, formula, services, new LinkedHashSet<>());
         result = checkForIllegalOps(formula, taclet, false);
-        if (result != null) {
-            throw new IllegalTacletException(result);
-        }
+        if (result != null) { throw new IllegalTacletException(result); }
         return new LemmaFormula(taclet, formula);
     }
 
@@ -60,17 +56,13 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     public static String checkTaclet(final Taclet taclet) {
         String result = checkForIllegalConditions(taclet);
-        if (result != null) {
-            return result;
-        }
+        if (result != null) { return result; }
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
             public void visit(Term visited) {
                 String res = checkForIllegalOps(visited, taclet, true);
-                if (res != null) {
-                    failureOccurred(res);
-                }
+                if (res != null) { failureOccurred(res); }
             }
 
             @Override
@@ -83,7 +75,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         // any restriction is fine. The polarity switches are equiv
                         // to"inSequentState" in this respect.
                         failureOccurred("The given taclet " + taclet.name()
-                            + " is neither \\sameUpdateLevel nor \\inSequentState.");
+                                + " is neither \\sameUpdateLevel nor \\inSequentState.");
                     }
                 }
 
@@ -98,7 +90,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     public static String checkForIllegalConditions(Taclet taclet) {
         if (!taclet.getVariableConditions().isEmpty()) {
             return "The given taclet " + taclet.name()
-                + " contains variable conditions that are not supported.";
+                    + " contains variable conditions that are not supported.";
         }
         return null;
     }
@@ -110,13 +102,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 || formula.op() instanceof ProgramSV || formula.op() instanceof SkolemTermSV
                 || formula.op() instanceof UpdateSV) {
             return "The given taclet " + owner.name()
-                + " contains a operator that is not allowed:\n" + formula.op().name();
+                    + " contains a operator that is not allowed:\n" + formula.op().name();
         }
         for (Term sub : formula.subs()) {
             String s = checkForIllegalOps(sub, owner, schemaVarsAreAllowed);
-            if (s != null) {
-                return s;
-            }
+            if (s != null) { return s; }
         }
         return null;
     }
@@ -125,8 +115,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * Returns the instantiation for a certain schema variable, i.e. the skolem term that is used
      * for the instantiation.
      *
-     * @param owner The taclet the schema variable belongs to.
-     * @param var The variable to be instantiated.
+     * @param owner
+     *        The taclet the schema variable belongs to.
+     * @param var
+     *        The variable to be instantiated.
      * @param services
      * @return instantiation of the schema variable <code>var</code>.
      */
@@ -160,27 +152,24 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     }
 
     private Term createInstantiation(Taclet owner, SchemaVariable sv, TermServices services) {
-        if (sv instanceof VariableSV) {
-            return createInstantiation(owner, (VariableSV) sv, services);
-        }
-        if (sv instanceof TermSV) {
-            return createInstantiation(owner, (TermSV) sv, services);
-        }
-        if (sv instanceof FormulaSV) {
-            return createInstantiation(owner, (FormulaSV) sv, services);
-        }
+        if (sv instanceof VariableSV) { return createInstantiation(owner, (VariableSV) sv, services); }
+        if (sv instanceof TermSV) { return createInstantiation(owner, (TermSV) sv, services); }
+        if (sv instanceof FormulaSV) { return createInstantiation(owner, (FormulaSV) sv, services); }
         throw new IllegalTacletException("The taclet contains a schema variable which"
-            + "is not supported.\n" + "Taclet: " + owner.name().toString() + "\n"
-            + "SchemaVariable: " + sv.name().toString() + "\n");
+                + "is not supported.\n" + "Taclet: " + owner.name().toString() + "\n"
+                + "SchemaVariable: " + sv.name().toString() + "\n");
     }
 
     /**
      * Creates the instantiation for a schema variable of type variable, i.e a new logical variable
      * is returned.
      *
-     * @param owner the taclet the schema variable belongs to.
-     * @param sv the schema variable to be instantiated.
-     * @param services some information about the proof currently considered.
+     * @param owner
+     *        the taclet the schema variable belongs to.
+     * @param sv
+     *        the schema variable to be instantiated.
+     * @param services
+     *        some information about the proof currently considered.
      * @return a term that can be used for instantiating the schema variable.
      */
     private Term createInstantiation(Taclet owner, VariableSV sv, TermServices services) {
@@ -231,10 +220,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, TermServices services) {
         Sort[] argSorts = new Sort[svSet.size()];
         int i = 0;
-        for (SchemaVariable sv : svSet) {
-            argSorts[i] = replaceSort(sv.sort(), services);
-            i++;
-        }
+        for (SchemaVariable sv : svSet) { argSorts[i] = replaceSort(sv.sort(), services); i++; }
         return argSorts;
     }
 
@@ -242,10 +228,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             TermServices services) {
         Term[] args = new Term[svSet.size()];
         int i = 0;
-        for (SchemaVariable sv : svSet) {
-            args[i] = getInstantiation(owner, sv, services);
-            i++;
-        }
+        for (SchemaVariable sv : svSet) { args[i] = getInstantiation(owner, sv, services); i++; }
         return args;
     }
 
@@ -288,8 +271,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * <p>
      * By default, this method returns the argument <tt>op</tt>.
      *
-     * @param op the operator to be replaced, not <code>null</code>
-     * @param services A services object for lookups
+     * @param op
+     *        the operator to be replaced, not <code>null</code>
+     * @param services
+     *        A services object for lookups
      * @return the replacement operator, not <code>null</code>
      */
     protected Operator replaceOp(Operator op, TermServices services) {
@@ -303,8 +288,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * <p>
      * By default, this method returns the argument <tt>sort</tt>.
      *
-     * @param sort the sort to be replaced, not <code>null</code>
-     * @param services A services object for lookups
+     * @param sort
+     *        the sort to be replaced, not <code>null</code>
+     * @param services
+     *        A services object for lookups
      * @return the replacement sort, not <code>null</code>
      */
     protected Sort replaceSort(Sort sort, TermServices services) {

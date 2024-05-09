@@ -23,32 +23,37 @@ public class Modifier implements Named {
     /**
      * No modifiers.
      */
-    public static final Modifier NONE = new Modifier("none", 0);
+    public static final Modifier NONE = create("none", 0);
 
     /**
      * A rigid (non-flexible) function.
      */
-    public static final Modifier RIGID = new Modifier("rigid", 1);
+    public static final Modifier RIGID = create("rigid", 1);
 
     /**
      * A skolem function.
      */
-    public static final Modifier SKOLEM = new Modifier("skolem", 1 << 1);
+    public static final Modifier SKOLEM = create("skolem", 1 << 1);
 
     /**
      * A unique function.
      */
-    public static final Modifier UNIQUE = new Modifier("unique", 1 << 2);
+    public static final Modifier UNIQUE = create("unique", 1 << 2);
+
+    static Modifier create(String name, int bitMask) {
+        var mod = MODIFIERS.get(bitMask);
+        if (mod != null) {
+            throw new IllegalArgumentException(
+                "Modifier with bitmask '" + bitMask + "' already declared with name: " + mod.name);
+        }
+        mod = new Modifier(name, bitMask);
+        MODIFIERS.put(bitMask, mod);
+        return mod;
+    }
 
     protected Modifier(String name, int bitMask) {
-        if (MODIFIERS.containsKey(bitMask)) {
-            throw new IllegalArgumentException(
-                "Modifier with bitmask '" + bitMask + "' already declared with name: "
-                    + MODIFIERS.get(bitMask).name);
-        }
         this.bitMask = bitMask;
         this.name = new Name(name);
-        MODIFIERS.put(bitMask, this);
     }
 
     private Modifier(int bitMask) {
@@ -64,7 +69,8 @@ public class Modifier implements Named {
     /**
      * Creates a new combined modifier.
      *
-     * @param that The midifier to add to the current one.
+     * @param that
+     *        The modifier to add to the current one.
      * @return A modifier that has all properties of `this` and `that`.
      */
     public Modifier combine(Modifier that) {
@@ -74,7 +80,8 @@ public class Modifier implements Named {
     /**
      * Checks whether `m` is a subset of the current modifier.
      *
-     * @param m The bitmask to check against.
+     * @param m
+     *        The bitmask to check against.
      * @return Whether all set bits of `m` are also set on `this`.
      */
     public boolean match(Modifier m) {

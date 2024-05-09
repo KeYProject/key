@@ -42,9 +42,7 @@ public class ModalityCache {
      */
     private boolean termHasModality(Term term) {
         Boolean cached = termCache.get(term);
-        if (cached != null) {
-            return cached;
-        }
+        if (cached != null) { return cached; }
 
         boolean hasModality;
 
@@ -70,13 +68,12 @@ public class ModalityCache {
     /**
      * Checks for a modality term in a sequent
      *
-     * @param sequent the sequent
+     * @param sequent
+     *        the sequent
      * @return whether the sequent contained a modality term
      */
     public boolean hasModality(Sequent sequent) {
-        if (this.sequent == sequent) {
-            return sequentValue;
-        }
+        if (this.sequent == sequent) { return sequentValue; }
 
         var result = false;
         for (SequentFormula sequentFormula : sequent) {

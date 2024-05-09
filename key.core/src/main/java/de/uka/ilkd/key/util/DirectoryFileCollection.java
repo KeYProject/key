@@ -34,7 +34,8 @@ public class DirectoryFileCollection implements FileCollection {
      * create a new File collection for a given directory The argument may be a single file also. A
      * directory is read recursively.
      *
-     * @param directory directory to iterate through,
+     * @param directory
+     *        directory to iterate through,
      */
     public DirectoryFileCollection(Path directory) {
         this.directory = directory;
@@ -52,9 +53,7 @@ public class DirectoryFileCollection implements FileCollection {
     private static void sortFiles(List<Path> files) {
         for (int a = 0; a < files.size() - 1; a++) {
             for (int b = a + 1; b < files.size(); b++) {
-                if (!(a < b)) {
-                    throw new RuntimeException("Incorrect sorting algorithms.");
-                }
+                if (!(a < b)) { throw new RuntimeException("Incorrect sorting algorithms."); }
                 Path fa = files.get(a);
                 Path fb = files.get(b);
 

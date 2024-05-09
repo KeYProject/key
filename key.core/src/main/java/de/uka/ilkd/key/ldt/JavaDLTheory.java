@@ -100,16 +100,16 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the cast function for the given sort
      *
-     * @param sort the Sort for which to retrieve the cast function
-     * @param services the TermServices for lookup
+     * @param sort
+     *        the Sort for which to retrieve the cast function
+     * @param services
+     *        the TermServices for lookup
      * @return the found cast function
      */
     public final SortDependingFunction getCastSymbol(Sort sort, TermServices services) {
         SortDependingFunction castFunction =
             SortDependingFunction.getFirstInstance(CAST_NAME, services);
-        if (castFunction == null) {
-            throw new IllegalStateException("No 'cast' function found for any type.");
-        }
+        if (castFunction == null) { throw new IllegalStateException("No 'cast' function found for any type."); }
         SortDependingFunction result = castFunction.getInstanceFor(sort, services);
         assert result.getSortDependingOn() == sort && result.sort() == sort;
         return result;
@@ -118,8 +118,10 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the instanceof function for the given sort
      *
-     * @param sort the Sort for which to retrieve the instanceof function
-     * @param services the TermServices for lookup
+     * @param sort
+     *        the Sort for which to retrieve the instanceof function
+     * @param services
+     *        the TermServices for lookup
      * @return the found instanceof function
      */
     public final SortDependingFunction getInstanceofSymbol(Sort sort, TermServices services) {
@@ -134,8 +136,10 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the exactInstance function for the given sort
      *
-     * @param sort the Sort for which to retrieve the exactInstance function
-     * @param services the TermServices for lookup
+     * @param sort
+     *        the Sort for which to retrieve the exactInstance function
+     * @param services
+     *        the TermServices for lookup
      * @return the found exactInstance function
      */
     public final SortDependingFunction getExactInstanceofSymbol(Sort sort, TermServices services) {

@@ -32,9 +32,7 @@ public class MergeRuleFeature implements Feature {
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Term t = pos.subTerm();
-        if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {
-            return TopRuleAppCost.INSTANCE;
-        }
+        if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) { return TopRuleAppCost.INSTANCE; }
 
         return JavaTools.getActiveStatement(
             TermBuilder.goBelowUpdates(t).javaBlock()) instanceof MergePointStatement

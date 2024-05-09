@@ -52,7 +52,8 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
 
     /**
-     * @param svInsts the SVInstantiations that have been already found (needed by unwind loop
+     * @param svInsts
+     *        the SVInstantiations that have been already found (needed by unwind loop
      *        constructs to determine which labels are needed)
      */
     public TacletSchemaVariableCollector(SVInstantiations svInsts) {
@@ -64,8 +65,10 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * collects all SchemVariables that occur in the JavaBlock
      *
-     * @param jb the JavaBlock where to look for Schemavariables
-     * @param vars the IList<SchemaVariable> where to add the found SchemaVariables
+     * @param jb
+     *        the JavaBlock where to look for Schemavariables
+     * @param vars
+     *        the IList<SchemaVariable> where to add the found SchemaVariables
      * @return the extended list of found schemavariables
      */
     protected ImmutableList<SchemaVariable> collectSVInProgram(JavaBlock jb,
@@ -82,15 +85,14 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      * collects all found
      * schema variables
      *
-     * @param visited the Term whose schema variables are collected
+     * @param visited
+     *        the Term whose schema variables are collected
      */
     @Override
     public void visit(Term visited) {
         final Operator op = visited.op();
         if (op instanceof Modality mod) {
-            if (mod.kind() instanceof ModalOperatorSV msv) {
-                varList = varList.prepend(msv);
-            }
+            if (mod.kind() instanceof ModalOperatorSV msv) { varList = varList.prepend(msv); }
             varList = collectSVInProgram(visited.javaBlock(), varList);
         } else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate) op, varList);
@@ -99,20 +101,14 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
         for (int j = 0, ar = visited.arity(); j < ar; j++) {
             for (int i = 0, sz = visited.varsBoundHere(j).size(); i < sz; i++) {
                 final QuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
-                if (qVar instanceof SchemaVariable) {
-                    varList = varList.prepend((SchemaVariable) qVar);
-                }
+                if (qVar instanceof SchemaVariable) { varList = varList.prepend((SchemaVariable) qVar); }
             }
         }
 
-        if (op instanceof SchemaVariable) {
-            varList = varList.prepend((SchemaVariable) op);
-        }
+        if (op instanceof SchemaVariable) { varList = varList.prepend((SchemaVariable) op); }
 
         for (TermLabel label : visited.getLabels()) {
-            if (label instanceof TermLabelSV) {
-                varList = varList.prepend((SchemaVariable) label);
-            }
+            if (label instanceof TermLabelSV) { varList = varList.prepend((SchemaVariable) label); }
         }
     }
 
@@ -120,8 +116,10 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * collects all schema variables occurring on the lhs of an elementary update
      *
-     * @param op the ElementaryUpdate operator to be scanned for schemavariables
-     * @param vars the ImmutableList<SchemaVariable> with already found schema variables
+     * @param op
+     *        the ElementaryUpdate operator to be scanned for schemavariables
+     * @param vars
+     *        the ImmutableList<SchemaVariable> with already found schema variables
      * @return a list of schema variables containing the ones of <code>vars</code> together with the
      *         schema variables found in <code>op</code>
      */
@@ -129,9 +127,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
             ImmutableList<SchemaVariable> vars) {
         ImmutableList<SchemaVariable> result = vars;
 
-        if (op.lhs() instanceof SchemaVariable) {
-            result = result.prepend((SchemaVariable) op.lhs());
-        }
+        if (op.lhs() instanceof SchemaVariable) { result = result.prepend((SchemaVariable) op.lhs()); }
 
         return result;
     }
@@ -162,19 +158,19 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * collects all variables in a Semisequent
      *
-     * @param semiseq the Semisequent to visit
+     * @param semiseq
+     *        the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (SequentFormula aSemiseq : semiseq) {
-            aSemiseq.formula().execPostOrder(this);
-        }
+        for (SequentFormula aSemiseq : semiseq) { aSemiseq.formula().execPostOrder(this); }
     }
 
 
     /**
      * goes through the given sequent an collects all vars found
      *
-     * @param seq the Sequent to visit
+     * @param seq
+     *        the Sequent to visit
      */
     public void visit(Sequent seq) {
         visit(seq.antecedent());
@@ -184,8 +180,10 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * collects all schema variables of a taclet
      *
-     * @param taclet the Taclet where the variables have to be collected to
-     * @param visitAddrules a boolean that contols if the addrule sections are to be ignored (iff
+     * @param taclet
+     *        the Taclet where the variables have to be collected to
+     * @param visitAddrules
+     *        a boolean that contols if the addrule sections are to be ignored (iff
      *        false) or if the visitor descends into them (iff true)
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
@@ -196,9 +194,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
 
     protected void visitFindPart(Taclet taclet) {
-        if (taclet instanceof FindTaclet) {
-            (((FindTaclet) taclet).find()).execPostOrder(this);
-        }
+        if (taclet instanceof FindTaclet) { (((FindTaclet) taclet).find()).execPostOrder(this); }
     }
 
 
@@ -213,11 +209,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
                     visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());
                 }
             }
-            if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
-                    visit(taclet1, true);
-                }
-            }
+            if (visitAddrules) { for (Taclet taclet1 : gt.rules()) { visit(taclet1, true); } }
         }
     }
 
@@ -226,7 +218,8 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      * collects all variables in a Taclet but ignores the variables that appear only in the addrule
      * sections of the Taclet
      *
-     * @param taclet the Taclet where the variables have to be collected to
+     * @param taclet
+     *        the Taclet where the variables have to be collected to
      */
     public void visitWithoutAddrule(Taclet taclet) {
         visit(taclet, false);

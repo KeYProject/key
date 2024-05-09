@@ -36,8 +36,7 @@ public class ProgramContextAdder {
     /**
      * an empty private constructor to ensure the singleton property
      */
-    private ProgramContextAdder() {
-    }
+    private ProgramContextAdder() {}
 
     /**
      * wraps the context around the statements found in the putIn block
@@ -94,11 +93,14 @@ public class ProgramContextAdder {
      * inserts the content of the statement block <code>putIn</code> and adds succeeding children of
      * the innermost non terminal element (usually statement block) in the context.
      *
-     * @param wrapper the JavaNonTerminalProgramElement with the context that has to be wrapped
+     * @param wrapper
+     *        the JavaNonTerminalProgramElement with the context that has to be wrapped
      *        around the content of <code>putIn</code>
-     * @param putIn the StatementBlock with content that has to be wrapped by the elements hidden in
+     * @param putIn
+     *        the StatementBlock with content that has to be wrapped by the elements hidden in
      *        the context
-     * @param suffix the PosInProgram describing the position of the first element before the suffix
+     * @param suffix
+     *        the PosInProgram describing the position of the first element before the suffix
      *        of the context
      * @return the StatementBlock which encloses the content of <code>putIn</code> together with the
      *         succeeding context elements of the innermost context statement block (attention: in a
@@ -119,9 +121,7 @@ public class ProgramContextAdder {
 
         final int childrenToAdd = putInLength + childLeft;
 
-        if (childLeft == 0 || lastChild == -1) {
-            return putIn;
-        }
+        if (childLeft == 0 || lastChild == -1) { return putIn; }
 
         final Statement[] body = new Statement[childrenToAdd];
 
@@ -146,8 +146,10 @@ public class ProgramContextAdder {
      * returns the replacement block if it is the only child of the statement block to be
      * constructed and the chld is a statementblock too.
      *
-     * @param wrapper the StatementBlock where to replace the first statement
-     * @param replacement the StatementBlock that replaces the first statement of the block
+     * @param wrapper
+     *        the StatementBlock where to replace the first statement
+     * @param replacement
+     *        the StatementBlock that replaces the first statement of the block
      * @return the resulting statement block
      */
     protected StatementBlock createStatementBlockWrapper(StatementBlock wrapper,
@@ -159,9 +161,7 @@ public class ProgramContextAdder {
             Statement[] body = new Statement[childrenCount > 0 ? childrenCount : 1];
             /* reconstruct block */
             body[0] = (Statement) replacement;
-            if (childrenCount - 1 > 0) {
-                wrapper.getBody().arraycopy(1, body, 1, childrenCount - 1);
-            }
+            if (childrenCount - 1 > 0) { wrapper.getBody().arraycopy(1, body, 1, childrenCount - 1); }
             return new StatementBlock(new ImmutableArray<>(body));
         }
     }

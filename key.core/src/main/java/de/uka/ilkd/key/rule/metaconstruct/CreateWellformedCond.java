@@ -45,12 +45,18 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
     /**
      * Creates a wellformedness condition containing the applicable heaps.
      *
-     * @param isTransaction Signals a transaction modality.
-     * @param isPermissions Signals the permission profile.
-     * @param anonHeapTerm The Skolem term for the standard heap.
-     * @param anonSavedHeapTerm The Skolem term for the saved (transaction) heap.
-     * @param anonPermissionsHeapTerm The Skolem term for the permissions heap.
-     * @param services The {@link Services} object.
+     * @param isTransaction
+     *        Signals a transaction modality.
+     * @param isPermissions
+     *        Signals the permission profile.
+     * @param anonHeapTerm
+     *        The Skolem term for the standard heap.
+     * @param anonSavedHeapTerm
+     *        The Skolem term for the saved (transaction) heap.
+     * @param anonPermissionsHeapTerm
+     *        The Skolem term for the permissions heap.
+     * @param services
+     *        The {@link Services} object.
      * @return The wellformedness condition.
      */
     private Term createWellformedCond(boolean isTransaction, boolean isPermissions,
@@ -60,13 +66,9 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
 
         Term result = tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        if (isTransaction) {
-            result = tb.and(result, tb.wellFormed(anonSavedHeapTerm));
-        }
+        if (isTransaction) { result = tb.and(result, tb.wellFormed(anonSavedHeapTerm)); }
 
-        if (isPermissions) {
-            result = tb.and(result, tb.wellFormed(anonPermissionsHeapTerm));
-        }
+        if (isPermissions) { result = tb.and(result, tb.wellFormed(anonPermissionsHeapTerm)); }
 
         return result;
     }

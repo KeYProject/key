@@ -41,9 +41,12 @@ public class ConstructorCall extends ProgramTransformer {
     private final ProgramVariable newObjectVar;
 
     /**
-     * @param name Constructor Name.
-     * @param newObjectSV The {@link SchemaVariable}
-     * @param consRef The constructor reference.
+     * @param name
+     *        Constructor Name.
+     * @param newObjectSV
+     *        The {@link SchemaVariable}
+     * @param consRef
+     *        The constructor reference.
      */
     protected ConstructorCall(Name name, SchemaVariable newObjectSV, ProgramElement consRef) {
         super(name, consRef);
@@ -54,8 +57,10 @@ public class ConstructorCall extends ProgramTransformer {
     /**
      * creates the metaconstruct
      *
-     * @param newObjectSV TODO
-     * @param consRef TODO
+     * @param newObjectSV
+     *        TODO
+     * @param consRef
+     *        TODO
      */
     public ConstructorCall(SchemaVariable newObjectSV, ProgramElement consRef) {
         this(new Name(CONSTRUCTOR_CALL), newObjectSV, consRef);

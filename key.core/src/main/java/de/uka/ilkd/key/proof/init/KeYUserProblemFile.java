@@ -48,10 +48,14 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * the physical source of the input, and a graphical representation to call back in order to
      * report the progress while reading.
      *
-     * @param name the name of the file
-     * @param file the file to read from
-     * @param monitor the possibly <tt>null</tt> monitor for progress
-     * @param profile the KeY profile under which to load
+     * @param name
+     *        the name of the file
+     * @param file
+     *        the file to read from
+     * @param monitor
+     *        the possibly <tt>null</tt> monitor for progress
+     * @param profile
+     *        the KeY profile under which to load
      */
     public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
         this(name, file, monitor, profile, false);
@@ -60,11 +64,16 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     /**
      * Instantiates a new user problem file.
      *
-     * @param name the name of the file
-     * @param file the file to read from
-     * @param monitor the possibly <tt>null</tt> monitor for progress
-     * @param profile the KeY profile under which to load
-     * @param compressed {@code true} iff the file is compressed
+     * @param name
+     *        the name of the file
+     * @param file
+     *        the file to read from
+     * @param monitor
+     *        the possibly <tt>null</tt> monitor for progress
+     * @param profile
+     *        the KeY profile under which to load
+     * @param compressed
+     *        {@code true} iff the file is compressed
      */
     public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
@@ -74,12 +83,18 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     /**
      * Instantiates a new user problem file.
      *
-     * @param name the name of the file
-     * @param file the file tp read from
-     * @param fileRepo the fileRepo which will store the file
-     * @param monitor the possibly <tt>null</tt> monitor for progress
-     * @param profile the KeY profile under which to load
-     * @param compressed {@code true} iff the file is compressed
+     * @param name
+     *        the name of the file
+     * @param file
+     *        the file tp read from
+     * @param fileRepo
+     *        the fileRepo which will store the file
+     * @param monitor
+     *        the possibly <tt>null</tt> monitor for progress
+     * @param profile
+     *        the KeY profile under which to load
+     * @param compressed
+     *        {@code true} iff the file is compressed
      */
     public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
@@ -92,9 +107,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     @Override
     public ImmutableSet<PositionedString> read() throws ProofInputException {
-        if (initConfig == null) {
-            throw new IllegalStateException("InitConfig not set.");
-        }
+        if (initConfig == null) { throw new IllegalStateException("InitConfig not set."); }
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
 
@@ -125,9 +138,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     @Override
     public void readProblem() throws ProofInputException {
-        if (initConfig == null) {
-            throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
-        }
+        if (initConfig == null) { throw new IllegalStateException("KeYUserProblemFile: InitConfig not set."); }
 
         try {
             problem = getProblemFinder().getProblem();
@@ -202,9 +213,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
         final KeYUserProblemFile kf = (KeYUserProblemFile) o;
         return kf.file.file().toAbsolutePath().equals(file.file().toAbsolutePath());
     }

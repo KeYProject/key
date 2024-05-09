@@ -41,9 +41,12 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      *
-     * @param mods a modifier array.
-     * @param typeRef a type reference.
-     * @param vars a variable specification array.
+     * @param mods
+     *        a modifier array.
+     * @param typeRef
+     *        a type reference.
+     * @param vars
+     *        a variable specification array.
      */
     public LocalVariableDeclaration(Modifier[] mods, TypeReference typeRef,
             VariableSpecification[] vars) {
@@ -54,8 +57,10 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration which declared exactly one variable.
      *
-     * @param typeRef a type reference.
-     * @param var the variable specification
+     * @param typeRef
+     *        a type reference.
+     * @param var
+     *        the variable specification
      */
     public LocalVariableDeclaration(TypeReference typeRef, VariableSpecification var) {
         this(new ImmutableArray<>(new Modifier[0]), typeRef, var);
@@ -65,9 +70,12 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      *
-     * @param mods a modifier array.
-     * @param typeRef a type reference.
-     * @param var a variable specification .
+     * @param mods
+     *        a modifier array.
+     * @param typeRef
+     *        a type reference.
+     * @param var
+     *        a variable specification .
      */
     public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
             VariableSpecification var) {
@@ -78,9 +86,12 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      *
-     * @param mods a modifier array.
-     * @param typeRef a type reference.
-     * @param vars a variable specification array.
+     * @param mods
+     *        a modifier array.
+     * @param typeRef
+     *        a type reference.
+     * @param vars
+     *        a variable specification array.
      */
     public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
             VariableSpecification[] vars) {
@@ -99,7 +110,8 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      *
-     * @param children an ExtList containing the children. May include: several
+     * @param children
+     *        an ExtList containing the children. May include: several
      *        VariableSpecification (specifying the declared local variable), a TypeReference (as
      *        reference to the type of the declared variable), several Modifier (taken as modifiers
      *        of the declaration), a Comment
@@ -134,44 +146,34 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) {
-            result += modArray.size();
-        }
-        if (typeReference != null) {
-            result++;
-        }
-        if (varSpecs != null) {
-            result += varSpecs.size();
-        }
+        if (modArray != null) { result += modArray.size(); }
+        if (typeReference != null) { result++; }
+        if (varSpecs != null) { result += varSpecs.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) {
-                return modArray.get(index);
-            }
+            if (len > index) { return modArray.get(index); }
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
-        if (varSpecs != null) {
-            return varSpecs.get(index);
-        }
+        if (varSpecs != null) { return varSpecs.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -219,7 +221,8 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnLocalVariableDeclaration(this);

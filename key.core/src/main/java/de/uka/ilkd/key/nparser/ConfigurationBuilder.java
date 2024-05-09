@@ -44,8 +44,7 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
         return sanitizeStringLiteral(text);
     }
 
-    @NonNull
-    private static String sanitizeStringLiteral(String text) {
+    private static @NonNull String sanitizeStringLiteral(String text) {
         return text.substring(1, text.length() - 1)
                 .replace("\\\"", "\"")
                 .replace("\\\\", "\\");
@@ -105,9 +104,7 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     @Override
     public Object visitList(KeYParser.ListContext ctx) {
         var seq = new ArrayList<>(ctx.children.size());
-        for (KeYParser.CvalueContext context : ctx.cvalue()) {
-            seq.add(context.accept(this));
-        }
+        for (KeYParser.CvalueContext context : ctx.cvalue()) { seq.add(context.accept(this)); }
         return seq;
     }
 }

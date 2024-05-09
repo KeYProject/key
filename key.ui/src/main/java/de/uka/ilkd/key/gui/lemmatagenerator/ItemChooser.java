@@ -125,14 +125,10 @@ class ItemChooser<T> extends JPanel {
         for (TableItem<T> item : tableItems) {
             boolean move = true;
             for (ItemFilter<T> filter : filtersForMovingItems) {
-                if (!filter.include(item.getData())) {
-                    move = false;
-                }
+                if (!filter.include(item.getData())) { move = false; }
             }
 
-            if (move) {
-                item.setSide(destList.getSide());
-            }
+            if (move) { item.setSide(destList.getSide()); }
         }
         srcList.update();
         destList.update();
@@ -143,9 +139,7 @@ class ItemChooser<T> extends JPanel {
 
 
     private SelectionPanel<T> getSuppliedList() {
-        if (suppliedList == null) {
-            suppliedList = new SelectionPanel<>("Choice", searchTitle, Side.LEFT, userFilter);
-        }
+        if (suppliedList == null) { suppliedList = new SelectionPanel<>("Choice", searchTitle, Side.LEFT, userFilter); }
         return suppliedList;
     }
 
@@ -166,9 +160,7 @@ class ItemChooser<T> extends JPanel {
 
         }
         ItemModel model = new ItemModel(columnName);
-        for (TableItem<T> item : items) {
-            model.addRow(new Object[] { item });
-        }
+        for (TableItem<T> item : items) { model.addRow(new Object[] { item }); }
 
 
 
@@ -183,25 +175,17 @@ class ItemChooser<T> extends JPanel {
     public List<T> getDataOfSelectedItems() {
 
         List<T> list = new LinkedList<>();
-        for (TableItem<T> item : items) {
-            if (item.getSide() == Side.RIGHT) {
-                list.add(item.getData());
-            }
-        }
+        for (TableItem<T> item : items) { if (item.getSide() == Side.RIGHT) { list.add(item.getData()); } }
         return list;
     }
 
     public void moveAllToLeft() {
-        for (TableItem<T> item : items) {
-            item.setSide(Side.LEFT);
-        }
+        for (TableItem<T> item : items) { item.setSide(Side.LEFT); }
         update();
     }
 
     public void moveAllToRight() {
-        for (TableItem<T> item : items) {
-            item.setSide(Side.RIGHT);
-        }
+        for (TableItem<T> item : items) { item.setSide(Side.RIGHT); }
         update();
     }
 
@@ -298,7 +282,9 @@ class SelectionPanel<T> extends JPanel {
                 }
 
                 @Override
-                public void insertUpdate(DocumentEvent e) { search(); }
+                public void insertUpdate(DocumentEvent e) {
+                    search();
+                }
 
                 @Override
                 public void changedUpdate(DocumentEvent arg0) {}
@@ -310,9 +296,7 @@ class SelectionPanel<T> extends JPanel {
 
 
     void addItems(List<TacletInfo> infoList) {
-        for (TacletInfo info : infoList) {
-            getModel().addRow(new Object[] { info });
-        }
+        for (TacletInfo info : infoList) { getModel().addRow(new Object[] { info }); }
     }
 
     void selectAll() {
@@ -383,16 +367,10 @@ class SelectionPanel<T> extends JPanel {
                     (TableItem<T>) entry.getModel().getValueAt(entry.getIdentifier(), 0);
 
                 for (ItemFilter<T> userFilter : userFilters) {
-                    if (!userFilter.include(item.getData())) {
-                        return false;
-                    }
+                    if (!userFilter.include(item.getData())) { return false; }
                 }
 
-                if (!findPattern.isEmpty()) {
-                    if (!item.getNameLowerCase().contains(findPattern)) {
-                        return false;
-                    }
-                }
+                if (!findPattern.isEmpty()) { if (!item.getNameLowerCase().contains(findPattern)) { return false; } }
 
                 return item.getSide() == side;
             }

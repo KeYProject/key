@@ -258,12 +258,8 @@ public final class MainWindow extends JFrame {
                 types.addAll(((SMTInvokeAction) action).getSolverUnion().getTypes());
             }
         }
-        if (types.isEmpty() || a.length == 0) {
-            return noSolverSelected;
-        }
-        for (SolverType type : types) {
-            builder.append(type.getName()).append(", ");
-        }
+        if (types.isEmpty() || a.length == 0) { return noSolverSelected; }
+        for (SolverType type : types) { builder.append(type.getName()).append(", "); }
         builder.delete(builder.length() - 2, builder.length());
         SolverTypeCollection chosenSolvers =
             new SolverTypeCollection(builder.toString(), types.size(), types);
@@ -290,9 +286,7 @@ public final class MainWindow extends JFrame {
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setLocationByPlatform(true);
         applyGnomeWorkaround();
-        if (!applyTaskbarIcon()) {
-            applyMacOsWorkaround();
-        }
+        if (!applyTaskbarIcon()) { applyMacOsWorkaround(); }
         setLaF();
         setIconImages(IconFactory.applicationLogos());
 
@@ -404,9 +398,7 @@ public final class MainWindow extends JFrame {
         }
         if (instance == null) {
             instance = new MainWindow();
-            if (ensureIsVisible) {
-                instance.setVisible(true);
-            }
+            if (ensureIsVisible) { instance.setVisible(true); }
         }
         return instance;
     }
@@ -477,7 +469,8 @@ public final class MainWindow extends JFrame {
     /**
      * Returns the MainWindow KeyMediator.
      *
-     * @param userInterface The UserInterfaceControl.
+     * @param userInterface
+     *        The UserInterfaceControl.
      */
     private KeYMediator getMainWindowMediator(AbstractMediatorUserInterfaceControl userInterface) {
         KeYMediator result = new KeYMediator(userInterface);
@@ -503,9 +496,7 @@ public final class MainWindow extends JFrame {
      * @return the mediator
      */
     public KeYMediator getMediator() {
-        if (mediator == null) {
-            throw new NullPointerException("KeYMediator is not set.");
-        }
+        if (mediator == null) { throw new NullPointerException("KeYMediator is not set."); }
         return mediator;
     }
 
@@ -624,8 +615,9 @@ public final class MainWindow extends JFrame {
         DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
-            + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
-            + " See About | License.", getFont());
+                + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
+                + " See About | License.",
+            getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
 
         // load preferred sizes from system preferences
@@ -701,9 +693,9 @@ public final class MainWindow extends JFrame {
         // Configure the smtComponent's empty item (this is selected if no solvers are available):
         String noneAvailableText = "No solver available";
         String noneAvailableTip = "<html>No SMT solver is applicable for KeY.<br>"
-            + "<br>If a solver is installed on your system,"
-            + "<br>please configure the KeY-System accordingly:" + System.lineSeparator()
-            + "<br>Options | SMT Solvers</html>";
+                + "<br>If a solver is installed on your system,"
+                + "<br>please configure the KeY-System accordingly:" + System.lineSeparator()
+                + "<br>Options | SMT Solvers</html>";
         smtComponent.setEmptyItem(noneAvailableText, noneAvailableTip);
 
         // Prepend "Run" to the currently selected action in the smtComponent
@@ -839,9 +831,7 @@ public final class MainWindow extends JFrame {
      * Update the sequent view.
      */
     public void makePrettyView() {
-        if (getMediator().ensureProofLoaded()) {
-            getMediator().getNotationInfo().refresh(mediator.getServices());
-        }
+        if (getMediator().ensureProofLoaded()) { getMediator().getNotationInfo().refresh(mediator.getServices()); }
         SwingUtilities.invokeLater(this::updateSequentView);
     }
 
@@ -853,9 +843,7 @@ public final class MainWindow extends JFrame {
         // Moved it from the super class to here, as it is only the windowed version and not the
         // console ui that
         // needs it.
-        for (Proof proof : plist.getProofs()) {
-            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
-        }
+        for (Proof proof : plist.getProofs()) { new ProofLoadUserAction(getMediator(), proof).actionPerformed(null); }
         // GUI
         proofList.setSize(proofList.getPreferredSize());
         proofListView.setViewportView(proofList);
@@ -965,7 +953,8 @@ public final class MainWindow extends JFrame {
     /**
      * Create the proof menu.
      *
-     * @param selected a specific proof that the menu should work on, may be null
+     * @param selected
+     *        a specific proof that the menu should work on, may be null
      * @return the menu
      */
     public JMenu createProofMenu(Proof selected) {
@@ -989,12 +978,10 @@ public final class MainWindow extends JFrame {
                 }
 
                 @Override
-                public void menuDeselected(MenuEvent e) {
-                }
+                public void menuDeselected(MenuEvent e) {}
 
                 @Override
-                public void menuCanceled(MenuEvent e) {
-                }
+                public void menuCanceled(MenuEvent e) {}
             });
             proof.add(goalBack);
             proof.add(new PruneProofAction(this));
@@ -1096,9 +1083,7 @@ public final class MainWindow extends JFrame {
         // If more than one action can be selected, add the selectAll-button.
         if (actions.length > 1) {
             // The old selection listener is not needed anymore.
-            if (selectAllListener != null) {
-                smtComponent.removeListener(selectAllListener);
-            }
+            if (selectAllListener != null) { smtComponent.removeListener(selectAllListener); }
             smtComponent.addComponent(separator);
             smtComponent.addComponent(selectAll);
             selectAll.setAction(new AbstractAction() {
@@ -1193,9 +1178,7 @@ public final class MainWindow extends JFrame {
      * Updates the sequent displayed in the main frame.
      */
     private synchronized void updateSequentView() {
-        if (disableCurrentGoalView) {
-            return;
-        }
+        if (disableCurrentGoalView) { return; }
         final SequentView newSequentView;
 
         // if this is set we can skip calls to printSequent, since it is invoked in setSequentView
@@ -1208,18 +1191,14 @@ public final class MainWindow extends JFrame {
             if (goal != null && !goal.node().isClosed()) {
                 currentGoalView.setPrinter(goal);
 
-                if (!isPrintRunImmediately) {
-                    currentGoalView.printSequent();
-                }
+                if (!isPrintRunImmediately) { currentGoalView.printSequent(); }
                 newSequentView = currentGoalView;
             } else {
                 Sequent seq = getMediator().getSelectionModel().getSelectedSequent();
                 RuleApp ruleApp = getMediator().getSelectionModel().getSelectedRuleApp();
                 newSequentView = new InnerNodeView(getMediator().getSelectedProof(),
                     getMediator().getSelectedNode(), ruleApp, seq, this);
-                if (!isPrintRunImmediately) {
-                    newSequentView.printSequent();
-                }
+                if (!isPrintRunImmediately) { newSequentView.printSequent(); }
             }
         }
 
@@ -1249,7 +1228,8 @@ public final class MainWindow extends JFrame {
     /**
      * Scroll the sequent view to the specified y coordinate.
      *
-     * @param y coordinate in pixels
+     * @param y
+     *        coordinate in pixels
      */
     public void scrollTo(int y) {
         mainFrame.scrollTo(y);
@@ -1263,12 +1243,11 @@ public final class MainWindow extends JFrame {
     /**
      * informs the NotificationManager about an event
      *
-     * @param event the NotificationEvent
+     * @param event
+     *        the NotificationEvent
      */
     public void notify(NotificationEvent event) {
-        if (notificationManager != null) {
-            notificationManager.handleNotificationEvent(event);
-        }
+        if (notificationManager != null) { notificationManager.handleNotificationEvent(event); }
     }
 
     public void popupInformationMessage(Object message, String title) {
@@ -1311,7 +1290,8 @@ public final class MainWindow extends JFrame {
      * explicitly synchronised; this happens at application end using {@link #syncPreferences()}.
      * All components which are in the component tree are queried.
      *
-     * @param component the non-null component whose preferences are to be saved
+     * @param component
+     *        the non-null component whose preferences are to be saved
      * @see PreferenceSaver
      */
     public void savePreferences(Component component) {
@@ -1325,7 +1305,8 @@ public final class MainWindow extends JFrame {
      * This uses the {@link Preferences} class to access the system preferences. All components
      * which are in the component tree are queried.
      *
-     * @param component the non-null component whose preferences are to be set
+     * @param component
+     *        the non-null component whose preferences are to be set
      * @see PreferenceSaver
      */
     public void loadPreferences(Component component) {
@@ -1408,8 +1389,10 @@ public final class MainWindow extends JFrame {
     /**
      * Loads the proof with the given path from the proof bundle.
      *
-     * @param proofBundle the path of the proof bundle
-     * @param proofPath the path of the proof to load (relative to the root of the bundle ->
+     * @param proofBundle
+     *        the path of the proof bundle
+     * @param proofPath
+     *        the path of the proof to load (relative to the root of the bundle ->
      *        filename only)
      */
     public void loadProofFromBundle(Path proofBundle, Path proofPath) {
@@ -1441,7 +1424,8 @@ public final class MainWindow extends JFrame {
     /**
      * Defines if taclet infos are shown or not.
      *
-     * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
+     * @param show
+     *        {@code true} show taclet infos, {@code false} hide taclet infos.
      */
     public void setShowTacletInfo(boolean show) {
         mainFrame.setShowTacletInfo(show);
@@ -1639,18 +1623,11 @@ public final class MainWindow extends JFrame {
             doNotReenable = new LinkedHashSet<>();
             Component[] cs = controlToolBar.getComponents();
             for (Component component : cs) {
-                if (!component.isEnabled()) {
-                    doNotReenable.add(component);
-                }
+                if (!component.isEnabled()) { doNotReenable.add(component); }
                 component.setEnabled(false);
             }
             cs = fileOpToolBar.getComponents();
-            for (Component c : cs) {
-                if (!c.isEnabled()) {
-                    doNotReenable.add(c);
-                }
-                c.setEnabled(false);
-            }
+            for (Component c : cs) { if (!c.isEnabled()) { doNotReenable.add(c); } c.setEnabled(false); }
         }
 
         private void setToolBarEnabled() {
@@ -1662,17 +1639,9 @@ public final class MainWindow extends JFrame {
             }
 
             Component[] cs = controlToolBar.getComponents();
-            for (Component component : cs) {
-                if (!doNotReenable.contains(component)) {
-                    component.setEnabled(true);
-                }
-            }
+            for (Component component : cs) { if (!doNotReenable.contains(component)) { component.setEnabled(true); } }
             cs = fileOpToolBar.getComponents();
-            for (Component c : cs) {
-                if (!doNotReenable.contains(c)) {
-                    c.setEnabled(true);
-                }
-            }
+            for (Component c : cs) { if (!doNotReenable.contains(c)) { c.setEnabled(true); } }
 
             doNotReenable = null;
         }
@@ -1726,9 +1695,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (disableCurrentGoalView) {
-                return;
-            }
+            if (disableCurrentGoalView) { return; }
             SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
         }
 
@@ -1737,18 +1704,14 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedProofChanged(KeYSelectionEvent e) {
-            if (disableCurrentGoalView) {
-                return;
-            }
+            if (disableCurrentGoalView) { return; }
             LOGGER.debug("Main: initialize with new proof");
 
             if (proof != null && !proof.isDisposed()) {
                 proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
             proof = e.getSource().getSelectedProof();
-            if (proof != null) {
-                proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
-            }
+            if (proof != null) { proof.getSettings().getStrategySettings().removePropertyChangeListener(this); }
 
             disableCurrentGoalView = false;
             makePrettyView();
@@ -1811,7 +1774,8 @@ public final class MainWindow extends JFrame {
     /**
      * Update other UI components based on the new sequent view.
      *
-     * @param sequentView the sequent view to show
+     * @param sequentView
+     *        the sequent view to show
      */
     public void setSequentView(SequentView sequentView) {
         sequentViewSearchBar.setSequentView(sequentView);

@@ -47,7 +47,8 @@ public abstract class JavaTransformer {
     /**
      * creates a transformer for the recoder model
      *
-     * @param services the CrossReferenceServiceConfiguration to access
+     * @param services
+     *        the CrossReferenceServiceConfiguration to access
      *        model information
      */
     public JavaTransformer(@NonNull TransformationPipelineServices services) {
@@ -64,9 +65,7 @@ public abstract class JavaTransformer {
     public void apply(TypeDeclaration<?> td) {}
 
     public void apply(CompilationUnit cu) {
-        for (TypeDeclaration<?> type : cu.getTypes()) {
-            apply(type);
-        }
+        for (TypeDeclaration<?> type : cu.getTypes()) { apply(type); }
     }
 
     public static RuntimeException reportError(Node node, String message, Object... args) {

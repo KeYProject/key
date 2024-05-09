@@ -29,9 +29,7 @@ class TestUnsatCore {
 
     @Test
     void testUnsatCore() throws ProblemLoaderException {
-        if (!z3Installed()) {
-            return;
-        }
+        if (!z3Installed()) { return; }
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory, "smt/unsatCore.proof").toPath());

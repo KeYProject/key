@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * tests non-destructive list implementation with String
  */
+@SuppressWarnings("initialization")
 public class TestSLListOfString {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestSLListOfString.class);
 
@@ -29,8 +31,8 @@ public class TestSLListOfString {
     ImmutableList<String> b; // "A" "B"
     ImmutableList<String> c; // "A" "B" "C" "D"
     ImmutableList<String> d; // "A" "B" "A"
-    ImmutableList<String> e; // "A" "B" null
-    ImmutableList<String> e1; // "A" "B" null
+    ImmutableList<@Nullable String> e; // "A" "B" null
+    ImmutableList<@Nullable String> e1; // "A" "B" null
 
 
     @BeforeEach
@@ -40,8 +42,10 @@ public class TestSLListOfString {
         b = ImmutableSLList.<String>nil().prepend("B").prepend("A");
         c = ImmutableSLList.<String>nil().prepend("D").prepend("C").prepend("B").prepend("A");
         d = ImmutableSLList.<String>nil().prepend("A").prepend("B").prepend("A");
-        e = ImmutableSLList.<String>nil().prepend((String) null).prepend("B").prepend("A");
-        e1 = ImmutableSLList.<String>nil().prepend((String) null).prepend("B").prepend("A");
+        e = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B")
+                .prepend("A");
+        e1 = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B")
+                .prepend("A");
     }
 
     // tests prepend and implicitly iterator, size
@@ -51,9 +55,7 @@ public class TestSLListOfString {
         ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
         newList[0] = ImmutableSLList.nil();
 
-        for (int i = 1; i < str.length + 1; i++) {
-            newList[i] = newList[i - 1].prepend(str[i - 1]);
-        }
+        for (int i = 1; i < str.length + 1; i++) { newList[i] = newList[i - 1].prepend(str[i - 1]); }
         // Test elements in list
         for (int i = 0; i < str.length + 1; i++) {
             Iterator<String> it = newList[i].iterator();
@@ -66,10 +68,7 @@ public class TestSLListOfString {
                 assertEquals(0, size);
             }
             int nr = 0;
-            while (it.hasNext()) {
-                assertSame(it.next(), str[size - 1 - nr]);
-                nr++;
-            }
+            while (it.hasNext()) { assertSame(it.next(), str[size - 1 - nr]); nr++; }
             // list has right length
             assertEquals(nr, size);
         }
@@ -89,9 +88,7 @@ public class TestSLListOfString {
         ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
         newList[0] = ImmutableSLList.nil();
 
-        for (int i = 1; i < str.length + 1; i++) {
-            newList[i] = newList[i - 1].append(str[i - 1]);
-        }
+        for (int i = 1; i < str.length + 1; i++) { newList[i] = newList[i - 1].append(str[i - 1]); }
         // Test elements in list
         for (int i = 0; i < str.length + 1; i++) {
             Iterator<String> it = newList[i].iterator();
@@ -104,10 +101,7 @@ public class TestSLListOfString {
                 assertEquals(0, size);
             }
             int nr = 0;
-            while (it.hasNext()) {
-                assertSame(it.next(), str[nr]);
-                nr++;
-            }
+            while (it.hasNext()) { assertSame(it.next(), str[nr]); nr++; }
             // list has right length
             assertEquals(nr, size);
         }
@@ -128,9 +122,7 @@ public class TestSLListOfString {
         ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
         newList[0] = ImmutableSLList.nil();
 
-        for (int i = 1; i < str.length + 1; i++) {
-            newList[i] = newList[i - 1].prepend(str[i - 1]);
-        }
+        for (int i = 1; i < str.length + 1; i++) { newList[i] = newList[i - 1].prepend(str[i - 1]); }
         // test cascading tail
         for (int i = 0; i < str.length; i++) {
             assertSame(newList[i + 1].tail(), newList[i]);
@@ -143,13 +135,9 @@ public class TestSLListOfString {
     public void testContains() {
         ImmutableList<String> newList = ImmutableSLList.nil();
 
-        for (int i = 1; i < str.length + 1; i++) {
-            newList = newList.append(str[i - 1]);
-        }
+        for (int i = 1; i < str.length + 1; i++) { newList = newList.append(str[i - 1]); }
         // test cascading tail
-        for (String aStr : str) {
-            assertTrue(newList.contains(aStr));
-        }
+        for (String aStr : str) { assertTrue(newList.contains(aStr)); }
     }
 
 
@@ -159,9 +147,7 @@ public class TestSLListOfString {
         ImmutableList<String> newList = ImmutableSLList.nil();
 
         newList = newList.append(str[0]);
-        for (int i = 1; i < str.length + 1; i++) {
-            newList = newList.append(str[i - 1]);
-        }
+        for (int i = 1; i < str.length + 1; i++) { newList = newList.append(str[i - 1]); }
         newList = newList.append(str[0]);
         newList = newList.removeAll(str[0]);
         assertFalse(newList.contains(str[0]), "str[0] should have been removed");
@@ -173,9 +159,7 @@ public class TestSLListOfString {
         ImmutableList<String> newList = ImmutableSLList.nil();
 
         newList = newList.prepend(str[0]);
-        for (int i = 1; i < str.length + 1; i++) {
-            newList = newList.prepend(str[i - 1]);
-        }
+        for (int i = 1; i < str.length + 1; i++) { newList = newList.prepend(str[i - 1]); }
         newList = newList.prepend(str[0]);
         int oldSize = newList.size();
         newList = newList.removeFirst(str[0]);
@@ -208,9 +192,7 @@ public class TestSLListOfString {
     @Test
     public void testToString() {
         ImmutableList<String> newList = ImmutableSLList.nil();
-        for (String aStr : str) {
-            newList = newList.append(aStr);
-        }
+        for (String aStr : str) { newList = newList.append(aStr); }
         assertEquals("[Dies,ist,ein,Test]", newList.toString());
     }
 
@@ -220,16 +202,12 @@ public class TestSLListOfString {
         ImmutableList<String> newList = ImmutableSLList.nil();
         LOGGER.info("Create list with prepend.");
         long start = System.currentTimeMillis();
-        for (int i = 0; i < n; i++) {
-            newList = newList.prepend("" + i);
-        }
+        for (int i = 0; i < n; i++) { newList = newList.prepend("" + i); }
         long end = System.currentTimeMillis();
         LOGGER.info("Time:" + (end - start) + " ms");
 
         start = System.currentTimeMillis();
-        for (int i = 0; i < n; i++) {
-            newList = newList.append("" + i);
-        }
+        for (int i = 0; i < n; i++) { newList = newList.append("" + i); }
         end = System.currentTimeMillis();
         LOGGER.info("append: {} ms ", end - start);
 

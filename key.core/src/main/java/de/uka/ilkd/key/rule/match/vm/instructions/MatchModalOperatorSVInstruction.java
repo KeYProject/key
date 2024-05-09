@@ -40,9 +40,7 @@ public class MatchModalOperatorSVInstruction
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
         MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) {
-            termPosition.gotoNext();
-        }
+        if (result != null) { termPosition.gotoNext(); }
         return result;
     }
 

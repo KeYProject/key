@@ -39,13 +39,20 @@ public interface FunctionalOperationContract extends OperationContract {
     /**
      * Returns the postcondition of the contract.
      *
-     * @param heap the heap variable.
-     * @param selfVar the self variable.
-     * @param paramVars the list of parameter variables.
-     * @param resultVar the result variable.
-     * @param excVar the exception variable.
-     * @param atPreVars the map of old variables.
-     * @param services the services object.
+     * @param heap
+     *        the heap variable.
+     * @param selfVar
+     *        the self variable.
+     * @param paramVars
+     *        the list of parameter variables.
+     * @param resultVar
+     *        the result variable.
+     * @param excVar
+     *        the exception variable.
+     * @param atPreVars
+     *        the map of old variables.
+     * @param services
+     *        the services object.
      * @return the post condition.
      */
     Term getPost(LocationVariable heap, ProgramVariable selfVar,
@@ -61,14 +68,22 @@ public interface FunctionalOperationContract extends OperationContract {
     /**
      * Returns the postcondition of the contract.
      *
-     * @param heap the heap variable.
-     * @param heapTerm the heap variable term.
-     * @param selfTerm the self variable term.
-     * @param paramTerms the list of parameter variable terms.
-     * @param resultTerm the result variable term.
-     * @param excTerm the exception variable term.
-     * @param atPres the map of old variable terms.
-     * @param services the services object.
+     * @param heap
+     *        the heap variable.
+     * @param heapTerm
+     *        the heap variable term.
+     * @param selfTerm
+     *        the self variable term.
+     * @param paramTerms
+     *        the list of parameter variable terms.
+     * @param resultTerm
+     *        the result variable term.
+     * @param excTerm
+     *        the exception variable term.
+     * @param atPres
+     *        the map of old variable terms.
+     * @param services
+     *        the services object.
      * @return the postcondition.
      */
     Term getPost(LocationVariable heap, Term heapTerm, Term selfTerm,

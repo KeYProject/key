@@ -53,7 +53,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testBlockContractAssignableLocationNotRequested() throws Exception {
@@ -65,7 +66,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code blockContractAssignableRequestedLocation}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testBlockContractAssignableRequestedLocation() throws Exception {
@@ -77,7 +79,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code blockContractAssignableEverything}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testBlockContractAssignableEverything() throws Exception {
@@ -89,7 +92,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code methodContractAssignableLocationNotRequested}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testMethodContractAssignableLocationNotRequested() throws Exception {
@@ -101,7 +105,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code methodContractAssignableRequestedLocation}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testMethodContractAssignableRequestedLocation() throws Exception {
@@ -113,7 +118,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code methodContractAssignableEverything}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testMethodContractAssignableEverything() throws Exception {
@@ -126,7 +132,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
      * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index
      * {@code 0}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testEquivalenceClasses_Index_1_no_OSS() throws Exception {
@@ -139,7 +146,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
      * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index
      * {@code 0}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testEquivalenceClasses_Index_0_no_OSS() throws Exception {
@@ -152,7 +160,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
      * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index
      * {@code 0}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testEquivalenceClasses_Index_1() throws Exception {
@@ -165,7 +174,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
      * Tests slicing on the example {@code equivalenceClassesTest} with equivalence classes at index
      * {@code 0}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testEquivalenceClasses_Index_0() throws Exception {
@@ -177,7 +187,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code aliasedByExecutionTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testAliasedByExecutionTest() throws Exception {
@@ -188,7 +199,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code aliasedByExecutionTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testNotAliasedByExecutionTest() throws Exception {
@@ -199,7 +211,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code loopInvariantNestedListFieldsTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testLoopInvariantNestedListFieldsTest() throws Exception {
@@ -211,7 +224,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code loopInvariantNotInListFieldsTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testLoopInvariantNotInListFieldsTest() throws Exception {
@@ -223,7 +237,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code loopInvariantInListFieldsTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testLoopInvariantInListFieldsTest() throws Exception {
@@ -234,7 +249,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code loopInvariantStarFieldsTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testLoopInvariantStarFieldsTest() throws Exception {
@@ -245,7 +261,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleStaticLoopInvariantTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleStaticLoopInvariantTest() throws Exception {
@@ -256,7 +273,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleLoopInvariantTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleLoopInvariantTest() throws Exception {
@@ -267,7 +285,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code arrayIndexAsVariableFieldTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testArrayIndexAsVariableFieldTest() throws Exception {
@@ -278,7 +297,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code arrayIndexVariableTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testArrayIndexVariableTest() throws Exception {
@@ -289,7 +309,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code arrayIndexSideeffectsBevore}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testArrayIndexSideeffectsBevore() throws Exception {
@@ -300,7 +321,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code arrayIndexSideeffectsAfter}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testArrayIndexSideeffectsAfter() throws Exception {
@@ -311,7 +333,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleMultidimensionArrayTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleMultidimensionArrayTest() throws Exception {
@@ -322,7 +345,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleArrayTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleArrayTest() throws Exception {
@@ -333,7 +357,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code figure2Param}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testFigure2Param_right() throws Exception {
@@ -344,7 +369,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code figure2Local}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testFigure2Local_right() throws Exception {
@@ -355,7 +381,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code figure2Instance}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testFigure2Instance_right() throws Exception {
@@ -366,7 +393,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code valueChange}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testValueChange() throws Exception {
@@ -377,7 +405,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code readWriteTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testReadWriteTest() throws Exception {
@@ -388,7 +417,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code aliasChanged}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testAliasChanged() throws Exception {
@@ -399,7 +429,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code aliasNotAvailable}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testAliasNotAvailable() throws Exception {
@@ -410,7 +441,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code intEndTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testIntEndTest() throws Exception {
@@ -421,7 +453,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleAliasChanged}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleAliasChanged() throws Exception {
@@ -432,7 +465,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code instanceFieldsAliased}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testInstanceFieldsAliased() throws Exception {
@@ -443,7 +477,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code nestedInstanceFields}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testNestedInstanceFields() throws Exception {
@@ -454,7 +489,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code methodCallTest}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testMethodCallTest() throws Exception {
@@ -465,7 +501,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code aliasing}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testAliasing() throws Exception {
@@ -476,7 +513,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code nestedInstanceAccess}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testNestedInstanceAccess_subResult() throws Exception {
@@ -487,7 +525,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code figure2}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testFigure2_right() throws Exception {
@@ -498,7 +537,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code figure2}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testFigure2_left() throws Exception {
@@ -509,7 +549,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleInstanceFields}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleInstanceFields() throws Exception {
@@ -520,7 +561,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleThisInstanceFields}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleThisInstanceFields() throws Exception {
@@ -531,7 +573,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleStaticFields}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleStaticFields() throws Exception {
@@ -542,7 +585,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Tests slicing on the example {@code simpleLocalVariables}.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testSimpleLocalVariables() throws Exception {
@@ -553,12 +597,17 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Performs a slicing test.
      *
-     * @param proofFileInRepository The path to the proof file.
-     * @param selector The {@link ISeedLocationSelector} to use.
-     * @param fullSlize {@code true} if the he full slice is given as expected slice and
+     * @param proofFileInRepository
+     *        The path to the proof file.
+     * @param selector
+     *        The {@link ISeedLocationSelector} to use.
+     * @param fullSlize
+     *        {@code true} if the he full slice is given as expected slice and
      *        {@code false} if only a part of the slice is given as expected slice.
-     * @param expectedSlice The serial IDs of the expected slices.
-     * @throws Exception Occurred Exception
+     * @param expectedSlice
+     *        The serial IDs of the expected slices.
+     * @throws Exception
+     *         Occurred Exception
      */
     protected void doSlicingTest(String proofFileInRepository, ISeedLocationSelector selector,
             boolean fullSlize, int... expectedSlice) throws Exception {
@@ -569,12 +618,17 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Performs a slicing test.
      *
-     * @param proofFileInRepository The path to the proof file.
-     * @param selector The {@link ISeedLocationSelector} to use.
-     * @param fullSlize {@code true} if the he full slice is given as expected slice and
+     * @param proofFileInRepository
+     *        The path to the proof file.
+     * @param selector
+     *        The {@link ISeedLocationSelector} to use.
+     * @param fullSlize
+     *        {@code true} if the he full slice is given as expected slice and
      *        {@code false} if only a part of the slice is given as expected slice.
-     * @param expectedSlice The serial IDs of the expected slices.
-     * @throws Exception Occurred Exception
+     * @param expectedSlice
+     *        The serial IDs of the expected slices.
+     * @throws Exception
+     *         Occurred Exception
      */
     protected void doSlicingTest(String proofFileInRepository, ISeedLocationSelector selector,
             IEquivalenceClassSelector eqSelector, boolean fullSlize, int... expectedSlice)
@@ -595,18 +649,14 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             Assertions.assertNotNull(eqSelector);
             ImmutableList<ISymbolicEquivalenceClass> sec =
                 eqSelector.selectEquivalenceClass(environment, proof, seed);
-            if (PRINT_SLICE) {
-                LOGGER.info("Equivalence Class: {}", sec);
-            }
+            if (PRINT_SLICE) { LOGGER.info("Equivalence Class: {}", sec); }
             // Perform slicing
             ThinBackwardSlicer slicer = new ThinBackwardSlicer();
             ImmutableArray<Node> slices = slicer.slice(seed.first, seed.second, sec);
             // Print slice if requested
             if (PRINT_SLICE) {
                 LOGGER.info("Found Slices: {}", slices.size());
-                for (Node slice : slices) {
-                    LOGGER.info("SerialNr {}", slice.serialNr());
-                }
+                for (Node slice : slices) { LOGGER.info("SerialNr {}", slice.serialNr()); }
             }
             if (fullSlize) {
                 // Compare all Nodes in the slice
@@ -624,9 +674,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
                     while (slice == null && currentIndex < slices.size()) {
                         Node toCheck = slices.get(currentIndex);
                         Assertions.assertNotNull(toCheck);
-                        if (toCheck.serialNr() == expected) {
-                            slice = toCheck;
-                        }
+                        if (toCheck.serialNr() == expected) { slice = toCheck; }
                         currentIndex++;
                     }
                     Assertions.assertNotNull(slice);
@@ -646,9 +694,12 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         /**
          * Selects the {@link ISymbolicEquivalenceClass}.
          *
-         * @param environment The current {@link KeYEnvironment}.
-         * @param proof The current {@link Proof}.
-         * @param seed The current seed.
+         * @param environment
+         *        The current {@link KeYEnvironment}.
+         * @param proof
+         *        The current {@link Proof}.
+         * @param seed
+         *        The current seed.
          * @return The {@link ISymbolicEquivalenceClass}es or {@code null} to select.
          */
         ImmutableList<ISymbolicEquivalenceClass> selectEquivalenceClass(
@@ -687,7 +738,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         /**
          * Constructor.
          *
-         * @param index The index of the {@link ISymbolicEquivalenceClass}es.
+         * @param index
+         *        The index of the {@link ISymbolicEquivalenceClass}es.
          */
         public EquivalenceClassByIndexSelector(int index) {
             this.index = index;
@@ -726,7 +778,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         /**
          * Constructor.
          *
-         * @param seedNodeId The serial ID of the seed node.
+         * @param seedNodeId
+         *        The serial ID of the seed node.
          */
         public RightVariableDeclarationSelector(int seedNodeId) {
             this.seedNodeId = seedNodeId;
@@ -765,7 +818,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         /**
          * Constructor.
          *
-         * @param seedNodeId The serial ID of the seed node.
+         * @param seedNodeId
+         *        The serial ID of the seed node.
          */
         public RightAssignmentSelector(int seedNodeId) {
             this.seedNodeId = seedNodeId;
@@ -802,7 +856,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         /**
          * Constructor.
          *
-         * @param seedNodeId The serial ID of the seed node.
+         * @param seedNodeId
+         *        The serial ID of the seed node.
          */
         public LeftAssignmentSelector(int seedNodeId) {
             this.seedNodeId = seedNodeId;
@@ -839,7 +894,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         /**
          * Constructor.
          *
-         * @param seedNodeId The serial ID of the seed node.
+         * @param seedNodeId
+         *        The serial ID of the seed node.
          */
         public ReturnSelector(int seedNodeId) {
             this.seedNodeId = seedNodeId;
@@ -874,8 +930,10 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     /**
      * Searches a {@link Node} with the given serial ID.
      *
-     * @param proof The {@link Proof} to search in.
-     * @param nodeId The ID of the {@link Node} to search.
+     * @param proof
+     *        The {@link Proof} to search in.
+     * @param nodeId
+     *        The ID of the {@link Node} to search.
      * @return The found {@link Node} or {@code null} if not available.
      */
     protected static Node findNode(Proof proof, int nodeId) {
@@ -903,7 +961,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         /**
          * Constructor.
          *
-         * @param nodeId The ID of the node to search.
+         * @param nodeId
+         *        The ID of the node to search.
          */
         public FindNodeProofVisitor(int nodeId) {
             this.nodeId = nodeId;
@@ -914,9 +973,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          */
         @Override
         public void visit(Proof proof, Node visitedNode) {
-            if (visitedNode.serialNr() == nodeId) {
-                node = visitedNode;
-            }
+            if (visitedNode.serialNr() == nodeId) { node = visitedNode; }
         }
 
         /**

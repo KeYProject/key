@@ -34,12 +34,8 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
 
     public TreeNode getParent() {
         Node n = getNode();
-        if (n == null) {
-            return null;
-        }
-        while (n.parent() != null && findChild(n.parent()) != null) {
-            n = n.parent();
-        }
+        if (n == null) { return null; }
+        while (n.parent() != null && findChild(n.parent()) != null) { n = n.parent(); }
         return findBranch(n);
     }
 
@@ -91,9 +87,8 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         children = null;
     }
 
-    @NonNull
     @Override
-    public String getSearchString() {
+    public @NonNull String getSearchString() {
         return toString();
     }
 }

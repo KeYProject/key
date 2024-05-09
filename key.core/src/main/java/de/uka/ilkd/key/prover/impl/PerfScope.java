@@ -65,9 +65,7 @@ public class PerfScope {
     private final long[] timesBefore = new long[PERF_COUNTERS.length];
 
     public PerfScope() {
-        for (int i = 0; i < PERF_COUNTERS.length; i++) {
-            timesBefore[i] = PERF_COUNTERS[i].second.get();
-        }
+        for (int i = 0; i < PERF_COUNTERS.length; i++) { timesBefore[i] = PERF_COUNTERS[i].second.get(); }
     }
 
     public static String formatTime(long dt) {

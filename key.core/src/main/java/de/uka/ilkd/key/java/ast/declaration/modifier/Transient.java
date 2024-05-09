@@ -26,7 +26,8 @@ public class Transient extends Modifier {
     /**
      * Transient.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
      */
 
     public Transient(PositionInfo pi, List<Comment> c) {

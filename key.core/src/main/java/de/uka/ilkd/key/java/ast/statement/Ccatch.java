@@ -35,8 +35,10 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     /**
      * Ccatch.
      *
-     * @param e a parameter declaration.
-     * @param body a statement.
+     * @param e
+     *        a parameter declaration.
+     * @param body
+     *        a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
         this(null, null, e, null, body);
@@ -45,8 +47,10 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     /**
      * Ccatch.
      *
-     * @param e a parameter declaration.
-     * @param body a statement.
+     * @param e
+     *        a parameter declaration.
+     * @param body
+     *        a statement.
      */
     public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
         this(null, null, null, e, body);
@@ -55,7 +59,8 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain:
+     * @param children
+     *        the children of this AST element as KeY classes. May contain:
      *        Comments, a* ParameterDeclaration (declaring the catched exceptions) a StatementBlock
      *        (as the* action to do when catching)
      */
@@ -89,43 +94,33 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     @Override
     public int getChildCount() {
         int result = 0;
-        if (hasParameterDeclaration()) {
-            result++;
-        }
-        if (hasNonStdParameterDeclaration()) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (hasParameterDeclaration()) { result++; }
+        if (hasNonStdParameterDeclaration()) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
-            if (index == 0) {
-                return parameter;
-            }
+            if (index == 0) { return parameter; }
             index--;
         }
         if (hasNonStdParameterDeclaration()) {
-            if (index == 0) {
-                return nonStdParameter;
-            }
+            if (index == 0) { return nonStdParameter; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -152,9 +147,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      */
     @Override
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -172,15 +165,15 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      * Return the parameter declaration at the specified index in this node's "virtual" parameter
      * declaration array.
      *
-     * @param index an index for a parameter declaration.
+     * @param index
+     *        an index for a parameter declaration.
      * @return the parameter declaration with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (hasParameterDeclaration() && index == 0) {
-            return parameter;
-        }
+        if (hasParameterDeclaration() && index == 0) { return parameter; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -188,14 +181,14 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      * Return the non-standard parameter declaration at the specified index in this node's "virtual"
      * parameter declaration array.
      *
-     * @param index an index for a parameter declaration.
+     * @param index
+     *        an index for a parameter declaration.
      * @return the parameter declaration with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
     public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(int index) {
-        if (hasNonStdParameterDeclaration() && index == 0) {
-            return nonStdParameter;
-        }
+        if (hasNonStdParameterDeclaration() && index == 0) { return nonStdParameter; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -230,7 +223,8 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     @Override
     public void visit(Visitor v) {

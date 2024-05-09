@@ -34,27 +34,21 @@ public abstract class AbstractProperties implements Properties {
             globalListeners.remove(listener);
         } else {
             Set<PropertyListener> list = listenerMap.get(property);
-            if (list != null) {
-                list.remove(listener);
-            }
+            if (list != null) { list.remove(listener); }
         }
     }
 
     @Override
     public void removePropertyListener(PropertyListener listener) {
         globalListeners.remove(listener);
-        for (Set<PropertyListener> list : listenerMap.values()) {
-            list.remove(listener);
-        }
+        for (Set<PropertyListener> list : listenerMap.values()) { list.remove(listener); }
     }
 
     protected <T> void firePropertyChange(Property<T> property, T oldValue, T newValue) {
         if (oldValue == null || !oldValue.equals(newValue)) {
             Set<PropertyListener> list = listenerMap.get(property);
             if (list != null) {
-                for (PropertyListener listener : list) {
-                    listener.propertyChanged(property, oldValue, newValue);
-                }
+                for (PropertyListener listener : list) { listener.propertyChanged(property, oldValue, newValue); }
             }
             for (PropertyListener listener : globalListeners) {
                 listener.propertyChanged(property, oldValue, newValue);

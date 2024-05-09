@@ -44,16 +44,12 @@ public abstract class ElementMatcher<T extends Operator> {
                 return (ElementMatcher<? super T>) variableSVMatcher;
             } else if (o instanceof SkolemTermSV) {
                 return (ElementMatcher<? super T>) skolemSVMatcher;
-            } else if (o instanceof TermLabelSV) {
-                return (ElementMatcher<? super T>) termLabelSVMatcher;
-            }
+            } else if (o instanceof TermLabelSV) { return (ElementMatcher<? super T>) termLabelSVMatcher; }
         } else if (o instanceof ElementaryUpdate) {
             return (ElementMatcher<? super T>) elUpMatcher;
         } else if (o instanceof SortDependingFunction) {
             return (ElementMatcher<? super T>) sortDependingFctMatcher;
-        } else if (o instanceof LogicVariable) {
-            return (ElementMatcher<? super T>) logicVarMatcher;
-        }
+        } else if (o instanceof LogicVariable) { return (ElementMatcher<? super T>) logicVarMatcher; }
         return IDENTITY_MATCHER;
     }
 
@@ -103,9 +99,7 @@ public abstract class ElementMatcher<T extends Operator> {
                         return null;
                     }
                 }
-                if (inMap.equals(peForCompare)) {
-                    return matchCond;
-                }
+                if (inMap.equals(peForCompare)) { return matchCond; }
             }
             LOGGER.debug("FAILED. Illegal Instantiation. {} {}", op, pe);
             return null;
@@ -166,9 +160,7 @@ public abstract class ElementMatcher<T extends Operator> {
             final ElementaryUpdate eu = (ElementaryUpdate) subst;
             final MatchConditions result = ElementMatcher.getElementMatcherFor(op.lhs())
                     .match(op.lhs(), eu.lhs(), mc, services);
-            if (result == null) {
-                LOGGER.debug("FAILED. Lhs mismatch (template: {}, operator: {})", eu, op);
-            }
+            if (result == null) { LOGGER.debug("FAILED. Lhs mismatch (template: {}, operator: {})", eu, op); }
             return result;
         }
     }
@@ -178,9 +170,7 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(FormulaSV op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (subst instanceof Term) {
-                return addInstantiation(op, (Term) subst, mc, services);
-            }
+            if (subst instanceof Term) { return addInstantiation(op, (Term) subst, mc, services); }
             LOGGER.debug("FAILED. Schemavariable of this kind only match terms.");
             return null;
         }
@@ -196,9 +186,7 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(Operator op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (subst == op) {
-                return mc;
-            }
+            if (subst == op) { return mc; }
             LOGGER.debug("FAILED. Operators are different(template, candidate) {} {}", op, subst);
             return null;
         }
@@ -213,13 +201,9 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(LogicVariable op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (subst == op) {
-                return mc;
-            }
+            if (subst == op) { return mc; }
             if (subst instanceof LogicVariable lv) {
-                if (lv.sort() == op.sort() && mc.renameTable().sameAbstractName(op, lv)) {
-                    return mc;
-                }
+                if (lv.sort() == op.sort() && mc.renameTable().sameAbstractName(op, lv)) { return mc; }
             }
             return null;
         }
@@ -302,9 +286,12 @@ public abstract class ElementMatcher<T extends Operator> {
         /**
          * tries to match sort <code>s1</code> to fit sort <code>s2</code>
          *
-         * @param s1 Sort tried to matched (maybe concrete or (contain) generic)
-         * @param s2 concrete Sort
-         * @param mc the MatchConditions up to now
+         * @param s1
+         *        Sort tried to matched (maybe concrete or (contain) generic)
+         * @param s2
+         *        concrete Sort
+         * @param mc
+         *        the MatchConditions up to now
          * @return <code>null</code> if failed the resulting match conditions otherwise
          */
         private static MatchConditions matchSorts(Sort s1, Sort s2, MatchConditions mc,
@@ -347,7 +334,8 @@ public abstract class ElementMatcher<T extends Operator> {
                 MatchConditions mc, Services services) {
             if (!(subst instanceof SortDependingFunction sdp)) {
                 LOGGER.debug("FAILED. Given operator cannot be matched by a sort"
-                    + "depending function (template, orig) {} {}", op, subst);
+                        + "depending function (template, orig) {} {}",
+                    op, subst);
                 return null;
             }
 
@@ -375,20 +363,14 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(TermLabelSV op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (!(subst instanceof Term t)) {
-                return null;
-            }
+            if (!(subst instanceof Term t)) { return null; }
 
             final SVInstantiations svInsts = mc.getInstantiations();
             final TermLabelInstantiationEntry inst =
                 (TermLabelInstantiationEntry) svInsts.getInstantiation(op);
             if (inst != null) {
                 assert inst.getInstantiation() != null;
-                for (TermLabel o : inst.getInstantiation()) {
-                    if (!t.containsLabel(o)) {
-                        return null;
-                    }
-                }
+                for (TermLabel o : inst.getInstantiation()) { if (!t.containsLabel(o)) { return null; } }
                 return mc;
             }
             return mc.setInstantiations(svInsts.add(op, t.getLabels(), services));
@@ -399,9 +381,7 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(TermSV op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (subst instanceof Term) {
-                return addInstantiation(op, (Term) subst, mc, services);
-            }
+            if (subst instanceof Term) { return addInstantiation(op, (Term) subst, mc, services); }
             LOGGER.debug("FAILED. Schemavariable of this kind only match terms.");
             return null;
         }
@@ -412,9 +392,7 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(UpdateSV op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (subst instanceof Term) {
-                return addInstantiation(op, (Term) subst, mc, services);
-            }
+            if (subst instanceof Term) { return addInstantiation(op, (Term) subst, mc, services); }
             LOGGER.debug("FAILED. Schemavariable of this kind only match terms.");
             return null;
         }

@@ -63,9 +63,7 @@ public class TestPosInTerm {
 
         assertEquals(pos.length, pit.depth());
 
-        for (int i = 0; i < pit.depth(); i++) {
-            assertEquals(pos[i], pit.getIndexAt(i));
-        }
+        for (int i = 0; i < pit.depth(); i++) { assertEquals(pos[i], pit.getIndexAt(i)); }
 
         pit = pit.up().up().up();
         pit = pit.down(10000).down(1000);
@@ -83,9 +81,7 @@ public class TestPosInTerm {
     private PosInTerm toPosInTerm(int[] pos) {
         PosInTerm pit = PosInTerm.getTopLevel();
 
-        for (int i : pos) {
-            pit = pit.down(i);
-        }
+        for (int i : pos) { pit = pit.down(i); }
         return pit;
     }
 

@@ -44,8 +44,10 @@ public final class GoalBackAction extends MainWindowAction {
     /**
      * Creates a new GoalBackAction.
      *
-     * @param mainWindow the main window this action belongs to
-     * @param longName true iff long names (including the name of the rule to undo) shall be
+     * @param mainWindow
+     *        the main window this action belongs to
+     * @param longName
+     *        true iff long names (including the name of the rule to undo) shall be
      *        displayed (e.g. in menu items)
      */
     public GoalBackAction(MainWindow mainWindow, boolean longName) {
@@ -115,9 +117,7 @@ public final class GoalBackAction extends MainWindowAction {
             final Goal goal = findNewestGoal(getMediator().getSelectedNode());
             if (goal != null && goal.node() != null && goal.node().parent() != null) {
                 RuleApp app = goal.node().parent().getAppliedRuleApp();
-                if (app != null) {
-                    appliedRule = " (" + app.rule().displayName() + ")";
-                }
+                if (app != null) { appliedRule = " (" + app.rule().displayName() + ")"; }
             }
         }
         putValue(NAME, "Undo Last Rule Application" + appliedRule);
@@ -132,9 +132,7 @@ public final class GoalBackAction extends MainWindowAction {
          * selected node
          */
         Goal selGoal = getMediator().getSelectedGoal();
-        if (selGoal == null && selNode != null) {
-            selGoal = findNewestGoal(selNode);
-        }
+        if (selGoal == null && selNode != null) { selGoal = findNewestGoal(selNode); }
 
         if (selGoal != null) {
             getMediator().setBack(selGoal);
@@ -147,15 +145,14 @@ public final class GoalBackAction extends MainWindowAction {
     /**
      * Finds the newest goal (the goal with the highest serial number) in the given subtree.
      *
-     * @param subtree the root of the subtree to search. If it is null, the return value is null.
+     * @param subtree
+     *        the root of the subtree to search. If it is null, the return value is null.
      * @return the newest goal in the given subtree or null, if no suitable goal is found in the
      *         open/closedGoals lists. This may be the case if the flag "--no-pruning-closed" is set
      *         (which means that the closedGoals list is empty) and the given subtree is closed.
      */
     private Goal findNewestGoal(Node subtree) {
-        if (subtree == null) {
-            return null;
-        }
+        if (subtree == null) { return null; }
 
         final Proof proof = subtree.proof();
 

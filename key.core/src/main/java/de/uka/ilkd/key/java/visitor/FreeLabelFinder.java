@@ -13,8 +13,7 @@ import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
  */
 public class FreeLabelFinder {
 
-    public FreeLabelFinder() {
-    }
+    public FreeLabelFinder() {}
 
     public boolean findLabel(Label label, ProgramElement node) {
         if (!(node instanceof LabeledStatement
@@ -22,14 +21,10 @@ public class FreeLabelFinder {
             if (node instanceof NonTerminalProgramElement nonTerminalNode) {
                 for (int i = 0; i < nonTerminalNode.getChildCount(); i++) {
                     if (nonTerminalNode.getChildAt(i) != null) {
-                        if (findLabel(label, nonTerminalNode.getChildAt(i))) {
-                            return true;
-                        }
+                        if (findLabel(label, nonTerminalNode.getChildAt(i))) { return true; }
                     }
                 }
-            } else if (node instanceof Label) {
-                return node.equals(label);
-            }
+            } else if (node instanceof Label) { return node.equals(label); }
         }
         return false;
     }

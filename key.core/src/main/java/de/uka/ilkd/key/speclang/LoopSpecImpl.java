@@ -72,19 +72,32 @@ public final class LoopSpecImpl implements LoopSpecification {
     /**
      * Creates a loop invariant.
      *
-     * @param loop the loop to which the invariant belongs.
-     * @param pm the method containing the loop.
-     * @param kjt the type of the class containing the method.
-     * @param invariants the invariant formula for each heap.
-     * @param freeInvariants the free invariant formula for each heap.
-     * @param modifies the modifies clause for each heap.
-     * @param freeModifies the free modifies clause for each heap.
-     * @param infFlowSpecs low variables for information flow.
-     * @param variant the variant term.
-     * @param selfTerm the term used for the receiver object.
-     * @param localIns the local variables read in the loop.
-     * @param localOuts the local variables written in the loop.
-     * @param atPres the term used for the at pre variables.
+     * @param loop
+     *        the loop to which the invariant belongs.
+     * @param pm
+     *        the method containing the loop.
+     * @param kjt
+     *        the type of the class containing the method.
+     * @param invariants
+     *        the invariant formula for each heap.
+     * @param freeInvariants
+     *        the free invariant formula for each heap.
+     * @param modifies
+     *        the modifies clause for each heap.
+     * @param freeModifies
+     *        the free modifies clause for each heap.
+     * @param infFlowSpecs
+     *        low variables for information flow.
+     * @param variant
+     *        the variant term.
+     * @param selfTerm
+     *        the term used for the receiver object.
+     * @param localIns
+     *        the local variables read in the loop.
+     * @param localOuts
+     *        the local variables written in the loop.
+     * @param atPres
+     *        the term used for the at pre variables.
      */
     public LoopSpecImpl(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
             Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
@@ -120,11 +133,16 @@ public final class LoopSpecImpl implements LoopSpecification {
     /**
      * Creates an empty, default loop invariant for the passed loop.
      *
-     * @param loop the loop to which the invariant belongs.
-     * @param pm the method containing the loop.
-     * @param kjt the type of the class containing the method.
-     * @param selfTerm the term used for the receiver object.
-     * @param atPres the term used for the at pre variables.
+     * @param loop
+     *        the loop to which the invariant belongs.
+     * @param pm
+     *        the method containing the loop.
+     * @param kjt
+     *        the type of the class containing the method.
+     * @param selfTerm
+     *        the term used for the receiver object.
+     * @param atPres
+     *        the term used for the at pre variables.
      */
     public LoopSpecImpl(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt, Term selfTerm,
             Map<LocationVariable, Term> atPres) {
@@ -170,9 +188,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             Services services) {
         final Map<Term, Term> result = new LinkedHashMap<>();
         final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        for (Map.Entry<Term, Term> next : replaceMap.entrySet()) {
-            result.put(next.getValue(), next.getKey());
-        }
+        for (Map.Entry<Term, Term> next : replaceMap.entrySet()) { result.put(next.getValue(), next.getKey()); }
         return result;
     }
 
@@ -420,9 +436,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             new OpReplacer(inverseReplaceMap, services.getTermFactory(), services.getProof());
 
         Map<LocationVariable, Term> newInvariants = new LinkedHashMap<>();
-        for (LocationVariable heap : invariants.keySet()) {
-            newInvariants.put(heap, or.replace(invariants.get(heap)));
-        }
+        for (LocationVariable heap : invariants.keySet()) { newInvariants.put(heap, or.replace(invariants.get(heap))); }
 
         Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<>();
         for (LocationVariable heap : freeInvariants.keySet()) {
@@ -441,17 +455,20 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public String toString() {
         return "invariants: " + originalInvariants + "free invariants: " + originalFreeInvariants
-            + "; modifies: " + originalModifies + "; information flow specification: "
-            + originalInfFlowSpecs + "; variant: " + originalVariant + "; input parameters: "
-            + localIns + "; output parameters: " + localOuts;
+                + "; modifies: " + originalModifies + "; information flow specification: "
+                + originalInfFlowSpecs + "; variant: " + originalVariant + "; input parameters: "
+                + localIns + "; output parameters: " + localOuts;
     }
 
     /**
      * Return a plain text representation of this loop specification.
      *
-     * @param services the services object
-     * @param usePrettyPrinting determines whether we get pretty or raw text
-     * @param useUnicodeSymbols determines whether unicode will be used
+     * @param services
+     *        the services object
+     * @param usePrettyPrinting
+     *        determines whether we get pretty or raw text
+     * @param useUnicodeSymbols
+     *        determines whether unicode will be used
      * @return the plain text representation as a string
      */
     public String getPlainText(Services services, boolean usePrettyPrinting,
@@ -516,10 +533,10 @@ public final class LoopSpecImpl implements LoopSpecification {
     public String getUniqueName() {
         if (pm != null) {
             return "Loop Invariant " + getLoop().getStartPosition().line() + " "
-                + getTarget().getUniqueName();
+                    + getTarget().getUniqueName();
         } else {
             return "Loop Invariant " + getLoop().getStartPosition().line() + " "
-                + Math.abs(getLoop().hashCode());
+                    + Math.abs(getLoop().hashCode());
         }
     }
 

@@ -125,17 +125,13 @@ public class TransformationPipelineServices {
 
     public ClassOrInterfaceType getType(String... names) {
         ClassOrInterfaceType type = null;
-        for (String name : names) {
-            type = new ClassOrInterfaceType(type, name);
-        }
+        for (String name : names) { type = new ClassOrInterfaceType(type, name); }
         return type;
     }
 
     public Name getName(String... names) {
         Name type = null;
-        for (String name : names) {
-            type = new Name(type, name);
-        }
+        for (String name : names) { type = new Name(type, name); }
         return type;
     }
 
@@ -179,9 +175,7 @@ public class TransformationPipelineServices {
             return new ArrayType(getType(type.asArrayType().getComponentType()));
         }
 
-        if (type.isReferenceType()) {
-            return getType(type.asReferenceType().getQualifiedName().split("[.]"));
-        }
+        if (type.isReferenceType()) { return getType(type.asReferenceType().getQualifiedName().split("[.]")); }
 
         if (type.isPrimitive()) {
             return new PrimitiveType(PrimitiveType.Primitive.valueOf(type.asPrimitive().name()));
@@ -225,7 +219,8 @@ public class TransformationPipelineServices {
      * }</pre>
      * </code>
      *
-     * @param cd the TypeDeclaration<?> of which the initilizers have to
+     * @param cd
+     *        the TypeDeclaration<?> of which the initilizers have to
      *        be collected
      * @return the list of copy assignments and method references
      *         realising the initializers.
@@ -273,9 +268,7 @@ public class TransformationPipelineServices {
     }
 
     public static <N extends Node> NodeList<N> cloneList(NodeList<N> list) {
-        if (list == null) {
-            return null;
-        }
+        if (list == null) { return null; }
         var seq = list.stream()
                 .map(Node::clone)
                 .map(it -> (N) it)
@@ -286,9 +279,7 @@ public class TransformationPipelineServices {
     public Expression getDefaultValue(ResolvedType type) {
         if (type.isPrimitive()) {
             var p = type.asPrimitive();
-            if (p.isBoolean()) {
-                return new BooleanLiteralExpr(false);
-            }
+            if (p.isBoolean()) { return new BooleanLiteralExpr(false); }
 
             final var name = p.name();
             return switch (name.toLowerCase()) {
@@ -301,13 +292,9 @@ public class TransformationPipelineServices {
 
         if (type.isReferenceType()
                 || type.isNull()
-                || type.isArray()) {
-            return new NullLiteralExpr();
-        }
+                || type.isArray()) { return new NullLiteralExpr(); }
 
-        if (type.isVoid()) {
-            throw new RuntimeException();
-        }
+        if (type.isVoid()) { throw new RuntimeException(); }
 
         return null;
     }
@@ -338,9 +325,7 @@ public class TransformationPipelineServices {
         }
 
         public Set<TypeDeclaration<?>> typeDeclarations() {
-            if (classDeclarations == null) {
-                init();
-            }
+            if (classDeclarations == null) { init(); }
             return classDeclarations;
         }
 

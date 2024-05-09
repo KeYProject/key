@@ -22,8 +22,10 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
 
     /**
      *
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
+     * @param rule
+     *        the rule being applied.
+     * @param occurrence
+     *        the position at which the rule is applied.
      */
     public LoopContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
@@ -32,12 +34,18 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
 
     /**
      *
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
-     * @param ifInstantiations if instantiations.
-     * @param statement the statement which the applied contract belongs to.
-     * @param contract the contract being applied.
-     * @param heaps the heap context.
+     * @param rule
+     *        the rule being applied.
+     * @param occurrence
+     *        the position at which the rule is applied.
+     * @param ifInstantiations
+     *        if instantiations.
+     * @param statement
+     *        the statement which the applied contract belongs to.
+     * @param contract
+     *        the contract being applied.
+     * @param heaps
+     *        the heap context.
      */
     public LoopContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,

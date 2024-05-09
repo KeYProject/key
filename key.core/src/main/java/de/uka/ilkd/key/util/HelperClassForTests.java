@@ -84,7 +84,8 @@ public class HelperClassForTests {
     /**
      * Checks if one step simplification is enabled in the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to read from or {@code null} to return the general settings
+     * @param proof
+     *        The {@link Proof} to read from or {@code null} to return the general settings
      *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
@@ -103,8 +104,10 @@ public class HelperClassForTests {
     /**
      * Defines if one step simplification is enabled in general and within the {@link Proof}.
      *
-     * @param proof The optional {@link Proof}.
-     * @param enabled {@code true} use one step simplification, {@code false} do not use one step
+     * @param proof
+     *        The optional {@link Proof}.
+     * @param enabled
+     *        {@code true} use one step simplification, {@code false} do not use one step
      *        simplification.
      */
     public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
@@ -131,11 +134,15 @@ public class HelperClassForTests {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param baseDir The base directory which contains the java file.
-     * @param javaPathInBaseDir The path in the base directory to the java file.
+     * @param baseDir
+     *        The base directory which contains the java file.
+     * @param javaPathInBaseDir
+     *        The path in the base directory to the java file.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptions(File baseDir,
             String javaPathInBaseDir)
@@ -167,12 +174,17 @@ public class HelperClassForTests {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param javaFile The java file to load.
-     * @param containerTypeName The type name which provides the target.
-     * @param targetName The target to proof.
+     * @param javaFile
+     *        The java file to load.
+     * @param containerTypeName
+     *        The type name which provides the target.
+     * @param targetName
+     *        The target to proof.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
             String containerTypeName,
@@ -204,12 +216,8 @@ public class HelperClassForTests {
                     contract.createProofObl(environment.getInitConfig(), contract));
                 // Assert.assertNotNull(proof);
             } catch (Exception e) {
-                if (proof != null) {
-                    proof.dispose();
-                }
-                if (environment != null) {
-                    environment.dispose();
-                }
+                if (proof != null) { proof.dispose(); }
+                if (environment != null) { environment.dispose(); }
             }
         }
         return setDefaultTacletOptions();
@@ -240,7 +248,8 @@ public class HelperClassForTests {
     /**
      * Restores the given taclet options.
      *
-     * @param options The taclet options to restore.
+     * @param options
+     *        The taclet options to restore.
      */
     public static void restoreTacletOptions(Map<String, String> options) {
         if (options != null) {
@@ -258,9 +267,12 @@ public class HelperClassForTests {
     /**
      * Searches a {@link IProgramMethod} in the given {@link Services}.
      *
-     * @param services The {@link Services} to search in.
-     * @param containerTypeName The name of the type which contains the method.
-     * @param methodFullName The method name to search.
+     * @param services
+     *        The {@link Services} to search in.
+     * @param containerTypeName
+     *        The name of the type which contains the method.
+     * @param methodFullName
+     *        The method name to search.
      * @return The first found {@link IProgramMethod} in the type.
      */
     public static IProgramMethod searchProgramMethod(Services services, String containerTypeName,

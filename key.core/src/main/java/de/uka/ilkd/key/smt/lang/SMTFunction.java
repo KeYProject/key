@@ -73,9 +73,7 @@ public class SMTFunction {
 
     public String processString(String id) {
         // is symbol already quoted?
-        if (id.startsWith("|") && id.endsWith("|")) {
-            return id;
-        }
+        if (id.startsWith("|") && id.endsWith("|")) { return id; }
 
         id = id.replace("::", ".");
         id = id.replace("<", "");
@@ -105,7 +103,8 @@ public class SMTFunction {
     }
 
     /**
-     * @param domainSorts the domainSorts to set
+     * @param domainSorts
+     *        the domainSorts to set
      */
     public void setDomainSorts(List<SMTSort> domainSorts) {
         this.domainSorts = domainSorts;
@@ -113,30 +112,18 @@ public class SMTFunction {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
+        if (obj == null) { return false; }
 
-        if (this == obj) {
-            return true;
-        }
+        if (this == obj) { return true; }
 
-        if (!(obj instanceof SMTFunction f)) {
-            return false;
-        }
+        if (!(obj instanceof SMTFunction f)) { return false; }
 
-        if (!this.id.equals(f.id)) {
-            return false;
-        }
+        if (!this.id.equals(f.id)) { return false; }
 
-        if (this.domainSorts.size() != f.domainSorts.size()) {
-            return false;
-        }
+        if (this.domainSorts.size() != f.domainSorts.size()) { return false; }
 
         for (int i = 0; i < this.domainSorts.size(); i++) {
-            if (!this.domainSorts.get(i).equals(f.domainSorts.get(i))) {
-                return false;
-            }
+            if (!this.domainSorts.get(i).equals(f.domainSorts.get(i))) { return false; }
         }
         return true;
     }
@@ -167,10 +154,7 @@ public class SMTFunction {
         int base = 10;
         int i = 1;
 
-        for (SMTSort sort : domainSorts) {
-            ret = ret + sort.getId().hashCode() * base ^ i;
-            i++;
-        }
+        for (SMTSort sort : domainSorts) { ret = ret + sort.getId().hashCode() * base ^ i; i++; }
 
         return ret;
     }
@@ -180,9 +164,7 @@ public class SMTFunction {
 
         buff.append("(declare-fun ").append(id).append(" ").append("(");
         // if (domainSorts == null) return "domainSorts is null";
-        for (SMTSort s : domainSorts) {
-            buff.append(s.getTopLevel().getId()).append(" ");
-        }
+        for (SMTSort s : domainSorts) { buff.append(s.getTopLevel().getId()).append(" "); }
         buff.append(")" + " ").append(imageSort.getTopLevel().getId()).append(")");
 
         return buff.toString();

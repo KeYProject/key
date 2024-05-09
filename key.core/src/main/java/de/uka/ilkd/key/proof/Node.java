@@ -53,7 +53,7 @@ public class Node implements Iterable<Node> {
     private final Proof proof;
 
     /** The parent node. **/
-    private Node parent = null;
+    private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
      */
@@ -110,8 +110,7 @@ public class Node implements Iterable<Node> {
 
     private String cachedName = null;
 
-    @Nullable
-    private Lookup userData = null;
+    private @Nullable Lookup userData = null;
 
 
     /**
@@ -232,19 +231,17 @@ public class Node implements Iterable<Node> {
 
     /**
      * Returns the set of created program variables known in this node.
-     *
+     * <p>
      * In the resulting list, the newest additions come first.
      *
-     * @returns a non-null immutable list of program variables.
+     * @return a non-null immutable list of program variables.
      */
     public ImmutableList<IProgramVariable> getLocalProgVars() {
         return localProgVars;
     }
 
     public void addLocalProgVars(Iterable<? extends IProgramVariable> elements) {
-        for (IProgramVariable pv : elements) {
-            localProgVars = localProgVars.prepend(pv);
-        }
+        for (IProgramVariable pv : elements) { localProgVars = localProgVars.prepend(pv); }
     }
 
     /**
@@ -259,15 +256,14 @@ public class Node implements Iterable<Node> {
     }
 
     public void addLocalFunctions(Collection<? extends JFunction> elements) {
-        for (JFunction op : elements) {
-            localFunctions = localFunctions.prepend(op);
-        }
+        for (JFunction op : elements) { localFunctions = localFunctions.prepend(op); }
     }
 
     /**
      * adds a new NoPosTacletApp to the set of available NoPosTacletApps at this node
      *
-     * @param s the app to add.
+     * @param s
+     *        the app to add.
      */
     public void addNoPosTacletApp(NoPosTacletApp s) {
         localIntroducedRules = localIntroducedRules.add(s);
@@ -276,7 +272,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
-    public Node parent() {
+    public @Nullable Node parent() {
         return parent;
     }
 
@@ -296,12 +292,7 @@ public class Node implements Iterable<Node> {
         // we assume that the proof tree node is part of has proper
         // links
 
-        while (node != this) {
-            if (node.root()) {
-                return false;
-            }
-            node = node.parent();
-        }
+        while (node != this) { if (node.root()) { return false; } node = node.parent(); }
 
         return true;
     }
@@ -310,32 +301,23 @@ public class Node implements Iterable<Node> {
      * Search for the root of the smallest subtree containing <code>this</code> and
      * <code>other</code>; we assume that the two nodes are part of the same proof tree
      *
-     * @param other a node.
+     * @param other
+     *        a node.
      * @return the most recent common ancestor of {@code this} and the specified node.
      */
     public Node commonAncestor(Node other) {
-        if (root()) {
-            return this;
-        }
-        if (other.root()) {
-            return other;
-        }
+        if (root()) { return this; }
+        if (other.root()) { return other; }
 
         HashSet<Node> paths = new LinkedHashSet<>();
         Node n = this;
 
         while (true) {
-            if (!paths.add(n)) {
-                return n;
-            }
-            if (n.root()) {
-                break;
-            }
+            if (!paths.add(n)) { return n; }
+            if (n.root()) { break; }
             n = n.parent();
 
-            if (!paths.add(other)) {
-                return other;
-            }
+            if (!paths.add(other)) { return other; }
             if (other.root()) {
                 other = n;
                 break;
@@ -343,9 +325,7 @@ public class Node implements Iterable<Node> {
             other = other.parent();
         }
 
-        while (!paths.contains(other)) {
-            other = other.parent();
-        }
+        while (!paths.contains(other)) { other = other.parent(); }
 
         return other;
     }
@@ -364,7 +344,8 @@ public class Node implements Iterable<Node> {
     /**
      * Makes the given node a child of this node.
      *
-     * @param newChild the node to make a child of this node.
+     * @param newChild
+     *        the node to make a child of this node.
      */
     public void add(Node newChild) {
         newChild.siblingNr = children.size();
@@ -376,7 +357,8 @@ public class Node implements Iterable<Node> {
     /**
      * Makes the given node children of this node.
      *
-     * @param newChildren the node to make into children of this node.
+     * @param newChildren
+     *        the node to make into children of this node.
      */
     public void addAll(Node[] newChildren) {
         final int size = children.size();
@@ -396,25 +378,22 @@ public class Node implements Iterable<Node> {
      * nothing happens. This is only used for testing purposes.
      */
     void remove() {
-        if (parent != null) {
-            parent.remove(this);
-        }
+        if (parent != null) { parent.remove(this); }
     }
 
     /**
      * Removes child/parent relationship between the given node and this node; if the given node is
      * not child of this node, nothing happens and then and only then false is returned.
      *
-     * @param child the child to remove.
+     * @param child
+     *        the child to remove.
      * @return false iff the given node was not child of this node and nothing has been done.
      */
     boolean remove(Node child) {
         if (children.remove(child)) {
             child.parent = null;
             final ListIterator<Node> it = children.listIterator(child.siblingNr);
-            while (it.hasNext()) {
-                it.next().siblingNr--;
-            }
+            while (it.hasNext()) { it.next().siblingNr--; }
             child.siblingNr = -1;
             return true;
         } else {
@@ -478,7 +457,8 @@ public class Node implements Iterable<Node> {
 
     /**
      *
-     * @param i an index (starting at 0).
+     * @param i
+     *        an index (starting at 0).
      * @return the i-th child of this node.
      */
     public Node child(int i) {
@@ -486,7 +466,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @param child a child of this node.
+     * @param child
+     *        a child of this node.
      * @return the number of the node <code>child</code>, if it is a child of this node (starting
      *         with <code>0</code>), <code>-1</code> otherwise
      */
@@ -494,12 +475,7 @@ public class Node implements Iterable<Node> {
         int res = 0;
         final Iterator<Node> it = childrenIterator();
 
-        while (it.hasNext()) {
-            if (it.next() == child) {
-                return res;
-            }
-            ++res;
-        }
+        while (it.hasNext()) { if (it.next() == child) { return res; } ++res; }
 
         return -1;
     }
@@ -512,9 +488,7 @@ public class Node implements Iterable<Node> {
         while (n != null) {
             c += n.localIntroducedRules.size();
 
-            if (n.parent != null && n.parent.childrenCount() > 1) {
-                id.append(n.siblingNr);
-            }
+            if (n.parent != null && n.parent.childrenCount() > 1) { id.append(n.siblingNr); }
 
             n = n.parent;
         }
@@ -527,12 +501,17 @@ public class Node implements Iterable<Node> {
     /**
      * Helper for {@link #toString()}
      *
-     * @param prefix needed to keep track if a line has to be printed
-     * @param tree the tree representation we want to add this subtree " @param preEnumeration the
+     * @param prefix
+     *        needed to keep track if a line has to be printed
+     * @param tree
+     *        the tree representation we want to add this subtree " @param preEnumeration the
      *        enumeration of the parent without the last number
-     * @param postNr the last number of the parents enumeration
-     * @param maxNr the number of nodes at this level
-     * @param ownNr the place of this node at this level
+     * @param postNr
+     *        the last number of the parents enumeration
+     * @param maxNr
+     *        the number of nodes at this level
+     * @param ownNr
+     *        the place of this node at this level
      * @return the string representation of this node.
      */
 
@@ -579,9 +558,7 @@ public class Node implements Iterable<Node> {
         } else if (ownNr == maxNr && maxNr > 1) {
             // last node of level no further connection
             prefix += frontIndent + " " + backFill;
-        } else if (ownNr != maxNr && maxNr <= 1) {
-            prefix = "";
-        }
+        } else if (ownNr != maxNr && maxNr <= 1) { prefix = ""; }
 
         // print subtrees
         int childId = 0;
@@ -628,14 +605,10 @@ public class Node implements Iterable<Node> {
                 return cachedName;
             }
 
-            if (nodeInfo.getFirstStatementString() != null) {
-                return nodeInfo.getFirstStatementString();
-            }
+            if (nodeInfo.getFirstStatementString() != null) { return nodeInfo.getFirstStatementString(); }
 
             cachedName = rap.displayName();
-            if (cachedName == null) {
-                cachedName = RULE_WITHOUT_NAME;
-            }
+            if (cachedName == null) { cachedName = RULE_WITHOUT_NAME; }
         }
         return cachedName;
     }
@@ -649,20 +622,12 @@ public class Node implements Iterable<Node> {
      */
     public boolean sanityCheckDoubleLinks() {
         if (!root()) {
-            if (!parent().children.contains(this)) {
-                return false;
-            }
-            if (parent.proof() != proof()) {
-                return false;
-            }
+            if (!parent().children.contains(this)) { return false; }
+            if (parent.proof() != proof()) { return false; }
         }
         if (!leaf()) {
             final Iterator<Node> it = childrenIterator();
-            while (it.hasNext()) {
-                if (!it.next().sanityCheckDoubleLinks()) {
-                    return false;
-                }
-            }
+            while (it.hasNext()) { if (!it.next().sanityCheckDoubleLinks()) { return false; } }
         }
         return true;
     }
@@ -672,11 +637,7 @@ public class Node implements Iterable<Node> {
         closed = true;
         Node tmp = parent;
         Node result = this;
-        while (tmp != null && tmp.isCloseable()) {
-            tmp.closed = true;
-            result = tmp;
-            tmp = tmp.parent();
-        }
+        while (tmp != null && tmp.isCloseable()) { tmp.closed = true; result = tmp; tmp = tmp.parent(); }
         clearNameCache();
         return result;
     }
@@ -692,21 +653,14 @@ public class Node implements Iterable<Node> {
     void reopen() {
         closed = false;
         Node tmp = parent;
-        while (tmp != null && tmp.isClosed()) {
-            tmp.closed = false;
-            tmp = tmp.parent();
-        }
+        while (tmp != null && tmp.isClosed()) { tmp.closed = false; tmp = tmp.parent(); }
         clearNameCache();
     }
 
     /** @return true iff this inner node is closeable */
     private boolean isCloseable() {
         assert childrenCount() > 0;
-        for (Node child : children) {
-            if (!child.isClosed()) {
-                return false;
-            }
-        }
+        for (Node child : children) { if (!child.isClosed()) { return false; } }
         return true;
     }
 
@@ -720,9 +674,7 @@ public class Node implements Iterable<Node> {
     public int countNodes() {
         Iterator<Node> it = subtreeIterator();
         int res = 0;
-        for (; it.hasNext(); it.next()) {
-            res++;
-        }
+        for (; it.hasNext(); it.next()) { res++; }
         return res;
     }
 
@@ -767,16 +719,16 @@ public class Node implements Iterable<Node> {
     /**
      * Retrieves a user-defined data.
      *
-     * @param service the class for which the data were registered
-     * @param <T> any class
+     * @param service
+     *        the class for which the data were registered
+     * @param <T>
+     *        any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
     public <T> T lookup(Class<T> service) {
         try {
-            if (userData == null) {
-                return null;
-            }
+            if (userData == null) { return null; }
             return userData.get(service);
         } catch (IllegalStateException ignored) {
             return null;
@@ -786,8 +738,10 @@ public class Node implements Iterable<Node> {
     /**
      * Register a user-defined data in this node info.
      *
-     * @param obj an object to be registered
-     * @param service the key under it should be registered
+     * @param obj
+     *        an object to be registered
+     * @param service
+     *        the key under it should be registered
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
@@ -797,14 +751,15 @@ public class Node implements Iterable<Node> {
     /**
      * Remove a previous registered user-defined data.
      *
-     * @param obj registered object
-     * @param service the key under which the data was registered
-     * @param <T> arbitray object
+     * @param obj
+     *        registered object
+     * @param service
+     *        the key under which the data was registered
+     * @param <T>
+     *        arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
-        if (userData != null) {
-            userData.deregister(obj, service);
-        }
+        if (userData != null) { userData.deregister(obj, service); }
     }
 
     /**
@@ -813,18 +768,14 @@ public class Node implements Iterable<Node> {
      * @return
      */
     public @NonNull Lookup getUserData() {
-        if (userData == null) {
-            userData = new Lookup();
-        }
+        if (userData == null) { userData = new Lookup(); }
         return userData;
     }
 
     public BranchLocation getBranchLocation() {
         if (branchLocation == null) {
             BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
-            if (parent != null && parent.children.size() > 1) {
-                prev = prev.append(new Pair<>(parent, siblingNr));
-            }
+            if (parent != null && parent.children.size() > 1) { prev = prev.append(new Pair<>(parent, siblingNr)); }
             this.branchLocation = prev;
         }
         return branchLocation;

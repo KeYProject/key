@@ -39,13 +39,13 @@ public class Position implements Comparable<Position> {
     /**
      * Constructs a new source code position object.
      *
-     * @param line the line number.
-     * @param column the column number.
+     * @param line
+     *        the line number.
+     * @param column
+     *        the column number.
      */
     private Position(int line, int column) {
-        if (line < 1 || column < 1) {
-            throw new IllegalArgumentException(line + ", " + column);
-        }
+        if (line < 1 || column < 1) { throw new IllegalArgumentException(line + ", " + column); }
         this.line = line;
         this.column = column;
     }
@@ -53,8 +53,10 @@ public class Position implements Comparable<Position> {
     /**
      * Creates a new Location with 1-based line and 1-based column numbers.
      *
-     * @param line_1 1-based line of the Location
-     * @param column_0 1-based column of the Location
+     * @param line_1
+     *        1-based line of the Location
+     * @param column_0
+     *        1-based column of the Location
      */
     public static Position newOneBased(int line_1, int column_0) {
         return new Position(line_1, column_0);
@@ -64,8 +66,10 @@ public class Position implements Comparable<Position> {
      * Creates a new Location with 1-based line and 0-based column numbers.
      * This format is used by most parsers so this deserves an explicit method call.
      *
-     * @param line_1 1-based line of the Location
-     * @param column_0 0-based column of the Location
+     * @param line_1
+     *        1-based line of the Location
+     * @param column_0
+     *        0-based column of the Location
      */
     public static Position fromOneZeroBased(int line_1, int column_0) {
         return new Position(line_1, column_0 + 1);
@@ -74,7 +78,8 @@ public class Position implements Comparable<Position> {
     /**
      * Creates a new location from a token.
      *
-     * @param token the token
+     * @param token
+     *        the token
      */
     public static Position fromToken(Token token) {
         return fromOneZeroBased(token.getLine(), token.getCharPositionInLine());
@@ -91,7 +96,8 @@ public class Position implements Comparable<Position> {
     /**
      * Creates a new Position with the offset added to the line.
      *
-     * @param offset the offset
+     * @param offset
+     *        the offset
      */
     public Position offsetLine(int offset) {
         return new Position(line + offset, column);
@@ -133,12 +139,8 @@ public class Position implements Comparable<Position> {
      */
 
     public boolean equals(Object x) {
-        if (x == this) {
-            return true;
-        }
-        if (!(x instanceof Position p)) {
-            return false;
-        }
+        if (x == this) { return true; }
+        if (!(x instanceof Position p)) { return false; }
         return line == p.line && column == p.column;
     }
 
@@ -146,7 +148,8 @@ public class Position implements Comparable<Position> {
      * Compares this position with the given object for order. An undefined position is less than
      * any defined position.
      *
-     * @param p the position to compare with.
+     * @param p
+     *        the position to compare with.
      * @return a negative number, zero, or a positive number, if this position is lower than, equals
      *         to, or higher than the given one.
      */

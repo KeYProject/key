@@ -18,7 +18,8 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 /**
  * A map from some type to the same type.
  *
- * @param <S> the key and value type.
+ * @param <S>
+ *        the key and value type.
  *
  * @author lanzinger
  */
@@ -28,7 +29,8 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     /**
      * constructs a replacement map with the given term factory
      *
-     * @param tf a term factory
+     * @param tf
+     *        a term factory
      */
     public ReplacementMap(TermFactory tf) {
         super(tf);
@@ -37,9 +39,12 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     /**
      * Adds a mapping for the self variable.
      *
-     * @param oldSelf the old self variable.
-     * @param newSelf the new self variable.
-     * @param services services.
+     * @param oldSelf
+     *        the old self variable.
+     * @param newSelf
+     *        the new self variable.
+     * @param services
+     *        services.
      */
     public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, TermServices services) {
         if (newSelf != null) {
@@ -53,9 +58,12 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     /**
      * Adds a mapping for every flag.
      *
-     * @param oldFlags old flags.
-     * @param newFlags new flags.
-     * @param services services.
+     * @param oldFlags
+     *        old flags.
+     * @param newFlags
+     *        new flags.
+     * @param services
+     *        services.
      */
     public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
             final Map<Label, S> newFlags, TermServices services) {
@@ -72,9 +80,12 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     /**
      * Adds a mapping for a variable.
      *
-     * @param oldVariable old variable.
-     * @param newVariable new variable.
-     * @param services services.
+     * @param oldVariable
+     *        old variable.
+     * @param newVariable
+     *        new variable.
+     * @param services
+     *        services.
      */
     public void replaceVariable(final ProgramVariable oldVariable, final S newVariable,
             TermServices services) {
@@ -89,18 +100,19 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     /**
      * Adds mappings for the remembrance heaps.
      *
-     * @param oldRemembranceHeaps old remembrance heaps.
-     * @param newRemembranceHeaps new remembrance heaps.
-     * @param services services.
+     * @param oldRemembranceHeaps
+     *        old remembrance heaps.
+     * @param newRemembranceHeaps
+     *        new remembrance heaps.
+     * @param services
+     *        services.
      */
     public void replaceRemembranceHeaps(
             final Map<LocationVariable, LocationVariable> oldRemembranceHeaps,
             final Map<LocationVariable, ? extends S> newRemembranceHeaps, final Services services) {
         if (newRemembranceHeaps != null) {
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
-                    continue;
-                }
+                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) { continue; }
 
                 if (oldRemembranceHeaps.get(heap) != null) {
                     final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
@@ -115,9 +127,12 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     /**
      * Adds mappings for the remembrance variables.
      *
-     * @param oldRemembranceLocalVariables old remembrance variables.
-     * @param newRemembranceLocalVariables new remembrance variables.
-     * @param services services
+     * @param oldRemembranceLocalVariables
+     *        old remembrance variables.
+     * @param newRemembranceLocalVariables
+     *        new remembrance variables.
+     * @param services
+     *        services
      */
     public void replaceRemembranceLocalVariables(
             final Map<LocationVariable, LocationVariable> oldRemembranceLocalVariables,
@@ -140,8 +155,10 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
     }
 
     /**
-     * @param variable a variable.
-     * @param services services.
+     * @param variable
+     *        a variable.
+     * @param services
+     *        services.
      * @return a conversion of the specified variable to the type {@code S}.
      */
     protected abstract S convert(ProgramVariable variable, TermServices services);

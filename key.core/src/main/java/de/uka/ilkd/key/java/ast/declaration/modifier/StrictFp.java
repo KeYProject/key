@@ -27,7 +27,8 @@ public class StrictFp extends Modifier {
     /**
      * Strict fp.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
      */
 
     public StrictFp(PositionInfo pi, List<Comment> c) {

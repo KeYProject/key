@@ -56,9 +56,7 @@ public class SettingsChecker implements Checker {
 
         // parse the settings of each proof file
         List<ProofSettings> proofSettings = new ArrayList<>();
-        for (KeYUserProblemFile f : problemFiles) {
-            proofSettings.add(f.readPreferences());
-        }
+        for (KeYUserProblemFile f : problemFiles) { proofSettings.add(f.readPreferences()); }
 
         // actual consistency check of the settings
         if (consistent(proofSettings, data)) {
@@ -86,17 +84,13 @@ public class SettingsChecker implements Checker {
         // TODO change to map Settings -> ProofEntry (for feedback)
         // extract ChoiceSettings from ProofSettings and check for compatibility
         List<ChoiceSettings> choiceSettings = new ArrayList<>();
-        for (ProofSettings settings : proofSettings) {
-            choiceSettings.add(settings.getChoiceSettings());
-        }
+        for (ProofSettings settings : proofSettings) { choiceSettings.add(settings.getChoiceSettings()); }
         return choicesConsistent(choiceSettings, data);
     }
 
     private static boolean choicesConsistent(List<ChoiceSettings> choiceSettings,
             CheckerData data) {
-        if (choiceSettings.isEmpty()) {
-            return true;
-        }
+        if (choiceSettings.isEmpty()) { return true; }
 
         boolean consistent = true;
 
@@ -115,7 +109,7 @@ public class SettingsChecker implements Checker {
                 data.addReferenceChoices(cs);
 
                 data.print(LogLevel.DEBUG, "Found (currently) unique settings (assigned id " +
-                    data.getChoices2Id().get(cs) + "): " + cs);
+                        data.getChoices2Id().get(cs) + "): " + cs);
 
                 // at least one of the entries is different:
                 // in this case we have to check if all entries are compatible
@@ -144,19 +138,15 @@ public class SettingsChecker implements Checker {
                 data.addChoices(cs);
                 // settings from cs are identical to reference
                 data.print(LogLevel.DEBUG, "These settings already exist (with id " +
-                    data.getChoices2Id().get(cs) + "): " + cs);
+                        data.getChoices2Id().get(cs) + "): " + cs);
             }
         }
         return consistent;
     }
 
     private static boolean compatible(Choice a, Choice b) {
-        if (!a.name().equals(b.name())) {
-            return false;
-        }
-        if (a.category().equals(b.category())) {
-            return true;
-        }
+        if (!a.name().equals(b.name())) { return false; }
+        if (a.category().equals(b.category())) { return true; }
 
         if (choiceCompatibilityClasses.containsKey(a.name().toString())) {
 

@@ -31,8 +31,10 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
      * creates an instance of this condition checking if array var has reference or primitive
      * component type depending on the value of <code>checkReferenceType</code>
      *
-     * @param var the SchemaVariable to be checked
-     * @param checkReferenceType the boolean flag which when is set (<tt>true</tt>) FIXME weigl:
+     * @param var
+     *        the SchemaVariable to be checked
+     * @param checkReferenceType
+     *        the boolean flag which when is set (<tt>true</tt>) FIXME weigl:
      *        this is not true! checkReferenceType is just the negated flag. checks for reference
      *        otherwise for primitive type
      */
@@ -49,22 +51,16 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
     @Override
     public boolean check(SchemaVariable var, SVSubstitute candidate, SVInstantiations svInst,
             Services services) {
-        if (var != this.var) {
-            return true;
-        }
+        if (var != this.var) { return true; }
         Sort s = null;
         if (candidate instanceof Term) {
             s = ((Term) candidate).sort();
         } else if (candidate instanceof Expression) {
             s = ((Expression) candidate).getKeYJavaType(services, svInst.getExecutionContext())
                     .getSort();
-        } else if (candidate instanceof TypeReference) {
-            s = ((TypeReference) candidate).getKeYJavaType().getSort();
-        }
+        } else if (candidate instanceof TypeReference) { s = ((TypeReference) candidate).getKeYJavaType().getSort(); }
 
-        if (!(s instanceof ArraySort)) {
-            return false;
-        }
+        if (!(s instanceof ArraySort)) { return false; }
         return !(((ArraySort) s).elementSort().extendsTrans(services.getJavaInfo().objectSort()))
                 ^ checkReferenceType;
     }

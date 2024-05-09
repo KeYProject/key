@@ -81,9 +81,7 @@ public final class ProblemInitializer {
     }
 
     public ProblemInitializer(Profile profile) {
-        if (profile == null) {
-            throw new IllegalArgumentException("Given profile is null");
-        }
+        if (profile == null) { throw new IllegalArgumentException("Given profile is null"); }
 
         this.progMon = null;
         this.listener = null;
@@ -91,9 +89,7 @@ public final class ProblemInitializer {
     }
 
     private void progressStarted(Object sender) {
-        if (listener != null) {
-            listener.progressStarted(sender);
-        }
+        if (listener != null) { listener.progressStarted(sender); }
     }
 
 
@@ -102,15 +98,11 @@ public final class ProblemInitializer {
     // -------------------------------------------------------------------------
 
     private void progressStopped(Object sender) {
-        if (listener != null) {
-            listener.progressStopped(sender);
-        }
+        if (listener != null) { listener.progressStopped(sender); }
     }
 
     private void proofCreated(ProofAggregate proofAggregate) {
-        if (listener != null) {
-            listener.proofCreated(this, proofAggregate);
-        }
+        if (listener != null) { listener.proofCreated(this, proofAggregate); }
     }
 
     /**
@@ -127,8 +119,10 @@ public final class ProblemInitializer {
     /**
      * displays the status report in the status line and the maximum used by a progress bar
      *
-     * @param status the String to be displayed in the status line
-     * @param progressMax an int describing what is 100 per cent
+     * @param status
+     *        the String to be displayed in the status line
+     * @param progressMax
+     *        an int describing what is 100 per cent
      */
     private void reportStatus(String status, int progressMax) {
         if (listener != null) {
@@ -138,15 +132,11 @@ public final class ProblemInitializer {
     }
 
     private void reportException(ProofOblInput input, Exception e) {
-        if (listener != null) {
-            listener.reportException(this, input, e);
-        }
+        if (listener != null) { listener.reportException(this, input, e); }
     }
 
     private void setProgress(int progress) {
-        if (progMon != null) {
-            progMon.setProgress(progress);
-        }
+        if (progMon != null) { progMon.setProgress(progress); }
     }
 
     /**
@@ -154,9 +144,7 @@ public final class ProblemInitializer {
      */
     private void readLDTIncludes(Includes in, InitConfig initConfig) throws ProofInputException {
         // avoid infinite recursion
-        if (in.getLDTIncludes().isEmpty()) {
-            return;
-        }
+        if (in.getLDTIncludes().isEmpty()) { return; }
 
         // collect all ldt includes into a single LDTInput
         KeYFile[] keyFile = new KeYFile[in.getLDTIncludes().size()];
@@ -255,9 +243,7 @@ public final class ProblemInitializer {
             List<Path> classes = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 Path file = envInput.getJavaFile();
-                if (classes.contains(file)) {
-                    classes = Collections.singletonList(file);
-                }
+                if (classes.contains(file)) { classes = Collections.singletonList(file); }
             }
             try {
                 javaService.readCompilationUnits(javaPath, classes, fileRepo,
@@ -283,9 +269,7 @@ public final class ProblemInitializer {
         Namespace<Sort> newSortNS = new Namespace<>();
         Namespace<JFunction> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {
-            if (!(n instanceof GenericSort)) {
-                newSortNS.addSafely(n);
-            }
+            if (!(n instanceof GenericSort)) { newSortNS.addSafely(n); }
         }
         for (JFunction n : initConfig.funcNS().allElements()) {
             if (!(n instanceof SortDependingFunction
@@ -301,9 +285,7 @@ public final class ProblemInitializer {
     public void readEnvInput(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
         if (alreadyParsed.add(envInput)) {
             // read includes
-            if (!(envInput instanceof LDTInput)) {
-                readIncludes(envInput, initConfig);
-            }
+            if (!(envInput instanceof LDTInput)) { readIncludes(envInput, initConfig); }
 
             // read envInput itself
             reportStatus("Reading " + envInput.name());
@@ -318,9 +300,7 @@ public final class ProblemInitializer {
     }
 
     private void populateNamespaces(Term term, NamespaceSet namespaces, Goal rootGoal) {
-        for (int i = 0; i < term.arity(); i++) {
-            populateNamespaces(term.sub(i), namespaces, rootGoal);
-        }
+        for (int i = 0; i < term.arity(); i++) { populateNamespaces(term.sub(i), namespaces, rootGoal); }
 
         if (term.op() instanceof JFunction) {
             namespaces.functions().add((JFunction) term.op());
@@ -331,18 +311,14 @@ public final class ProblemInitializer {
             }
         } else if (term.op() instanceof ElementaryUpdate) {
             final ProgramVariable pv = (ProgramVariable) ((ElementaryUpdate) term.op()).lhs();
-            if (namespaces.programVariables().lookup(pv.name()) == null) {
-                rootGoal.addProgramVariable(pv);
-            }
+            if (namespaces.programVariables().lookup(pv.name()) == null) { rootGoal.addProgramVariable(pv); }
         } else if (term.javaBlock() != null && !term.javaBlock().isEmpty()) {
             final ProgramElement pe = term.javaBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<ProgramVariable> freeProgVars =
                 MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
             for (ProgramVariable pv : freeProgVars) {
-                if (namespaces.programVariables().lookup(pv.name()) == null) {
-                    rootGoal.addProgramVariable(pv);
-                }
+                if (namespaces.programVariables().lookup(pv.name()) == null) { rootGoal.addProgramVariable(pv); }
             }
         }
     }
@@ -354,9 +330,7 @@ public final class ProblemInitializer {
     private void populateNamespaces(Proof proof) {
         final NamespaceSet namespaces = proof.getNamespaces();
         final Goal rootGoal = proof.openGoals().head();
-        for (SequentFormula cf : proof.root().sequent()) {
-            populateNamespaces(cf.formula(), namespaces, rootGoal);
-        }
+        for (SequentFormula cf : proof.root().sequent()) { populateNamespaces(cf.formula(), namespaces, rootGoal); }
     }
 
     // what is the purpose of this method?
@@ -369,9 +343,7 @@ public final class ProblemInitializer {
 
     private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl)
             throws ProofInputException {
-        if (pl == null) {
-            throw new ProofInputException("No proof");
-        }
+        if (pl == null) { throw new ProofInputException("No proof"); }
 
         // register non-built-in rules
         // register non-built-in rules
@@ -391,9 +363,7 @@ public final class ProblemInitializer {
                 proofs[i].getInitConfig().registerRule(r, profile.getJustification(r));
                 setProgress((++j) * step + 3 + i * proofs.length);
             }
-            if (step == 0) {
-                setProgress(10 + i * proofs.length);
-            }
+            if (step == 0) { setProgress(10 + i * proofs.length); }
 
             // TODO: refactor Proof.setNamespaces() so this becomes unnecessary
             proofs[i].setNamespaces(proofs[i].getNamespaces());
@@ -410,15 +380,15 @@ public final class ProblemInitializer {
     /**
      * Creates an input config for the given env input
      *
-     * @param envInput the env input
+     * @param envInput
+     *        the env input
      * @return a *new* config
-     * @throws ProofInputException on load error
+     * @throws ProofInputException
+     *         on load error
      */
     private InitConfig createInputConfigFor(EnvInput envInput) throws ProofInputException {
         var profile = services.getProfile();
-        if (BASE_INPUT_CONFIG != null && profile == BASE_INPUT_CONFIG.getProfile()) {
-            return BASE_INPUT_CONFIG.copy();
-        }
+        if (BASE_INPUT_CONFIG != null && profile == BASE_INPUT_CONFIG.getProfile()) { return BASE_INPUT_CONFIG.copy(); }
 
         var config = new InitConfig(services);
         activateInitConfigJava(config, envInput);
@@ -591,9 +561,7 @@ public final class ProblemInitializer {
                 if (pm == null) {
                     continue; // weigl 2021-11-10
                 }
-                if (!(pm.isVoid() || pm.isConstructor())) {
-                    functions.add(pm);
-                }
+                if (!(pm.isVoid() || pm.isConstructor())) { functions.add(pm); }
             }
         }
 
@@ -628,9 +596,7 @@ public final class ProblemInitializer {
             // final work
             setUpProofHelper(po, pa);
 
-            if (Debug.ENABLE_DEBUG) {
-                print(pa.getFirstProof());
-            }
+            if (Debug.ENABLE_DEBUG) { print(pa.getFirstProof()); }
 
             // done
             proofCreated(pa);
@@ -675,7 +641,8 @@ public final class ProblemInitializer {
     /**
      * Sets the FileRepo responsible for consistency between source code and proof.
      *
-     * @param fileRepo the FileRepo to set
+     * @param fileRepo
+     *        the FileRepo to set
      */
     public void setFileRepo(FileRepo fileRepo) {
         this.fileRepo = fileRepo;
@@ -704,7 +671,6 @@ public final class ProblemInitializer {
 
         void reportException(Object sender, ProofOblInput input, Exception e);
 
-        default void showIssueDialog(Collection<PositionedString> issues) {
-        }
+        default void showIssueDialog(Collection<PositionedString> issues) {}
     }
 }

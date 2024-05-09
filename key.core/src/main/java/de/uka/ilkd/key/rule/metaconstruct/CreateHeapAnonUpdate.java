@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -41,18 +40,14 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term loopTerm = term.sub(0);
-        final Optional<LoopSpecification> loopSpec = //
-            MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
-
-        if (!loopSpec.isPresent()) {
-            return null;
-        }
+        final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
+        if (loopSpec == null) { return null; }
 
         final Term anonHeapTerm = term.sub(1);
         final Term anonSavedHeapTerm = term.sub(2);
         final Term anonPermissionsHeapTerm = term.sub(3);
 
-        return createHeapAnonUpdate(loopSpec.get(),
+        return createHeapAnonUpdate(loopSpec,
             MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
             MiscTools.isPermissions(services),
             anonHeapTerm, anonSavedHeapTerm, anonPermissionsHeapTerm, services);
@@ -61,15 +56,22 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     /**
      * Creates the anonymizing update for the given loop specification.
      *
-     * @param loopSpec The {@link LoopSpecification}.
-     * @param isTransaction set to true iff we're in a transaction modality (then, there are more
+     * @param loopSpec
+     *        The {@link LoopSpecification}.
+     * @param isTransaction
+     *        set to true iff we're in a transaction modality (then, there are more
      *        heaps available).
-     * @param isPermissions set to true if the permissions profile is active (then, the permissions
+     * @param isPermissions
+     *        set to true if the permissions profile is active (then, the permissions
      *        heap is available).
-     * @param anonHeapTerm The term with the Skolem heap.
-     * @param anonSavedHeapTerm The term with the Skolem saved heap.
-     * @param anonPermissionsHeapTerm The term with the Skolem permissions heap.
-     * @param services The {@link Services} object (for the {@link TermBuilder}).
+     * @param anonHeapTerm
+     *        The term with the Skolem heap.
+     * @param anonSavedHeapTerm
+     *        The term with the Skolem saved heap.
+     * @param anonPermissionsHeapTerm
+     *        The term with the Skolem permissions heap.
+     * @param services
+     *        The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
     private static Term createHeapAnonUpdate(LoopSpecification loopSpec, boolean isTransaction,
@@ -115,11 +117,15 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * Creates an elementary "heap := anon_heap_LOOP<<anonHeapFunction>>" update, or a Skip update
      * if the mod signals that nothing is modified.
      *
-     * @param heap The heap variable.
-     * @param anonHeap The anonymized heap term.
-     * @param mod The modifies clause, only for checking whether it's strictly nothing (then the
+     * @param heap
+     *        The heap variable.
+     * @param anonHeap
+     *        The anonymized heap term.
+     * @param mod
+     *        The modifies clause, only for checking whether it's strictly nothing (then the
      *        elementary update is a skip).
-     * @param services The {@link Services} object (for the {@link TermBuilder}).
+     * @param services
+     *        The {@link Services} object (for the {@link TermBuilder}).
      * @return An elementary anonymizing heap update.
      */
     private static Term createElementaryAnonUpdate(LocationVariable heap, Term anonHeap, Term mod,

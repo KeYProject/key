@@ -46,8 +46,10 @@ public interface SpecExtractor {
     /**
      * Returns the block contracts for the passed block.
      *
-     * @param method the program method
-     * @param block the statement block
+     * @param method
+     *        the program method
+     * @param block
+     *        the statement block
      * @return the block contracts
      */
     ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method,
@@ -56,10 +58,13 @@ public interface SpecExtractor {
     /**
      * Returns the loop contracts for the passed block.
      *
-     * @param method the program method containing the block.
-     * @param block the block.
+     * @param method
+     *        the program method containing the block.
+     * @param block
+     *        the block.
      * @return the loop contracts
-     * @throws SLTranslationException a translation exception
+     * @throws SLTranslationException
+     *         a translation exception
      */
     ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
             StatementBlock block) throws SLTranslationException;
@@ -67,10 +72,13 @@ public interface SpecExtractor {
     /**
      * Returns the loop contracts for the passed loop.
      *
-     * @param method the program method containing the loop.
-     * @param loop the loop.
+     * @param method
+     *        the program method containing the loop.
+     * @param loop
+     *        the loop.
      * @return the loop contracts
-     * @throws SLTranslationException a translation exception
+     * @throws SLTranslationException
+     *         a translation exception
      */
     ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
             LoopStatement loop) throws SLTranslationException;
@@ -78,7 +86,8 @@ public interface SpecExtractor {
     /**
      * Returns the {@link MergeContract}s for the given {@link MergePointStatement}.
      *
-     * @param methodParams TODO
+     * @param methodParams
+     *        TODO
      */
     ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
             MergePointStatement mps, ImmutableList<ProgramVariable> methodParams)
@@ -87,10 +96,13 @@ public interface SpecExtractor {
     /**
      * Returns the block contracts for the passed labeled statement if it labels a block.
      *
-     * @param method the program method
-     * @param labeled the labeled statement
+     * @param method
+     *        the program method
+     * @param labeled
+     *        the labeled statement
      * @return the block contracts
-     * @throws SLTranslationException a translation exception
+     * @throws SLTranslationException
+     *         a translation exception
      */
     ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method,
             LabeledStatement labeled) throws SLTranslationException;
@@ -98,10 +110,13 @@ public interface SpecExtractor {
     /**
      * Returns the loop contracts for the passed labeled statement if it labels a block.
      *
-     * @param method the program method
-     * @param labeled the labeled statement
+     * @param method
+     *        the program method
+     * @param labeled
+     *        the labeled statement
      * @return the loop contracts
-     * @throws SLTranslationException a translation exception
+     * @throws SLTranslationException
+     *         a translation exception
      */
     ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
             LabeledStatement labeled) throws SLTranslationException;

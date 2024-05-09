@@ -46,12 +46,14 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. a ClassDeclaration (in case
+     * @param children
+     *        the children of this AST element as KeY classes. a ClassDeclaration (in case
      *        of an anonymous class decl) a TypeReference (the referred type) 2 of Expression (the
      *        first Expression as left hand side, the second as right hand side), Comments; does NOT
      *        contain: a ReferencePrefix for the constructor as it might be mixed up with the
      *        TypeReference
-     * @param rp a ReferencePrefix as access path for the constructor
+     * @param rp
+     *        a ReferencePrefix as access path for the constructor
      */
     public New(ExtList children, ReferencePrefix rp) {
         super(children);
@@ -63,12 +65,14 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. a ClassDeclaration (in case
+     * @param children
+     *        the children of this AST element as KeY classes. a ClassDeclaration (in case
      *        of an anonymous class decl) a TypeReference (the referred type) 2 of Expression (the
      *        first Expression as left hand side, the second as right hand side), Comments; does NOT
      *        contain: a ReferencePrefix for the constructor as it might be mixed up with the
      *        TypeReference
-     * @param rp a ReferencePrefix as access path for the constructor
+     * @param rp
+     *        a ReferencePrefix as access path for the constructor
      */
     public New(ExtList children, ReferencePrefix rp, PositionInfo pi) {
         super(children, pi);
@@ -80,8 +84,10 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param type a TypeReference (the referred type)
-     * @param rp a ReferencePrefix as access path for the constructor
+     * @param type
+     *        a TypeReference (the referred type)
+     * @param rp
+     *        a ReferencePrefix as access path for the constructor
      */
     public New(Expression[] arguments, TypeReference type, ReferencePrefix rp) {
         super(arguments, type);
@@ -152,9 +158,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     @Override
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (anonymousClass != null && index == 0) {
-            return anonymousClass;
-        }
+        if (anonymousClass != null && index == 0) { return anonymousClass; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -162,18 +166,10 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     @Override
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null) {
-            result++;
-        }
-        if (typeReference != null) {
-            result++;
-        }
-        if (children != null) {
-            result += children.size();
-        }
-        if (anonymousClass != null) {
-            result++;
-        }
+        if (accessPath != null) { result++; }
+        if (typeReference != null) { result++; }
+        if (children != null) { result += children.size(); }
+        if (anonymousClass != null) { result++; }
         return result;
     }
 
@@ -182,29 +178,19 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     public ProgramElement getChildAt(int index) {
         int len;
         if (accessPath != null) {
-            if (index == 0) {
-                return accessPath;
-            }
+            if (index == 0) { return accessPath; }
             index--;
         }
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
         if (children != null) {
             len = children.size();
-            if (len > index) {
-                return children.get(index);
-            }
+            if (len > index) { return children.get(index); }
             index -= len;
         }
-        if (anonymousClass != null) {
-            if (index == 0) {
-                return anonymousClass;
-            }
-        }
+        if (anonymousClass != null) { if (index == 0) { return anonymousClass; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 

@@ -26,8 +26,10 @@ public class RecoderExample {
     /**
      * this method is used to create the part of the AST representing an if-then statement.
      *
-     * @param expr the Expression that is the condition of the if part
-     * @param prg the JavaStatement after 'then'
+     * @param expr
+     *        the Expression that is the condition of the if part
+     * @param prg
+     *        the JavaStatement after 'then'
      * @return the If Statement with condition expr and 'then' part prg
      */
     public If createIfThen(Expression expr, JavaStatement prg) {
@@ -40,7 +42,8 @@ public class RecoderExample {
     /**
      * transformates a "while(expr) {prg;}" to "if (exr) then {prg;}"
      *
-     * @param _while the while-loop to transform
+     * @param _while
+     *        the while-loop to transform
      * @return the transformed AST
      */
     public ExtList transform(While _while) {
@@ -55,7 +58,8 @@ public class RecoderExample {
     /**
      * transforms all while statements in a statement block to the wanted "if-then-while" statement
      *
-     * @param prg the Statementblock to be transformed
+     * @param prg
+     *        the Statementblock to be transformed
      */
     public StatementBlock transform(StatementBlock prg) {
         ExtList newBody = new ExtList();
@@ -82,7 +86,7 @@ public class RecoderExample {
         System.out.println("Read Original:\n" + block);
         System.out.println("Transforming...");
         System.out.println("Transformed:\n"
-            + (JavaBlock.createJavaBlock(ex.transform((StatementBlock) block.program()))));
+                + (JavaBlock.createJavaBlock(ex.transform((StatementBlock) block.program()))));
         System.out.println("The original is left untouched:\n" + block);
     }
 

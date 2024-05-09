@@ -37,12 +37,11 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     /**
      * Creates a new {@link BreakpointStopCondition}.
      *
-     * @param breakpoints The {@link IBreakpoint} to use.
+     * @param breakpoints
+     *        The {@link IBreakpoint} to use.
      */
     public BreakpointStopCondition(IBreakpoint... breakpoints) {
-        if (breakpoints != null) {
-            Collections.addAll(this.breakpoints, breakpoints);
-        }
+        if (breakpoints != null) { Collections.addAll(this.breakpoints, breakpoints); }
     }
 
     /**
@@ -94,10 +93,14 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     /**
      * Checks if a breakpoint is hit.
      *
-     * @param activeStatement the activeStatement of the node
-     * @param ruleApp the applied {@link RuleApp}
-     * @param proof the current proof
-     * @param node the current node
+     * @param activeStatement
+     *        the activeStatement of the node
+     * @param ruleApp
+     *        the applied {@link RuleApp}
+     * @param proof
+     *        the current proof
+     * @param node
+     *        the current node
      * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not
      *         hit.
      */

@@ -49,18 +49,14 @@ public class ClasslevelTranslatorTest {
             String l;
             StringBuilder content = new StringBuilder();
             while ((l = reader.readLine()) != null) {
-                if (l.trim().isEmpty() || l.startsWith("#")) {
-                    continue;
-                }
+                if (l.trim().isEmpty() || l.startsWith("#")) { continue; }
                 content.append(l).append('\n');
             }
             final String[] split = content.toString().split("---\\s*Contract\\s*---\n");
             LOGGER.debug("cases: {}", split.length);
             for (String value : split) {
                 value = value.trim();
-                if (!value.isEmpty()) {
-                    seq.add(value.replaceAll("---Contract---", ""));
-                }
+                if (!value.isEmpty()) { seq.add(value.replaceAll("---Contract---", "")); }
             }
         }
         return seq.stream().map(it -> DynamicTest.dynamicTest(it, () -> fn.accept(it)));

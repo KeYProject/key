@@ -133,7 +133,8 @@ public class BuiltInRuleAppIndex {
     /**
      * called if a formula has been replaced
      *
-     * @param sci SequentChangeInfo describing the change of the sequent
+     * @param sci
+     *        SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(Goal goal, SequentChangeInfo sci, NewRuleListener listener) {
         scanAddedFormulas(goal, true, sci, listener);

@@ -70,9 +70,11 @@ public final class LoopScopeBlock extends JavaStatement
     /**
      * creates a loop-scope block
      *
-     * @param iProgramVariable the IProgramVariable to indicate whether the scope should be left
+     * @param iProgramVariable
+     *        the IProgramVariable to indicate whether the scope should be left
      *        or continuued
-     * @param body the StatementBlock inside the loop scope (the actual loop body)
+     * @param body
+     *        the StatementBlock inside the loop scope (the actual loop body)
      */
     public LoopScopeBlock(IProgramVariable iProgramVariable, StatementBlock body) {
         super((PositionInfo) null, null);
@@ -87,7 +89,8 @@ public final class LoopScopeBlock extends JavaStatement
     /**
      * Synchronized block.
      *
-     * @param children a list with all children
+     * @param children
+     *        a list with all children
      */
     public LoopScopeBlock(ExtList children) {
         super(children);
@@ -158,9 +161,11 @@ public final class LoopScopeBlock extends JavaStatement
      * Return the expression at the specified index in this node's "virtual"
      * expression array.
      *
-     * @param index an index for an expression.
+     * @param index
+     *        an index for an expression.
      * @return the expression with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
     @Override
     public Expression getExpressionAt(int index) {
@@ -197,9 +202,11 @@ public final class LoopScopeBlock extends JavaStatement
      * Returns the child at the specified index in this node's "virtual" child
      * array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -236,15 +243,15 @@ public final class LoopScopeBlock extends JavaStatement
      * Return the statement at the specified index in this node's "virtual"
      * statement array.
      *
-     * @param index an index for a statement.
+     * @param index
+     *        an index for a statement.
      * @return the statement with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
     @Override
     public Statement getStatementAt(int index) {
-        if (index == 0) {
-            return body;
-        }
+        if (index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -258,7 +265,8 @@ public final class LoopScopeBlock extends JavaStatement
      * Calls the corresponding method of a visitor in order to perform some
      * action/transformation on this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     @Override
     public void visit(Visitor v) {

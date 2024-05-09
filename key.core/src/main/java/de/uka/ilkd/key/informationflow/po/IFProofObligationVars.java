@@ -66,10 +66,13 @@ public class IFProofObligationVars {
     private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<Term, Term> map) {
         final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
         for (final Term symbTerm : seVars.termList) {
-            final Term ifTerm = ifVarsIt.next();
-            if (symbTerm != null) {
-                map.put(symbTerm, ifTerm);
+            final Term ifTerm;
+            if (ifVarsIt.hasNext()) {
+                ifTerm = ifVarsIt.next();
+            } else {
+                ifTerm = null;
             }
+            if (symbTerm != null) { map.put(symbTerm, ifTerm); }
         }
     }
 

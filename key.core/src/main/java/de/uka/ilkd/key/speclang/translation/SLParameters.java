@@ -16,18 +16,15 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public record SLParameters(ImmutableList<SLExpression> parameters) {
     public boolean isListOfTerm() {
-        for (SLExpression expr : parameters) {
-            if (!expr.isTerm()) {
-                return false;
-            }
-        }
+        for (SLExpression expr : parameters) { if (!expr.isTerm()) { return false; } }
         return true;
     }
 
     /**
      * returns the type signature of the parameter list
      *
-     * @param services the Services
+     * @param services
+     *        the Services
      * @return the list of types that compose the type signature
      */
     public ImmutableList<KeYJavaType> getSignature(Services services) {
@@ -37,9 +34,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
             if (type == null) {
                 final Term term = expr.getTerm();
                 if (term != null) {
-                    if (term.sort() == JavaDLTheory.FORMULA) {
-                        type = services.getTypeConverter().getBooleanType();
-                    }
+                    if (term.sort() == JavaDLTheory.FORMULA) { type = services.getTypeConverter().getBooleanType(); }
                 }
             }
             result = result.append(type);

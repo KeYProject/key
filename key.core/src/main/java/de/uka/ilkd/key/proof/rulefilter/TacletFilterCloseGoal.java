@@ -9,8 +9,7 @@ public class TacletFilterCloseGoal extends TacletFilter {
 
     public final static TacletFilterCloseGoal INSTANCE = new TacletFilterCloseGoal();
 
-    private TacletFilterCloseGoal() {
-    }
+    private TacletFilterCloseGoal() {}
 
     protected boolean filter(Taclet taclet) {
         return taclet.goalTemplates().size() == 0;

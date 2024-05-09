@@ -107,7 +107,8 @@ public class JP2KeYTypeConverter {
      * This method retrieves the recoder nameinfo and queries it for the type for typeName and
      * passes this result to {@link #getKeYJavaType(ResolvedType)}
      *
-     * @param typeName name of a type to be converted
+     * @param typeName
+     *        name of a type to be converted
      * @return the KJT for the string representation.
      * @author mu
      * @see #getKeYJavaType(ResolvedType)
@@ -122,22 +123,19 @@ public class JP2KeYTypeConverter {
      * <p>
      * Returned the cached value if present - otherwise create a new type.
      *
-     * @param type type to be converted, may be null
+     * @param type
+     *        type to be converted, may be null
      * @return a keytype.
      */
     @NonNull
     public KeYJavaType getKeYJavaType(ResolvedType type) {
         // change from 2012-02-07: there must be a definite KJT
-        if (type == null) {
-            throw new NullPointerException("null cannot be converted into a KJT");
-        }
+        if (type == null) { throw new NullPointerException("null cannot be converted into a KJT"); }
 
         {
             // lookup in the cache
             var kjt = jp2KeY.resolvedTypeToKeY(type);
-            if (kjt != null) {
-                return kjt;
-            }
+            if (kjt != null) { return kjt; }
         }
 
         // create a new KeYJavaType
@@ -170,20 +168,14 @@ public class JP2KeYTypeConverter {
         var primitiveType = PrimitiveType.getPrimitiveType(type.describe());
         var result = getTypeConverter().getKeYJavaType(primitiveType);
         var sort = result.getSort();
-        if (sort == null) {
-            throw new RuntimeException("Cannot assign " + description + " a primitive sort.");
-        }
+        if (sort == null) { throw new RuntimeException("Cannot assign " + description + " a primitive sort."); }
         storeInCache(type, result);
     }
 
     private void addNullType(ResolvedType type) {
         var sort = getSortsNamespace().lookup(NullSort.NAME);
-        if (sort == null) {
-            sort = new NullSort(getObjectType().getSort());
-        }
-        if (getSortsNamespace().lookup(sort.name()) == null) {
-            getSortsNamespace().add(sort);
-        }
+        if (sort == null) { sort = new NullSort(getObjectType().getSort()); }
+        if (getSortsNamespace().lookup(sort.name()) == null) { getSortsNamespace().add(sort); }
         storeInCache(type, new KeYJavaType(NullType.JAVA_NULL, sort));
     }
 
@@ -199,9 +191,7 @@ public class JP2KeYTypeConverter {
         var arraySort = ArraySort.getArraySort(kjt.getSort(), elemType, getObjectType().getSort(),
             getCloneableType().getSort(), getSerializableType().getSort());
         var result = new KeYJavaType(arraySort);
-        if (getSortsNamespace().lookup(arraySort.name()) == null) {
-            getSortsNamespace().add(arraySort);
-        }
+        if (getSortsNamespace().lookup(arraySort.name()) == null) { getSortsNamespace().add(arraySort); }
 
         storeInCache(type, result);
 
@@ -244,9 +234,7 @@ public class JP2KeYTypeConverter {
             }
         }
 
-        if (getSortsNamespace().lookup(sort.name()) == null) {
-            getSortsNamespace().add(sort);
-        }
+        if (getSortsNamespace().lookup(sort.name()) == null) { getSortsNamespace().add(sort); }
         // Important: javaType is null until being set by visiting the class/interface/enum
         // declaration!
         storeInCache(type, new KeYJavaType(sort));
@@ -264,26 +252,25 @@ public class JP2KeYTypeConverter {
     /**
      * get all direct super sorts of a class type (not transitive)
      *
-     * @param classType type to examine, not null
+     * @param classType
+     *        type to examine, not null
      * @return a freshly created set of sorts
      */
     private ImmutableSet<Sort> directSuperSorts(ResolvedReferenceTypeDeclaration classType) {
         ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
-        for (var s : classType.getAncestors()) {
-            ss = ss.add(getKeYJavaType(s).getSort());
-        }
+        for (var s : classType.getAncestors()) { ss = ss.add(getKeYJavaType(s).getSort()); }
 
-        if (ss.isEmpty() && !classType.isJavaLangObject()) {
-            ss = ss.add(getObjectType().getSort());
-        }
+        if (ss.isEmpty() && !classType.isJavaLangObject()) { ss = ss.add(getObjectType().getSort()); }
         return ss;
     }
 
     /**
      * create a sort out of a recoder class
      *
-     * @param ct classtype to create for, not null
-     * @param supers the set of (direct?) super-sorts
+     * @param ct
+     *        classtype to create for, not null
+     * @param supers
+     *        the set of (direct?) super-sorts
      * @return a freshly created Sort object
      */
     private Sort createObjectSort(ResolvedTypeDeclaration ct, ImmutableSet<Sort> supers) {
@@ -368,9 +355,12 @@ public class JP2KeYTypeConverter {
     /**
      * Adds several implicit fields and methods to given list of members.
      *
-     * @param members an ExtList with the members of parent
-     * @param parent the KeYJavaType of the array to be enriched by its implicit members
-     * @param baseType the KeYJavaType of the parent's element type
+     * @param members
+     *        an ExtList with the members of parent
+     * @param parent
+     *        the KeYJavaType of the array to be enriched by its implicit members
+     * @param baseType
+     *        the KeYJavaType of the parent's element type
      */
     private void addImplicitArrayMembers(ExtList members, KeYJavaType parent, KeYJavaType baseType,
             ProgramVariable len) {
@@ -390,9 +380,7 @@ public class JP2KeYTypeConverter {
 
         ProgramVariable length = len;// find("length", fields);
 
-        if (arrayMethodBuilder == null) {
-            initArrayMethodBuilder();
-        }
+        if (arrayMethodBuilder == null) { initArrayMethodBuilder(); }
 
         final IProgramMethod prepare =
             arrayMethodBuilder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
@@ -406,16 +394,15 @@ public class JP2KeYTypeConverter {
     /**
      * extracts all fields out of fielddeclaration
      *
-     * @param field the FieldDeclaration of which the field specifications have to be extracted
+     * @param field
+     *        the FieldDeclaration of which the field specifications have to be extracted
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
-        for (int i = spec.size() - 1; i >= 0; i--) {
-            result = result.prepend(spec.get(i));
-        }
+        for (int i = spec.size() - 1; i >= 0; i--) { result = result.prepend(spec.get(i)); }
         return result;
     }
 
@@ -423,7 +410,8 @@ public class JP2KeYTypeConverter {
      * extracts all field specifications out of the given list. Therefore it descends into field
      * declarations.
      *
-     * @param list the ExtList with the members of a type declaration
+     * @param list
+     *        the ExtList with the members of a type declaration
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
@@ -431,9 +419,7 @@ public class JP2KeYTypeConverter {
         ImmutableList<Field> result = ImmutableSLList.nil();
         for (Object aList : list) {
             Object pe = aList;
-            if (pe instanceof FieldDeclaration) {
-                result = result.prepend(filterField((FieldDeclaration) pe));
-            }
+            if (pe instanceof FieldDeclaration) { result = result.prepend(filterField((FieldDeclaration) pe)); }
         }
         return result;
     }

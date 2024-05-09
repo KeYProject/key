@@ -43,28 +43,27 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
      * subsort of the variable to be substituted and the term's arity is 2 and the number of
      * variables bound there is 0 for the 0th subterm and 1 for the 1st subterm.
      *
-     * @throws TermCreationException if the check fails
+     * @throws TermCreationException
+     *         if the check fails
      */
     @Override
     public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
             throws TermCreationException {
         super.validTopLevelException(term);
-        if (term.varsBoundHere(1).size() != 1) {
-            throw new TermCreationException(this, term);
-        }
+        if (term.varsBoundHere(1).size() != 1) { throw new TermCreationException(this, term); }
         Sort substSort = term.sub(0).sort();
         Sort varSort = term.varsBoundHere(1).get(0).sort();
-        if (!substSort.extendsTrans(varSort)) {
-            throw new TermCreationException(this, term);
-        }
+        if (!substSort.extendsTrans(varSort)) { throw new TermCreationException(this, term); }
     }
 
     /**
      * Apply this substitution operator to <code>term</code>, which has this operator as top-level
      * operator
      *
-     * @param term the {@link Term} on which to apply the substitution
-     * @param tb the {@link TermBuilder} to use for term construction
+     * @param term
+     *        the {@link Term} on which to apply the substitution
+     * @param tb
+     *        the {@link TermBuilder} to use for term construction
      */
     public abstract Term apply(Term term, TermBuilder tb);// {
     // QuantifiableVariable v = term.varsBoundHere(1).getQuantifiableVariable(0);

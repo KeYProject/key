@@ -47,7 +47,8 @@ public class DependencyNode {
     /**
      * Creates a new dependency node for the given contract.
      *
-     * @param contract the contract represented by this node
+     * @param contract
+     *        the contract represented by this node
      */
     public DependencyNode(Contract contract) {
         this.contract = contract;
@@ -100,16 +101,16 @@ public class DependencyNode {
     /**
      * Adds a new edge from this node to the given target node.
      *
-     * @param targetNode the target node of the edge
-     * @param edgeType the type of the edge to add
+     * @param targetNode
+     *        the target node of the edge
+     * @param edgeType
+     *        the type of the edge to add
      */
     public void addEdge(DependencyNode targetNode, DependencyGraph.EdgeType edgeType) {
         DependencyGraph.EdgeType current = dependencies.get(targetNode);
         if (current != null) {
             // overwrite current edge type only if the given one is stronger
-            if (current != TERMINATION_SENSITIVE) {
-                dependencies.put(targetNode, edgeType);
-            }
+            if (current != TERMINATION_SENSITIVE) { dependencies.put(targetNode, edgeType); }
         } else {
             dependencies.put(targetNode, edgeType);
         }
@@ -133,9 +134,7 @@ public class DependencyNode {
         result.append(contract.getName()).append(" -> (");
         boolean first = true;
         for (DependencyNode currentNode : dependencies.keySet()) {
-            if (!first) {
-                result.append(" ");
-            }
+            if (!first) { result.append(" "); }
             result.append(currentNode.contract.getName());
             first = false;
         }

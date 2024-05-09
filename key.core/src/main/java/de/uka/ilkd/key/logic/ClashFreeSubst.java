@@ -60,9 +60,7 @@ public class ClashFreeSubst {
     // XXX
     protected static ImmutableArray<QuantifiableVariable> getSingleArray(
             ImmutableArray<QuantifiableVariable>[] bv) {
-        if (bv == null) {
-            return null;
-        }
+        if (bv == null) { return null; }
         ImmutableArray<QuantifiableVariable> result = null;
         for (ImmutableArray<QuantifiableVariable> arr : bv) {
             if (arr != null && !arr.isEmpty()) {
@@ -86,9 +84,7 @@ public class ClashFreeSubst {
         final Term[] newSubterms = new Term[arity];
         @SuppressWarnings("unchecked")
         final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[arity];
-        for (int i = 0; i < arity; i++) {
-            applyOnSubterm(t, i, newSubterms, newBoundVars);
-        }
+        for (int i = 0; i < arity; i++) { applyOnSubterm(t, i, newSubterms, newBoundVars); }
         return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.getLabels());
     }
 
@@ -138,9 +134,7 @@ public class ClashFreeSubst {
                 subTerm.execPostOrder(vcv);
                 usedVars = svars;
                 usedVars = usedVars.union(vcv.vars());
-                for (int i = varInd + 1; i < boundVars.size(); i++) {
-                    usedVars = usedVars.add(boundVars.get(i));
-                }
+                for (int i = varInd + 1; i < boundVars.size(); i++) { usedVars = usedVars.add(boundVars.get(i)); }
                 // Get a new variable with a fitting name.
                 QuantifiableVariable qv1 = newVarFor(qv, usedVars);
 
@@ -171,9 +165,7 @@ public class ClashFreeSubst {
             newBoundVars[varInd] = qv;
             if (qv == v) {
                 newSubterms[subInd] = subTerm;
-                for (int i = varInd; i < boundVars.size(); i++) {
-                    newBoundVars[i] = boundVars.get(varInd);
-                }
+                for (int i = varInd; i < boundVars.size(); i++) { newBoundVars[i] = boundVars.get(varInd); }
             } else {
                 applyOnSubterm1(varInd + 1, boundVars, newBoundVars, subInd, subTerm, newSubterms);
             }
@@ -192,11 +184,7 @@ public class ClashFreeSubst {
         if (!subTerm.freeVars().contains(v)) {
             return false;
         } else {
-            for (int i = 0; i < boundVars.size(); i++) {
-                if (v == boundVars.get(i)) {
-                    return false;
-                }
-            }
+            for (int i = 0; i < boundVars.size(); i++) { if (v == boundVars.get(i)) { return false; } }
         }
         return true;
     }
@@ -212,9 +200,7 @@ public class ClashFreeSubst {
         LogicVariable lv = (LogicVariable) var;
         String stem = var.name().toString();
         int i = 1;
-        while (!nameNewInSet((stem + i), usedVars)) {
-            i++;
-        }
+        while (!nameNewInSet((stem + i), usedVars)) { i++; }
         return new LogicVariable(new Name(stem + i), lv.sort());
     }
 
@@ -222,11 +208,7 @@ public class ClashFreeSubst {
      * returns true if there is no object named <code>n</code> in the set <code>s</code>
      */
     private boolean nameNewInSet(String n, ImmutableSet<QuantifiableVariable> qvars) {
-        for (QuantifiableVariable qvar : qvars) {
-            if (qvar.name().toString().equals(n)) {
-                return false;
-            }
-        }
+        for (QuantifiableVariable qvar : qvars) { if (qvar.name().toString().equals(n)) { return false; } }
         return true;
     }
 
@@ -251,9 +233,7 @@ public class ClashFreeSubst {
             } else {
                 for (int i = 0; i < t.arity(); i++) {
                     var vbh = t.varsBoundHere(i);
-                    for (int j = 0; j < vbh.size(); j++) {
-                        vars = vars.add(vbh.get(j));
-                    }
+                    for (int j = 0; j < vbh.size(); j++) { vars = vars.add(vbh.get(j)); }
                 }
             }
         }

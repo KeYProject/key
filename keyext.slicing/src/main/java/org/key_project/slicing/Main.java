@@ -63,9 +63,7 @@ public final class Main {
             }
         } else if (file.isDirectory()) {
             try (var s = Files.newDirectoryStream(file.toPath())) {
-                for (Path child : s) {
-                    processFileOrDir(child, overwrite);
-                }
+                for (Path child : s) { processFileOrDir(child, overwrite); }
             } catch (IOException e) {
                 LOGGER.error("error walking dir ", e);
             }
@@ -75,7 +73,8 @@ public final class Main {
     /**
      * Main entry point. Parses CLI flags/options and performs the appropriate actions.
      *
-     * @param args command-line arguments
+     * @param args
+     *        command-line arguments
      */
     public static void main(String[] args) {
         try {
@@ -85,9 +84,7 @@ public final class Main {
             evaluateOptions(cl);
             var fileArguments = cl.getFileArguments();
             var overwrite = cl.isSet("--overwrite");
-            if (overwrite) {
-                LOGGER.info("--overwrite given, writing files");
-            }
+            if (overwrite) { LOGGER.info("--overwrite given, writing files"); }
             for (File file : fileArguments) {
                 try {
                     processFileOrDir(file.toPath(), overwrite);

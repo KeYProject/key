@@ -225,9 +225,7 @@ public class ProofExplorationServiceTest {
         if (lookup != null) {
             foundExploration = true;
             String explorationAction = lookup.getExplorationAction();
-            if (explorationAction != null) {
-                foundExplorationAction = true;
-            }
+            if (explorationAction != null) { foundExplorationAction = true; }
         }
 
         return foundExploration & foundExplorationAction;

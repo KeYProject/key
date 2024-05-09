@@ -49,7 +49,8 @@ public class CharLiteral extends AbstractIntegerLiteral {
     /**
      * Creates a new CharLiteral from the given char.
      *
-     * @param charVal a char value.
+     * @param charVal
+     *        a char value.
      */
     public CharLiteral(char charVal) {
         this(null, null, charVal);
@@ -64,8 +65,10 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * <p>
      * Note that the char must be enclosed in single-quotes.
      *
-     * @param children an ExtList with all children(comments). May contain: Comments
-     * @param valueStr a string.
+     * @param children
+     *        an ExtList with all children(comments). May contain: Comments
+     * @param valueStr
+     *        a string.
      */
     public CharLiteral(ExtList children, String valueStr) {
         super(children);
@@ -76,7 +79,8 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * Creates a new CharLiteral from the given String. The String must be of the form
      * <code>'c'</code> (with c being an arbitrary char).
      *
-     * @param valueStr a string.
+     * @param valueStr
+     *        a string.
      */
     public CharLiteral(String valueStr) {
         this(null, null, parseFromString(valueStr));
@@ -122,9 +126,11 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * <p>
      * This method does not check the length of the literal for validity.
      *
-     * @param sourceStr the String containing the literal surrounded by single-quotes
+     * @param sourceStr
+     *        the String containing the literal surrounded by single-quotes
      * @return the parsed value as a char
-     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     * @throws NumberFormatException
+     *         if the given String does not represent a syntactically valid
      *         character literal or the literal is not surrounded by single-quotes
      * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4">
      *      https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>

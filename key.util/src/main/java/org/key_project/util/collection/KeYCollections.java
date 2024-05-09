@@ -10,9 +10,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.checkerframework.checker.nullness.util.NullnessUtil;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Utilities for Collections.
- *
  *
  * @author Alexander Weigl
  * @version 1 (29.03.19)
@@ -27,9 +29,11 @@ public class KeYCollections {
      * first one.
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
+        @Nullable
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
         System.arraycopy(s2, 0, res, s1.length, s2.length);
-        return res;
+        // After arraycopy, all elements of res are NonNull.
+        return NullnessUtil.castNonNullDeep(res);
     }
 
     // =======================================================
@@ -58,9 +62,10 @@ public class KeYCollections {
         }
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {
-            final U value = m1.get(e.getValue());
-            if (value != null) {
-                res.put(e.getKey(), value);
+            final T v1 = e.getValue();
+            if (v1 != null) {
+                final U value = m1.get(v1);
+                if (value != null) { res.put(e.getKey(), value); }
             }
         }
         return res;
@@ -73,8 +78,10 @@ public class KeYCollections {
      * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null collection
-     * @param delimiter a non-null string which is put between the elements.
+     * @param collection
+     *        an arbitrary non-null collection
+     * @param delimiter
+     *        a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
@@ -88,8 +95,10 @@ public class KeYCollections {
      * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null array of objects
-     * @param delimiter a non-null string which is put between the elements.
+     * @param collection
+     *        an arbitrary non-null array of objects
+     * @param delimiter
+     *        a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Object[] collection, String delimiter) {
@@ -104,7 +113,8 @@ public class KeYCollections {
      * All alphabetic characters (A-Z and a-z) are copied to the result while all other characters
      * are removed.
      *
-     * @param string an arbitrary string
+     * @param string
+     *        an arbitrary string
      * @return a string which is a sub-structure of the original character sequence
      * @author mattias ulbrich
      */
@@ -112,9 +122,7 @@ public class KeYCollections {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-                res.append(c);
-            }
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) { res.append(c); }
         }
         return res.toString();
     }

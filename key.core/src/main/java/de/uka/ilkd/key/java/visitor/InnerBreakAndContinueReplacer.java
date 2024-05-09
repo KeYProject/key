@@ -50,19 +50,22 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     /**
      *
-     * @param block a block that begins with a loop.
-     * @param loopLabels all labels belonging to the loop.
-     * @param breakLabel the label used for break statements.
-     * @param continueLabel the label used for continue statements.
-     * @param services services.
+     * @param block
+     *        a block that begins with a loop.
+     * @param loopLabels
+     *        all labels belonging to the loop.
+     * @param breakLabel
+     *        the label used for break statements.
+     * @param continueLabel
+     *        the label used for continue statements.
+     * @param services
+     *        services.
      */
     public InnerBreakAndContinueReplacer(final StatementBlock block,
             final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
             final Services services) {
         super(block, services);
-        for (Label label : loopLabels) {
-            this.loopLabels.push(label);
-        }
+        for (Label label : loopLabels) { this.loopLabels.push(label); }
 
         this.breakOuter = new Break(breakLabel);
         this.breakInner = new Break(continueLabel);
@@ -105,19 +108,11 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         } else {
             stack.push(new ExtList());
         }
-        if (node instanceof LoopStatement || node instanceof Switch) {
-            loopAndSwitchCascadeDepth++;
-        }
-        if (node instanceof MethodFrame) {
-            frames.push((MethodFrame) node);
-        }
+        if (node instanceof LoopStatement || node instanceof Switch) { loopAndSwitchCascadeDepth++; }
+        if (node instanceof MethodFrame) { frames.push((MethodFrame) node); }
         super.walk(node);
-        if (node instanceof MethodFrame) {
-            frames.pop();
-        }
-        if (node instanceof LoopStatement || node instanceof Switch) {
-            loopAndSwitchCascadeDepth--;
-        }
+        if (node instanceof MethodFrame) { frames.pop(); }
+        if (node instanceof LoopStatement || node instanceof Switch) { loopAndSwitchCascadeDepth--; }
     }
 
     @Override
@@ -272,9 +267,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            if (x.getLabel() != null) {
-                l = (Label) changeList.removeFirst();
-            }
+            if (x.getLabel() != null) { l = (Label) changeList.removeFirst(); }
             addChild(new LabeledStatement(changeList, l, x.getPositionInfo()));
             changed();
         } else {
@@ -353,9 +346,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            if (x.getExpression() != null) {
-                e = (Expression) changeList.removeFirst();
-            }
+            if (x.getExpression() != null) { e = (Expression) changeList.removeFirst(); }
             addChild(new Case(changeList, e, x.getPositionInfo()));
             changed();
         } else {
@@ -409,9 +400,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     private void changed() {
         ExtList list = stack.peek();
-        if (list.getFirst() != CHANGED) {
-            list.addFirst(CHANGED);
-        }
+        if (list.getFirst() != CHANGED) { list.addFirst(CHANGED); }
     }
 
     private void addChild(final SourceElement x) {

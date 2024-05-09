@@ -59,11 +59,7 @@ public final class ProofCorrectnessMgt {
 
 
     private boolean allHaveMeasuredBy(ImmutableList<Contract> contracts) {
-        for (Contract contract : contracts) {
-            if (!contract.hasMby()) {
-                return false;
-            }
-        }
+        for (Contract contract : contracts) { if (!contract.hasMby()) { return false; } }
         return true;
     }
 
@@ -85,9 +81,7 @@ public final class ProofCorrectnessMgt {
     public boolean isContractApplicable(Contract contract) {
         // get the contract which is being verified in our current proof
         final ContractPO po = specRepos.getContractPOForProof(proof);
-        if (po == null) {
-            return true;
-        }
+        if (po == null) { return true; }
         final Contract originalContract = po.getContract();
 
         // get initial contracts
@@ -97,9 +91,7 @@ public final class ProofCorrectnessMgt {
 
         // initial paths
         ImmutableSet<ImmutableList<Contract>> newPaths = DefaultImmutableSet.nil();
-        for (Contract c : contractsToBeApplied) {
-            newPaths = newPaths.add(ImmutableSLList.<Contract>nil().prepend(c));
-        }
+        for (Contract c : contractsToBeApplied) { newPaths = newPaths.add(ImmutableSLList.<Contract>nil().prepend(c)); }
 
         // look for cycles
         while (!newPaths.isEmpty()) {
@@ -110,9 +102,7 @@ public final class ProofCorrectnessMgt {
                 final ImmutableList<Contract> path = it.next();
                 final Contract end = path.head();
                 if (end.equals(originalContract)) {
-                    if (!allHaveMeasuredBy(path.prepend(originalContract))) {
-                        return false;
-                    }
+                    if (!allHaveMeasuredBy(path.prepend(originalContract))) { return false; }
                 } else {
                     final ImmutableSet<Proof> proofsForEnd = specRepos.getProofs(end);
                     for (Proof proofForEnd : proofsForEnd) {
@@ -140,9 +130,7 @@ public final class ProofCorrectnessMgt {
 
         // get the target which is being verified in the passed goal
         final IObserverFunction targetUnderVerification = specRepos.getTargetOfProof(proof);
-        if (targetUnderVerification == null) {
-            return true;
-        }
+        if (targetUnderVerification == null) { return true; }
 
         // collect all proofs on which the specification of the
         // passed target may depend
@@ -166,9 +154,7 @@ public final class ProofCorrectnessMgt {
         // is one of those proofs about the target under verification?
         for (Proof p : proofs) {
             final IObserverFunction target2 = specRepos.getTargetOfProof(p);
-            if (target2.equals(targetUnderVerification)) {
-                return false;
-            }
+            if (target2.equals(targetUnderVerification)) { return false; }
         }
 
         return true;
@@ -231,9 +217,7 @@ public final class ProofCorrectnessMgt {
             LOGGER.debug("No justification found for rule " + r.rule().name());
             return;
         }
-        if (!rj.isAxiomJustification()) {
-            cachedRuleApps.add(r);
-        }
+        if (!rj.isAxiomJustification()) { cachedRuleApps.add(r); }
     }
 
 

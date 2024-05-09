@@ -43,15 +43,23 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
      * Creates a new {@link AbstractConditionalBreakpoint}. Call setCondition immediately after
      * calling the constructor!
      *
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-     * @param proof the {@link Proof} that will be executed and should stop
-     * @param condition the condition as given by the user
-     * @param enabled flag if the Breakpoint is enabled
-     * @param conditionEnabled flag if the condition is enabled
-     * @param containerType the type of the element containing the breakpoint
-     * @param suspendOnTrue the flag if the condition needs to evaluate to true or just be
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
+     * @param condition
+     *        the condition as given by the user
+     * @param enabled
+     *        flag if the Breakpoint is enabled
+     * @param conditionEnabled
+     *        flag if the condition is enabled
+     * @param containerType
+     *        the type of the element containing the breakpoint
+     * @param suspendOnTrue
+     *        the flag if the condition needs to evaluate to true or just be
      *        satisfiable
-     * @throws SLTranslationException if the condition could not be parsed to a valid Term
+     * @throws SLTranslationException
+     *         if the condition could not be parsed to a valid Term
      */
     public KeYWatchpoint(int hitCount, Proof proof, String condition, boolean enabled,
             boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue)
@@ -92,9 +100,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
                 IExecutionContext ec =
                     JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
                 // put values into map which have to be replaced
-                if (ec != null) {
-                    getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
-                }
+                if (ec != null) { getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance()); }
                 // replace renamings etc.
                 OpReplacer replacer = new OpReplacer(getVariableNamingMap(),
                     getProof().getServices().getTermFactory());

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class Streams {
-
     private Streams() {
         throw new Error("do not instantiate");
     }
@@ -17,9 +16,7 @@ public class Streams {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf = new byte[2048];
         int count;
-        while ((count = is.read(buf)) >= 0) {
-            baos.write(buf, 0, count);
-        }
+        while ((count = is.read(buf)) >= 0) { baos.write(buf, 0, count); }
         return baos.toString();
     }
 

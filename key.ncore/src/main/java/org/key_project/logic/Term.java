@@ -80,7 +80,8 @@ public interface Term extends LogicElement, Sorted {
      * at
      * each upstep the method visit of the visitor is called.
      *
-     * @param visitor the Visitor
+     * @param visitor
+     *        the Visitor
      */
     <T extends Term> void execPostOrder(Visitor<T> visitor);
 
@@ -88,7 +89,8 @@ public interface Term extends LogicElement, Sorted {
      * The visitor walks downwards the tree, while at each downstep the method visit of the visitor
      * is called.
      *
-     * @param visitor the Visitor
+     * @param visitor
+     *        the Visitor
      */
     <T extends Term> void execPreOrder(Visitor<T> visitor);
 }

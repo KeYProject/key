@@ -34,9 +34,7 @@ public class FocusProjection implements ProjectionToTerm {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;
-        while (n-- > 0 && !pos.isTopLevel()) {
-            pos = pos.up();
-        }
+        while (n-- > 0 && !pos.isTopLevel()) { pos = pos.up(); }
 
         return pos.subTerm();
     }

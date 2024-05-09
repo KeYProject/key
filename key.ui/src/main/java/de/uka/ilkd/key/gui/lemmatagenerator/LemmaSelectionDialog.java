@@ -60,9 +60,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
         this.getTacletChooser().setItems(taclets, "Taclets");
         this.setVisible(true);
         ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
-        for (TacletInfo info : getTacletChooser().getDataOfSelectedItems()) {
-            set = set.add(info.getTaclet());
-        }
+        for (TacletInfo info : getTacletChooser().getDataOfSelectedItems()) { set = set.add(info.getTaclet()); }
         return set;
     }
 

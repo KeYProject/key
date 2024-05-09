@@ -72,9 +72,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
             RuleFilter p_filter, PosInOccurrence pos, Services services) {
 
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
-        if (tacletApps == null) {
-            return result;
-        }
+        if (tacletApps == null) { return result; }
 
         if (tacletApps.size() > 256) {
             NoPosTacletApp[] toMatch = tacletApps.toArray(NoPosTacletApp.class);
@@ -93,22 +91,16 @@ final class MultiThreadedTacletIndex extends TacletIndex {
             List<NoPosTacletApp> matchedRules = new LinkedList<>();
 
             try {
-                for (Future<List<NoPosTacletApp>> res : execs.invokeAll(forks)) {
-                    matchedRules.addAll(res.get());
-                }
+                for (Future<List<NoPosTacletApp>> res : execs.invokeAll(forks)) { matchedRules.addAll(res.get()); }
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
             }
             result = result.prependReverse(matchedRules);
         } else {
             for (final NoPosTacletApp tacletApp : tacletApps) {
-                if (!p_filter.filter(tacletApp.taclet())) {
-                    continue;
-                }
+                if (!p_filter.filter(tacletApp.taclet())) { continue; }
                 final NoPosTacletApp newTacletApp = tacletApp.matchFind(pos, services);
-                if (newTacletApp != null) {
-                    result = result.prepend(newTacletApp);
-                }
+                if (newTacletApp != null) { result = result.prepend(newTacletApp); }
             }
         }
 
@@ -131,12 +123,18 @@ final class MultiThreadedTacletIndex extends TacletIndex {
          * to {@code upper} excluding against the term at position {@code pos}. Only taclets passing
          * the filter {@code ruleFilter} are considered
          *
-         * @param toMatch the list containing the taclets to be matched
-         * @param lower the index (incl.) where to start
-         * @param upper the index (excl.) where to stop
-         * @param pos the {@link PosInOccurrence} refering to the term to match
-         * @param ruleFilter {@link RuleFilter} constraining the taclets to be matched
-         * @param services the {@link Services}
+         * @param toMatch
+         *        the list containing the taclets to be matched
+         * @param lower
+         *        the index (incl.) where to start
+         * @param upper
+         *        the index (excl.) where to stop
+         * @param pos
+         *        the {@link PosInOccurrence} refering to the term to match
+         * @param ruleFilter
+         *        {@link RuleFilter} constraining the taclets to be matched
+         * @param services
+         *        the {@link Services}
          */
         public TacletSetMatchTask(NoPosTacletApp[] toMatch, int lower, int upper,
                 PosInOccurrence pos, RuleFilter ruleFilter, Services services) {
@@ -153,13 +151,9 @@ final class MultiThreadedTacletIndex extends TacletIndex {
             List<NoPosTacletApp> result = new LinkedList<>();
             for (int i = lower; i < upper; i++) {
                 NoPosTacletApp tacletApp = toMatch[i];
-                if (!ruleFilter.filter(tacletApp.taclet())) {
-                    continue;
-                }
+                if (!ruleFilter.filter(tacletApp.taclet())) { continue; }
                 final NoPosTacletApp newTacletApp = tacletApp.matchFind(pos, services);
-                if (newTacletApp != null) {
-                    result.add(newTacletApp);
-                }
+                if (newTacletApp != null) { result.add(newTacletApp); }
             }
             return result;
         }

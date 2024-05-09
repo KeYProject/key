@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -50,7 +49,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         final ProgramVariable permissionsHeapBeforePV = //
             (ProgramVariable) term.sub(3).op();
 
-        final Optional<LoopSpecification> loopSpec = //
+        final LoopSpecification loopSpec = //
             MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
         final boolean isTransaction = MiscTools.isTransaction(((Modality) loopFormula.op()).kind());
@@ -61,7 +60,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
                 permissionsHeapBeforePV, services);
 
         final Term frameCondition =
-            createFrameCondition(loopSpec.get(), isTransaction, heapToBeforeLoopMap, services);
+            createFrameCondition(loopSpec, isTransaction, heapToBeforeLoopMap, services);
 
         return frameCondition;
     }
@@ -69,11 +68,15 @@ public final class CreateFrameCond extends AbstractTermTransformer {
     /**
      * Creates the frame condition.
      *
-     * @param loopSpec The {@link LoopSpecification}, for the modifies clause.
-     * @param isTransaction A flag set to true iff the current modality is a transaction modality.
-     * @param heapToBeforeLoopMap The map from heap variables to a map from original to pre-state
+     * @param loopSpec
+     *        The {@link LoopSpecification}, for the modifies clause.
+     * @param isTransaction
+     *        A flag set to true iff the current modality is a transaction modality.
+     * @param heapToBeforeLoopMap
+     *        The map from heap variables to a map from original to pre-state
      *        terms.
-     * @param services The {@link Services} object.
+     * @param services
+     *        The {@link Services} object.
      * @return The frame condition.
      */
     private static Term createFrameCondition(final LoopSpecification loopSpec,
@@ -110,12 +113,18 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      * Creates the map from heap variables to a map from original terms to the pre-state terms.
      * Thereby, saves the new variables in the namespaces (which should not have occurred before!).
      *
-     * @param isTransaction Signals that the current modality is a transaction modality.
-     * @param isPermissions Signals that the current profile is one with permissions.
-     * @param heapBeforePV The fresh PV for saving the standard heap.
-     * @param savedHeapBeforePV The fresh PV for saving the transaction heap.
-     * @param permissionsHeapBeforePV The fresh PV for saving the permissions heap.
-     * @param services The {@link Services} object.
+     * @param isTransaction
+     *        Signals that the current modality is a transaction modality.
+     * @param isPermissions
+     *        Signals that the current profile is one with permissions.
+     * @param heapBeforePV
+     *        The fresh PV for saving the standard heap.
+     * @param savedHeapBeforePV
+     *        The fresh PV for saving the transaction heap.
+     * @param permissionsHeapBeforePV
+     *        The fresh PV for saving the permissions heap.
+     * @param services
+     *        The {@link Services} object.
      *
      * @return A map from heap variables to a map from original terms to the pre-state terms.
      */

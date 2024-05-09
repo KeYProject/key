@@ -37,9 +37,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
         walk(root());
         final ExtList el = stack.peek();
         int i = 0;
-        while (!(el.get(i) instanceof ProgramElement)) {
-            i++;
-        }
+        while (!(el.get(i) instanceof ProgramElement)) { i++; }
         result = (ProgramElement) stack.peek().get(i);
     }
 
@@ -50,9 +48,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnFieldReference(final FieldReference x) {
         final ExtList changeList = stack.peek();
-        if (changeList.getFirst() == CHANGED) {
-            changeList.removeFirst();
-        }
+        if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
         changeList.removeFirstOccurrence(PositionInfo.class);
         if (x.getReferencePrefix() != null) {
             final Expression field = (Expression) changeList.get(1);
@@ -77,8 +73,8 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
             typeName = PrettyPrinter.getTypeNameForAccessMethods(typeName);
             addChild(new MethodReference(new ExtList(),
                 new ProgramElementName("_"
-                    + ((ProgramVariable) changeList.get(0)).getProgramElementName().getProgramName()
-                    + typeName),
+                        + ((ProgramVariable) changeList.get(0)).getProgramElementName().getProgramName()
+                        + typeName),
                 null));
         }
         changed();

@@ -71,9 +71,12 @@ class ContextualBlock {
 
     /**
      *
-     * @param start first index of the block
-     * @param end last index of the block
-     * @param type type of the block
+     * @param start
+     *        first index of the block
+     * @param end
+     *        last index of the block
+     * @param type
+     *        type of the block
      */
     public ContextualBlock(int start, int end, int type) {
         super();

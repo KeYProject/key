@@ -55,9 +55,7 @@ public class FormulaTagManager {
      */
     public PosInOccurrence getPosForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
-        if (info == null) {
-            return null;
-        }
+        if (info == null) { return null; }
         return info.pio;
     }
 
@@ -68,9 +66,7 @@ public class FormulaTagManager {
      */
     public long getAgeForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
-        if (info == null) {
-            return 0;
-        }
+        if (info == null) { return 0; }
         return info.age;
     }
 
@@ -131,7 +127,8 @@ public class FormulaTagManager {
     /**
      * Create new tags for all formulas of a sequent
      *
-     * @param p_goal The sequent
+     * @param p_goal
+     *        The sequent
      */
     private void createNewTags(Goal p_goal) {
         createNewTags(p_goal, false);
@@ -141,8 +138,10 @@ public class FormulaTagManager {
     /**
      * Create new tags for all formulas of a semisequent
      *
-     * @param p_goal The sequent that contains the semisequent
-     * @param p_antec true iff the formulas of the antecedent should be added
+     * @param p_goal
+     *        The sequent that contains the semisequent
+     * @param p_antec
+     *        true iff the formulas of the antecedent should be added
      */
     private void createNewTags(Goal p_goal, boolean p_antec) {
         final Sequent seq = p_goal.sequent();
@@ -157,7 +156,8 @@ public class FormulaTagManager {
     /**
      * Add a new tag to the maps
      *
-     * @param p_pio The formula for which a new tag is supposed to be created
+     * @param p_pio
+     *        The formula for which a new tag is supposed to be created
      */
     private void createNewTag(PosInOccurrence p_pio, Goal p_goal) {
         final FormulaTag tag = new FormulaTag();
@@ -206,9 +206,7 @@ public class FormulaTagManager {
     ////////////////////////////////////////////////////////////////////////////
 
     private FormulaInfo getFormulaInfo(FormulaTag p_tag) {
-        if (lastTagQueried != p_tag) {
-            putInQueryCache(p_tag, tagToFormulaInfo.get(p_tag));
-        }
+        if (lastTagQueried != p_tag) { putInQueryCache(p_tag, tagToFormulaInfo.get(p_tag)); }
         return lastQueryResult;
     }
 
@@ -227,7 +225,7 @@ public class FormulaTagManager {
         @Override
         public String toString() {
             return "FormulaInfo [pio=" + pio + ", modifications=" + modifications + ", age=" + age
-                + "]";
+                    + "]";
         }
 
         public final PosInOccurrence pio;

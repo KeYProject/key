@@ -121,9 +121,7 @@ public final class ProgVarReplacer {
             } else if (ie instanceof ProgramInstantiation) {
                 ProgramElement pe = (ProgramElement) inst;
                 ProgramElement newPe = replace(pe);
-                if (newPe != pe) {
-                    result = result.replace(sv, newPe, services);
-                }
+                if (newPe != pe) { result = result.replace(sv, newPe, services); }
             } else if (ie instanceof ProgramListInstantiation) {
                 @SuppressWarnings("unchecked")
                 ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
@@ -134,9 +132,7 @@ public final class ProgVarReplacer {
                 for (int i = 0; i < size; i++) {
                     ProgramElement pe = a.get(i);
                     array[i] = replace(pe);
-                    if (array[i] != pe) {
-                        changedSomething = true;
-                    }
+                    if (array[i] != pe) { changedSomething = true; }
                 }
 
                 if (changedSomething) {
@@ -146,9 +142,7 @@ public final class ProgVarReplacer {
             } else if (ie instanceof TermInstantiation) {
                 Term t = (Term) inst;
                 Term newT = replace(t);
-                if (newT != t) {
-                    result = result.replace(sv, newT, services);
-                }
+                if (newT != t) { result = result.replace(sv, newT, services); }
             } else {
                 assert false : "unexpected subtype of InstantiationEntry<?>";
             }
@@ -189,9 +183,7 @@ public final class ProgVarReplacer {
             final SequentFormula oldcf = it.next();
             final SequentFormula newcf = replace(oldcf);
 
-            if (newcf != oldcf) {
-                result.combine(result.semisequent().replace(formulaNumber, newcf));
-            }
+            if (newcf != oldcf) { result.combine(result.semisequent().replace(formulaNumber, newcf)); }
         }
 
         return result;
@@ -206,9 +198,7 @@ public final class ProgVarReplacer {
 
         final Term newFormula = replace(cf.formula());
 
-        if (newFormula != cf.formula()) {
-            result = new SequentFormula(newFormula);
-        }
+        if (newFormula != cf.formula()) { result = new SequentFormula(newFormula); }
         return result;
     }
 
@@ -216,9 +206,7 @@ public final class ProgVarReplacer {
     private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         ProgramVariable o = map.get(pv);
-        if (o != null) {
-            return services.getTermFactory().createTerm(o, t.getLabels());
-        }
+        if (o != null) { return services.getTermFactory().createTerm(o, t.getLabels()); }
         return t;
     }
 
@@ -233,9 +221,7 @@ public final class ProgVarReplacer {
         for (int i = 0, ar = t.arity(); i < ar; i++) {
             final Term subTerm = t.sub(i);
             newSubTerms[i] = replace(subTerm);
-            if (newSubTerms[i] != subTerm) {
-                changedSubTerm = true;
-            }
+            if (newSubTerms[i] != subTerm) { changedSubTerm = true; }
         }
 
         Operator op = t.op();
@@ -279,7 +265,8 @@ public final class ProgVarReplacer {
      * replaces a program variable on the lefthandside of an elementary update
      * requires the given term to have an elementary update operator as top level operator
      *
-     * @param t the Term where to replace renamed variables
+     * @param t
+     *        the Term where to replace renamed variables
      * @return the term with all replacements done
      */
     private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {

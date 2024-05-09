@@ -19,9 +19,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
     private String failureDescription = null;
 
     private void visit(Semisequent semiseq) {
-        for (SequentFormula aSemiseq : semiseq) {
-            aSemiseq.formula().execPostOrder(this);
-        }
+        for (SequentFormula aSemiseq : semiseq) { aSemiseq.formula().execPostOrder(this); }
     }
 
 
@@ -46,9 +44,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
     }
 
     protected void visitFindPart(Taclet taclet) {
-        if (taclet instanceof FindTaclet) {
-            (((FindTaclet) taclet).find()).execPostOrder(this);
-        }
+        if (taclet instanceof FindTaclet) { (((FindTaclet) taclet).find()).execPostOrder(this); }
     }
 
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
@@ -62,11 +58,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
                     visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());
                 }
             }
-            if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
-                    visit(taclet1, true);
-                }
-            }
+            if (visitAddrules) { for (Taclet taclet1 : gt.rules()) { visit(taclet1, true); } }
         }
     }
 

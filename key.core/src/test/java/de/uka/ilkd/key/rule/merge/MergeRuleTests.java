@@ -46,7 +46,8 @@ public class MergeRuleTests {
      * Simple regression test case loading an existing closed proof (standard Gcd example) including
      * two merges with ITE antecedent merges and trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * @throws ProblemLoaderException
+     *         If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProof() {
@@ -58,7 +59,8 @@ public class MergeRuleTests {
      * Simple regression test case loading an existing closed proof (standard Gcd example) including
      * two merges with predicate abstraction and trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * @throws ProblemLoaderException
+     *         If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstr() {
@@ -71,7 +73,8 @@ public class MergeRuleTests {
      * two merges with predicate abstraction (with lattice elements manually chosen by the user) and
      * trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * @throws ProblemLoaderException
+     *         If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstrAndUserChoices() {
@@ -93,9 +96,7 @@ public class MergeRuleTests {
         Iterator<Node> it = proof.root().subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
-            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                mergeAppsCnt++;
-            }
+            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) { mergeAppsCnt++; }
         }
 
         Assertions.assertEquals(2, mergeAppsCnt, "There should be two merge apps.");
@@ -115,9 +116,7 @@ public class MergeRuleTests {
         Iterator<Node> it = proof.root().subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
-            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                mergeAppsCnt++;
-            }
+            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) { mergeAppsCnt++; }
         }
 
         Assertions.assertEquals(2, mergeAppsCnt, "There should be two merge apps.");
@@ -136,9 +135,7 @@ public class MergeRuleTests {
         Iterator<Node> it = proof.root().subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
-            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                mergeAppsCnt++;
-            }
+            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) { mergeAppsCnt++; }
         }
 
         Assertions.assertEquals(1, mergeAppsCnt, "There should be one merge app.");
@@ -174,7 +171,8 @@ public class MergeRuleTests {
      * <p>
      * At the end, the proof should be closed.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * @throws ProblemLoaderException
+     *         If the proof could not be loaded.
      */
     @Test
     public void testDoManualGcdProof() throws Exception {
@@ -243,7 +241,8 @@ public class MergeRuleTests {
     /**
      * Runs the automatic JavaDL strategy on the given proof.
      *
-     * @param proof Proof to prove automatically.
+     * @param proof
+     *        Proof to prove automatically.
      */
     public static void startAutomaticStrategy(final Proof proof) {
         ProofStarter starter = new ProofStarter(false);
@@ -255,7 +254,8 @@ public class MergeRuleTests {
      * Merges the first open goal in the given proof. Asserts that the constructed merge rule
      * application is complete.
      *
-     * @param proof The proof the first goal of which to merge with suitable partner(s).
+     * @param proof
+     *        The proof the first goal of which to merge with suitable partner(s).
      */
     private void mergeFirstGoal(final Proof proof, MergeProcedure mergeProc) {
         final Services services = proof.getServices();
@@ -274,15 +274,14 @@ public class MergeRuleTests {
             mergeApp.setMergeNode(mergeNode);
         }
 
-        if (!mergeApp.complete()) {
-            throw new IncompleteRuleAppException();
-        }
+        if (!mergeApp.complete()) { throw new IncompleteRuleAppException(); }
 
         mergeGoal.apply(mergeApp);
     }
 
     /**
-     * @param sequent Sequent to get the PIO of the first succedent formula for.
+     * @param sequent
+     *        Sequent to get the PIO of the first succedent formula for.
      * @return The PIO for the first succedent formula of the given sequent.
      */
     private PosInOccurrence getPioFirstFormula(Sequent sequent) {
@@ -292,8 +291,10 @@ public class MergeRuleTests {
     /**
      * Runs the given macro on the given proof node.
      *
-     * @param macro The macro to execute.
-     * @param node The node to execute the macro on.
+     * @param macro
+     *        The macro to execute.
+     * @param node
+     *        The node to execute the macro on.
      */
     private void runMacro(AbstractProofMacro macro, Node node) {
         try {
@@ -312,11 +313,11 @@ public class MergeRuleTests {
      * fails if the proof could not be loaded.
      *
      * @param directory
-     * @param proofFileName The file name of the proof file to load.
+     * @param proofFileName
+     *        The file name of the proof file to load.
      * @return The loaded proof.
      */
-    @NonNull
-    public static Proof loadProof(File directory, String proofFileName) {
+    public static @NonNull Proof loadProof(File directory, String proofFileName) {
         File proofFile = new File(directory, proofFileName);
         assertTrue(proofFile.exists(),
             "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");

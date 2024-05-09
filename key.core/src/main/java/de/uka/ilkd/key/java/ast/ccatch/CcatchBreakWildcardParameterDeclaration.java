@@ -19,8 +19,7 @@ import org.key_project.util.ExtList;
  */
 public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
-    public CcatchBreakWildcardParameterDeclaration(ExtList children) {
-    }
+    public CcatchBreakWildcardParameterDeclaration(ExtList children) {}
 
     public CcatchBreakWildcardParameterDeclaration(PositionInfo pi, List<Comment> c) {
         super();

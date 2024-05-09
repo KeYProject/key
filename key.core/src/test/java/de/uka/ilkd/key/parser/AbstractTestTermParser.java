@@ -86,7 +86,8 @@ public class AbstractTestTermParser {
     /**
      * Convert a {@link Term} into a {@link String}.
      *
-     * @param t The {@link Term} that will be converted.
+     * @param t
+     *        The {@link Term} that will be converted.
      */
     protected String printTerm(Term t) {
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
@@ -127,8 +128,8 @@ public class AbstractTestTermParser {
         // check whether parsing pretty-syntax produces the correct term
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         String message = "\nAssertion failed while parsing pretty syntax. " + "Parsed string \""
-            + expectedPrettySyntax + "\", which results in term:\n" + parsedPrettySyntax
-            + "\nBut expected parse result is:\n" + expectedParseResult + "\n";
+                + expectedPrettySyntax + "\", which results in term:\n" + parsedPrettySyntax
+                + "\nBut expected parse result is:\n" + expectedParseResult + "\n";
         assertEquals(expectedParseResult, parsedPrettySyntax, message);
     }
 
@@ -138,9 +139,12 @@ public class AbstractTestTermParser {
      * {@link String} and compared with the first argument. The first argument is expected to be in
      * pretty-syntax.
      *
-     * @param prettySyntax {@link Term} representation in pretty-syntax.
-     * @param verboseSyntax {@link Term} in verbose syntax.
-     * @param optionalStringRepresentations Optionally, additional String representations will be
+     * @param prettySyntax
+     *        {@link Term} representation in pretty-syntax.
+     * @param verboseSyntax
+     *        {@link Term} in verbose syntax.
+     * @param optionalStringRepresentations
+     *        Optionally, additional String representations will be
      *        tested for correct parsing.
      */
     protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax,
@@ -154,9 +158,12 @@ public class AbstractTestTermParser {
      * Takes a {@link String} and a {@link Term} and checks whether they can be transformed into
      * each other by the operations parsing and printing.
      *
-     * @param prettySyntax Expected result after pretty-printing {@code expectedParseResult}.
-     * @param expectedParseResult Expected result after parsing {@code expectedPrettySyntax}.
-     * @param optionalStringRepresentations Optionally, additional String representations will be
+     * @param prettySyntax
+     *        Expected result after pretty-printing {@code expectedParseResult}.
+     * @param expectedParseResult
+     *        Expected result after parsing {@code expectedPrettySyntax}.
+     * @param optionalStringRepresentations
+     *        Optionally, additional String representations will be
      *        tested for correct parsing.
      */
     protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax,
@@ -176,7 +183,7 @@ public class AbstractTestTermParser {
     protected Services getServices() {
         if (SERVICES == null) {
             File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-                + "termParser" + File.separator + "parserTest.key");
+                    + "termParser" + File.separator + "parserTest.key");
             SERVICES = HelperClassForTests.createServices(keyFile);
         }
         return SERVICES.copy(false);

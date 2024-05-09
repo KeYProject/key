@@ -57,10 +57,13 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * Constructor for a "normal" value.
      *
-     * @param parentNode The parent {@link IExecutionNode} which provides this
+     * @param parentNode
+     *        The parent {@link IExecutionNode} which provides this
      *        {@link ExecutionVariable}.
-     * @param programVariable The represented {@link IProgramVariable} which value is shown.
-     * @param additionalCondition An optional additional condition to consider.
+     * @param programVariable
+     *        The represented {@link IProgramVariable} which value is shown.
+     * @param additionalCondition
+     *        An optional additional condition to consider.
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
             PosInOccurrence modalityPIO, IProgramVariable programVariable,
@@ -71,11 +74,15 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * Constructor for a "normal" child value.
      *
-     * @param parentNode The parent {@link IExecutionNode} which provides this
+     * @param parentNode
+     *        The parent {@link IExecutionNode} which provides this
      *        {@link ExecutionVariable}.
-     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
-     * @param programVariable The represented {@link IProgramVariable} which value is shown.
-     * @param additionalCondition An optional additional condition to consider.
+     * @param parentValue
+     *        The parent {@link ExecutionValue} or {@code null} if not available.
+     * @param programVariable
+     *        The represented {@link IProgramVariable} which value is shown.
+     * @param additionalCondition
+     *        An optional additional condition to consider.
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
             PosInOccurrence modalityPIO, ExecutionValue parentValue,
@@ -91,12 +98,17 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * Constructor for an array cell value.
      *
-     * @param parentNode The parent {@link IExecutionNode} which provides this
+     * @param parentNode
+     *        The parent {@link IExecutionNode} which provides this
      *        {@link ExecutionVariable}.
-     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
-     * @param arrayIndex The index in the parent array.
-     * @param lengthValue The {@link ExecutionValue} from which the array length was computed.
-     * @param additionalCondition An optional additional condition to consider.
+     * @param parentValue
+     *        The parent {@link ExecutionValue} or {@code null} if not available.
+     * @param arrayIndex
+     *        The index in the parent array.
+     * @param lengthValue
+     *        The {@link ExecutionValue} from which the array length was computed.
+     * @param additionalCondition
+     *        An optional additional condition to consider.
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
             PosInOccurrence modalityPIO, ExecutionValue parentValue, Term arrayIndex,
@@ -114,9 +126,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     @Override
     public ExecutionValue[] getValues() throws ProofInputException {
         synchronized (this) {
-            if (values == null) {
-                values = lazyComputeValues();
-            }
+            if (values == null) { values = lazyComputeValues(); }
             return values;
         }
     }
@@ -124,7 +134,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * Computes the value for {@link #getValues()} lazily when the method is called the first time.
      *
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
@@ -181,15 +192,23 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * Analyzes the side proof defined by the {@link ApplyStrategyInfo} and creates
      * {@link ExecutionValue}s from it.
      *
-     * @param initConfig The {@link InitConfig} of the side proof.
-     * @param services The {@link Services} of the side proof.
-     * @param tb The {@link TermBuilder} of the side proof.
-     * @param info The side proof.
-     * @param resultOperator The {@link Operator} of the result predicate.
-     * @param siteProofSelectTerm The queried value.
-     * @param siteProofCondition The condition under which the value is queried.
+     * @param initConfig
+     *        The {@link InitConfig} of the side proof.
+     * @param services
+     *        The {@link Services} of the side proof.
+     * @param tb
+     *        The {@link TermBuilder} of the side proof.
+     * @param info
+     *        The side proof.
+     * @param resultOperator
+     *        The {@link Operator} of the result predicate.
+     * @param siteProofSelectTerm
+     *        The queried value.
+     * @param siteProofCondition
+     *        The condition under which the value is queried.
      * @return The created {@link ExecutionValue} instances.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
             Services services, TermBuilder tb, ApplyStrategyInfo info, Operator resultOperator,
@@ -212,9 +231,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 // Compute value condition
                 Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
                 String conditionString = null;
-                if (condition != null) {
-                    conditionString = formatTerm(condition, services);
-                }
+                if (condition != null) { conditionString = formatTerm(condition, services); }
                 // Update result
                 result.add(new ExecutionValue(getProofNode(), this, false, value, valueString,
                     typeString, condition, conditionString));
@@ -225,9 +242,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             // Compute value condition
             Term condition = computeValueCondition(tb, unknownValues, initConfig);
             String conditionString = null;
-            if (condition != null) {
-                conditionString = formatTerm(condition, services);
-            }
+            if (condition != null) { conditionString = formatTerm(condition, services); }
             // Update result
             result.add(new ExecutionValue(getProofNode(), this, true,
                 null, null, null, condition, conditionString));
@@ -239,7 +254,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * Checks if the given {@link Term} represents a valid value.
      *
-     * @param value The value to check.
+     * @param value
+     *        The value to check.
      * @return {@code true} valid value, {@code false} invalid value to be ignored.
      */
     protected boolean isValidValue(Term value) {
@@ -249,9 +265,12 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * Groups all {@link Goal}s which provides the same value.
      *
-     * @param goals All available {@link Goal}s to group.
-     * @param operator The {@link Operator} of the {@link Term} which provides the value.
-     * @param services The {@link Services} to use.
+     * @param goals
+     *        All available {@link Goal}s to group.
+     * @param operator
+     *        The {@link Operator} of the {@link Term} which provides the value.
+     * @param services
+     *        The {@link Services} to use.
      */
     protected void groupGoalsByValue(ImmutableList<Goal> goals, Operator operator,
             Term siteProofSelectTerm, Term siteProofCondition, Map<Term, List<Goal>> valueMap,
@@ -289,12 +308,16 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * Computes the combined path condition of all {@link Goal}s which is the or combination of each
      * path condition per {@link Goal}.
      *
-     * @param tb The {@link TermBuilder} to use passed to ensure that it is still available even if
+     * @param tb
+     *        The {@link TermBuilder} to use passed to ensure that it is still available even if
      *        the {@link Proof} is disposed in between.
-     * @param valueGoals The {@link Goal}s to compute combined path condition for.
-     * @param initConfig The {@link InitConfig} to use.
+     * @param valueGoals
+     *        The {@link Goal}s to compute combined path condition for.
+     * @param initConfig
+     *        The {@link InitConfig} to use.
      * @return The combined path condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals,
             InitConfig initConfig) throws ProofInputException {

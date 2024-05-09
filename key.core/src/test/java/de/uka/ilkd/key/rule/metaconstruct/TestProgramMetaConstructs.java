@@ -139,8 +139,6 @@ public class TestProgramMetaConstructs {
         assertEquals(expectedStmts.length, stmts.length);
 
         int i = 0;
-        for (String stmt : expectedStmts) {
-            assertEquals(stmt, stmts[i++].toString());
-        }
+        for (String stmt : expectedStmts) { assertEquals(stmt, stmts[i++].toString()); }
     }
 }

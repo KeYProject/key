@@ -35,8 +35,10 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param var the ProgramVariable representing this concrete field
-     * @param type the Type of this field
+     * @param var
+     *        the ProgramVariable representing this concrete field
+     * @param type
+     *        the Type of this field
      */
 
     public FieldSpecification(ProgramVariable var, Type type) {
@@ -46,9 +48,12 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param var the ProgramVariable representing this concrete field
-     * @param init the Expression the field is initialised with.
-     * @param type the Type of this field
+     * @param var
+     *        the ProgramVariable representing this concrete field
+     * @param init
+     *        the Expression the field is initialised with.
+     * @param type
+     *        the Type of this field
      */
 
     public FieldSpecification(ProgramVariable var, Expression init, Type type) {
@@ -58,10 +63,14 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param var the ProgramVariable representing this concrete field
-     * @param dimensions an int defining the dimension
-     * @param init the Expression the field is initialised with.
-     * @param type the Type of this field
+     * @param var
+     *        the ProgramVariable representing this concrete field
+     * @param dimensions
+     *        an int defining the dimension
+     * @param init
+     *        the Expression the field is initialised with.
+     * @param type
+     *        the Type of this field
      */
     public FieldSpecification(ProgramVariable var, int dimensions, Expression init, Type type) {
         super(var, dimensions, init, type, null);
@@ -71,11 +80,15 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param children an ExtList with the children. May contain: an Expression (as initializer of
+     * @param children
+     *        an ExtList with the children. May contain: an Expression (as initializer of
      *        the variable) a ProgramElementName (as name of the variable) a Comment
-     * @param var the ProgramVariable representing this concrete field
-     * @param dimensions an int defining the dimension
-     * @param type the Type of this field
+     * @param var
+     *        the ProgramVariable representing this concrete field
+     * @param dimensions
+     *        an int defining the dimension
+     * @param type
+     *        the Type of this field
      */
 
     public FieldSpecification(ExtList children, ProgramVariable var, int dimensions, Type type) {
@@ -155,7 +168,8 @@ public class FieldSpecification extends VariableSpecification implements Field {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnFieldSpecification(this);

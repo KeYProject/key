@@ -49,10 +49,7 @@ public class PreParser {
 
     private void jmlCheck(ParserRuleContext ctx) {
         List<PositionedString> warn = new ArrayList<>();
-        for (JmlCheck check : JmlChecks.getJmlChecks()) {
-            List<PositionedString> w = check.check(ctx);
-            warn.addAll(w);
-        }
+        for (JmlCheck check : JmlChecks.getJmlChecks()) { List<PositionedString> w = check.check(ctx); warn.addAll(w); }
         this.warnings = warnings.prepend(ImmutableList.fromList(warn));
     }
 

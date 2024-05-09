@@ -46,9 +46,7 @@ public class Heap {
     public String toString() {
         StringBuilder result = new StringBuilder("Heap " + name + "\n");
 
-        for (ObjectVal o : objects) {
-            result.append(o).append("\n");
-        }
+        for (ObjectVal o : objects) { result.append(o).append("\n"); }
 
         return result.toString();
 
@@ -75,9 +73,7 @@ public class Heap {
      */
     public boolean equals(Object that) {
 
-        if (that instanceof Heap thatHeap) {
-            return thatHeap.name.equals(name);
-        }
+        if (that instanceof Heap thatHeap) { return thatHeap.name.equals(name); }
 
 
         return false;

@@ -50,16 +50,19 @@ public class JavaCompilerCheckFacade {
      * and
      * reports any issues to the provided <code>listener</code>
      *
-     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
+     * @param listener
+     *        the {@link ProblemInitializer.ProblemInitializerListener} to be informed
      *        about any issues found in the target Java program
-     * @param bootClassPath the {@link File} referring to the path containing the core Java classes
-     * @param classPath the {@link List} of {@link File}s referring to the directory that make up
+     * @param bootClassPath
+     *        the {@link File} referring to the path containing the core Java classes
+     * @param classPath
+     *        the {@link List} of {@link File}s referring to the directory that make up
      *        the target Java programs classpath
-     * @param javaPath the {@link String} with the path to the source of the target Java program
+     * @param javaPath
+     *        the {@link String} with the path to the source of the target Java program
      * @return future providing the list of diagnostics
      */
-    @NonNull
-    public static CompletableFuture<List<PositionedIssueString>> check(
+    public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
             Path bootClassPath, List<Path> classPath, Path javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
@@ -87,18 +90,12 @@ public class JavaCompilerCheckFacade {
 
         // gather configured bootstrap classpath and regular classpath
         List<Path> paths = new ArrayList<>();
-        if (bootClassPath != null) {
-            paths.add(bootClassPath);
-        }
-        if (classPath != null && !classPath.isEmpty()) {
-            paths.addAll(classPath);
-        }
+        if (bootClassPath != null) { paths.add(bootClassPath); }
+        if (classPath != null && !classPath.isEmpty()) { paths.addAll(classPath); }
         paths.add(javaPath);
         ArrayList<Path> files = new ArrayList<>();
         for (Path path : paths) {
-            if (!Files.isDirectory(path)) {
-                continue;
-            }
+            if (!Files.isDirectory(path)) { continue; }
             try (var s = Files.walk(path)) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))
@@ -150,7 +147,8 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     /**
      * Construct a new wrapper.
      *
-     * @param jfm file manager
+     * @param jfm
+     *        file manager
      */
     public JavaFileManagerDelegate(StandardJavaFileManager jfm) {
         this.fileManager = jfm;

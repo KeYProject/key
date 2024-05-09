@@ -30,7 +30,8 @@ public class ProofEvent {
     /**
      * creates a new proof event the interactive prover where the event initially occured
      *
-     * @param source the source event
+     * @param source
+     *        the source event
      */
     public ProofEvent(Proof source) {
         this.source = source;
@@ -39,9 +40,12 @@ public class ProofEvent {
     /**
      * creates a proof event for a change triggered by a rule applications
      *
-     * @param source the Proof where the rule was applied
-     * @param rai the RuleAppInfo object with further information about the changes
-     * @param newGoals the list of newly created goals (empty in case a goal was closed)
+     * @param source
+     *        the Proof where the rule was applied
+     * @param rai
+     *        the RuleAppInfo object with further information about the changes
+     * @param newGoals
+     *        the list of newly created goals (empty in case a goal was closed)
      */
     public ProofEvent(Proof source, RuleAppInfo rai, ImmutableList<Goal> newGoals) {
         this(source);

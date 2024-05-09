@@ -170,8 +170,7 @@ public final class Main {
      */
     public static final boolean showExampleChooserIfExamplesDirIsDefined = true;
 
-    private Main() {
-    }
+    private Main() {}
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
@@ -219,9 +218,7 @@ public final class Main {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
-            for (File f : fileArguments) {
-                ui.loadProblem(f.toPath());
-            }
+            for (File f : fileArguments) { ui.loadProblem(f.toPath()); }
             if (ui instanceof ConsoleUserInterfaceControl) {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
@@ -254,7 +251,7 @@ public final class Main {
         cl.addOption(NO_PRUNING_CLOSED, null,
             "disables pruning and goal back in closed branches (saves memory)");
         cl.addOption(KEEP_FILEREPOS, null, "disables the automatic deletion of temporary"
-            + "directories of file repos (for debugging)");
+                + "directories of file repos (for debugging)");
         cl.addSection("Batchmode options:");
         cl.addOption(TACLET_DIR, "<dir>",
             "load base taclets from a directory, not from internal structures");
@@ -273,7 +270,7 @@ public final class Main {
             "save all selected contracts for automatic execution");
         cl.addOption(TIMEOUT, "<timeout>",
             "timeout for each automatic proof of a problem in ms (default: "
-                + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
+                    + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
         cl.addOption(JUSTIFY_RULES, "<filename>",
             "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
@@ -285,10 +282,10 @@ public final class Main {
         cl.addText("\n", true);
         cl.addOption(JMAX_RULES, "<number>",
             "maximum number of rule application to perform (default: "
-                + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
+                    + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
         cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
         cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: "
-            + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
+                + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
         cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
         cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>",
             "save or drop proofs (then stored to path given by " + JPATH_OF_RESULT + ")");
@@ -300,14 +297,13 @@ public final class Main {
     /**
      * Evaluate the commandline options
      *
-     * @param cl parsed command lines, not null
+     * @param cl
+     *        parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
         Integer verbosity = null;
         // this property overrides the default
-        if (Boolean.getBoolean("key.verbose-ui")) {
-            verbosity = Verbosity.TRACE;
-        }
+        if (Boolean.getBoolean("key.verbose-ui")) { verbosity = Verbosity.TRACE; }
         if (cl.isSet(VERBOSITY)) { // verbosity
             try {
                 verbosity = cl.getInteger(VERBOSITY, Verbosity.DEBUG);
@@ -331,9 +327,7 @@ public final class Main {
         if (cl.isSet(SHOW_PROPERTIES)) {
             try {
                 java.util.Properties props = System.getProperties();
-                for (var e : props.entrySet()) {
-                    LOGGER.info("Property: {} = {}", e.getKey(), e.getValue());
-                }
+                for (var e : props.entrySet()) { LOGGER.info("Property: {} = {}", e.getKey(), e.getValue()); }
             } finally {
                 System.exit(0);
             }
@@ -351,9 +345,7 @@ public final class Main {
         if (cl.isSet(AUTOSAVE)) {
             try {
                 int eachSteps = cl.getInteger(AUTOSAVE, 0);
-                if (eachSteps < 0) {
-                    printUsageAndExit(false, "Illegal autosave period (must be a number >= 0)", -5);
-                }
+                if (eachSteps < 0) { printUsageAndExit(false, "Illegal autosave period (must be a number >= 0)", -5); }
                 AutoSaver.setDefaultValues(eachSteps, uiMode == UiMode.INTERACTIVE);
             } catch (CommandLineException e) {
                 LOGGER.error("Failed to read integer", e);
@@ -365,9 +357,7 @@ public final class Main {
             printUsageAndExit(true, null, 0);
         }
 
-        if (cl.isSet(NO_JMLSPECS)) {
-            GeneralSettings.disableSpecs = true;
-        }
+        if (cl.isSet(NO_JMLSPECS)) { GeneralSettings.disableSpecs = true; }
 
         if (cl.isSet(TIMEOUT)) {
             LOGGER.info("Timeout is set");
@@ -379,20 +369,14 @@ public final class Main {
                 LOGGER.error("Failed to read long", e);
             }
 
-            if (timeout < -1) {
-                printUsageAndExit(false, "Illegal timeout (must be a number >= -1)", -5);
-            }
+            if (timeout < -1) { printUsageAndExit(false, "Illegal timeout (must be a number >= -1)", -5); }
 
             ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
         }
 
-        if (cl.isSet(EXAMPLES)) {
-            examplesDir = cl.getString(EXAMPLES, null);
-        }
+        if (cl.isSet(EXAMPLES)) { examplesDir = cl.getString(EXAMPLES, null); }
 
-        if (Debug.ENABLE_DEBUG) {
-            LOGGER.info("Running in debug mode");
-        }
+        if (Debug.ENABLE_DEBUG) { LOGGER.info("Running in debug mode"); }
 
         if (Debug.ENABLE_ASSERTION) {
             LOGGER.info("Using assertions");
@@ -412,17 +396,11 @@ public final class Main {
             LOGGER.info("Loading RIFL specification from {}", riflFileName);
         }
 
-        if (cl.isSet(LAST)) {
-            loadRecentFile = true;
-        }
+        if (cl.isSet(LAST)) { loadRecentFile = true; }
 
-        if (cl.isSet(JUSTIFY_RULES)) {
-            evaluateLemmataOptions(cl);
-        }
+        if (cl.isSet(JUSTIFY_RULES)) { evaluateLemmataOptions(cl); }
 
-        if (cl.isSet(DEBUG)) {
-            Debug.ENABLE_DEBUG = true;
-        }
+        if (cl.isSet(DEBUG)) { Debug.ENABLE_DEBUG = true; }
 
         if (cl.isSet(MACRO)) {
             String macro = cl.getString(MACRO, "");
@@ -448,22 +426,16 @@ public final class Main {
             }
         }
 
-        if (cl.isSet(SAVE_ALL_CONTRACTS)) {
-            saveAllContracts = true;
-        }
+        if (cl.isSet(SAVE_ALL_CONTRACTS)) { saveAllContracts = true; }
 
         if (cl.isSet(TACLET_DIR)) {
             System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY,
                 cl.getString(TACLET_DIR, ""));
         }
 
-        if (cl.isSet(NO_PRUNING_CLOSED)) {
-            GeneralSettings.noPruningClosed = false;
-        }
+        if (cl.isSet(NO_PRUNING_CLOSED)) { GeneralSettings.noPruningClosed = false; }
 
-        if (cl.isSet(KEEP_FILEREPOS)) {
-            GeneralSettings.keepFileRepos = true;
-        }
+        if (cl.isSet(KEEP_FILEREPOS)) { GeneralSettings.keepFileRepos = true; }
     }
 
     /**
@@ -506,14 +478,10 @@ public final class Main {
             Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
                 LOGGER.error("Auto mode was terminated by an exception:", e);
                 final String msg = e.getMessage();
-                if (msg != null) {
-                    LOGGER.info(msg);
-                }
+                if (msg != null) { LOGGER.info(msg); }
                 System.exit(-1);
             });
-            if (fileArguments.isEmpty()) {
-                printUsageAndExit(true, "Error: No file to load from.", -4);
-            }
+            if (fileArguments.isEmpty()) { printUsageAndExit(true, "Error: No file to load from.", -4); }
 
             return new ConsoleUserInterfaceControl(loadOnly);
         } else {
@@ -546,24 +514,18 @@ public final class Main {
     public static void ensureExamplesAvailable() {
         File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
                 : new File(getExamplesDir());
-        if (!examplesDir.exists()) {
-            examplesDir = setupExamples();
-        }
+        if (!examplesDir.exists()) { examplesDir = setupExamples(); }
         setExamplesDir(examplesDir.getAbsolutePath());
     }
 
     private static File setupExamples() {
         try {
             URL examplesURL = Main.class.getResource("/examples.zip");
-            if (examplesURL == null) {
-                throw new IOException("Missing examples.zip in resources");
-            }
+            if (examplesURL == null) { throw new IOException("Missing examples.zip in resources"); }
 
             File tempDir = createTempDirectory();
 
-            if (tempDir != null) {
-                IOUtil.extractZip(examplesURL.openStream(), tempDir.toPath());
-            }
+            if (tempDir != null) { IOUtil.extractZip(examplesURL.openStream(), tempDir.toPath()); }
             return tempDir;
         } catch (IOException e) {
             LOGGER.warn("Error setting up examples", e);
@@ -575,9 +537,7 @@ public final class Main {
     private static File createTempDirectory() throws IOException {
         final File tempDir = File.createTempFile("keyheap-examples-", null);
         tempDir.delete();
-        if (!tempDir.mkdir()) {
-            return null;
-        }
+        if (!tempDir.mkdir()) { return null; }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> IOUtil.delete(tempDir)));
         return tempDir;
     }
@@ -593,9 +553,7 @@ public final class Main {
             handler.start();
 
         } catch (Exception e) {
-            if (Debug.ENABLE_DEBUG) {
-                LOGGER.warn("Lemmata options failed", e);
-            }
+            if (Debug.ENABLE_DEBUG) { LOGGER.warn("Lemmata options failed", e); }
             printUsageAndExit(false, e.getMessage(), -2);
         }
 
@@ -603,12 +561,8 @@ public final class Main {
 
     public static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
         PrintStream ps = exitValue == 0 ? System.out : System.err;
-        if (offending != null) {
-            ps.println(offending);
-        }
-        if (printUsage) {
-            cl.printUsage(ps);
-        }
+        if (offending != null) { ps.println(offending); }
+        if (printUsage) { cl.printUsage(ps); }
         System.exit(exitValue);
     }
 
@@ -679,7 +633,8 @@ public final class Main {
      * Defines the examples directory. This method is used by the Eclipse integration (KeY4Eclipse)
      * to use the examples extract from the plug-in into the workspace.
      *
-     * @param newExamplesDir The new examples directory to use.
+     * @param newExamplesDir
+     *        The new examples directory to use.
      */
     public static void setExamplesDir(String newExamplesDir) {
         examplesDir = newExamplesDir;

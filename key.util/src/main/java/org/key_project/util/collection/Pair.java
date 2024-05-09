@@ -8,11 +8,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Simple value object to hold two values.
  *
- * @param <T1> type of first element
- * @param <T2> type of second element
+ * @param <T1>
+ *        type of first element
+ * @param <T2>
+ *        type of second element
  */
 public class Pair<T1, T2> {
     /**
@@ -28,8 +32,10 @@ public class Pair<T1, T2> {
     /**
      * Construct a new pair containing the given values.
      *
-     * @param first first element
-     * @param second second element
+     * @param first
+     *        first element
+     * @param second
+     *        second element
      */
     public Pair(T1 first, T2 second) {
         this.first = first;
@@ -43,10 +49,8 @@ public class Pair<T1, T2> {
 
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Pair<?, ?> p)) {
-            return false;
-        }
+    public boolean equals(@Nullable Object o) {
+        if (!(o instanceof Pair<?, ?> p)) { return false; }
         return Objects.equals(first, p.first) && Objects.equals(second, p.second);
     }
 
@@ -62,7 +66,8 @@ public class Pair<T1, T2> {
     /**
      * Convert a collection of pairs into a map.
      *
-     * @throws IllegalArgumentException if it contains duplicate first entries
+     * @throws IllegalArgumentException
+     *         if it contains duplicate first entries
      */
     public static <S, T> Map<S, T> toMap(Collection<Pair<S, T>> pairs) {
         Map<S, T> res = new java.util.LinkedHashMap<>();
@@ -81,9 +86,7 @@ public class Pair<T1, T2> {
      */
     public static <S, T> Set<S> getFirstSet(Collection<Pair<S, T>> pairs) {
         Set<S> res = new java.util.HashSet<>();
-        for (Pair<S, T> p : pairs) {
-            res.add(p.first);
-        }
+        for (Pair<S, T> p : pairs) { res.add(p.first); }
         return res;
     }
 
@@ -92,9 +95,7 @@ public class Pair<T1, T2> {
      */
     public static <S, T> Set<T> getSecondSet(Collection<Pair<S, T>> pairs) {
         Set<T> res = new java.util.HashSet<>();
-        for (Pair<S, T> p : pairs) {
-            res.add(p.second);
-        }
+        for (Pair<S, T> p : pairs) { res.add(p.second); }
         return res;
     }
 }

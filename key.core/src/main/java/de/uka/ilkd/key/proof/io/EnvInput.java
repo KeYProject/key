@@ -107,5 +107,7 @@ public interface EnvInput {
      *
      * @see de.uka.ilkd.key.proof.init.ProblemInitializer
      */
-    default boolean isIgnoreOtherJavaFiles() { return false; }
+    default boolean isIgnoreOtherJavaFiles() {
+        return false;
+    }
 }

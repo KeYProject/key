@@ -57,9 +57,7 @@ public class FeatureSettingsPanel extends SettingsPanel implements SettingsProvi
                 fs.deactivate(feature);
 
             final var activeAfter = fs.isActivated(feature);
-            if (activeBefore != activeAfter) {
-                showMessageReloadRequired |= reloadRequired;
-            }
+            if (activeBefore != activeAfter) { showMessageReloadRequired |= reloadRequired; }
         }
 
         if (showMessageReloadRequired) {

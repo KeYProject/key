@@ -50,7 +50,7 @@ public abstract class LDT implements Named {
         sort = services.getNamespaces().sorts().lookup(name);
         if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
-                + "It seems that there are definitions missing from the .key files.");
+                    + "It seems that there are definitions missing from the .key files.");
         }
         this.name = name;
     }
@@ -60,7 +60,7 @@ public abstract class LDT implements Named {
         sort = targetSort;
         if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
-                + "It seems that there are definitions missing from the .key files.");
+                    + "It seems that there are definitions missing from the .key files.");
         }
         this.name = name;
     }
@@ -82,7 +82,8 @@ public abstract class LDT implements Named {
     /**
      * looks up a function in the namespace and adds it to the LDT
      *
-     * @param funcName the String with the name of the function to look up
+     * @param funcName
+     *        the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
     protected final JFunction addFunction(TermServices services, String funcName) {
@@ -90,7 +91,7 @@ public abstract class LDT implements Named {
         final JFunction f = funcNS.lookup(new Name(funcName));
         if (f == null) {
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
-                + "It seems that there are definitions missing from the .key files.");
+                    + "It seems that there are definitions missing from the .key files.");
         }
         return addFunction(f);
     }
@@ -133,6 +134,7 @@ public abstract class LDT implements Named {
         ret.put(HeapLDT.NAME, new HeapLDT(s));
         ret.put(PermissionLDT.NAME, new PermissionLDT(s));
         ret.put(SeqLDT.NAME, new SeqLDT(s));
+        ret.put(SortLDT.NAME, new SortLDT(s));
         ret.put(FreeLDT.NAME, new FreeLDT(s));
         ret.put(MapLDT.NAME, new MapLDT(s));
         ret.put(FloatLDT.NAME, new FloatLDT(s));
@@ -172,10 +174,14 @@ public abstract class LDT implements Named {
      * returns true if the LDT offers an operation for the given java operator and the logic
      * subterms
      *
-     * @param op the de.uka.ilkd.key.java.expression.Operator to translate
-     * @param subs the logic subterms of the java operator
-     * @param services the Services
-     * @param ec the ExecutionContext in which the expression is evaluated
+     * @param op
+     *        the de.uka.ilkd.key.java.expression.Operator to translate
+     * @param subs
+     *        the logic subterms of the java operator
+     * @param services
+     *        the Services
+     * @param ec
+     *        the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
     public abstract boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
@@ -187,11 +193,16 @@ public abstract class LDT implements Named {
      * returns true if the LDT offers an operation for the given binary java operator and the logic
      * subterms
      *
-     * @param op the de.uka.ilkd.key.java.expression.Operator to translate
-     * @param left the left subterm of the java operator
-     * @param right the right subterm of the java operator
-     * @param services the Services
-     * @param ec the ExecutionContext in which the expression is evaluated
+     * @param op
+     *        the de.uka.ilkd.key.java.expression.Operator to translate
+     * @param left
+     *        the left subterm of the java operator
+     * @param right
+     *        the right subterm of the java operator
+     * @param services
+     *        the Services
+     * @param ec
+     *        the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
     public abstract boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
@@ -203,10 +214,14 @@ public abstract class LDT implements Named {
      * returns true if the LDT offers an operation for the given unary java operator and the logic
      * subterms
      *
-     * @param op the de.uka.ilkd.key.java.expression.Operator to translate
-     * @param sub the logic subterms of the java operator
-     * @param services the Services
-     * @param ec the ExecutionContext in which the expression is evaluated
+     * @param op
+     *        the de.uka.ilkd.key.java.expression.Operator to translate
+     * @param sub
+     *        the logic subterms of the java operator
+     * @param services
+     *        the Services
+     * @param ec
+     *        the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterm
      */
     public abstract boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term sub,
@@ -216,7 +231,8 @@ public abstract class LDT implements Named {
     /**
      * translates a given literal to its logic counterpart
      *
-     * @param lit the Literal to be translated
+     * @param lit
+     *        the Literal to be translated
      * @return the Term that represents the given literal in its logic form
      */
     public abstract Term translateLiteral(Literal lit, Services services);
@@ -238,8 +254,10 @@ public abstract class LDT implements Named {
      *
      * For example: "+" may map to "add" for integers, and to "addFloat" for floats.
      *
-     * @param operationName non-null operationName for a generic function
-     * @param services services to use
+     * @param operationName
+     *        non-null operationName for a generic function
+     * @param services
+     *        services to use
      * @return reference to the respective LDT-specific function for the operation, null if not
      *         available
      */

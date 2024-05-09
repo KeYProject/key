@@ -28,7 +28,8 @@ public abstract class ComparativeOperator extends Operator {
     /**
      * Comparative operator.
      *
-     * @param children an ExtList with all children of this node the first children in list will be
+     * @param children
+     *        an ExtList with all children of this node the first children in list will be
      *        the one on the left side, the second the one on the right side.
      */
 

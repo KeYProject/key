@@ -112,9 +112,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     /**
      * loads the problem or proof from the given file
      *
-     * @param file the File with the problem description or the proof
-     * @param classPath the class path entries to use.
-     * @param bootClassPath the boot class path to use.
+     * @param file
+     *        the File with the problem description or the proof
+     * @param classPath
+     *        the class path entries to use.
+     * @param bootClassPath
+     *        the boot class path to use.
      */
     public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
             List<Path> includes) {
@@ -177,18 +180,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     private void taskFinishedInternal(TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
-            if (!isAtLeastOneMacroRunning()) {
-                resetStatus(this);
-            }
+            if (!isAtLeastOneMacroRunning()) { resetStatus(this); }
             ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
             if (proof != null && !proof.isDisposed() && !proof.closed()
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
-                if (g == null) {
-                    g = proof.openGoals().head();
-                }
+                if (g == null) { g = proof.openGoals().head(); }
                 mainWindow.getMediator().goalChosen(g);
                 if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
                     // iff Stop on non-closeable Goal is selected a little
@@ -197,9 +196,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
                     dialog.show();
                 }
-                if (!isAtLeastOneMacroRunning()) {
-                    showNotification("Automated proof search", info.toString());
-                }
+                if (!isAtLeastOneMacroRunning()) { showNotification("Automated proof search", info.toString()); }
             }
             mainWindow.displayResults(info.toString());
         } else if (info != null && info.getSource() instanceof ProofMacro macro) {
@@ -218,9 +215,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                             "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
                         dialog.show();
                     }
-                    if (!isAtLeastOneMacroRunning()) {
-                        showNotification(macro.getName(), info.toString());
-                    }
+                    if (!isAtLeastOneMacroRunning()) { showNotification(macro.getName(), info.toString()); }
                 }
             }
         } else if (info != null && info.getSource() instanceof ProblemLoader problemLoader) {
@@ -228,9 +223,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
                 LOGGER.error("", result);
-                if (result instanceof ParseCancellationException) {
-                    result = result.getCause();
-                }
+                if (result instanceof ParseCancellationException) { result = result.getCause(); }
                 IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
@@ -248,15 +241,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     } catch (ProofInputException e) {
                         LOGGER.warn("Failed to load proof", e);
                     }
-                } else if (macroChosen()) {
-                    applyMacro();
-                }
+                } else if (macroChosen()) { applyMacro(); }
             }
         } else {
             resetStatus(this);
-            if (info != null && !info.toString().isEmpty()) {
-                mainWindow.displayResults(info.toString());
-            }
+            if (info != null && !info.toString().isEmpty()) { mainWindow.displayResults(info.toString()); }
         }
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
@@ -265,8 +254,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     /**
      * Show a notification, if enabled by the settings.
      *
-     * @param title header
-     * @param text body
+     * @param title
+     *        header
+     * @param text
+     *        body
      */
     private void showNotification(String title, String text) {
         var mode =
@@ -274,9 +265,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         if (mode.equals(ViewSettings.NOTIFICATION_ALWAYS)) {
             SwingUtil.showNotification(title, text);
         } else if (mode.equals(ViewSettings.NOTIFICATION_UNFOCUSED)) {
-            if (!MainWindow.getInstance().isActive()) {
-                SwingUtil.showNotification(title, text);
-            }
+            if (!MainWindow.getInstance().isActive()) { SwingUtil.showNotification(title, text); }
         }
     }
 
@@ -370,9 +359,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
             throws ProblemLoaderException {
-        if (file != null) {
-            mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString());
-        }
+        if (file != null) { mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString()); }
         try {
             getMediator().stopInterface(true);
             return super.load(profile, file, classPath, bootClassPath, includes,
@@ -388,8 +375,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * turned off by default, i.e. only manual saving is possible, and the save dialog never pops up
      * automatically (except for hitting the "Save ..." or "Save current proof" button).
      *
-     * @param proof the proof to be saved
-     * @param fileExtension the respective file extension
+     * @param proof
+     *        the proof to be saved
+     * @param fileExtension
+     *        the respective file extension
      * @return the saved proof as a file
      */
     public File saveProof(Proof proof, String fileExtension) {
@@ -431,7 +420,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * sources, classpath and bootclasspath if present, other included key files, e.g., user-defined
      * taclets).
      *
-     * @param proof the proof to save
+     * @param proof
+     *        the proof to save
      */
     public void saveProofBundle(Proof proof) {
         final MainWindow mainWindow = MainWindow.getInstance();
@@ -460,18 +450,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
         File selectedFile = null;
-        if (proof != null) {
-            selectedFile = proof.getProofFile().toFile();
-        }
+        if (proof != null) { selectedFile = proof.getProofFile().toFile(); }
         // Suggest default file name if required
         final String defaultName;
         if (selectedFile == null) {
             // Remove space
             var name = proof.name().toString();
             var prefix = "Taclet: ";
-            if (name.startsWith(prefix)) {
-                name = "Taclet:" + name.substring(prefix.length());
-            }
+            if (name.startsWith(prefix)) { name = "Taclet:" + name.substring(prefix.length()); }
             defaultName = MiscTools.toValidFileName(name) + fileExtension;
             selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
         } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
@@ -532,9 +518,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
                         "Proof could only be loaded partially.\n" + "In summary "
-                            + result.getErrorList().size()
-                            + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().get(0).getMessage(),
+                                + result.getErrorList().size()
+                                + " not loadable rule application(s) have been detected.\n"
+                                + "The first one:\n" + result.getErrorList().get(0).getMessage(),
                         result.getErrorList().get(0));
                 }
             }
@@ -551,14 +537,20 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * Loads the given location and returns all required references as {@link KeYEnvironment} with
      * KeY's {@link MainWindow}.
      *
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param includes Optional includes to consider.
-     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
+     * @param location
+     *        The location to load.
+     * @param classPaths
+     *        The class path entries to use.
+     * @param bootClassPath
+     *        The boot class path to use.
+     * @param includes
+     *        Optional includes to consider.
+     * @param makeMainWindowVisible
+     *        Make KeY's {@link MainWindow} visible if it is not already
      *        visible?
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     // public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
     // List<File> classPaths,
@@ -573,28 +565,34 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * Loads the given location and returns all required references as {@link KeYEnvironment} with
      * KeY's {@link MainWindow}.
      *
-     * @param profile The {@link Profile} to use.
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param includes Optional includes to consider.
-     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
+     * @param profile
+     *        The {@link Profile} to use.
+     * @param location
+     *        The location to load.
+     * @param classPaths
+     *        The class path entries to use.
+     * @param bootClassPath
+     *        The boot class path to use.
+     * @param includes
+     *        Optional includes to consider.
+     * @param makeMainWindowVisible
+     *        Make KeY's {@link MainWindow} visible if it is not already
      *        visible?
-     * @param forceNewProfileOfNewProofs {@code} true {@code AbstractProfile.profileOfNewProofs}
+     * @param forceNewProfileOfNewProofs
+     *        {@code} true {@code AbstractProfile.profileOfNewProofs}
      *        will be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
             Path location, List<Path> classPaths, Path bootClassPath, List<Path> includes,
             boolean forceNewProfileOfNewProofs, boolean makeMainWindowVisible)
             throws ProblemLoaderException {
         MainWindow main = MainWindow.getInstance();
-        if (makeMainWindowVisible && !main.isVisible()) {
-            main.setVisible(true);
-        }
+        if (makeMainWindowVisible && !main.isVisible()) { main.setVisible(true); }
         AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths,
             bootClassPath, includes, null, forceNewProfileOfNewProofs, null);
         InitConfig initConfig = loader.getInitConfig();

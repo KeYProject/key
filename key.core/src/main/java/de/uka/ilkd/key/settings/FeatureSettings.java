@@ -50,8 +50,10 @@ public class FeatureSettings extends AbstractSettings {
     /**
      * Helper function for notification on feature flag changes.
      *
-     * @param feature the feature to be listening on
-     * @param update a callback function which gets informed on changes with the new value
+     * @param feature
+     *        the feature to be listening on
+     * @param update
+     *        a callback function which gets informed on changes with the new value
      */
     public static void on(Feature feature, Consumer<Boolean> update) {
         ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings().addPropertyChangeListener(
@@ -61,8 +63,10 @@ public class FeatureSettings extends AbstractSettings {
     /**
      * Helper function for notification on feature flag changes which also calls the consumer.
      *
-     * @param feature the feature to be listening on
-     * @param update a callback function which gets informed on changes with the new value
+     * @param feature
+     *        the feature to be listening on
+     * @param update
+     *        a callback function which gets informed on changes with the new value
      */
     public static void onAndActivate(Feature feature, Consumer<Boolean> update) {
         on(feature, update);
@@ -92,8 +96,8 @@ public class FeatureSettings extends AbstractSettings {
      */
     private boolean isTrue(Object value) {
         return switch (value.toString().toLowerCase()) {
-        case "true", "yes", "on" -> true;
-        default -> false;
+            case "true", "yes", "on" -> true;
+            default -> false;
         };
     }
 
@@ -114,17 +118,13 @@ public class FeatureSettings extends AbstractSettings {
     @Override
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
-        for (String activatedFeature : activatedFeatures) {
-            props.put(prefix + activatedFeature, "true");
-        }
+        for (String activatedFeature : activatedFeatures) { props.put(prefix + activatedFeature, "true"); }
     }
 
     @Override
     public void readSettings(@NonNull Configuration props) {
         activatedFeatures.clear();
-        for (String s : props.getStringList(CATEGORY)) {
-            activate(s);
-        }
+        for (String s : props.getStringList(CATEGORY)) { activate(s); }
     }
 
     @Override
@@ -197,6 +197,7 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     public record Feature(String id, String documentation, boolean restartRequired) {
+
         public static final List<Feature> FEATURES = new ArrayList<>();
 
         public Feature {

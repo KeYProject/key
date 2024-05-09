@@ -69,9 +69,7 @@ public class Config {
 
     private int readSizeIndex() {
         int s = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().sizeIndex();
-        if (s < 0 || s > SIZES.length) {
-            s = 0;
-        }
+        if (s < 0 || s > SIZES.length) { s = 0; }
         return s;
     }
 
@@ -107,9 +105,7 @@ public class Config {
 
     public synchronized void fireConfigChange() {
         synchronized (listenerList) {
-            for (ConfigChangeListener aListenerList : listenerList) {
-                aListenerList.configChanged(configChangeEvent);
-            }
+            for (ConfigChangeListener aListenerList : listenerList) { aListenerList.configChanged(configChangeEvent); }
         }
     }
 

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java.thread;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Provides a basic implementation of {@link IRunnableWithException}.
@@ -19,20 +22,21 @@ public abstract class AbstractRunnableWithException implements IRunnableWithExce
     /**
      * An occurred exception.
      */
-    private Exception exception;
+    private @MonotonicNonNull Exception exception;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Exception getException() {
+    public @Nullable Exception getException() {
         return exception;
     }
 
     /**
      * Sets the occurred exception.
      *
-     * @param exception The occurred exception.
+     * @param exception
+     *        The occurred exception.
      */
     protected void setException(Exception exception) {
         this.exception = exception;

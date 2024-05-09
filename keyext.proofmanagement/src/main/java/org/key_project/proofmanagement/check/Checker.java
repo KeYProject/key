@@ -14,9 +14,12 @@ public interface Checker {
     /**
      * Checks the given proof bundle for consistency.
      *
-     * @param pbh the ProofBundleHandler to access the bundle
-     * @param data container to share data between checkers and to store results
-     * @throws ProofManagementException if the ProofManagement has to be aborted
+     * @param pbh
+     *        the ProofBundleHandler to access the bundle
+     * @param data
+     *        container to share data between checkers and to store results
+     * @throws ProofManagementException
+     *         if the ProofManagement has to be aborted
      *         due to a critical error
      */
     void check(ProofBundleHandler pbh, CheckerData data) throws ProofManagementException;

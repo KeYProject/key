@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
 public final class ThreadUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadUtilities.class);
 
-    private ThreadUtilities() {
-    }
+    private ThreadUtilities() {}
 
 
     /**
@@ -22,7 +21,8 @@ public final class ThreadUtilities {
      *
      * If an exception occurs during the run, the trace is printed to stderr.
      *
-     * @param runner Runnable capturing code to execute on the awt thread.
+     * @param runner
+     *        Runnable capturing code to execute on the awt thread.
      */
     public static void invokeAndWait(Runnable runner) {
         if (SwingUtilities.isEventDispatchThread()) {
@@ -45,7 +45,8 @@ public final class ThreadUtilities {
      * If the current thread is already the event queue, the {@link Runnable} object is simply
      * executed.
      *
-     * @param runnable Runnable capturing code to execute on the awt thread.
+     * @param runnable
+     *        Runnable capturing code to execute on the awt thread.
      */
     public static void invokeOnEventQueue(Runnable runnable) {
         if (EventQueue.isDispatchThread()) {
@@ -63,14 +64,10 @@ public final class ThreadUtilities {
     public static Thread[] getThreads() {
         ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
         ThreadGroup parentGroup;
-        while ((parentGroup = rootGroup.getParent()) != null) {
-            rootGroup = parentGroup;
-        }
+        while ((parentGroup = rootGroup.getParent()) != null) { rootGroup = parentGroup; }
 
         Thread[] threads = new Thread[rootGroup.activeCount() + 1];
-        while (rootGroup.enumerate(threads, true) == threads.length) {
-            threads = new Thread[threads.length * 2];
-        }
+        while (rootGroup.enumerate(threads, true) == threads.length) { threads = new Thread[threads.length * 2]; }
         return threads;
     }
 }

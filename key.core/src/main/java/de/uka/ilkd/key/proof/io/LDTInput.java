@@ -43,9 +43,12 @@ public class LDTInput implements EnvInput {
     /**
      * creates a representation of the LDT files to be used as input to the KeY prover.
      *
-     * @param keyFiles an array containing the LDT .key files
-     * @param listener an LDTInputListener for stsus reports while loading
-     * @param profile the Profile for which the LDTs are load
+     * @param keyFiles
+     *        an array containing the LDT .key files
+     * @param listener
+     *        an LDTInputListener for stsus reports while loading
+     * @param profile
+     *        the Profile for which the LDTs are load
      */
     public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
         assert profile != null;
@@ -64,9 +67,7 @@ public class LDTInput implements EnvInput {
     @Override
     public int getNumberOfChars() {
         int sum = 0;
-        for (KeYFile keyFile : keyFiles) {
-            sum = sum + keyFile.getNumberOfChars();
-        }
+        for (KeYFile keyFile : keyFiles) { sum = sum + keyFile.getNumberOfChars(); }
         return sum;
     }
 
@@ -74,18 +75,14 @@ public class LDTInput implements EnvInput {
     @Override
     public void setInitConfig(InitConfig conf) {
         this.initConfig = conf;
-        for (KeYFile keyFile : keyFiles) {
-            keyFile.setInitConfig(conf);
-        }
+        for (KeYFile keyFile : keyFiles) { keyFile.setInitConfig(conf); }
     }
 
 
     @Override
     public Includes readIncludes() throws ProofInputException {
         Includes result = new Includes();
-        for (KeYFile keyFile : keyFiles) {
-            result.putAll(keyFile.readIncludes());
-        }
+        for (KeYFile keyFile : keyFiles) { result.putAll(keyFile.readIncludes()); }
         return result;
     }
 
@@ -122,25 +119,15 @@ public class LDTInput implements EnvInput {
     public ImmutableSet<PositionedString> read() {
         var warnings = new ArrayList<PositionedString>();
 
-        if (initConfig == null) {
-            throw new IllegalStateException("LDTInput: InitConfig not set.");
-        }
+        if (initConfig == null) { throw new IllegalStateException("LDTInput: InitConfig not set."); }
 
-        for (KeYFile keYFile : keyFiles) {
-            var w = keYFile.readSorts();
-            warnings.addAll(w);
-        }
-        for (KeYFile file : keyFiles) {
-            var w = file.readFuncAndPred();
-            warnings.addAll(w);
-        }
+        for (KeYFile keYFile : keyFiles) { var w = keYFile.readSorts(); warnings.addAll(w); }
+        for (KeYFile file : keyFiles) { var w = file.readFuncAndPred(); warnings.addAll(w); }
         // create LDT objects to have them available for parsing
         initConfig.getServices().getTypeConverter().init();
         for (KeYFile keyFile : keyFiles) {
-            if (listener != null) {
-                listener.reportStatus("Reading " + keyFile.name(),
-                    keyFile.getNumberOfChars());
-            }
+            if (listener != null) { listener.reportStatus("Reading " + keyFile.name(),
+                keyFile.getNumberOfChars()); }
             keyFile.readRules();
         }
 
@@ -150,13 +137,9 @@ public class LDTInput implements EnvInput {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LDTInput li)) {
-            return false;
-        }
+        if (!(o instanceof LDTInput li)) { return false; }
 
-        if (keyFiles.length != li.keyFiles.length) {
-            return false;
-        }
+        if (keyFiles.length != li.keyFiles.length) { return false; }
 
         for (KeYFile keyFile : keyFiles) {
             boolean found = false;
@@ -166,9 +149,7 @@ public class LDTInput implements EnvInput {
                     break;
                 }
             }
-            if (!found) {
-                return false;
-            }
+            if (!found) { return false; }
         }
 
         return true;
@@ -177,9 +158,7 @@ public class LDTInput implements EnvInput {
     @Override
     public int hashCode() {
         int result = 0;
-        for (KeYFile keyFile : keyFiles) {
-            result += keyFile.hashCode();
-        }
+        for (KeYFile keyFile : keyFiles) { result += keyFile.hashCode(); }
         return result;
     }
 

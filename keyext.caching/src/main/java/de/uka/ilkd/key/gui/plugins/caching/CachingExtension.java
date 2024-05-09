@@ -84,15 +84,14 @@ public class CachingExtension
     private CachingPruneHandler cachingPruneHandler = null;
 
     private void initActions(MainWindow mainWindow) {
-        if (toggleAction == null) {
-            toggleAction = new CachingToggleAction(mainWindow);
-        }
+        if (toggleAction == null) { toggleAction = new CachingToggleAction(mainWindow); }
     }
 
     /**
      * Update the GUI state of the status line button.
      *
-     * @param proof the currently open proof
+     * @param proof
+     *        the currently open proof
      */
     public void updateGUIState(Proof proof) {
         referenceSearchButton.updateState(proof);
@@ -121,9 +120,7 @@ public class CachingExtension
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
-        if (p == null || trackedProofs.contains(p)) {
-            return;
-        }
+        if (p == null || trackedProofs.contains(p)) { return; }
         trackedProofs.add(p);
         p.addRuleAppListener(this);
         p.addProofDisposedListener(this);
@@ -134,30 +131,22 @@ public class CachingExtension
     public void ruleApplied(ProofEvent e) {
         // main entry point for proof caching logic:
         // this is called after every rule application in the proof
-        if (!tryToClose) {
-            return;
-        }
+        if (!tryToClose) { return; }
         if (e.getSource().lookup(CopyingProofReplayer.class) != null) {
             // either:
             // copy in progress,
             // macro that excepts the proof to really close in progress
             return;
         }
-        if (!CachingSettingsProvider.getCachingSettings().getEnabled()) {
-            return;
-        }
+        if (!CachingSettingsProvider.getCachingSettings().getEnabled()) { return; }
         // new global off switch
-        if (!getProofCachingEnabled()) {
-            return;
-        }
+        if (!getProofCachingEnabled()) { return; }
         Proof p = e.getSource();
         if (e.getRuleAppInfo().getOriginalNode().getNodeInfo().getInteractiveRuleApplication()) {
             return; // only applies for automatic proof search
         }
         ImmutableList<Goal> newGoals = e.getNewGoals();
-        if (newGoals.size() <= 1) {
-            return;
-        }
+        if (newGoals.size() <= 1) { return; }
         for (Goal goal : newGoals) {
             ClosedBy c = null;
             try {
@@ -200,9 +189,8 @@ public class CachingExtension
 
     }
 
-    @NonNull
     @Override
-    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
             @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             Node node = (Node) underlyingObject;
@@ -287,9 +275,12 @@ public class CachingExtension
         /**
          * Construct new listener.
          *
-         * @param mediator the mediator
-         * @param referencedProof referenced proof
-         * @param newProof new proof
+         * @param mediator
+         *        the mediator
+         * @param referencedProof
+         *        referenced proof
+         * @param newProof
+         *        new proof
          */
         public CopyBeforeDispose(KeYMediator mediator, Proof referencedProof, Proof newProof) {
             this.mediator = mediator;
@@ -299,9 +290,7 @@ public class CachingExtension
 
         @Override
         public void proofDisposing(ProofDisposedEvent e) {
-            if (newProof.isDisposed()) {
-                return;
-            }
+            if (newProof.isDisposed()) { return; }
             if (CachingSettingsProvider.getCachingSettings().getDispose()
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
                 mediator.initiateAutoMode(newProof, true, false);
@@ -309,8 +298,7 @@ public class CachingExtension
                     CopyReferenceResolver.copyCachedGoals(newProof, referencedProof, null, null);
                 } finally {
                     mediator.finishAutoMode(newProof, true, true,
-                        /* do not select a different node */ () -> {
-                        });
+                        /* do not select a different node */ () -> {});
                 }
             } else {
                 newProof.closedGoals().stream()

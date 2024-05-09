@@ -90,18 +90,14 @@ public class TacletBuilderManipulators {
         new AbstractConditionBuilder("scrictSub", TR, TR) {
             @Override
             public boolean isSuitableFor(@NonNull String name) {
-                if (super.isSuitableFor(name)) {
-                    return true;
-                }
+                if (super.isSuitableFor(name)) { return true; }
                 return "\\strict\\sub".equalsIgnoreCase(name);
             }
 
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated) {
-                    throw new IllegalArgumentException("Negation is not supported");
-                }
+                if (negated) { throw new IllegalArgumentException("Negation is not supported"); }
                 return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], STRICT_SUBTYPE);
             }
@@ -116,9 +112,7 @@ public class TacletBuilderManipulators {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated) {
-                    throw new IllegalArgumentException("Negation is not supported");
-                }
+                if (negated) { throw new IllegalArgumentException("Negation is not supported"); }
                 return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], DISJOINTMODULONULL);
             }
@@ -138,9 +132,7 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated) {
-                    throw new IllegalArgumentException("Negation is not supported");
-                }
+                if (negated) { throw new IllegalArgumentException("Negation is not supported"); }
                 KeYJavaType kjt = (KeYJavaType) arguments[1];
                 tacletBuilder.addVarsNew((SchemaVariable) arguments[0], kjt);
             }
@@ -151,9 +143,7 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated) {
-                    throw new IllegalArgumentException("Negation is not supported");
-                }
+                if (negated) { throw new IllegalArgumentException("Negation is not supported"); }
                 SchemaVariable sv = (SchemaVariable) arguments[0];
                 Sort sort = (Sort) arguments[1];
                 // TODO weigl tacletBuilder.addVarsNew(sv, sort);
@@ -194,9 +184,7 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated) {
-                    throw new IllegalArgumentException("Negation is not supported");
-                }
+                if (negated) { throw new IllegalArgumentException("Negation is not supported"); }
                 tacletBuilder.addVarsNew((SchemaVariable) arguments[0],
                     (SchemaVariable) arguments[1]);
 
@@ -207,9 +195,7 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tb, Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated) {
-                    throw new IllegalArgumentException("Negation is not supported");
-                }
+                if (negated) { throw new IllegalArgumentException("Negation is not supported"); }
                 tb.addVarsNewDependingOn((SchemaVariable) arguments[0],
                     (SchemaVariable) arguments[1]);
             }
@@ -386,9 +372,7 @@ public class TacletBuilderManipulators {
      * {@link de.uka.ilkd.key.nparser.builder.TacletPBuilder}.
      */
     public static void register(TacletBuilderCommand... cb) {
-        for (TacletBuilderCommand a : cb) {
-            register(a);
-        }
+        for (TacletBuilderCommand a : cb) { register(a); }
     }
 
     /**

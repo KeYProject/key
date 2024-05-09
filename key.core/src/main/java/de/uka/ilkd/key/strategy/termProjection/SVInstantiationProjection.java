@@ -42,7 +42,7 @@ public class SVInstantiationProjection implements ProjectionToTerm {
         final Object instObj = tapp.instantiations().lookupValue(svName);
         if (!(instObj instanceof Term instantiation)) {
             Debug.assertFalse(demandInst, "Did not find schema variable " + svName
-                + " that I was supposed to examine" + " (taclet " + tapp.taclet().name() + ")");
+                    + " that I was supposed to examine" + " (taclet " + tapp.taclet().name() + ")");
             return null;
         }
         return instantiation;

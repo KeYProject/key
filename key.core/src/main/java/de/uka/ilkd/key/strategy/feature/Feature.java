@@ -16,10 +16,14 @@ public interface Feature {
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
      *
-     * @param app the RuleApp
-     * @param pos position where <code>app</code> is to be applied
-     * @param goal the goal on which <code>app</code> is to be applied
-     * @param mState variable bank / local storage for feature who might require to store temporary
+     * @param app
+     *        the RuleApp
+     * @param pos
+     *        position where <code>app</code> is to be applied
+     * @param goal
+     *        the goal on which <code>app</code> is to be applied
+     * @param mState
+     *        variable bank / local storage for feature who might require to store temporary
      *        information
      *        that changes during computation, e.g.
      *        {@link de.uka.ilkd.key.strategy.termProjection.TermBuffer}s

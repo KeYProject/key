@@ -22,9 +22,7 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
     }
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (index == 0) {
-            return tr;
-        }
+        if (index == 0) { return tr; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -33,9 +31,7 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
     }
 
     public ProgramElement getChildAt(int index) {
-        if (index == 0) {
-            return tr;
-        }
+        if (index == 0) { return tr; }
         throw new ArrayIndexOutOfBoundsException();
     }
 

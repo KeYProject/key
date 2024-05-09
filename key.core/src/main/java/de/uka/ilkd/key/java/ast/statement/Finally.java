@@ -32,7 +32,8 @@ public class Finally extends BranchImp {
     /**
      * Finally.
      *
-     * @param body a statement.
+     * @param body
+     *        a statement.
      */
     public Finally(StatementBlock body) {
         this.body = body;
@@ -42,7 +43,8 @@ public class Finally extends BranchImp {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: a Body (as body
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: a Body (as body
      *        of the Finally), Comments
      */
     public Finally(ExtList children) {
@@ -57,25 +59,21 @@ public class Finally extends BranchImp {
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result++;
-        }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (body != null) {
-            if (index == 0) {
-                return body;
-            }
-        }
+        if (body != null) { if (index == 0) { return body; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -99,9 +97,7 @@ public class Finally extends BranchImp {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -122,7 +118,8 @@ public class Finally extends BranchImp {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnFinally(this);

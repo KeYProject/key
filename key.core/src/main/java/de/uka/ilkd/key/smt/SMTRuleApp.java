@@ -29,9 +29,12 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
     /**
      * Create a new rule app without ifInsts (will be null).
      *
-     * @param rule the SMTRule to apply
-     * @param pio the pos in term to apply the rule on
-     * @param successfulSolverName the name of the solver that was able to close find the proof
+     * @param rule
+     *        the SMTRule to apply
+     * @param pio
+     *        the pos in term to apply the rule on
+     * @param successfulSolverName
+     *        the name of the solver that was able to close find the proof
      */
     SMTRuleApp(SMTRule rule, PosInOccurrence pio, String successfulSolverName) {
         this(rule, pio, null, successfulSolverName);
@@ -77,8 +80,10 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         /**
          * Create a new rule application with the given solver name and unsat core.
          *
-         * @param successfulSolverName solver that produced this result
-         * @param unsatCore formulas required to prove the result
+         * @param successfulSolverName
+         *        solver that produced this result
+         * @param unsatCore
+         *        formulas required to prove the result
          * @return rule application instance
          */
         public SMTRuleApp createApp(String successfulSolverName,
@@ -102,9 +107,12 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
          * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
          * with the same sequent as the given one.
          *
-         * @param goal the Goal on which to apply <tt>ruleApp</tt>
-         * @param services the Services with the necessary information about the java programs
-         * @param ruleApp the rule application to be executed
+         * @param goal
+         *        the Goal on which to apply <tt>ruleApp</tt>
+         * @param services
+         *        the Services with the necessary information about the java programs
+         * @param ruleApp
+         *        the rule application to be executed
          * @return a list with an identical goal as the given <tt>goal</tt>
          */
         @Override
@@ -152,7 +160,8 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
      * Add all top level formulas of the goal
      * to the RuleApp's ifInsts.
      *
-     * @param goal the goal to instantiate the current RuleApp on
+     * @param goal
+     *        the goal to instantiate the current RuleApp on
      * @return a new RuleApp with the same pio and all top level formulas of the goal as ifInsts
      */
     @Override

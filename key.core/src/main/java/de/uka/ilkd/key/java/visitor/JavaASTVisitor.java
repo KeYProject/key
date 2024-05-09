@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.java.expression.operator.Subtype;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -45,8 +46,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     /**
      * create the JavaASTVisitor
      *
-     * @param root the ProgramElement where to begin
-     * @param services the Services object
+     * @param root
+     *        the ProgramElement where to begin
+     * @param services
+     *        the Services object
      */
     public JavaASTVisitor(ProgramElement root, Services services) {
         super(root);
@@ -60,21 +63,15 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
                 services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
-            if (li != null) {
-                performActionOnLoopInvariant(li);
-            }
+            if (li != null) { performActionOnLoopInvariant(li); }
         } else if (node instanceof StatementBlock && services != null) {
             ImmutableSet<BlockContract> bcs =
                 services.getSpecificationRepository().getBlockContracts((StatementBlock) node);
-            for (BlockContract bc : bcs) {
-                performActionOnBlockContract(bc);
-            }
+            for (BlockContract bc : bcs) { performActionOnBlockContract(bc); }
 
             ImmutableSet<LoopContract> lcs =
                 services.getSpecificationRepository().getLoopContracts((StatementBlock) node);
-            for (LoopContract lc : lcs) {
-                performActionOnLoopContract(lc);
-            }
+            for (LoopContract lc : lcs) { performActionOnLoopContract(lc); }
         } else if (node instanceof MergePointStatement && services != null) {
             ImmutableSet<MergeContract> mcs =
                 services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
@@ -94,7 +91,8 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     /**
      * the action that is performed just before leaving the node the last time
      *
-     * @param node the node described above
+     * @param node
+     *        the node described above
      */
     protected abstract void doDefaultAction(SourceElement node);
 
@@ -737,6 +735,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnStringLiteral(StringLiteral x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSubtype(Subtype x) {
         doDefaultAction(x);
     }
 

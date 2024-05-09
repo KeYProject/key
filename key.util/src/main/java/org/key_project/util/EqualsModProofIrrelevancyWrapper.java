@@ -9,9 +9,11 @@ package org.key_project.util;
  * {@link EqualsModProofIrrelevancy#equalsModProofIrrelevancy(Object)} and
  * {@link EqualsModProofIrrelevancy#hashCodeModProofIrrelevancy()}.
  *
- * @param <T> type to wrap
+ * @param <T>
+ *        type to wrap
  * @author Arne Keller
  */
+@SuppressWarnings("nullness")
 public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevancy> {
     /**
      * The wrapped object.
@@ -22,7 +24,8 @@ public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevanc
      * Construct a new wrapper for the provided object. The provided object must implement
      * {@link EqualsModProofIrrelevancy}.
      *
-     * @param inner object to wrap
+     * @param inner
+     *        object to wrap
      */
     public EqualsModProofIrrelevancyWrapper(T inner) {
         this.inner = inner;
@@ -30,12 +33,8 @@ public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevanc
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
 
         EqualsModProofIrrelevancyWrapper<?> that = (EqualsModProofIrrelevancyWrapper<?>) o;
 

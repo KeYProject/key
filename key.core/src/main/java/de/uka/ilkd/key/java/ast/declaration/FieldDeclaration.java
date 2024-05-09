@@ -30,10 +30,14 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Field declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param typeRef a type reference.
-     * @param vars a variable specification array.
-     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param mods
+     *        a modifier mutable list.
+     * @param typeRef
+     *        a type reference.
+     * @param vars
+     *        a variable specification array.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff parent is an InterfaceDeclaration
      */
 
     public FieldDeclaration(Modifier[] mods, TypeReference typeRef, FieldSpecification[] vars,
@@ -45,10 +49,12 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Field declaration.
      *
-     * @param children an ExtList of children. May include: several FieldSpecification (for the
+     * @param children
+     *        an ExtList of children. May include: several FieldSpecification (for the
      *        field) a TypeReference (as reference to the type of the declared variable) several
      *        Modifier (taken as modifiers of the declaration), a Comment
-     * @param parentIsInterfaceDeclaration a boolean set true
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true
      */
     public FieldDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
         super(children, parentIsInterfaceDeclaration);
@@ -79,43 +85,33 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) {
-            result += modArray.size();
-        }
-        if (typeReference != null) {
-            result++;
-        }
-        if (fieldSpecs != null) {
-            result += fieldSpecs.size();
-        }
+        if (modArray != null) { result += modArray.size(); }
+        if (typeReference != null) { result++; }
+        if (fieldSpecs != null) { result += fieldSpecs.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) {
-                return modArray.get(index);
-            }
+            if (len > index) { return modArray.get(index); }
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
-        if (fieldSpecs != null) {
-            return fieldSpecs.get(index);
-        }
+        if (fieldSpecs != null) { return fieldSpecs.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -196,7 +192,8 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnFieldDeclaration(this);

@@ -56,9 +56,7 @@ class TestReferenceSearcher {
         // -> only check the first node in each closed branch
         for (Goal g : p.closedGoals()) {
             Node n = g.node();
-            while (n.parent().childrenCount() == 1) {
-                n = n.parent();
-            }
+            while (n.parent().childrenCount() == 1) { n = n.parent(); }
             if (ReferenceSearcher.suitableForCloseByReference(n)) {
                 ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, n);
                 assertEquals(n.serialNr(), c.node().serialNr());

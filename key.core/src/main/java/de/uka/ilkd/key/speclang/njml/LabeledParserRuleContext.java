@@ -11,31 +11,25 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.
  */
 public class LabeledParserRuleContext {
-    @NonNull
-    public final ParserRuleContext first;
-    @Nullable
-    public final TermLabel second;
+
+    public final @Nullable ParserRuleContext first;
+    public final @Nullable TermLabel second;
 
     public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
-        if (first == null) {
-            throw new IllegalArgumentException("ParserRuleContext is null");
-        }
+        if (first == null) { throw new IllegalArgumentException("ParserRuleContext is null"); }
         this.first = first;
         this.second = second;
     }
 
 
     public LabeledParserRuleContext(ParserRuleContext first) {
-        if (first == null) {
-            throw new IllegalArgumentException("ParserRuleContext is null");
-        }
+        if (first == null) { throw new IllegalArgumentException("ParserRuleContext is null"); }
         this.first = first;
         second = null;
     }

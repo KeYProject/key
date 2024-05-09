@@ -29,9 +29,7 @@ public enum LateApplicationCheck {
         List<String> conflicts = new LinkedList<>();
         for (SequentFormula sf : sequent) {
             String result = check.check(cutNode, sf.formula());
-            if (result != null) {
-                conflicts.add(result);
-            }
+            if (result != null) { conflicts.add(result); }
         }
         return conflicts;
     }

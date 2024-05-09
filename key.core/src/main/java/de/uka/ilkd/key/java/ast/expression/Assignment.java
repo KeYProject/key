@@ -29,7 +29,8 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. In this case the order of
+     * @param children
+     *        the children of this AST element as KeY classes. In this case the order of
      *        the children is IMPORTANT. May contain: 2 of Expression (the first Expression as left
      *        hand side, the second as right hand side), Comments
      */
@@ -41,7 +42,8 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * Unary Assignment (e.g. +=, ++).
      *
-     * @param lhs an expression.
+     * @param lhs
+     *        an expression.
      */
     public Assignment(Expression lhs) {
         super(lhs);
@@ -50,8 +52,10 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * Assignment.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
     public Assignment(Expression lhs, Expression rhs) {
         super(lhs, rhs);
@@ -80,8 +84,10 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * retrieves the type of the assignment expression
      *
-     * @param javaServ the Services offering access to the Java model
-     * @param ec the ExecutionContext in which the expression is evaluated
+     * @param javaServ
+     *        the Services offering access to the Java model
+     * @param ec
+     *        the ExecutionContext in which the expression is evaluated
      * @return the type of the assignment expression
      */
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {

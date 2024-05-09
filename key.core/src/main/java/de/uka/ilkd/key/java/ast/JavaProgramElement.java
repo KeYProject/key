@@ -39,7 +39,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     /**
      * Java program element.
      *
-     * @param list ExtList with comments
+     * @param list
+     *        ExtList with comments
      */
     public JavaProgramElement(ExtList list) {
         super(list);
@@ -50,7 +51,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     /**
      * creates a java program element with the given position information
      *
-     * @param pos the PositionInfo where the Java program element occurs in the source
+     * @param pos
+     *        the PositionInfo where the Java program element occurs in the source
      */
     public JavaProgramElement(PositionInfo pos) {
         super(pos);
@@ -72,7 +74,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     /**
      * collects comments contained in the given list
      *
-     * @param list the ExtList with children and comments of this node
+     * @param list
+     *        the ExtList with children and comments of this node
      */
     private Comment[] extractComments(ExtList list) {
         final Comment[] c = list.collect(Comment.class);
@@ -113,9 +116,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     public final int hashCode() {
         if (hashCode == -1) {
             int localHash = computeHashCode();
-            if (localHash == -1) {
-                localHash = 1;
-            }
+            if (localHash == -1) { localHash = 1; }
             this.hashCode = localHash;
         }
         return hashCode;
@@ -123,12 +124,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == this) { return true; }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
 
         return equalsModRenaming((JavaProgramElement) o, NameAbstractionTableDisabled.INSTANCE);
     }
@@ -138,7 +135,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
      * this is the default implementation of the signature, which is used to determine program
      * similarity.
      *
-     * @param ec TODO
+     * @param ec
+     *        TODO
      */
     public String reuseSignature(Services services, ExecutionContext ec) {
         final String s = getClass().toString();
@@ -155,8 +153,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         public static final NameAbstractionTableDisabled INSTANCE =
             new NameAbstractionTableDisabled();
 
-        public void add(SourceElement pe1, SourceElement pe2) {
-        }
+        public void add(SourceElement pe1, SourceElement pe2) {}
 
         public boolean sameAbstractName(SourceElement pe1, SourceElement pe2) {
             return pe1.equals(pe2);
@@ -168,9 +165,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
 
-        if (src.getClass() != getClass()) {
-            return null;
-        }
+        if (src.getClass() != getClass()) { return null; }
         source.next();
         return matchCond;
     }

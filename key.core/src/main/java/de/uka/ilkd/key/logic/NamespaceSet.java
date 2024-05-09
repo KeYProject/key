@@ -23,8 +23,7 @@ public class NamespaceSet {
     private Namespace<Sort> sortNS = new Namespace<>();
     private Namespace<Choice> choiceNS = new Namespace<>();
 
-    public NamespaceSet() {
-    }
+    public NamespaceSet() {}
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
             Namespace<JFunction> funcNS,
@@ -143,7 +142,8 @@ public class NamespaceSet {
     /**
      * looks up for the symbol in the namespaces sort, functions and programVariables
      *
-     * @param name the Name to look up
+     * @param name
+     *        the Name to look up
      * @return the element of the given name or null
      */
     public Named lookupLogicSymbol(Name name) {
@@ -157,12 +157,7 @@ public class NamespaceSet {
      *         <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace<?>[] spaces) {
-        for (Namespace<?> space : spaces) {
-            final Named n = space.lookup(name);
-            if (n != null) {
-                return n;
-            }
-        }
+        for (Namespace<?> space : spaces) { final Named n = space.lookup(name); if (n != null) { return n; } }
         return null;
     }
 
@@ -170,17 +165,13 @@ public class NamespaceSet {
     @Override
     public String toString() {
         return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n" + "Variables: "
-            + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n" + "Heuristics: "
-            + ruleSets() + "\n" + "Taclet Options: " + choices() + "\n";
+                + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n" + "Heuristics: "
+                + ruleSets() + "\n" + "Taclet Options: " + choices() + "\n";
     }
 
 
     public <T extends Name> boolean containsAll(Iterable<T> names) {
-        for (Name name : names) {
-            if (lookupLogicSymbol(name) == null) {
-                return false;
-            }
-        }
+        for (Name name : names) { if (lookupLogicSymbol(name) == null) { return false; } }
         return true;
     }
 
@@ -211,9 +202,7 @@ public class NamespaceSet {
     }
 
     public void flushToParent() {
-        for (Namespace<?> ns : asArray()) {
-            ns.flushToParent();
-        }
+        for (Namespace<?> ns : asArray()) { ns.flushToParent(); }
     }
 
     public NamespaceSet getParent() {

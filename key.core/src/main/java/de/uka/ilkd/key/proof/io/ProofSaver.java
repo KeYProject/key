@@ -27,9 +27,12 @@ public class ProofSaver extends OutputStreamProofSaver {
     /**
      * Save this proof to a file
      *
-     * @param file file to save proof in
-     * @param proof the {@link Proof} to be saved
-     * @throws IOException on any I/O error
+     * @param file
+     *        file to save proof in
+     * @param proof
+     *        the {@link Proof} to be saved
+     * @throws IOException
+     *         on any I/O error
      */
     public static void saveToFile(File file, Proof proof) throws IOException {
         ProofSaver saver = new ProofSaver(proof, file);
@@ -40,9 +43,12 @@ public class ProofSaver extends OutputStreamProofSaver {
      * Save this proof to a file whilst omitting all proof steps.
      * In effect, this only saves the proof obligation.
      *
-     * @param file file to save proof in
-     * @param proof the {@link Proof} to be saved
-     * @throws IOException on any I/O error
+     * @param file
+     *        file to save proof in
+     * @param proof
+     *        the {@link Proof} to be saved
+     * @throws IOException
+     *         on any I/O error
      */
     public static void saveProofObligationToFile(File file, Proof proof) throws IOException {
         ProofSaver saver = new ProofSaver(proof, file, false);
@@ -80,9 +86,12 @@ public class ProofSaver extends OutputStreamProofSaver {
     /**
      * Create a new proof saver.
      *
-     * @param proof proof to save
-     * @param file file to save proof into
-     * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
+     * @param proof
+     *        proof to save
+     * @param file
+     *        file to save proof into
+     * @param saveProofSteps
+     *        whether to save proof steps (false -> only proof obligation)
      */
     public ProofSaver(Proof proof, File file, boolean saveProofSteps) {
         this(proof, file, KeYConstants.INTERNAL_VERSION, saveProofSteps);
@@ -91,10 +100,14 @@ public class ProofSaver extends OutputStreamProofSaver {
     /**
      * Create a new proof saver.
      *
-     * @param proof proof to save
-     * @param file file to save proof into
-     * @param internalVersion version of KeY to add to the proof log
-     * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
+     * @param proof
+     *        proof to save
+     * @param file
+     *        file to save proof into
+     * @param internalVersion
+     *        version of KeY to add to the proof log
+     * @param saveProofSteps
+     *        whether to save proof steps (false -> only proof obligation)
      */
     public ProofSaver(Proof proof, File file, String internalVersion, boolean saveProofSteps) {
         super(proof, internalVersion, saveProofSteps);
@@ -107,8 +120,10 @@ public class ProofSaver extends OutputStreamProofSaver {
      * The format in which the proof is stored depends on the class. Thr base class creates a plain
      * output file. Subclasses may choose to use other formats.
      *
-     * @param file the file to write to
-     * @throws IOException if I/O fails
+     * @param file
+     *        the file to write to
+     * @throws IOException
+     *         if I/O fails
      */
     protected void save(File file) throws IOException {
         save(new BufferedOutputStream(new FileOutputStream(file)));
@@ -144,9 +159,11 @@ public class ProofSaver extends OutputStreamProofSaver {
      * <p>
      * This method is used by {@link #getBasePath()} and by the Eclipse integration.
      *
-     * @param proofFile The proof {@link File}.
+     * @param proofFile
+     *        The proof {@link File}.
      * @return The computed base path of the given proof {@link File}.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     public static String computeBasePath(File proofFile) throws IOException {
         return proofFile.getCanonicalFile().getParentFile().getCanonicalPath();
@@ -155,35 +172,32 @@ public class ProofSaver extends OutputStreamProofSaver {
     /**
      * Adds the {@link ProofSaverListener}.
      *
-     * @param l The {@link ProofSaverListener} to add.
+     * @param l
+     *        The {@link ProofSaverListener} to add.
      */
     public static void addProofSaverListener(ProofSaverListener l) {
-        if (l != null) {
-            listeners.add(l);
-        }
+        if (l != null) { listeners.add(l); }
     }
 
     /**
      * Removes the {@link ProofSaverListener}.
      *
-     * @param l The {@link ProofSaverListener} to remove.
+     * @param l
+     *        The {@link ProofSaverListener} to remove.
      */
     public static void removeProofSaverListener(ProofSaverListener l) {
-        if (l != null) {
-            listeners.remove(l);
-        }
+        if (l != null) { listeners.remove(l); }
     }
 
     /**
      * Informs all listener about the event {@link ProofSaverListener#proofSaved(ProofSaverEvent)}.
      *
-     * @param e The event.
+     * @param e
+     *        The event.
      */
     protected static void fireProofSaved(ProofSaverEvent e) {
         ProofSaverListener[] toInform = listeners.toArray(new ProofSaverListener[0]);
-        for (ProofSaverListener l : toInform) {
-            l.proofSaved(e);
-        }
+        for (ProofSaverListener l : toInform) { l.proofSaved(e); }
     }
 
     private String filename() {

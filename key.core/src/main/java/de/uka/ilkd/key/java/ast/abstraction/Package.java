@@ -16,7 +16,8 @@ public class Package implements ClassTypeContainer {
     /**
      * Creates a new package with the given name, organized by the given program model info.
      *
-     * @param name the name of the package.
+     * @param name
+     *        the name of the package.
      */
     public Package(String name) {
         this.name = name;

@@ -41,8 +41,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TacletForTests {
 
-    private TacletForTests() {
-    }
+    private TacletForTests() {}
 
     public static final String testRules =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
@@ -97,16 +96,12 @@ public class TacletForTests {
     }
 
     public static InitConfig initConfig() {
-        if (initConfig == null) {
-            parse();
-        }
+        if (initConfig == null) { parse(); }
         return initConfig.deepCopy();
     }
 
     public static Services services() {
-        if (services == null) {
-            parse();
-        }
+        if (services == null) { parse(); }
         return services;
     }
 
@@ -196,9 +191,7 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, Services services) {
-        if (termstr.isEmpty()) {
-            return null;
-        }
+        if (termstr.isEmpty()) { return null; }
 
         try {
             KeyIO io = new KeyIO(services, nss);
@@ -212,9 +205,7 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-        if (termstr.isEmpty()) {
-            return null;
-        }
+        if (termstr.isEmpty()) { return null; }
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 

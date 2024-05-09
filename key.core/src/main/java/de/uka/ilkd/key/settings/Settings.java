@@ -27,7 +27,8 @@ public interface Settings {
     /**
      * The settings to store are written to the given Properties object.
      *
-     * @param props the Properties object where to write the settings as (key, value) pair
+     * @param props
+     *        the Properties object where to write the settings as (key, value) pair
      * @deprecated Deprecated in favour of {@link #writeSettings(Configuration)}
      */
     @Deprecated
@@ -39,7 +40,8 @@ public interface Settings {
      * so {@link java.beans.PropertyChangeEvent} should be triggered accordingly to the new state.
      * <p>
      *
-     * @param props a non-null references to a configuration object. The state of this object
+     * @param props
+     *        a non-null references to a configuration object. The state of this object
      *        shall not be changed by the implementations.
      */
     void readSettings(@NonNull Configuration props);
@@ -51,7 +53,8 @@ public interface Settings {
      * <p>
      * The internal state shall not be changed by the implementations.
      *
-     * @param props a non-null reference to a configration object, which state is modified
+     * @param props
+     *        a non-null reference to a configration object, which state is modified
      *        accordingly to the local
      *        internal state.
      */
@@ -61,7 +64,8 @@ public interface Settings {
     /**
      * Register a new listener which is triggered for changes on properties.
      *
-     * @param listener a non-null reference
+     * @param listener
+     *        a non-null reference
      * @see java.beans.PropertyChangeSupport#addPropertyChangeListener(PropertyChangeListener)
      */
     void addPropertyChangeListener(@NonNull PropertyChangeListener listener);
@@ -69,7 +73,8 @@ public interface Settings {
     /**
      * Removes the given listener.
      *
-     * @param listener a non-null reference
+     * @param listener
+     *        a non-null reference
      * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(PropertyChangeListener)
      */
     void removePropertyChangeListener(PropertyChangeListener listener);
@@ -77,8 +82,10 @@ public interface Settings {
     /**
      * Register a new listener which is triggered for changes on the specified property.
      *
-     * @param propertyName the name for identification of the property
-     * @param listener the listener to be added
+     * @param propertyName
+     *        the name for identification of the property
+     * @param listener
+     *        the listener to be added
      * @see PropertyChangeSupport#addPropertyChangeListener(String, PropertyChangeListener)
      */
     void addPropertyChangeListener(@NonNull String propertyName,
@@ -87,8 +94,10 @@ public interface Settings {
     /**
      * Removes the given listener from being triggered by changes of the specified property.
      *
-     * @param propertyName the name for identification of the property
-     * @param listener the listener to be removed
+     * @param propertyName
+     *        the name for identification of the property
+     * @param listener
+     *        the listener to be removed
      * @see PropertyChangeSupport#removePropertyChangeListener(String, PropertyChangeListener)
      */
     void removePropertyChangeListener(@NonNull String propertyName,

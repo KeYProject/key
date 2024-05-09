@@ -19,8 +19,10 @@ public class Do extends LoopStatement {
     /**
      * Do.
      *
-     * @param guard an expression.
-     * @param body a statement.
+     * @param guard
+     *        an expression.
+     * @param body
+     *        a statement.
      */
     public Do(Expression guard, Statement body, ExtList l, PositionInfo pos) {
         super(guard, body, l, pos);
@@ -29,8 +31,10 @@ public class Do extends LoopStatement {
     /**
      * Do.
      *
-     * @param guard an expression.
-     * @param body a statement.
+     * @param guard
+     *        an expression.
+     * @param body
+     *        a statement.
      */
     public Do(Expression guard, Statement body, PositionInfo pos) {
         super(guard, body, pos);
@@ -57,7 +61,8 @@ public class Do extends LoopStatement {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnDo(this);

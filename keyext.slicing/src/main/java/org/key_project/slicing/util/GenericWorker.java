@@ -10,7 +10,8 @@ import javax.swing.*;
 /**
  * Generic background thread worker.
  *
- * @param <T> result of running the provided task
+ * @param <T>
+ *        result of running the provided task
  * @author Arne Keller
  */
 public class GenericWorker<T> extends SwingWorker<Void, Void> {
@@ -31,9 +32,12 @@ public class GenericWorker<T> extends SwingWorker<Void, Void> {
      * Create a new {@link GenericWorker}. Make sure to start it using {@link #execute()}!
      * The provided callbacks will be invoked on the AWT event dispatching thread.
      *
-     * @param backgroundTask task to execute
-     * @param callback callback on successful execution
-     * @param callbackError callback if task raised an exception
+     * @param backgroundTask
+     *        task to execute
+     * @param callback
+     *        callback on successful execution
+     * @param callbackError
+     *        callback if task raised an exception
      */
     public GenericWorker(Callable<T> backgroundTask, Consumer<T> callback,
             Consumer<Exception> callbackError) {

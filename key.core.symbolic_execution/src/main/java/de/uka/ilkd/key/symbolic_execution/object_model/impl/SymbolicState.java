@@ -21,8 +21,10 @@ public class SymbolicState extends AbstractSymbolicAssociationValueContainer
     /**
      * Constructor.
      *
-     * @param name The name of this state.
-     * @param settings The {@link IModelSettings} to use.
+     * @param name
+     *        The name of this state.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicState(String name, IModelSettings settings) {
         super(settings);

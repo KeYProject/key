@@ -53,8 +53,10 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *
-     * @param svInst mapping of schemavariables to their instantiation
-     * @param services the Services
+     * @param svInst
+     *        mapping of schemavariables to their instantiation
+     * @param services
+     *        the Services
      */
     public LightweightSyntacticalReplaceVisitor(SVInstantiations svInst, Services services) {
         this.services = services;
@@ -69,9 +71,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
 
     private JavaProgramElement addContext(StatementBlock pe) {
         final ContextInstantiationEntry cie = svInst.getContextInstantiation();
-        if (cie == null) {
-            throw new IllegalStateException("Context should also be instantiated");
-        }
+        if (cie == null) { throw new IllegalStateException("Context should also be instantiated"); }
 
         if (cie.prefix() != null) {
             return ProgramContextAdder.INSTANCE.start(
@@ -82,9 +82,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
     private JavaBlock replacePrg(SVInstantiations svInst, JavaBlock jb) {
-        if (svInst.isEmpty()) {
-            return jb;
-        }
+        if (svInst.isEmpty()) { return jb; }
 
         ProgramReplaceVisitor trans;
         ProgramElement result = null;
@@ -114,16 +112,12 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
             }
             result[i] = (Term) top;
         }
-        if (newTerm && (subStack.empty() || subStack.peek() != newMarker)) {
-            subStack.push(newMarker);
-        }
+        if (newTerm && (subStack.empty() || subStack.peek() != newMarker)) { subStack.push(newMarker); }
         return result;
     }
 
     protected void pushNew(Object t) {
-        if (subStack.empty() || subStack.peek() != newMarker) {
-            subStack.push(newMarker);
-        }
+        if (subStack.empty() || subStack.peek() != newMarker) { subStack.push(newMarker); }
         subStack.push(t);
     }
 
@@ -139,9 +133,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
         final UpdateableOperator originalLhs = op.lhs();
         if (originalLhs instanceof SchemaVariable) {
             Object lhsInst = svInst.getInstantiation((SchemaVariable) originalLhs);
-            if (lhsInst instanceof Term) {
-                lhsInst = ((Term) lhsInst).op();
-            }
+            if (lhsInst instanceof Term) { lhsInst = ((Term) lhsInst).op(); }
 
             final UpdateableOperator newLhs;
             if (lhsInst instanceof UpdateableOperator) {
@@ -149,7 +141,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
             } else {
                 assert false : "not updateable: " + lhsInst;
                 throw new IllegalStateException("Encountered non-updateable operator " + lhsInst
-                    + " on left-hand side of update.");
+                        + " on left-hand side of update.");
             }
             return newLhs == originalLhs ? op : ElementaryUpdate.getInstance(newLhs);
         } else {
@@ -162,9 +154,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
         if (op.kind() instanceof ModalOperatorSV) {
             kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
         }
-        if (jb != op.program() || kind != op.kind()) {
-            return Modality.getModality(kind, jb);
-        }
+        if (jb != op.program() || kind != op.kind()) { return Modality.getModality(kind, jb); }
         return op;
     }
 
@@ -214,9 +204,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
                 newVars[j] = boundVar;
             }
 
-            if (varsChanged) {
-                vBoundVars = new ImmutableArray<>(newVars);
-            }
+            if (varsChanged) { vBoundVars = new ImmutableArray<>(newVars); }
         }
         return vBoundVars;
     }
@@ -241,9 +229,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
 
             if (jb != JavaBlock.EMPTY_JAVABLOCK) {
                 jb = replacePrg(svInst, jb);
-                if (jb != visited.javaBlock()) {
-                    jblockChanged = true;
-                }
+                if (jb != visited.javaBlock()) { jblockChanged = true; }
             }
 
             final Operator newOp = instantiateOperator(visitedOp, jb);
@@ -277,8 +263,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
             svInst.getGenericSortInstantiations().getRealSort(depSort, services);
 
         final Operator res = depOp.getInstanceFor(realDepSort, services);
-        assert res != null
-                : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
+        assert res != null : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
         return res;
     }
 
@@ -297,9 +282,7 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
     public Term getTerm() {
         if (computedResult == null) {
             Object o = null;
-            do {
-                o = subStack.pop();
-            } while (o == newMarker);
+            do { o = subStack.pop(); } while (o == newMarker);
             computedResult = (Term) o;
         }
         return computedResult;
@@ -323,7 +306,8 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
      * can override this method when the visitor behaviour depends on informations bound to
      * subtrees.
      *
-     * @param subtreeRoot root of the subtree which the visitor leaves.
+     * @param subtreeRoot
+     *        root of the subtree which the visitor leaves.
      */
     @Override
     public void subtreeLeft(Term subtreeRoot) {

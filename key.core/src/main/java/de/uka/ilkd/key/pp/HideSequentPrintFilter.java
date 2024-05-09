@@ -22,8 +22,10 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
     /**
      *
-     * @param lp the logic printer in use
-     * @param regex should the search be treated as regex?
+     * @param lp
+     *        the logic printer in use
+     * @param regex
+     *        should the search be treated as regex?
      */
     public HideSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
         this.lp = lp;
@@ -58,9 +60,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             lp.printConstrainedFormula(sf);
             String formString = lp.result();
             Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
-            if (m.find()) {
-                antec = antec.append(new IdentityFilterEntry(sf));
-            }
+            if (m.find()) { antec = antec.append(new IdentityFilterEntry(sf)); }
         }
 
         succ = ImmutableSLList.nil();
@@ -71,9 +71,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             lp.printConstrainedFormula(sf);
             String formString = lp.result();
             Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
-            if (m.find()) {
-                succ = succ.append(new IdentityFilterEntry(sf));
-            }
+            if (m.find()) { succ = succ.append(new IdentityFilterEntry(sf)); }
         }
     }
 }

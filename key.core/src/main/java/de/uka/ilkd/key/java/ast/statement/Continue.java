@@ -28,7 +28,8 @@ public class Continue extends LabelJumpStatement {
     /**
      * Continue.
      *
-     * @param label an identifier.
+     * @param label
+     *        an identifier.
      */
     public Continue(Label label) {
         super(label);
@@ -37,7 +38,8 @@ public class Continue extends LabelJumpStatement {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments, a
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments, a
      *        ProgramElementName (as label of the label jump statement)
      */
     public Continue(ExtList children) {
@@ -52,7 +54,8 @@ public class Continue extends LabelJumpStatement {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnContinue(this);

@@ -40,9 +40,8 @@ public abstract sealed
 
 class Literal extends JavaProgramElement
         implements Expression, TerminalProgramElement
-permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
-                EmptySeqLiteral, EmptySetLiteral, FloatLiteral, FreeLiteral, NullLiteral, RealLiteral, StringLiteral
-{
+        permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
+        EmptySeqLiteral, EmptySetLiteral, FloatLiteral, FreeLiteral, NullLiteral, RealLiteral, StringLiteral {
 
     public Literal(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
@@ -51,7 +50,8 @@ permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
+     * @param children
+     *        the children of this AST element as KeY classes.
      *        May contain: Comments
      */
     public Literal(ExtList children) {
@@ -61,8 +61,10 @@ permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
     /**
      * Literal with specific source code position.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
-     * @param pos The specific source code position.
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
+     * @param pos
+     *        The specific source code position.
      */
     public Literal(ExtList children, PositionInfo pos) {
         super(children, pos);
@@ -71,7 +73,8 @@ permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
     /**
      * Literal with specific source code position.
      *
-     * @param pos The specific source code position.
+     * @param pos
+     *        The specific source code position.
      */
     public Literal(PositionInfo pos) {
         super(pos);
@@ -85,8 +88,10 @@ permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
      * retrieves the literal's type (as it is independant of the
      * execution context, it is same as using {@link #getKeYJavaType(Services)})
      *
-     * @param javaServ the Services offering access to the Java model
-     * @param ec the ExecutionContext in which the expression is evaluated
+     * @param javaServ
+     *        the Services offering access to the Java model
+     * @param ec
+     *        the ExecutionContext in which the expression is evaluated
      * @return the literal's type
      */
     @Override
@@ -98,7 +103,8 @@ permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
     /**
      * retrieves the literal's type
      *
-     * @param javaServ the Services offering access to the Java model
+     * @param javaServ
+     *        the Services offering access to the Java model
      * @return the literal's type
      */
     public abstract KeYJavaType getKeYJavaType(Services javaServ);

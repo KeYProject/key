@@ -27,15 +27,9 @@ public abstract class DirectlyBelowFeature extends BinaryFeature {
     }
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        if (pos == null) {
-            return false;
-        }
-        if (pos.isTopLevel()) {
-            return false;
-        }
-        if (!isBadSymbol(pos.up().subTerm().op())) {
-            return false;
-        }
+        if (pos == null) { return false; }
+        if (pos.isTopLevel()) { return false; }
+        if (!isBadSymbol(pos.up().subTerm().op())) { return false; }
         return index == -1 || index == pos.getIndex();
     }
 

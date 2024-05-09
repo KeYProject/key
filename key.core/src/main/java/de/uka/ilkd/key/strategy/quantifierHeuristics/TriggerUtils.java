@@ -21,9 +21,7 @@ class TriggerUtils {
      */
     public static Term discardQuantifiers(Term qterm) {
         Term t = qterm;
-        while (t.op() instanceof Quantifier) {
-            t = t.sub(0);
-        }
+        while (t.op() instanceof Quantifier) { t = t.sub(0); }
         return t;
     }
 
@@ -35,9 +33,7 @@ class TriggerUtils {
     }
 
     public static ImmutableSet<Term> setByOperator(Term term, Operator op) {
-        if (term.op() == op) {
-            return setByOperator(term.sub(0), op).union(setByOperator(term.sub(1), op));
-        }
+        if (term.op() == op) { return setByOperator(term.sub(0), op).union(setByOperator(term.sub(1), op)); }
         return DefaultImmutableSet.<Term>nil().add(term);
     }
 
@@ -53,9 +49,7 @@ class TriggerUtils {
         ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.nil();
         for (QuantifiableVariable aSet0 : set0) {
             final QuantifiableVariable el = aSet0;
-            if (set1.contains(el)) {
-                res = res.add(el);
-            }
+            if (set1.contains(el)) { res = res.add(el); }
         }
         return res;
     }

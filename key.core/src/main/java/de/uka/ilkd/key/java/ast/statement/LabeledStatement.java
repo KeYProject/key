@@ -41,7 +41,8 @@ public class LabeledStatement extends JavaStatement
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: a Label (as
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: a Label (as
      *        name of the label) a Statement (as body of the labeled statement) Comments
      */
     public LabeledStatement(ExtList children, Label label, PositionInfo pos) {
@@ -65,7 +66,8 @@ public class LabeledStatement extends JavaStatement
     /**
      * Labeled statement.
      *
-     * @param name an identifier.
+     * @param name
+     *        an identifier.
      */
 
     public LabeledStatement(Label name) {
@@ -82,8 +84,10 @@ public class LabeledStatement extends JavaStatement
     /**
      * Labeled statement.
      *
-     * @param id a Label.
-     * @param statement a statement.
+     * @param id
+     *        a Label.
+     * @param statement
+     *        a statement.
      */
 
     public LabeledStatement(Label id, Statement statement, PositionInfo pos) {
@@ -190,9 +194,7 @@ public class LabeledStatement extends JavaStatement
      * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-        if ((name instanceof ProgramElementName) || (name == null)) {
-            return (ProgramElementName) name;
-        }
+        if ((name instanceof ProgramElementName) || (name == null)) { return (ProgramElementName) name; }
         LOGGER.debug("labeledstatement: SCHEMAVARIABLE IN LABELEDSTATEMENT");
         return null;
     }
@@ -214,34 +216,28 @@ public class LabeledStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (name != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (name != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0) {
-                return name;
-            }
+            if (index == 0) { return name; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -260,15 +256,15 @@ public class LabeledStatement extends JavaStatement
     /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
-     * @param index an index for a statement.
+     * @param index
+     *        an index for a statement.
      * @return the statement with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -276,7 +272,8 @@ public class LabeledStatement extends JavaStatement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnLabeledStatement(this);
@@ -287,9 +284,7 @@ public class LabeledStatement extends JavaStatement
      * declaration of label names have to be mapped to the same abstract name. This is done here.
      */
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (se == null || this.getClass() != se.getClass()) {
-            return false;
-        }
+        if (se == null || this.getClass() != se.getClass()) { return false; }
 
         final LabeledStatement lSt = (LabeledStatement) se;
 

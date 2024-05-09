@@ -40,12 +40,8 @@ class SubtreeIterator implements Iterator<Node> {
 
     @Override
     public boolean hasNext() {
-        if (atRoot) {
-            return true;
-        }
-        if (!n.leaf()) {
-            return true;
-        }
+        if (atRoot) { return true; }
+        if (!n.leaf()) { return true; }
         return nextSibling(n) != null;
     }
 

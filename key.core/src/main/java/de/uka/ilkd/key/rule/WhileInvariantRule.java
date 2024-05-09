@@ -174,8 +174,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     // constructors
     // -------------------------------------------------------------------------
 
-    private WhileInvariantRule() {
-    }
+    private WhileInvariantRule() {}
 
 
     // -------------------------------------------------------------------------
@@ -193,25 +192,19 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term progPost = update.second;
 
         // focus (below update) must be modality term
-        if (!checkFocus(progPost)) {
-            return null;
-        }
+        if (!checkFocus(progPost)) { return null; }
 
         // active statement must be while loop
         final While loop = app.getLoopStatement();
 
         // try to get invariant from JML specification
         LoopSpecification spec = app.getSpec();
-        if (spec == null) {
-            throw new RuleAbortException("no invariant found");
-        }
+        if (spec == null) { throw new RuleAbortException("no invariant found"); }
 
         // collect self, execution context
         final MethodFrame innermostMethodFrame =
             JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
-        if (innermostMethodFrame != null) {
-            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
-        }
+        if (innermostMethodFrame != null) { spec = spec.setTarget(innermostMethodFrame.getProgramMethod()); }
 
         final Term selfTerm = innermostMethodFrame == null ? null
                 : MiscTools.getSelfTerm(innermostMethodFrame, services);
@@ -280,16 +273,12 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private static Term buildAtPostVar(Term varTerm, String suffix, Services services) {
-        if (varTerm == null) {
-            return null;
-        }
+        if (varTerm == null) { return null; }
         assert varTerm.op() instanceof LocationVariable;
 
         final TermBuilder tb = services.getTermBuilder();
         final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
-        if (!suffix.equalsIgnoreCase("")) {
-            suffix = "_" + suffix;
-        }
+        if (!suffix.equalsIgnoreCase("")) { suffix = "_" + suffix; }
         final String name = tb.newName(varTerm + "_After" + suffix);
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
@@ -299,9 +288,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private static Term buildBeforeVar(Term varTerm, Services services) {
-        if (varTerm == null) {
-            return null;
-        }
+        if (varTerm == null) { return null; }
         assert varTerm.op() instanceof LocationVariable;
 
         final TermBuilder tb = services.getTermBuilder();
@@ -315,9 +302,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private static Term buildAfterVar(Term varTerm, Services services) {
-        if (varTerm == null) {
-            return null;
-        }
+        if (varTerm == null) { return null; }
         assert varTerm.op() instanceof LocationVariable;
 
         final TermBuilder tb = services.getTermBuilder();
@@ -332,9 +317,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static ImmutableList<Term> buildLocalOutsAtPre(ImmutableList<Term> varTerms,
             Services services) {
-        if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
-        }
+        if (varTerms == null || varTerms.isEmpty()) { return varTerms; }
         final TermBuilder tb = services.getTermBuilder();
         ImmutableList<Term> localOuts = ImmutableSLList.nil();
         for (final Term varTerm : varTerms) {
@@ -354,9 +337,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static ImmutableList<Term> buildLocalOutsAtPost(ImmutableList<Term> varTerms,
             Services services) {
-        if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
-        }
+        if (varTerms == null || varTerms.isEmpty()) { return varTerms; }
         final TermBuilder tb = services.getTermBuilder();
         ImmutableList<Term> localOuts = ImmutableSLList.nil();
         for (final Term varTerm : varTerms) {
@@ -377,9 +358,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     static void register(ProgramVariable pv, Services services) {
         final Namespace<IProgramVariable> progVarNames =
             services.getNamespaces().programVariables();
-        if (pv != null && progVarNames.lookup(pv.name()) == null) {
-            progVarNames.addSafely(pv);
-        }
+        if (pv != null && progVarNames.lookup(pv.name()) == null) { progVarNames.addSafely(pv); }
     }
 
     private static void setUpInfFlowPartOfUseGoal(final InfFlowData infData, final Term baseHeap,
@@ -429,7 +408,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final ImmutableList<AnonUpdateData> anonUpdateDatas, final Term anonUpdate,
             Services services) throws RuleAbortException {
         assert anonUpdateDatas.size() == 1 : "information flow " + "extension is at the "
-            + "moment not compatible " + "with the non-base-heap " + "setting";
+                + "moment not compatible " + "with the non-base-heap " + "setting";
         final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -478,9 +457,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term invTerm = services.getTermBuilder().tt();
         for (LocationVariable heap : heapContext) {
             final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
-            if (i == null) {
-                continue;
-            }
+            if (i == null) { continue; }
             if (invTerm == null) {
                 invTerm = i;
             } else {
@@ -495,9 +472,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term freeInvTerm = services.getTermBuilder().tt();
         for (LocationVariable heap : heapContext) {
             final Term i = inst.inv.getFreeInvariant(heap, inst.selfTerm, atPres, services);
-            if (i == null) {
-                continue;
-            }
+            if (i == null) { continue; }
             if (freeInvTerm == null) {
                 freeInvTerm = i;
             } else {
@@ -654,18 +629,12 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     // focus must be top level succedent
     static boolean checkApplicability(Goal g, PosInOccurrence pio) {
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-            return false;
-        }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) { return false; }
         // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) {
-            return false;
-        }
+        if (Transformer.inTransformer(pio)) { return false; }
         Pair<Term, Term> up = applyUpdates(pio.subTerm(), g.proof().getServices());
         final Term progPost = up.second;
-        if (!checkFocus(progPost)) {
-            return false;
-        }
+        if (!checkFocus(progPost)) { return false; }
         // active statement must be while loop
         final SourceElement activeStatement = JavaTools.getActiveStatement(progPost.javaBlock());
         return activeStatement instanceof While;
@@ -684,9 +653,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term selfTerm, final LocationVariable heap, final Term anonHeap,
             final Term localAnonUpdate, final ImmutableSet<ProgramVariable> localIns,
             PosInOccurrence pio, Services services) {
-        if (goal == null) {
-            return;
-        }
+        if (goal == null) { return; }
         goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
         final LoopWellDefinedness lwd = new LoopWellDefinedness(inv, localIns, services);
         final ProgramVariable self;
@@ -702,9 +669,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
@@ -736,14 +702,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ImmutableSet<ProgramVariable> localIns = MiscTools.getLocalIns(inst.loop, services);
         final ImmutableSet<ProgramVariable> localOuts = MiscTools.getLocalOuts(inst.loop, services);
         Term reachableIn = tb.tt();
-        for (ProgramVariable pv : localIns) {
-            reachableIn = tb.and(reachableIn, tb.reachableValue(pv));
-        }
+        for (ProgramVariable pv : localIns) { reachableIn = tb.and(reachableIn, tb.reachableValue(pv)); }
         Term reachableOut = tb.tt();
 
-        for (ProgramVariable pv : localOuts) {
-            reachableOut = tb.and(reachableOut, tb.reachableValue(pv));
-        }
+        for (ProgramVariable pv : localOuts) { reachableOut = tb.and(reachableOut, tb.reachableValue(pv)); }
 
         // prepare variant
         final Pair<Term, Term> variantPair = prepareVariant(inst, variant, services);
@@ -821,9 +783,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             } else {
                 wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
             }
-            if (anonHeap == null) {
-                anonHeap = tAnon.anonHeap;
-            }
+            if (anonHeap == null) { anonHeap = tAnon.anonHeap; }
             final Term mod = mods.get(heap);
             final Term freeMod = freeMods.get(heap);
             final Term strictlyNothing = tb.strictlyNothing();

@@ -84,9 +84,7 @@ public class KeYProgModelInfo {
     @NonNull
     private List<ResolvedMethodDeclaration> getAllMethods(KeYJavaType kjt) {
         var type = rec2key().resolveType(kjt);
-        if (type.isReferenceType()) {
-            return type.asReferenceType().getAllMethods();
-        }
+        if (type.isReferenceType()) { return type.asReferenceType().getAllMethods(); }
         return Collections.emptyList();
     }
 
@@ -102,9 +100,7 @@ public class KeYProgModelInfo {
         List<IProgramMethod> result = new ArrayList<>(methods.size());
         for (var rm : methods) {
             var declaration = rec2key().resolvedDeclarationToKeY(rm);
-            if (declaration != null) {
-                result.add((IProgramMethod) declaration);
-            }
+            if (declaration != null) { result.add((IProgramMethod) declaration); }
         }
         return result;
     }
@@ -142,9 +138,7 @@ public class KeYProgModelInfo {
 
     public boolean isFinal(KeYJavaType kjt) {
         var type = rec2key().resolveType(kjt);
-        if (type.isArray() || type.isPrimitive() || type.isVoid() || type.isNull()) {
-            return false;
-        }
+        if (type.isArray() || type.isPrimitive() || type.isVoid() || type.isNull()) { return false; }
         if (type.isReferenceType()) { // TODO weigl enum declarations and records!
             var rt = type.asReferenceType();
             var td = rt.getTypeDeclaration().orElseThrow();
@@ -203,22 +197,19 @@ public class KeYProgModelInfo {
      * Returns the ProgramMethods locally defined within the given
      * class type.
      *
-     * @param ct a class type.
+     * @param ct
+     *        a class type.
      */
     public List<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct) {
         var result = new ArrayList<ProgramMethod>();
         var type = getJavaParserType(ct);
-        if (!type.isReferenceType()) {
-            return result;
-        }
+        if (!type.isReferenceType()) { return result; }
         var rml = type.asReferenceType().getDeclaredMethods();
         result.ensureCapacity(rml.size());
         for (MethodUsage methodUsage : rml) {
             if (methodUsage.getDeclaration() instanceof JavaParserMethodDeclaration) {
                 var element = mapping.resolvedDeclarationToKeY(methodUsage.getDeclaration());
-                if (element != null) {
-                    result.add((ProgramMethod) element);
-                }
+                if (element != null) { result.add((ProgramMethod) element); }
             }
         }
         return result;
@@ -229,7 +220,8 @@ public class KeYProgModelInfo {
      * class type. If the type is represented in source code,
      * the returned list matches the syntactic order.
      *
-     * @param ct a class type.
+     * @param ct
+     *        a class type.
      */
 
     public List<IProgramMethod> getConstructors(KeYJavaType ct) {
@@ -243,9 +235,7 @@ public class KeYProgModelInfo {
                 continue;
             }
             var m = mapping.resolvedDeclarationToKeY(decl);
-            if (m != null) {
-                result.add((IProgramMethod) m);
-            }
+            if (m != null) { result.add((IProgramMethod) m); }
         }
         return result;
     }
@@ -254,8 +244,10 @@ public class KeYProgModelInfo {
      * retrieves the most specific constructor declared in the given type with
      * respect to the given signature
      *
-     * @param ct the KeYJavyType where to look for the constructor
-     * @param signature IList<KeYJavaType> representing the signature of the constructor
+     * @param ct
+     *        the KeYJavyType where to look for the constructor
+     * @param signature
+     *        IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type
      */
     @Nullable
@@ -266,9 +258,7 @@ public class KeYProgModelInfo {
 
             List<ResolvedConstructorDeclaration> constructors = rt.get().getConstructors();
             constr: for (var constructor : constructors) {
-                if (sig.size() != constructor.getNumberOfParams()) {
-                    continue;
-                }
+                if (sig.size() != constructor.getNumberOfParams()) { continue; }
 
                 if (sig.size() == 0) { // fast track for default constructor calls!
                     var ast = constructor.toAst().get();
@@ -277,11 +267,7 @@ public class KeYProgModelInfo {
 
                 // compare types of the parameters
                 List<ResolvedType> types = constructor.formalParameterTypes();
-                for (int i = 0; i < types.size(); i++) {
-                    if (!types.get(i).equals(sig.get(i))) {
-                        break constr;
-                    }
-                }
+                for (int i = 0; i < types.size(); i++) { if (!types.get(i).equals(sig.get(i))) { break constr; } }
                 var ast = constructor.toAst().get();
                 return (IProgramMethod) mapping.nodeToKeY(ast);
             }
@@ -298,18 +284,14 @@ public class KeYProgModelInfo {
         final Map<String, IProgramMethod> m = implicits.get(ct);
         if (m != null) {
             final IProgramMethod pm = m.get(name);
-            if (pm != null) {
-                return pm;
-            }
+            if (pm != null) { return pm; }
         }
         TypeDeclaration cd = (TypeDeclaration) ct.getJavaType();
         ImmutableArray<MemberDeclaration> members = cd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof IProgramMethod pm
-                    && pm.getMethodDeclaration().getName().equals(name)) {
-                return pm;
-            }
+                    && pm.getMethodDeclaration().getName().equals(name)) { return pm; }
         }
         LOGGER.debug("keyprogmodelinfo: implicit method {} not found in {}", name, ct);
         return null;
@@ -320,9 +302,12 @@ public class KeYProgModelInfo {
      * in the given type or in a supertype where it is visible for the
      * given type, and has a signature that is compatible to the given one.
      *
-     * @param ct the class type to get methods from.
-     * @param name the name of the methods in question.
-     * @param signature the statical type signature of a callee.
+     * @param ct
+     *        the class type to get methods from.
+     * @param name
+     *        the name of the methods in question.
+     * @param signature
+     *        the statical type signature of a callee.
      * @return the IProgramMethods, if one is found,
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
@@ -330,14 +315,10 @@ public class KeYProgModelInfo {
     @Nullable
     public IProgramMethod getProgramMethod(@NonNull KeYJavaType ct, String name,
             Iterable<KeYJavaType> signature) {
-        if (ct.getJavaType() instanceof ArrayType) {
-            return getImplicitMethod(ct, name);
-        }
+        if (ct.getJavaType() instanceof ArrayType) { return getImplicitMethod(ct, name); }
 
         var type = getJavaParserType(ct);
-        if (!type.isReferenceType()) {
-            return null;
-        }
+        if (!type.isReferenceType()) { return null; }
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
                 .map(this::getJavaParserType).toList();
@@ -357,9 +338,12 @@ public class KeYProgModelInfo {
      * in the given type or in a supertype where it is visible for the
      * given type, and has a signature that is compatible to the given one.
      *
-     * @param ct the class type to get methods from.
-     * @param name the name of the methods in question.
-     * @param signature the statical type signature of a callee.
+     * @param ct
+     *        the class type to get methods from.
+     * @param name
+     *        the name of the methods in question.
+     * @param signature
+     *        the statical type signature of a callee.
      * @return the IProgramMethods, if one is found,
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
@@ -383,13 +367,12 @@ public class KeYProgModelInfo {
      * If the type is represented in source code, the returned list
      * matches the syntactic order.
      *
-     * @param ct the class type whose fields are returned
+     * @param ct
+     *        the class type whose fields are returned
      * @return the list of field members of the given type.
      */
     public List<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
-        if (ct.getJavaType() instanceof ArrayType) {
-            return getVisibleArrayFields(ct);
-        }
+        if (ct.getJavaType() instanceof ArrayType) { return getVisibleArrayFields(ct); }
         return getReferenceType(ct)
                 .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
                 .orElseGet(ArrayList::new);
@@ -404,13 +387,12 @@ public class KeYProgModelInfo {
      * If the type is represented in source code, the returned list
      * matches the syntactic order.
      *
-     * @param ct the class type whose fields are returned
+     * @param ct
+     *        the class type whose fields are returned
      * @return the list of field members of the given type.
      */
     public List<Field> getAllVisibleFields(KeYJavaType ct) {
-        if (ct.getJavaType() instanceof ArrayDeclaration) {
-            return getVisibleArrayFields(ct);
-        }
+        if (ct.getJavaType() instanceof ArrayDeclaration) { return getVisibleArrayFields(ct); }
         // TODO javaparser this should be declared + visible to inheritors of super
         return getReferenceType(ct)
                 .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
@@ -420,7 +402,8 @@ public class KeYProgModelInfo {
     /**
      * returns all fields of and visible in an array field
      *
-     * @param arrayType the KeYJavaType of the array
+     * @param arrayType
+     *        the KeYJavaType of the array
      * @return the list of visible fields
      */
     private List<Field> getVisibleArrayFields(KeYJavaType arrayType) {
@@ -431,9 +414,7 @@ public class KeYProgModelInfo {
             if (member instanceof FieldDeclaration) {
                 final ImmutableArray<FieldSpecification> specs =
                     ((FieldDeclaration) member).getFieldSpecifications();
-                for (FieldSpecification spec : specs) {
-                    result.add(spec);
-                }
+                for (FieldSpecification spec : specs) { result.add(spec); }
             }
         }
 
@@ -466,9 +447,7 @@ public class KeYProgModelInfo {
         for (var decl : types) {
             ResolvedReferenceTypeDeclaration resolved = (ResolvedReferenceTypeDeclaration) decl;
             if (resolved.isAssignableBy(rt)) // TODO weigl correct direction?
-            {
-                res.add(resolved);
-            }
+            { res.add(resolved); }
         }
         // TODO weigl
         return res;
@@ -495,7 +474,8 @@ public class KeYProgModelInfo {
      * returns a list of KeYJavaTypes representing the given recoder types in
      * the same order
      *
-     * @param rctl the ASTList<ClassType> to be converted
+     * @param rctl
+     *        the ASTList<ClassType> to be converted
      * @return list of KeYJavaTypes representing the given recoder types in
      *         the same order
      */
@@ -511,7 +491,8 @@ public class KeYProgModelInfo {
      * Returns all known supertypes of the given class type with the type itself
      * as first element.
      *
-     * @param ct a class type
+     * @param ct
+     *        a class type
      * @return the list of the known subtypes of the given class type.
      */
     public List<KeYJavaType> getAllSupertypes(KeYJavaType ct) {
@@ -526,7 +507,8 @@ public class KeYProgModelInfo {
     /**
      * Returns all proper subtypes of the given class type
      *
-     * @param ct a class type
+     * @param ct
+     *        a class type
      * @return the list of the known subtypes of the given class type.
      */
     public List<KeYJavaType> getAllSubtypes(KeYJavaType ct) {
@@ -536,9 +518,7 @@ public class KeYProgModelInfo {
     public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,
             ImmutableList<KeYJavaType> signature) {
         var type = rec2key().resolveType(ct);
-        if (!type.isReferenceType()) {
-            return ImmutableList.of();
-        }
+        if (!type.isReferenceType()) { return ImmutableList.of(); }
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);

@@ -94,12 +94,18 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Creates a new menu that displays all applicable actions and rules at the given position
      *
-     * @param sequentView the SequentView that is the parent of this menu
-     * @param findList with all applicable FindTaclets
-     * @param rewriteList with all applicable RewriteTaclets
-     * @param noFindList with all applicable noFindTaclets
-     * @param builtInList with all applicable BuiltInRules
-     * @param pos the PosInSequent
+     * @param sequentView
+     *        the SequentView that is the parent of this menu
+     * @param findList
+     *        with all applicable FindTaclets
+     * @param rewriteList
+     *        with all applicable RewriteTaclets
+     * @param noFindList
+     *        with all applicable noFindTaclets
+     * @param builtInList
+     *        with all applicable BuiltInRules
+     * @param pos
+     *        the PosInSequent
      */
     CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
             ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
@@ -118,7 +124,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Removes the unsound "introduceAxiom" taclet from the list of displayed taclets.
      *
-     * @param list The list from which to filter.
+     * @param list
+     *        The list from which to filter.
      * @return The original list, without the "introduceAxiom" taclet.
      */
     private static ImmutableList<TacletApp> removeIntroduceAxiomTaclet(
@@ -131,7 +138,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * removes RewriteTaclet from list
      *
-     * @param list from where the RewriteTaclet are removed
+     * @param list
+     *        from where the RewriteTaclet are removed
      * @return list without RewriteTaclets
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
@@ -157,7 +165,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Creates the menu by adding all sub-menus and items.
      *
-     * @param control the action listener.
+     * @param control
+     *        the action listener.
      */
     private void createMenu(ImmutableList<TacletApp> find, ImmutableList<TacletApp> noFind,
             ImmutableList<BuiltInRule> builtInList, MenuControl control) {
@@ -181,9 +190,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         createDelayedCutJoinMenu(control);
         createMergeRuleMenu();
 
-        if (getPos() != null && getPos().isSequent()) {
-            createSMTMenu(control);
-        }
+        if (getPos() != null && getPos().isSequent()) { createSMTMenu(control); }
         createFocussedAutoModeMenu(control);
         addMacroMenu();
 
@@ -213,25 +220,19 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         if (!builtInList.isEmpty()) {
             addSeparator();
-            for (BuiltInRule builtInRule : builtInList) {
-                addBuiltInRuleItem(builtInRule, control);
-            }
+            for (BuiltInRule builtInRule : builtInList) { addBuiltInRuleItem(builtInRule, control); }
         }
     }
 
     private void addMacroMenu() {
         ProofMacroMenu menu = new ProofMacroMenu(mediator, getPos().getPosInOccurrence());
-        if (!menu.isEmpty()) {
-            add(menu);
-        }
+        if (!menu.isEmpty()) { add(menu); }
     }
 
     private void createSMTMenu(MenuControl control) {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
                 .getSMTSettings().getSolverUnions();
-        if (!solverUnions.isEmpty()) {
-            addSeparator();
-        }
+        if (!solverUnions.isEmpty()) { addSeparator(); }
         for (SolverTypeCollection union : solverUnions) {
             if (union.isUsable()) {
                 JMenuItem item = new SMTMenuItem(union);
@@ -336,15 +337,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         List<TacletApp> list = new ArrayList<>(finds.size());
 
-        for (final TacletApp app : finds) {
-            list.add(app);
-        }
+        for (final TacletApp app : finds) { list.add(app); }
 
         list.sort(comp);
 
-        for (final TacletApp app : list) {
-            result = result.prepend(app);
-        }
+        for (final TacletApp app : list) { result = result.prepend(app); }
 
         return result;
     }
@@ -372,8 +369,10 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * adds a TacletMenuItem for each taclet in the list and sets the given MenuControl as the
      * ActionListener
      *
-     * @param taclets {@link ImmutableList<Taclet>} with the Taclets the items represent
-     * @param control the ActionListener
+     * @param taclets
+     *        {@link ImmutableList<Taclet>} with the Taclets the items represent
+     * @param control
+     *        the ActionListener
      */
     private void addToMenu(ImmutableList<TacletApp> taclets, MenuControl control) {
 
@@ -399,9 +398,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 insSystemInvItem.add(app);
                 continue;
             }
-            if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
-                continue;
-            }
+            if (!mediator.getFilterForInteractiveProving().filter(taclet)) { continue; }
 
             if (isRareRule(taclet)) {
                 rareTaclets.add(app);
@@ -458,9 +455,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private boolean isRareRule(Taclet taclet) {
-        if (clutterRules.contains(taclet.name().toString())) {
-            return true;
-        }
+        if (clutterRules.contains(taclet.name().toString())) { return true; }
         return taclet.getRuleSets().stream()
                 .anyMatch(it -> clutterRuleSets.contains(it.name().toString()));
     }
@@ -489,9 +484,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     class MenuControl extends SequentViewMenu<CurrentGoalView>.MenuControl {
 
         private boolean validAbbreviation(String s) {
-            if (s == null || s.length() == 0) {
-                return false;
-            }
+            if (s == null || s.length() == 0) { return false; }
             for (int i = 0; i < s.length(); i++) {
                 if (!((s.charAt(i) <= '9' && s.charAt(i) >= '0')
                         || (s.charAt(i) <= 'z' && s.charAt(i) >= 'a')
@@ -592,7 +585,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                 if (!validAbbreviation(abbreviation)) {
                                     JOptionPane.showMessageDialog(new JFrame(),
                                         "Only letters, numbers and '_'"
-                                            + "are allowed for Abbreviations",
+                                                + "are allowed for Abbreviations",
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     mediator.getNotationInfo().getAbbrevMap()
@@ -622,9 +615,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         public FocussedRuleApplicationMenuItem() {
             super(APPLY_RULES_AUTOMATICALLY_HERE);
             setToolTipText("<html>Initiates and restricts automatic rule applications on the "
-                + "highlighted formula, term or sequent.<br> "
-                + "'Shift + left mouse click' on the highlighted "
-                + "entity does the same.</html>");
+                    + "highlighted formula, term or sequent.<br> "
+                    + "'Shift + left mouse click' on the highlighted "
+                    + "entity does the same.</html>");
         }
 
     }
@@ -634,12 +627,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         private int countFormulaSV(TacletSchemaVariableCollector c) {
             int formulaSV = 0;
             Iterator<SchemaVariable> it = c.varIterator();
-            while (it.hasNext()) {
-                SchemaVariable sv = it.next();
-                if (sv instanceof FormulaSV) {
-                    formulaSV++;
-                }
-            }
+            while (it.hasNext()) { SchemaVariable sv = it.next(); if (sv instanceof FormulaSV) { formulaSV++; } }
 
             return formulaSV;
         }
@@ -657,9 +645,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                         result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();
                     }
                 }
-                if (!gt.sequent().isEmpty()) {
-                    result += 10;
-                }
+                if (!gt.sequent().isEmpty()) { result += 10; }
             }
             return result;
         }
@@ -668,9 +654,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          * rough approximation of the program complexity
          */
         public int programComplexity(JavaBlock b) {
-            if (b.isEmpty()) {
-                return 0;
-            }
+            if (b.isEmpty()) { return 0; }
             return new de.uka.ilkd.key.java.visitor.JavaASTWalker(b.program()) {
                 private int counter = 0;
 
@@ -699,17 +683,13 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 if (!s1.equals(s2)) {
                     throw new IllegalStateException(
                         "A decision should have been made on a higher level ( " + s1 + "<->" + s2
-                            + ")");
+                                + ")");
                 }
                 int v1 = map1.get(s1);
                 int v2 = map2.get(s2);
                 // the order will be reversed when the list is sorted
-                if (v1 < v2) {
-                    return 1;
-                }
-                if (v1 > v2) {
-                    return -1;
-                }
+                if (v1 < v2) { return 1; }
+                if (v1 > v2) { return -1; }
             }
             return 0;
         }

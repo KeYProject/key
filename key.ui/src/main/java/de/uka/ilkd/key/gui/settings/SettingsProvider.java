@@ -37,7 +37,8 @@ public interface SettingsProvider {
      * You are allowed to reuse the return component. But then you should update the components,
      * e.g. text field, during handling of the call.
      *
-     * @param window non-null reference
+     * @param window
+     *        non-null reference
      * @return
      */
     JPanel getPanel(MainWindow window);
@@ -64,7 +65,8 @@ public interface SettingsProvider {
      * window. If a field is not in the appropiate format, you should throw an
      * {@link InvalidSettingsInputException} with the reference to the panel and component.
      *
-     * @throws InvalidSettingsInputException if an input component is not properly fill. Prevent the
+     * @throws InvalidSettingsInputException
+     *         if an input component is not properly fill. Prevent the
      *         settings dialog from closing.
      */
     void applySettings(MainWindow window) throws InvalidSettingsInputException;
@@ -86,7 +88,8 @@ public interface SettingsProvider {
      * Implement this function for search support. The settings dialog ask every provider if a user
      * given search request is "handled" by a settings provider.
      *
-     * @param substring a possible empty, non-null string
+     * @param substring
+     *        a possible empty, non-null string
      * @return true iff the search should highlight your settings provider.
      */
     default boolean contains(String substring) {

@@ -17,8 +17,10 @@ public class InjectionException extends Exception {
     /**
      * An injection reflection exception with no cause (to display).
      *
-     * @param message the respective String message to be passed.
-     * @param argument the proof script argument.
+     * @param message
+     *        the respective String message to be passed.
+     * @param argument
+     *        the proof script argument.
      */
     public InjectionException(String message, ProofScriptArgument<?> argument) {
         super(message);
@@ -28,9 +30,12 @@ public class InjectionException extends Exception {
     /**
      * An injection exception with a cause to be displayed.
      *
-     * @param message the respective String message to be passed.
-     * @param cause the cause of the exception.
-     * @param argument the proof script argument.
+     * @param message
+     *        the respective String message to be passed.
+     * @param cause
+     *        the cause of the exception.
+     * @param argument
+     *        the proof script argument.
      */
     public InjectionException(String message, Throwable cause, ProofScriptArgument<?> argument) {
         super(message, cause);

@@ -79,11 +79,15 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * <h3>Postcondition</h3> It returns a formula that is a conjunction. It implies the equality of
      * termExt and termBase.
      *
-     * @param term A term of the type {@code #ObserverEquality(t1, t2)}, not null.
-     * @param svInst instantiations of schema variables, not used
-     * @param services non-null {@link Services}
+     * @param term
+     *        A term of the type {@code #ObserverEquality(t1, t2)}, not null.
+     * @param svInst
+     *        instantiations of schema variables, not used
+     * @param services
+     *        non-null {@link Services}
      * @return a non-null Term of sort FORMULA
-     * @throws IllegalArgumentException if the term argument is not as expected
+     * @throws IllegalArgumentException
+     *         if the term argument is not as expected
      */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         Term termExt = term.sub(0);
@@ -94,9 +98,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
             throw new IllegalArgumentException("\\sameObserver must be true for " + NAME);
         }
 
-        if (obs1 != obs2) {
-            throw new IllegalArgumentException("\\sameObserver must be true");
-        }
+        if (obs1 != obs2) { throw new IllegalArgumentException("\\sameObserver must be true"); }
 
         KeYJavaType kjt = obs1.isStatic() ? obs1.getContainerType()
                 : services.getTypeConverter().getKeYJavaType(termExt.sub(1));

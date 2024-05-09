@@ -56,7 +56,8 @@ public class SuperArrayDeclaration extends TypeDeclaration {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnSuperArrayDeclaration(this);

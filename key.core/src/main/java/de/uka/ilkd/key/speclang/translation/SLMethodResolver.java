@@ -39,16 +39,12 @@ public final class SLMethodResolver extends SLExpressionResolver {
     protected SLExpression doResolving(SLExpression receiver, String methodName,
             SLParameters parameters) throws SLTranslationException {
 
-        if (parameters == null || !parameters.isListOfTerm()) {
-            return null;
-        }
+        if (parameters == null || !parameters.isListOfTerm()) { return null; }
 
         // FIXME weigl this seems wrong. Should it not be that this
         // containingType=manager.specInClass?
         KeYJavaType containingType = receiver.getType();
-        if (containingType == null) {
-            return null;
-        }
+        if (containingType == null) { return null; }
         ImmutableList<SLExpression> ps = parameters.parameters();
         for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
             while (ps.size() > 0
@@ -80,16 +76,12 @@ public final class SLMethodResolver extends SLExpressionResolver {
             }
         }
 
-        if (pm == null) {
-            return null;
-        }
+        if (pm == null) { return null; }
 
         List<LocationVariable> heaps = new ArrayList<>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
-            if (hc >= pm.getHeapCount(services)) {
-                break;
-            }
+            if (hc >= pm.getHeapCount(services)) { break; }
             heaps.add(h);
         }
         ImmutableList<SLExpression> params = parameters.parameters();
@@ -99,9 +91,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         for (LocationVariable heap : heaps) {
             if (pm.getStateCount() >= 1) {
                 subs[i++] = services.getTermBuilder().var(heap);
-                if (pm.getStateCount() == 2) {
-                    subs[i++] = params.head().getTerm();
-                }
+                if (pm.getStateCount() == 2) { subs[i++] = params.head().getTerm(); }
             }
             params = params.tail();
         }
@@ -109,7 +99,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         if (!pm.isStatic()) {
             if (!receiver.isTerm()) {
                 throw manager.excManager.createException("non-static method (" + methodName
-                    + ") invocation" + " on Type " + receiver.getType());
+                        + ") invocation" + " on Type " + receiver.getType());
             }
             subs[i++] = recTerm;
         }

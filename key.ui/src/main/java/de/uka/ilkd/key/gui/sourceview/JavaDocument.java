@@ -411,9 +411,7 @@ public class JavaDocument extends DefaultStyledDocument {
                 } else {
                     insertJavadocString(token, tokenStart);
                 }
-            } else if (mode == Mode.JML) {
-                insertJMLString(token, tokenStart);
-            }
+            } else if (mode == Mode.JML) { insertJMLString(token, tokenStart); }
             state = CommentState.NO;
             mode = Mode.NORMAL;
             token = ""; // reset token
@@ -458,11 +456,11 @@ public class JavaDocument extends DefaultStyledDocument {
         // case '*':
         // case '/':
         case '(', ')', '[', ']', '{', '}', '%', '!', '^', '~', '&', '|', '.', ':', ';', '?', '<', '>', '=', '\'' ->
-            // case ' ':
-            // case '"':
-            // case '\'':
-            // case '\n':
-            checkDelimiter(strChar);
+                // case ' ':
+                // case '"':
+                // case '\'':
+                // case '\n':
+                checkDelimiter(strChar);
         default -> checkOther(strChar);
         }
     }
@@ -523,11 +521,7 @@ public class JavaDocument extends DefaultStyledDocument {
         int endpos = offs + strLen;
         int strpos;
         // process char by char
-        for (int i = offs; i < endpos; i++) {
-            currentPos = i;
-            strpos = i - offs;
-            processChar(str.charAt(strpos));
-        }
+        for (int i = offs; i < endpos; i++) { currentPos = i; strpos = i - offs; processChar(str.charAt(strpos)); }
         // place the internal "cursor" of the document after the inserted String, reset internal
         // state to defaults (fixes problems when editing a document)
         currentPos = endpos;

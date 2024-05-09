@@ -33,8 +33,10 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionMethodCall(ITreeSettings settings, Node proofNode) {
@@ -58,16 +60,15 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
         MethodReference explicitConstructorMR = getExplicitConstructorMethodReference();
         String call = explicitConstructorMR != null ? explicitConstructorMR.toString()
                 : getMethodReference().toString();
-        if (call.endsWith(";")) {
-            call = call.substring(0, call.length() - 1);
-        }
+        if (call.endsWith(";")) { call = call.substring(0, call.length() - 1); }
         return call;
     }
 
     /**
      * Removes the given {@link IExecutionBaseMethodReturn}.
      *
-     * @param methodReturn The {@link IExecutionBaseMethodReturn} to be deleted.
+     * @param methodReturn
+     *        The {@link IExecutionBaseMethodReturn} to be deleted.
      * @author Anna Filighera
      */
     public void removeMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
@@ -149,7 +150,8 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     /**
      * Registers the given {@link IExecutionBaseMethodReturn}.
      *
-     * @param methodReturn The {@link IExecutionBaseMethodReturn} to register.
+     * @param methodReturn
+     *        The {@link IExecutionBaseMethodReturn} to register.
      */
     public void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
         if (methodReturn != null) {

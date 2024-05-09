@@ -24,10 +24,14 @@ public class ApplyTFFeature implements Feature {
     private final boolean demandInst;
 
     /**
-     * @param proj the ProjectionToTerm to the instantiation is supposed to be inspected
-     * @param termFeature the term feature to use
-     * @param noInstCost result if <code>schemaVar</code> is not instantiated
-     * @param demandInst if <code>true</code> then raise an exception if <code>schemaVar</code> is
+     * @param proj
+     *        the ProjectionToTerm to the instantiation is supposed to be inspected
+     * @param termFeature
+     *        the term feature to use
+     * @param noInstCost
+     *        result if <code>schemaVar</code> is not instantiated
+     * @param demandInst
+     *        if <code>true</code> then raise an exception if <code>schemaVar</code> is
      *        not instantiated (otherwise: return <code>noInstCost</code>)
      */
     private ApplyTFFeature(ProjectionToTerm proj, TermFeature termFeature, RuleAppCost noInstCost,

@@ -8,17 +8,20 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Hash set using the object's identity instead of their hashcode to determine uniqueness.
  *
- * @param <T> elmeent type
+ * @param <T>
+ *        elmeent type
  * @author Arne Keller
  */
-public class IdentityHashSet<T> implements Set<T> {
+public final class IdentityHashSet<T extends @Nullable Object> implements Set<T> {
     /**
      * Backing store.
      */
-    private final IdentityHashMap<T, Object> innerMap = new IdentityHashMap<>();
+    private final IdentityHashMap<T, @Nullable Object> innerMap = new IdentityHashMap<>();
 
     /**
      * Construct an empty set.
@@ -30,7 +33,8 @@ public class IdentityHashSet<T> implements Set<T> {
     /**
      * Copy provided elements into a new set.
      *
-     * @param list elements to add
+     * @param list
+     *        elements to add
      */
     public IdentityHashSet(ImmutableList<T> list) {
         list.forEach(this::add);
@@ -47,7 +51,7 @@ public class IdentityHashSet<T> implements Set<T> {
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(@Nullable Object o) {
         return innerMap.containsKey(o);
     }
 
@@ -56,13 +60,17 @@ public class IdentityHashSet<T> implements Set<T> {
         return innerMap.keySet().iterator();
     }
 
+    // see https://eisop.github.io/cf/manual/manual.html#nullness-collection-toarray
+    @SuppressWarnings({ "nullness", "override.return.invalid" })
     @Override
-    public Object[] toArray() {
+    public @Nullable Object[] toArray() {
         return innerMap.keySet().toArray();
     }
 
+    // see https://eisop.github.io/cf/manual/manual.html#nullness-collection-toarray
+    @SuppressWarnings({ "nullness", "override.return.invalid" })
     @Override
-    public <T1> T1[] toArray(T1[] a) {
+    public <T> T[] toArray(T[] a) {
         return innerMap.keySet().toArray(a);
     }
 
@@ -72,7 +80,7 @@ public class IdentityHashSet<T> implements Set<T> {
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(@Nullable Object o) {
         var contained = innerMap.containsKey(o);
         innerMap.remove(o);
         return contained;
@@ -81,9 +89,7 @@ public class IdentityHashSet<T> implements Set<T> {
     @Override
     public boolean addAll(Collection<? extends T> c) {
         var changed = false;
-        for (T o : c) {
-            changed |= add(o);
-        }
+        for (T o : c) { changed |= add(o); }
         return changed;
     }
 
@@ -95,11 +101,11 @@ public class IdentityHashSet<T> implements Set<T> {
     @Override
     public boolean removeAll(Collection<?> c) {
         var changed = false;
-        for (Object o : c) {
-            changed |= remove(o);
-        }
+        for (Object o : c) { changed |= remove(o); }
         return changed;
     }
+
+
 
     @Override
     public boolean retainAll(Collection<?> c) {

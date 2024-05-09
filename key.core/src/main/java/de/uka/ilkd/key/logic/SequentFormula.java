@@ -35,7 +35,8 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
     /**
      * creates a new SequentFormula
      *
-     * @param term a Term of sort {@link JavaDLTheory#FORMULA}
+     * @param term
+     *        a Term of sort {@link JavaDLTheory#FORMULA}
      */
     public SequentFormula(Term term) {
         if (term.sort() != JavaDLTheory.FORMULA
@@ -54,12 +55,8 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
 
     /** equal if terms and constraints are equal */
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj instanceof SequentFormula cmp) {
-            return term.equals(cmp.formula());
-        }
+        if (this == obj) { return true; }
+        if (obj instanceof SequentFormula cmp) { return term.equals(cmp.formula()); }
         return false;
     }
 
@@ -74,9 +71,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (this == obj) {
-            return true;
-        }
+        if (this == obj) { return true; }
         if (obj instanceof SequentFormula cmp) {
             return term.equalsModProperty(cmp.formula(), PROOF_IRRELEVANCY_PROPERTY);
         }

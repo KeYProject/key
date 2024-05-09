@@ -23,7 +23,8 @@ public class Return extends ExpressionJumpStatement {
     /**
      * Expression jump statement.
      *
-     * @param expr an Expression used to jump
+     * @param expr
+     *        an Expression used to jump
      */
     public Return(Expression expr) {
         super(expr);
@@ -32,7 +33,8 @@ public class Return extends ExpressionJumpStatement {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: an Expression
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: an Expression
      *        (as expression of the ExpressionJumpStatement), Comments
      */
     public Return(ExtList children) {
@@ -47,7 +49,8 @@ public class Return extends ExpressionJumpStatement {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnReturn(this);

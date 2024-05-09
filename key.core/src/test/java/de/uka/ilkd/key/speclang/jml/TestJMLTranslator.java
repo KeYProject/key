@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJMLTranslator {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "speclang" + File.separator + "testFile.key";
+            + "speclang" + File.separator + "testFile.key";
     private static TermBuilder TB;
     private static JavaInfo javaInfo;
     private static Services services;
@@ -86,9 +86,7 @@ public class TestJMLTranslator {
     private boolean termContains(Term t, Term sub) {
 
         for (int i = 0; i < t.arity(); i++) {
-            if (t.sub(i).equals(sub) || termContains(t.sub(i), sub)) {
-                return true;
-            }
+            if (t.sub(i).equals(sub) || termContains(t.sub(i), sub)) { return true; }
         }
 
         return false;
@@ -97,15 +95,9 @@ public class TestJMLTranslator {
 
     private boolean termContains(Term t, Operator op) {
 
-        if (t.op().arity() == op.arity() && t.op().name().equals(op.name())) {
-            return true;
-        }
+        if (t.op().arity() == op.arity() && t.op().name().equals(op.name())) { return true; }
 
-        for (int i = 0; i < t.arity(); i++) {
-            if (termContains(t.sub(i), op)) {
-                return true;
-            }
-        }
+        for (int i = 0; i < t.arity(); i++) { if (termContains(t.sub(i), op)) { return true; } }
 
         return false;
     }

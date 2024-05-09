@@ -23,9 +23,7 @@ public final class LocalVariableCondition extends VariableConditionAdapter {
     public LocalVariableCondition(SchemaVariable var, boolean neg) {
         this.var = var;
         this.neg = neg;
-        if (!(var instanceof ProgramSV)) {
-            throw new IllegalArgumentException("Illegal schema variable");
-        }
+        if (!(var instanceof ProgramSV)) { throw new IllegalArgumentException("Illegal schema variable"); }
     }
 
 
@@ -33,9 +31,7 @@ public final class LocalVariableCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SVSubstitute candidate, SVInstantiations svInst,
             Services services) {
 
-        if (var != this.var) {
-            return true;
-        }
+        if (var != this.var) { return true; }
         final boolean isLocalVar =
             ((candidate instanceof ProgramVariable) && !((ProgramVariable) candidate).isMember());
         return neg != isLocalVar;

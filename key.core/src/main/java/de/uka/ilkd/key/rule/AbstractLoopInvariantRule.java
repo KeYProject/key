@@ -64,9 +64,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * new set of goals, that is splitting the current goal is no longer required after calling this
      * method.
      *
-     * @param goal the Goal on which to apply <tt>ruleApp</tt>
-     * @param services the Services with the necessary information about the java programs
-     * @param ruleApp the rule application to be executed
+     * @param goal
+     *        the Goal on which to apply <tt>ruleApp</tt>
+     * @param services
+     *        the Services with the necessary information about the java programs
+     * @param ruleApp
+     *        the rule application to be executed
      * @return The {@link LoopInvariantInformation} object containing the data for the application
      *         of loop invariant rules.
      */
@@ -133,9 +136,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec() || Transformer.inTransformer(pio)) {
-            return false;
-        }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec() || Transformer.inTransformer(pio)) { return false; }
 
         final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
         JavaBlock javaBlock = progPost.javaBlock();
@@ -166,10 +167,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Creates the "...Before_LOOP" update needed for the variant.
      *
-     * @param services The {@link Services} object.
-     * @param heapContext TODO
-     * @param localOuts TODO
-     * @param heapToBeforeLoop TODO
+     * @param services
+     *        The {@link Services} object.
+     * @param heapContext
+     *        TODO
+     * @param localOuts
+     *        TODO
+     * @param heapToBeforeLoop
+     *        TODO
      * @return The "...Before_LOOP" update needed for the variant.
      */
     protected static Term createBeforeLoopUpdate(Services services,
@@ -212,8 +217,10 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Creates an update for the anonymization of all {@link ProgramVariable}s in localOuts.
      *
-     * @param localOuts The {@link ProgramVariable}s to anonymize.
-     * @param services The {@link Services} object.
+     * @param localOuts
+     *        The {@link ProgramVariable}s to anonymize.
+     * @param services
+     *        The {@link Services} object.
      * @return The anonymizing update.
      */
     protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
@@ -233,10 +240,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * Creates a conjunction of all invariant formulas for the {@link LocationVariable}s in
      * heapContext.
      *
-     * @param services The {@link Services} object.
-     * @param inst The {@link Instantiation} for this rule application.
-     * @param atPres TODO
-     * @param heapContext The heap formulas to create a conjunction of invariants for.
+     * @param services
+     *        The {@link Services} object.
+     * @param inst
+     *        The {@link Instantiation} for this rule application.
+     * @param atPres
+     *        TODO
+     * @param heapContext
+     *        The heap formulas to create a conjunction of invariants for.
      * @return A conjunction of all invariant formulas for the {@link LocationVariable}s in
      *         heapContext.
      */
@@ -250,10 +261,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * Creates a conjunction of all <em>free</em> invariant formulas for the
      * {@link LocationVariable}s in heapContext.
      *
-     * @param services The {@link Services} object.
-     * @param inst The {@link Instantiation} for this rule application.
-     * @param atPres TODO
-     * @param heapContext The heap formulas to create a conjunction of <em>free</em> invariants for.
+     * @param services
+     *        The {@link Services} object.
+     * @param inst
+     *        The {@link Instantiation} for this rule application.
+     * @param atPres
+     *        TODO
+     * @param heapContext
+     *        The heap formulas to create a conjunction of <em>free</em> invariants for.
      * @return A conjunction of all <em>free</em> invariant formulas for the
      *         {@link LocationVariable}s in heapContext.
      */
@@ -268,9 +283,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * fct may return null when applied to a T object; in this case, the result is ignored when
      * constructing the conjunction.
      *
-     * @param services The {@link Services} object.
-     * @param fct A mapping from T objects to {@link Term}s (formulas!).
-     * @param listOfT A list of T objects.
+     * @param services
+     *        The {@link Services} object.
+     * @param fct
+     *        A mapping from T objects to {@link Term}s (formulas!).
+     * @param listOfT
+     *        A list of T objects.
      * @return A conjunction of Terms produced by fct for all elements in listOfT.
      */
     protected static <T> Term mapAndConjunct(Services services,
@@ -288,9 +306,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Creates the variant proof obligation and update.
      *
-     * @param inst The {@link Instantiation} for this rule application.
-     * @param variant The variant term as given by the loop specification.
-     * @param services The {@link Services} object.
+     * @param inst
+     *        The {@link Instantiation} for this rule application.
+     * @param variant
+     *        The variant term as given by the loop specification.
+     * @param services
+     *        The {@link Services} object.
      * @return The variant proof obligation and update.
      */
     protected static Pair<Term, Term> prepareVariant(Instantiation inst, Term variant,
@@ -311,8 +332,10 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Splits a term into the update and formula part.
      *
-     * @param focusTerm The term to split into update and formula the update is applied to.
-     * @param services The {@link Services} object.
+     * @param focusTerm
+     *        The term to split into update and formula the update is applied to.
+     * @param services
+     *        The {@link Services} object.
      * @return A pair of the update and the formula the update is applied to.
      */
     protected static Pair<Term, Term> splitUpdates(Term focusTerm, TermServices services) {
@@ -327,7 +350,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Checks whether progPost contains a Java program.
      *
-     * @param progPost The Term to check.
+     * @param progPost
+     *        The Term to check.
      * @return true iff progPost (directly) contains a Java program.
      */
     protected static boolean isModalityTerm(final Term progPost) {
@@ -339,9 +363,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Creates a conjunction of t1 and t2 if both are not null, and returns t2 only if t1 is null.
      *
-     * @param tb The {@link TermBuilder} object.
-     * @param t1 The first formula of the conjunction; may be null.
-     * @param t2 The second formula of the conjunction; may <em>not</em> be null.
+     * @param tb
+     *        The {@link TermBuilder} object.
+     * @param t1
+     *        The first formula of the conjunction; may be null.
+     * @param t2
+     *        The second formula of the conjunction; may <em>not</em> be null.
      * @return returns {@code t2} if {@code t1} is null and {@code t1 & t2} if both aren't null.
      */
     protected static Term and(TermBuilder tb, Term t1, Term t2) {
@@ -353,12 +380,15 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * Constructs the {@link Instantiation} object containing the relevant parameters for this
      * {@link LoopScopeInvariantRule} application.
      *
-     * @param app The {@link LoopInvariantBuiltInRuleApp} object for the application of the
+     * @param app
+     *        The {@link LoopInvariantBuiltInRuleApp} object for the application of the
      *        {@link LoopScopeInvariantRule}.
-     * @param services The {@link Services} object.
+     * @param services
+     *        The {@link Services} object.
      * @return The {@link Instantiation} object containing the relevant parameters for this
      *         {@link LoopScopeInvariantRule} application.
-     * @throws RuleAbortException If the {@link LoopInvariantBuiltInRuleApp} does not contain a
+     * @throws RuleAbortException
+     *         If the {@link LoopInvariantBuiltInRuleApp} does not contain a
      *         {@link LoopSpecification}.
      */
     protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
@@ -376,9 +406,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term progPost = update.second;
 
         // focus (below update) must be modality term
-        if (!isModalityTerm(progPost)) {
-            return null;
-        }
+        if (!isModalityTerm(progPost)) { return null; }
 
         // active statement must be while loop
         final While loop = app.getLoopStatement();
@@ -393,9 +421,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         // collect self, execution context
         final MethodFrame innermostMethodFrame =
             JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
-        if (innermostMethodFrame != null) {
-            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
-        }
+        if (innermostMethodFrame != null) { spec = spec.setTarget(innermostMethodFrame.getProgramMethod()); }
 
         final Term selfTerm = innermostMethodFrame == null ? null
                 : MiscTools.getSelfTerm(innermostMethodFrame, services);
@@ -418,10 +444,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Computes the anonymizing update, the loop heap, the base heap, and the anonymized heap.
      *
-     * @param heap The original heap {@link LocationVariable}.
-     * @param mod The modifiers term.
-     * @param inv The loop invariant.
-     * @param services The {@link Services} object.
+     * @param heap
+     *        The original heap {@link LocationVariable}.
+     * @param mod
+     *        The modifiers term.
+     * @param inv
+     *        The loop invariant.
+     * @param services
+     *        The {@link Services} object.
      * @return An {@link AnonUpdateData} object encapsulating the anonymizing update, the loop heap,
      *         the base heap, and the anonymized heap.
      */
@@ -457,13 +487,19 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Prepare anon update, wellformed formula, frame condition and reachable state formula.
      *
-     * @param services The {@link Services} object.
-     * @param inst The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule}
+     * @param services
+     *        The {@link Services} object.
+     * @param inst
+     *        The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule}
      *        app.
-     * @param heapContext TODO
-     * @param localOuts TODO
-     * @param heapToBeforeLoop TODO
-     * @param atPres TODO
+     * @param heapContext
+     *        TODO
+     * @param localOuts
+     *        TODO
+     * @param heapToBeforeLoop
+     *        TODO
+     * @param atPres
+     *        TODO
      * @return An {@link AdditionalHeapTerms} object containing the anonymized update, the
      *         wellformed formula, the frame condition formula, and the reachable state formula.
      */
@@ -476,9 +512,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         Term anonUpdate = createLocalAnonUpdate(localOuts, services);
         // can still be null
-        if (anonUpdate == null) {
-            anonUpdate = tb.skip();
-        }
+        if (anonUpdate == null) { anonUpdate = tb.skip(); }
 
         Term wellFormedAnon = null;
         Term frameCondition = null;
@@ -540,10 +574,10 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *
      * @author Dominic Scheurer
      */
-    protected record AdditionalHeapTerms(Term anonUpdate, Term wellFormedAnon, Term frameCondition,
+    protected record AdditionalHeapTerms(
+            Term anonUpdate, Term wellFormedAnon, Term frameCondition,
             Term reachableState,
-            ImmutableList<AnonUpdateData> anonUpdateData) {
-    }
+            ImmutableList<AnonUpdateData> anonUpdateData) {}
 
     /**
      * A container for an instantiation of this {@link LoopScopeInvariantRule} application; contains
@@ -551,10 +585,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * {@link LoopScopeInvariantRule} should be applied to, the {@link LoopSpecification}, the
      * self {@link Term}.
      *
-     * @param innermostExecutionContext TODO Removed this field; was however used in old invariant rule. Could be needed for the information flow validity goal.
+     * @param innermostExecutionContext
+     *        TODO Removed this field; was however used in old invariant rule. Could be needed for the information flow
+     *        validity goal.
      */
-        public record Instantiation(Term u, Term progPost, While loop, LoopSpecification inv, Term selfTerm,
-                                       ExecutionContext innermostExecutionContext) {
+    public record Instantiation(
+            Term u, Term progPost, While loop, LoopSpecification inv, Term selfTerm,
+            ExecutionContext innermostExecutionContext) {
         public Instantiation {
             assert u != null;
             assert u.sort() == JavaDLTheory.UPDATE;
@@ -564,7 +601,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             assert inv != null;
 
         }
-        }
+    }
 
     /**
      * A container containing data for the anonymizing update, that is the actual update and the
@@ -585,55 +622,85 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * A container object containing the information required for the concrete loop invariant rules
      * to create the sequents for the new goals.
      *
-     * @param goal                      The original goal.
-     * @param services                  The {@link Services} object.
-     * @param inst                      The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule} app.
-     * @param ruleApp                   The {@link RuleApp} for this {@link LoopScopeInvariantRule} application.
-     * @param goals                     The goals created by the invariant rules application; those are filled with content by
-     *                                  the concrete loop invariant rules.
-     * @param termLabelState            The {@link TermLabelState}.
-     * @param invTerm                   The loop invariant formula.
-     * @param variantPO                 The proof obligation for the variant.
-     * @param reachableState            The reachable state formula.
-     * @param anonUpdate                The anonymized update {@link Term}.
-     * @param wellFormedAnon            The wellformed formula.
-     * @param uAnonInv                  A formula containing the anonymized update and the loop invariant.
-     * @param frameCondition            The frame condition.
-     * @param uBeforeLoopDefAnonVariant An array containing the original update, the "before the loop" update for reasoning about
-     *                                  the variant, the anonymized update, and the variant update.
-     * @param anonUpdateData            Anonymizing updates for all heaps.
+     * @param goal
+     *        The original goal.
+     * @param services
+     *        The {@link Services} object.
+     * @param inst
+     *        The {@link Instantiation} of parameters for the {@link LoopScopeInvariantRule} app.
+     * @param ruleApp
+     *        The {@link RuleApp} for this {@link LoopScopeInvariantRule} application.
+     * @param goals
+     *        The goals created by the invariant rules application; those are filled with content by
+     *        the concrete loop invariant rules.
+     * @param termLabelState
+     *        The {@link TermLabelState}.
+     * @param invTerm
+     *        The loop invariant formula.
+     * @param variantPO
+     *        The proof obligation for the variant.
+     * @param reachableState
+     *        The reachable state formula.
+     * @param anonUpdate
+     *        The anonymized update {@link Term}.
+     * @param wellFormedAnon
+     *        The wellformed formula.
+     * @param uAnonInv
+     *        A formula containing the anonymized update and the loop invariant.
+     * @param frameCondition
+     *        The frame condition.
+     * @param uBeforeLoopDefAnonVariant
+     *        An array containing the original update, the "before the loop" update for reasoning about
+     *        the variant, the anonymized update, and the variant update.
+     * @param anonUpdateData
+     *        Anonymizing updates for all heaps.
      */
-        public record LoopInvariantInformation(Goal goal, Services services, Instantiation inst,
-                                               LoopInvariantBuiltInRuleApp ruleApp, ImmutableList<Goal> goals,
-                                               TermLabelState termLabelState, Term invTerm, Term variantPO,
-                                               Term reachableState, Term anonUpdate, Term wellFormedAnon, Term uAnonInv,
-                                               Term frameCondition, Term[] uBeforeLoopDefAnonVariant,
-                                               ImmutableList<AnonUpdateData> anonUpdateData) {
+    public record LoopInvariantInformation(
+            Goal goal, Services services, Instantiation inst,
+            LoopInvariantBuiltInRuleApp ruleApp, ImmutableList<Goal> goals,
+            TermLabelState termLabelState, Term invTerm, Term variantPO,
+            Term reachableState, Term anonUpdate, Term wellFormedAnon, Term uAnonInv,
+            Term frameCondition, Term[] uBeforeLoopDefAnonVariant,
+            ImmutableList<AnonUpdateData> anonUpdateData) {
         /**
          * Creates a new {@link LoopInvariantInformation} object.
          *
-         * @param goal                      TODO
-         * @param services                  The {@link Services} object.
-         * @param inst                      The {@link Instantiation} of parameters for the
-         *                                  {@link LoopScopeInvariantRule} app.
-         * @param ruleApp                   The {@link RuleApp} for this {@link LoopScopeInvariantRule} application.
-         * @param goals                     The goals created by the invariant rules application; those are filled with
-         *                                  content by the concrete loop invariant rules.
-         * @param termLabelState            The {@link TermLabelState}.
-         * @param invTerm                   The loop invariant formula.
-         * @param variantPO                 The proof obligation for the variant.
-         * @param reachableState            The reachable state formula.
-         * @param anonUpdate                The anonymized update {@link Term}.
-         * @param wellFormedAnon            The wellformed formula.
-         * @param uAnonInv                  A formula containing the anonymized update and the loop invariant.
-         * @param frameCondition            The frame condition.
-         * @param uBeforeLoopDefAnonVariant An array containing the original update, the "before the
-         *                                  loop" update for reasoning about the variant, the anonymized update, and the
-         *                                  variant update.
-         * @param anonUpdateData            TODO
+         * @param goal
+         *        TODO
+         * @param services
+         *        The {@link Services} object.
+         * @param inst
+         *        The {@link Instantiation} of parameters for the
+         *        {@link LoopScopeInvariantRule} app.
+         * @param ruleApp
+         *        The {@link RuleApp} for this {@link LoopScopeInvariantRule} application.
+         * @param goals
+         *        The goals created by the invariant rules application; those are filled with
+         *        content by the concrete loop invariant rules.
+         * @param termLabelState
+         *        The {@link TermLabelState}.
+         * @param invTerm
+         *        The loop invariant formula.
+         * @param variantPO
+         *        The proof obligation for the variant.
+         * @param reachableState
+         *        The reachable state formula.
+         * @param anonUpdate
+         *        The anonymized update {@link Term}.
+         * @param wellFormedAnon
+         *        The wellformed formula.
+         * @param uAnonInv
+         *        A formula containing the anonymized update and the loop invariant.
+         * @param frameCondition
+         *        The frame condition.
+         * @param uBeforeLoopDefAnonVariant
+         *        An array containing the original update, the "before the
+         *        loop" update for reasoning about the variant, the anonymized update, and the
+         *        variant update.
+         * @param anonUpdateData
+         *        TODO
          */
-        public LoopInvariantInformation {
-        }
-        }
+        public LoopInvariantInformation {}
+    }
 
 }

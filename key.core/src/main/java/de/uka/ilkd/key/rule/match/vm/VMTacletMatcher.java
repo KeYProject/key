@@ -81,7 +81,8 @@ public class VMTacletMatcher implements TacletMatcher {
     private final Term findExp;
 
     /**
-     * @param taclet the Taclet matched by this matcher
+     * @param taclet
+     *        the Taclet matched by this matcher
      */
     public VMTacletMatcher(Taclet taclet) {
         varconditions = taclet.getVariableConditions();
@@ -127,16 +128,12 @@ public class VMTacletMatcher implements TacletMatcher {
         ImmutableList<UpdateLabelPair> context =
             ImmutableSLList.nil();
 
-        if (updateContextPresent) {
-            context = p_matchCond.getInstantiations().getUpdateContext();
-        }
+        if (updateContextPresent) { context = p_matchCond.getInstantiations().getUpdateContext(); }
 
         for (var cf : p_toMatch) {
             Term formula = cf.getConstrainedFormula().formula();
 
-            if (updateContextPresent) {
-                formula = matchUpdateContext(context, formula);
-            }
+            if (updateContextPresent) { formula = matchUpdateContext(context, formula); }
             if (formula != null) {// update context not present or update context match succeeded
                 final MatchConditions newMC =
                     checkConditions(prg.match(formula, p_matchCond, p_services), p_services);
@@ -155,8 +152,10 @@ public class VMTacletMatcher implements TacletMatcher {
      * If it does not then {@code null} is returned, otherwise the formula without the update
      * context.
      *
-     * @param context the list of update label pairs describing the update context
-     * @param formula the formula whose own update context must be equal (modulo renaming) to the
+     * @param context
+     *        the list of update label pairs describing the update context
+     * @param formula
+     *        the formula whose own update context must be equal (modulo renaming) to the
      *        given one
      * @return {@code null} if the update context does not match the one of the formula or the
      *         formula without the update context
@@ -207,19 +206,16 @@ public class VMTacletMatcher implements TacletMatcher {
             Iterator<SequentFormula> itIfSequent = candidateInAntec ? anteIterator : succIterator;
             // Fix end
 
-            assert itIfSequent.hasNext()
-                    : "p_toMatch and assumes sequent must have same number of elements";
+            assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
-            if (newMC.isEmpty()) {
-                return null;
-            }
+            if (newMC.isEmpty()) { return null; }
 
             p_matchCond = newMC.head();
         }
-        assert !anteIterator.hasNext() && !succIterator.hasNext()
-                : "p_toMatch and assumes sequent must have same number of elements";
+        assert !anteIterator.hasNext()
+                && !succIterator.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
 
         return p_matchCond;
     }
@@ -251,15 +247,12 @@ public class VMTacletMatcher implements TacletMatcher {
     /**
      * looks if a variable is declared as not free in
      *
-     * @param var the SchemaVariable to look for
+     * @param var
+     *        the SchemaVariable to look for
      * @return true iff declared not free
      */
     private boolean varDeclaredNotFree(SchemaVariable var) {
-        for (final NotFreeIn nfi : varsNotFreeIn) {
-            if (nfi.first() == var) {
-                return true;
-            }
-        }
+        for (final NotFreeIn nfi : varsNotFreeIn) { if (nfi.first() == var) { return true; } }
         return false;
     }
 
@@ -268,7 +261,8 @@ public class VMTacletMatcher implements TacletMatcher {
      * returns true iff the given variable is bound either in the ifSequent or in any part of the
      * TacletGoalTemplates
      *
-     * @param v the bound variable to be searched
+     * @param v
+     *        the bound variable to be searched
      */
     private boolean varIsBound(SchemaVariable v) {
         return (v instanceof QuantifiableVariable) && boundVars.contains((QuantifiableVariable) v);
@@ -306,8 +300,10 @@ public class VMTacletMatcher implements TacletMatcher {
      * ignores a possible update prefix This method assumes that the taclet allows to ignore updates
      * and the find expression does not start with an update application operator
      *
-     * @param term the term to be matched
-     * @param matchCond the accumulated match conditions for a successful match
+     * @param term
+     *        the term to be matched
+     * @param matchCond
+     *        the accumulated match conditions for a successful match
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates
      *         (Which have been added to the update context in the match conditions)
      */
@@ -362,9 +358,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
         matchCond = instr.match(term, matchCond, services);
 
-        if (matchCond != null) {
-            matchCond = checkVariableConditions(sv, term, matchCond, services);
-        }
+        if (matchCond != null) { matchCond = checkVariableConditions(sv, term, matchCond, services); }
 
         return matchCond;
     }
@@ -379,9 +373,7 @@ public class VMTacletMatcher implements TacletMatcher {
             TacletMatchProgram.getMatchInstructionForSV(sv);
         matchCond = instr.match(pe, matchCond, services);
 
-        if (matchCond != null) {
-            matchCond = checkConditions(matchCond, services);
-        }
+        if (matchCond != null) { matchCond = checkConditions(matchCond, services); }
 
         return matchCond;
     }

@@ -32,7 +32,8 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * children may contain: TypeReference (for import), a Comment
      *
-     * @param isMultiImport indicates whether the import contains multiple imports
+     * @param isMultiImport
+     *        indicates whether the import contains multiple imports
      */
     public Import(ExtList children, boolean isMultiImport) {
         super(children);
@@ -52,8 +53,10 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Import.
      *
-     * @param t a type reference.
-     * @param multi indicates the wildcard.
+     * @param t
+     *        a type reference.
+     * @param multi
+     *        indicates the wildcard.
      */
     public Import(TypeReference t, boolean multi, PositionInfo pi, List<Comment> comments) {
         super(pi, comments);
@@ -64,7 +67,8 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Import.
      *
-     * @param t a package reference.
+     * @param t
+     *        a package reference.
      */
 
     public Import(PackageReference t, PositionInfo pi, List<Comment> comments) {
@@ -94,25 +98,21 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (reference != null) {
-            result++;
-        }
+        if (reference != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (reference != null) {
-            if (index == 0) {
-                return reference;
-            }
-        }
+        if (reference != null) { if (index == 0) { return reference; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -138,9 +138,7 @@ public class Import extends JavaNonTerminalProgramElement
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (reference instanceof TypeReference && index == 0) {
-            return (TypeReference) reference;
-        }
+        if (reference instanceof TypeReference && index == 0) { return (TypeReference) reference; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -178,7 +176,8 @@ public class Import extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnImport(this);

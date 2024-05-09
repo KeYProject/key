@@ -38,7 +38,8 @@ public abstract class JavaSourceElement implements SourceElement {
     /**
      * Java source element.
      *
-     * @param pi PositionInfo the PositionInfo of the element
+     * @param pi
+     *        PositionInfo the PositionInfo of the element
      */
     public JavaSourceElement(PositionInfo pi) {
         posInfo = getPosInfo(pi);
@@ -47,7 +48,8 @@ public abstract class JavaSourceElement implements SourceElement {
     /**
      * Java source element.
      *
-     * @param children a list of the children of this element. May contain: PositionInfo
+     * @param children
+     *        a list of the children of this element. May contain: PositionInfo
      */
     public JavaSourceElement(ExtList children) {
         posInfo = getPosInfo(children.get(PositionInfo.class));
@@ -61,7 +63,8 @@ public abstract class JavaSourceElement implements SourceElement {
     /**
      * internal method use to guarantee the position info object is always not the null reference
      *
-     * @param p a PositionInfo
+     * @param p
+     *        a PositionInfo
      * @return if <tt>p</tt> is <tt>null</tt> the undefined position
      *         ({@link PositionInfo#UNDEFINED}) is returned otherwise <tt>p</tt>
      */
@@ -150,7 +153,8 @@ public abstract class JavaSourceElement implements SourceElement {
      * this violates immutability, but the method is only called right after the object is
      * created...
      *
-     * @param s the path of the parent class as String
+     * @param s
+     *        the path of the parent class as String
      */
     protected void setParentClass(URI s) {
         posInfo.setParentClassURI(s);

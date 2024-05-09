@@ -25,7 +25,6 @@ public class EmptySequent extends SequentView {
     }
 
     @Override
-    public void printSequent() {
-    }
+    public void printSequent() {}
 
 }

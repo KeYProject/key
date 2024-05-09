@@ -75,7 +75,8 @@ public class LongLiteral extends AbstractIntegerLiteral {
     /**
      * Creates a new LongLiteral representing the given long.
      *
-     * @param value the long value represented by the literal
+     * @param value
+     *        the long value represented by the literal
      */
     public LongLiteral(long value) {
         this(null, null, value);
@@ -87,8 +88,10 @@ public class LongLiteral extends AbstractIntegerLiteral {
      * Specification. This includes hexadecimal, decimal, octal, and binary literals as well as
      * literals containing underscores as separators. In addition, a preceding '-' sign is allowed.
      *
-     * @param valStr the String that contains the literal
-     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     * @param valStr
+     *        the String that contains the literal
+     * @throws NumberFormatException
+     *         if the given String does not represent a syntactically valid
      *         literal or represents a value out of long range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
      *      http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
@@ -100,9 +103,12 @@ public class LongLiteral extends AbstractIntegerLiteral {
     /**
      * Constructor for Recoder2KeY transformation.
      *
-     * @param children the children of this AST element as KeY classes, may contain: Comments
-     * @param valStr the value of the literal
-     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     * @param children
+     *        the children of this AST element as KeY classes, may contain: Comments
+     * @param valStr
+     *        the value of the literal
+     * @throws NumberFormatException
+     *         if the given String does not represent a syntactically valid
      *         literal or represents a value out of long range
      */
     public LongLiteral(ExtList children, String valStr) {
@@ -145,9 +151,11 @@ public class LongLiteral extends AbstractIntegerLiteral {
      * considering the asymmetric range of long.
      * Hexadecimal, octal and binary literals are converted using two's complement.
      *
-     * @param sourceStr the String containing the value
+     * @param sourceStr
+     *        the String containing the value
      * @return the parsed value as a long
-     * @throws NumberFormatException if the given String does not represent a syntactically valid
+     * @throws NumberFormatException
+     *         if the given String does not represent a syntactically valid
      *         literal or represents a value out of long range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
      *      http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
@@ -170,9 +178,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
         valStr = valStr.replace("_", "");
 
         // remove long suffix
-        if (valStr.endsWith("L") || valStr.endsWith("l")) {
-            valStr = valStr.substring(0, valStr.length() - 1);
-        }
+        if (valStr.endsWith("L") || valStr.endsWith("l")) { valStr = valStr.substring(0, valStr.length() - 1); }
 
         if (valStr.startsWith("0x") || valStr.startsWith("0X")) { // hex
             radix = 16;
@@ -186,9 +192,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
         }
 
         // add minus sign again
-        if (neg) {
-            valStr = "-" + valStr;
-        }
+        if (neg) { valStr = "-" + valStr; }
 
         ///////////////////////////////////////////////////////////////////////////
         /* range check and actual conversion: */

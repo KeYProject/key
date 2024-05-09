@@ -160,14 +160,22 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Creates a new oracle file.
      *
-     * @param node The node to save as oracle file.
-     * @param oraclePathInBaseDirFile The path in example directory.
-     * @param saveConstraints Save constraints?
-     * @param saveVariables Save variables?
-     * @param saveCallStack Save call stack?
-     * @param saveReturnValues Save method return values?
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
+     * @param node
+     *        The node to save as oracle file.
+     * @param oraclePathInBaseDirFile
+     *        The path in example directory.
+     * @param saveConstraints
+     *        Save constraints?
+     * @param saveVariables
+     *        Save variables?
+     * @param saveCallStack
+     *        Save call stack?
+     * @param saveReturnValues
+     *        Save method return values?
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     protected static void createOracleFile(IExecutionNode<?> node, String oraclePathInBaseDirFile,
             boolean saveConstraints, boolean saveVariables, boolean saveCallStack,
@@ -207,14 +215,22 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given nodes and their subtrees contains the same content.
      *
-     * @param expected The expected {@link IExecutionNode}.
-     * @param current The current {@link IExecutionNode}.
-     * @param compareVariables Compare variables?
-     * @param compareCallStack Compare call stack?
-     * @param compareChildOrder Is the order of children relevant?
-     * @param compareReturnValues Compare return values?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionNode}.
+     * @param current
+     *        The current {@link IExecutionNode}.
+     * @param compareVariables
+     *        Compare variables?
+     * @param compareCallStack
+     *        Compare call stack?
+     * @param compareChildOrder
+     *        Is the order of children relevant?
+     * @param compareReturnValues
+     *        Compare return values?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static void assertExecutionNodes(IExecutionNode<?> expected, IExecutionNode<?> current,
             boolean compareVariables, boolean compareCallStack, boolean compareChildOrder,
@@ -242,9 +258,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             while (expectedExecutionTreeNodeIterator.hasNext()) {
                 IExecutionNode<?> expectedNext = expectedExecutionTreeNodeIterator.next();
                 IExecutionNode<?> currentNext = searchExecutionNode(current, expectedNext);
-                if (!currentVisitedNodes.add(currentNext)) {
-                    fail("Node " + currentNext + " visited twice.");
-                }
+                if (!currentVisitedNodes.add(currentNext)) { fail("Node " + currentNext + " visited twice."); }
                 assertExecutionNode(expectedNext, currentNext, true, compareVariables,
                     compareCallStack, compareReturnValues, compareConstraints);
             }
@@ -264,10 +278,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Searches the direct or indirect child in subtree of the node to search in.
      *
-     * @param toSearchIn The node to search in.
-     * @param childToSearch The node to search.
+     * @param toSearchIn
+     *        The node to search in.
+     * @param childToSearch
+     *        The node to search.
      * @return The found node.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static IExecutionNode<?> searchExecutionNode(IExecutionNode<?> toSearchIn,
             IExecutionNode<?> childToSearch) throws ProofInputException {
@@ -277,10 +294,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         // Collect parents
         Deque<IExecutionNode<?>> parents = new LinkedList<>();
         IExecutionNode<?> parent = childToSearch;
-        while (parent != null) {
-            parents.addFirst(parent);
-            parent = parent.getParent();
-        }
+        while (parent != null) { parents.addFirst(parent); parent = parent.getParent(); }
         // Search children in parent order
         boolean afterFirst = false;
         for (IExecutionNode<?> currentParent : parents) {
@@ -291,17 +305,20 @@ public abstract class AbstractSymbolicExecutionTestCase {
             }
         }
         assertNotNull(toSearchIn, "Direct or indirect Child " + childToSearch
-            + " is not contained in " + toSearchIn + ".");
+                + " is not contained in " + toSearchIn + ".");
         return toSearchIn;
     }
 
     /**
      * Searches the direct child. Nodes are equal if the name and the element type is equal.
      *
-     * @param parentToSearchIn The parent to search in its children.
-     * @param directChildToSearch The child to search.
+     * @param parentToSearchIn
+     *        The parent to search in its children.
+     * @param directChildToSearch
+     *        The child to search.
      * @return The found child.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static IExecutionNode<?> searchDirectChildNode(IExecutionNode<?> parentToSearchIn,
             IExecutionNode<?> directChildToSearch) throws ProofInputException {
@@ -343,14 +360,22 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given nodes contains the same content. Children are not compared.
      *
-     * @param expected The expected {@link IExecutionNode}.
-     * @param current The current {@link IExecutionNode}.
-     * @param compareParent Compare also the parent node?
-     * @param compareVariables Compare variables?
-     * @param compareCallStack Compare call stack?
-     * @param compareReturnValues Compare return values?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionNode}.
+     * @param current
+     *        The current {@link IExecutionNode}.
+     * @param compareParent
+     *        Compare also the parent node?
+     * @param compareVariables
+     *        Compare variables?
+     * @param compareCallStack
+     *        Compare call stack?
+     * @param compareReturnValues
+     *        Compare return values?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertExecutionNode(IExecutionNode<?> expected, IExecutionNode<?> current,
             boolean compareParent, boolean compareVariables, boolean compareCallStack,
@@ -390,8 +415,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
                     ((IExecutionBranchCondition) expected).getFormatedBranchCondition(),
                     ((IExecutionBranchCondition) current).getFormatedBranchCondition()),
                 "Expected \"" + ((IExecutionBranchCondition) expected).getFormatedBranchCondition()
-                    + "\" but is \""
-                    + ((IExecutionBranchCondition) current).getFormatedBranchCondition() + "\".");
+                        + "\" but is \""
+                        + ((IExecutionBranchCondition) current).getFormatedBranchCondition() + "\".");
             assertEquals(((IExecutionBranchCondition) expected).isMergedBranchCondition(),
                 ((IExecutionBranchCondition) current).isMergedBranchCondition());
             assertEquals(((IExecutionBranchCondition) expected).isBranchConditionComputed(),
@@ -401,20 +426,20 @@ public abstract class AbstractSymbolicExecutionTestCase {
                     ((IExecutionBranchCondition) expected).getAdditionalBranchLabel(),
                     ((IExecutionBranchCondition) current).getAdditionalBranchLabel()),
                 "Expected \"" + ((IExecutionBranchCondition) expected).getAdditionalBranchLabel()
-                    + "\" but is \""
-                    + ((IExecutionBranchCondition) current).getAdditionalBranchLabel() + "\".");
+                        + "\" but is \""
+                        + ((IExecutionBranchCondition) current).getAdditionalBranchLabel() + "\".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionStart) {
             assertTrue(current instanceof IExecutionStart, "Expected IExecutionStartNode but is "
-                + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertTerminations((IExecutionStart) expected, (IExecutionStart) current);
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionTermination) {
             assertTrue(current instanceof IExecutionTermination,
                 "Expected IExecutionTermination but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertEquals(((IExecutionTermination) expected).getTerminationKind(),
                 ((IExecutionTermination) current).getTerminationKind());
             assertEquals(((IExecutionTermination) expected).isBranchVerified(),
@@ -424,52 +449,52 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else if (expected instanceof IExecutionBranchStatement) {
             assertTrue(current instanceof IExecutionBranchStatement,
                 "Expected IExecutionBranchStatement but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionLoopCondition) {
             assertTrue(current instanceof IExecutionLoopCondition,
                 "Expected IExecutionLoopCondition but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionLoopStatement) {
             assertTrue(current instanceof IExecutionLoopStatement,
                 "Expected IExecutionLoopStatement but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionMethodCall) {
             assertTrue(current instanceof IExecutionMethodCall,
                 "Expected IExecutionMethodCall but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
             assertMethodReturns((IExecutionMethodCall) expected, (IExecutionMethodCall) current);
         } else if (expected instanceof IExecutionMethodReturn) {
             assertTrue(current instanceof IExecutionMethodReturn,
                 "Expected IExecutionMethodReturn but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertTrue(
                 StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn) expected).getSignature(),
                     ((IExecutionMethodReturn) current).getSignature()),
                 ((IExecutionMethodReturn) expected).getSignature() + " does not match "
-                    + ((IExecutionMethodReturn) current).getSignature());
+                        + ((IExecutionMethodReturn) current).getSignature());
             if (compareReturnValues) {
                 assertTrue(
                     StringUtil.equalIgnoreWhiteSpace(
                         ((IExecutionMethodReturn) expected).getNameIncludingReturnValue(),
                         ((IExecutionMethodReturn) current).getNameIncludingReturnValue()),
                     ((IExecutionMethodReturn) expected).getNameIncludingReturnValue()
-                        + " does not match "
-                        + ((IExecutionMethodReturn) current).getNameIncludingReturnValue());
+                            + " does not match "
+                            + ((IExecutionMethodReturn) current).getNameIncludingReturnValue());
                 assertTrue(
                     StringUtil.equalIgnoreWhiteSpace(
                         ((IExecutionMethodReturn) expected).getSignatureIncludingReturnValue(),
                         ((IExecutionMethodReturn) current).getSignatureIncludingReturnValue()),
                     ((IExecutionMethodReturn) expected).getSignatureIncludingReturnValue()
-                        + " does not match "
-                        + ((IExecutionMethodReturn) current).getSignatureIncludingReturnValue());
+                            + " does not match "
+                            + ((IExecutionMethodReturn) current).getSignatureIncludingReturnValue());
                 assertEquals(((IExecutionMethodReturn) expected).isReturnValuesComputed(),
                     ((IExecutionMethodReturn) current).isReturnValuesComputed());
             }
@@ -478,8 +503,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
                     ((IExecutionMethodReturn) expected).getFormattedMethodReturnCondition(),
                     ((IExecutionMethodReturn) current).getFormattedMethodReturnCondition()),
                 ((IExecutionMethodReturn) expected).getFormattedMethodReturnCondition()
-                    + " does not match "
-                    + ((IExecutionMethodReturn) current).getFormattedMethodReturnCondition());
+                        + " does not match "
+                        + ((IExecutionMethodReturn) current).getFormattedMethodReturnCondition());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
             if (compareReturnValues) {
@@ -489,31 +514,31 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else if (expected instanceof IExecutionExceptionalMethodReturn) {
             assertTrue(current instanceof IExecutionExceptionalMethodReturn,
                 "Expected IExecutionExceptionalMethodReturn but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertTrue(
                 StringUtil.equalIgnoreWhiteSpace(
                     ((IExecutionExceptionalMethodReturn) expected).getSignature(),
                     ((IExecutionExceptionalMethodReturn) current).getSignature()),
                 ((IExecutionExceptionalMethodReturn) expected).getSignature() + " does not match "
-                    + ((IExecutionExceptionalMethodReturn) current).getSignature());
+                        + ((IExecutionExceptionalMethodReturn) current).getSignature());
             assertTrue(StringUtil.equalIgnoreWhiteSpace(
                 ((IExecutionExceptionalMethodReturn) expected).getFormattedMethodReturnCondition(),
                 ((IExecutionExceptionalMethodReturn) current).getFormattedMethodReturnCondition()),
                 ((IExecutionExceptionalMethodReturn) expected).getFormattedMethodReturnCondition()
-                    + " does not match " + ((IExecutionExceptionalMethodReturn) current)
-                            .getFormattedMethodReturnCondition());
+                        + " does not match " + ((IExecutionExceptionalMethodReturn) current)
+                                .getFormattedMethodReturnCondition());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionStatement) {
             assertTrue(current instanceof IExecutionStatement,
                 "Expected IExecutionStatement but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionOperationContract) {
             assertTrue(current instanceof IExecutionOperationContract,
                 "Expected IExecutionOperationContract but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertEquals(((IExecutionOperationContract) expected).isPreconditionComplied(),
                 ((IExecutionOperationContract) current).isPreconditionComplied());
             assertEquals(((IExecutionOperationContract) expected).hasNotNullCheck(),
@@ -533,7 +558,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else if (expected instanceof IExecutionLoopInvariant) {
             assertTrue(current instanceof IExecutionLoopInvariant,
                 "Expected IExecutionLoopInvariant but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertEquals(((IExecutionLoopInvariant) expected).isInitiallyValid(),
                 ((IExecutionLoopInvariant) current).isInitiallyValid());
             assertVariables(expected, current, compareVariables, compareConstraints);
@@ -541,14 +566,14 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else if (expected instanceof IExecutionAuxiliaryContract) {
             assertTrue(current instanceof IExecutionAuxiliaryContract,
                 "Expected IExecutionBlockContract but is "
-                    + current.getClass() + ".");
+                        + current.getClass() + ".");
             assertEquals(((IExecutionAuxiliaryContract) expected).isPreconditionComplied(),
                 ((IExecutionAuxiliaryContract) current).isPreconditionComplied());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionJoin) {
             assertTrue(current instanceof IExecutionJoin, "Expected IExecutionJoin but is "
-                + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertEquals(((IExecutionJoin) expected).isWeakeningVerified(),
                 ((IExecutionJoin) current).isWeakeningVerified());
             assertVariables(expected, current, compareVariables, compareConstraints);
@@ -571,7 +596,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             } else {
                 assertTrue(currentStack == null || currentStack.length == 0,
                     "Call stack of \"" + current + "\" is \"" + Arrays.toString(currentStack)
-                        + "\" but should be null or empty.");
+                            + "\" but should be null or empty.");
             }
         }
         // Optionally compare parent
@@ -584,9 +609,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Compares the outgoing links.
      *
-     * @param expected The expected {@link IExecutionNode}.
-     * @param current The current {@link IExecutionNode}.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionNode}.
+     * @param current
+     *        The current {@link IExecutionNode}.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertOutgoingLinks(IExecutionNode<?> expected, IExecutionNode<?> current)
             throws ProofInputException {
@@ -612,16 +640,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertFalse(actualExecutionTreeNodeIterator.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(), "Outgoing links of \""
-                + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
+                    + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
         }
     }
 
     /**
      * Compares the incoming links.
      *
-     * @param expected The expected {@link IExecutionNode}.
-     * @param current The current {@link IExecutionNode}.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionNode}.
+     * @param current
+     *        The current {@link IExecutionNode}.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertIncomingLinks(IExecutionNode<?> expected, IExecutionNode<?> current)
             throws ProofInputException {
@@ -647,16 +678,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertFalse(actualExecutionTreeNodeIterator.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(), "Incoming links of \""
-                + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
+                    + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
         }
     }
 
     /**
      * Compares the completed blocks.
      *
-     * @param expected The expected {@link IExecutionNode}.
-     * @param current The current {@link IExecutionNode}.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionNode}.
+     * @param current
+     *        The current {@link IExecutionNode}.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertCompletedBlocks(IExecutionNode<?> expected,
             IExecutionNode<?> current) throws ProofInputException {
@@ -688,16 +722,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
                 "Completed block entries of \"" + current + "\" is \"" + currentEntries
-                    + "\" but should be null or empty.");
+                        + "\" but should be null or empty.");
         }
     }
 
     /**
      * Compares the block completions.
      *
-     * @param expected The expected {@link IExecutionBlockStartNode}.
-     * @param current The current {@link IExecutionBlockStartNode}.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionBlockStartNode}.
+     * @param current
+     *        The current {@link IExecutionBlockStartNode}.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertBlockCompletions(IExecutionBlockStartNode<?> expected,
             IExecutionBlockStartNode<?> current) throws ProofInputException {
@@ -722,16 +759,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
                 "Block completion entries of \"" + current + "\" is \"" + currentEntries
-                    + "\" but should be null or empty.");
+                        + "\" but should be null or empty.");
         }
     }
 
     /**
      * Compares the method returns.
      *
-     * @param expected The expected {@link IExecutionMethodCall}.
-     * @param current The current {@link IExecutionMethodCall}.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionMethodCall}.
+     * @param current
+     *        The current {@link IExecutionMethodCall}.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertMethodReturns(IExecutionMethodCall expected,
             IExecutionMethodCall current) throws ProofInputException {
@@ -757,16 +797,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
                 "Method return entries of \"" + current + "\" is \"" + currentEntries
-                    + "\" but should be null or empty.");
+                        + "\" but should be null or empty.");
         }
     }
 
     /**
      * Compares the terminations.
      *
-     * @param expected The expected {@link IExecutionStart}.
-     * @param current The current {@link IExecutionStart}.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionStart}.
+     * @param current
+     *        The current {@link IExecutionStart}.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertTerminations(IExecutionStart expected, IExecutionStart current)
             throws ProofInputException {
@@ -791,33 +834,37 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
                 "Termination entries of \"" + current + "\" is \"" + currentEntries
-                    + "\" but should be null or empty.");
+                        + "\" but should be null or empty.");
         }
     }
 
     /**
      * Makes sure that the given nodes contains the same {@link IExecutionMethodReturnValue}s.
      *
-     * @param expected The expected {@link IExecutionMethodReturnValue}s.
-     * @param current The current {@link IExecutionMethodReturnValue}s.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionMethodReturnValue}s.
+     * @param current
+     *        The current {@link IExecutionMethodReturnValue}s.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertReturnValues(IExecutionMethodReturnValue[] expected,
             IExecutionMethodReturnValue[] current) throws ProofInputException {
         assertNotNull(expected);
         assertNotNull(current);
         assertEquals(expected.length, current.length);
-        for (int i = 0; i < expected.length; i++) {
-            assertReturnValue(expected[i], current[i]);
-        }
+        for (int i = 0; i < expected.length; i++) { assertReturnValue(expected[i], current[i]); }
     }
 
     /**
      * Makes sure that the given {@link IExecutionMethodReturnValue}s are the same.
      *
-     * @param expected The expected {@link IExecutionMethodReturnValue}.
-     * @param current The current {@link IExecutionMethodReturnValue}.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected {@link IExecutionMethodReturnValue}.
+     * @param current
+     *        The current {@link IExecutionMethodReturnValue}.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertReturnValue(IExecutionMethodReturnValue expected,
             IExecutionMethodReturnValue current) throws ProofInputException {
@@ -839,10 +886,14 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given nodes contains the same {@link IExecutionNode}s.
      *
-     * @param expected The expected node.
-     * @param current The current node.
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected node.
+     * @param current
+     *        The current node.
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertConstraints(IExecutionNode<?> expected, IExecutionNode<?> current,
             boolean compareConstraints) throws ProofInputException {
@@ -858,9 +909,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given constraints are the same.
      *
-     * @param expected The expected constraints.
-     * @param current The current constraints.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected constraints.
+     * @param current
+     *        The current constraints.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertConstraints(IExecutionConstraint[] expected,
             IExecutionConstraint[] current) throws ProofInputException {
@@ -889,9 +943,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given constraints are the same.
      *
-     * @param expected The expected constraint.
-     * @param current The current constraint.
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected constraint.
+     * @param current
+     *        The current constraint.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertConstraint(IExecutionConstraint expected,
             IExecutionConstraint current) throws ProofInputException {
@@ -909,11 +966,16 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Makes sure that the given nodes contains the same {@link IExecutionVariable}s of the call
      * state.
      *
-     * @param expected The expected node.
-     * @param current The current node.
-     * @param compareVariables Compare variables?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected node.
+     * @param current
+     *        The current node.
+     * @param compareVariables
+     *        Compare variables?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertCallStateVariables(IExecutionBaseMethodReturn<?> expected,
             IExecutionBaseMethodReturn<?> current, boolean compareVariables,
@@ -930,11 +992,16 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given nodes contains the same {@link IExecutionVariable}s.
      *
-     * @param expected The expected node.
-     * @param current The current node.
-     * @param compareVariables Compare variables?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected node.
+     * @param current
+     *        The current node.
+     * @param compareVariables
+     *        Compare variables?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertVariables(IExecutionNode<?> expected, IExecutionNode<?> current,
             boolean compareVariables, boolean compareConstraints) throws ProofInputException {
@@ -950,12 +1017,18 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given variables are the same.
      *
-     * @param expected The expected variables.
-     * @param current The current variables.
-     * @param compareParent Compare parent?
-     * @param compareChildren Compare children?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected variables.
+     * @param current
+     *        The current variables.
+     * @param compareParent
+     *        Compare parent?
+     * @param compareChildren
+     *        Compare children?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertVariables(IExecutionVariable[] expected,
             IExecutionVariable[] current, boolean compareParent, boolean compareChildren,
@@ -986,12 +1059,18 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given variables are the same.
      *
-     * @param expected The expected variable.
-     * @param current The current variable.
-     * @param compareParent Compare parent?
-     * @param compareChildren Compare children?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected variable.
+     * @param current
+     *        The current variable.
+     * @param compareParent
+     *        Compare parent?
+     * @param compareChildren
+     *        Compare children?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertVariable(IExecutionVariable expected, IExecutionVariable current,
             boolean compareParent, boolean compareChildren, boolean compareConstraints)
@@ -1021,12 +1100,18 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given values are the same.
      *
-     * @param expected The expected values.
-     * @param current The current values.
-     * @param compareParent Compare parent?
-     * @param compareChildren Compare children?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected values.
+     * @param current
+     *        The current values.
+     * @param compareParent
+     *        Compare parent?
+     * @param compareChildren
+     *        Compare children?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertValues(IExecutionValue[] expected, IExecutionValue[] current,
             boolean compareParent, boolean compareChildren, boolean compareConstraints)
@@ -1059,12 +1144,18 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the given values are the same.
      *
-     * @param expected The expected variable.
-     * @param current The current variable.
-     * @param compareParent Compare parent?
-     * @param compareChildren Compare children?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param expected
+     *        The expected variable.
+     * @param current
+     *        The current variable.
+     * @param compareParent
+     *        Compare parent?
+     * @param compareChildren
+     *        Compare children?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertValue(IExecutionValue expected, IExecutionValue current,
             boolean compareParent, boolean compareChildren, boolean compareConstraints)
@@ -1112,16 +1203,26 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Executes a "step return" global on all goals on the given
      * {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param ui The {@link DefaultUserInterfaceControl} to use.
-     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
-     * @param oraclePathInBaseDirFile The oracle path.
-     * @param oracleIndex The index of the current step.
-     * @param oracleFileExtension The oracle file extension
-     * @param baseDir The base directory for oracles.
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
+     * @param ui
+     *        The {@link DefaultUserInterfaceControl} to use.
+     * @param builder
+     *        The {@link SymbolicExecutionGoalChooser} to do step on.
+     * @param oraclePathInBaseDirFile
+     *        The oracle path.
+     * @param oracleIndex
+     *        The index of the current step.
+     * @param oracleFileExtension
+     *        The oracle file extension
+     * @param baseDir
+     *        The base directory for oracles.
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
      */
     protected static void stepReturn(DefaultUserInterfaceControl ui,
             SymbolicExecutionTreeBuilder builder, String oraclePathInBaseDirFile, int oracleIndex,
@@ -1150,16 +1251,26 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Executes a "step return" global on all goals on the given
      * {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param ui The {@link DefaultUserInterfaceControl} to use.
-     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
-     * @param oraclePathInBaseDirFile The oracle path.
-     * @param oracleIndex The index of the current step.
-     * @param oracleFileExtension The oracle file extension
-     * @param baseDir The base directory for oracles.
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
+     * @param ui
+     *        The {@link DefaultUserInterfaceControl} to use.
+     * @param builder
+     *        The {@link SymbolicExecutionGoalChooser} to do step on.
+     * @param oraclePathInBaseDirFile
+     *        The oracle path.
+     * @param oracleIndex
+     *        The index of the current step.
+     * @param oracleFileExtension
+     *        The oracle file extension
+     * @param baseDir
+     *        The base directory for oracles.
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
      */
     protected static void stepReturnWithBreakpoints(DefaultUserInterfaceControl ui,
             SymbolicExecutionTreeBuilder builder, String oraclePathInBaseDirFile, int oracleIndex,
@@ -1188,16 +1299,26 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Executes a "step over" global on all goals on the given
      * {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param ui The {@link DefaultUserInterfaceControl} to use.
-     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
-     * @param oraclePathInBaseDirFile The oracle path.
-     * @param oracleIndex The index of the current step.
-     * @param oracleFileExtension The oracle file extension
-     * @param baseDir The base directory for oracles.
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
+     * @param ui
+     *        The {@link DefaultUserInterfaceControl} to use.
+     * @param builder
+     *        The {@link SymbolicExecutionGoalChooser} to do step on.
+     * @param oraclePathInBaseDirFile
+     *        The oracle path.
+     * @param oracleIndex
+     *        The index of the current step.
+     * @param oracleFileExtension
+     *        The oracle file extension
+     * @param baseDir
+     *        The base directory for oracles.
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
      */
     protected static void stepOver(DefaultUserInterfaceControl ui,
             SymbolicExecutionTreeBuilder builder, String oraclePathInBaseDirFile, int oracleIndex,
@@ -1225,17 +1346,27 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Executes a "step into" global on all goals on the given
      * {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param ui The {@link DefaultUserInterfaceControl} to use.
-     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
-     * @param oraclePathInBaseDirFile The oracle path.
-     * @param oracleIndex The index of the current step.
-     * @param oracleFileExtension The oracle file extension
-     * @param baseDir The base directory for oracles.
+     * @param ui
+     *        The {@link DefaultUserInterfaceControl} to use.
+     * @param builder
+     *        The {@link SymbolicExecutionGoalChooser} to do step on.
+     * @param oraclePathInBaseDirFile
+     *        The oracle path.
+     * @param oracleIndex
+     *        The index of the current step.
+     * @param oracleFileExtension
+     *        The oracle file extension
+     * @param baseDir
+     *        The base directory for oracles.
      * @return The found {@link SymbolicExecutionCompletions}.
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
      */
     protected static SymbolicExecutionCompletions stepInto(DefaultUserInterfaceControl ui,
             SymbolicExecutionTreeBuilder builder, String oraclePathInBaseDirFile, int oracleIndex,
@@ -1263,14 +1394,22 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Executes a "step into" global on all goals on the given
      * {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param ui The {@link DefaultUserInterfaceControl} to use.
-     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
-     * @param oraclePathInBaseDirFile The oracle path.
-     * @param baseDir The base directory for oracles.
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
+     * @param ui
+     *        The {@link DefaultUserInterfaceControl} to use.
+     * @param builder
+     *        The {@link SymbolicExecutionGoalChooser} to do step on.
+     * @param oraclePathInBaseDirFile
+     *        The oracle path.
+     * @param baseDir
+     *        The base directory for oracles.
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
      */
     protected static void resume(DefaultUserInterfaceControl ui,
             SymbolicExecutionTreeBuilder builder, String oraclePathInBaseDirFile, File baseDir)
@@ -1294,13 +1433,20 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that after a step the correct set tree is created.
      *
-     * @param builder The {@link SymbolicExecutionTreeBuilder} to test.
-     * @param oraclePathInBaseDirFile The oracle path.
-     * @param baseDir The base directory for oracles.
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
+     * @param builder
+     *        The {@link SymbolicExecutionTreeBuilder} to test.
+     * @param oraclePathInBaseDirFile
+     *        The oracle path.
+     * @param baseDir
+     *        The base directory for oracles.
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
      */
     protected static void assertSetTreeAfterStep(SymbolicExecutionTreeBuilder builder,
             String oraclePathInBaseDirFile, File baseDir)
@@ -1323,15 +1469,24 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that after a step the correct set tree is created.
      *
-     * @param builder The {@link SymbolicExecutionTreeBuilder} to test.
-     * @param oraclePathInBaseDirFile The oracle path.
-     * @param oracleIndex The index of the current step.
-     * @param oracleFileExtension The oracle file extension
-     * @param baseDir The base directory for oracles.
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
+     * @param builder
+     *        The {@link SymbolicExecutionTreeBuilder} to test.
+     * @param oraclePathInBaseDirFile
+     *        The oracle path.
+     * @param oracleIndex
+     *        The index of the current step.
+     * @param oracleFileExtension
+     *        The oracle file extension
+     * @param baseDir
+     *        The base directory for oracles.
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
      */
     protected static void assertSetTreeAfterStep(SymbolicExecutionTreeBuilder builder,
             String oraclePathInBaseDirFile, int oracleIndex, String oracleFileExtension,
@@ -1344,9 +1499,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Searches a {@link IProgramMethod} in the given {@link Services}.
      *
-     * @param services The {@link Services} to search in.
-     * @param containerTypeName The name of the type which contains the method.
-     * @param methodFullName The method name to search.
+     * @param services
+     *        The {@link Services} to search in.
+     * @param containerTypeName
+     *        The name of the type which contains the method.
+     * @param methodFullName
+     *        The method name to search.
      * @return The first found {@link IProgramMethod} in the type.
      */
     public static IProgramMethod searchProgramMethod(Services services, String containerTypeName,
@@ -1359,29 +1517,44 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * finding the method to proof, instantiation of proof and creation with configuration of
      * {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param baseContractName The name of the contract.
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param baseContractName
+     *        The name of the contract.
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled,
+     * @param truthValueEvaluationEnabled
+     *        {@code true} truth value evaluation is enabled,
      *        {@code false} truth value evaluation is disabled.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      * @return The created {@link SymbolicExecutionEnvironment}.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(
             File baseDir, String javaPathInBaseDir, String baseContractName,
@@ -1427,30 +1600,47 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * finding the method to proof, instantiation of proof and creation with configuration of
      * {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param containerTypeName The name of the type which contains the method.
-     * @param methodFullName The method name to search.
-     * @param precondition An optional precondition to use.
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param containerTypeName
+     *        The name of the type which contains the method.
+     * @param methodFullName
+     *        The method name to search.
+     * @param precondition
+     *        An optional precondition to use.
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      * @return The created {@link SymbolicExecutionEnvironment}.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(
             File baseDir, String javaPathInBaseDir, String containerTypeName, String methodFullName,
@@ -1496,9 +1686,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         choices = choices.add(new Choice("methodExpansion", "noRestriction"));
 
         ProofSettings settings = env.getInitConfig().getSettings();
-        if (settings == null) {
-            settings = ProofSettings.DEFAULT_SETTINGS;
-        }
+        if (settings == null) { settings = ProofSettings.DEFAULT_SETTINGS; }
         settings.getChoiceSettings().updateWith(choices);
     }
 
@@ -1506,28 +1694,42 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Creates a {@link SymbolicExecutionEnvironment} which consists of loading a proof file to load
      * and creation with configuration of {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param proofPathInBaseDir The path to the proof file inside the base directory.
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param proofPathInBaseDir
+     *        The path to the proof file inside the base directory.
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled,
+     * @param truthValueEvaluationEnabled
+     *        {@code true} truth value evaluation is enabled,
      *        {@code false} truth value evaluation is disabled.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      * @return The created {@link SymbolicExecutionEnvironment}.
-     * @throws ProblemLoaderException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
      */
     protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(
             File baseDir, String proofPathInBaseDir, boolean mergeBranchConditions,
@@ -1568,32 +1770,51 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * finding the method to proof, instantiation of proof and creation with configuration of
      * {@link SymbolicExecutionTreeBuilder}.
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param containerTypeName The name of the type which contains the method.
-     * @param methodFullName The method name to search.
-     * @param precondition An optional precondition to use.
-     * @param startPosition The start position.
-     * @param endPosition The end position.
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param containerTypeName
+     *        The name of the type which contains the method.
+     * @param methodFullName
+     *        The method name to search.
+     * @param precondition
+     *        An optional precondition to use.
+     * @param startPosition
+     *        The start position.
+     * @param endPosition
+     *        The end position.
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      * @return The created {@link SymbolicExecutionEnvironment}.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(
             File baseDir, String javaPathInBaseDir, String containerTypeName, String methodFullName,
@@ -1637,7 +1858,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Extracts the content of the try block from the initial {@link Sequent}.
      *
-     * @param proof The {@link Proof} which contains the initial {@link Sequent}:
+     * @param proof
+     *        The {@link Proof} which contains the initial {@link Sequent}:
      * @return The try content.
      */
     protected String getTryContent(Proof proof) {
@@ -1663,16 +1885,25 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that the save and loading process works.
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param oraclePathInBaseDirFile The oracle path.
-     * @param env The already executed {@link SymbolicExecutionEnvironment} which contains the proof
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param oraclePathInBaseDirFile
+     *        The oracle path.
+     * @param env
+     *        The already executed {@link SymbolicExecutionEnvironment} which contains the proof
      *        to save/load.
-     * @throws IOException Occurred Exception
-     * @throws ProofInputException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     protected void assertSaveAndReload(File baseDir, String javaPathInBaseDir,
             String oraclePathInBaseDirFile, SymbolicExecutionEnvironment<?> env)
@@ -1700,12 +1931,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
             reloadedBuilder.analyse();
             assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
         } finally {
-            if (reloadedBuilder != null) {
-                reloadedBuilder.dispose();
-            }
-            if (reloadedEnv != null) {
-                reloadedEnv.dispose();
-            }
+            if (reloadedBuilder != null) { reloadedBuilder.dispose(); }
+            if (reloadedEnv != null) { reloadedEnv.dispose(); }
             tempFile.delete();
             assertFalse(tempFile.exists());
         }
@@ -1724,39 +1951,65 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * <li>Compare created symbolic execution tree with oracle model</li>
      * </ol>
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param containerTypeName The java class to test.
-     * @param methodFullName The method to test.
-     * @param precondition An optional precondition.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @param includeConstraints Include constraints?
-     * @param includeVariables Include variables?
-     * @param includeCallStack Include call stack?
-     * @param includeReturnValues Include method return values?
-     * @param maximalNumberOfExecutedSetNodesPerRun The number of executed set nodes per auto mode
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param containerTypeName
+     *        The java class to test.
+     * @param methodFullName
+     *        The method to test.
+     * @param precondition
+     *        An optional precondition.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @param includeConstraints
+     *        Include constraints?
+     * @param includeVariables
+     *        Include variables?
+     * @param includeCallStack
+     *        Include call stack?
+     * @param includeReturnValues
+     *        Include method return values?
+     * @param maximalNumberOfExecutedSetNodesPerRun
+     *        The number of executed set nodes per auto mode
      *        run. The whole test is executed for each defined value.
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
-     * @throws ProofInputException Occurred Exception
-     * @throws IOException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     protected void doSETTest(File baseDir, String javaPathInBaseDir, String containerTypeName,
             String methodFullName, String precondition, String oraclePathInBaseDirFile,
@@ -1785,38 +2038,64 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Executes method <code>doTest</code>
      * and disposes the created {@link SymbolicExecutionEnvironment}.
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param containerTypeName The java class to test.
-     * @param methodFullName The method to test.
-     * @param precondition An optional precondition.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @param includeConstraints Include constraints?
-     * @param includeVariables Include variables?
-     * @param includeCallStack Include call stack?
-     * @param includeReturnValues Include method return values?
-     * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param containerTypeName
+     *        The java class to test.
+     * @param methodFullName
+     *        The method to test.
+     * @param precondition
+     *        An optional precondition.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @param includeConstraints
+     *        Include constraints?
+     * @param includeVariables
+     *        Include variables?
+     * @param includeCallStack
+     *        Include call stack?
+     * @param includeReturnValues
+     *        Include method return values?
+     * @param maximalNumberOfExecutedSetNodes
+     *        The number of executed set nodes per auto mode run.
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
-     * @throws ProofInputException Occurred Exception
-     * @throws IOException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     protected void doSETTestAndDispose(File baseDir, String javaPathInBaseDir,
             String containerTypeName, String methodFullName, String precondition,
@@ -1852,32 +2131,53 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * <li>Compare created symbolic execution tree with oracle model</li>
      * </ol>
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param proofFilePathInBaseDir The path to the proof file inside the base directory.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @param includeConstraints Include constraints?
-     * @param includeVariables Include variables?
-     * @param includeCallStack Include call stack?
-     * @param includeReturnValues Include method return values?
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param proofFilePathInBaseDir
+     *        The path to the proof file inside the base directory.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @param includeConstraints
+     *        Include constraints?
+     * @param includeVariables
+     *        Include variables?
+     * @param includeCallStack
+     *        Include call stack?
+     * @param includeReturnValues
+     *        Include method return values?
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @throws ProofInputException Occurred Exception
-     * @throws IOException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     protected void doSETTestAndDispose(File baseDir, String proofFilePathInBaseDir,
             String oraclePathInBaseDirFile, boolean includeConstraints, boolean includeVariables,
@@ -1893,9 +2193,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
                 useOperationContracts, useLoopInvariants, blockTreatmentContract,
                 nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting,
                 variablesAreOnlyComputedFromUpdates, false, true);
-        if (env != null) {
-            env.dispose();
-        }
+        if (env != null) { env.dispose(); }
     }
 
     /**
@@ -1911,37 +2209,60 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * <li>Compare created symbolic execution tree with oracle model</li>
      * </ol>
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param proofFilePathInBaseDir The path to the proof file inside the base directory.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @param includeConstraints Include constraints?
-     * @param includeVariables Include variables?
-     * @param includeCallStack Include call stack?
-     * @param includeReturnValues Include method return values?
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param proofFilePathInBaseDir
+     *        The path to the proof file inside the base directory.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @param includeConstraints
+     *        Include constraints?
+     * @param includeVariables
+     *        Include variables?
+     * @param includeCallStack
+     *        Include call stack?
+     * @param includeReturnValues
+     *        Include method return values?
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled,
+     * @param truthValueEvaluationEnabled
+     *        {@code true} truth value evaluation is enabled,
      *        {@code false} truth value evaluation is disabled.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      * @return The tested {@link SymbolicExecutionEnvironment}.
-     * @throws ProofInputException Occurred Exception
-     * @throws IOException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     protected SymbolicExecutionEnvironment<DefaultUserInterfaceControl> doSETTest(File baseDir,
             String proofFilePathInBaseDir, String oraclePathInBaseDirFile,
@@ -2002,39 +2323,65 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * <li>Compare created symbolic execution tree with oracle model</li>
      * </ol>
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param containerTypeName The java class to test.
-     * @param methodFullName The method to test.
-     * @param precondition An optional precondition.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @param includeConstraints Include constraints?
-     * @param includeVariables Include variables?
-     * @param includeCallStack Include call stack?
-     * @param includeReturnValues Include method return values?
-     * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param containerTypeName
+     *        The java class to test.
+     * @param methodFullName
+     *        The method to test.
+     * @param precondition
+     *        An optional precondition.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @param includeConstraints
+     *        Include constraints?
+     * @param includeVariables
+     *        Include variables?
+     * @param includeCallStack
+     *        Include call stack?
+     * @param includeReturnValues
+     *        Include method return values?
+     * @param maximalNumberOfExecutedSetNodes
+     *        The number of executed set nodes per auto mode run.
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      * @return The tested {@link SymbolicExecutionEnvironment}.
-     * @throws ProofInputException Occurred Exception
-     * @throws IOException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     protected SymbolicExecutionEnvironment<DefaultUserInterfaceControl> doSETTest(File baseDir,
             String javaPathInBaseDir, String containerTypeName, final String methodFullName,
@@ -2096,39 +2443,64 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * <li>Compare created symbolic execution tree with oracle model</li>
      * </ol>
      *
-     * @param baseDir The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param baseContractName The name of the contract.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @param includeConstraints Include constraints?
-     * @param includeVariables Include variables?
-     * @param includeCallStack Include call stack?
-     * @param includeReturnValues Include method return values?
-     * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
-     * @param mergeBranchConditions Merge branch conditions?
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param baseDir
+     *        The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param baseContractName
+     *        The name of the contract.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @param includeConstraints
+     *        Include constraints?
+     * @param includeVariables
+     *        Include variables?
+     * @param includeCallStack
+     *        Include call stack?
+     * @param includeReturnValues
+     *        Include method return values?
+     * @param maximalNumberOfExecutedSetNodes
+     *        The number of executed set nodes per auto mode run.
+     * @param mergeBranchConditions
+     *        Merge branch conditions?
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param aliasChecks
+     *        Do alias checks?
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates
+     *        {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled,
+     * @param truthValueEvaluationEnabled
+     *        {@code true} truth value evaluation is enabled,
      *        {@code false} truth value evaluation is disabled.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      * @return The tested {@link SymbolicExecutionEnvironment}.
-     * @throws ProofInputException Occurred Exception
-     * @throws IOException Occurred Exception
-     * @throws ParserConfigurationException Occurred Exception
-     * @throws SAXException Occurred Exception
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
+     * @throws ParserConfigurationException
+     *         Occurred Exception
+     * @throws SAXException
+     *         Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     protected SymbolicExecutionEnvironment<DefaultUserInterfaceControl> doSETTest(File baseDir,
             String javaPathInBaseDir, String baseContractName, String oraclePathInBaseDirFile,
@@ -2220,11 +2592,15 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param javaPathInBaseDir The path in the base directory to the java file.
-     * @param baseContractName The name of the contract to prove.
+     * @param javaPathInBaseDir
+     *        The path in the base directory to the java file.
+     * @param baseContractName
+     *        The name of the contract to prove.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptions(String javaPathInBaseDir,
             String baseContractName)
@@ -2245,13 +2621,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param baseDir The base directory which contains the java file.
-     * @param javaPathInBaseDir The path in the base directory to the java file.
-     * @param containerTypeName name of the type where the method is implemented/declared
-     * @param methodFullName The method to prove.
+     * @param baseDir
+     *        The base directory which contains the java file.
+     * @param javaPathInBaseDir
+     *        The path in the base directory to the java file.
+     * @param containerTypeName
+     *        name of the type where the method is implemented/declared
+     * @param methodFullName
+     *        The method to prove.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptions(File baseDir,
             String javaPathInBaseDir,
@@ -2273,12 +2655,17 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param javaFile The java file to load.
-     * @param containerTypeName The type name which provides the target.
-     * @param targetName The target to proof.
+     * @param javaFile
+     *        The java file to load.
+     * @param containerTypeName
+     *        The type name which provides the target.
+     * @param targetName
+     *        The target to proof.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     @SuppressWarnings("unused")
     public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
@@ -2305,7 +2692,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Restores the given taclet options.
      *
-     * @param options The taclet options to restore.
+     * @param options
+     *        The taclet options to restore.
      */
     public static void restoreTacletOptions(Map<String, String> options) {
         HelperClassForTests.restoreTacletOptions(options);
@@ -2325,8 +2713,10 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Makes sure that two {@link Term}s are equal.
      *
-     * @param expected The expected {@link Term}.
-     * @param actual The actual {@link Term}.
+     * @param expected
+     *        The expected {@link Term}.
+     * @param actual
+     *        The actual {@link Term}.
      */
     protected void assertTerm(Term expected, Term actual) {
         if (expected != null) {
@@ -2334,9 +2724,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertEquals(expected.javaBlock(), actual.javaBlock());
             assertEquals(expected.getLabels(), actual.getLabels());
             assertEquals(expected.arity(), actual.arity());
-            for (int i = 0; i < expected.arity(); i++) {
-                assertTerm(expected.sub(i), actual.sub(i));
-            }
+            for (int i = 0; i < expected.arity(); i++) { assertTerm(expected.sub(i), actual.sub(i)); }
         } else {
             assertNull(actual);
         }
@@ -2345,7 +2733,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Checks if one-step simplification is enabled in the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to read from or {@code null} to return the general settings
+     * @param proof
+     *        The {@link Proof} to read from or {@code null} to return the general settings
      *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
@@ -2356,8 +2745,10 @@ public abstract class AbstractSymbolicExecutionTestCase {
     /**
      * Defines if one-step simplification is enabled in general and within the {@link Proof}.
      *
-     * @param proof The optional {@link Proof}.
-     * @param enabled {@code true} use one-step simplification, {@code false} do not use one-step
+     * @param proof
+     *        The optional {@link Proof}.
+     * @param enabled
+     *        {@code true} use one-step simplification, {@code false} do not use one-step
      *        simplification.
      */
     public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {

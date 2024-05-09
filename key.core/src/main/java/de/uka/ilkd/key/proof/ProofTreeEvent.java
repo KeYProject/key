@@ -67,6 +67,6 @@ public class ProofTreeEvent {
 
     public String toString() {
         return "ProofTreeEvent: " + ((node != null) ? "node " : "")
-            + ((goal != null) ? "goal " : "") + ((!goals.isEmpty()) ? "goals " : "");
+                + ((goal != null) ? "goal " : "") + ((!goals.isEmpty()) ? "goals " : "");
     }
 }

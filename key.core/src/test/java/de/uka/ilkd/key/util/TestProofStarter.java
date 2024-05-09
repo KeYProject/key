@@ -27,7 +27,8 @@ public class TestProofStarter {
      * Loads key-file {@code examples/_testcase/proofStarter/CC/project.key} and runs the auto mode
      * via {@link ProofStarter} while one step simplification is disabled.
      *
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     @Test()
     @Timeout(60000)
@@ -39,7 +40,8 @@ public class TestProofStarter {
      * Loads key-file {@code examples/_testcase/proofStarter/CC/project.key} and runs the auto mode
      * via {@link ProofStarter} while one step simplification is enabled.
      *
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     @Test
     @Timeout(120000)
@@ -51,8 +53,10 @@ public class TestProofStarter {
      * Executes the test steps of {@link #testDirectProof()} and
      * {@link #testDirectProofWithOneStepSimplification()}.
      *
-     * @param oneStepSimplification Use one step simplification?
-     * @throws ProblemLoaderException Occurred Exception
+     * @param oneStepSimplification
+     *        Use one step simplification?
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
     protected void doProofStarter(boolean oneStepSimplification) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = null;
@@ -73,9 +77,7 @@ public class TestProofStarter {
         } finally {
             HelperClassForTests.setOneStepSimplificationEnabled(null,
                 originalOneStepSimplification);
-            if (env != null) {
-                env.dispose();
-            }
+            if (env != null) { env.dispose(); }
         }
     }
 }

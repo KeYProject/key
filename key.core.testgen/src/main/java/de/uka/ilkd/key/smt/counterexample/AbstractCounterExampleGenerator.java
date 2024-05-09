@@ -57,10 +57,14 @@ public abstract class AbstractCounterExampleGenerator {
     /**
      * Searches a counter example for the given {@link Sequent}.
      *
-     * @param ui The {@link UserInterfaceControl} to use.
-     * @param oldProof The old {@link Proof} used as template to instantiate a new one.
-     * @param oldSequent The {@link Sequent} to find a counter example for.
-     * @throws ProofInputException Occurred Exception.
+     * @param ui
+     *        The {@link UserInterfaceControl} to use.
+     * @param oldProof
+     *        The old {@link Proof} used as template to instantiate a new one.
+     * @param oldSequent
+     *        The {@link Sequent} to find a counter example for.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public void searchCounterExample(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent)
             throws ProofInputException {
@@ -102,12 +106,17 @@ public abstract class AbstractCounterExampleGenerator {
     /**
      * Creates a new {@link Proof}.
      *
-     * @param ui The {@link UserInterfaceControl} to use.
-     * @param oldProof The old {@link Proof} used as template to instantiate a new one.
-     * @param oldSequent The {@link Sequent} to find a counter example for.
-     * @param proofName The name for the new proof.
+     * @param ui
+     *        The {@link UserInterfaceControl} to use.
+     * @param oldProof
+     *        The old {@link Proof} used as template to instantiate a new one.
+     * @param oldSequent
+     *        The {@link Sequent} to find a counter example for.
+     * @param proofName
+     *        The name for the new proof.
      * @return The created {@link Proof}.
-     * @throws ProofInputException Ocurred Exception
+     * @throws ProofInputException
+     *         Ocurred Exception
      */
     protected abstract Proof createProof(UserInterfaceControl ui, Proof oldProof,
             Sequent oldSequent, String proofName) throws ProofInputException;
@@ -117,7 +126,8 @@ public abstract class AbstractCounterExampleGenerator {
      * Creates the {@link Sequent} for the new {@link Proof} created by
      * {@link #createProof(UserInterfaceControl, Proof, Sequent, String)}.
      *
-     * @param oldSequent The {@link Sequent} to find a counter example for.
+     * @param oldSequent
+     *        The {@link Sequent} to find a counter example for.
      * @return The new {@link Sequent}.
      */
     protected Sequent createNewSequent(Sequent oldSequent) {
@@ -127,17 +137,19 @@ public abstract class AbstractCounterExampleGenerator {
     /**
      * This method is called after the {@link SemanticsBlastingMacro} has been executed.
      *
-     * @param ui The {@link UserInterfaceControl} to use.
+     * @param ui
+     *        The {@link UserInterfaceControl} to use.
      */
-    protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
-    }
+    protected void semanticsBlastingCompleted(UserInterfaceControl ui) {}
 
     /**
      * Creates the {@link SolverLauncherListener} which handles the results of the launched SMT
      * solver.
      *
-     * @param settings The {@link DefaultSMTSettings}.
-     * @param proof The {@link Proof} on which the SMT solver will be performed.
+     * @param settings
+     *        The {@link DefaultSMTSettings}.
+     * @param proof
+     *        The {@link Proof} on which the SMT solver will be performed.
      * @return The {@link SolverLauncherListener} to use.
      */
     protected abstract SolverLauncherListener createSolverListener(DefaultSMTSettings settings,

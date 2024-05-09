@@ -63,7 +63,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as there are different "
-            + "prefixes at different occurrences");
+                + "prefixes at different occurrences");
         sb.addVarsNotFreeIn(u, (SchemaVariable) b.op());
         sb.addVarsNotFreeIn(v, (SchemaVariable) b.op());
         sb.getTaclet(); // no exception is thrown here anymore
@@ -87,7 +87,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-            + "occurs more than once in the Taclets if and find");
+                + "occurs more than once in the Taclets if and find");
     }
 
     @Test
@@ -109,7 +109,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-            + "occurs more than once in the Taclets if and find");
+                + "occurs more than once in the Taclets if and find");
     }
 
     @Test
@@ -126,7 +126,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-            + "occurs more than once in the Taclets if and find");
+                + "occurs more than once in the Taclets if and find");
     }
 
     public static final String testRules =

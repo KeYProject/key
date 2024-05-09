@@ -25,9 +25,7 @@ class TacletDescriber {
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
         boolean started = false;
         if (sv.isRigid() && !(sv instanceof VariableSV)) {
-            if (!started) {
-                out.append("[");
-            }
+            if (!started) { out.append("["); }
             out.append("rigid");
             started = true;
         }
@@ -41,19 +39,13 @@ class TacletDescriber {
             started = true;
         }
 
-        if (started) {
-            out.append("]");
-        }
+        if (started) { out.append("]"); }
     }
 
     private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
         if (schemaVar instanceof ModalOperatorSV modalOpSV) {
             String sep = "";
-            for (final var op : modalOpSV.getModalities()) {
-                out.append(sep);
-                out.append(op.name());
-                sep = ", ";
-            }
+            for (final var op : modalOpSV.getModalities()) { out.append(sep); out.append(op.name()); sep = ", "; }
             out.append(" } ").append(modalOpSV.name());
         } else if (schemaVar instanceof TermSV) {
             out.append("\\term");
@@ -87,13 +79,9 @@ class TacletDescriber {
     private static void writeTacletSchemaVariablesHelper(StringBuffer out, final Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
 
-        for (final NewVarcond nvc : t.varsNew()) {
-            schemaVars = schemaVars.add(nvc.getSchemaVariable());
-        }
+        for (final NewVarcond nvc : t.varsNew()) { schemaVars = schemaVars.add(nvc.getSchemaVariable()); }
 
-        for (final NewDependingOn ndo : t.varsNewDependingOn()) {
-            schemaVars = schemaVars.add(ndo.first());
-        }
+        for (final NewDependingOn ndo : t.varsNewDependingOn()) { schemaVars = schemaVars.add(ndo.first()); }
 
         if (!schemaVars.isEmpty()) {
             out.append("\\schemaVariables {\n");
@@ -119,8 +107,10 @@ class TacletDescriber {
      * This information is also relevant for other tools like the Symbolic Execution Debugger.
      * </p>
      *
-     * @param mediator The {@link KeYMediator} to use.
-     * @param app The {@link RuleApp} to use.
+     * @param mediator
+     *        The {@link KeYMediator} to use.
+     * @param app
+     *        The {@link RuleApp} to use.
      * @return The text to show.
      */
     public static String getTacletDescription(KeYMediator mediator, RuleApp app, int width) {

@@ -74,8 +74,7 @@ public class ChoiceSettings extends AbstractSettings {
      * <p>
      * The method name is somewhat misleading.
      */
-    @NonNull
-    public Map<String, String> getDefaultChoices() {
+    public @NonNull Map<String, String> getDefaultChoices() {
         return Collections.unmodifiableMap(category2Default);
     }
 
@@ -83,8 +82,7 @@ public class ChoiceSettings extends AbstractSettings {
     /**
      * returns the current selected choices as an immutable set
      */
-    @NonNull
-    public ImmutableSet<Choice> getDefaultChoicesAsSet() {
+    public @NonNull ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }
 
@@ -107,7 +105,8 @@ public class ChoiceSettings extends AbstractSettings {
      * updates <code>category2Choices</code> if new entries are found in <code>choiceNS</code> or if
      * entries of <code>category2Choices</code> are no longer present in <code>choiceNS</code>
      *
-     * @param remove remove entries not present in <code>choiceNS</code>
+     * @param remove
+     *        remove entries not present in <code>choiceNS</code>
      */
     public void updateChoices(Namespace<Choice> choiceNS, boolean remove) {
         // Translate the given namespace into a map of 'string -> list[string]'
@@ -200,26 +199,18 @@ public class ChoiceSettings extends AbstractSettings {
 
 
     public ChoiceSettings updateWith(Iterable<Choice> sc) {
-        for (final Choice c : sc) {
-            category2Default.put(c.category(), c.name().toString());
-        }
+        for (final Choice c : sc) { category2Default.put(c.category(), c.name().toString()); }
         return this;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
 
         ChoiceSettings that = (ChoiceSettings) o;
 
-        if (!Objects.equals(category2Default, that.category2Default)) {
-            return false;
-        }
+        if (!Objects.equals(category2Default, that.category2Default)) { return false; }
         return Objects.equals(category2Choices, that.category2Choices);
     }
 

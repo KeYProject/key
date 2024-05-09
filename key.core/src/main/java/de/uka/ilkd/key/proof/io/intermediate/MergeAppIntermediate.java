@@ -29,20 +29,30 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
     /**
      * Constructs a new join rule.
      *
-     * @param ruleName Name of the rule; should be "JoinRule".
-     * @param pos Position information for the join rule application (Symbolic State - Program
+     * @param ruleName
+     *        Name of the rule; should be "JoinRule".
+     * @param pos
+     *        Position information for the join rule application (Symbolic State - Program
      *        Counter formula).
-     * @param id ID of the join rule application (should have been stored during proof saving and
+     * @param id
+     *        ID of the join rule application (should have been stored during proof saving and
      *        should match the joinNodeId fields of the corresponding partner nodes).
-     * @param joinProc The name of the join procedure used during joining.
-     * @param nrPartners Number of involved join partners.
-     * @param newNames New names registered in the course of the join rule application.
-     * @param distinguishingFormula The user-supplied distinguishing formula for the join.
-     * @param predAbstrLatticeType The type for the used predicate abstraction lattice which
+     * @param joinProc
+     *        The name of the join procedure used during joining.
+     * @param nrPartners
+     *        Number of involved join partners.
+     * @param newNames
+     *        New names registered in the course of the join rule application.
+     * @param distinguishingFormula
+     *        The user-supplied distinguishing formula for the join.
+     * @param predAbstrLatticeType
+     *        The type for the used predicate abstraction lattice which
      *        determines how abstract domain elements are generated from predicates.
-     * @param abstractionPredicates The abstraction predicates, if predicate abstraction is used as
+     * @param abstractionPredicates
+     *        The abstraction predicates, if predicate abstraction is used as
      *        a join technique.
-     * @param userChoices abstraction predicates for program variables involved in a join that are
+     * @param userChoices
+     *        abstraction predicates for program variables involved in a join that are
      *        manually
      *        chosen by the user
      */
@@ -54,9 +64,9 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
         super(ruleName, pos, null, null, null, newNames);
 
         String mergeRuleName = MergeRule.INSTANCE.name().toString();
-        assert ruleName.equals(mergeRuleName)
-                : "This was somehow unexpected; are there other join rules than " + mergeRuleName
-                    + "?";
+        assert ruleName.equals(mergeRuleName) : "This was somehow unexpected; are there other join rules than "
+                + mergeRuleName
+                + "?";
 
         this.id = id;
         this.mergeProc = joinProc;

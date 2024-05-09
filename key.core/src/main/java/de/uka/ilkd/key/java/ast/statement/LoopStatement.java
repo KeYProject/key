@@ -51,7 +51,8 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement.
      *
-     * @param body a statement.
+     * @param body
+     *        a statement.
      */
     public LoopStatement(@NonNull Expression guard, @NonNull Statement body, ExtList comments) {
         super(comments);
@@ -75,7 +76,8 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement.
      *
-     * @param body a statement.
+     * @param body
+     *        a statement.
      */
     public LoopStatement(Expression guard, @NonNull Statement body) {
         this.body = body;
@@ -96,10 +98,14 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement. This constructor is used for the transformation of Recoder to KeY.
      *
-     * @param inits the initializers of the loop
-     * @param guard the guard of the loop
-     * @param updates the updates of the loop
-     * @param body the body of the loop
+     * @param inits
+     *        the initializers of the loop
+     * @param guard
+     *        the guard of the loop
+     * @param updates
+     *        the updates of the loop
+     * @param body
+     *        the body of the loop
      */
     public LoopStatement(LoopInitializer[] inits, Expression guard, Expression[] updates,
             @NonNull Statement body) {
@@ -116,11 +122,16 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement. This constructor is used for the transformation of Recoder to KeY.
      *
-     * @param inits the initializers of the loop
-     * @param guard the guard of the loop
-     * @param updates the updates of the loop
-     * @param body the body of the loop
-     * @param comments the comments attached to this statement.
+     * @param inits
+     *        the initializers of the loop
+     * @param guard
+     *        the guard of the loop
+     * @param updates
+     *        the updates of the loop
+     * @param body
+     *        the body of the loop
+     * @param comments
+     *        the comments attached to this statement.
      */
     public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
             @NonNull Statement body,
@@ -147,11 +158,16 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement. This constructor is used for the transformation of Recoder to KeY.
      *
-     * @param inits the initializers of the loop
-     * @param guard the guard of the loop
-     * @param updates the updates of the loop
-     * @param body the body of the loop
-     * @param pos the position of the loop
+     * @param inits
+     *        the initializers of the loop
+     * @param guard
+     *        the guard of the loop
+     * @param updates
+     *        the updates of the loop
+     * @param body
+     *        the body of the loop
+     * @param pos
+     *        the position of the loop
      */
     public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
             @NonNull Statement body,
@@ -167,10 +183,14 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement. This constructor is used for the transformation of Recoder to KeY.
      *
-     * @param inits the initializers of the loop
-     * @param guard the guard of the loop
-     * @param updates the updates of the loop
-     * @param body the body of the loop
+     * @param inits
+     *        the initializers of the loop
+     * @param guard
+     *        the guard of the loop
+     * @param updates
+     *        the updates of the loop
+     * @param body
+     *        the body of the loop
      */
     public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
             @NonNull Statement body) {
@@ -202,60 +222,44 @@ public abstract class LoopStatement extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (inits != null) {
-            result++;
-        }
-        if (guard != null) {
-            result++;
-        }
-        if (updates != null) {
-            result++;
-        }
-        if (body != null) {
-            result++;
-        }
+        if (inits != null) { result++; }
+        if (guard != null) { result++; }
+        if (updates != null) { result++; }
+        if (body != null) { result++; }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (inits != null) {
-            if (index == 0) {
-                return inits;
-            }
+            if (index == 0) { return inits; }
             index--;
         }
         if (isCheckedBeforeIteration()) {
             if (guard != null) {
-                if (index == 0) {
-                    return guard;
-                }
+                if (index == 0) { return guard; }
                 index--;
             }
         }
         if (updates != null) {
-            if (index == 0) {
-                return updates;
-            }
+            if (index == 0) { return updates; }
             index--;
         }
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
         if (!isCheckedBeforeIteration()) {
             if (guard != null) {
-                if (index == 0) {
-                    return guard;
-                }
+                if (index == 0) { return guard; }
                 index--;
             }
         }
@@ -269,15 +273,9 @@ public abstract class LoopStatement extends JavaStatement
      */
     public int getExpressionCount() {
         int result = 0;
-        if (guard != null) {
-            result += 1;
-        }
-        if (inits != null) {
-            result += 1;
-        }
-        if (updates != null) {
-            result += updates.size();
-        }
+        if (guard != null) { result += 1; }
+        if (inits != null) { result += 1; }
+        if (updates != null) { result += updates.size(); }
         return result;
     }
 
@@ -292,9 +290,7 @@ public abstract class LoopStatement extends JavaStatement
      */
     public Expression getExpressionAt(int index) {
         if (guard != null) {
-            if (index == 0) {
-                return (Expression) guard.getChildAt(0);
-            }
+            if (index == 0) { return (Expression) guard.getChildAt(0); }
             index -= 1;
         }
         if (inits != null) {
@@ -302,16 +298,12 @@ public abstract class LoopStatement extends JavaStatement
             for (int i = 0; i < s && index >= 0; i++) {
                 final LoopInitializer ii = inits.getInits().get(i);
                 if (ii instanceof Expression) {
-                    if (index == 0) {
-                        return (Expression) ii;
-                    }
+                    if (index == 0) { return (Expression) ii; }
                     index -= 1;
                 }
             }
         }
-        if (updates != null) {
-            return updates.getExpressionAt(index);
-        }
+        if (updates != null) { return updates.getExpressionAt(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -364,9 +356,7 @@ public abstract class LoopStatement extends JavaStatement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -376,9 +366,7 @@ public abstract class LoopStatement extends JavaStatement
      * @return the loop initializer array wrapper .
      */
     public ImmutableArray<LoopInitializer> getInitializers() {
-        if (inits != null) {
-            return inits.getInits();
-        }
+        if (inits != null) { return inits.getInits(); }
         return null;
     }
 
@@ -389,9 +377,7 @@ public abstract class LoopStatement extends JavaStatement
      * @return the expression mutable list.
      */
     public ImmutableArray<Expression> getUpdates() {
-        if (updates != null) {
-            return updates.getUpdates();
-        }
+        if (updates != null) { return updates.getUpdates(); }
         return null;
     }
 
@@ -422,9 +408,7 @@ public abstract class LoopStatement extends JavaStatement
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LoopStatement cmp)) {
-            return false;
-        }
+        if (!(o instanceof LoopStatement cmp)) { return false; }
 
         return super.equals(cmp) && (this.getStartPosition().equals(Position.UNDEFINED)
                 || cmp.getStartPosition().equals(Position.UNDEFINED)

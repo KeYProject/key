@@ -68,12 +68,17 @@ public class MasterHandler {
     /**
      * Create a new handler with the default set of smt handlers.
      *
-     * @param services non-null services
-     * @param settings settings from the proof for the property settings.
-     * @param handlerNames fully qualified class names of the handlers to use. If empty, all
+     * @param services
+     *        non-null services
+     * @param settings
+     *        settings from the proof for the property settings.
+     * @param handlerNames
+     *        fully qualified class names of the handlers to use. If empty, all
      *        available handlers are used.
-     * @param handlerOptions arbitrary String options for the handlers to process
-     * @throws IOException if the handlers cannot be loaded
+     * @param handlerOptions
+     *        arbitrary String options for the handlers to process
+     * @throws IOException
+     *         if the handlers cannot be loaded
      */
     public MasterHandler(Services services, SMTSettings settings, String[] handlerNames,
             String[] handlerOptions) throws IOException {
@@ -90,14 +95,10 @@ public class MasterHandler {
      */
     public void addDeclarationsAndAxioms(Properties snippets) {
         String decls = snippets.getProperty("decls");
-        if (decls != null) {
-            addDeclaration(new VerbatimSMT(decls));
-        }
+        if (decls != null) { addDeclaration(new VerbatimSMT(decls)); }
 
         String axioms = snippets.getProperty("axioms");
-        if (axioms != null) {
-            addAxiom(new VerbatimSMT(axioms));
-        }
+        if (axioms != null) { addAxiom(new VerbatimSMT(axioms)); }
 
         for (Entry<Object, Object> en : snippets.entrySet()) {
             String key = (String) en.getKey();
@@ -127,7 +128,8 @@ public class MasterHandler {
      * <p>
      * A default translation is triggered if no handler can be found.
      *
-     * @param problem the non-null term to translate
+     * @param problem
+     *        the non-null term to translate
      * @return the S-Expression representing the translation
      */
     public SExpr translate(Term problem) {
@@ -172,8 +174,10 @@ public class MasterHandler {
      * <p>
      * A default translation is triggered if no handler can be found.
      *
-     * @param problem the non-null term to translate
-     * @param type the type of the resulting s-expression
+     * @param problem
+     *        the non-null term to translate
+     * @param type
+     *        the type of the resulting s-expression
      * @return the S-Expression representing the translation
      */
     public SExpr translate(Term problem, Type type) {
@@ -195,13 +199,12 @@ public class MasterHandler {
     /**
      * If no handler can handle a term, it is taken care of here.
      *
-     * @param problem the problematic term
+     * @param problem
+     *        the problematic term
      * @return a generic translation as unknown value
      */
     private SExpr handleAsUnknownValue(Term problem) {
-        if (unknownValues.containsKey(problem)) {
-            return unknownValues.get(problem);
-        }
+        if (unknownValues.containsKey(problem)) { return unknownValues.get(problem); }
         int number = unknownValues.size();
         SExpr translation;
         SExpr abbr = new SExpr("unknown_" + number, Type.UNIVERSE);
@@ -242,8 +245,10 @@ public class MasterHandler {
      *
      * is returned where t1, ..., tn are the smt-translations of the subterms of term.
      *
-     * @param functionName the name of the function
-     * @param term the term to be translated
+     * @param functionName
+     *        the name of the function
+     * @param term
+     *        the term to be translated
      * @return an expression with the name functionName and subterms as children
      */
     SExpr handleAsFunctionCall(String functionName, Term term) {
@@ -261,23 +266,25 @@ public class MasterHandler {
      *
      * is returned where t1, ..., tn are the smt-translations of the sub-terms of term.
      *
-     * @param functionName the name of the function
-     * @param type the type of the resulting s-expression
-     * @param term the term to be translated
+     * @param functionName
+     *        the name of the function
+     * @param type
+     *        the type of the resulting s-expression
+     * @param term
+     *        the term to be translated
      * @return an expression with the name functionName and the term's sub-terms as children
      */
     SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
         List<SExpr> children = new ArrayList<>();
-        for (int i = 0; i < term.arity(); i++) {
-            children.add(translate(term.sub(i), Type.UNIVERSE));
-        }
+        for (int i = 0; i < term.arity(); i++) { children.add(translate(term.sub(i), Type.UNIVERSE)); }
         return new SExpr(functionName, type, children);
     }
 
     /**
      * Decides whether a symbol is already known to the master handler.
      *
-     * @param pr the SMT symbol name to test
+     * @param pr
+     *        the SMT symbol name to test
      * @return true iff the name is already known
      */
     boolean isKnownSymbol(String pr) {
@@ -296,10 +303,13 @@ public class MasterHandler {
     /**
      * Translate a list of terms into a list of SExprs.
      *
-     * @param terms non-null list of terms.
-     * @param type the non-null smt type to coerce to
+     * @param terms
+     *        non-null list of terms.
+     * @param type
+     *        the non-null smt type to coerce to
      * @return a list of translations
-     * @throws SMTTranslationException if the type conversion is impossible
+     * @throws SMTTranslationException
+     *         if the type conversion is impossible
      */
     public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
         return SExprs.coerce(translate(terms), type);
@@ -308,14 +318,13 @@ public class MasterHandler {
     /**
      * Translate a list of terms into a list of SExprs without coercion.
      *
-     * @param terms non-null list of terms.
+     * @param terms
+     *        non-null list of terms.
      * @return a list of translations
      */
     public List<SExpr> translate(Iterable<Term> terms) {
         List<SExpr> result = new LinkedList<>();
-        for (Term term : terms) {
-            result.add(translate(term));
-        }
+        for (Term term : terms) { result.add(translate(term)); }
         return result;
     }
 
@@ -348,9 +357,7 @@ public class MasterHandler {
     }
 
     void introduceSymbol(String functionName) throws SMTTranslationException {
-        if (isKnownSymbol(functionName)) {
-            return;
-        }
+        if (isKnownSymbol(functionName)) { return; }
 
         if (translationState.containsKey(functionName + ".intro")) {
             SymbolIntroducer introducer =
@@ -360,9 +367,7 @@ public class MasterHandler {
 
         // Handle it locally.
         // mark it known to avoid cyclic inclusion (if not already registered)
-        if (!isKnownSymbol(functionName)) {
-            addKnownSymbol(functionName);
-        }
+        if (!isKnownSymbol(functionName)) { addKnownSymbol(functionName); }
 
         if (translationState.containsKey(functionName + ".decls")) {
             String decls = (String) translationState.get(functionName + ".decls");
@@ -379,9 +384,7 @@ public class MasterHandler {
         if (translationState.containsKey(functionName + ".deps")) {
             String entry = (String) translationState.get(functionName + ".deps");
             String[] deps = entry.trim().split(", *");
-            for (String dep : deps) {
-                introduceSymbol(dep);
-            }
+            for (String dep : deps) { introduceSymbol(dep); }
         }
 
     }

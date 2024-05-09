@@ -21,7 +21,8 @@ public class Equals extends ComparativeOperator {
     /**
      * Equals.
      *
-     * @param children an ExtList with all children of this node the first children in list will be
+     * @param children
+     *        an ExtList with all children of this node the first children in list will be
      *        the one on the left side, the second the one on the right side.
      */
     public Equals(ExtList children) {
@@ -31,8 +32,10 @@ public class Equals extends ComparativeOperator {
     /**
      * Creates the equals expression <code>lhs==rhs</code>
      *
-     * @param lhs the Expression on the left side of the comparison
-     * @param rhs the Expression on the right side of the comparison
+     * @param lhs
+     *        the Expression on the left side of the comparison
+     * @param rhs
+     *        the Expression on the right side of the comparison
      */
     public Equals(Expression lhs, Expression rhs) {
         super(lhs, rhs);
@@ -56,7 +59,8 @@ public class Equals extends ComparativeOperator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnEquals(this);

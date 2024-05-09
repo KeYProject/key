@@ -109,9 +109,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
             ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
-        for (IBuiltInRuleApp bir : birs) {
-            result = result.prepend(createAppContainer(bir, pio, goal));
-        }
+        for (IBuiltInRuleApp bir : birs) { result = result.prepend(createAppContainer(bir, pio, goal)); }
 
         return result;
     }
@@ -120,30 +118,22 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 
     @Override
     public ImmutableList<RuleAppContainer> createFurtherApps(Goal goal) {
-        if (!isStillApplicable(goal)) {
-            return ImmutableSLList.nil();
-        }
+        if (!isStillApplicable(goal)) { return ImmutableSLList.nil(); }
 
         final PosInOccurrence pio = getPosInOccurrence(goal);
 
         RuleAppContainer container = createAppContainer(bir, pio, goal);
-        if (container.getCost() instanceof TopRuleAppCost) {
-            return ImmutableSLList.nil();
-        }
+        if (container.getCost() instanceof TopRuleAppCost) { return ImmutableSLList.nil(); }
         return ImmutableSLList.<RuleAppContainer>nil().prepend(container);
     }
 
 
     @Override
     public RuleApp completeRuleApp(Goal goal) {
-        if (!isStillApplicable(goal)) {
-            return null;
-        }
+        if (!isStillApplicable(goal)) { return null; }
 
         final PosInOccurrence pio = getPosInOccurrence(goal);
-        if (!goal.getGoalStrategy().isApprovedApp(bir, pio, goal)) {
-            return null;
-        }
+        if (!goal.getGoalStrategy().isApprovedApp(bir, pio, goal)) { return null; }
 
         final BuiltInRule rule = bir.rule();
         IBuiltInRuleApp app = rule.createApp(pio, goal.proof().getServices());

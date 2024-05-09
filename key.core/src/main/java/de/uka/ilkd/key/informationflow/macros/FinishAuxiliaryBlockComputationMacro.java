@@ -97,11 +97,16 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
     /**
      * constructs a taclet to unfold block contracts for information flow reasoning
      *
-     * @param services the Services
-     * @param blockRuleApp the rule application of the block contract
-     * @param contract the block contract
-     * @param ifVars variables specific for the IF proof obligation
-     * @param result the term representing the result (?) // TODO: someone who knows what the taclet
+     * @param services
+     *        the Services
+     * @param blockRuleApp
+     *        the rule application of the block contract
+     * @param contract
+     *        the block contract
+     * @param ifVars
+     *        variables specific for the IF proof obligation
+     * @param result
+     *        the term representing the result (?) // TODO: someone who knows what the taclet
      *        does please provide a description
      * @return the created taclet
      */

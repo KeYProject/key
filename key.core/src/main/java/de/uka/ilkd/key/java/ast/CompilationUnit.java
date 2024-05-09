@@ -47,9 +47,12 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     /**
      * creates a compilation unit
      *
-     * @param packageSpec a PackageSpecification (pck of this CU)
-     * @param imports an array of Import (all it imports)
-     * @param typeDeclarations an array of TypeDeclaration (the type declared in it)
+     * @param packageSpec
+     *        a PackageSpecification (pck of this CU)
+     * @param imports
+     *        an array of Import (all it imports)
+     * @param typeDeclarations
+     *        an array of TypeDeclaration (the type declared in it)
      */
     public CompilationUnit(PackageSpecification packageSpec, Import[] imports,
             TypeDeclaration[] typeDeclarations) {
@@ -62,7 +65,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     /**
      * creates a compilation unit
      *
-     * @param children list with the children of this unit
+     * @param children
+     *        list with the children of this unit
      */
     public CompilationUnit(ExtList children) {
         super(children);
@@ -115,44 +119,34 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (packageSpec != null) {
-            result++;
-        }
-        if (imports != null) {
-            result += imports.size();
-        }
-        if (typeDeclarations != null) {
-            result += typeDeclarations.size();
-        }
+        if (packageSpec != null) { result++; }
+        if (imports != null) { result += imports.size(); }
+        if (typeDeclarations != null) { result += typeDeclarations.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (packageSpec != null) {
-            if (index == 0) {
-                return packageSpec;
-            }
+            if (index == 0) { return packageSpec; }
             index--;
         }
         if (imports != null) {
             len = imports.size();
-            if (len > index) {
-                return imports.get(index);
-            }
+            if (len > index) { return imports.get(index); }
             index -= len;
         }
-        if (typeDeclarations != null) {
-            return typeDeclarations.get(index);
-        }
+        if (typeDeclarations != null) { return typeDeclarations.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -200,9 +194,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      */
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (typeDeclarations != null) {
-            return typeDeclarations.get(index);
-        }
+        if (typeDeclarations != null) { return typeDeclarations.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -234,9 +226,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
                     break;
                 }
             } else {
-                if (res == null) {
-                    res = t;
-                }
+                if (res == null) { res = t; }
             }
         }
         return res;
@@ -246,7 +236,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnCompilationUnit(this);

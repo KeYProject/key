@@ -35,7 +35,8 @@ public final class ProofCollection {
      * {@link ProofCollectionUnit}s.
      *
      * @return A list of {@link RunAllProofsTestUnit}s.
-     * @throws IOException Names of {@link SingletonProofCollectionUnit}s are
+     * @throws IOException
+     *         Names of {@link SingletonProofCollectionUnit}s are
      *         determined by their
      *         corresponding file names. In case file name can't be read
      *         {@link IOException} may be
@@ -49,9 +50,7 @@ public final class ProofCollection {
         Set<String> testCaseNames = new LinkedHashSet<>();
         for (ProofCollectionUnit proofCollectionUnit : units) {
 
-            if (activeGroups != null && !activeGroups.contains(proofCollectionUnit.getName())) {
-                continue;
-            }
+            if (activeGroups != null && !activeGroups.contains(proofCollectionUnit.getName())) { continue; }
 
             final String proposedTestCaseName = proofCollectionUnit.getName();
             String testCaseName = proposedTestCaseName;
@@ -68,9 +67,7 @@ public final class ProofCollection {
         }
 
         Set<String> enabledTestCaseNames = settings.getEnabledTestCaseNames();
-        if (enabledTestCaseNames != null) {
-            ret.removeIf(unit -> !enabledTestCaseNames.contains(unit.getTestName()));
-        }
+        if (enabledTestCaseNames != null) { ret.removeIf(unit -> !enabledTestCaseNames.contains(unit.getTestName())); }
         return ret;
     }
 
@@ -88,7 +85,8 @@ public final class ProofCollection {
     /**
      * Removes all groups from this collection except the given names
      *
-     * @param groupNames a list of groups to be kept
+     * @param groupNames
+     *        a list of groups to be kept
      */
     public void keep(String... groupNames) {
         Arrays.sort(groupNames);

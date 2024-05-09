@@ -53,7 +53,8 @@ public abstract class TextualJMLConstruct {
     }
 
     /**
-     * @param loopContract boolean to identify contract as loop contract
+     * @param loopContract
+     *        boolean to identify contract as loop contract
      * @see #isLoopContract()
      */
     public final void setLoopContract(boolean loopContract) {
@@ -78,12 +79,11 @@ public abstract class TextualJMLConstruct {
      * approximate position can still be changed while it is undefined. Also set source file name if
      * known.
      *
-     * @param ps set position of the construct
+     * @param ps
+     *        set position of the construct
      */
     protected void setPosition(PositionedString ps) {
-        if (location == null) {
-            location = ps.location;
-        }
+        if (location == null) { location = ps.location; }
     }
 
     protected void setPosition(ParserRuleContext ps) {

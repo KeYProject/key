@@ -37,8 +37,10 @@ public final class CopyReferencedProof extends KeyAction {
     /**
      * Construct a new action.
      *
-     * @param mediator the mediator
-     * @param node the node
+     * @param mediator
+     *        the mediator
+     * @param node
+     *        the node
      */
     public CopyReferencedProof(KeYMediator mediator, Node node) {
         this.mediator = mediator;

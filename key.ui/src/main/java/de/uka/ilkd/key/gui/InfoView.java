@@ -82,29 +82,23 @@ public class InfoView extends JSplitPane implements TabPanel {
             public void componentShown(ComponentEvent e) {
                 if (mediator.getSelectedProof() != null) {
                     Goal goal = mediator.getSelectedGoal();
-                    if (goal != null) {
-                        updateModel(mediator.getSelectedGoal());
-                    }
+                    if (goal != null) { updateModel(mediator.getSelectedGoal()); }
                 }
             }
 
             @Override
-            public void componentResized(ComponentEvent e) {
-            }
+            public void componentResized(ComponentEvent e) {}
 
             @Override
-            public void componentMoved(ComponentEvent e) {
-            }
+            public void componentMoved(ComponentEvent e) {}
 
             @Override
-            public void componentHidden(ComponentEvent e) {
-            }
+            public void componentHidden(ComponentEvent e) {}
         });
 
         proofDisposedListener = new ProofDisposedListener() {
             @Override
-            public void proofDisposing(ProofDisposedEvent e) {
-            }
+            public void proofDisposing(ProofDisposedEvent e) {}
 
             @Override
             public void proofDisposed(ProofDisposedEvent e) {
@@ -127,9 +121,7 @@ public class InfoView extends JSplitPane implements TabPanel {
                     Rule selected = infoTree.getLastSelectedPathComponent().getRule();
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         DefaultContextMenuKind.TACLET_INFO, selected, mediator);
-                    if (menu.getComponentCount() > 0) {
-                        menu.show(InfoView.this, e.getX(), e.getY());
-                    }
+                    if (menu.getComponentCount() > 0) { menu.show(InfoView.this, e.getX(), e.getY()); }
                 }
             }
         });
@@ -154,9 +146,7 @@ public class InfoView extends JSplitPane implements TabPanel {
 
     public void setMediator(KeYMediator m) {
         assert m != null;
-        if (mediator != null) {
-            mediator.removeKeYSelectionListener(selectionListener);
-        }
+        if (mediator != null) { mediator.removeKeYSelectionListener(selectionListener); }
         m.addKeYSelectionListener(selectionListener);
         mediator = m;
     }
@@ -205,8 +195,7 @@ public class InfoView extends JSplitPane implements TabPanel {
          * focused node has changed
          */
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-        }
+        public void selectedNodeChanged(KeYSelectionEvent e) {}
 
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)

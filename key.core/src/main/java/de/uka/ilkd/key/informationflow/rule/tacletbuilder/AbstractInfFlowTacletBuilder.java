@@ -53,17 +53,13 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     ImmutableList<Term> createTermSV(ImmutableList<Term> ts, String schemaPrefix,
             Services services) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term t : ts) {
-            result = result.append(createTermSV(t, schemaPrefix, services));
-        }
+        for (Term t : ts) { result = result.append(createTermSV(t, schemaPrefix, services)); }
         return result;
     }
 
 
     Term createTermSV(Term t, String schemaPrefix, Services services) {
-        if (t == null) {
-            return null;
-        }
+        if (t == null) { return null; }
         t = unlabel(t);
         String svName = MiscTools.toValidVariableName(schemaPrefix + t.toString()).toString();
         Sort sort = t.sort();
@@ -74,9 +70,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     SchemaVariable createVariableSV(QuantifiableVariable v, String schemaPrefix,
             Services services) {
-        if (v == null) {
-            return null;
-        }
+        if (v == null) { return null; }
         String svName = MiscTools.toValidVariableName(schemaPrefix + v.name()).toString();
         Sort sort = v.sort();
         Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
@@ -92,9 +86,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         Set<SchemaVariable> schemaVars = svCollector.collectSchemaVariables();
         for (SchemaVariable sv : schemaVars) {
             if (sv instanceof TermSV) {
-                for (SchemaVariable qv : quantifiableSVs) {
-                    tacletBuilder.addVarsNotFreeIn(qv, sv);
-                }
+                for (SchemaVariable qv : quantifiableSVs) { tacletBuilder.addVarsNotFreeIn(qv, sv); }
             }
         }
     }
@@ -120,11 +112,16 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     /**
      * Get eqAtLocs function as a term.
      *
-     * @param services the Services object.
-     * @param heap1 the first heap term.
-     * @param locset1 the first location set term.
-     * @param heap2 the first heap term.
-     * @param locset2 the first location set term.
+     * @param services
+     *        the Services object.
+     * @param heap1
+     *        the first heap term.
+     * @param locset1
+     *        the first location set term.
+     * @param heap2
+     *        the first heap term.
+     * @param locset2
+     *        the first location set term.
      * @return The eqAtLocs function term.
      */
     public Term eqAtLocs(Services services, Term heap1, Term locset1, Term heap2, Term locset2) {
@@ -136,13 +133,20 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     /**
      * Get eqAtLocsPost function as a term.
      *
-     * @param services the Services object.
-     * @param heap1Pre the first pre-heap term.
-     * @param heap1Post the first post-heap term.
-     * @param locset1 the first location set term.
-     * @param heap2Pre the second pre-heap term.
-     * @param heap2Post the second post-heap term.
-     * @param locset2 the second location set term.
+     * @param services
+     *        the Services object.
+     * @param heap1Pre
+     *        the first pre-heap term.
+     * @param heap1Post
+     *        the first post-heap term.
+     * @param locset1
+     *        the first location set term.
+     * @param heap2Pre
+     *        the second pre-heap term.
+     * @param heap2Post
+     *        the second post-heap term.
+     * @param locset2
+     *        the second location set term.
      * @return The eqAtLocsPost function term.
      */
     public Term eqAtLocsPost(Services services, Term heap1Pre, Term heap1Post, Term locset1,
@@ -163,9 +167,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
         @Override
         public void visit(Term visited) {
-            for (var boundVar : visited.boundVars()) {
-                vars.add(boundVar);
-            }
+            for (var boundVar : visited.boundVars()) { vars.add(boundVar); }
         }
 
 

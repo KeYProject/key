@@ -29,8 +29,7 @@ public class BooleanLattice extends AbstractDomainLattice {
     /**
      * Private constructor: Singleton.
      */
-    private BooleanLattice() {
-    }
+    private BooleanLattice() {}
 
     /**
      * @return The singleton instance of this lattice.
@@ -47,9 +46,7 @@ public class BooleanLattice extends AbstractDomainLattice {
                 "Expected arguments of the abstract domain of sign analysis.");
         }
 
-        if (a.isTop() || b.isTop()) {
-            return Top.getInstance();
-        }
+        if (a.isTop() || b.isTop()) { return Top.getInstance(); }
 
         if (a.isTrue()) {
             if (b.isFalse()) {
@@ -89,8 +86,7 @@ public class BooleanLattice extends AbstractDomainLattice {
             }
 
             @Override
-            public void remove() {
-            }
+            public void remove() {}
         };
     }
 

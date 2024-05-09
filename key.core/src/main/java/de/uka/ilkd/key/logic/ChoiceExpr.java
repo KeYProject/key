@@ -22,8 +22,7 @@ public abstract class ChoiceExpr {
     public static final ChoiceExpr TRUE = new True();
 
 
-    protected ChoiceExpr() {
-    }
+    protected ChoiceExpr() {}
 
     public static ChoiceExpr and(ChoiceExpr left, ChoiceExpr right) {
         return new And(left, right);
@@ -44,7 +43,8 @@ public abstract class ChoiceExpr {
     /**
      * Evaluate the expression to a boolean value given the current activated choices.
      *
-     * @param current activated choices
+     * @param current
+     *        activated choices
      * @return true if the expr is true given the assignment in {@code current}
      */
     public abstract boolean eval(@NonNull Set<Choice> current);
@@ -85,12 +85,8 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof Proposition that)) {
-                return false;
-            }
+            if (this == o) { return true; }
+            if (!(o instanceof Proposition that)) { return false; }
             return choice.equals(that.choice);
         }
 
@@ -121,12 +117,8 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof And and)) {
-                return false;
-            }
+            if (this == o) { return true; }
+            if (!(o instanceof And and)) { return false; }
             return left.equals(and.left) && right.equals(and.right);
         }
 
@@ -157,12 +149,8 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof Or or)) {
-                return false;
-            }
+            if (this == o) { return true; }
+            if (!(o instanceof Or or)) { return false; }
             return left.equals(or.left) && right.equals(or.right);
         }
 
@@ -191,12 +179,8 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof Not not)) {
-                return false;
-            }
+            if (this == o) { return true; }
+            if (!(o instanceof Not not)) { return false; }
             return sub.equals(not.sub);
         }
 

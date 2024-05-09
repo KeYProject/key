@@ -22,9 +22,7 @@ public class TermNavigator {
      */
     private static final ArrayDeque<TermNavigator> TERM_NAVIGATOR_POOL = new ArrayDeque<>();
     static {
-        for (int i = 0; i < POOL_SIZE; i++) {
-            TERM_NAVIGATOR_POOL.push(new TermNavigator());
-        }
+        for (int i = 0; i < POOL_SIZE; i++) { TERM_NAVIGATOR_POOL.push(new TermNavigator()); }
     }
 
     /**
@@ -38,9 +36,7 @@ public class TermNavigator {
     public static TermNavigator get(Term term) {
         TermNavigator tn = null;
         synchronized (TERM_NAVIGATOR_POOL) {
-            if (!TERM_NAVIGATOR_POOL.isEmpty()) {
-                tn = TERM_NAVIGATOR_POOL.pop();
-            }
+            if (!TERM_NAVIGATOR_POOL.isEmpty()) { tn = TERM_NAVIGATOR_POOL.pop(); }
         }
         if (tn != null) {
             tn.stack.push(MutablePair.get(term, 0));
@@ -60,8 +56,7 @@ public class TermNavigator {
      */
     private final ArrayDeque<MutablePair> stack = new ArrayDeque<>();
 
-    private TermNavigator() {
-    }
+    private TermNavigator() {}
 
     private TermNavigator(Term term) {
         stack.push(MutablePair.get(term, 0));
@@ -81,9 +76,7 @@ public class TermNavigator {
     }
 
     private /* @ helper @ */ void gotoNextHelper() {
-        if (stack.isEmpty()) {
-            return;
-        }
+        if (stack.isEmpty()) { return; }
         do {
             MutablePair el = stack.peek();
             if (el.second < el.first.arity()) {
@@ -138,9 +131,7 @@ public class TermNavigator {
          */
         private static final ArrayDeque<MutablePair> PAIR_POOL = new ArrayDeque<>();
         static {
-            for (int i = 0; i < PAIR_POOL_SIZE; i++) {
-                PAIR_POOL.push(new MutablePair(null, null));
-            }
+            for (int i = 0; i < PAIR_POOL_SIZE; i++) { PAIR_POOL.push(new MutablePair(null, null)); }
         }
 
         /**
@@ -154,9 +145,7 @@ public class TermNavigator {
         static MutablePair get(Term first, Integer second) {
             MutablePair pair = null;
             synchronized (PAIR_POOL) {
-                if (!PAIR_POOL.isEmpty()) {
-                    pair = PAIR_POOL.pop();
-                }
+                if (!PAIR_POOL.isEmpty()) { pair = PAIR_POOL.pop(); }
             }
             if (pair != null) {
                 pair.set(first, second);

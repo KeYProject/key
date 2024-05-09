@@ -68,19 +68,19 @@ public class HeatmapOptionsDialog extends JDialog {
     /** Descriptions for heatmap options */
     private static final String[] DESCRIPTIONS = { "No Heatmaps are shown.",
         "All sequent formulae that have been added or changed in the last k steps are highlighted. "
-            + "More recent formulae will have a stronger highlight. It is possible that less "
-            + "than k formulae are highlighted, e.g. if one formula has changed multiple times.",
+                + "More recent formulae will have a stronger highlight. It is possible that less "
+                + "than k formulae are highlighted, e.g. if one formula has changed multiple times.",
         "All formulae in the sequent are sorted by how new they are, i.e., how recently they have"
-            + " been added or changed. The first k formulae of the sorted list are highlighted "
-            + "according to their position in the list,"
-            + " with the most recent formula receiving the strongest highlight.",
+                + " been added or changed. The first k formulae of the sorted list are highlighted "
+                + "according to their position in the list,"
+                + " with the most recent formula receiving the strongest highlight.",
         "All terms that have been added or changed in the last k steps are highlighted. "
-            + "More recent terms will have a stronger highlight. It is possible that less than "
-            + "k terms are highlighted, e.g. if one term has changed multiple times.",
+                + "More recent terms will have a stronger highlight. It is possible that less than "
+                + "k terms are highlighted, e.g. if one term has changed multiple times.",
         "All terms in the sequent are sorted by how new they are, i.e., how recently they "
-            + "have been added or changed. The first k terms of the sorted list are highlighted "
-            + "according to their position in the list,"
-            + " with the most recent term receiving the strongest highlight." };
+                + "have been added or changed. The first k terms of the sorted list are highlighted "
+                + "according to their position in the list,"
+                + " with the most recent term receiving the strongest highlight." };
 
     /** Error message on invalid textfield input */ // Not needed atm
     // private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and
@@ -170,7 +170,8 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param radioButtons the radio buttons to set
+     * @param radioButtons
+     *        the radio buttons to set
      */
     private void loadSettings(JRadioButton[] radioButtons) {
         if (VS.isShowHeatmap()) {
@@ -213,8 +214,10 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param okButton the ok button on the panel
-     * @param cancelButton the cancel button on the panel
+     * @param okButton
+     *        the ok button on the panel
+     * @param cancelButton
+     *        the cancel button on the panel
      * @return a panel with ok and cancel button
      */
     private JPanel setupButtonPanel(JButton okButton, JButton cancelButton) {
@@ -227,7 +230,8 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param spinner the spinner shown on the panel
+     * @param spinner
+     *        the spinner shown on the panel
      * @return a panel with spinner and explanation
      */
     private JPanel setupSpinnerPanel(JSpinner spinner, Color bg) {
@@ -248,8 +252,10 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param radioButtons the radio buttons shown on the panel
-     * @param bg the background color
+     * @param radioButtons
+     *        the radio buttons shown on the panel
+     * @param bg
+     *        the background color
      * @return a panel with all the radio buttons and explanations
      */
     private JPanel setupRadioPanel(JRadioButton[] radioButtons, Color bg, JDialog parent) {
@@ -264,9 +270,7 @@ public class HeatmapOptionsDialog extends JDialog {
             sf.setAlignmentX(.5f);
             JLabel terms = new JLabel("Highlight terms");
             terms.setAlignmentX(.5f);
-            if (i == 0) {
-                radioBoxes.add(dis);
-            }
+            if (i == 0) { radioBoxes.add(dis); }
             if (i == 1) {
                 radioBoxes.add(new JLabel("                   "));
                 radioBoxes.add(sf);
@@ -300,9 +304,12 @@ public class HeatmapOptionsDialog extends JDialog {
     /**
      * Sets up the action that is called on pressing the ok button
      *
-     * @param panel the main panel
-     * @param group the radio button group
-     * @param spinner the age spinner
+     * @param panel
+     *        the main panel
+     * @param group
+     *        the radio button group
+     * @param spinner
+     *        the age spinner
      * @return
      */
     private Action setupOkAction(JPanel panel, final ButtonGroup group, JSpinner spinner) {
@@ -358,9 +365,12 @@ public class HeatmapOptionsDialog extends JDialog {
 
         /**
          *
-         * @param s the description
-         * @param title title of the dialog
-         * @param owner the parent window
+         * @param s
+         *        the description
+         * @param title
+         *        title of the dialog
+         * @param owner
+         *        the parent window
          */
         public InfoDialog(String title, String s, final JDialog owner) {
             super(owner);

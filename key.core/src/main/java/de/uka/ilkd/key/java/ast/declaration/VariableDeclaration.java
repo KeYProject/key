@@ -47,9 +47,12 @@ public abstract class VariableDeclaration extends JavaDeclaration
     /**
      * Variable declaration.
      *
-     * @param mods a modifier mutable list.
-     * @param typeRef a type reference.
-     * @param parentIsInterfaceDeclaration a boolean set true iff the parent is an
+     * @param mods
+     *        a modifier mutable list.
+     * @param typeRef
+     *        a type reference.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
      */
     public VariableDeclaration(Modifier[] mods, TypeReference typeRef,
@@ -62,9 +65,12 @@ public abstract class VariableDeclaration extends JavaDeclaration
     /**
      * Variable declaration.
      *
-     * @param mods a modifier immutable list.
-     * @param typeRef a type reference.
-     * @param parentIsInterfaceDeclaration a boolean set true iff the parent is an
+     * @param mods
+     *        a modifier immutable list.
+     * @param typeRef
+     *        a type reference.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
      */
     public VariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
@@ -77,10 +83,12 @@ public abstract class VariableDeclaration extends JavaDeclaration
     /**
      * Variable declaration.
      *
-     * @param children an ExtList of children. May include: a TypeReference (as reference to the
+     * @param children
+     *        an ExtList of children. May include: a TypeReference (as reference to the
      *        type of the declared variable) several Modifier (taken as modifiers of the
      *        declaration), Comments
-     * @param parentIsInterfaceDeclaration a boolean set true iff the parent is an
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
      */
     public VariableDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
@@ -131,9 +139,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) {
-            return typeReference;
-        }
+        if (typeReference != null && index == 0) { return typeReference; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -205,7 +211,8 @@ public abstract class VariableDeclaration extends JavaDeclaration
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnVariableDeclaration(this);

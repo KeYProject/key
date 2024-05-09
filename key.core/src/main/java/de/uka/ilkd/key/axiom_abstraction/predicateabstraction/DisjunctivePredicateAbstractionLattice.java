@@ -36,7 +36,8 @@ public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
      * applicable predicates. The caller is responsible for making sure that no combinations of
      * predicates are valid.
      *
-     * @param applicablePredicates The predicates to generate the lattice from.
+     * @param applicablePredicates
+     *        The predicates to generate the lattice from.
      */
     public DisjunctivePredicateAbstractionLattice(List<AbstractionPredicate> applicablePredicates) {
         super();
@@ -106,7 +107,7 @@ public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
     @Override
     public String toString() {
         return "Disjunctive Predicate Abstraction Lattice of size " + size() + " with predicates "
-            + predicates.toString();
+                + predicates.toString();
     }
 
     /**
@@ -128,9 +129,7 @@ public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
             // behavior, since the the predicate abstraction lattice is (and
             // should be) never initialized with a null list. The lines below
             // fix this issue locally.
-            if (predicates == null) {
-                predicates = new ArrayList<>();
-            }
+            if (predicates == null) { predicates = new ArrayList<>(); }
 
             nrZeroes = predicates.size();
         }

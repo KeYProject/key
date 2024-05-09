@@ -112,8 +112,7 @@ public class MergeRule implements BuiltInRule {
     /**
      * {@link MergeRule} is a Singleton class, therefore constructor only package-wide visible.
      */
-    MergeRule() {
-    }
+    MergeRule() {}
 
     @Override
     public Name name() {
@@ -130,16 +129,14 @@ public class MergeRule implements BuiltInRule {
         return displayName();
     }
 
-    @NonNull
     @Override
-    public final ImmutableList<Goal> apply(Goal goal, final Services services, RuleApp ruleApp)
+    public final @NonNull ImmutableList<Goal> apply(Goal goal, final Services services,
+            RuleApp ruleApp)
             throws RuleAbortException {
 
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
 
-        if (!mergeRuleApp.complete()) {
-            throw new RuleAbortException("Merge rule not complete");
-        }
+        if (!mergeRuleApp.complete()) { throw new RuleAbortException("Merge rule not complete"); }
 
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
@@ -253,9 +250,7 @@ public class MergeRule implements BuiltInRule {
         services.saveNameRecorder(currentNode);
 
         // Register new names
-        for (Name newName : newNames) {
-            services.addNameProposal(newName);
-        }
+        for (Name newName : newNames) { services.addNameProposal(newName); }
 
         // Add new goals for side conditions that have to be proven
         if (sideConditionsToProve.size() > 0) {
@@ -295,14 +290,20 @@ public class MergeRule implements BuiltInRule {
      *
      * Override this method for special merge procedures.
      *
-     * @param mergeRule The merge procedure to use for the merge.
-     * @param state1 First state to merge.
-     * @param state2 Second state to merge.
-     * @param programCounter The formula \&lt;{ ... }\&gt; phi consisting of the common program
+     * @param mergeRule
+     *        The merge procedure to use for the merge.
+     * @param state1
+     *        First state to merge.
+     * @param state2
+     *        Second state to merge.
+     * @param programCounter
+     *        The formula \&lt;{ ... }\&gt; phi consisting of the common program
      *        counter and the post condition.
-     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
+     * @param distinguishingFormula
+     *        The user-specified distinguishing formula. May be null (for
      *        automatic generation).
-     * @param services The services object.
+     * @param services
+     *        The services object.
      * @return A new merged SE state (U*,C*) which is a weakening of the original states.
      */
     @SuppressWarnings("unused")
@@ -345,13 +346,9 @@ public class MergeRule implements BuiltInRule {
             Term rightSide1 = getUpdateRightSideFor(state1.first, v);
             Term rightSide2 = getUpdateRightSideFor(state2.first, v);
 
-            if (rightSide1 == null) {
-                rightSide1 = tb.var(v);
-            }
+            if (rightSide1 == null) { rightSide1 = tb.var(v); }
 
-            if (rightSide2 == null) {
-                rightSide2 = tb.var(v);
-            }
+            if (rightSide2 == null) { rightSide2 = tb.var(v); }
 
             // Check if location v is set to different value in both states.
 
@@ -454,13 +451,20 @@ public class MergeRule implements BuiltInRule {
      *
      * Override this method for specialized heap merge procedures.
      *
-     * @param heapVar The heap variable for which the values should be merged.
-     * @param heap1 The first heap term.
-     * @param heap2 The second heap term.
-     * @param state1 SE state for the first heap term.
-     * @param state2 SE state for the second heap term
-     * @param services The services object.
-     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
+     * @param heapVar
+     *        The heap variable for which the values should be merged.
+     * @param heap1
+     *        The first heap term.
+     * @param heap2
+     *        The second heap term.
+     * @param state1
+     *        SE state for the first heap term.
+     * @param state2
+     *        SE state for the second heap term
+     * @param services
+     *        The services object.
+     * @param distinguishingFormula
+     *        The user-specified distinguishing formula. May be null (for
      *        automatic generation).
      * @return A merged heap term.
      */
@@ -586,8 +590,10 @@ public class MergeRule implements BuiltInRule {
      * We admit top level formulas of the form \&lt;{ ... }\&gt; phi and U \&lt;{ ... }\&gt; phi,
      * where U must be an update in normal form, i.e. a parallel update of elementary updates.
      *
-     * @param goal Current goal.
-     * @param pio Position of selected sequent formula.
+     * @param goal
+     *        Current goal.
+     * @param pio
+     *        Position of selected sequent formula.
      * @return true iff a suitable top level formula for merging.
      */
     @Override
@@ -600,9 +606,12 @@ public class MergeRule implements BuiltInRule {
      * where U must be an update in normal form, i.e. a parallel update of elementary updates. We
      * require that phi does not contain a Java block.
      *
-     * @param goal Current goal.
-     * @param pio Position of selected sequent formula.
-     * @param doMergePartnerCheck Checks for available merge partners iff this flag is set to true.
+     * @param goal
+     *        Current goal.
+     * @param pio
+     *        Position of selected sequent formula.
+     * @param doMergePartnerCheck
+     *        Checks for available merge partners iff this flag is set to true.
      * @return true iff a suitable top level formula for merging.
      */
     public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence pio,
@@ -612,9 +621,7 @@ public class MergeRule implements BuiltInRule {
         // in normal form, i.e. a parallel update of elementary
         // updates.
 
-        if (pio == null || !pio.isTopLevel()) {
-            return false;
-        }
+        if (pio == null || !pio.isTopLevel()) { return false; }
 
         Term selected = pio.subTerm();
 
@@ -644,9 +651,7 @@ public class MergeRule implements BuiltInRule {
         if (termAfterUpdate.op() instanceof Modality
                 && !termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
             return false;
-        } else if (termAfterUpdate.op() instanceof UpdateApplication) {
-            return false;
-        }
+        } else if (termAfterUpdate.op() instanceof UpdateApplication) { return false; }
 
         return !doMergePartnerCheck || findPotentialMergePartners(goal, pio).size() > 0;
 
@@ -665,8 +670,10 @@ public class MergeRule implements BuiltInRule {
     /**
      * Finds all suitable merge partners
      *
-     * @param goal Current goal to merge.
-     * @param pio Position of update-program counter formula in goal.
+     * @param goal
+     *        Current goal to merge.
+     * @param pio
+     *        Position of update-program counter formula in goal.
      * @return A list of suitable merge partners. May be empty if none exist.
      */
     public static ImmutableList<MergePartner> findPotentialMergePartners(Goal goal,

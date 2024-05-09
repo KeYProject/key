@@ -43,12 +43,17 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * JML modifiers of a type
      *
-     * @param strictlyPure strictly pure
-     * @param pure pure
-     * @param nullableByDefault nullable by default
-     * @param specMathMode spec math mode
+     * @param strictlyPure
+     *        strictly pure
+     * @param pure
+     *        pure
+     * @param nullableByDefault
+     *        nullable by default
+     * @param specMathMode
+     *        spec math mode
      */
-    public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
+    public record JMLModifiers(
+            boolean strictlyPure, boolean pure, boolean nullableByDefault,
             SpecMathMode specMathMode) {}
 
     protected final JMLModifiers jmlModifiers;
@@ -82,9 +87,12 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * Type declaration.
      *
-     * @param mods a modifier array.
-     * @param name ProgramElementName of the type
-     * @param members an array containing the memberdeclarations of
+     * @param mods
+     *        a modifier array.
+     * @param name
+     *        ProgramElementName of the type
+     * @param members
+     *        an array containing the memberdeclarations of
      *        this type
      */
     public TypeDeclaration(
@@ -104,8 +112,10 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     /**
-     * @param children an ExtList of children.
-     * @param name the ProgramElementName of the type
+     * @param children
+     *        an ExtList of children.
+     * @param name
+     *        the ProgramElementName of the type
      *        May contain:
      *        several MemberDeclaration (as members of the type),
      *        a parentIsInterfaceDeclaration (indicating if parent is interface),
@@ -132,7 +142,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     /**
-     * @param children an ExtList of children.
+     * @param children
+     *        an ExtList of children.
      *        May contain:
      *        a ProgramElementName (as name),
      *        several MemberDeclaration (as members of the type),
@@ -245,9 +256,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * [dlohner] The given parameter is obsolete with this implementation.
      */
     public ImmutableList<Field> getAllFields(Services services) {
-        if (members == null) {
-            return ImmutableSLList.nil();
-        }
+        if (members == null) { return ImmutableSLList.nil(); }
 
         ImmutableList<Field> result = ImmutableSLList.nil();
 
@@ -314,9 +323,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         int count = 0;
         if (members != null) {
             for (int i = members.size() - 1; i >= 0; i -= 1) {
-                if (members.get(i) instanceof TypeDeclaration) {
-                    count += 1;
-                }
+                if (members.get(i) instanceof TypeDeclaration) { count += 1; }
             }
         }
         return count;
@@ -340,9 +347,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
             for (int i = 0; i < s && index >= 0; i += 1) {
                 MemberDeclaration md = members.get(i);
                 if (md instanceof TypeDeclaration) {
-                    if (index == 0) {
-                        return (TypeDeclaration) md;
-                    }
+                    if (index == 0) { return (TypeDeclaration) md; }
                     index -= 1;
                 }
             }

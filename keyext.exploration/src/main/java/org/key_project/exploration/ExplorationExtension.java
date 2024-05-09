@@ -76,16 +76,14 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         }
     };
 
-    @NonNull
     @Override
-    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
             @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
-    @NonNull
     @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
             explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model, mainWindow)));
@@ -111,9 +109,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
                 Proof newProof = mediator.getSelectedProof();
                 if (oldProof != newProof) {
                     leftPanel.setProof(newProof);
-                    if (oldProof != null) {
-                        oldProof.removeProofTreeListener(proofTreeListener);
-                    }
+                    if (oldProof != null) { oldProof.removeProofTreeListener(proofTreeListener); }
                     if (newProof != null) {
                         newProof.addProofTreeListener(proofTreeListener);
                         newProof.addProofDisposedListener(extension);
@@ -132,22 +128,17 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
             e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
     }
 
-    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(@NonNull MainWindow window,
+    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
             @NonNull KeYMediator mediator) {
-        if (leftPanel == null) {
-            initLeftPanel(window);
-        }
+        if (leftPanel == null) { initLeftPanel(window); }
 
         return Collections.singleton(leftPanel);
     }
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        if (leftPanel == null) {
-            initLeftPanel(MainWindow.getInstance());
-        }
+        if (leftPanel == null) { initLeftPanel(MainWindow.getInstance()); }
 
         return Collections.singletonList(leftPanel.getHasExplorationSteps());
     }
@@ -160,9 +151,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-        if (e.getSource() == leftPanel.getProof()) {
-            leftPanel.setProof(null);
-        }
+        if (e.getSource() == leftPanel.getProof()) { leftPanel.setProof(null); }
     }
 
     @Override

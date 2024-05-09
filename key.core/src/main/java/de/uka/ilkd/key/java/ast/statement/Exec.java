@@ -36,7 +36,8 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     /**
      * Exec.
      *
-     * @param body a statement block.
+     * @param body
+     *        a statement block.
      */
     public Exec(StatementBlock body) {
         super(null, null);
@@ -50,8 +51,10 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     /**
      * Exec.
      *
-     * @param body a statement block.
-     * @param branches a branch array.
+     * @param body
+     *        a statement block.
+     * @param branches
+     *        a branch array.
      */
     public Exec(StatementBlock body, Branch[] branches) {
         super(null, null);
@@ -66,8 +69,10 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     /**
      * Exec.
      *
-     * @param body a statement block.
-     * @param branches a branch array.
+     * @param body
+     *        a statement block.
+     * @param branches
+     *        a branch array.
      */
     public Exec(StatementBlock body, ImmutableArray<Branch> branches) {
         super(null, null);
@@ -82,7 +87,8 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     /**
      * Exec.
      *
-     * @param children a list with all children
+     * @param children
+     *        a list with all children
      */
     public Exec(ExtList children) {
         super(children);
@@ -148,33 +154,27 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     @Override
     public int getChildCount() {
         int result = 0;
-        if (body != null) {
-            result++;
-        }
-        if (branches != null) {
-            result += branches.size();
-        }
+        if (body != null) { result++; }
+        if (branches != null) { result += branches.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0) {
-                return body;
-            }
+            if (index == 0) { return body; }
             index--;
         }
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -201,15 +201,15 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
-     * @param index an index for a statement.
+     * @param index
+     *        an index for a statement.
      * @return the statement with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
     @Override
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -226,15 +226,15 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     /**
      * Return the branch at the specified index in this node's "virtual" branch array.
      *
-     * @param index an index for a branch.
+     * @param index
+     *        an index for a branch.
      * @return the branch with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds.
      */
     @Override
     public Branch getBranchAt(int index) {
-        if (branches != null) {
-            return branches.get(index);
-        }
+        if (branches != null) { return branches.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -251,7 +251,8 @@ public class Exec extends BranchStatement implements StatementContainer, Program
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     @Override
     public void visit(Visitor v) {

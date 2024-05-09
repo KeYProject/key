@@ -9,17 +9,13 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
-import org.jspecify.annotations.NonNull;
-
 
 public class SLTranslationException extends ProofInputException implements HasLocation {
     protected final Location location;
 
     public SLTranslationException(String message, Throwable cause, Location location) {
         super(message, cause);
-        if (location == null) {
-            throw new IllegalArgumentException();
-        }
+        if (location == null) { throw new IllegalArgumentException(); }
         this.location = location;
     }
 
@@ -36,7 +32,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
     }
 
     @Override
-    public @NonNull Location getLocation() {
+    public Location getLocation() {
         return location;
     }
 }

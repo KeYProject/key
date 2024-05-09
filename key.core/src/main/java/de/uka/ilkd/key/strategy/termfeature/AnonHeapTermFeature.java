@@ -14,8 +14,7 @@ public final class AnonHeapTermFeature extends BinaryTermFeature {
 
     public static final AnonHeapTermFeature INSTANCE = new AnonHeapTermFeature();
 
-    private AnonHeapTermFeature() {
-    }
+    private AnonHeapTermFeature() {}
 
     @Override
     protected boolean filter(Term t, MutableState mState, Services services) {

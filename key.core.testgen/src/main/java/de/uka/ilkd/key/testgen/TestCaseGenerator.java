@@ -106,25 +106,25 @@ public class TestCaseGenerator {
     // KeY-project
     private String compileWithOpenJML =
         "#!/bin/bash" + NEW_LINE + NEW_LINE + "if [ -e \"openjml.jar\" ]" + NEW_LINE + "then"
-            + NEW_LINE + "   java -jar openjml.jar -cp \".\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT
-            + NEW_LINE + "else" + NEW_LINE + "   echo \"openjml.jar not found!\"" + NEW_LINE
-            + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
-            + NEW_LINE + "   echo \"Copy openjml.jar into the directory with test files.\""
-            + NEW_LINE + "fi" + NEW_LINE;
+                + NEW_LINE + "   java -jar openjml.jar -cp \".\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT
+                + NEW_LINE + "else" + NEW_LINE + "   echo \"openjml.jar not found!\"" + NEW_LINE
+                + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
+                + NEW_LINE + "   echo \"Copy openjml.jar into the directory with test files.\""
+                + NEW_LINE + "fi" + NEW_LINE;
 
     private String createCompileWithOpenJML(String openJMLPath, String objenesisPath) {
         return "#!/bin/bash" + NEW_LINE + NEW_LINE + "if [ -e \"" + openJMLPath + File.separator
-            + "openjml.jar\" ] " + NEW_LINE + "then" + NEW_LINE + "   if [ -e \"" + objenesisPath
-            + File.separator + OBJENESIS_NAME + "\" ]" + NEW_LINE + "   then" + NEW_LINE
-            + "      java -jar " + openJMLPath + File.separator + "openjml.jar -cp \"."
-            + objenesisPath + File.separator + OBJENESIS_NAME + "\" -rac *"
-            + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE + "   else" + NEW_LINE
-            + "      echo \"objenesis-2.2.jar not found!\"" + NEW_LINE + "   fi" + NEW_LINE + "else"
-            + NEW_LINE + "   echo \"openjml.jar not found!\"" + NEW_LINE
+                + "openjml.jar\" ] " + NEW_LINE + "then" + NEW_LINE + "   if [ -e \"" + objenesisPath
+                + File.separator + OBJENESIS_NAME + "\" ]" + NEW_LINE + "   then" + NEW_LINE
+                + "      java -jar " + openJMLPath + File.separator + "openjml.jar -cp \"."
+                + objenesisPath + File.separator + OBJENESIS_NAME + "\" -rac *"
+                + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE + "   else" + NEW_LINE
+                + "      echo \"objenesis-2.2.jar not found!\"" + NEW_LINE + "   fi" + NEW_LINE + "else"
+                + NEW_LINE + "   echo \"openjml.jar not found!\"" + NEW_LINE
 
-            + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
-            + NEW_LINE + "   echo \"Copy openjml.jar into the directory with test files.\""
-            + NEW_LINE + "fi" + NEW_LINE;
+                + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
+                + NEW_LINE + "   echo \"Copy openjml.jar into the directory with test files.\""
+                + NEW_LINE + "fi" + NEW_LINE;
     }
 
     // TODO: in future remove this string and provide the file in the
@@ -133,28 +133,28 @@ public class TestCaseGenerator {
 
     private String createExecuteWithOpenJML(String path, String objenesisPath) {
         return "#!/bin/bash" + NEW_LINE + "if [ -e \"" + path + File.separator
-            + "jmlruntime.jar\" ]" + NEW_LINE + "then" + "  if [ -e \"" + path + File.separator
-            + "jmlspecs.jar\" ]" + NEW_LINE + "  then" + NEW_LINE + "     if [ -e \""
-            + objenesisPath + File.separator + OBJENESIS_NAME + "\" ]" + NEW_LINE + "     then"
-            + NEW_LINE + "        if [ \"$1\" = \"\" ] ; then" + NEW_LINE
-            + "           echo \"Provide the test driver as an argument (without "
-            + JAVA_FILE_EXTENSION_WITH_DOT + " postfix). For example:\"" + NEW_LINE
-            + "           echo \"  executeWithOpenJML.sh TestGeneric0 \"" + NEW_LINE
-            + "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\""
-            + NEW_LINE + "           echo \"current directory.\"" + NEW_LINE + "           quit"
-            + NEW_LINE + "        else" + NEW_LINE + "           java -cp " + objenesisPath
-            + File.separator + OBJENESIS_NAME + ":" + path + File.separator + "jmlruntime.jar:"
-            + path + File.separator + "jmlspecs.jar:. $1" + NEW_LINE + "        fi" + NEW_LINE
-            + "      else" + NEW_LINE + "         echo \"objenesis-2.2.jar not found!\"" + NEW_LINE
-            + "      fi" + NEW_LINE + "else" + NEW_LINE + "  echo \"jmlspecs.jar not found!\""
-            + NEW_LINE
-            + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
-            + NEW_LINE + "  echo \"Copy jmlspecs.jar into the directory with test files.\""
-            + NEW_LINE + "  quit" + NEW_LINE + "fi" + NEW_LINE + "else" + NEW_LINE
-            + "   echo \"jmlruntime.jar not found!\"" + NEW_LINE
-            + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
-            + NEW_LINE + "   echo \"Copy jmlruntime.jar into the directory with test files.\""
-            + NEW_LINE + "   quit" + NEW_LINE + "fi" + NEW_LINE;
+                + "jmlruntime.jar\" ]" + NEW_LINE + "then" + "  if [ -e \"" + path + File.separator
+                + "jmlspecs.jar\" ]" + NEW_LINE + "  then" + NEW_LINE + "     if [ -e \""
+                + objenesisPath + File.separator + OBJENESIS_NAME + "\" ]" + NEW_LINE + "     then"
+                + NEW_LINE + "        if [ \"$1\" = \"\" ] ; then" + NEW_LINE
+                + "           echo \"Provide the test driver as an argument (without "
+                + JAVA_FILE_EXTENSION_WITH_DOT + " postfix). For example:\"" + NEW_LINE
+                + "           echo \"  executeWithOpenJML.sh TestGeneric0 \"" + NEW_LINE
+                + "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\""
+                + NEW_LINE + "           echo \"current directory.\"" + NEW_LINE + "           quit"
+                + NEW_LINE + "        else" + NEW_LINE + "           java -cp " + objenesisPath
+                + File.separator + OBJENESIS_NAME + ":" + path + File.separator + "jmlruntime.jar:"
+                + path + File.separator + "jmlspecs.jar:. $1" + NEW_LINE + "        fi" + NEW_LINE
+                + "      else" + NEW_LINE + "         echo \"objenesis-2.2.jar not found!\"" + NEW_LINE
+                + "      fi" + NEW_LINE + "else" + NEW_LINE + "  echo \"jmlspecs.jar not found!\""
+                + NEW_LINE
+                + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
+                + NEW_LINE + "  echo \"Copy jmlspecs.jar into the directory with test files.\""
+                + NEW_LINE + "  quit" + NEW_LINE + "fi" + NEW_LINE + "else" + NEW_LINE
+                + "   echo \"jmlruntime.jar not found!\"" + NEW_LINE
+                + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
+                + NEW_LINE + "   echo \"Copy jmlruntime.jar into the directory with test files.\""
+                + NEW_LINE + "   quit" + NEW_LINE + "fi" + NEW_LINE;
     }
 
     public TestCaseGenerator(Proof proof) {
@@ -190,7 +190,8 @@ public class TestCaseGenerator {
      * Computes the project specific sub path of the output directory ({@link #directory}) in which
      * the generated files will be stored.
      *
-     * @param modelDir The path to the source files of the performed {@link Proof}.
+     * @param modelDir
+     *        The path to the source files of the performed {@link Proof}.
      * @return The computed sub path.
      */
     protected String computeProjectSubPath(String modelDir) {
@@ -216,9 +217,7 @@ public class TestCaseGenerator {
                 params.append(",").append(var.name());
             }
         }
-        if (params.length() > 0) {
-            params = new StringBuilder(params.substring(1));
-        }
+        if (params.length() > 0) { params = new StringBuilder(params.substring(1)); }
 
         String caller;
         if (m.isStatic()) {
@@ -239,9 +238,7 @@ public class TestCaseGenerator {
         final JavaInfo jinfo = services.getJavaInfo();
         final KeYJavaType kjt = jinfo.getKeYJavaType(sort);
         final String className = getDummyClassNameFor(sort);
-        if (sortDummyClass.containsKey(sort)) {
-            return className;
-        }
+        if (sortDummyClass.containsKey(sort)) { return className; }
         final var sb = new StringBuilder();
         sortDummyClass.put(sort, sb);
         // Put the string buffer as soon as possible, due to possible recursive calls of this
@@ -255,30 +252,18 @@ public class TestCaseGenerator {
                                                                                    // constructor
 
         for (IProgramMethod m : jinfo.getAllProgramMethods(kjt)) {
-            if (m.getFullName().indexOf('<') > -1) {
-                continue;
-            }
-            if (m.isPrivate() || m.isFinal() || !m.isAbstract()) {
-                continue;
-            }
+            if (m.getFullName().indexOf('<') > -1) { continue; }
+            if (m.isPrivate() || m.isFinal() || !m.isAbstract()) { continue; }
             sb.append(" ");
             final MethodDeclaration md = m.getMethodDeclaration();
 
-            if (m.isProtected()) {
-                sb.append("protected ");
-            }
-            if (m.isPublic()) {
-                sb.append("public ");
-            }
+            if (m.isProtected()) { sb.append("protected "); }
+            if (m.isPublic()) { sb.append("public "); }
             if (m.isFinal()) {
                 sb.append("final "); // Is this possible?
             }
-            if (m.isStatic()) {
-                sb.append("static ");
-            }
-            if (m.isSynchronized()) {
-                sb.append("synchronized ");
-            }
+            if (m.isStatic()) { sb.append("static "); }
+            if (m.isSynchronized()) { sb.append("synchronized "); }
             if (md.getTypeReference() == null) {
                 sb.append("void ");
             } else {
@@ -289,9 +274,7 @@ public class TestCaseGenerator {
             int varcount = 0;
             while (pdIter.hasNext()) {
                 final ParameterDeclaration pd = pdIter.next();
-                if (pd.isFinal()) {
-                    sb.append("final ");
-                }
+                if (pd.isFinal()) { sb.append("final "); }
                 if (pd.getTypeReference() == null) {
                     sb.append("void /*unkown type*/ ");
                 } else {
@@ -302,9 +285,7 @@ public class TestCaseGenerator {
                 } else {
                     sb.append(pd.getVariables().iterator().next().getFullName());
                 }
-                if (pdIter.hasNext()) {
-                    sb.append(", ");
-                }
+                if (pdIter.hasNext()) { sb.append(", "); }
                 varcount++;
             }
             sb.append(")");
@@ -334,9 +315,7 @@ public class TestCaseGenerator {
                     } catch (final Exception e) {
                         returnNull = true;
                     }
-                    if (returnNull) {
-                        sb.append("{ return null;}");
-                    }
+                    if (returnNull) { sb.append("{ return null;}"); }
                 }
             }
             sb.append(NEW_LINE);
@@ -348,18 +327,12 @@ public class TestCaseGenerator {
     private void copyFiles(final String srcName, final String targName) throws IOException {
         // We don't want to copy the Folder with API Reference
         // Implementation
-        if (srcName.equals(dontCopy)) {
-            return;
-        }
+        if (srcName.equals(dontCopy)) { return; }
         // Create the File with given filename and check if it exists and if
         // it's readable
         final File srcFile = new File(srcName);
-        if (!srcFile.exists()) {
-            throw new IOException("FileCopy: " + "no such source file: " + srcName);
-        }
-        if (!srcFile.canRead()) {
-            throw new IOException("FileCopy: " + "source file is unreadable: " + srcName);
-        }
+        if (!srcFile.exists()) { throw new IOException("FileCopy: " + "no such source file: " + srcName); }
+        if (!srcFile.canRead()) { throw new IOException("FileCopy: " + "source file is unreadable: " + srcName); }
         if (srcFile.isDirectory()) {
             final String newTarget;
             if (srcName.equals(modDir)) {
@@ -367,14 +340,10 @@ public class TestCaseGenerator {
             } else {
                 newTarget = targName + File.separator + srcFile.getName();
             }
-            for (final String subName : srcFile.list()) {
-                copyFiles(srcName + File.separator + subName, newTarget);
-            }
+            for (final String subName : srcFile.list()) { copyFiles(srcName + File.separator + subName, newTarget); }
         } else if (srcFile.isFile()) {
             final File targDir = new File(targName);
-            if (!targDir.exists()) {
-                targDir.mkdirs();
-            }
+            if (!targDir.exists()) { targDir.mkdirs(); }
             final File targFile = new File(targDir, srcFile.getName());
             if (targFile.exists()) {
                 if (!targFile.canWrite()) {
@@ -476,16 +445,14 @@ public class TestCaseGenerator {
         StringBuilder testSuite = createTestCaseCotent(problemSolvers);
         writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testSuite);
         logger.writeln("Writing test file to:" + directory + modDir + File.separator + fileName
-            + JAVA_FILE_EXTENSION_WITH_DOT);
+                + JAVA_FILE_EXTENSION_WITH_DOT);
         exportCodeUnderTest();
         createDummyClasses();
         try {
-            if (useRFL) {
-                writeRFLFile();
-            }
+            if (useRFL) { writeRFLFile(); }
         } catch (Exception ex) {
             logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT
-                + " is either not generated or it has an error.");
+                    + " is either not generated or it has an error.");
             LOGGER.error("Error: The file RFL {} is either not generated or it has an error.",
                 JAVA_FILE_EXTENSION_WITH_DOT);
         }
@@ -499,7 +466,7 @@ public class TestCaseGenerator {
         String mut = getMUTCall();
         if (mut == null) {
             mut = "<method under test> //Manually write a call to the method under test, "
-                + "because KeY could not determine it automatically.";
+                    + "because KeY could not determine it automatically.";
         } else {
             fileName += "_" + mutName;
         }
@@ -556,13 +523,9 @@ public class TestCaseGenerator {
                         testMethods.append(testMethod);
                     }
                 }
-                if (!success) {
-                    logger.writeln("A model (test data) was not generated for:" + originalNodeName);
-                }
+                if (!success) { logger.writeln("A model (test data) was not generated for:" + originalNodeName); }
             } catch (final Exception ex) {
-                for (StackTraceElement ste : ex.getStackTrace()) {
-                    logger.writeln(ste.toString());
-                }
+                for (StackTraceElement ste : ex.getStackTrace()) { logger.writeln(ste.toString()); }
                 logger.writeln(
                     "A test case was not generated due to an exception. Continuing test generation...");
             }
@@ -570,33 +533,26 @@ public class TestCaseGenerator {
         if (i == 0) {
             logger.writeln(
                 "Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) "
-                    + "in Options->SMT Solvers.");
+                        + "in Options->SMT Solvers.");
         } else if (i < problemSolvers.size()) {
             logger.writeln("Warning: SMT solver could not solve all test data constraints. "
-                + "Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+                    + "Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
         }
         testSuite.append(getMainMethod(fileName, i)).append(NEW_LINE).append(NEW_LINE);
         testSuite.append(testMethods);
 
         if (junitFormat) {
-            for (OracleMethod m : oracleMethods) {
-                testSuite.append(NEW_LINE).append(NEW_LINE);
-                testSuite.append(m);
-            }
+            for (OracleMethod m : oracleMethods) { testSuite.append(NEW_LINE).append(NEW_LINE); testSuite.append(m); }
         }
 
-        if (rflAsInternalClass) {
-            testSuite.append(createRFLFileContent());
-        }
+        if (rflAsInternalClass) { testSuite.append(createRFLFileContent()); }
 
         testSuite.append(NEW_LINE).append("}");
         return testSuite;
     }
 
     protected String inferSort(Map<String, Sort> typeInfMap, String progVar) {
-        if (typeInfMap.containsKey(progVar)) {
-            return typeInfMap.get(progVar).name().toString();
-        }
+        if (typeInfMap.containsKey(progVar)) { return typeInfMap.get(progVar).name().toString(); }
         LOGGER.warn("Warning: inferSort did not find:  {}", progVar);
         return "NOTYPE";
     }
@@ -616,9 +572,7 @@ public class TestCaseGenerator {
             ProgramVariable pv = (ProgramVariable) t.op();
             final String name = pv.name().toString();
             if (map.containsKey(name)) {
-                if (map.get(name) != pv.sort()) {
-                    LOGGER.warn("Warning: ProgramVariable {} is ambiguous.", name);
-                }
+                if (map.get(name) != pv.sort()) { LOGGER.warn("Warning: ProgramVariable {} is ambiguous.", name); }
             } else {
                 LOGGER.debug("PV {} Sort: {} KeYJavaType: {}", name, pv.sort(),
                     pv.getKeYJavaType());
@@ -638,9 +592,7 @@ public class TestCaseGenerator {
                     String name = JavaDLFieldNames.toJava(func.name());
 
                     if (map.containsKey(name)) {
-                        if (map.get(name) != pv.sort()) {
-                            LOGGER.warn("Function {} is ambiguous.", name);
-                        }
+                        if (map.get(name) != pv.sort()) { LOGGER.warn("Function {} is ambiguous.", name); }
                     } else {
                         LOGGER.debug("Func: {} Sort: {} PV.sort: {}", name, func.sort(), pv.sort());
                         map.put(name, pv.sort());
@@ -651,9 +603,7 @@ public class TestCaseGenerator {
             }
         }
 
-        for (int i = 0; i < t.arity(); i++) {
-            generateTypeInferenceMapHelper(t.sub(i), map);
-        }
+        for (int i = 0; i < t.arity(); i++) { generateTypeInferenceMapHelper(t.sub(i), map); }
     }
 
     private ProgramVariable getProgramVariable(Term locationTerm) {
@@ -755,9 +705,7 @@ public class TestCaseGenerator {
 
             // create objects
             for (final ObjectVal o : heap.getObjects()) {
-                if (o.getName().equals("#o0")) {
-                    continue;
-                }
+                if (o.getName().equals("#o0")) { continue; }
                 final String type = getSafeType(o.getSort());
                 String right;
                 if (type.endsWith("[]")) {
@@ -826,14 +774,10 @@ public class TestCaseGenerator {
         if (heap != null) {
             for (final ObjectVal o : heap.getObjects()) {
                 if (o.getName().equals("#o0")
-                        || o.getSort().name().toString().endsWith("Exception")) {
-                    continue;
-                }
+                        || o.getSort().name().toString().endsWith("Exception")) { continue; }
                 final String receiverObject = createObjectName(o);
                 for (final String f : o.getFieldvalues().keySet()) {
-                    if (f.contains("<") || f.contains(">")) {
-                        continue;
-                    }
+                    if (f.contains("<") || f.contains(">")) { continue; }
                     String fieldName = f.substring(f.lastIndexOf(':') + 1);
                     fieldName = fieldName.replace("|", "");
                     String val = o.getFieldvalues().get(f);
@@ -936,32 +880,30 @@ public class TestCaseGenerator {
 
     private String getFilePrefix(String className, String packageName) {
         String res = "/** This is a test driver generated by KeY " + KeYConstants.VERSION
-            + " (www.key-project.org). " + NEW_LINE + " * Possible use cases:" + NEW_LINE
-            + " *  Use Case 1. Using JUnit 4:" + NEW_LINE
-            + " *        javac -cp .:PATH_TO_JUNIT4_JAR *.java" + NEW_LINE
-            + " *        java  -cp .:PATH_TO_JUNIT4_JAR:PATH_TO_HAMCREST_JAR org.junit.runner.JUnitCore "
-            + className + NEW_LINE + " *  Use Case 2. Use JML runtime checker: " + NEW_LINE
-            + " *      Compile this file and and execute the main method with a JML runtime checker. On linux you can use the built-in scripts:"
-            + NEW_LINE + " *        ./compileWithOpenJML.sh" + NEW_LINE
-            + " *        ./executeWithOpenJML.sh " + className + NEW_LINE
-            + " *  Use Case 3. Use simply a program debugger to follow and understand the execution of the program."
-            + NEW_LINE + " * @author Christoph Gladisch" + NEW_LINE + " * @author Mihai Herda"
-            + NEW_LINE + " */" + NEW_LINE;
-        if (packageName != null) {
-            res += "package " + packageName + ";" + NEW_LINE;
-        }
+                + " (www.key-project.org). " + NEW_LINE + " * Possible use cases:" + NEW_LINE
+                + " *  Use Case 1. Using JUnit 4:" + NEW_LINE
+                + " *        javac -cp .:PATH_TO_JUNIT4_JAR *.java" + NEW_LINE
+                + " *        java  -cp .:PATH_TO_JUNIT4_JAR:PATH_TO_HAMCREST_JAR org.junit.runner.JUnitCore "
+                + className + NEW_LINE + " *  Use Case 2. Use JML runtime checker: " + NEW_LINE
+                + " *      Compile this file and and execute the main method with a JML runtime checker. On linux you can use the built-in scripts:"
+                + NEW_LINE + " *        ./compileWithOpenJML.sh" + NEW_LINE
+                + " *        ./executeWithOpenJML.sh " + className + NEW_LINE
+                + " *  Use Case 3. Use simply a program debugger to follow and understand the execution of the program."
+                + NEW_LINE + " * @author Christoph Gladisch" + NEW_LINE + " * @author Mihai Herda"
+                + NEW_LINE + " */" + NEW_LINE;
+        if (packageName != null) { res += "package " + packageName + ";" + NEW_LINE; }
 
         if (junitFormat) {
             res += "import java.util.Set;" + NEW_LINE + "import java.util.HashSet;" + NEW_LINE
-                + "import java.util.Map;" + NEW_LINE + "import java.util.HashMap;" + NEW_LINE
-                + " public class " + className + " extends junit.framework.TestCase {" + NEW_LINE
-                + NEW_LINE + " public static junit.framework.Test suite() { "
-                + "   return new junit.framework.JUnit4TestAdapter(" + className + ".class);"
-                + NEW_LINE + " } " + NEW_LINE + NEW_LINE + " public " + className + "(){}"
-                + NEW_LINE + NEW_LINE;
+                    + "import java.util.Map;" + NEW_LINE + "import java.util.HashMap;" + NEW_LINE
+                    + " public class " + className + " extends junit.framework.TestCase {" + NEW_LINE
+                    + NEW_LINE + " public static junit.framework.Test suite() { "
+                    + "   return new junit.framework.JUnit4TestAdapter(" + className + ".class);"
+                    + NEW_LINE + " } " + NEW_LINE + NEW_LINE + " public " + className + "(){}"
+                    + NEW_LINE + NEW_LINE;
         } else {
             res += "public class " + className + "{ " + NEW_LINE + NEW_LINE + " public " + className
-                + "(){}" + NEW_LINE;
+                    + "(){}" + NEW_LINE;
         }
         return res;
     }
@@ -975,9 +917,7 @@ public class TestCaseGenerator {
         for (int j = 0; j < i; j++) {
             res.append("   testSuiteObject.testcode").append(j).append("();").append(NEW_LINE);
         }
-        if (i == 0) {
-            res.append("   //Warning:no test methods were generated.").append(NEW_LINE);
-        }
+        if (i == 0) { res.append("   //Warning:no test methods were generated.").append(NEW_LINE); }
         res.append(" }");
         return res;
     }
@@ -986,7 +926,7 @@ public class TestCaseGenerator {
         // bool
         String allbool = ALL_BOOLS;
         return NEW_LINE + TAB + "Set<Boolean> " + allbool + "= new HashSet<Boolean>();" + NEW_LINE
-            + TAB + allbool + ".add(true);" + NEW_LINE + TAB + allbool + ".add(false);" + NEW_LINE;
+                + TAB + allbool + ".add(true);" + NEW_LINE + TAB + allbool + ".add(false);" + NEW_LINE;
     }
 
     private String createIntSet() {
@@ -1016,9 +956,7 @@ public class TestCaseGenerator {
 
         for (ObjectVal o : h.getObjects()) {
             String name = o.getName();
-            if (name.equals("#o0")) {
-                continue;
-            }
+            if (name.equals("#o0")) { continue; }
             name = name.replace("#", "_");
             res.append(TAB + ALL_OBJECTS + ".add(").append(name).append(");").append(NEW_LINE);
 
@@ -1065,12 +1003,8 @@ public class TestCaseGenerator {
     }
 
     protected String translateValueExpression(String val) {
-        if (val.contains("/")) {
-            val = val.substring(0, val.indexOf('/'));
-        }
-        if (val.equals("#o0")) {
-            return "null";
-        }
+        if (val.contains("/")) { val = val.substring(0, val.indexOf('/')); }
+        if (val.equals("#o0")) { return "null"; }
         val = val.replace("|", "");
         val = val.replace("#", "_");
         return val;
@@ -1078,9 +1012,7 @@ public class TestCaseGenerator {
 
     public void writeToFile(String file, StringBuilder sb) throws IOException {
         final File dir = new File(directory + modDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        if (!dir.exists()) { dir.mkdirs(); }
         final File pcFile = new File(dir, file);
         LOGGER.debug("Writing file: {}", pcFile);
         try (BufferedWriter bw =

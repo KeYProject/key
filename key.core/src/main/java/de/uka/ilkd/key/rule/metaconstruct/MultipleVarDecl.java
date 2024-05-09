@@ -38,9 +38,7 @@ public class MultipleVarDecl extends ProgramTransformer {
         VariableSpecification headVar = variables.get(0);
         VariableSpecification[] tailVars = new VariableSpecification[variables.size() - 1];
 
-        for (int i = 0; i < variables.size() - 1; i++) {
-            tailVars[i] = variables.get(i + 1);
-        }
+        for (int i = 0; i < variables.size() - 1; i++) { tailVars[i] = variables.get(i + 1); }
 
         if (pe instanceof LocalVariableDeclaration) {
             LocalVariableDeclaration newVarDecl =

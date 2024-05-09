@@ -84,10 +84,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         Iterator<IfFormulaInstantiation> it = candidates.iterator();
         int i = 0;
 
-        while (it.hasNext()) {
-            res[i] = it.next();
-            ++i;
-        }
+        while (it.hasNext()) { res[i] = it.next(); ++i; }
 
         return res;
     }
@@ -95,25 +92,26 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
     /**
      * parses and returns the term encoded as string 's'
      *
-     * @param s the String to parse
+     * @param s
+     *        the String to parse
      * @return the term encoded in 's'
-     * @throws RecognitionException In case an exception occurs during parse.
+     * @throws RecognitionException
+     *         In case an exception occurs during parse.
      */
     public Term parseFormula(String s) throws RecognitionException {
         return new KeyIO(services).parseExpression(s);
     }
 
     /**
-     * @param pos int describes position of the if-sequent (only required for error message)
+     * @param pos
+     *        int describes position of the if-sequent (only required for error message)
      * @return the selected instantiation of the if sequent
      * @throws SVInstantiationParserException
      * @throws MissingInstantiationException
      */
     public IfFormulaInstantiation getSelection(int pos)
             throws SVInstantiationParserException, MissingInstantiationException {
-        if (!isManualInputSelected()) {
-            return (IfFormulaInstantiation) getSelectedItem();
-        }
+        if (!isManualInputSelected()) { return (IfFormulaInstantiation) getSelectedItem(); }
         try {
             if (manualInput == null || manualInput.isEmpty()) {
                 throw new MissingInstantiationException(
@@ -132,7 +130,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
             throw new SVInstantiationParserException(manualInput,
                 Position.newOneBased(pos, e.position.column()),
                 "Problem occured parsing a manual input" + " of an '\\assumes'-sequent.\n"
-                    + e.getMessage(),
+                        + e.getMessage(),
                 true).initCause(e);
         }
     }

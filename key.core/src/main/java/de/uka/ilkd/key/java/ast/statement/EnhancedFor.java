@@ -39,11 +39,16 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     /**
      * Used for the Recoder2KeY transformation.
      *
-     * @param init the initializers - here a single VariableDeclaration. may not be null.
-     * @param guard a guard - here an expression of type Iterable. may not be null.
-     * @param statement the statement of the loop
-     * @param comments collected comments
-     * @param info position
+     * @param init
+     *        the initializers - here a single VariableDeclaration. may not be null.
+     * @param guard
+     *        a guard - here an expression of type Iterable. may not be null.
+     * @param statement
+     *        the statement of the loop
+     * @param comments
+     *        collected comments
+     * @param info
+     *        position
      */
     public EnhancedFor(@NonNull LoopInit init, @NonNull Guard guard, @NonNull Statement statement,
             ExtList comments, PositionInfo info) {
@@ -53,7 +58,8 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     /**
      * Used by the {@link CreatingASTVisitor}.
      *
-     * @param children a list of parameters
+     * @param children
+     *        a list of parameters
      */
     public EnhancedFor(ExtList children) {
         super(children.get(ILoopInit.class), children.get(IGuard.class), null,

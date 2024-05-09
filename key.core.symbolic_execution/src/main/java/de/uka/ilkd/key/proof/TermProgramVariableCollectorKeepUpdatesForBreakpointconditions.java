@@ -27,9 +27,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
     @Override
     public void visit(Term t) {
         super.visit(t);
-        if (t.op() instanceof Modality) {
-            addVarsToKeep();
-        }
+        if (t.op() instanceof Modality) { addVarsToKeep(); }
     }
 
     private void addVarsToKeep() {
@@ -37,9 +35,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
             if (breakpoint instanceof AbstractConditionalBreakpoint conditionalBreakpoint) {
                 if (conditionalBreakpoint.getToKeep() != null) {
                     for (LocationVariable sub : conditionalBreakpoint.getToKeep()) {
-                        if (sub instanceof LocationVariable) {
-                            super.result().add(sub);
-                        }
+                        if (sub instanceof LocationVariable) { super.result().add(sub); }
                     }
                 }
             }

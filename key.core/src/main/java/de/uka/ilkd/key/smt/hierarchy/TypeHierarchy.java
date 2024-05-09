@@ -53,9 +53,7 @@ public class TypeHierarchy {
                 addSort(sort);
                 sortList.add(sort);
 
-                if (sort.name().toString().endsWith("[]")) {
-                    arraySortList.add(sort);
-                }
+                if (sort.name().toString().endsWith("[]")) { arraySortList.add(sort); }
             }
         }
 
@@ -67,9 +65,7 @@ public class TypeHierarchy {
             for (Sort p : s.extendsSorts(services)) {
                 // get parent node
                 SortNode pn = sortMap.get(p);
-                if (pn == null) {
-                    continue;
-                }
+                if (pn == null) { continue; }
                 n.addParent(pn);
                 pn.addChild(n);
             }
@@ -98,21 +94,21 @@ public class TypeHierarchy {
     /**
      * Returns the children of a sort s.
      *
-     * @param s A sort s.
+     * @param s
+     *        A sort s.
      * @return The SortNodes containing the children of s.
      */
     public Set<SortNode> getChildren(Sort s) {
 
-        if (sortMap.get(s) == null) {
-            return new HashSet<>();
-        }
+        if (sortMap.get(s) == null) { return new HashSet<>(); }
         return sortMap.get(s).getChildren();
     }
 
     /**
      * Returns the parents of a sort s.
      *
-     * @param s A sort s.
+     * @param s
+     *        A sort s.
      * @return The SortNodes containing the parents of s.
      */
     public Set<SortNode> getParents(Sort s) {
@@ -144,9 +140,7 @@ public class TypeHierarchy {
 
         }
         // remove the found interface sorts from the map
-        for (Sort sort : interfaceSorts) {
-            sortMap.remove(sort);
-        }
+        for (Sort sort : interfaceSorts) { sortMap.remove(sort); }
         /*
          * Some sorts may end up with two parents, one of which is java.lang.Object. In those cases
          * we remove java.lang.Object as parent.
@@ -161,9 +155,7 @@ public class TypeHierarchy {
                         toRemove.add(p);
                     }
                 }
-                for (SortNode p : toRemove) {
-                    node.removeParent(p);
-                }
+                for (SortNode p : toRemove) { node.removeParent(p); }
 
             }
         }
@@ -175,7 +167,8 @@ public class TypeHierarchy {
      * Contracts a sort s. Removes s as child of its parents and parent of its children. The
      * children of s become the children of all parents of s and vice-versa.
      *
-     * @param s The sort to be contracted.
+     * @param s
+     *        The sort to be contracted.
      */
     private void contractNode(Sort s) {
         SortNode node = sortMap.get(s);
@@ -184,19 +177,9 @@ public class TypeHierarchy {
 
 
         // add children as children of parent
-        for (SortNode p : parents) {
-            p.removeChild(node);
-            for (SortNode c : children) {
-                p.addChild(c);
-            }
-        }
+        for (SortNode p : parents) { p.removeChild(node); for (SortNode c : children) { p.addChild(c); } }
         // add parents as parents of children
-        for (SortNode c : children) {
-            c.removeParent(node);
-            for (SortNode p : parents) {
-                c.addParent(p);
-            }
-        }
+        for (SortNode c : children) { c.removeParent(node); for (SortNode p : parents) { c.addParent(p); } }
     }
 
 

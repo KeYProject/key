@@ -40,18 +40,10 @@ public class Public extends VisibilityModifier {
 
     @Override
     public int compareTo(VisibilityModifier arg0) {
-        if (arg0 instanceof Private) {
-            return -3;
-        }
-        if (arg0 == null) {
-            return -2;
-        }
-        if (arg0 instanceof Protected) {
-            return -1;
-        }
-        if (arg0 instanceof Public) {
-            return 0;
-        }
+        if (arg0 instanceof Private) { return -3; }
+        if (arg0 == null) { return -2; }
+        if (arg0 instanceof Protected) { return -1; }
+        if (arg0 instanceof Public) { return 0; }
         assert false;
         return 0;
     }

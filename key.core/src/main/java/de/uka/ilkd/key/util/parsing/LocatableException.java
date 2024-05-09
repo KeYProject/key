@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util.parsing;
 
 import de.uka.ilkd.key.parser.Location;
 
-import org.jspecify.annotations.NonNull;
 
 /**
  * A simple checked exception which holds an location.
@@ -43,7 +42,7 @@ public class LocatableException extends RuntimeException implements HasLocation 
     }
 
     @Override
-    public @NonNull Location getLocation() {
+    public Location getLocation() {
         return location;
     }
 }

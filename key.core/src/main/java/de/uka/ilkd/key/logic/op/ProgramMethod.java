@@ -75,7 +75,8 @@ public final class ProgramMethod extends ObserverFunction
     /**
      * Get the java types of the parameters required by the method md.
      *
-     * @param md some method declaration
+     * @param md
+     *        some method declaration
      * @return java types of the parameters required by md
      */
     private static ImmutableArray<KeYJavaType> getParamTypes(MethodDeclaration md) {
@@ -145,7 +146,8 @@ public final class ProgramMethod extends ObserverFunction
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     @Override
     public void visit(Visitor v) {
@@ -261,9 +263,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof IProgramMethod)) {
-            return false;
-        }
+        if (!(se instanceof IProgramMethod)) { return false; }
 
         return method == ((IProgramMethod) se).getMethodDeclaration();
     }
@@ -313,9 +313,9 @@ public final class ProgramMethod extends ObserverFunction
     @Override
     public String getUniqueName() {
         return getName() + "_"
-            + Math.abs(ContractFactory
-                    .generateContractTypeName("", getContainerType(), this, getContainerType())
-                    .hashCode());
+                + Math.abs(ContractFactory
+                        .generateContractTypeName("", getContainerType(), this, getContainerType())
+                        .hashCode());
     } // Included HashCode to make IF-Predicates unique and still reproducible
 
     /*
@@ -456,8 +456,7 @@ public final class ProgramMethod extends ObserverFunction
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);
             IProgramVariable paramProgVar = pd.getVariableSpecification().getProgramVariable();
-            assert paramProgVar instanceof LocationVariable
-                    : "Parameter declaration expected to be location var!";
+            assert paramProgVar instanceof LocationVariable : "Parameter declaration expected to be location var!";
             LocationVariable paramLocVar = (LocationVariable) paramProgVar;
             paramVars = paramVars.prepend(paramLocVar);
         }

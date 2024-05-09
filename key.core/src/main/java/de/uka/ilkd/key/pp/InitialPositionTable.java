@@ -40,14 +40,14 @@ public class InitialPositionTable extends PositionTable {
     /**
      * Returns the PosInSequent for a given char position in a sequent.
      *
-     * @param index the char position that points to the wanted position in sequent
-     * @param filter the sequent print filter from that was used to print the sequent
+     * @param index
+     *        the char position that points to the wanted position in sequent
+     * @param filter
+     *        the sequent print filter from that was used to print the sequent
      *
      */
     public PosInSequent getPosInSequent(int index, SequentPrintFilter filter) {
-        if (index < startPos[0] || index >= endPos[0]) {
-            return null;
-        }
+        if (index < startPos[0] || index >= endPos[0]) { return null; }
 
         ImmutableList<Integer> posList = pathForIndex(index);
 
@@ -56,9 +56,7 @@ public class InitialPositionTable extends PositionTable {
         Range r = rangeForIndex(index);
         pis.setBounds(r);
         Range firstStatement = firstStatementRangeForIndex(index);
-        if (firstStatement != null) {
-            pis.setFirstJavaStatementRange(firstStatement);
-        }
+        if (firstStatement != null) { pis.setFirstJavaStatementRange(firstStatement); }
         return pis;
     }
 
@@ -66,8 +64,10 @@ public class InitialPositionTable extends PositionTable {
      * Returns a PosInSequent for a given position list, but without filling in the bounds. It is
      * assumed that this is the top level position table for a sequent.
      *
-     * @param posList the position list that navigates through the position tables.
-     * @param filter the sequent print filter from that was used to print the sequent
+     * @param posList
+     *        the position list that navigates through the position tables.
+     * @param filter
+     *        the sequent print filter from that was used to print the sequent
      */
     private PosInSequent getTopPIS(ImmutableList<Integer> posList, SequentPrintFilter filter) {
         if (posList.isEmpty() || posList.tail().isEmpty()) {
@@ -83,17 +83,17 @@ public class InitialPositionTable extends PositionTable {
      * of the SequentFormula in the sequent, the position in the constrained formula, and possibly
      * inside a Metavariable instantiation.
      *
-     * @param pio the given PosInOccurrence
-     * @param filter the current filter
+     * @param pio
+     *        the given PosInOccurrence
+     * @param filter
+     *        the current filter
      * @return the path for the given pio
      */
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio, SequentPrintFilter filter) {
         ImmutableList<Integer> p = ImmutableSLList.nil();
         p = prependPathInFormula(p, pio);
         int index = indexOfCfma(pio.sequentFormula(), filter);
-        if (index == -1) {
-            return null;
-        }
+        if (index == -1) { return null; }
         p = p.prepend(index);
         p = p.prepend(0);
         return p;
@@ -102,9 +102,7 @@ public class InitialPositionTable extends PositionTable {
     private ImmutableList<Integer> prependPathInFormula(ImmutableList<Integer> p,
             PosInOccurrence pio) {
         IntIterator pit = pio.posInTerm().reverseIterator();
-        while (pit.hasNext()) {
-            p = p.prepend(pit.next());
-        }
+        while (pit.hasNext()) { p = p.prepend(pit.next()); }
         return p;
     }
 
@@ -112,8 +110,10 @@ public class InitialPositionTable extends PositionTable {
     /**
      * Returns the index of the constrained formula in the sequent as printed.
      *
-     * @param cfma the sequent formula
-     * @param filter the current filter
+     * @param cfma
+     *        the sequent formula
+     * @param filter
+     *        the current filter
      * @return the index of the given formula in the sequent as printed
      */
     private int indexOfCfma(SequentFormula cfma, SequentPrintFilter filter) {
@@ -121,9 +121,7 @@ public class InitialPositionTable extends PositionTable {
             filter.getFilteredAntec().append(filter.getFilteredSucc());
         int k;
         for (k = 0; !list.isEmpty(); k++, list = list.tail()) {
-            if (list.head().getOriginalFormula() == cfma) {
-                return k;
-            }
+            if (list.head().getOriginalFormula() == cfma) { return k; }
         }
         return -1;
     }
@@ -132,7 +130,8 @@ public class InitialPositionTable extends PositionTable {
      * Returns the character range of the `lowest' subtable that includes <code>index</code> in its
      * range.
      *
-     * @param index the character index to search for.
+     * @param index
+     *        the character index to search for.
      */
     public Range rangeForIndex(int index) {
         return rangeForIndex(index, endPos[0]);
@@ -148,7 +147,8 @@ public class InitialPositionTable extends PositionTable {
     /**
      * Adds a range for a keyword to the keyword list.
      *
-     * @param r Range of keyword to be added
+     * @param r
+     *        Range of keyword to be added
      */
     public void addKeywordRange(Range r) {
         keywordRanges = keywordRanges.prepend(r);
@@ -164,7 +164,8 @@ public class InitialPositionTable extends PositionTable {
     /**
      * Adds a range for a java block to the java block list.
      *
-     * @param r Range of keyword to be added
+     * @param r
+     *        Range of keyword to be added
      */
     public void addJavaBlockRange(Range r) {
         javaBlockRanges = javaBlockRanges.prepend(r);

@@ -39,7 +39,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Inheritance specification.
      *
-     * @param supertype a type reference.
+     * @param supertype
+     *        a type reference.
      */
 
     public InheritanceSpecification(TypeReference supertype) {
@@ -49,7 +50,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Inheritance specification.
      *
-     * @param supertypes a type reference mutable list.
+     * @param supertypes
+     *        a type reference mutable list.
      */
 
     public InheritanceSpecification(TypeReference[] supertypes) {
@@ -59,7 +61,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Inheritance specification.
      *
-     * @param children the ExtList may include: a Comment several TypeReference (as references to
+     * @param children
+     *        the ExtList may include: a Comment several TypeReference (as references to
      *        the supertypes) a Comment
      */
     protected InheritanceSpecification(ExtList children) {
@@ -73,9 +76,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
 
     public SourceElement getLastElement() {
-        if (supertypes == null) {
-            return this;
-        }
+        if (supertypes == null) { return this; }
         return supertypes.get(supertypes.size() - 1);
     }
 
@@ -88,24 +89,22 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     public int getChildCount() {
         int result = 0;
-        if (supertypes != null) {
-            result += supertypes.size();
-        }
+        if (supertypes != null) { result += supertypes.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-        if (supertypes != null) {
-            return supertypes.get(index);
-        }
+        if (supertypes != null) { return supertypes.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -141,9 +140,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (supertypes != null) {
-            return supertypes.get(index);
-        }
+        if (supertypes != null) { return supertypes.get(index); }
         throw new ArrayIndexOutOfBoundsException();
     }
 }

@@ -46,21 +46,15 @@ public class TestDeclarationProgramVariableCollector {
 
     @BeforeEach
     public void setUp() {
-        if (down != 0) {
-            return;
-        }
+        if (down != 0) { return; }
         final JavaService r2k = TacletForTests.services().getJavaService();
-        for (int i = 0; i < jblocks.length; i++) {
-            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i], null);
-        }
+        for (int i = 0; i < jblocks.length; i++) { test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i], null); }
     }
 
     @AfterEach
     public void tearDown() {
         down++;
-        if (down < testCases) {
-            return;
-        }
+        if (down < testCases) { return; }
         test_block = null;
     }
 
@@ -89,7 +83,7 @@ public class TestDeclarationProgramVariableCollector {
 
 
             assertTrue(dpvc.result().size() <= expectedVars[i].length, ""
-                + "Too many variables collected. Collected:" + dpvc.result() + " in " + jblocks[i]);
+                    + "Too many variables collected. Collected:" + dpvc.result() + " in " + jblocks[i]);
 
 
             for (int j = 0; j < expectedVars[i].length; j++) {

@@ -41,9 +41,7 @@ public class SMTProblem {
      */
     public static Collection<SMTProblem> createSMTProblems(Proof proof) {
         LinkedList<SMTProblem> problems = new LinkedList<>();
-        for (Goal goal : proof.openGoals()) {
-            problems.add(new SMTProblem(goal));
-        }
+        for (Goal goal : proof.openGoals()) { problems.add(new SMTProblem(goal)); }
         return problems;
     }
 
@@ -117,14 +115,10 @@ public class SMTProblem {
         }
         if (valid != null && invalid != null) {
             throw new IllegalStateException("FATAL ERROR: The results are inconsistent for goal "
-                + goal.node().serialNr() + "!");
+                    + goal.node().serialNr() + "!");
         }
-        if (valid != null) {
-            return valid;
-        }
-        if (invalid != null) {
-            return invalid;
-        }
+        if (valid != null) { return valid; }
+        if (invalid != null) { return invalid; }
         return unknown;
     }
 
@@ -162,15 +156,11 @@ public class SMTProblem {
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
-        for (SequentFormula f : s.antecedent()) {
-            ante = ante.append(f.formula());
-        }
+        for (SequentFormula f : s.antecedent()) { ante = ante.append(f.formula()); }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (SequentFormula f : s.succedent()) {
-            succ = succ.append(f.formula());
-        }
+        for (SequentFormula f : s.succedent()) { succ = succ.append(f.formula()); }
 
         return tb.imp(tb.and(ante), tb.or(succ));
 
@@ -183,15 +173,11 @@ public class SMTProblem {
 
         final TermBuilder tb = goal.proof().getServices().getTermBuilder();
         ante = ante.append(tb.tt());
-        for (SequentFormula f : s.antecedent()) {
-            ante = ante.append(f.formula());
-        }
+        for (SequentFormula f : s.antecedent()) { ante = ante.append(f.formula()); }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (SequentFormula f : s.succedent()) {
-            succ = succ.append(f.formula());
-        }
+        for (SequentFormula f : s.succedent()) { succ = succ.append(f.formula()); }
 
         return tb.imp(tb.and(ante), tb.or(succ));
 

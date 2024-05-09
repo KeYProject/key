@@ -37,9 +37,7 @@ public class ScriptNode {
     public void dump(int indent) {
         LOGGER.debug("{} {} {}", " ".repeat(indent),
             proofNode == null ? "xxx" : proofNode.serialNr(), command);
-        for (ScriptNode child : children) {
-            child.dump(indent + 1);
-        }
+        for (ScriptNode child : children) { child.dump(indent + 1); }
     }
 
     public Map<String, String> getCommand() {

@@ -78,16 +78,20 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      */
     private Instantiation lastInstantiation;
 
-    private BlockContractExternalRule() {
-    }
+    private BlockContractExternalRule() {}
 
     /**
      *
-     * @param contract the contract being applied.
-     * @param heaps the heaps.
-     * @param localInVariables all free program variables in the block.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
-     * @param services services.
+     * @param contract
+     *        the contract being applied.
+     * @param heaps
+     *        the heaps.
+     * @param localInVariables
+     *        all free program variables in the block.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder.
+     * @param services
+     *        services.
      * @return the preconditions.
      */
     private static Term[] createPreconditions(final Instantiation instantiation,
@@ -108,9 +112,12 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
     /**
      *
-     * @param localOutVariables all free program variables modified by the block.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param localOutVariables
+     *        all free program variables modified by the block.
+     * @param anonymisationHeaps
+     *        the anonymization heaps.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder.
      * @return the postconditions.
      */
     private static Term[] createAssumptions(final ImmutableSet<ProgramVariable> localOutVariables,
@@ -129,11 +136,16 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
     /**
      *
-     * @param contextUpdate the context update.
-     * @param heaps the heaps.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param variables the variables.
-     * @param services services.
+     * @param contextUpdate
+     *        the context update.
+     * @param heaps
+     *        the heaps.
+     * @param anonymisationHeaps
+     *        the anonymization heaps.
+     * @param variables
+     *        the variables.
+     * @param services
+     *        services.
      * @return the updates.
      */
     private static Term[] createUpdates(final Term contextUpdate,
@@ -187,9 +199,8 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         return !InfFlowCheckInfo.isInfFlow(goal) && super.isApplicable(goal, occurrence);
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof BlockContractExternalBuiltInRuleApp;
         BlockContractExternalBuiltInRuleApp application =
@@ -239,9 +250,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
         final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
                 .getInitConfig().getJustifInfo().getJustification(this);
-        for (Contract c : contract.getFunctionalContracts()) {
-            cjust.add(application, new RuleJustificationBySpec(c));
-        }
+        for (Contract c : contract.getFunctionalContracts()) { cjust.add(application, new RuleJustificationBySpec(c)); }
 
         return result;
     }

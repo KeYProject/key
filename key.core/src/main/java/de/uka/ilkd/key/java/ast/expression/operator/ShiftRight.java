@@ -31,8 +31,10 @@ public class ShiftRight extends Operator {
     /**
      * Shift right.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
     public ShiftRight(Expression lhs, Expression rhs) {
         super(lhs, rhs);
@@ -43,7 +45,8 @@ public class ShiftRight extends Operator {
      * Expression in the given list is taken as the left hand side of the expression, the second
      * occurrence is taken as the right hand side of the expression.
      *
-     * @param children the children of this AST element as KeY classes.
+     * @param children
+     *        the children of this AST element as KeY classes.
      */
     public ShiftRight(ExtList children) {
         super(children);
@@ -88,7 +91,8 @@ public class ShiftRight extends Operator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnShiftRight(this);

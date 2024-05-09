@@ -60,9 +60,12 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
     /**
      * Instantiates a new proof script worker.
      *
-     * @param mediator the mediator
-     * @param script the script
-     * @param location the location
+     * @param mediator
+     *        the mediator
+     * @param script
+     *        the script
+     * @param location
+     *        the location
      */
     public ProofScriptWorker(KeYMediator mediator, String script, Location location) {
         this(mediator, script, location, null);
@@ -71,10 +74,14 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
     /**
      * Instantiates a new proof script worker.
      *
-     * @param mediator the mediator
-     * @param script the script
-     * @param location the location
-     * @param initiallySelectedGoal the initially selected goal
+     * @param mediator
+     *        the mediator
+     * @param script
+     *        the script
+     * @param location
+     *        the location
+     * @param initiallySelectedGoal
+     *        the initially selected goal
      */
     public ProofScriptWorker(KeYMediator mediator, String script, Location location,
             Goal initiallySelectedGoal) {
@@ -134,9 +141,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
                 message.append(echo.message());
             } else {
                 var exec = (ProofScriptEngine.ExecuteInfo) info;
-                if (exec.command().startsWith("'echo ")) {
-                    continue;
-                }
+                if (exec.command().startsWith("'echo ")) { continue; }
                 if (exec.location().getFileURI().isPresent()) {
                     message.append(exec.location().getFileURI().get()).append(":");
                 }
@@ -169,9 +174,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
      */
     @Override
     public void done() {
-        if (monitor != null) {
-            monitor.setVisible(false);
-        }
+        if (monitor != null) { monitor.setVisible(false); }
 
         try {
             get();

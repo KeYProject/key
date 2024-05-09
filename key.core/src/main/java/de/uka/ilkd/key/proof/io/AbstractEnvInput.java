@@ -45,9 +45,7 @@ public abstract class AbstractEnvInput implements EnvInput {
         this.profile = profile;
         this.includes = new Includes();
         if (includes != null) {
-            for (Path path : includes) {
-                this.includes.put(path.toString(), RuleSourceFactory.initRuleFile(path));
-            }
+            for (Path path : includes) { this.includes.put(path.toString(), RuleSourceFactory.initRuleFile(path)); }
         }
     }
 

@@ -128,10 +128,7 @@ public class TestFixedLengthBitSet {
         ImmutableFixedLengthBitSet lbn = new ImmutableFixedLengthBitSet(4);
         assertEquals(0, lbn.getValue());
 
-        for (int i = 0; i < 15; i++) {
-            assertEquals(i, lbn.getValue());
-            lbn = lbn.inc();
-        }
+        for (int i = 0; i < 15; i++) { assertEquals(i, lbn.getValue()); lbn = lbn.inc(); }
 
         assertEquals(15, lbn.getValue());
     }

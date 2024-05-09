@@ -37,7 +37,8 @@ public class ExecutionNodePreorderIterator {
     /**
      * Constructor.
      *
-     * @param start The {@link IExecutionNode} to iterate over its sub tree.
+     * @param start
+     *        The {@link IExecutionNode} to iterate over its sub tree.
      */
     public ExecutionNodePreorderIterator(IExecutionNode<?> start) {
         this.start = start;
@@ -82,7 +83,8 @@ public class ExecutionNodePreorderIterator {
      * Returns the next element to select if all children of the given {@link IExecutionNode} are
      * visited.
      *
-     * @param node The visited {@link IExecutionNode}.
+     * @param node
+     *        The visited {@link IExecutionNode}.
      * @return The next {@link IExecutionNode} to visit.
      */
     protected IExecutionNode<?> getNextOnParent(IExecutionNode<?> node) {
@@ -95,15 +97,9 @@ public class ExecutionNodePreorderIterator {
                                                         // child after iteration has finished
             for (IExecutionNode<?> child : children) {
                 nextChildOnParent = child;
-                if (nextChildOnParent == start) {
-                    return null;
-                }
-                if (IExecutionNodeFound) {
-                    return nextChildOnParent;
-                }
-                if (nextChildOnParent == node) {
-                    IExecutionNodeFound = true;
-                }
+                if (nextChildOnParent == start) { return null; }
+                if (IExecutionNodeFound) { return nextChildOnParent; }
+                if (nextChildOnParent == node) { IExecutionNodeFound = true; }
             }
             if (nextChildOnParent != start) {
                 node = parent; // Continue search on parent without recursive call!

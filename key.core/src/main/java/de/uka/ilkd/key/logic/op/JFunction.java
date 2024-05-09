@@ -39,8 +39,8 @@ public class JFunction extends Function implements Operator, Sorted {
 
         assert sort != JavaDLTheory.UPDATE;
         assert !(unique && sort == JavaDLTheory.FORMULA);
-        assert !(sort instanceof NullSort) || name.toString().equals("null")
-                : "Functions with sort \"null\" are not allowed: " + this;
+        assert !(sort instanceof NullSort)
+                || name.toString().equals("null") : "Functions with sort \"null\" are not allowed: " + this;
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
@@ -95,8 +95,10 @@ public class JFunction extends Function implements Operator, Sorted {
      * checks if a given Term could be subterm (at the at'th subterm position) of a term with this
      * function at its top level. The validity of the given subterm is NOT checked.
      *
-     * @param at theposition of the term where this method should check the validity.
-     * @param possibleSub the subterm to be ckecked.
+     * @param at
+     *        theposition of the term where this method should check the validity.
+     * @param possibleSub
+     *        the subterm to be ckecked.
      * @return true iff the given term can be subterm at the indicated position
      */
     private boolean possibleSub(int at, Term possibleSub) {
@@ -122,9 +124,7 @@ public class JFunction extends Function implements Operator, Sorted {
             throws TermCreationException {
         super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {
-            if (!possibleSub(i, (Term) term.sub(i))) {
-                throw new TermCreationException(this, term);
-            }
+            if (!possibleSub(i, (Term) term.sub(i))) { throw new TermCreationException(this, term); }
         }
     }
 }

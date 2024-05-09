@@ -102,8 +102,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * Constructs a new {@link AbstractionPredicatesChoiceDialog}. The given goal is used to get
      * information about the proof.
      *
-     * @param goal The goal on which the merge rule is applied.
-     * @param differingLocVars Location variables the values of which differ in the merge partner
+     * @param goal
+     *        The goal on which the merge rule is applied.
+     * @param differingLocVars
+     *        Location variables the values of which differ in the merge partner
      *        states.
      */
     public AbstractionPredicatesChoiceDialog(Goal goal, List<LocationVariable> differingLocVars) {
@@ -451,7 +453,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 "Could not find css/html resources for the abstraction predicates choice dialog.";
 
         String sb = "<html><head>" + "<style type=\"text/css\">" + infoCSS + "</style>"
-            + "</head><body>" + infoHTML + "</body></html>";
+                + "</head><body>" + infoHTML + "</body></html>";
 
         final JTextPane infoLabel = new JTextPane();
         infoLabel.setContentType("text/html");
@@ -473,7 +475,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     /**
      * Parses a placeholder using {@link MergeRuleUtils#parsePlaceholder(String, Services)}.
      *
-     * @param input The input to parse.
+     * @param input
+     *        The input to parse.
      * @return The parsed placeholder (sort and name).
      */
     private Pair<Sort, Name> parsePlaceholder(String input) {
@@ -484,10 +487,13 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * Parses an abstraction predicate using
      * {@link MergeRuleUtils#parsePredicate(String, ArrayList, NamespaceSet, Services)}.
      *
-     * @param input The input to parse.
-     * @param localNamespaces The local {@link NamespaceSet}.
+     * @param input
+     *        The input to parse.
+     * @param localNamespaces
+     *        The local {@link NamespaceSet}.
      * @return The parsed abstraction predicate.
-     * @throws ParserException If there is a mistake in the input.
+     * @throws ParserException
+     *         If there is a mistake in the input.
      */
     private AbstractionPredicate parsePredicate(String input, NamespaceSet localNamespaces)
             throws ParserException {
@@ -499,24 +505,19 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * A String representation of an abstraction predicate, that is a "pair" expression of the
      * placeholder variable and the predicate term of the form "(PROGVAR,PREDTERM)".
      *
-     * @param domElem The abstraction predicate to convert into a String representation.
+     * @param domElem
+     *        The abstraction predicate to convert into a String representation.
      * @return A String representation of the given abstraction predicate.
      */
     private String abstrPredToStringRepr(
             Optional<AbstractPredicateAbstractionDomainElement> domElem) {
-        if (domElem == null) {
-            return "";
-        }
+        if (domElem == null) { return ""; }
 
-        if (!domElem.isPresent()) {
-            return "None.";
-        }
+        if (!domElem.isPresent()) { return "None."; }
 
         final AbstractPredicateAbstractionDomainElement predElem = domElem.get();
 
-        if (predElem.getPredicates().size() < 1) {
-            return predElem.toString();
-        }
+        if (predElem.getPredicates().size() < 1) { return predElem.toString(); }
 
         final StringBuilder sb = new StringBuilder();
 
@@ -526,9 +527,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         while (it.hasNext()) {
             sb.append(abstrPredToString(it.next()));
 
-            if (it.hasNext()) {
-                sb.append(predElem.getPredicateNameCombinationString());
-            }
+            if (it.hasNext()) { sb.append(predElem.getPredicateNameCombinationString()); }
         }
 
         return sb.toString();
@@ -537,7 +536,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     /**
      * Returns a String representation of an abstraction predicate.
      *
-     * @param pred Predicate to compute a String representation for.
+     * @param pred
+     *        Predicate to compute a String representation for.
      * @return A String representation of an abstraction predicate.
      */
     private String abstrPredToString(AbstractionPredicate pred) {
@@ -545,7 +545,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         final Pair<LocationVariable, Term> predFormWithPh = pred.getPredicateFormWithPlaceholder();
 
         return "(" + predFormWithPh.first.toString() + ","
-            + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";
+                + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";
     }
 
     // ///////////////////////////// //
@@ -638,9 +638,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         @Override
         public TableCellEditor getCellEditor(int row, int column) {
-            if (column != 1) {
-                return super.getCellEditor(row, column);
-            }
+            if (column != 1) { return super.getCellEditor(row, column); }
 
             final Sort s = abstrPredicateChoices.get(row).getProgVar().sort();
 
@@ -684,9 +682,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         @Override
         public TableCellRenderer getCellRenderer(int row, int column) {
-            if (column != 1) {
-                return super.getCellRenderer(row, column);
-            }
+            if (column != 1) { return super.getCellRenderer(row, column); }
 
             return new DefaultTableCellRenderer() {
                 private static final long serialVersionUID = 1L;
@@ -779,7 +775,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * Loads the given proof file. Checks if the proof file exists and the proof is not null, and
      * fails if the proof could not be loaded.
      *
-     * @param proofFileName The file name of the proof file to load.
+     * @param proofFileName
+     *        The file name of the proof file to load.
      * @return The loaded proof.
      */
     static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {

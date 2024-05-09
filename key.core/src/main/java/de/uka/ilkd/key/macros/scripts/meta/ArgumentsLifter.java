@@ -17,8 +17,7 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 public final class ArgumentsLifter {
     // private static final Map<Class, Type> TYPE_MAP = new HashMap<>();
 
-    private ArgumentsLifter() {
-    }
+    private ArgumentsLifter() {}
 
     public static <T> List<ProofScriptArgument<T>> inferScriptArguments(Class<?> clazz,
             ProofScriptCommand<T> command) {
@@ -37,9 +36,7 @@ public final class ArgumentsLifter {
                     args.add(lift(flag, field));
                 } else {
                     Varargs vargs = field.getDeclaredAnnotation(Varargs.class);
-                    if (vargs != null) {
-                        args.add(lift(vargs, field));
-                    }
+                    if (vargs != null) { args.add(lift(vargs, field)); }
                 }
             }
         }

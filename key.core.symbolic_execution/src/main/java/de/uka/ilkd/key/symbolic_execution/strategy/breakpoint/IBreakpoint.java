@@ -29,15 +29,21 @@ public interface IBreakpoint {
      * {@link StopCondition#isGoalAllowed(int, long, Proof, long, int, Goal)} and can be used to
      * update the state of the {@link IBreakpoint}.
      *
-     * @param maxApplications The defined maximal number of rules to apply. Can be different to
+     * @param maxApplications
+     *        The defined maximal number of rules to apply. Can be different to
      *        {@link StrategySettings#getMaxSteps()} in side proofs.
-     * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to
+     * @param timeout
+     *        The defined timeout in ms or {@code -1} if disabled. Can be different to
      *        {@link StrategySettings#getTimeout()} in side proofs.
-     * @param proof The current {@link Proof}.
-     * @param startTime The timestamp when the apply strategy has started, computed via
+     * @param proof
+     *        The current {@link Proof}.
+     * @param startTime
+     *        The timestamp when the apply strategy has started, computed via
      *        {@link System#currentTimeMillis()}
-     * @param countApplied The number of already applied rules.
-     * @param goal The current {@link Goal} on which the next rule will be applied.
+     * @param countApplied
+     *        The number of already applied rules.
+     * @param goal
+     *        The current {@link Goal} on which the next rule will be applied.
      */
     void updateState(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, Goal goal);
@@ -46,10 +52,14 @@ public interface IBreakpoint {
      * Determines if the breakpoint represented by this BreakpointStopConition is triggered.
      * Override this method in order to suspend execution when a breakpoint is hit.
      *
-     * @param activeStatement the activeStatement of the node
-     * @param ruleApp the applied {@link RuleApp}
-     * @param proof the current proof
-     * @param node the current node
+     * @param activeStatement
+     *        the activeStatement of the node
+     * @param ruleApp
+     *        the applied {@link RuleApp}
+     * @param proof
+     *        the current proof
+     * @param node
+     *        the current node
      * @return true if execution should hold
      */
     boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,

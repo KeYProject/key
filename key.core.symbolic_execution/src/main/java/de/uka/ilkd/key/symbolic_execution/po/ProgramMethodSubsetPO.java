@@ -103,12 +103,18 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param name The name to use.
-     * @param pm The {@link IProgramMethod} to execute code parts from.
-     * @param precondition An optional precondition to use.
-     * @param startPosition The start position.
-     * @param endPosition The end position.
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param name
+     *        The name to use.
+     * @param pm
+     *        The {@link IProgramMethod} to execute code parts from.
+     * @param precondition
+     *        An optional precondition to use.
+     * @param startPosition
+     *        The start position.
+     * @param endPosition
+     *        The end position.
      */
     public ProgramMethodSubsetPO(InitConfig initConfig, String name, IProgramMethod pm,
             String precondition, Position startPosition, Position endPosition) {
@@ -122,15 +128,23 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param name The name to use.
-     * @param pm The {@link IProgramMethod} to execute code parts from.
-     * @param precondition An optional precondition to use.
-     * @param startPosition The start position.
-     * @param endPosition The end position.
-     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate,
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param name
+     *        The name to use.
+     * @param pm
+     *        The {@link IProgramMethod} to execute code parts from.
+     * @param precondition
+     *        An optional precondition to use.
+     * @param startPosition
+     *        The start position.
+     * @param endPosition
+     *        The end position.
+     * @param addUninterpretedPredicate
+     *        {@code true} postcondition contains uninterpreted predicate,
      *        {@code false} uninterpreted predicate is not contained in postcondition.
-     * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
+     * @param addSymbolicExecutionLabel
+     *        {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
     public ProgramMethodSubsetPO(InitConfig initConfig, String name, IProgramMethod pm,
@@ -168,9 +182,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         undeclaredVariableCollector.start();
         // Register undeclared variables
         Set<LocationVariable> undeclaredVariables = undeclaredVariableCollector.result();
-        for (LocationVariable x : undeclaredVariables) {
-            register(x, services);
-        }
+        for (LocationVariable x : undeclaredVariables) { register(x, services); }
         return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
     }
 
@@ -178,8 +190,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * Collects recursive the {@link Statement}s which are in the given source range defined by
      * {@link #startPosition} and {@link #endPosition}.
      *
-     * @param toFill The result {@link List} to fill.
-     * @param container The {@link StatementContainer} to seach in.
+     * @param toFill
+     *        The result {@link List} to fill.
+     * @param container
+     *        The {@link StatementContainer} to seach in.
      */
     protected void collectStatementsToExecute(List<Statement> toFill,
             StatementContainer container) {
@@ -206,7 +220,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Checks if the last statement is a {@link Return} statement.
      *
-     * @param statements The statements to check.
+     * @param statements
+     *        The statements to check.
      * @return {@code true} last statement is {@link Return}, {@code false} statements are empty or
      *         last statement is something else.
      */
@@ -258,14 +273,13 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Converts the given {@link Collection} into an {@link ImmutableList}.
      *
-     * @param c The {@link Collection} to convert.
+     * @param c
+     *        The {@link Collection} to convert.
      * @return The created {@link ImmutableList}.
      */
     protected static ImmutableList<ProgramVariable> convert(Collection<LocationVariable> c) {
         ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
-        for (LocationVariable var : c) {
-            result = result.append(var);
-        }
+        for (LocationVariable var : c) { result = result.append(var); }
         return result;
     }
 
@@ -329,10 +343,13 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already load {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
             throws IOException {
@@ -345,9 +362,11 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Extracts the start position from the given {@link Properties}.
      *
-     * @param properties The proof obligation settings to read from.
+     * @param properties
+     *        The proof obligation settings to read from.
      * @return The defined start {@link Position}.
-     * @throws IOException Occurred Exception if it was not possible to read the start position.
+     * @throws IOException
+     *         Occurred Exception if it was not possible to read the start position.
      */
     protected static Position getStartPosition(Properties properties) throws IOException {
         String line = properties.getProperty("startLine");
@@ -365,27 +384,25 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         } catch (NumberFormatException e) {
             throw new IOException("Start line \"" + line + "\" is no valid integer.");
         }
-        if (lineValue < 0) {
-            throw new IOException("Start line \"" + line + "\" is a negative integer.");
-        }
+        if (lineValue < 0) { throw new IOException("Start line \"" + line + "\" is a negative integer."); }
         int columnValue;
         try {
             columnValue = Integer.parseInt(column);
         } catch (NumberFormatException e) {
             throw new IOException("Start column \"" + column + "\" is no valid integer.");
         }
-        if (columnValue < 0) {
-            throw new IOException("Start column \"" + column + "\" is a negative integer.");
-        }
+        if (columnValue < 0) { throw new IOException("Start column \"" + column + "\" is a negative integer."); }
         return Position.newOneBased(lineValue, columnValue);
     }
 
     /**
      * Extracts the end position from the given {@link Properties}.
      *
-     * @param properties The proof obligation settings to read from.
+     * @param properties
+     *        The proof obligation settings to read from.
      * @return The defined end {@link Position}.
-     * @throws IOException Occurred Exception if it was not possible to read the end position.
+     * @throws IOException
+     *         Occurred Exception if it was not possible to read the end position.
      */
     protected static Position getEndPosition(Properties properties) throws IOException {
         String line = properties.getProperty("endLine");
@@ -402,18 +419,14 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         } catch (NumberFormatException e) {
             throw new IOException("End line \"" + line + "\" is no valid integer.");
         }
-        if (lineValue <= 0) {
-            throw new IOException("End line \"" + line + "\" is a negative integer.");
-        }
+        if (lineValue <= 0) { throw new IOException("End line \"" + line + "\" is a negative integer."); }
         int columnValue;
         try {
             columnValue = Integer.parseInt(column);
         } catch (NumberFormatException e) {
             throw new IOException("End column \"" + column + "\" is no valid integer.");
         }
-        if (columnValue <= 0) {
-            throw new IOException("End column \"" + column + "\" is a negative integer.");
-        }
+        if (columnValue <= 0) { throw new IOException("End column \"" + column + "\" is a negative integer."); }
         return Position.newOneBased(lineValue, columnValue);
     }
 }

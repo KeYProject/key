@@ -25,7 +25,8 @@ public class Else extends BranchImp {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: a Body (as body
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: a Body (as body
      *        of Else), Comments
      */
     public Else(ExtList children) {
@@ -38,7 +39,8 @@ public class Else extends BranchImp {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param body Statement that is the body of the else part
+     * @param body
+     *        Statement that is the body of the else part
      */
     public Else(Statement body) {
         this.body = body;
@@ -61,16 +63,14 @@ public class Else extends BranchImp {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (body != null) {
-            if (index == 0) {
-                return body;
-            }
-        }
+        if (body != null) { if (index == 0) { return body; } }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -93,9 +93,7 @@ public class Else extends BranchImp {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) {
-            return body;
-        }
+        if (body != null && index == 0) { return body; }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -111,7 +109,8 @@ public class Else extends BranchImp {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnElse(this);

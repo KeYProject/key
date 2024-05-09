@@ -21,17 +21,17 @@ public interface NonTerminalProgramElement extends ProgramElement {
     /**
      * Returns the child at the specified index in this node's "virtual" child array.
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
     ProgramElement getChildAt(int index);
 
     default Stream<ProgramElement> stream() {
         Stream<ProgramElement> s = Stream.<ProgramElement>empty();
-        for (int i = 0; i < getChildCount(); i++) {
-            s = Stream.concat(s, Stream.of(getChildAt(i)));
-        }
+        for (int i = 0; i < getChildCount(); i++) { s = Stream.concat(s, Stream.of(getChildAt(i))); }
         return s;
     }
 }

@@ -12,6 +12,7 @@ import org.key_project.util.Strings;
  * This class implements the leftist heap, see &quot;Functional Data Structures&quot; by Chris
  * Okasaki
  */
+@SuppressWarnings("nullness")
 public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements ImmutableHeap<T> {
 
     /**
@@ -114,7 +115,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         /**
          * Add an element to this heap object
          *
-         * @param element the element to be added
+         * @param element
+         *        the element to be added
          * @return a heap that contains all elements of this heap, and additionally
          *         <code>element</code>
          */
@@ -129,7 +131,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         /**
          * Add multiple elements to this heap object
          *
-         * @param h a heap containing the elements to be added
+         * @param h
+         *        a heap containing the elements to be added
          * @return a heap that contains all elements of this heap, and additionally all objects from
          *         <code>h</code>
          */
@@ -173,19 +176,13 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         public ImmutableHeap<S> removeAll(S element) {
             int c = data.compareTo(element);
 
-            if (c > 0) {
-                return this;
-            }
+            if (c > 0) { return this; }
 
             ImmutableLeftistHeap<S> newLeft = (ImmutableLeftistHeap<S>) left.removeAll(element);
             ImmutableLeftistHeap<S> newRight = (ImmutableLeftistHeap<S>) right.removeAll(element);
 
-            if (c == 0 && data.equals(element)) {
-                return newLeft.insert(newRight);
-            }
-            if (left == newLeft && right == newRight) {
-                return this;
-            }
+            if (c == 0 && data.equals(element)) { return newLeft.insert(newRight); }
+            if (left == newLeft && right == newRight) { return this; }
             return new Node<>(data, newLeft, newRight);
         }
 
@@ -231,7 +228,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         /**
          * Add an element to this heap object
          *
-         * @param element The element to be added
+         * @param element
+         *        The element to be added
          * @return a heap that contains all elements of this heap, and additionally
          *         <code>element</code>
          */
@@ -242,7 +240,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         /**
          * Add multiple elements to this heap object
          *
-         * @param h a heap containing the elements to be added
+         * @param h
+         *        a heap containing the elements to be added
          * @return a heap that contains all elements of this heap, and additionally all objects from
          *         <code>h</code>
          */
@@ -288,7 +287,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
     /**
      * Add multiple elements to this heap object
      *
-     * @param elements the elements to be added
+     * @param elements
+     *        the elements to be added
      * @return a heap that contains all elements of this heap, and additionally all objects from
      *         <code>elements</code>
      */
@@ -311,9 +311,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
             s.push(h);
         }
         ImmutableHeap<T> res = s.pop();
-        while (!s.isEmpty()) {
-            res = res.insert(s.pop());
-        }
+        while (!s.isEmpty()) { res = res.insert(s.pop()); }
         return res;
     }
 
@@ -349,9 +347,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         }
 
         private void push(ImmutableLeftistHeap<T> heap) {
-            if (!heap.isEmpty()) {
-                remainder.push((Node<T>) heap);
-            }
+            if (!heap.isEmpty()) { remainder.push((Node<T>) heap); }
         }
 
         public boolean hasNext() {

@@ -61,7 +61,8 @@ public non-sealed class RealLiteral extends Literal {
     /**
      * Double literal.
      *
-     * @param value a string.
+     * @param value
+     *        a string.
      */
 
     public RealLiteral(String value) {
@@ -72,9 +73,7 @@ public non-sealed class RealLiteral extends Literal {
      * tests if equals
      */
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof RealLiteral)) {
-            return false;
-        }
+        if (!(o instanceof RealLiteral)) { return false; }
         return ((RealLiteral) o).getValue().equals(getValue());
     }
 
@@ -97,7 +96,8 @@ public non-sealed class RealLiteral extends Literal {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         // v.performActionOnDoubleLiteral(this);

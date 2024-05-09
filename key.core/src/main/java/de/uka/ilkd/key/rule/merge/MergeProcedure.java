@@ -54,14 +54,21 @@ public abstract class MergeProcedure {
      * Merges two values valueInState1 and valueInState2 of corresponding SE states state1 and
      * state2 to a new value of a merge state.
      *
-     * @param v The variable for which the values should be merged
-     * @param state1 First SE state.
-     * @param valueInState1 Value in state1.
-     * @param state2 Second SE state.
-     * @param valueInState2 Value in state2.
-     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
+     * @param v
+     *        The variable for which the values should be merged
+     * @param state1
+     *        First SE state.
+     * @param valueInState1
+     *        Value in state1.
+     * @param state2
+     *        Second SE state.
+     * @param valueInState2
+     *        Value in state2.
+     * @param distinguishingFormula
+     *        The user-specified distinguishing formula. May be null (for
      *        automatic generation).
-     * @param services The services object.
+     * @param services
+     *        The services object.
      * @return The merge result.
      */
     public abstract ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
@@ -86,15 +93,12 @@ public abstract class MergeProcedure {
     /**
      * Returns the merge procedure for the given name.
      *
-     * @param procName Name of the merge procedure.
+     * @param procName
+     *        Name of the merge procedure.
      * @return The merge procedure of the given name; null if there is no such procedure.
      */
     public static MergeProcedure getProcedureByName(String procName) {
-        for (MergeProcedure proc : CONCRETE_RULES) {
-            if (proc.toString().equals(procName)) {
-                return proc;
-            }
-        }
+        for (MergeProcedure proc : CONCRETE_RULES) { if (proc.toString().equals(procName)) { return proc; } }
 
         return null;
     }
@@ -113,9 +117,9 @@ public abstract class MergeProcedure {
      *
      * @author Dominic Scheurer
      */
-    public record ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
+    public record ValuesMergeResult(
+            ImmutableSet<Term> newConstraints, Term mergeVal,
             LinkedHashSet<Name> newNames,
-            LinkedHashSet<Term> sideConditions) {
-    }
+            LinkedHashSet<Term> sideConditions) {}
 
 }

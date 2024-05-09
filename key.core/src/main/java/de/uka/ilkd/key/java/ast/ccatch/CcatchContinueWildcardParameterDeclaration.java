@@ -20,8 +20,7 @@ import org.key_project.util.ExtList;
 public class CcatchContinueWildcardParameterDeclaration
         extends CcatchNonstandardParameterDeclaration {
 
-    public CcatchContinueWildcardParameterDeclaration(ExtList children) {
-    }
+    public CcatchContinueWildcardParameterDeclaration(ExtList children) {}
 
     public CcatchContinueWildcardParameterDeclaration(PositionInfo pi, List<Comment> c) {
         super(pi, c);

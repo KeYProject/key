@@ -71,7 +71,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * Construct a feature that checks the prefix with the passed PrefixCheckers. Computes zero
      * costs, if all PrefixCheckers return true, otherwise computes top cost.
      *
-     * @param prefixCheckers the PrefixCheckers to be used.
+     * @param prefixCheckers
+     *        the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PrefixChecker... prefixCheckers) {
         this(new PositionModifier[0], prefixCheckers);
@@ -83,8 +84,10 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * check all PositionModifiers are applied. This allows for instance to ignore prefixing
      * updates.
      *
-     * @param positionModifier the PositionModifier to be applied.
-     * @param prefixCheckers the PrefixCheckers to be used.
+     * @param positionModifier
+     *        the PositionModifier to be applied.
+     * @param prefixCheckers
+     *        the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PositionModifier positionModifier,
             PrefixChecker... prefixCheckers) {
@@ -97,8 +100,10 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * check all PositionModifiers are applied. This allows for instance to ignore prefixing
      * updates.
      *
-     * @param positionModifiers the PositionModifiers to be applied.
-     * @param prefixCheckers the PrefixCheckers to be used.
+     * @param positionModifiers
+     *        the PositionModifiers to be applied.
+     * @param prefixCheckers
+     *        the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PositionModifier[] positionModifiers,
             PrefixChecker... prefixCheckers) {
@@ -124,16 +129,13 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     /**
      * Applies the PrefixCheckers.
      *
-     * @param pos the PosInOccurrence to be checked.
+     * @param pos
+     *        the PosInOccurrence to be checked.
      * @return true, if all PrefixCheckers return true
      */
     private boolean checkPrefix(PosInOccurrence pos) {
         // iterate through the prefix and let the prefix checkers do their work
-        for (PrefixChecker prefixChecker : prefixCheckers) {
-            if (!prefixChecker.check(pos)) {
-                return false;
-            }
-        }
+        for (PrefixChecker prefixChecker : prefixCheckers) { if (!prefixChecker.check(pos)) { return false; } }
         return true;
     }
 }

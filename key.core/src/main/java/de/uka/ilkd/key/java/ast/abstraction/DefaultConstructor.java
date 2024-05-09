@@ -27,8 +27,10 @@ public class DefaultConstructor implements Constructor {
      * Create a new default constructor for the given class type. The name of the constructor is set
      * appropriately.
      *
-     * @param name of the Constructor
-     * @param parentIsPublic is set true iff the parent is declared public.
+     * @param name
+     *        of the Constructor
+     * @param parentIsPublic
+     *        is set true iff the parent is declared public.
      */
     @Deprecated
     public DefaultConstructor(String name, boolean parentIsPublic) {

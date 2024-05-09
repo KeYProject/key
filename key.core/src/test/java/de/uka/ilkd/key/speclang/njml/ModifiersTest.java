@@ -21,9 +21,7 @@ public class ModifiersTest {
 
     @BeforeEach
     public void setUp() throws URISyntaxException, IOException {
-        if (java == null) {
-            java = TacletForTests.services().getJavaService();
-        }
+        if (java == null) { java = TacletForTests.services().getJavaService(); }
     }
 
     private static final String CLASSES =

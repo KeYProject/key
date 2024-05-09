@@ -57,9 +57,7 @@ public class ProblemFinder extends ExpressionBuilder {
                 proofObligation = "";
             }
         }
-        if (ctx.PROBLEM() != null) {
-            problem = accept(ctx.termorseq());
-        }
+        if (ctx.PROBLEM() != null) { problem = accept(ctx.termorseq()); }
         return null;
     }
 
@@ -73,18 +71,15 @@ public class ProblemFinder extends ExpressionBuilder {
         return null;
     }
 
-    @Nullable
-    public String getChooseContract() {
+    public @Nullable String getChooseContract() {
         return chooseContract;
     }
 
-    @Nullable
-    public String getProofObligation() {
+    public @Nullable String getProofObligation() {
         return proofObligation;
     }
 
-    @Nullable
-    public Sequent getProblem() {
+    public @Nullable Sequent getProblem() {
         return problem;
     }
 }

@@ -81,10 +81,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     private int countLines(String s) {
         int i = 0;
         int p = 0;
-        while ((p = s.indexOf('\n', p)) >= 0) {
-            i++;
-            p++;
-        }
+        while ((p = s.indexOf('\n', p)) >= 0) { i++; p++; }
         return i + 1;
     }
 
@@ -125,9 +122,7 @@ public abstract class ApplyTacletDialog extends JDialog {
         // show taclet
         JScrollPane scroll = new JScrollPane();
         int nolines = countLines(model[0].taclet().toString()) + 1;
-        if (nolines > 10) {
-            nolines = 11;
-        }
+        if (nolines > 10) { nolines = 11; }
         JTextArea text = new JTextArea(tacletSB.toString(), nolines, 68);
         text.setEditable(false);
         scroll.setViewportView(text);
@@ -176,9 +171,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     }
 
     protected void setStatus(String s) {
-        if (statusArea != null) {
-            statusArea.setText(s);
-        }
+        if (statusArea != null) { statusArea.setText(s); }
     }
 
     protected void closeDlg() {

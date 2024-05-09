@@ -113,9 +113,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
             concrete = getBaseDir().resolve(p.normalize());
         }
 
-        if (concrete == null) {
-            return null;
-        }
+        if (concrete == null) { return null; }
 
         // open new FileInputStream of the converted path
         return new FileInputStream(concrete.toFile());
@@ -154,9 +152,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         final Path norm = path.toAbsolutePath().normalize();
 
         // internal files are not registered to repo
-        if (!isInternalFile(norm)) {
-            addFile(norm);
-        }
+        if (!isInternalFile(norm)) { addFile(norm); }
 
         return new FileInputStream(norm.toFile());
     }

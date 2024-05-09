@@ -35,9 +35,12 @@ public class SourceData {
      * creates a new source data object with parent node <tt>element</tt> whose <tt>childPos</tt>-th
      * child has to be matched (-1 denotes <tt>element</tt> itself has to be matched
      *
-     * @param element the ProgramElement
-     * @param childPos the int giving the index of the child of <tt>element</tt> to be matched
-     * @param services the Services
+     * @param element
+     *        the ProgramElement
+     * @param childPos
+     *        the int giving the index of the child of <tt>element</tt> to be matched
+     * @param services
+     *        the Services
      */
     public SourceData(ProgramElement element, int childPos, Services services) {
         assert services != null;
@@ -62,7 +65,8 @@ public class SourceData {
     /**
      * sets the index of the child to be matched
      *
-     * @param childPos the int with the new index
+     * @param childPos
+     *        the int with the new index
      */
     public void setChildPos(int childPos) {
         this.childPos = childPos;
@@ -81,7 +85,8 @@ public class SourceData {
     /**
      * sets the parent node
      *
-     * @param element the ProgramElement used as new parent node
+     * @param element
+     *        the ProgramElement used as new parent node
      */
     public void setElement(ProgramElement element) {
         this.element = element;
@@ -95,9 +100,7 @@ public class SourceData {
      * @return the ProgramElement to be matched next or <tt>null</tt> if there is no such element
      */
     public ProgramElement getSource() {
-        if (childPos == -1) {
-            return element;
-        }
+        if (childPos == -1) { return element; }
 
         final NonTerminalProgramElement ntpe = (NonTerminalProgramElement) element;
 

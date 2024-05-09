@@ -104,9 +104,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
         Map<ProgramVariable, Term> deps = new LinkedHashMap<>();
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            deps.put(heap, TB.allLocs());
-        }
+        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) { deps.put(heap, TB.allLocs()); }
         this.contract = new DependencyContractImpl("JML model field",
             ContractFactory.generateContractName("JML model field", rep.getKJT(), rep.getTarget(),
                 rep.getTarget().getContainerType(), 0),
@@ -135,10 +133,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Gets the argument list for the operator of the method
      *
-     * @param sv schema variable for self
-     * @param heap schema variable for the heap
-     * @param isStatic information whether this is a static method
-     * @param params schema variables for the parameters
+     * @param sv
+     *        schema variable for self
+     * @param heap
+     *        schema variable for the heap
+     * @param isStatic
+     *        information whether this is a static method
+     * @param params
+     *        schema variables for the parameters
      * @return the term array of arguments used to construct the method term
      */
     private Term[] getArgs(SchemaVariable sv, ParsableVariable heap, ParsableVariable heapAtPre,
@@ -146,24 +148,19 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         Term[] args = new Term[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);
-        if (twoState) {
-            args[i++] = TB.var(heapAtPre);
-        }
-        if (!isStatic) {
-            args[i++] = TB.var(sv);
-        }
-        for (ParsableVariable arg : params) {
-            assert arg instanceof SchemaVariable;
-            args[i++] = TB.var(arg);
-        }
+        if (twoState) { args[i++] = TB.var(heapAtPre); }
+        if (!isStatic) { args[i++] = TB.var(sv); }
+        for (ParsableVariable arg : params) { assert arg instanceof SchemaVariable; args[i++] = TB.var(arg); }
         return args;
     }
 
     /**
      * Finds an -on top level- conjuncted term of the form (exc = null) in the given term.
      *
-     * @param t the term to be searched in
-     * @param exc the exception variable
+     * @param t
+     *        the term to be searched in
+     * @param exc
+     *        the exception variable
      * @return true if the term guarantees exc to be equal to null
      */
     private boolean findExcNull(Term t, ProgramVariable exc) {
@@ -203,9 +200,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Generates a term of the form (mbyAtPre = mby) if mby is specified.
      *
-     * @param self the self variable
-     * @param params the list of parameters
-     * @param mbyAtPreFunc the measured-by function
+     * @param self
+     *        the self variable
+     * @param params
+     *        the list of parameters
+     * @param mbyAtPreFunc
+     *        the measured-by function
      * @param services
      * @return the measured by at pre equation for the precondition
      */
@@ -234,13 +234,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     ImmutableList<Term> getRest() {
         ImmutableList<Term> rest = super.getRest();
         final Term globalDefs = getGlobalDefs();
-        if (globalDefs != null) {
-            rest = rest.append(globalDefs);
-        }
+        if (globalDefs != null) { rest = rest.append(globalDefs); }
         final Term axiom = getAxiom();
-        if (axiom != null) {
-            rest = rest.append(axiom);
-        }
+        if (axiom != null) { rest = rest.append(axiom); }
         return rest;
     }
 
@@ -273,7 +269,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final IObserverFunction target = getTarget();
         final String methodName = target.name().toString();
         final String tName = getKJT().getJavaType().getFullName() + " "
-            + methodName.substring(methodName.indexOf("::") + 2).replace("$", "");
+                + methodName.substring(methodName.indexOf("::") + 2).replace("$", "");
         final boolean isStatic = target.isStatic();
         final boolean twoState = target.getStateCount() == 2;
         final LocationVariable heap = getHeap();
@@ -290,9 +286,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
         StringBuilder ps = new StringBuilder();
-        for (ProgramVariable pv : getOrigVars().params) {
-            ps.append(" ").append(pv.getKeYJavaType().getFullName());
-        }
+        for (ProgramVariable pv : getOrigVars().params) { ps.append(" ").append(pv.getKeYJavaType().getFullName()); }
         final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {
             prefix = WellDefinednessCheck.OP_TACLET;
@@ -314,8 +308,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Combines two well-definedness taclets for (pure) method invocations.
      *
-     * @param t1 taclet one
-     * @param t2 taclet two
+     * @param t1
+     *        taclet one
+     * @param t2
+     *        taclet two
      * @param services
      * @return the combined taclet
      */
@@ -363,9 +359,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return true for either normal behaviour or model fields
      */
     public boolean isNormal(TermServices services) {
-        if (modelField() || isModel()) {
-            return true;
-        }
+        if (modelField() || isModel()) { return true; }
         final Term post =
             getEnsures().implicit().equals(TB.tt()) ? getEnsures().explicit()
                     : getEnsures().implicit();

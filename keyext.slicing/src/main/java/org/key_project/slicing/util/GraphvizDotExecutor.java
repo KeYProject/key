@@ -56,7 +56,8 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     /**
      * Construct a new graphviz executor given the provided input graph.
      *
-     * @param dot graph to render (in DOT format)
+     * @param dot
+     *        graph to render (in DOT format)
      */
     public GraphvizDotExecutor(String dot) {
         this.dot = dot;
@@ -92,9 +93,7 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
      * @return whether this class is usable
      */
     public static boolean isDotInstalled() {
-        if (!graphvizDotInstallationChecked) {
-            checkDotInstallation();
-        }
+        if (!graphvizDotInstallationChecked) { checkDotInstallation(); }
         return graphvizDotInstalled;
     }
 
@@ -118,15 +117,11 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
                     || outStream.available() > 0 || errStream.available() > 0) {
                 while (outStream.available() > 0) {
                     int res = outStream.read(buffer);
-                    if (res > 0) {
-                        output.write(buffer, 0, res);
-                    }
+                    if (res > 0) { output.write(buffer, 0, res); }
                 }
                 while (errStream.available() > 0) {
                     int res2 = errStream.read(buffer);
-                    if (res2 > 0) {
-                        stderr.write(buffer, 0, res2);
-                    }
+                    if (res2 > 0) { stderr.write(buffer, 0, res2); }
                 }
                 Thread.sleep(10);
             }

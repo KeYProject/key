@@ -50,10 +50,13 @@ public class ExecutionContext
     /**
      * creates an execution context reference
      *
-     * @param classContext the TypeReference referring to the next enclosing
+     * @param classContext
+     *        the TypeReference referring to the next enclosing
      *        class
-     * @param methodContext the IProgramMethod referring to the currently active method
-     * @param runtimeInstance a ReferencePrefix to the object that
+     * @param methodContext
+     *        the IProgramMethod referring to the currently active method
+     * @param runtimeInstance
+     *        a ReferencePrefix to the object that
      *        is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, IProgramMethod methodContext,
@@ -64,7 +67,8 @@ public class ExecutionContext
     /**
      * creates an execution context reference
      *
-     * @param children an ExtList with the required children of the execution
+     * @param children
+     *        an ExtList with the required children of the execution
      *        context
      */
     public ExecutionContext(ExtList children) {
@@ -98,9 +102,11 @@ public class ExecutionContext
      * Returns the child at the specified index in this node's "virtual"
      * child array.
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out
      *            of bounds
      */
     @Override
@@ -151,7 +157,8 @@ public class ExecutionContext
      * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     @Override
     public void visit(Visitor v) {

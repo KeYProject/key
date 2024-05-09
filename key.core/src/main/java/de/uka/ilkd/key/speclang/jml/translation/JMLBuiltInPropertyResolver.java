@@ -35,9 +35,7 @@ public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
     @Override
     protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
             throws SLTranslationException {
-        if (parameters != null) {
-            return null;
-        }
+        if (parameters != null) { return null; }
 
         if (name.equals("length") && receiver.isTerm()
                 && receiver.getTerm().sort().equals(seqLDT.targetSort())) {

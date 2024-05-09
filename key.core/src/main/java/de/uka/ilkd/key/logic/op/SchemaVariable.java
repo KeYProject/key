@@ -24,7 +24,8 @@ public interface SchemaVariable extends ParsableVariable {
     /**
      * Creates a parseable string representation of the declaration of the schema variable.
      *
-     * @param l the layouter to use
+     * @param l
+     *        the layouter to use
      */
     void layout(Layouter<?> l);
 }

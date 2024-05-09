@@ -106,13 +106,13 @@ public class CreateObjectBuilder extends JavaTransformer {
         md.setBody(createBody(type));
     }
 
-    public void prepare() {
-    }
+    public void prepare() {}
 
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
         if (td instanceof ClassOrInterfaceDeclaration

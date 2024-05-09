@@ -13,7 +13,8 @@ public interface Visitor<T extends Term> {
      * By default, it always accepts any tree
      * </p>
      *
-     * @param visited The currently visited {@link Term}.
+     * @param visited
+     *        The currently visited {@link Term}.
      * @return {@code true} visit subtree, {@code false} skip sub tree.
      */
     default boolean visitSubtree(T visited) {
@@ -23,7 +24,8 @@ public interface Visitor<T extends Term> {
     /**
      * the entry method for the visitor pattern
      *
-     * @param visited the Term to be visited
+     * @param visited
+     *        the Term to be visited
      */
     void visit(T visited);
 
@@ -36,7 +38,8 @@ public interface Visitor<T extends Term> {
      * By default, it does nothing
      * </p>
      *
-     * @param subtreeRoot root of the subtree which the visitor enters.
+     * @param subtreeRoot
+     *        root of the subtree which the visitor enters.
      */
     default void subtreeEntered(T subtreeRoot) {
         // do nothing
@@ -51,7 +54,8 @@ public interface Visitor<T extends Term> {
      * By default, it does nothing
      * </p>
      *
-     * @param subtreeRoot root of the subtree which the visitor leaves.
+     * @param subtreeRoot
+     *        root of the subtree which the visitor leaves.
      */
     default void subtreeLeft(T subtreeRoot) {
         // do nothing

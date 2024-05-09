@@ -39,8 +39,8 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (5.12.19)
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
-    @NonNull
-    final T ctx;
+
+    final @NonNull T ctx;
 
     protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;
@@ -114,9 +114,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public Token findProof() {
             KeYParser.ProofContext a = ctx.proof();
-            if (a != null) {
-                return a.PROOF().getSymbol();
-            }
+            if (a != null) { return a.PROOF().getSymbol(); }
             return null;
         }
 

@@ -17,8 +17,10 @@ public interface StrategyFactory extends Named {
     /**
      * Create strategy for a proof.
      *
-     * @param proof the Proof a strategy is created for
-     * @param strategyProperties the StrategyProperties to customize the strategy
+     * @param proof
+     *        the Proof a strategy is created for
+     * @param strategyProperties
+     *        the StrategyProperties to customize the strategy
      * @return the newly created strategy
      */
     Strategy create(Proof proof, StrategyProperties strategyProperties);

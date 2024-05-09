@@ -88,9 +88,7 @@ public class TriggersSet {
             QuantifiableVariable v = allterm.varsBoundHere(0).get(0);
             return getAllUQS(allterm.sub(0)).add(v);
         }
-        if (op == Quantifier.EX) {
-            return getAllUQS(allterm.sub(0));
-        }
+        if (op == Quantifier.EX) { return getAllUQS(allterm.sub(0)); }
         return DefaultImmutableSet.nil();
     }
 
@@ -113,10 +111,14 @@ public class TriggersSet {
 
     /**
      *
-     * @param trigger a <code>Term</code>
-     * @param qvs all universal variables of <code>trigger</code>
-     * @param isUnify true if <code>trigger</code>contains existential variable
-     * @param isElement true if the <code>Trigger</code> to be created is taken as a element of
+     * @param trigger
+     *        a <code>Term</code>
+     * @param qvs
+     *        all universal variables of <code>trigger</code>
+     * @param isUnify
+     *        true if <code>trigger</code>contains existential variable
+     * @param isElement
+     *        true if the <code>Trigger</code> to be created is taken as a element of
      *        multi-trigger
      * @return a <code>Trigger</code> with <code>trigger</code> as its term
      */
@@ -133,8 +135,10 @@ public class TriggersSet {
     /**
      *
      * @param trs
-     * @param clause a <code>Term</code> of clause form
-     * @param qvs all universal varaibles of all <code>clause</code>
+     * @param clause
+     *        a <code>Term</code> of clause form
+     * @param qvs
+     *        all universal varaibles of all <code>clause</code>
      * @return the MultTrigger for the given triggers
      */
     private Trigger createMultiTrigger(ImmutableSet<Trigger> trs, Term clause,
@@ -182,9 +186,7 @@ public class TriggersSet {
                 final Term oriTerm = it.next();
                 for (Term term : expandIfThenElse(oriTerm, services)) {
                     Term t = term;
-                    if (t.op() == Junctor.NOT) {
-                        t = t.sub(0);
-                    }
+                    if (t.op() == Junctor.NOT) { t = t.sub(0); }
                     recAddTriggers(t, services);
                 }
             }
@@ -192,14 +194,14 @@ public class TriggersSet {
         }
 
         /**
-         * @param term one atom at the begining
-         * @param services the Services
+         * @param term
+         *        one atom at the begining
+         * @param services
+         *        the Services
          * @return true if find any trigger from <code>term</code>
          */
         private boolean recAddTriggers(Term term, Services services) {
-            if (!mightContainTriggers(term)) {
-                return false;
-            }
+            if (!mightContainTriggers(term)) { return false; }
 
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
                 TriggerUtils.intersect(term.freeVars(), selfUQVS);
@@ -209,9 +211,7 @@ public class TriggersSet {
                 final Term subTerm = term.sub(i);
                 final boolean found = recAddTriggers(subTerm, services);
 
-                if (found && uniVarsInTerm.subset(subTerm.freeVars())) {
-                    foundSubtriggers = true;
-                }
+                if (found && uniVarsInTerm.subset(subTerm.freeVars())) { foundSubtriggers = true; }
             }
 
             if (!foundSubtriggers) {
@@ -273,9 +273,7 @@ public class TriggersSet {
          * Check whether a given term (or a subterm of the term) might be a trigger candidate
          */
         private boolean mightContainTriggers(Term term) {
-            if (term.freeVars().isEmpty()) {
-                return false;
-            }
+            if (term.freeVars().isEmpty()) { return false; }
             final Operator op = term.op();
             if (op instanceof Modality || op instanceof UpdateApplication
                     || op instanceof QuantifiableVariable) {
@@ -296,9 +294,7 @@ public class TriggersSet {
             if (term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(),
                 services)) {
                 if (term.sub(2).op().name().toString()
-                        .endsWith(PipelineConstants.IMPLICIT_CREATED)) {
-                    return false;
-                }
+                        .endsWith(PipelineConstants.IMPLICIT_CREATED)) { return false; }
             }
 
             final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
@@ -320,9 +316,7 @@ public class TriggersSet {
          * add a uni-trigger to triggers set or add an element of multi-triggers for this clause
          */
         private void addUniTrigger(Term term, Services services) {
-            if (!isAcceptableTrigger(term, services)) {
-                return;
-            }
+            if (!isAcceptableTrigger(term, services)) { return; }
             final boolean isUnify = !term.freeVars().subset(selfUQVS);
             final boolean isElement = !selfUQVS.subset(term.freeVars());
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
@@ -341,7 +335,8 @@ public class TriggersSet {
          * all variables of this clause, it will be used to construct the multi-trigger which will
          * be add to triggers set
          *
-         * @param ts elements of multi-triggers at the beginning
+         * @param ts
+         *        elements of multi-triggers at the beginning
          * @return a set of triggers
          */
         private Set<ImmutableSet<Trigger>> setMultiTriggers(Iterator<Trigger> ts) {
@@ -356,9 +351,7 @@ public class TriggersSet {
                 for (ImmutableSet<Trigger> nextTrigger : nextTriggers) {
                     ImmutableSet<Trigger> next = nextTrigger;
                     next = next.add(trigger);
-                    if (addMultiTrigger(next)) {
-                        continue;
-                    }
+                    if (addMultiTrigger(next)) { continue; }
                     res.add(next);
                 }
             }
@@ -368,16 +361,15 @@ public class TriggersSet {
         /**
          * try to construct a multi-trigger by given <code>ts</code>
          *
-         * @param trs a set of trigger
+         * @param trs
+         *        a set of trigger
          * @return true if <code>trs</code> contains all universal varaibles of this clause, and add
          *         the contstructed multi-trigger to triggers set
          */
         private boolean addMultiTrigger(ImmutableSet<Trigger> trs) {
             ImmutableSet<QuantifiableVariable> mulqvs =
                 DefaultImmutableSet.nil();
-            for (Trigger tr : trs) {
-                mulqvs = mulqvs.union(tr.getTriggerTerm().freeVars());
-            }
+            for (Trigger tr : trs) { mulqvs = mulqvs.union(tr.getTriggerTerm().freeVars()); }
             if (selfUQVS.subset(mulqvs)) {
                 Trigger mt = createMultiTrigger(trs, clause, selfUQVS);
                 allTriggers = allTriggers.add(mt);

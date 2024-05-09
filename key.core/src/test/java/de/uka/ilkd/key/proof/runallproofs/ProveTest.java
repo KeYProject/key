@@ -114,9 +114,7 @@ public class ProveTest {
             AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
                 LOGGER.info("({}) {} Error(s) while loading", caseId, replayResult.getErrorList());
-                for (Throwable error : replayResult.getErrorList()) {
-                    LOGGER.info("({}) Error", caseId, error);
-                }
+                for (Throwable error : replayResult.getErrorList()) { LOGGER.info("({}) Error", caseId, error); }
             }
 
             if (testProperty == TestProperty.NOTLOADABLE) {
@@ -137,18 +135,12 @@ public class ProveTest {
                     LOGGER.info("({}) Finished proof: {}", caseId,
                         (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile);
-                    if (success) {
-                        reload(proofFile, loadedProof);
-                    }
+                    if (success) { reload(proofFile, loadedProof); }
                 }
             }
         } finally {
-            if (loadedProof != null) {
-                loadedProof.dispose();
-            }
-            if (env != null) {
-                env.dispose();
-            }
+            if (loadedProof != null) { loadedProof.dispose(); }
+            if (env != null) { env.dispose(); }
         }
 
         String message = String.format("(%s) %sVerifying property \"%s\"%sfor file: %s",
@@ -156,9 +148,7 @@ public class ProveTest {
             success ? "pass: " : "FAIL: ", testProperty.toString().toLowerCase(),
             success ? " was successful " : " failed ", keyFile);
 
-        if (!success) {
-            fail(message);
-        }
+        if (!success) { fail(message); }
     }
 
     /**
@@ -207,7 +197,8 @@ public class ProveTest {
      * Reload proof that was previously saved at the location corresponding to the given
      * {@link File} object.
      *
-     * @param proofFile File that contains the proof that will be (re-)loaded.
+     * @param proofFile
+     *        File that contains the proof that will be (re-)loaded.
      */
     private boolean reloadProof(File proofFile) throws Exception {
         /*
@@ -222,9 +213,7 @@ public class ProveTest {
             AbstractProblemLoader.ReplayResult result = proofLoadEnvironment.getReplayResult();
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
-                for (Throwable ex : errorList) {
-                    LOGGER.error("Error", ex);
-                }
+                for (Throwable ex : errorList) { LOGGER.error("Error", ex); }
                 throw errorList.get(0);
             }
 
@@ -234,12 +223,8 @@ public class ProveTest {
             throw new Exception(
                 "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
-            if (reloadedProof != null) {
-                reloadedProof.dispose();
-            }
-            if (proofLoadEnvironment != null) {
-                proofLoadEnvironment.dispose();
-            }
+            if (reloadedProof != null) { reloadedProof.dispose(); }
+            if (proofLoadEnvironment != null) { proofLoadEnvironment.dispose(); }
         }
     }
 
@@ -258,17 +243,13 @@ public class ProveTest {
         // Write statistics.
         try {
             StatisticsFile statisticsFile = getStatisticsFile();
-            if (statisticsFile != null) {
-                statisticsFile.appendStatistics(loadedProof, keyFile);
-            }
+            if (statisticsFile != null) { statisticsFile.appendStatistics(loadedProof, keyFile); }
         } catch (IOException e) {
             LOGGER.warn("Failed to append stats", e);
         }
     }
 
     private void debugOut(String format, Object... args) {
-        if (verbose) {
-            System.err.format(format, args);
-        }
+        if (verbose) { System.err.format(format, args); }
     }
 }

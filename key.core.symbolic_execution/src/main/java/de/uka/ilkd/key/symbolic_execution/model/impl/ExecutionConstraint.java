@@ -30,10 +30,13 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param term The {@link Term} representing the constraint.
+     * @param term
+     *        The {@link Term} representing the constraint.
      */
     public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO,
             Term term) {

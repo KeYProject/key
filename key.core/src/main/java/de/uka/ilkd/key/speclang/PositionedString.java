@@ -19,18 +19,15 @@ import org.jspecify.annotations.NonNull;
  * used for error reporting.
  */
 public class PositionedString {
-    @NonNull
-    public final String text;
 
-    @NonNull
-    public final Location location;
+    public final @NonNull String text;
+
+    public final @NonNull Location location;
 
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
     public PositionedString(@NonNull String text, @NonNull Location location) {
-        if (text == null || location == null) {
-            throw new IllegalArgumentException();
-        }
+        if (text == null || location == null) { throw new IllegalArgumentException(); }
 
         this.text = text;
         this.location = location;
@@ -59,28 +56,22 @@ public class PositionedString {
 
     public String toString() {
         return text + " ("
-            + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
-            + location.getPosition() + ")";
+                + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
+                + location.getPosition() + ")";
     }
 
-    @NonNull
-    public String getText() {
+    public @NonNull String getText() {
         return text;
     }
 
-    @NonNull
-    public Location getLocation() {
+    public @NonNull Location getLocation() {
         return location;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof PositionedString that)) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (!(o instanceof PositionedString that)) { return false; }
         return text.equals(that.text) && Objects.equals(location, that.location);
     }
 
@@ -99,7 +90,8 @@ public class PositionedString {
     /**
      * checks if the given label is attached to the positioned string
      *
-     * @param label the ITermLabel for which to look (must not be null)
+     * @param label
+     *        the ITermLabel for which to look (must not be null)
      */
     public boolean containsLabel(TermLabel label) {
         return false;

@@ -55,17 +55,13 @@ public class JavaDLFieldNames {
 
     public static ParsedFieldName split(String name) {
         int index = name.indexOf(SEPARATOR);
-        if (index == -1) {
-            return new ParsedFieldName(null, name);
-        }
+        if (index == -1) { return new ParsedFieldName(null, name); }
         return new ParsedFieldName(name.substring(0, index), name.substring(index + 2));
     }
 
     public record ParsedFieldName(@Nullable String scope, String name) {
         public String nameWithoutFieldPrefix() {
-            if (!name.isEmpty() && name.charAt(0) == JavaDLFieldNames.FIELD_PREFIX) {
-                return name.substring(1);
-            }
+            if (!name.isEmpty() && name.charAt(0) == JavaDLFieldNames.FIELD_PREFIX) { return name.substring(1); }
             return name;
         }
     }

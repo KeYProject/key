@@ -91,9 +91,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
         Term uInst = (Term) svInst.getInstantiation(u);
         Term xInst = (Term) svInst.getInstantiation(x);
         Term resultInst = (Term) svInst.getInstantiation(result);
-        if (uInst == null || xInst == null) {
-            return mc;
-        }
+        if (uInst == null || xInst == null) { return mc; }
 
         Term properResultInst = dropEffectlessElementaries(uInst, xInst, services);
         if (properResultInst == null) {

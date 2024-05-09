@@ -22,7 +22,8 @@ public class GreaterThan extends ComparativeOperator {
     /**
      * Greater than.
      *
-     * @param children an ExtList with all children of this node the first children in list will be
+     * @param children
+     *        an ExtList with all children of this node the first children in list will be
      *        the one on the left side, the second the one on the right side.
      */
 
@@ -33,8 +34,10 @@ public class GreaterThan extends ComparativeOperator {
     /**
      * Greater than.
      *
-     * @param lhs the expression that is checked to be greater than rhs
-     * @param rhs the expression that is checked to be less than lhs
+     * @param lhs
+     *        the expression that is checked to be greater than rhs
+     * @param rhs
+     *        the expression that is checked to be less than lhs
      */
     public GreaterThan(Expression lhs, Expression rhs) {
         super(lhs, rhs);
@@ -58,7 +61,8 @@ public class GreaterThan extends ComparativeOperator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnGreaterThan(this);

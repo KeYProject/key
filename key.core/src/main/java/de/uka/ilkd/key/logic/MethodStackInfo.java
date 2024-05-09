@@ -35,9 +35,7 @@ public class MethodStackInfo implements NameCreationInfo {
             for (int i = prefix.size() - 1; i >= 0; i--) {
                 if (prefix.get(i) instanceof MethodFrame frame) {
                     IProgramMethod method = frame.getProgramMethod();
-                    if (method != null) {
-                        list = list.prepend(method);
-                    }
+                    if (method != null) { list = list.prepend(method); }
                 }
             }
         }
@@ -52,9 +50,7 @@ public class MethodStackInfo implements NameCreationInfo {
             result.append("- ").append(method.getProgramElementName().toString()).append("\n");
         }
 
-        if (result.length() < 1) {
-            return "";
-        }
+        if (result.length() < 1) { return ""; }
 
         result = new StringBuilder(result.substring(0, result.length() - 1));
 

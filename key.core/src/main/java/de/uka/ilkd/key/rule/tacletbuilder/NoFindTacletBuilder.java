@@ -41,7 +41,8 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
     /**
      * adds a new goal descriptions to the goal descriptions of the Taclet.
      *
-     * @param goal the TacletGoalTemplate specifying all the changes to be made to achieve one of
+     * @param goal
+     *        the TacletGoalTemplate specifying all the changes to be made to achieve one of
      *        the resulting goals
      */
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
@@ -56,9 +57,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      */
     protected void checkBoundInIfAndFind() {
         final BoundUniquenessChecker ch = new BoundUniquenessChecker(ifSequent());
-        if (!ch.correct()) {
-            throw new TacletBuilderException(this, "A bound SchemaVariable occurs twice in if.");
-        }
+        if (!ch.correct()) { throw new TacletBuilderException(this, "A bound SchemaVariable occurs twice in if."); }
     }
 
 

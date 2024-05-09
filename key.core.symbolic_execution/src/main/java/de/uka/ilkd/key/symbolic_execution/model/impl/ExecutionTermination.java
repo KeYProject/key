@@ -41,12 +41,16 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param exceptionVariable Contains the exception variable which is used to check if the
+     * @param exceptionVariable
+     *        Contains the exception variable which is used to check if the
      *        executed program in proof terminates normally.
-     * @param terminationKind The {@link TerminationKind} or {@code null} to compute it when it is
+     * @param terminationKind
+     *        The {@link TerminationKind} or {@code null} to compute it when it is
      *        requested the first time (normal or exceptional termination only).
      */
     public ExecutionTermination(ITreeSettings settings, Node proofNode,
@@ -63,13 +67,13 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
     protected String lazyComputeName() {
         return switch (getTerminationKind()) {
         case EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort
-            + INTERNAL_NODE_NAME_END;
+                + INTERNAL_NODE_NAME_END;
         case LOOP_BODY -> LOOP_BODY_TERMINATION_NODE_NAME;
         case BLOCK_CONTRACT_NORMAL -> INTERNAL_NODE_NAME_START + "block contract end"
-            + INTERNAL_NODE_NAME_END;
+                + INTERNAL_NODE_NAME_END;
         case BLOCK_CONTRACT_EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "block contract uncaught "
-            + exceptionSort
-            + INTERNAL_NODE_NAME_END;
+                + exceptionSort
+                + INTERNAL_NODE_NAME_END;
         default -> NORMAL_TERMINATION_NODE_NAME;
         };
     }

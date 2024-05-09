@@ -67,13 +67,12 @@ public class OriginTermLabel implements TermLabel {
      * Find a term's origin. If the term has no origin, iterate through its parent terms until we
      * find one with an origin.
      *
-     * @param pis the position of the term whose origin to find.
+     * @param pis
+     *        the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
     public static Origin getOrigin(PosInSequent pis) {
-        if (pis == null) {
-            return null;
-        }
+        if (pis == null) { return null; }
 
         return getOrigin(pis.getPosInOccurrence());
     }
@@ -82,13 +81,12 @@ public class OriginTermLabel implements TermLabel {
      * Find a term's origin. If the term has no origin, iterate through its parent terms until we
      * find one with an origin.
      *
-     * @param pio the position of the term whose origin to find.
+     * @param pio
+     *        the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
     public static Origin getOrigin(PosInOccurrence pio) {
-        if (pio == null) {
-            return null;
-        }
+        if (pio == null) { return null; }
 
         Term term = pio.subTerm();
 
@@ -128,7 +126,8 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param origin the term's origin.
+     * @param origin
+     *        the term's origin.
      */
     OriginTermLabel(Origin origin) {
         this.origin = origin;
@@ -138,8 +137,10 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param origin the term's origin.
-     * @param subtermOrigins the origins of the term's (former) subterms.
+     * @param origin
+     *        the term's origin.
+     * @param subtermOrigins
+     *        the origins of the term's (former) subterms.
      */
     OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
         this(origin);
@@ -152,7 +153,8 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param subtermOrigins the origins of the term's (former) subterms.
+     * @param subtermOrigins
+     *        the origins of the term's (former) subterms.
      */
     OriginTermLabel(Set<Origin> subtermOrigins) {
         this.origin = new Origin(SpecType.NONE);
@@ -190,8 +192,10 @@ public class OriginTermLabel implements TermLabel {
      * various problems during proof search.
      * </p>
      *
-     * @param term a term
-     * @param services services.
+     * @param term
+     *        a term
+     * @param services
+     *        services.
      * @return {@code true} iff an {@code OriginTermLabel} can be added to the specified term.
      */
     public static boolean canAddLabel(Term term, Services services) {
@@ -209,8 +213,10 @@ public class OriginTermLabel implements TermLabel {
      * various problems during proof search.
      * </p>
      *
-     * @param op the specified operator.
-     * @param services services.
+     * @param op
+     *        the specified operator.
+     * @param services
+     *        services.
      * @return {@code true} iff an {@code OriginTermLabel} can be added to a term with the specified
      *         operator.
      */
@@ -243,8 +249,10 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Removes all {@link OriginTermLabel} from the specified sequent.
      *
-     * @param seq the sequent to transform.
-     * @param services services.
+     * @param seq
+     *        the sequent to transform.
+     * @param services
+     *        services.
      * @return the resulting sequent change info.
      */
     public static SequentChangeInfo removeOriginLabels(Sequent seq, Services services) {
@@ -270,14 +278,14 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Removes all {@link OriginTermLabel} from the specified term and its sub-terms.
      *
-     * @param term the term to transform.
-     * @param services services.
+     * @param term
+     *        the term to transform.
+     * @param services
+     *        services.
      * @return the transformed term.
      */
     public static Term removeOriginLabels(Term term, Services services) {
-        if (term == null) {
-            return null;
-        }
+        if (term == null) { return null; }
 
         List<TermLabel> labels = term.getLabels().toList();
         final TermLabel originTermLabel = term.getLabel(NAME);
@@ -285,13 +293,9 @@ public class OriginTermLabel implements TermLabel {
         final ImmutableArray<Term> oldSubs = term.subs();
         Term[] newSubs = new Term[oldSubs.size()];
 
-        if (originTermLabel != null) {
-            labels.remove(originTermLabel);
-        }
+        if (originTermLabel != null) { labels.remove(originTermLabel); }
 
-        for (int i = 0; i < newSubs.length; ++i) {
-            newSubs[i] = removeOriginLabels(oldSubs.get(i), services);
-        }
+        for (int i = 0; i < newSubs.length; ++i) { newSubs[i] = removeOriginLabels(oldSubs.get(i), services); }
 
         return tf.createTerm(term.op(), newSubs, term.boundVars(),
             new ImmutableArray<>(labels));
@@ -300,13 +304,12 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Compute the common origin from all origins in the passed origins set.
      *
-     * @param origins the passed origins set
+     * @param origins
+     *        the passed origins set
      * @return the computed common origin
      */
     public static Origin computeCommonFileOrigin(final Set<FileOrigin> origins) {
-        if (origins.isEmpty()) {
-            return new Origin(SpecType.NONE);
-        }
+        if (origins.isEmpty()) { return new Origin(SpecType.NONE); }
 
         SpecType commonSpecType = null;
         URI commonFileName = null;
@@ -315,21 +318,15 @@ public class OriginTermLabel implements TermLabel {
         for (FileOrigin origin : origins) {
             if (commonSpecType == null) {
                 commonSpecType = origin.specType;
-            } else if (commonSpecType != origin.specType) {
-                return new Origin(SpecType.NONE);
-            }
+            } else if (commonSpecType != origin.specType) { return new Origin(SpecType.NONE); }
 
             if (commonFileName == null) {
                 commonFileName = origin.fileName;
-            } else if (!commonFileName.equals(origin.fileName)) {
-                return new Origin(SpecType.NONE);
-            }
+            } else if (!commonFileName.equals(origin.fileName)) { return new Origin(SpecType.NONE); }
 
             if (commonLine == -1) {
                 commonLine = origin.line;
-            } else if (commonLine != origin.line) {
-                return new Origin(SpecType.NONE);
-            }
+            } else if (commonLine != origin.line) { return new Origin(SpecType.NONE); }
         }
 
         if (commonFileName == null) {
@@ -343,13 +340,12 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Compute the common origin from all origins in the passed origins set.
      *
-     * @param origins the passed origins set
+     * @param origins
+     *        the passed origins set
      * @return the computed common origin
      */
     public static Origin computeCommonNodeOrigin(final Set<NodeOrigin> origins) {
-        if (origins.isEmpty()) {
-            return new Origin(SpecType.NONE);
-        }
+        if (origins.isEmpty()) { return new Origin(SpecType.NONE); }
 
         SpecType commonSpecType = SpecType.NONE;
         String commonRuleName = null;
@@ -358,21 +354,15 @@ public class OriginTermLabel implements TermLabel {
         for (NodeOrigin origin : origins) {
             if (commonSpecType == null) {
                 commonSpecType = origin.specType;
-            } else if (commonSpecType != origin.specType) {
-                return new Origin(SpecType.NONE);
-            }
+            } else if (commonSpecType != origin.specType) { return new Origin(SpecType.NONE); }
 
             if (commonRuleName == null) {
                 commonRuleName = origin.ruleName;
-            } else if (!commonRuleName.equals(origin.ruleName)) {
-                return new Origin(SpecType.NONE);
-            }
+            } else if (!commonRuleName.equals(origin.ruleName)) { return new Origin(SpecType.NONE); }
 
             if (commonNr == -1) {
                 commonNr = origin.nodeNr;
-            } else if (commonNr != origin.nodeNr) {
-                return new Origin(SpecType.NONE);
-            }
+            } else if (commonNr != origin.nodeNr) { return new Origin(SpecType.NONE); }
         }
 
         return new NodeOrigin(commonSpecType, commonRuleName, commonNr);
@@ -381,23 +371,18 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Compute the common origin from all origins in the passed origins set.
      *
-     * @param origins the passed origins set
+     * @param origins
+     *        the passed origins set
      * @return the computed common origin
      */
     @SuppressWarnings("unchecked")
     public static Origin computeCommonOrigin(final Set<? extends Origin> origins) {
-        if (origins.isEmpty()) {
-            return new Origin(SpecType.NONE);
-        }
+        if (origins.isEmpty()) { return new Origin(SpecType.NONE); }
 
         Iterator<? extends Origin> it = origins.iterator();
         Class<? extends Origin> clazz = it.next().getClass();
 
-        while (it.hasNext()) {
-            if (!it.next().getClass().equals(clazz)) {
-                return new Origin(SpecType.NONE);
-            }
-        }
+        while (it.hasNext()) { if (!it.next().getClass().equals(clazz)) { return new Origin(SpecType.NONE); } }
 
         if (clazz.equals(FileOrigin.class)) {
             return computeCommonFileOrigin((Set<FileOrigin>) origins);
@@ -409,9 +394,7 @@ public class OriginTermLabel implements TermLabel {
             for (Origin origin : origins) {
                 if (commonSpecType == SpecType.NONE) {
                     commonSpecType = origin.specType;
-                } else if (commonSpecType != origin.specType) {
-                    return new Origin(SpecType.NONE);
-                }
+                } else if (commonSpecType != origin.specType) { return new Origin(SpecType.NONE); }
             }
 
             return new Origin(commonSpecType);
@@ -422,14 +405,14 @@ public class OriginTermLabel implements TermLabel {
      * This method transforms a term in such a way that every {@link OriginTermLabel} contains all
      * the correct {@link #getSubtermOrigins()}.
      *
-     * @param term the term to transform.
-     * @param services services.
+     * @param term
+     *        the term to transform.
+     * @param services
+     *        services.
      * @return the transformed term.
      */
     public static Term collectSubtermOrigins(Term term, Services services) {
-        if (!canAddLabel(term, services)) {
-            return term;
-        }
+        if (!canAddLabel(term, services)) { return term; }
 
         SubTermOriginData newSubs = getSubTermOriginData(term.subs(), services);
         final ImmutableArray<TermLabel> labels =
@@ -517,8 +500,10 @@ public class OriginTermLabel implements TermLabel {
     }
 
     /**
-     * @param subs the sub-terms to be searched
-     * @param services a services object used for getting type information and creating the new
+     * @param subs
+     *        the sub-terms to be searched
+     * @param services
+     *        a services object used for getting type information and creating the new
      *        sub-term
      * @return origin information about the searched sub-terms stored in a {@link SubTermOriginData}
      *         object.
@@ -558,8 +543,10 @@ public class OriginTermLabel implements TermLabel {
         /**
          * This method constructs an object of type {@link SubTermOriginData}.
          *
-         * @param subterms the collected sub-terms
-         * @param subtermOrigins the origin information collected from these sub-terms
+         * @param subterms
+         *        the collected sub-terms
+         * @param subtermOrigins
+         *        the origin information collected from these sub-terms
          */
         public SubTermOriginData(Term[] subterms, Set<Origin> subtermOrigins) {
             this.terms = subterms;
@@ -581,7 +568,8 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
          *
-         * @param specType the spec type the term originates from.
+         * @param specType
+         *        the spec type the term originates from.
          */
         public Origin(SpecType specType) {
             assert specType != null;
@@ -632,9 +620,12 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
          *
-         * @param specType the spec type the term originates from.
-         * @param ruleName the name of the rule applied at the node the term originates from.
-         * @param nodeNr the {@link Node#serialNr()} of the node the term originates from.
+         * @param specType
+         *        the spec type the term originates from.
+         * @param ruleName
+         *        the name of the rule applied at the node the term originates from.
+         * @param nodeNr
+         *        the {@link Node#serialNr()} of the node the term originates from.
          */
         public NodeOrigin(SpecType specType, String ruleName, int nodeNr) {
             super(specType);
@@ -652,19 +643,11 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!super.equals(obj)) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
+            if (this == obj) { return true; }
+            if (!super.equals(obj)) { return false; }
+            if (getClass() != obj.getClass()) { return false; }
             NodeOrigin other = (NodeOrigin) obj;
-            if (nodeNr != other.nodeNr) {
-                return false;
-            }
+            if (nodeNr != other.nodeNr) { return false; }
             if (ruleName == null) {
                 return other.ruleName == null;
             } else {
@@ -692,8 +675,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * The file the term originates from.
          */
-        @Nullable
-        private final URI fileName;
+        private final @Nullable URI fileName;
 
         /**
          * The line in the file the term originates from.
@@ -703,9 +685,12 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
          *
-         * @param specType the spec type the term originates from.
-         * @param fileName the file the term originates from.
-         * @param line the line in the file.
+         * @param specType
+         *        the spec type the term originates from.
+         * @param fileName
+         *        the file the term originates from.
+         * @param line
+         *        the line in the file.
          */
         public FileOrigin(SpecType specType, @Nullable URI fileName, int line) {
             super(specType);
@@ -746,23 +731,13 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!super.equals(obj)) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
+            if (this == obj) { return true; }
+            if (!super.equals(obj)) { return false; }
+            if (getClass() != obj.getClass()) { return false; }
             FileOrigin other = (FileOrigin) obj;
             if (fileName == null) {
-                if (other.fileName != null) {
-                    return false;
-                }
-            } else if (!fileName.equals(other.fileName)) {
-                return false;
-            }
+                if (other.fileName != null) { return false; }
+            } else if (!fileName.equals(other.fileName)) { return false; }
             return line == other.line;
         }
     }
@@ -894,7 +869,8 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@code SpecType}
          *
-         * @param name the {@code SpecType}'s string representation.
+         * @param name
+         *        the {@code SpecType}'s string representation.
          */
         SpecType(String name) {
             this.name = name;

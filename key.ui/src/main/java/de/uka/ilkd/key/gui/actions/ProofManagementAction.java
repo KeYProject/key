@@ -32,8 +32,7 @@ public final class ProofManagementAction extends MainWindowAction {
 
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
+            public void selectedNodeChanged(KeYSelectionEvent e) {}
 
             /**
              * the selected proof has changed. Enable or disable action depending whether a proof is

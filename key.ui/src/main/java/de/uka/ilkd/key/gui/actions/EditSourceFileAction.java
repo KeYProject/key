@@ -74,8 +74,10 @@ public class EditSourceFileAction extends KeyAction {
     /**
      * Instantiates a new edits the source file action.
      *
-     * @param parent the parent
-     * @param exception the exception
+     * @param parent
+     *        the parent
+     * @param exception
+     *        the exception
      */
     public EditSourceFileAction(final Window parent, final Throwable exception) {
         setName("Edit File");
@@ -94,16 +96,9 @@ public class EditSourceFileAction extends KeyAction {
         int col = position.column();
         String text = textArea.getText();
         int i = 0;
-        while (i < text.length() && line > 1) {
-            if (text.charAt(i) == '\n') {
-                line--;
-            }
-            i++;
-        }
+        while (i < text.length() && line > 1) { if (text.charAt(i) == '\n') { line--; } i++; }
         i += col - 1;
-        if (i > textArea.getDocument().getLength()) {
-            i = textArea.getDocument().getLength();
-        }
+        if (i > textArea.getDocument().getLength()) { i = textArea.getDocument().getLength(); }
         textArea.setCaretPosition(i);
     }
 
@@ -138,10 +133,10 @@ public class EditSourceFileAction extends KeyAction {
             }
         };
         Optional<URI> file = location.getFileURI();
-        String source = IOUtil.readFrom(file.orElse(null)).orElse("");
+        String source = IOUtil.readFrom(file.orElse(null));
         // workaround for #1641: replace all carriage returns, since JavaDocument can currently
         // not handle them
-        source = source.replace("\r", "");
+        source = source != null ? source.replace("\r", "") : "";
 
         if (file.isPresent() && file.get().toString().endsWith(".java")) {
             JavaDocument doc = new JavaDocument();
@@ -208,9 +203,7 @@ public class EditSourceFileAction extends KeyAction {
 
     private static @Nullable File tryGetFile(@Nullable URI sourceURL) {
         File sourceFile = null;
-        if (sourceURL != null && sourceURL.getScheme().equals("file")) {
-            sourceFile = Paths.get(sourceURL).toFile();
-        }
+        if (sourceURL != null && sourceURL.getScheme().equals("file")) { sourceFile = Paths.get(sourceURL).toFile(); }
         return sourceFile;
     }
 
@@ -274,11 +267,10 @@ public class EditSourceFileAction extends KeyAction {
         }
 
         try {
-            final Location location = ExceptionTools.getLocation(exception)
-                    .filter(l -> l.getFileURI().isPresent())
-                    .orElseThrow(
-                        () -> new IOException("Cannot recover file location from exception."));
-            final URI uri = location.getFileURI().orElseThrow();
+            final Location location = ExceptionTools.getLocation(exception);
+            if (location == null)
+                throw new IOException("Cannot recover file location from exception.");
+            final URI uri = location.fileUri();
 
             // indicate edit/readonly in dialog title
             String prefix;

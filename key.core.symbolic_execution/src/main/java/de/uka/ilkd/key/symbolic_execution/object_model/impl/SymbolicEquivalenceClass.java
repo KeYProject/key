@@ -35,8 +35,10 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicEquivalenceClass(Services services, IModelSettings settings) {
         this(services, ImmutableSLList.nil(), settings);
@@ -45,9 +47,12 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param terms The contained {@link Term}s which represents the same {@link ISymbolicObject}.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param terms
+     *        The contained {@link Term}s which represents the same {@link ISymbolicObject}.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicEquivalenceClass(Services services, ImmutableList<Term> terms,
             IModelSettings settings) {
@@ -67,7 +72,8 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     /**
      * Adds a new {@link Term}.
      *
-     * @param term The new {@link Term} to add.
+     * @param term
+     *        The new {@link Term} to add.
      */
     public void addTerm(Term term) {
         terms = terms.append(OriginTermLabel.removeOriginLabels(term, services));
@@ -87,9 +93,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     @Override
     public ImmutableList<String> getTermStrings() {
         ImmutableList<String> strings = ImmutableSLList.nil();
-        for (Term term : terms) {
-            strings = strings.append(formatTerm(term, services));
-        }
+        for (Term term : terms) { strings = strings.append(formatTerm(term, services)); }
         return strings;
     }
 

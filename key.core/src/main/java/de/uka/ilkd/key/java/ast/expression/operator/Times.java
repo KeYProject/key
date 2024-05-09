@@ -24,8 +24,10 @@ public class Times extends BinaryOperator {
     /**
      * Times.
      *
-     * @param lhs an expression.
-     * @param rhs an expression.
+     * @param lhs
+     *        an expression.
+     * @param rhs
+     *        an expression.
      */
 
     public Times(Expression lhs, Expression rhs) {
@@ -38,7 +40,8 @@ public class Times extends BinaryOperator {
      * Expression in the given list is taken as the left hand side of the expression, the second
      * occurrence is taken as the right hand side of the expression.
      *
-     * @param children the children of this AST element as KeY classes.
+     * @param children
+     *        the children of this AST element as KeY classes.
      */
     public Times(ExtList children) {
         super(children);
@@ -73,7 +76,8 @@ public class Times extends BinaryOperator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnTimes(this);

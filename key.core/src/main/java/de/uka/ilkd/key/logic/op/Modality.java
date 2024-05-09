@@ -32,8 +32,10 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     /**
      * Retrieves the modality of the given kind and program.
      *
-     * @param kind the kind of the modality such as diamond or box
-     * @param jb the program of this modality
+     * @param kind
+     *        the kind of the modality such as diamond or box
+     * @param jb
+     *        the program of this modality
      * @return the modality of the given kind and program.
      */
     public static Modality getModality(Modality.JavaModalityKind kind, JavaBlock jb) {
@@ -74,8 +76,10 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      * checks if a given Term could be subterm (at the at'th subterm position) of a term with this
      * function at its top level. The validity of the given subterm is NOT checked.
      *
-     * @param at the position of the term where this method should check the validity.
-     * @param possibleSub the subterm to be checked.
+     * @param at
+     *        the position of the term where this method should check the validity.
+     * @param possibleSub
+     *        the subterm to be checked.
      * @return true iff the given term can be subterm at the indicated position
      */
     private boolean possibleSub(int at, Term possibleSub) {
@@ -89,39 +93,27 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     protected <T extends org.key_project.logic.Term> void additionalValidTopLevel(T p_term) {
         final Term term = (Term) p_term;
         for (int i = 0, n = arity(); i < n; i++) {
-            if (!possibleSub(i, term.sub(i))) {
-                throw new TermCreationException(this, term);
-            }
+            if (!possibleSub(i, term.sub(i))) { throw new TermCreationException(this, term); }
         }
     }
 
     @Override
     public void validTopLevelException(org.key_project.logic.Term term)
             throws TermCreationException {
-        if (1 != term.arity()) {
-            throw new TermCreationException(this, term);
-        }
+        if (1 != term.arity()) { throw new TermCreationException(this, term); }
 
-        if (1 != term.subs().size()) {
-            throw new TermCreationException(this, term);
-        }
+        if (1 != term.subs().size()) { throw new TermCreationException(this, term); }
 
-        if (!term.boundVars().isEmpty()) {
-            throw new TermCreationException(this, term);
-        }
+        if (!term.boundVars().isEmpty()) { throw new TermCreationException(this, term); }
 
-        if (term.sub(0) == null) {
-            throw new TermCreationException(this, term);
-        }
+        if (term.sub(0) == null) { throw new TermCreationException(this, term); }
 
         additionalValidTopLevel(term);
     }
 
     @Override
     public String toString() {
-        if (kind() instanceof ModalOperatorSV) {
-            return kind().toString();
-        }
+        if (kind() instanceof ModalOperatorSV) { return kind().toString(); }
         return super.toString();
     }
 

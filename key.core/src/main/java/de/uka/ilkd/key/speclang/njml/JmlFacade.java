@@ -29,8 +29,7 @@ import org.jspecify.annotations.NonNull;
  */
 public final class JmlFacade {
 
-    private JmlFacade() {
-    }
+    private JmlFacade() {}
 
     /**
      * Creates an JML lexer for the give stream.
@@ -87,9 +86,7 @@ public final class JmlFacade {
         } else {
             c = ctx.storeref();
         }
-        if (c == null) {
-            throw new NullPointerException();
-        }
+        if (c == null) { throw new NullPointerException(); }
         return c;
     }
 

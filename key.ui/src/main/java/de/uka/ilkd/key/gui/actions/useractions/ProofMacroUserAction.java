@@ -37,9 +37,7 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
 
     @Override
     protected void apply() {
-        if (mediator.isInAutoMode()) {
-            return;
-        }
+        if (mediator.isInAutoMode()) { return; }
         mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, pio);
     }
 }

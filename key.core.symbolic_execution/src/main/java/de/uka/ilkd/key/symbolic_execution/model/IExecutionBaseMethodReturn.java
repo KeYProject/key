@@ -25,7 +25,8 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      * Returns a human readable signature which describes this element.
      *
      * @return The human readable signature which describes this element.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getSignature() throws ProofInputException;
 

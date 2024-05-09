@@ -87,7 +87,7 @@ public class TestLocalSymbols {
 
         Term target = TacletForTests
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
-                    + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
+                        + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 
         Proof proof = new Proof("TestLocalSymbols", target, "n/a", TacletForTests.initConfig());
 
@@ -142,10 +142,7 @@ public class TestLocalSymbols {
     private void apply(Proof proof, NoPosTacletApp rule, int goalNo, int formulaNo) {
 
         ImmutableList<Goal> goals = proof.openGoals();
-        while (goalNo > 0) {
-            goals = goals.tail();
-            goalNo--;
-        }
+        while (goalNo > 0) { goals = goals.tail(); goalNo--; }
 
         Goal goal = goals.head();
 
@@ -164,7 +161,8 @@ public class TestLocalSymbols {
      * Loads the given proof file. Checks if the proof file exists and the proof is not null, and
      * fails if the proof could not be loaded.
      *
-     * @param proofFileName The file name of the proof file to load.
+     * @param proofFileName
+     *        The file name of the proof file to load.
      * @return The loaded proof.
      */
     private KeYEnvironment<?> loadProof(String proofFileName) {

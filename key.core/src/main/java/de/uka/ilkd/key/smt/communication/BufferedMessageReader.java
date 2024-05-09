@@ -44,8 +44,10 @@ class BufferedMessageReader {
     /**
      * Creates a new BufferedMessageReader wrapping the given Reader.
      *
-     * @param reader the Reader to wrap
-     * @param delimiters the delimiters, where incoming messages should be split
+     * @param reader
+     *        the Reader to wrap
+     * @param delimiters
+     *        the delimiters, where incoming messages should be split
      */
     public BufferedMessageReader(Reader reader, String[] delimiters) {
         this.reader = reader;
@@ -57,7 +59,8 @@ class BufferedMessageReader {
      * no message, it blocks until there is a further message or the stream has been closed.
      *
      * @return a string between two delimiters or until the EOF.
-     * @throws IOException if reading fails
+     * @throws IOException
+     *         if reading fails
      */
     public String readMessage() throws IOException {
 
@@ -69,9 +72,7 @@ class BufferedMessageReader {
                 if (endsWith(sb, delim)) {
                     String result = sb.substring(0, sb.length() - delim.length());
 
-                    if (!result.isEmpty()) {
-                        return result;
-                    }
+                    if (!result.isEmpty()) { return result; }
 
                     // if empty then continue with an empty buffer
                     sb.setLength(0);
@@ -94,23 +95,19 @@ class BufferedMessageReader {
      *
      * It is more efficient since no arrays must be copied ...
      *
-     * @param sb any non-null character sequence
-     * @param s the non-null string to check for
+     * @param sb
+     *        any non-null character sequence
+     * @param s
+     *        the non-null string to check for
      * @return true if sb ends in s.
      */
     private static boolean endsWith(CharSequence sb, String s) {
         int len = sb.length();
         int dlen = s.length();
 
-        if (len < dlen) {
-            return false;
-        }
+        if (len < dlen) { return false; }
 
-        for (int i = len - dlen, j = 0; i < len; i++, j++) {
-            if (sb.charAt(i) != s.charAt(j)) {
-                return false;
-            }
-        }
+        for (int i = len - dlen, j = 0; i < len; i++, j++) { if (sb.charAt(i) != s.charAt(j)) { return false; } }
 
         return true;
     }
@@ -121,7 +118,8 @@ class BufferedMessageReader {
      * The reader is read until its EOF.
      *
      * @return a string containing all text (including delimiters)
-     * @throws IOException if reading fails
+     * @throws IOException
+     *         if reading fails
      */
     public String drain() throws IOException {
         StringWriter sw = new StringWriter();

@@ -22,7 +22,8 @@ public interface TacletSetTranslation {
      * Builds the translation of the taclets given by calling the method
      * <code>setTacletSet()</code>.
      *
-     * @param sorts this sorts are used for the instantiation of generic types.
+     * @param sorts
+     *        this sorts are used for the instantiation of generic types.
      * @return returns the resulting formulae of the taclets. Each formula of the resulting set is
      *         associated with one taclet.
      */

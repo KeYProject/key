@@ -83,9 +83,7 @@ public final class QueryAxiom extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || o.getClass() != getClass()) {
-            return false;
-        }
+        if (o == null || o.getClass() != getClass()) { return false; }
         final QueryAxiom other = (QueryAxiom) o;
         return name.equals(other.name) && target.equals(other.target) && kjt.equals(other.kjt);
     }
@@ -159,9 +157,7 @@ public final class QueryAxiom extends ClassAxiom {
         Term update = null;
         int hc = 0;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            if (hc >= target.getHeapCount(services)) {
-                break;
-            }
+            if (hc >= target.getHeapCount(services)) { break; }
             Term u = tb.elementary(heap, tb.var(heapSVs.get(hc++)));
             if (update == null) {
                 update = u;
@@ -203,18 +199,12 @@ public final class QueryAxiom extends ClassAxiom {
         // create find
         final Term[] subs = new Term[target.arity()];
         int offset = 0;
-        for (SchemaVariable heapSV : heapSVs) {
-            subs[offset] = tb.var(heapSV);
-            offset++;
-        }
+        for (SchemaVariable heapSV : heapSVs) { subs[offset] = tb.var(heapSV); offset++; }
         if (!target.isStatic()) {
             subs[offset] = tb.var(selfSV);
             offset++;
         }
-        for (SchemaVariable paramSV : paramSVs) {
-            subs[offset] = tb.var(paramSV);
-            offset++;
-        }
+        for (SchemaVariable paramSV : paramSVs) { subs[offset] = tb.var(paramSV); offset++; }
         final Term find = tb.func(target, subs);
 
         // create replacewith
@@ -232,9 +222,7 @@ public final class QueryAxiom extends ClassAxiom {
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
             new RewriteTacletBuilder<>();
         tacletBuilder.setFind(find);
-        for (SchemaVariable heapSV : heapSVs) {
-            tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
-        }
+        for (SchemaVariable heapSV : heapSVs) { tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV); }
         if (!target.isStatic()) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
             tacletBuilder.setIfSequent(ifSeq);

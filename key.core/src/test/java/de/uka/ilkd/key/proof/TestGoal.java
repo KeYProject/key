@@ -73,13 +73,13 @@ public class TestGoal {
         assertEquals(1, proof.openGoals().size());
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("imp_right"),
             "Taclet Index of set back goal contains rule \"imp-right\" that were not "
-                + "there before");
+                    + "there before");
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("or_right"),
             "Taclet Index of set back goal contains rule \"or-right\"that were not "
-                + "there before");
+                    + "there before");
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("imp_left"),
             "Taclet Index of set back goal contains rule \"imp-left\" that were not "
-                + "there before");
+                    + "there before");
 
     }
 

@@ -70,8 +70,10 @@ public class ProofMacroMenu extends JMenu {
      * <p>
      * Only applicable macros are added as menu items.
      *
-     * @param mediator the mediator of the current proof.
-     * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
+     * @param mediator
+     *        the mediator of the current proof.
+     * @param posInOcc
+     *        the pos in occurrence, can be <code>null</code> if not available.
      */
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy Macros");
@@ -101,9 +103,7 @@ public class ProofMacroMenu extends JMenu {
                 addSeparator();
             }
 
-            for (JMenuItem item : items) {
-                add(item);
-            }
+            for (JMenuItem item : items) { add(item); }
         }
 
         {

@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
 
-
 public abstract class GUIAbstractTreeNode implements TreeNode {
 
     private final GUIProofTreeModel tree;
@@ -44,11 +43,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public abstract @NonNull String getSearchString();
 
     public int getIndex(TreeNode node) {
-        for (int i = 0; i < getChildCount(); i++) {
-            if (getChildAt(i).equals(node)) {
-                return i;
-            }
-        }
+        for (int i = 0; i < getChildCount(); i++) { if (getChildAt(i).equals(node)) { return i; } }
         return -1;
     }
 
@@ -65,17 +60,13 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         LinkedList<TreeNode> path = new LinkedList<>();
         TreeNode n = this;
         path.addFirst(n);
-        while ((n = n.getParent()) != null) {
-            path.addFirst(n);
-        }
+        while ((n = n.getParent()) != null) { path.addFirst(n); }
         return path.toArray(new TreeNode[0]);
     }
 
     protected TreeNode findBranch(Node p_node) {
         TreeNode res = getProofTreeModel().findBranch(p_node);
-        if (res != null) {
-            return res;
-        }
+        if (res != null) { return res; }
 
         String label = ensureBranchLabelIsSet(p_node);
 
@@ -121,20 +112,14 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     }
 
     protected Node findChild(Node n) {
-        if (n.childrenCount() == 1) {
-            return n.child(0);
-        }
+        if (n.childrenCount() == 1) { return n.child(0); }
 
-        if (!getProofTreeModel().globalFilterActive()) {
-            return null;
-        }
+        if (!getProofTreeModel().globalFilterActive()) { return null; }
 
         Node nextN = null;
         for (int i = 0; i != n.childrenCount(); ++i) {
             if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
-                if (nextN != null) {
-                    return null;
-                }
+                if (nextN != null) { return null; }
                 nextN = n.child(i);
             }
         }

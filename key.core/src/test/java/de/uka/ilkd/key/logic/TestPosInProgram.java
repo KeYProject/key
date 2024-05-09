@@ -46,17 +46,14 @@ class TestPosInProgram {
     }
 
     @Test
-    void getProgramAt() {
-    }
+    void getProgramAt() {}
 
     @ParameterizedTest(name = "{index}: ==> (0)")
     @MethodSource("validPositions")
     void depth(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
         assertEquals(0, pip.depth(), "Wrong top position");
-        for (int po : pos) {
-            pip = pip.down(po);
-        }
+        for (int po : pos) { pip = pip.down(po); }
         assertEquals(pos.length, pip.depth(), "Wrong position depth for " + Arrays.toString(pos));
     }
 
@@ -72,9 +69,7 @@ class TestPosInProgram {
 
     private static PosInProgram getPiPFor(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
-        for (int po : pos) {
-            pip = pip.down(po);
-        }
+        for (int po : pos) { pip = pip.down(po); }
         return pip;
     }
 
@@ -94,11 +89,7 @@ class TestPosInProgram {
     @MethodSource("validPositions")
     void up(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
-        for (int po : pos) {
-            PosInProgram pipTmp = pip.down(po);
-            assertEquals(pip, pipTmp.up());
-            pip = pipTmp;
-        }
+        for (int po : pos) { PosInProgram pipTmp = pip.down(po); assertEquals(pip, pipTmp.up()); pip = pipTmp; }
 
         for (int i = pip.depth() - 1; i >= 0; i--) {
             int lastPos = pip.last();
@@ -119,12 +110,8 @@ class TestPosInProgram {
         assertEquals(pip4, PosInProgram.TOP.append(pip4));
 
         final PosInProgram both = pip4.append(pip5);
-        for (int i = 0; i < pip4.depth(); i++) {
-            assertEquals(validPositions()[4][i], both.get(i));
-        }
-        for (int i = 0; i < pip5.depth(); i++) {
-            assertEquals(validPositions()[5][i], both.get(i + pip4.depth()));
-        }
+        for (int i = 0; i < pip4.depth(); i++) { assertEquals(validPositions()[4][i], both.get(i)); }
+        for (int i = 0; i < pip5.depth(); i++) { assertEquals(validPositions()[5][i], both.get(i + pip4.depth())); }
     }
 
     @Test
@@ -142,9 +129,7 @@ class TestPosInProgram {
             assertEquals(validPositions()[5][i], both.get(i),
                 "Invalid content at index " + i + ":" + both);
         }
-        for (int i = 0; i < pip4.depth(); i++) {
-            assertEquals(validPositions()[4][i], both.get(i + pip5.depth()));
-        }
+        for (int i = 0; i < pip4.depth(); i++) { assertEquals(validPositions()[4][i], both.get(i + pip5.depth())); }
         assertEquals(both, pip5.append(pip4));
     }
 
@@ -201,9 +186,7 @@ class TestPosInProgram {
     @Test
     void getInsindeBounds() {
         final PosInProgram pip5 = getPiPFor(validPositions()[5]);
-        for (int i = 0; i < pip5.depth(); i++) {
-            assertEquals(validPositions()[5][i], pip5.get(i));
-        }
+        for (int i = 0; i < pip5.depth(); i++) { assertEquals(validPositions()[5][i], pip5.get(i)); }
     }
 
     @Test

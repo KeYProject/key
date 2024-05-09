@@ -83,9 +83,7 @@ public class TestKeYWatchpointGlobalVariablesOnSatisfiable
         } finally {
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);
-            if (env != null) {
-                env.dispose();
-            }
+            if (env != null) { env.dispose(); }
         }
     }
 }

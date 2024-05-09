@@ -54,7 +54,8 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
     /**
      *
-     * @param occurrence an occurrence.
+     * @param occurrence
+     *        an occurrence.
      * @return {@code true} iff the occurrence is not at the top level in the succedent.
      */
     protected static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence) {
@@ -64,14 +65,14 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     /**
      * Adds {@code pv} to the {@code sevices}' program variable namespace.
      *
-     * @param pv a variable.
-     * @param services services.
+     * @param pv
+     *        a variable.
+     * @param services
+     *        services.
      */
     protected static void register(ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
-        if (pv != null && progVarNames.lookup(pv.name()) == null) {
-            progVarNames.addSafely(pv);
-        }
+        if (pv != null && progVarNames.lookup(pv.name()) == null) { progVarNames.addSafely(pv); }
     }
 
     /**
@@ -88,14 +89,16 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
     /**
      *
-     * @param inst the last instantiation.
+     * @param inst
+     *        the last instantiation.
      * @see #getLastInstantiation()
      */
     protected abstract void setLastInstantiation(Instantiation inst);
 
     /**
      *
-     * @param formula the last focus term.
+     * @param formula
+     *        the last focus term.
      * @see #getLastFocusTerm()
      */
     protected abstract void setLastFocusTerm(Term formula);
@@ -117,8 +120,10 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
     /**
      *
-     * @param localOuts a set of variables.
-     * @param services services.
+     * @param localOuts
+     *        a set of variables.
+     * @param services
+     *        services.
      * @return an anonymizing update for the specified variables.
      */
     protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
@@ -142,9 +147,12 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
     /**
      *
-     * @param nameBase a base name.
-     * @param type a type.
-     * @param services services.
+     * @param nameBase
+     *        a base name.
+     * @param type
+     *        a type.
+     * @param services
+     *        services.
      * @return a new local variable with the specified base name of the specified type.
      */
     protected static ProgramVariable createLocalVariable(final String nameBase,
@@ -156,17 +164,24 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     /**
      * This encapsulates all information from the rule application that is needed to apply the rule.
      *
-     * @param update    The context update.
-     * @param formula   The update target.
-     * @param modality  The contract's modality.
-     * @param self      The self variable.
-     * @param statement The statement the contract belongs to.
-     * @param context   The execution context in which the block occurs.
+     * @param update
+     *        The context update.
+     * @param formula
+     *        The update target.
+     * @param modality
+     *        The contract's modality.
+     * @param self
+     *        The self variable.
+     * @param statement
+     *        The statement the contract belongs to.
+     * @param context
+     *        The execution context in which the block occurs.
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
-        public record Instantiation(@NonNull Term update, @NonNull Term formula, @NonNull Modality modality, Term self,
-                                    @NonNull JavaStatement statement,
-                                    ExecutionContext context) {
+    public record Instantiation(
+            @NonNull Term update, @NonNull Term formula, @NonNull Modality modality, Term self,
+            @NonNull JavaStatement statement,
+            ExecutionContext context) {
         public Instantiation {
             assert update != null;
             assert update.sort() == JavaDLTheory.UPDATE;
@@ -176,13 +191,13 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             assert statement != null;
         }
 
-            /**
-             * @return {@code true} iff the modality is transactional.
-             */
-            public boolean isTransactional() {
-                return modality.transaction();
-            }
+        /**
+         * @return {@code true} iff the modality is transactional.
+         */
+        public boolean isTransactional() {
+            return modality.transaction();
         }
+    }
 
     /**
      * A builder for {@link Instantiation}s.
@@ -206,9 +221,12 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
         /**
          *
-         * @param formula the formula on which the rule is to be applied.
-         * @param goal the current goal.
-         * @param services services.
+         * @param formula
+         *        the formula on which the rule is to be applied.
+         * @param goal
+         *        the current goal.
+         * @param services
+         *        services.
          */
         public Instantiator(final Term formula, final Goal goal, final Services services) {
             this.formula = formula;
@@ -223,15 +241,11 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         public Instantiation instantiate() {
             final Term update = extractUpdate();
             final Term target = extractUpdateTarget();
-            if (!(target.op() instanceof Modality modality)) {
-                return null;
-            }
+            if (!(target.op() instanceof Modality modality)) { return null; }
             final JavaStatement statement =
                 getFirstStatementInPrefixWithAtLeastOneApplicableContract(modality,
                     goal);
-            if (statement == null) {
-                return null;
-            }
+            if (statement == null) { return null; }
             final MethodFrame frame =
                 JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
             final Term self = extractSelf(frame);
@@ -266,31 +280,31 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
         /**
          *
-         * @param frame the outermost method-frame used in the formula.
+         * @param frame
+         *        the outermost method-frame used in the formula.
          * @return the self term.
          */
         private Term extractSelf(final MethodFrame frame) {
-            if (frame == null) {
-                return null;
-            }
+            if (frame == null) { return null; }
             return MiscTools.getSelfTerm(frame, services);
         }
 
         /**
          *
-         * @param frame the outermost method-frame used in the formula.
+         * @param frame
+         *        the outermost method-frame used in the formula.
          * @return the execution context.
          */
         private static ExecutionContext extractExecutionContext(final MethodFrame frame) {
-            if (frame == null) {
-                return null;
-            }
+            if (frame == null) { return null; }
             return (ExecutionContext) frame.getExecutionContext();
         }
 
         /**
-         * @param modality the contract's modality.
-         * @param goal the current goal.
+         * @param modality
+         *        the contract's modality.
+         * @param goal
+         *        the current goal.
          * @return the first block in the java block's prefix with at least one applicable contract.
          */
         private JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
@@ -320,10 +334,14 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         }
 
         /**
-         * @param services services.
-         * @param element a block or loop.
-         * @param modalityKind the current goal's modality kind.
-         * @param goal the current goal.
+         * @param services
+         *        services.
+         * @param element
+         *        a block or loop.
+         * @param modalityKind
+         *        the current goal's modality kind.
+         * @param goal
+         *        the current goal.
          * @return {@code true} iff the block has applicable contracts.
          */
         protected abstract boolean hasApplicableContracts(final Services services,

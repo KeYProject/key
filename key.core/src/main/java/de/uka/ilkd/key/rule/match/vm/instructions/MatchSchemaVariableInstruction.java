@@ -34,9 +34,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
     protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
             Services services) {
 
-        if (op.isRigid() && !term.isRigid()) {
-            return null;
-        }
+        if (op.isRigid() && !term.isRigid()) { return null; }
 
         final SVInstantiations inst = matchCond.getInstantiations();
 
@@ -61,10 +59,13 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
      * {@link ProgramElement} {@code instantiationCandidate} w.r.t. the given constraints by
      * {@link MatchConditions}
      *
-     * @param instantiationCandidate the {@link ProgramElement} to be matched
-     * @param mc the {@link MatchConditions} with additional constraints (e.g. previous matches of
+     * @param instantiationCandidate
+     *        the {@link ProgramElement} to be matched
+     * @param mc
+     *        the {@link MatchConditions} with additional constraints (e.g. previous matches of
      *        this instructions {@link SchemaVariable})
-     * @param services the {@link Services}
+     * @param services
+     *        the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair ({@link SchemaVariable}, {@link ProgramElement}) added
      */

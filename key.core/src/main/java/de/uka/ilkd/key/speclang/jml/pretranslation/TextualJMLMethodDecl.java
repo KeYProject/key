@@ -45,8 +45,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         String paramsString = methodDefinition.param_list().param_decl().stream()
                 .map(it -> (it.NULLABLE() != null ? "/*@ nullable @*/"
                         : it.NON_NULL() != null ? "/*@ non_null @*/" : "")
-                    + " " + it.typespec().getText() + " " + it.p.getText()
-                    + StringUtil.repeat("[]", it.LBRACKET().size()))
+                        + " " + it.typespec().getText() + " " + it.p.getText()
+                        + StringUtil.repeat("[]", it.LBRACKET().size()))
                 .collect(Collectors.joining(","));
         return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
             getMethodName(), paramsString);
@@ -71,12 +71,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
         return Objects.equals(methodDefinition, that.methodDefinition);
     }
@@ -87,12 +83,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     public int getStateCount() {
-        if (mods.contains(JMLModifier.TWO_STATE)) {
-            return 2;
-        }
-        if (mods.contains(JMLModifier.NO_STATE)) {
-            return 0;
-        }
+        if (mods.contains(JMLModifier.TWO_STATE)) { return 2; }
+        if (mods.contains(JMLModifier.NO_STATE)) { return 0; }
         return 1;
     }
 

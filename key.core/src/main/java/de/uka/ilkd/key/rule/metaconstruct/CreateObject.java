@@ -23,7 +23,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class CreateObject extends ProgramTransformer {
 
     /**
-     * @param newExpr The {@link ProgramElement}
+     * @param newExpr
+     *        The {@link ProgramElement}
      */
     public CreateObject(ProgramElement newExpr) {
         super("create-object", newExpr);

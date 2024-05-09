@@ -13,6 +13,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Arne Keller
  */
+@SuppressWarnings("nullness")
 public final class EqualsModProofIrrelevancyUtil {
     private EqualsModProofIrrelevancyUtil() {
 
@@ -21,51 +22,39 @@ public final class EqualsModProofIrrelevancyUtil {
     /**
      * Compare two arrays using the elements' {@link EqualsModProofIrrelevancy} implementation.
      *
-     * @param a first array
-     * @param b second array
+     * @param a
+     *        first array
+     * @param b
+     *        second array
      * @return whether they are equal (same length, equal elements)
      */
     public static boolean compareArrays(EqualsModProofIrrelevancy[] a,
             EqualsModProofIrrelevancy[] b) {
-        if (a == b) {
-            return true;
-        }
+        if (a == b) { return true; }
 
-        if (a.length != b.length) {
-            return false;
-        }
+        if (a.length != b.length) { return false; }
 
-        for (int i = 0; i < b.length; i++) {
-            if (!(b[i]).equalsModProofIrrelevancy(a[i])) {
-                return false;
-            }
-        }
+        for (int i = 0; i < b.length; i++) { if (!(b[i]).equalsModProofIrrelevancy(a[i])) { return false; } }
         return true;
     }
 
     /**
      * Compare two arrays using the elements' {@link EqualsModProofIrrelevancy} implementation.
      *
-     * @param a first array
-     * @param b second array
+     * @param a
+     *        first array
+     * @param b
+     *        second array
      * @return whether they are equal (same length, equal elements)
      */
     public static boolean compareImmutableArrays(
             ImmutableArray<? extends EqualsModProofIrrelevancy> a,
             ImmutableArray<? extends EqualsModProofIrrelevancy> b) {
-        if (a == b) {
-            return true;
-        }
+        if (a == b) { return true; }
 
-        if (a.size() != b.size()) {
-            return false;
-        }
+        if (a.size() != b.size()) { return false; }
 
-        for (int i = 0; i < b.size(); i++) {
-            if (!(b.get(i)).equalsModProofIrrelevancy(a.get(i))) {
-                return false;
-            }
-        }
+        for (int i = 0; i < b.size(); i++) { if (!(b.get(i)).equalsModProofIrrelevancy(a.get(i))) { return false; } }
         return true;
     }
 
@@ -73,14 +62,13 @@ public final class EqualsModProofIrrelevancyUtil {
      * Compute the hashcode of an iterable using the elements' {@link EqualsModProofIrrelevancy}
      * implementation.
      *
-     * @param iter iterable of elements
+     * @param iter
+     *        iterable of elements
      * @return combined hashcode
      */
     public static int hashCodeIterable(Iterable<? extends EqualsModProofIrrelevancy> iter) {
         // adapted from Arrays.hashCode
-        if (iter == null) {
-            return 0;
-        }
+        if (iter == null) { return 0; }
 
         int result = 1;
 
@@ -96,26 +84,22 @@ public final class EqualsModProofIrrelevancyUtil {
      * implementation.
      * A null list is considered equal to a zero-sized list.
      *
-     * @param a first list
-     * @param b second list
+     * @param a
+     *        first list
+     * @param b
+     *        second list
      * @return whether they are equal (same length, equal elements)
      */
     public static boolean compareImmutableLists(
             ImmutableList<? extends EqualsModProofIrrelevancy> a,
             ImmutableList<? extends EqualsModProofIrrelevancy> b) {
-        if (a == b || (a == null && b.size() == 0) || (b == null && a.size() == 0)) {
-            return true;
-        }
-        if (a == null || b == null || (a.size() != b.size())) {
-            return false;
-        }
+        if (a == b || (a == null && b.size() == 0) || (b == null && a.size() == 0)) { return true; }
+        if (a == null || b == null || (a.size() != b.size())) { return false; }
         ImmutableList<? extends EqualsModProofIrrelevancy> remainderToCompare = a;
         while (!remainderToCompare.isEmpty()) {
             EqualsModProofIrrelevancy obj1 = remainderToCompare.head();
             Object obj2 = b.head();
-            if (!(obj1).equalsModProofIrrelevancy(obj2)) {
-                return false;
-            }
+            if (!(obj1).equalsModProofIrrelevancy(obj2)) { return false; }
             remainderToCompare = remainderToCompare.tail();
             b = b.tail();
         }
@@ -127,20 +111,17 @@ public final class EqualsModProofIrrelevancyUtil {
      * {@link EqualsModProofIrrelevancy}
      * implementation.
      *
-     * @param list list of elements
+     * @param list
+     *        list of elements
      * @return combined hashcode
      */
     public static int hashCodeImmutableList(
             ImmutableList<? extends EqualsModProofIrrelevancy> list) {
-        if (list == null) {
-            return 0;
-        }
+        if (list == null) { return 0; }
         var hashcode = Objects.hash(list.size());
         while (!list.isEmpty()) {
-            if (list.head() != null) {
-                hashcode = Objects.hash(hashcode,
-                    (list.head()).hashCodeModProofIrrelevancy());
-            }
+            if (list.head() != null) { hashcode = Objects.hash(hashcode,
+                (list.head()).hashCodeModProofIrrelevancy()); }
             list = list.tail();
         }
         return hashcode;

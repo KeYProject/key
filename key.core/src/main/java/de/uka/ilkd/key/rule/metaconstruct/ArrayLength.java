@@ -14,7 +14,8 @@ public class ArrayLength extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param expr the instance of expression contained by the meta construct
+     * @param expr
+     *        the instance of expression contained by the meta construct
      */
     public ArrayLength(Expression expr) {
         super("#length-reference", expr);

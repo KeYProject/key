@@ -46,8 +46,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     // constructors
     // -------------------------------------------------------------------------
 
-    private UseDependencyContractRule() {
-    }
+    private UseDependencyContractRule() {}
 
 
     // -------------------------------------------------------------------------
@@ -58,9 +57,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final List<Term> result = new LinkedList<>();
         for (SequentFormula cf : seq.antecedent()) {
             final Term formula = cf.formula();
-            if (formula.op() instanceof Equality && formula.sub(1).equals(term)) {
-                result.add(formula.sub(0));
-            }
+            if (formula.op() instanceof Equality && formula.sub(1).equals(term)) { result.add(formula.sub(0)); }
         }
         return result;
     }
@@ -102,11 +99,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             return true;
         } else if (op.arity() == 0) {
             final List<Term> defs = getEqualityDefs(heapTerm, seq);
-            for (Term def : defs) {
-                if (hasRawSteps(def, seq, services)) {
-                    return true;
-                }
-            }
+            for (Term def : defs) { if (hasRawSteps(def, seq, services)) { return true; } }
             return false;
         } else {
             return false;
@@ -126,9 +119,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             getRawSteps(h, seq, services, result);
         } else if (op.arity() == 0) {
             final List<Term> defs = getEqualityDefs(heapTerm, seq);
-            for (Term def : defs) {
-                getRawSteps(def, seq, services, result);
-            }
+            for (Term def : defs) { getRawSteps(def, seq, services, result); }
         }
     }
 
@@ -149,9 +140,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 final PosInOccurrence defHeapPos = def.second.down(0);
                 assert defHeapPos.subTerm().equals(def.first);
                 final PosInOccurrence pos = getFreshLocsStep(defHeapPos, seq, services);
-                if (pos != null) {
-                    return pos;
-                }
+                if (pos != null) { return pos; }
             }
             return null;
         } else {
@@ -206,9 +195,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     public static boolean isBaseOcc(Term focus, Term candidate) {
-        if (!candidate.op().equals(focus.op())) {
-            return false;
-        }
+        if (!candidate.op().equals(focus.op())) { return false; }
         for (int i = 1, n = candidate.arity(); i < n; i++) {
             if (!(candidate.sub(i).equalsModProperty(focus.sub(i), IRRELEVANT_TERM_LABELS_PROPERTY)
                     || candidate.sub(i).op() instanceof LogicVariable)) {
@@ -222,12 +209,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     private static void collectBaseOccsHelper(Term focus, PosInOccurrence pos,
             Map<Term, PosInOccurrence> result) {
         final Term candidate = pos.subTerm();
-        if (isBaseOcc(focus, candidate)) {
-            result.put(candidate.sub(0), pos);
-        }
-        for (int i = 0, n = candidate.arity(); i < n; i++) {
-            collectBaseOccsHelper(focus, pos.down(i), result);
-        }
+        if (isBaseOcc(focus, candidate)) { result.put(candidate.sub(0), pos); }
+        for (int i = 0, n = candidate.arity(); i < n; i++) { collectBaseOccsHelper(focus, pos.down(i), result); }
     }
 
 
@@ -277,9 +260,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 // filter steps
                 for (Term rawStep : rawSteps) {
                     final PosInOccurrence step = baseOccs.get(rawStep);
-                    if (step != null) {
-                        result.add(step);
-                    }
+                    if (step != null) { result.add(step); }
                 }
             }
         }
@@ -290,11 +271,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     public static PosInOccurrence findStepInIfInsts(List<PosInOccurrence> steps,
             UseDependencyContractApp app, TermServices services) {
-        for (PosInOccurrence pio : app.ifInsts()) {
-            if (steps.contains(pio)) {
-                return pio;
-            }
-        }
+        for (PosInOccurrence pio : app.ifInsts()) { if (steps.contains(pio)) { return pio; } }
         return null;
     }
 
@@ -307,9 +284,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         ImmutableSet<Contract> result =
             services.getSpecificationRepository().getContracts(kjt, target);
         for (Contract contract : result) {
-            if (!(contract instanceof DependencyContract)) {
-                result = result.remove(contract);
-            }
+            if (!(contract instanceof DependencyContract)) { result = result.remove(contract); }
         }
         return result;
     }
@@ -321,25 +296,17 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null) {
-            return false;
-        }
+        if (pio == null) { return false; }
 
         // top level symbol must be observer
         final Term focus = pio.subTerm();
-        if (!(focus.op() instanceof IObserverFunction target)) {
-            return false;
-        }
+        if (!(focus.op() instanceof IObserverFunction target)) { return false; }
 
         // there must not be free variables in the focus term
-        if (!focus.freeVars().isEmpty()) {
-            return false;
-        }
+        if (!focus.freeVars().isEmpty()) { return false; }
 
         // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) {
-            return false;
-        }
+        if (Transformer.inTransformer(pio)) { return false; }
 
         // heap term of observer must be store-term (or anon, create,
         // memset, ...)
@@ -352,31 +319,23 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 break;
             }
         }
-        if (!hasRawSteps) {
-            return false;
-        }
+        if (!hasRawSteps) { return false; }
         // there must be contracts for the observer
         final KeYJavaType kjt = target.isStatic() ? target.getContainerType()
                 : services.getJavaInfo().getKeYJavaType(
                     focus.sub(target.getHeapCount(services) * target.getStateCount()).sort());
         assert kjt != null : "could not determine receiver type for " + focus;
-        if (kjt.getSort() instanceof NullSort) {
-            return false;
-        }
+        if (kjt.getSort() instanceof NullSort) { return false; }
         final ImmutableSet<Contract> contracts = getApplicableContracts(services, kjt, target);
-        if (contracts.isEmpty()) {
-            return false;
-        }
+        if (contracts.isEmpty()) { return false; }
 
         // applying a contract here must not create circular dependencies
         // between proofs
         return goal.proof().mgt().isContractApplicable(contracts.iterator().next());
     }
 
-
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         // collect information
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final PosInOccurrence pio = ruleApp.posInOccurrence();
@@ -413,13 +372,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
         Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         int i = 0;
         for (LocationVariable heap : heaps) {
-            if (i >= obsHeapCount) {
-                break;
-            }
+            if (i >= obsHeapCount) { break; }
             heapTerms.put(heap, step.subTerm().sub(2 * i));
-            if (twoState) {
-                atPres.put(heap, step.subTerm().sub(2 * i + 1));
-            }
+            if (twoState) { atPres.put(heap, step.subTerm().sub(2 * i + 1)); }
             i++;
         }
         final Term mby =
@@ -437,9 +392,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         ImmutableList<PosInOccurrence> ifInsts = ImmutableSLList.nil();
         int hc = 0;
         for (LocationVariable heap : heaps) {
-            if (hc >= obsHeapCount) {
-                break;
-            }
+            if (hc >= obsHeapCount) { break; }
             for (boolean atPre : twoState ? new boolean[] { false, true }
                     : new boolean[] { false }) {
                 // get changed locs and used equalities
@@ -484,9 +437,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 if (!useful && !changedLocs.first.op().equals(locSetLDT.getEmpty())) {
                     final ImmutableSet<Term> changed =
                         addEqualDefs(TB.unionToSet(changedLocs.first), goal);
-                    if (!changed.contains(dep)) {
-                        useful = true;
-                    }
+                    if (!changed.contains(dep)) { useful = true; }
                 } else {
                     useful = true;
                 }
@@ -516,9 +467,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 .getInitConfig().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
 
-        if (!useful) {
-            return goal.split(1);
-        }
+        if (!useful) { return goal.split(1); }
 
         // prepare cut formula
         final ContractPO po =

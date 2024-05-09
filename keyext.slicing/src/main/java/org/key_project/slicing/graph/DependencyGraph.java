@@ -61,7 +61,8 @@ public class DependencyGraph {
     /**
      * Ensure the provided proof is fully represented in this dependency graph.
      *
-     * @param p the proof
+     * @param p
+     *        the proof
      */
     public void ensureProofIsTracked(Proof p) {
         if (!edgeDataReversed.keySet().stream().findFirst().map(x -> x.proof() == p).orElse(true)) {
@@ -71,9 +72,7 @@ public class DependencyGraph {
         var nodeIterator = p.root().subtreeIterator();
         while (nodeIterator.hasNext()) {
             var node = nodeIterator.next();
-            if (node.getAppliedRuleApp() == null || edgeDataReversed.containsKey(node)) {
-                continue;
-            }
+            if (node.getAppliedRuleApp() == null || edgeDataReversed.containsKey(node)) { continue; }
             tracker.trackNode(node);
         }
     }
@@ -81,10 +80,13 @@ public class DependencyGraph {
     /**
      * Add a rule application to the dependency graph.
      *
-     * @param node the node to add
-     * @param input inputs required by this proof step
+     * @param node
+     *        the node to add
+     * @param input
+     *        inputs required by this proof step
      *        (pairs of graph node + whether the rule app consumes the node)
-     * @param output outputs produced by this proof step
+     * @param output
+     *        outputs produced by this proof step
      */
     public void addRuleApplication(Node node, Collection<Pair<GraphNode, Boolean>> input,
             Collection<GraphNode> output) {
@@ -102,7 +104,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param node a graph node
+     * @param node
+     *        a graph node
      * @return whether the graph contains that node
      */
     public boolean containsNode(GraphNode node) {
@@ -110,53 +113,50 @@ public class DependencyGraph {
     }
 
     /**
-     * @param node a graph node
+     * @param node
+     *        a graph node
      * @return the rule application(s) that produced the graph node, if any
      */
     public Stream<Node> incomingEdgesOf(GraphNode node) {
-        if (!graph.containsVertex(node)) {
-            return Stream.of();
-        }
+        if (!graph.containsVertex(node)) { return Stream.of(); }
         return graph.incomingEdgesOf(node).stream().map(AnnotatedEdge::getProofStep);
     }
 
     /**
-     * @param node a graph node
+     * @param node
+     *        a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
     public Stream<Triple<Node, GraphNode, AnnotatedEdge>> incomingGraphEdgesOf(GraphNode node) {
-        if (!graph.containsVertex(node)) {
-            return Stream.of();
-        }
+        if (!graph.containsVertex(node)) { return Stream.of(); }
         return graph.incomingEdgesOf(node).stream()
                 .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeSource(edge), edge));
     }
 
     /**
-     * @param node a graph node
+     * @param node
+     *        a graph node
      * @return the rule application(s) that used the graph node, if any
      */
     public Stream<Node> outgoingEdgesOf(GraphNode node) {
-        if (!graph.containsVertex(node)) {
-            return Stream.of();
-        }
+        if (!graph.containsVertex(node)) { return Stream.of(); }
         return graph.outgoingEdgesOf(node).stream().map(AnnotatedEdge::getProofStep);
     }
 
     /**
-     * @param node a graph node
+     * @param node
+     *        a graph node
      * @return the outgoing (graph edges, graph targets) of that node
      */
     public Stream<Triple<Node, GraphNode, AnnotatedEdge>> outgoingGraphEdgesOf(GraphNode node) {
-        if (!graph.containsVertex(node)) {
-            return Stream.of();
-        }
+        if (!graph.containsVertex(node)) { return Stream.of(); }
         return graph.outgoingEdgesOf(node).stream()
                 .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
     }
 
     /**
-     * @param location branch location
+     * @param location
+     *        branch location
      * @return graph nodes created in that branch (and descendent branches)
      */
     public Stream<GraphNode> nodesInBranch(BranchLocation location) {
@@ -165,7 +165,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param location branch location
+     * @param location
+     *        branch location
      * @return closed goals in that branch and descendents
      */
     public Stream<ClosedGoal> goalsInBranch(BranchLocation location) {
@@ -186,7 +187,8 @@ public class DependencyGraph {
      * Process a prune of the proof tree.
      * Deletes graph data that belongs to removed steps.
      *
-     * @param pruneTarget the node up to which the prune occurs
+     * @param pruneTarget
+     *        the node up to which the prune occurs
      */
     public void prune(Node pruneTarget) {
         // prune event specifies the node pruned to
@@ -214,7 +216,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param node graph node
+     * @param node
+     *        graph node
      * @return neighbors of that graph node (all nodes connected by incoming or outgoing edge)
      */
     public Stream<GraphNode> neighborsOf(GraphNode node) {
@@ -227,7 +230,8 @@ public class DependencyGraph {
      * Gets all the edges representing the supplied proof step.
      * The combination of these represents the hyperedge corresponding to the proof step.
      *
-     * @param proofStep the proof step
+     * @param proofStep
+     *        the proof step
      * @return the edges representing this step
      */
     public Collection<AnnotatedEdge> edgesOf(Node proofStep) {
@@ -235,7 +239,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param edge a graph edge
+     * @param edge
+     *        a graph edge
      * @return source node of this edge
      */
     public GraphNode inputOf(AnnotatedEdge edge) {
@@ -243,7 +248,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param edge a graph edge
+     * @param edge
+     *        a graph edge
      * @return target node of this edge
      */
     public GraphNode outputOf(AnnotatedEdge edge) {
@@ -251,7 +257,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param proofStep a proof step
+     * @param proofStep
+     *        a proof step
      * @return the graph nodes required by that step
      */
     public Stream<GraphNode> inputsOf(Node proofStep) {
@@ -259,7 +266,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param proofStep a proof step
+     * @param proofStep
+     *        a proof step
      * @return the graph nodes created by that step
      */
     public Stream<GraphNode> outputsOf(Node proofStep) {
@@ -267,7 +275,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param proofStep a proof step
+     * @param proofStep
+     *        a proof step
      * @return the graph nodes replaced by this proof step (only formulas)
      */
     public Stream<GraphNode> inputsConsumedBy(Node proofStep) {
@@ -276,7 +285,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param node graph node
+     * @param node
+     *        graph node
      * @return the outgoing edges of that node
      */
     public Stream<AnnotatedEdge> edgesUsing(GraphNode node) {
@@ -284,7 +294,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param node graph node
+     * @param node
+     *        graph node
      * @return the edge(s) whose proof steps replace this graph node
      */
     public Stream<AnnotatedEdge> edgesConsuming(GraphNode node) {
@@ -294,7 +305,8 @@ public class DependencyGraph {
     }
 
     /**
-     * @param node graph node
+     * @param node
+     *        graph node
      * @return edges leading to this graph node (proof steps that produced this node)
      */
     public Stream<AnnotatedEdge> edgesProducing(GraphNode node) {
@@ -323,41 +335,37 @@ public class DependencyGraph {
     /**
      * Return the graph node and any previous derivations of it in the same branch.
      *
-     * @param node graph node
+     * @param node
+     *        graph node
      * @return passed graph node and equivalent nodes
      */
     public Collection<GraphNode> nodeAndPreviousDerivations(GraphNode node) {
         Collection<GraphNode> all = new ArrayList<>();
         all.add(node);
-        if (node instanceof EqualsModProofIrrelevancy) {
-            all = graph.getVerticesModProofIrrelevancy(node);
-        }
+        if (node instanceof EqualsModProofIrrelevancy) { all = graph.getVerticesModProofIrrelevancy(node); }
         return all;
     }
 
     /**
      * Get the graph node of the provided PosInOccurence.
      *
-     * @param proof the proof
-     * @param locationGuess best guess for the branch the formula was derived in
+     * @param proof
+     *        the proof
+     * @param locationGuess
+     *        best guess for the branch the formula was derived in
      *        (allowed to be more specific than the correct branch location)
-     * @param pio formula
+     * @param pio
+     *        formula
      * @return graph node, null if not found
      */
     public GraphNode getGraphNode(Proof proof, BranchLocation locationGuess, PosInOccurrence pio) {
-        if (proof == null) {
-            return null;
-        }
+        if (proof == null) { return null; }
         while (true) {
             TrackedFormula formula =
                 new TrackedFormula(pio.sequentFormula(), locationGuess, pio.isInAntec(),
                     proof.getServices());
-            if (containsNode(formula)) {
-                return formula;
-            }
-            if (locationGuess.isEmpty()) {
-                break;
-            }
+            if (containsNode(formula)) { return formula; }
+            if (locationGuess.isEmpty()) { break; }
             // remove last branch choice
             locationGuess = locationGuess.removeLast();
         }
@@ -384,27 +392,21 @@ public class DependencyGraph {
         for (var node : toCheck) {
             var incoming = nGraph.incomingGraphEdgesOf(node).toList();
             var outgoing = nGraph.outgoingGraphEdgesOf(node).toList();
-            if (incoming.size() != 1 || outgoing.size() != 1) {
-                continue;
-            }
+            if (incoming.size() != 1 || outgoing.size() != 1) { continue; }
             // we want to remove the incoming edge.
             // that edge is part of a node startNode,
             // whose hyperedge should not connect more nodes
             // (otherwise we cannot remove the edge without
             // making the graph inconsistent)
             Node startNode = incoming.get(0).first;
-            if (edgesOf(startNode).size() != 1) {
-                continue;
-            }
+            if (edgesOf(startNode).size() != 1) { continue; }
             GraphNode startGraphNode = incoming.get(0).second;
             AnnotatedEdge edge = incoming.get(0).third;
 
             // get real initial node
             // (in case of repeated shortenings)
             Node initialNode = startNode;
-            if (edge instanceof AnnotatedShortenedEdge ase) {
-                initialNode = ase.getInitial();
-            }
+            if (edge instanceof AnnotatedShortenedEdge ase) { initialNode = ase.getInitial(); }
 
             // we want to remove the outgoing edge.
             // that edge is part of a node endNode,
@@ -414,9 +416,7 @@ public class DependencyGraph {
             Node endNode = outgoing.get(0).first;
             GraphNode endGraphNode = outgoing.get(0).second;
             var edge2 = outgoing.get(0).third;
-            if (edgesOf(endNode).size() != 1) {
-                continue;
-            }
+            if (edgesOf(endNode).size() != 1) { continue; }
 
             // situation:
             // startGraphNode ---> node ---> endGraphNode

@@ -72,15 +72,11 @@ public final class RunAllProofsTestUnit implements Serializable {
         List<TestResult> testResults;
 
         boolean verbose = settings.getVerboseOutput();
-        if (verbose) {
-            LOGGER.info("Running test " + testName);
-        }
+        if (verbose) { LOGGER.info("Running test " + testName); }
 
         boolean ignoreTest = settings.getIgnoreTest();
         if (ignoreTest) {
-            if (verbose) {
-                LOGGER.info("... ignoring this test due to 'ignore=true' in file");
-            }
+            if (verbose) { LOGGER.info("... ignoring this test due to 'ignore=true' in file"); }
             return new TestResult("Test case has been ignored", true);
         }
 
@@ -106,9 +102,7 @@ public final class RunAllProofsTestUnit implements Serializable {
         default -> throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
         }
 
-        if (verbose) {
-            LOGGER.info("Returning from test " + testName);
-        }
+        if (verbose) { LOGGER.info("Returning from test " + testName); }
 
         /*
          * Merge list of test results into one single test result, unless it is a singleton case
@@ -150,9 +144,7 @@ public final class RunAllProofsTestUnit implements Serializable {
     public Path getTempDir() throws IOException {
         File runAllProofsTempDir = settings.getTempDir();
         if (tempDir == null) {
-            if (!runAllProofsTempDir.exists()) {
-                runAllProofsTempDir.mkdirs();
-            }
+            if (!runAllProofsTempDir.exists()) { runAllProofsTempDir.mkdirs(); }
             tempDir = Files.createTempDirectory(runAllProofsTempDir.toPath(), testName + "-");
         }
         return tempDir;

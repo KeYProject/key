@@ -36,18 +36,12 @@ public class TableRowResizer extends MouseInputAdapter {
     }
 
     private int getResizingRow(Point p, int row) {
-        if (row == -1) {
-            return -1;
-        }
+        if (row == -1) { return -1; }
         int col = table.columnAtPoint(p);
-        if (col == -1) {
-            return -1;
-        }
+        if (col == -1) { return -1; }
         Rectangle r = table.getCellRect(row, col, true);
         r.grow(0, -3);
-        if (r.contains(p)) {
-            return -1;
-        }
+        if (r.contains(p)) { return -1; }
 
         int midPoint = r.y + r.height / 2;
         int rowIndex = (p.y < midPoint) ? row - 1 : row;
@@ -69,9 +63,7 @@ public class TableRowResizer extends MouseInputAdapter {
     }
 
     public void mouseMoved(MouseEvent e) {
-        if ((getResizingRow(e.getPoint()) >= 0) != (table.getCursor() == resizeCursor)) {
-            swapCursor();
-        }
+        if ((getResizingRow(e.getPoint()) >= 0) != (table.getCursor() == resizeCursor)) { swapCursor(); }
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -79,9 +71,7 @@ public class TableRowResizer extends MouseInputAdapter {
 
         if (resizingRow >= 0) {
             int newHeight = mouseY - mouseYOffset;
-            if (newHeight > 0) {
-                table.setRowHeight(resizingRow, newHeight);
-            }
+            if (newHeight > 0) { table.setRowHeight(resizingRow, newHeight); }
         }
     }
 }

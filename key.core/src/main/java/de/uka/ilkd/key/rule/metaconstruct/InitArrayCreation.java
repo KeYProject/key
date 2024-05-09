@@ -28,8 +28,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -54,9 +56,11 @@ public class InitArrayCreation extends InitArray {
      * {@link java.lang.NegativeArraySizeException} to be thrown. The if statement implementing this
      * behaviour is created by this method.
      *
-     * @param cond the Expression representing the guard checking if the given length is negative or
+     * @param cond
+     *        the Expression representing the guard checking if the given length is negative or
      *        not
-     * @param services the Services offering access to the type model
+     * @param services
+     *        the Services offering access to the type model
      * @return an if statement throwing a NegativeArraySizeException if cond is evaluated to false
      */
     private If checkNegativeDimension(Expression cond, Services services) {
@@ -76,20 +80,39 @@ public class InitArrayCreation extends InitArray {
      * and adds them to given list of statements. Further more the new declared program variables
      * initialised with the evaluated dimension expressions are returned
      *
-     * @param bodyStmnts the LinkedList of statements where the new statements are inserted
-     * @param dimExpr the ArrayOf<Expression> which describe the array's dimensions
-     * @param services the Services object
+     * @param bodyStmnts
+     *        the LinkedList of statements where the new statements are inserted
+     * @param dimExpr
+     *        the ArrayOf<Expression> which describe the array's dimensions
+     * @param services
+     *        the Services object
      */
     private ProgramVariable[] evaluateAndCheckDimensionExpressions(LinkedList<Statement> bodyStmnts,
             ImmutableArray<Expression> dimExpr, Services services) {
 
         Expression checkDimensions = BooleanLiteral.FALSE;
         ProgramVariable[] pvars = new ProgramVariable[dimExpr.size()];
+        final NameRecorder nameRecorder = services.getNameRecorder();
         final VariableNamer varNamer = services.getVariableNamer();
         final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
 
         for (int i = 0; i < pvars.length; i++) {
-            final ProgramElementName name = varNamer.getTemporaryNameProposal("dim" + i);
+            // first check for previously saved name
+            Name proposedName = null;
+            for (var name : nameRecorder.getSetProposals()) {
+                if (name.toString().startsWith("dim" + i + VariableNamer.TEMP_INDEX_SEPARATOR)) {
+                    proposedName = name;
+                    break;
+                }
+            }
+            final ProgramElementName name;
+            if (proposedName != null) {
+                name = new ProgramElementName(proposedName.toString());
+            } else {
+                // if there is no previous name, create a new one
+                name = varNamer.getTemporaryNameProposal("dim" + i);
+                nameRecorder.addProposal(new Name(name.getProgramName()));
+            }
 
             final LocalVariableDeclaration argDecl =
                 KeYJavaASTFactory.declare(name, dimExpr.get(i), intType);

@@ -26,8 +26,7 @@ public class TypeCast extends TypeOperator {
      * Type cast.
      */
 
-    public TypeCast() {
-    }
+    public TypeCast() {}
 
     /**
      * Note: The ordering of the arguments does not match the syntactical appearance of a Java type
@@ -41,7 +40,8 @@ public class TypeCast extends TypeOperator {
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes.
+     * @param children
+     *        the children of this AST element as KeY classes.
      */
     public TypeCast(ExtList children) {
         super(children);
@@ -60,36 +60,30 @@ public class TypeCast extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null) {
-            result++;
-        }
-        if (children != null) {
-            result += children.size();
-        }
+        if (typeReference != null) { result++; }
+        if (children != null) { result += children.size(); }
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException
+     *         if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0) {
-                return typeReference;
-            }
+            if (index == 0) { return typeReference; }
             index--;
         }
         if (children != null) {
             len = children.size();
-            if (len > index) {
-                return children.get(index);
-            }
+            if (len > index) { return children.get(index); }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -138,7 +132,8 @@ public class TypeCast extends TypeOperator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnTypeCast(this);

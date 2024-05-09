@@ -67,18 +67,14 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
 
         int offset;
 
-        for (offset = 0; offset < stateCount * heapCount; offset++) {
-            result[offset] = heapSort;
-        }
+        for (offset = 0; offset < stateCount * heapCount; offset++) { result[offset] = heapSort; }
         if (!isStatic) {
             result[offset] = container.getSort();
             assert result[offset] != null : "Bad KJT: " + container;
             offset++;
         }
 
-        for (int i = 0, n = paramTypes.size(); i < n; i++) {
-            result[i + offset] = paramTypes.get(i).getSort();
-        }
+        for (int i = 0, n = paramTypes.size(); i < n; i++) { result[i + offset] = paramTypes.get(i).getSort(); }
 
         return result;
     }

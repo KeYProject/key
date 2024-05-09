@@ -41,27 +41,13 @@ public class ConstantExpressionEvaluator {
     }
 
     private Expression toLiteral(Object value) throws EvaluationException {
-        if (value instanceof String) {
-            return new StringLiteralExpr(value.toString());
-        }
-        if (value instanceof Integer) {
-            return new IntegerLiteralExpr(value.toString());
-        }
-        if (value instanceof Float) {
-            return new DoubleLiteralExpr(value + "f");
-        }
-        if (value instanceof Double) {
-            return new DoubleLiteralExpr(value + "D");
-        }
-        if (value instanceof Short) {
-            return new IntegerLiteralExpr(value + "D");
-        }
-        if (value instanceof Long) {
-            return new IntegerLiteralExpr(value + "L");
-        }
-        if (value instanceof Byte) {
-            return new IntegerLiteralExpr(value.toString());
-        }
+        if (value instanceof String) { return new StringLiteralExpr(value.toString()); }
+        if (value instanceof Integer) { return new IntegerLiteralExpr(value.toString()); }
+        if (value instanceof Float) { return new DoubleLiteralExpr(value + "f"); }
+        if (value instanceof Double) { return new DoubleLiteralExpr(value + "D"); }
+        if (value instanceof Short) { return new IntegerLiteralExpr(value + "D"); }
+        if (value instanceof Long) { return new IntegerLiteralExpr(value + "L"); }
+        if (value instanceof Byte) { return new IntegerLiteralExpr(value.toString()); }
         throw new EvaluationException("Can not express the given value as a literal", null);
     }
 

@@ -40,8 +40,7 @@ public final class SolverTypes {
      *
      * @return the available solver types, including legacy solvers
      */
-    @NonNull
-    public static Collection<SolverType> getSolverTypes() {
+    public static @NonNull Collection<SolverType> getSolverTypes() {
         if (SOLVERS.isEmpty()) {
             SolverPropertiesLoader solverLoader = new SolverPropertiesLoader();
             SOLVERS.addAll(solverLoader.getSolvers());
@@ -55,11 +54,8 @@ public final class SolverTypes {
      *
      * @return the available legacy solver types
      */
-    @NonNull
-    public static Collection<SolverType> getLegacySolvers() {
-        if (SOLVERS.isEmpty()) {
-            getSolverTypes();
-        }
+    public static @NonNull Collection<SolverType> getLegacySolvers() {
+        if (SOLVERS.isEmpty()) { getSolverTypes(); }
         return new ArrayList<>(LEGACY_SOLVERS);
     }
 

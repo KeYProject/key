@@ -31,9 +31,12 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
     /**
      * Constructor.
      *
-     * @param root The {@link ProgramElement} to start search in.
-     * @param toSearch The {@link SourceElement} to search.
-     * @param services The {@link Services} to use.
+     * @param root
+     *        The {@link ProgramElement} to start search in.
+     * @param toSearch
+     *        The {@link SourceElement} to search.
+     * @param services
+     *        The {@link Services} to use.
      */
     public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch,
             Services services) {
@@ -68,8 +71,10 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
      * SymbolicExecutionUtil#equalsWithPosition(SourceElement, SourceElement) which has been copied
      * here since it's not possible to create a dependency to its original container project.
      *
-     * @param first The first {@link SourceElement}.
-     * @param second The second {@link SourceElement}.
+     * @param first
+     *        The first {@link SourceElement}.
+     * @param second
+     *        The second {@link SourceElement}.
      * @return {@code true} both are equal and at the same {@link PositionInfo}, {@code false}
      *         otherwise.
      */

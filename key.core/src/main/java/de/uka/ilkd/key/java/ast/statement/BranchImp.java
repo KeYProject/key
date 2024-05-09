@@ -22,7 +22,8 @@ public abstract class BranchImp extends JavaNonTerminalProgramElement implements
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param children
+     *        the children of this AST element as KeY classes. May contain: Comments
      */
     public BranchImp(ExtList children) {
         super(children);

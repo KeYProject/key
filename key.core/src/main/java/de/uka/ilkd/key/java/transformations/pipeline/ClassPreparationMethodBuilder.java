@@ -60,7 +60,8 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
      * preparation method is created and added for all classes,
      * which are declared in one of the given compilation units.
      *
-     * @param services the CrossReferenceServiceConfiguration with the
+     * @param services
+     *        the CrossReferenceServiceConfiguration with the
      *        information about the recoder model
      */
     public ClassPreparationMethodBuilder(TransformationPipelineServices services) {
@@ -75,7 +76,8 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
      * <p>
      * some special settings for implicit fields are performed here as well
      *
-     * @param typeDeclaration the TypeDeclaration<?> whose fields have to be prepared
+     * @param typeDeclaration
+     *        the TypeDeclaration<?> whose fields have to be prepared
      * @return the list of copy assignments
      */
     private NodeList<Statement> prepareFields(TypeDeclaration<?> typeDeclaration) {
@@ -114,10 +116,8 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
                 boolean b = td.getMembers().stream()
                         .anyMatch(BodyDeclaration::isClassOrInterfaceDeclaration);
 
-                if (b) {
-                    LOGGER.debug(
-                        "Inner Class detected. Reject building class initialisation methods.");
-                }
+                if (b) { LOGGER.debug(
+                    "Inner Class detected. Reject building class initialisation methods."); }
 
                 // collect initializers for transformation phase
                 class2staticFields.put(td, prepareFields(td));
@@ -129,7 +129,8 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
      * creates the static method <code>&lt;clprepare&gt;</code> for the
      * given type declaration
      *
-     * @param td the TypeDeclaration to which the new created method
+     * @param td
+     *        the TypeDeclaration to which the new created method
      *        will be attached
      * @return the created class preparation method
      */
@@ -141,9 +142,7 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
             new VoidType(), // return type is void
             CLASS_PREPARE_IDENTIFIER);
         final var statements = class2staticFields.get(td);
-        if (statements != null) {
-            method.setBody(new BlockStmt(statements));
-        }
+        if (statements != null) { method.setBody(new BlockStmt(statements)); }
         return method;
     }
 
@@ -151,7 +150,8 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
     /**
      * entry method for the constructor normalform builder
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
         td.addMember(createPrepareMethod(td));

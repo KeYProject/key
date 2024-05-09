@@ -66,7 +66,8 @@ public class CreateBuilder extends JavaTransformer {
      * creates the implicit static <code>&lt;createObject&gt;</code>
      * method that takes the object to be created out of the pool
      *
-     * @param type the TypeDeclaration for which the
+     * @param type
+     *        the TypeDeclaration for which the
      *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
@@ -85,7 +86,8 @@ public class CreateBuilder extends JavaTransformer {
     /**
      * entry method for the constructor {@link ConstructorNormalformBuilder}
      *
-     * @param td the TypeDeclaration
+     * @param td
+     *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
         if (td instanceof ClassOrInterfaceDeclaration
