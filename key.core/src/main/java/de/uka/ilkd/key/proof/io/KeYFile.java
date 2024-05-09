@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -61,10 +62,8 @@ public class KeYFile implements EnvInput {
     private final Profile profile;
     protected InitConfig initConfig;
     private KeyAst.File fileCtx = null;
-    @Nullable
-    private ProblemFinder problemFinder = null;
-    @Nullable
-    private ProblemInformation problemInformation = null;
+    private @Nullable ProblemFinder problemFinder = null;
+    private @Nullable ProblemInformation problemInformation = null;
     private Includes includes;
 
     /**
@@ -252,9 +251,8 @@ public class KeYFile implements EnvInput {
     }
 
 
-    @NonNull
     @Override
-    public List<File> readClassPath() {
+    public @NonNull List<File> readClassPath() {
         @NonNull
         ProblemInformation pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
@@ -340,8 +338,7 @@ public class KeYFile implements EnvInput {
         return DefaultImmutableSet.nil();
     }
 
-    @NonNull
-    protected ProblemFinder getProblemFinder() {
+    protected @NonNull ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
             problemFinder = new ProblemFinder(initConfig.getServices(), initConfig.namespaces());
             getParseContext().accept(problemFinder);
@@ -432,7 +429,7 @@ public class KeYFile implements EnvInput {
         return null;
     }
 
-    public String getProofObligation() {
+    public Configuration getProofObligation() {
         return null;
     }
 

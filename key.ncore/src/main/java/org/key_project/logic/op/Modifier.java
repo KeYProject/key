@@ -44,7 +44,7 @@ public class Modifier implements Named {
         var mod = MODIFIERS.get(bitMask);
         if (mod != null) {
             throw new IllegalArgumentException(
-                    "Modifier with bitmask '" + bitMask + "' already declared with name: " + mod.name);
+                "Modifier with bitmask '" + bitMask + "' already declared with name: " + mod.name);
         }
         mod = new Modifier(name, bitMask);
         MODIFIERS.put(bitMask, mod);

@@ -41,14 +41,13 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Jul 15 10:22:46 CEST 2016
-name=MethodCallTest[MethodCallTest\\:\\:main(MethodCallTest)].JML normal_behavior operation contract.0
-addSymbolicExecutionLabel=true
-contract=MethodCallTest[MethodCallTest\\:\\:main(MethodCallTest)].JML normal_behavior operation contract.0
-addUninterpretedPredicate=true
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "MethodCallTest[MethodCallTest::main(MethodCallTest)].JML normal_behavior operation contract.0",
+	"addSymbolicExecutionLabel": true,
+	"contract": "MethodCallTest[MethodCallTest::main(MethodCallTest)].JML normal_behavior operation contract.0",
+	"addUninterpretedPredicate": true,
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

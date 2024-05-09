@@ -126,8 +126,7 @@ public class OverloadedOperatorHandler {
         return integerHandler.getSpecMathMode();
     }
 
-    @Nullable
-    public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+    public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
             throws SLTranslationException {
         for (JMLOperatorHandler handler : handlers) {
             var term = handler.build(op, left, right);
@@ -148,9 +147,8 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -174,9 +172,8 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -208,9 +205,8 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
             if ((left.getTerm().sort() == sortBoolean
                     || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean

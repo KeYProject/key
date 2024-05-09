@@ -35,9 +35,8 @@ public class SLTranslationException extends ProofInputException implements HasLo
         this(message, null, new Location(null, Position.UNDEFINED));
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         return location;
     }
 }

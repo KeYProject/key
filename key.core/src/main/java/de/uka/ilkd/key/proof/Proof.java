@@ -94,8 +94,7 @@ public class Proof implements Named {
     /**
      * the proof environment (optional)
      */
-    @Nullable
-    private ProofEnvironment env;
+    private @Nullable ProofEnvironment env;
 
     /**
      * maps the Abbreviations valid for this proof to their corresponding terms.
@@ -130,8 +129,7 @@ public class Proof implements Named {
 
     private long autoModeTime = 0;
 
-    @Nullable
-    private Strategy activeStrategy;
+    private @Nullable Strategy activeStrategy;
 
     private PropertyChangeListener settingsListener;
 
@@ -155,11 +153,9 @@ public class Proof implements Named {
      * The {@link File} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
-    @Nullable
-    private File proofFile;
+    private @Nullable File proofFile;
 
-    @Nullable
-    private Lookup userData;
+    private @Nullable Lookup userData;
 
     /**
      * Whether closing the proof should emit a {@link ProofEvent}.

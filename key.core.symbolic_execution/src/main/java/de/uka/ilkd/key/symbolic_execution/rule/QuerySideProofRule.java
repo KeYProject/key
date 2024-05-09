@@ -189,9 +189,8 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     /**
      * {@inheritDoc}
      */
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
         try {
             // Extract required Terms from goal

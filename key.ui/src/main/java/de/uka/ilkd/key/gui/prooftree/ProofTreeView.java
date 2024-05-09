@@ -679,9 +679,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofTreeSearchPanel.setVisible(true);
     }
 
-    @NonNull
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Proof";
     }
 
@@ -690,9 +689,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return IconFactory.PROOF_TREE.get(IconFactory.DEFAULT_SIZE);
     }
 
-    @NonNull
     @Override
-    public JComponent getComponent() {
+    public @NonNull JComponent getComponent() {
         return this;
     }
 
@@ -776,9 +774,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return defaultPath;
     }
 
-    @NonNull
     @Override
-    public Collection<CAction> getTitleCActions() {
+    public @NonNull Collection<CAction> getTitleCActions() {
         return List.of(ProofTreeSettingsMenuFactory.create(this));
     }
 
