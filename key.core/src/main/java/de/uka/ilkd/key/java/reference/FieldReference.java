@@ -8,8 +8,9 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 
 public class FieldReference extends VariableReference

@@ -548,7 +548,8 @@ public final class MiscTools {
      * @param node the Node where to look up the actual variable (result from renaming)
      * @return The renamed variable
      */
-    public static ProgramVariable findActualVariable(ProgramVariable originalVar, @Nullable Node node) {
+    public static ProgramVariable findActualVariable(ProgramVariable originalVar,
+            @Nullable Node node) {
         if (node != null) {
             do {
                 if (node.getRenamingTable() != null) {

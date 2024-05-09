@@ -3,17 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.util.Position;
-import org.antlr.v4.runtime.CharStream;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
+
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.util.Position;
+
+import org.antlr.v4.runtime.CharStream;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -86,8 +87,8 @@ public class Configuration {
      * Returns the stored value for the given name casted to the given clazz if possible.
      * If no value exists, or value is not compatible to {@code clazz}, {@code null} is returned.
      *
-     * @param <T>   an arbitrary class, exptected return type
-     * @param name  property name
+     * @param <T> an arbitrary class, exptected return type
+     * @param name property name
      * @param clazz data type because of missing reified generics.
      */
     public <T> @Nullable T get(String name, Class<T> clazz) {
@@ -101,13 +102,14 @@ public class Configuration {
      * The same as {@link #get(String, Class)} but returns the {@code defaultValue} instead
      * of a {@code null} reference.
      *
-     * @param <T>          the expected return type compatible to the {@code defaultValue}
-     * @param name         property name
+     * @param <T> the expected return type compatible to the {@code defaultValue}
+     * @param name property name
      * @param defaultValue the returned instead of {@code null}.
      */
+    @SuppressWarnings("unchecked")
     public <T> T get(String name, T defaultValue) {
         if (exists(name, defaultValue.getClass()))
-            return clazz.cast(data.get(name));
+            return (T) defaultValue.getClass().cast(data.get(name));
         else
             return defaultValue;
     }
@@ -137,7 +139,7 @@ public class Configuration {
      * Returns an integer value for the given name.
      *
      * @param name property name
-     * @throws ClassCastException   if the entry is not a {@link Long}
+     * @throws ClassCastException if the entry is not a {@link Long}
      * @throws NullPointerException if no such value entry exists
      */
     public int getInt(String name, int defaultValue) {
@@ -148,7 +150,7 @@ public class Configuration {
      * Returns a long value for the given name.
      *
      * @param name property name
-     * @throws ClassCastException   if the entry is not a {@link Long}
+     * @throws ClassCastException if the entry is not a {@link Long}
      * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
@@ -159,7 +161,7 @@ public class Configuration {
      * Returns a long value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
-     * @throws ClassCastException   if the entry is not an {@link Long}
+     * @throws ClassCastException if the entry is not an {@link Long}
      * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name, long defaultValue) {
@@ -171,7 +173,7 @@ public class Configuration {
      * Returns a boolean value for the given name.
      *
      * @param name property name
-     * @throw ClassCastException if the entry is not an {@link #Long}
+     * @throw ClassCastException if the entry is not an {@link Long}
      * @throw NullPointerException if no such value entry exists
      */
     public boolean getBool(String name) {
@@ -182,11 +184,11 @@ public class Configuration {
      * Returns a boolean value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
-     * @throws ClassCastException   if the entry is not an {@link Long}
+     * @throws ClassCastException if the entry is not an {@link Long}
      * @throws NullPointerException if no such value entry exists
      */
     public boolean getBool(String name, boolean defaultValue) {
-        return get(name, Boolean.class, defaultValue);
+        return get(name, defaultValue);
     }
 
     /**
@@ -194,7 +196,7 @@ public class Configuration {
      * present.
      *
      * @param name property name
-     * @throws ClassCastException   if the entry is not an {@link Long}
+     * @throws ClassCastException if the entry is not an {@link Long}
      * @throws NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
@@ -219,7 +221,7 @@ public class Configuration {
      * @throws ClassCastException if the entry is not an {@link String}
      */
     public String getString(String name, String defaultValue) {
-        return get(name, String.class, defaultValue);
+        return get(name, defaultValue);
     }
 
     /**
@@ -268,7 +270,7 @@ public class Configuration {
 
     /**
      * Returns a list of strings for the given name.
-     *
+     * <p>
      * In contrast to the other methods, this method does not throw an exception if the entry does
      * not
      * exist in the configuration. Instead, it returns an empty list.
@@ -292,7 +294,7 @@ public class Configuration {
      * Returns string array for the requested entry. {@code defaultValue} is returned if no such
      * entry exists.
      *
-     * @param name         a string identifying the entry
+     * @param name a string identifying the entry
      * @param defaultValue a default value
      * @throws ClassCastException if the given entry has non-string elements
      */
@@ -314,7 +316,7 @@ public class Configuration {
      * @throws IllegalArgumentException if defaultValue does not belong to an enum
      */
     @SuppressWarnings("unchecked")
-    public <T extends Enum<T>> @NonNull T getEnum(String name, @NonNull T defaultValue) {
+    public <T extends Enum<T>> T getEnum(String name, T defaultValue) {
         Class<T> clazz = (Class<T>) defaultValue.getClass();
         if (!clazz.isEnum()) {
             throw new IllegalArgumentException(clazz + " is not an enum type.");
@@ -406,26 +408,9 @@ public class Configuration {
     }
 
     /**
-     * Interprets the given entry as an enum value.
-     *
-     * @param <T>          the enum
-     * @param name         a name identifying an entry
-     * @param defaultValue the default value to be returned
-     */
-    public <T extends Enum<T>> T getEnum(String name, T defaultValue) {
-        var idx = getString(name);
-        try {
-            if (idx != null)
-                return Enum.valueOf((Class<T>) defaultValue.getClass(), idx);
-        } catch (IllegalArgumentException | NullPointerException ignored) {
-        }
-        return defaultValue;
-    }
-
-    /**
      * Serializes this configuration instance into the given writer.
      *
-     * @param writer  a writer
+     * @param writer a writer
      * @param comment a comment
      */
     public void save(Writer writer, String comment) {
@@ -437,6 +422,7 @@ public class Configuration {
     }
 
     // TODO Add documentation for this.
+
     /**
      * POJO for metadata of configuration entries.
      */
@@ -534,7 +520,7 @@ public class Configuration {
             indent += 4;
             newline().printIndent();
             for (Iterator<? extends Map.Entry<?, ?>> iterator =
-                 value.entrySet().iterator(); iterator.hasNext(); ) {
+                value.entrySet().iterator(); iterator.hasNext();) {
                 Map.Entry<?, ?> entry = iterator.next();
                 String k = entry.getKey().toString();
                 Object v = entry.getValue();

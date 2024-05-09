@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.proof.Node;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.proof.Node;
+
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScriptNode {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptNode.class);
@@ -23,7 +24,8 @@ public class ScriptNode {
     private @Nullable Node proofNode;
     private @Nullable Throwable encounteredException;
 
-    public ScriptNode(@Nullable ScriptNode parent, Map<String, String> command, int fromPos, int toPos) {
+    public ScriptNode(@Nullable ScriptNode parent, Map<String, String> command, int fromPos,
+            int toPos) {
         this.parent = parent;
         this.command = command;
         this.fromPos = fromPos;
@@ -36,7 +38,7 @@ public class ScriptNode {
 
     public void dump(int indent) {
         LOGGER.debug("{} {} {}", " ".repeat(indent),
-                proofNode == null ? "xxx" : proofNode.serialNr(), command);
+            proofNode == null ? "xxx" : proofNode.serialNr(), command);
         for (ScriptNode child : children) {
             child.dump(indent + 1);
         }

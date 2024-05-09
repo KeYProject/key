@@ -15,9 +15,10 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**

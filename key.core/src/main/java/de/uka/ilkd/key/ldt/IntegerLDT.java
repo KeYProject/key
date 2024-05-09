@@ -19,11 +19,11 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +170,8 @@ public final class IntegerLDT extends LDT {
         }
         neglit = addFunction(services, NEGATIVE_LITERAL_STRING);
         numbers = addFunction(services, NUMBERS_NAME.toString());
-        if (sharp.sort() != numbers.argSort(0)) throw new AssertionError();
+        if (sharp.sort() != numbers.argSort(0))
+            throw new AssertionError();
         charID = addFunction(services, CHAR_ID_NAME.toString());
         add = addFunction(services, "add");
         neg = addFunction(services, "neg");
