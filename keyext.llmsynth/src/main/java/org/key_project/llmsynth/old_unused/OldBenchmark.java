@@ -1,7 +1,6 @@
-package org.key_project.llmsynth;
+package org.key_project.llmsynth.old_unused;
 
 import de.uka.ilkd.key.logic.TermCreationException;
-import org.key_project.llmsynth.prompts.Gpt3Prompt;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Benchmark {
+public class OldBenchmark {
     public static String[] benchmarks = {
 //        "2-Pot-contract.java",
 //        "3-setSize-contract.java",
@@ -125,7 +124,7 @@ public class Benchmark {
     int[] result;
     private String repr = null;
 
-    public Benchmark(String n, boolean[] r) {
+    public OldBenchmark(String n, boolean[] r) {
         name = n;
         result = new int[r.length];
         for(int i = 0; i < r.length; i++)
@@ -140,7 +139,7 @@ public class Benchmark {
         return repr;
     }
 
-    public static Benchmark onClass(String classDir, String _class, String token, int maxTries, Path tmpFile, int repeats) throws Exception {
+    public static OldBenchmark onClass(String classDir, String _class, String token, int maxTries, Path tmpFile, int repeats) throws Exception {
         String[] vs;
         {
             String s = _class;
@@ -201,7 +200,7 @@ public class Benchmark {
                 }
             default:
         }
-        var b = new Benchmark(name, res);
+        var b = new OldBenchmark(name, res);
         Utility.appendToFile(resFile, b.getRepr());
         return b;
     }

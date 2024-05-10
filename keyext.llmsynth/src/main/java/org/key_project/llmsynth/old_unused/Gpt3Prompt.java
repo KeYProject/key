@@ -1,4 +1,4 @@
-package org.key_project.llmsynth.prompts;
+package org.key_project.llmsynth.old_unused;
 
 import com.theokanning.openai.service.OpenAiService;
 import com.theokanning.openai.completion.chat.*;
@@ -11,7 +11,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import io.reactivex.Flowable;
 import org.key_project.llmsynth.UnclosedProof;
-import org.key_project.llmsynth.Utility;
+import org.key_project.llmsynth.old_unused.Utility;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Gpt3Prompt {
+    //region Literals
     final static String STR_NEXT_QUERY =
             "===================== NEXT QUERY =====================";
     final static String STR_INIT_QUERY =
@@ -58,6 +59,8 @@ public class Gpt3Prompt {
     final static Pattern method_jml = Pattern.compile(PTN_JML);
     final static Pattern gpt_code_delim = Pattern.compile("```");
 
+    //endregion
+
     public static boolean verbose = true;
     public static void status(String msg) {
         if (verbose)
@@ -89,7 +92,7 @@ public class Gpt3Prompt {
         return new ChatMessage(ChatMessageRole.USER.value(), text);
     }
 
-    private static int lineOfMethod(List<String> lines, String methodName) {
+    public static int lineOfMethod(List<String> lines, String methodName) {
         for(int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
             Matcher m = method_decl.matcher(line);
@@ -102,7 +105,7 @@ public class Gpt3Prompt {
         throw new RuntimeException("Location of method not found: " + methodName);
     }
 
-    private static int lineOfFirstInvariantPlaceInMethod(List<String> lines, String methodName) {
+    public static int lineOfFirstInvariantPlaceInMethod(List<String> lines, String methodName) {
         int ml = lineOfMethod(lines, methodName);
         // while for
         for (int i = ml; i < lines.size(); i++) {
@@ -113,7 +116,7 @@ public class Gpt3Prompt {
         throw new RuntimeException("Location of loop statement not found: " + methodName);
     }
 
-    private static String expandJMLBlock(List<String> lines, int expandFrom, int dir, String strt, String stop) {
+    public static String expandJMLBlock(List<String> lines, int expandFrom, int dir, String strt, String stop) {
 //        Predicate<String> p = method_jml.asMatchPredicate();
 //        if (!p.test(lines.get(expandFrom))) return null;
         boolean anyJML = false;
@@ -198,7 +201,7 @@ public class Gpt3Prompt {
         return jml;
     }
 
-    private static String extractCodeRegion(List<String> lines) {
+    public static String extractCodeRegion(List<String> lines) {
         int begin, end;
         boolean found_begin = false;
         boolean finished = false;
@@ -254,7 +257,7 @@ public class Gpt3Prompt {
         }
     }
 
-    enum FailureReason {
+    public enum FailureReason {
         NONE,
         NO_JML_IN_SEARCH_LOCATIONS,
         NO_JML_IN_REGION,
@@ -264,7 +267,7 @@ public class Gpt3Prompt {
         UNKNOWN_FATAL
     }
 
-    private static Pair<String, FailureReason> extractJML(String text, String methodName) {
+    public static Pair<String, FailureReason> extractJML(String text, String methodName) {
         // Case 1: JML mixed with Java code:
         // Case 2: Pure JML
         List<String> lines = Arrays.asList(text.split("\\n"));
@@ -283,7 +286,7 @@ public class Gpt3Prompt {
         }
     }
 
-    private static Pair<String, FailureReason> extractInvariant(String text, String methodName) {
+    public static Pair<String, FailureReason> extractInvariant(String text, String methodName) {
         // Case 1: JML mixed with Java code:
         // Case 2: Pure JML
         List<String> lines = Arrays.asList(text.split("\\n"));
@@ -302,7 +305,7 @@ public class Gpt3Prompt {
         }
     }
 
-    private static Triple<Boolean, FailureReason, ProblemLoaderException> tryKeyValidation(List<String> classLines, String methodName, String subfun, String jmlText, boolean isInvariant, Path tmpfile, FailureReason errSoFar) {
+    public static Triple<Boolean, FailureReason, ProblemLoaderException> tryKeyValidation(List<String> classLines, String methodName, String subfun, String jmlText, boolean isInvariant, Path tmpfile, FailureReason errSoFar) {
         if (errSoFar != FailureReason.NONE)
             return new Triple<>(false, errSoFar, null); // todo: this is hacky, but an easy way to short-circuit for now
 
@@ -368,7 +371,15 @@ public class Gpt3Prompt {
     }
 
 
-    public static boolean specifyFunction(String token, List<String> classLines, String methodName, boolean isCtor, String subfun, boolean specInvariant, int maxTries, Path tmpFile) {
+    public static boolean specifyFunction(
+            String token,
+            List<String> classLines,
+            String methodName,
+            boolean isCtor,
+            String subfun,
+            boolean specInvariant,
+            int maxTries,
+            Path tmpFile) {
         OpenAiService service = new OpenAiService(token);
         List<ChatMessage> messages = new ArrayList<>();
         boolean keyCouldVerify = false;
@@ -429,7 +440,7 @@ public class Gpt3Prompt {
             }
             status ("Validating");
             FailureReason freason = FailureReason.NONE;
-            String fjml = "";
+            String fjml ="";
             ProblemLoaderException fex = null;
             if (possible_jml_text.x == null) {
                 freason = possible_jml_text.y;
@@ -446,9 +457,9 @@ public class Gpt3Prompt {
                     });
                     try {
                         var kr = fut.get(timeout, tou);
-                        key_result = new Triple<>(kr.x.booleanValue(), kr.y, kr.z);
+                        key_result = new Triple<>(kr.x, kr.y, kr.z);
                     } catch (TimeoutException | InterruptedException | RuntimeException | ExecutionException e) {
-                        System.out.println(e);
+                        System.out.println(e.toString());
                         System.out.println(e.getStackTrace());
                         key_result = new Triple<>(false, FailureReason.INVALID_JAVA, null);
                     } finally {
