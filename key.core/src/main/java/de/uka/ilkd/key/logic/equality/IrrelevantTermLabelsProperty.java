@@ -98,8 +98,12 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
         hashcode = hashcode * 17 + term.boundVars().hashCode();
         hashcode = hashcode * 17 + term.javaBlock().hashCode();
 
-        for (TermLabel label : term.getLabels()) {
-            hashcode += (label.isProofRelevant() ? 7 * label.hashCode() : 0);
+        final ImmutableArray<TermLabel> labels = term.getLabels();
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            final TermLabel currentLabel = labels.get(i);
+            if (currentLabel.isProofRelevant()) {
+                hashcode += 7 * currentLabel.hashCode();
+            }
         }
 
         return hashcode;

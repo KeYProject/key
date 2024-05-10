@@ -66,16 +66,16 @@ public class TermLabelsProperty implements Property<Term> {
 
     /**
      * Computes the hash code of {@code term} while ignoring <b>all</b> term labels.
-     * <p>
-     * Currently, the hash code is computed almost the same way as in TermImpl. This is also the
-     * case for labeled terms,
-     * as all term labels are ignored.
      *
      * @param term the term to compute the hash code for
      * @return the hash code
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
+        /*
+         * Currently, the hash code is computed almost the same way as in TermImpl. This is also the
+         * case for labeled terms, as all term labels are ignored.
+         */
         int hashcode = 5;
         hashcode = hashcode * 17 + term.op().hashCode();
         hashcode = hashcode * 17
