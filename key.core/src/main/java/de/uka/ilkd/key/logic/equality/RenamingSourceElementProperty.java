@@ -97,11 +97,44 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     @Override
     public int hashCodeModThisProperty(SourceElement sourceElement) {
-        throw new UnsupportedOperationException(
-            "Hashing of SourceElements modulo renaming not yet implemented!");
+        /*
+         * Currently, the best approach seems to walk through the sourceElement with a
+         * JavaASTTreeWalker and sum up hash codes.
+         */
+        JavaASTTreeWalker tw = new JavaASTTreeWalker(sourceElement);
+        SourceElement next = tw.currentNode();
+
+        int hashCode = 1;
+
+        while (next != null) {
+            // Handle special cases of prior equalsModRenaming implementation
+            if (next instanceof LabeledStatement ls) {
+                // TODO: decide what to add here;
+                hashCode = 31 * hashCode + ls.getChildCount();
+            } else if (next instanceof VariableSpecification vs) {
+                hashCode = 31 * hashCode + 5;
+            } else if (next instanceof ProgramVariable || next instanceof ProgramElementName) {
+                // TODO: decide what to add here;
+                hashCode = 31 * hashCode + 37;
+            } else if (next instanceof JavaNonTerminalProgramElement jnte) {
+                // TODO: decide what to add here;
+                hashCode = 31 * hashCode + 43;
+            } else {
+                // In the standard case, we just use the default hashCode implementation
+                hashCode = 31 * hashCode + next.hashCode();
+            }
+
+            // walk to the next nodes in the tree
+            next = tw.nextNode();
+        }
+
+        return hashCode;
     }
 
-    /* --------------------- Helper methods for special cases ---------------------- */
+    /*
+     * --------------------- Helper methods for special cases in equalsModThisProperty
+     * ----------------------
+     */
     /**
      * Handles the standard case of comparing two {@link SourceElement}s modulo renaming.
      *
@@ -244,5 +277,8 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     }
 
 
-    /* ------------------ End of helper methods for special cases ------------------ */
+    /*
+     * ------------------ End of helper methods for special cases in
+     * equalsModThisProperty------------------
+     */
 }
