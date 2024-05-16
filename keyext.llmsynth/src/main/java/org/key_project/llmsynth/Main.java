@@ -57,9 +57,16 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException {
-        String token = Files.readString(Path.of("/home/pat/repos/key-key/token")).trim();
+        String token;
+        try {
+            // TODO: Left here for Demo; Remove afterwards.
+            token = Files.readString(Path.of("/home/pat/repos/key-key/token")).trim();
+        } catch (IOException e) {
+            token = Files.readString(Path.of(System.getProperty("user.home")+"/.key/openai-key.txt")).trim();
+        }
         // todo: Kommentieren (was muss man tun, um das u modifizieren)
-        ClassInfo ci = new ClassInfo("Demo", Path.of("/home/pat/repos/key-key/Demo.java"));
+        // ClassInfo ci = new ClassInfo("Demo", Path.of("/home/pat/repos/key-key/Demo.java"));
+        ClassInfo ci = new ClassInfo("Demo", Path.of("./example/Demo.java"));
         MethodInfo mi_f = new MethodInfo("f");
         MethodInfo mi_g = new MethodInfo("g");
 
@@ -75,9 +82,15 @@ public class Main {
         // Different tasks may require different strategies both depending on the task type and parameters, this will instantiate a strategy depending on these values
         // Key also requires an empty folder with a filename to be used, as it will load the whole folder during its own verification step
         // Therefore, a path to a filename in an otherwise empty folder should be given here as well
-        LegacyStrategyProvider lsp = new LegacyStrategyProvider(Path.of("/home/pat/repos/key-key/tmp/tmpfile.java"));
+        File tmpdir = Files.createTempDirectory("keyLlmSynth").toFile();
+        String tmpfile = File.createTempFile("MyFile",".java", tmpdir).getAbsolutePath();
+        System.out.printf("Saving temporary files in %s", tmpfile);
+        LegacyStrategyProvider lsp = new LegacyStrategyProvider(Path.of(tmpfile));
+        // Task: Create a contract for the given method; we do not care about the method's surroundings
         StrategyProvider<TaskSpecifyFunction, Nothing> legacySpecifyFunctionProvider = lsp.getTaskSpecifyFunctionProvider();
+        // Task: Create a contract for the given method; the contract must allow the verification of the top-level method
         StrategyProvider<TaskSpecifySubcontract, Nothing> legacySpecifySubcontractProvider = lsp.getTaskSpecifySubcontractProvider();
+        // Task: Create a invariant for the method's loop; the invariant must allow the verification of the method's contract
         StrategyProvider<TaskSpecifyLoopInvariant, Nothing> legacySpecifyLoopinvariantProvider = lsp.getTaskSpecifyLoopInvariantProvider();
 
         // Enable output of Prompts and answers so that they can be read
