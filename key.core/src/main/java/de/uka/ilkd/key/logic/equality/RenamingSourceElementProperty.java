@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
@@ -104,21 +106,27 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         JavaASTTreeWalker tw = new JavaASTTreeWalker(sourceElement);
         SourceElement next = tw.currentNode();
 
+        NameAbstractionMap absMap = new NameAbstractionMap();
+
         int hashCode = 1;
 
         while (next != null) {
-            // Handle special cases of prior equalsModRenaming implementation
+            // Handle special cases so that hashCodeModThisProperty fits equalsModThisProperty
             if (next instanceof LabeledStatement ls) {
-                // TODO: decide what to add here;
                 hashCode = 31 * hashCode + ls.getChildCount();
+                absMap.add(ls);
             } else if (next instanceof VariableSpecification vs) {
-                hashCode = 31 * hashCode + 5;
+                hashCode = 31 * hashCode + vs.getChildCount();
+                hashCode =
+                    31 * hashCode + 17 * ((vs.getType() == null) ? 0 : vs.getType().hashCode())
+                            + vs.getDimensions();
+                absMap.add(vs);
             } else if (next instanceof ProgramVariable || next instanceof ProgramElementName) {
-                // TODO: decide what to add here;
-                hashCode = 31 * hashCode + 37;
+                // TODO: fix; somehow this returns null, meaning that something must be looked up,
+                // that is not yet in the map
+                hashCode = 31 * hashCode + absMap.getDepth(next);
             } else if (next instanceof JavaNonTerminalProgramElement jnte) {
-                // TODO: decide what to add here;
-                hashCode = 31 * hashCode + 43;
+                hashCode = 31 * hashCode + jnte.getChildCount();
             } else {
                 // In the standard case, we just use the default hashCode implementation
                 hashCode = 31 * hashCode + next.hashCode();
@@ -131,10 +139,7 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         return hashCode;
     }
 
-    /*
-     * --------------------- Helper methods for special cases in equalsModThisProperty
-     * ----------------------
-     */
+    /*------------- Helper methods for special cases in equalsModThisProperty --------------*/
     /**
      * Handles the standard case of comparing two {@link SourceElement}s modulo renaming.
      *
@@ -277,8 +282,17 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     }
 
 
-    /*
-     * ------------------ End of helper methods for special cases in
-     * equalsModThisProperty------------------
-     */
+    /* ---------- End of helper methods for special cases in equalsModThisProperty ---------- */
+
+    private static class NameAbstractionMap {
+        private final Map<SourceElement, Integer> declarationsMap = new HashMap<>();
+
+        public void add(SourceElement element) {
+            declarationsMap.put(element, declarationsMap.size());
+        }
+
+        public int getDepth(SourceElement element) {
+            return declarationsMap.get(element);
+        }
+    }
 }
