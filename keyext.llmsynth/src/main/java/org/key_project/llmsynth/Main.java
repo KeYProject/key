@@ -67,8 +67,11 @@ public class Main {
         // todo: Kommentieren (was muss man tun, um das u modifizieren)
         // ClassInfo ci = new ClassInfo("Demo", Path.of("/home/pat/repos/key-key/Demo.java"));
         ClassInfo ci = new ClassInfo("Demo", Path.of("./example/Demo.java"));
+        // ClassInfo ci = new ClassInfo("Demo", Path.of("./example/DemoTwo.java"));
+        //ClassInfo ci = new ClassInfo("Demo", Path.of("./example/Loop1.java"));
         MethodInfo mi_f = new MethodInfo("f");
         MethodInfo mi_g = new MethodInfo("g");
+        //MethodInfo mi_loop = new MethodInfo("method1");
 
         //
         BenchmarkParameters bp = new BenchmarkParameters();
@@ -76,6 +79,8 @@ public class Main {
         bp.oracle = LLMChoice.GPT_3_5_TURBO;
         bp.name = "test";
         bp.task = new TaskSpecifyFunction(ci,mi_g);
+        // bp.task = new TaskSpecifySubcontract(ci,mi_g,mi_f);
+        // bp.task = new TaskSpecifyLoopInvariant(ci, mi_loop);
         Benchmark benchmark = new Benchmark(bp);
 
 

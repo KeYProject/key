@@ -334,26 +334,31 @@ public class Gpt3Prompt {
             env = Utility.createKeyEnvironment(tmpfile.toFile(), null, null, null);
             ImmutableList<ProgramVariable> projectionVariables = ImmutableList.fromList(new LinkedList<>());
             List<Contract> contracts = Utility.getContracts(env);
-            Contract relevantContract = null; // todo: this should be a list
             status("Looking for contracts:");
+            boolean foundRelevantContract = false;
             for (Contract c : contracts) {
                 if (!(c instanceof FunctionalOperationContractImpl)) continue;
-                FunctionalOperationContractImpl foc = (FunctionalOperationContractImpl)c; // todo: highly fragile
-                ProgramMethod pm = (ProgramMethod)foc.pm;
+                FunctionalOperationContractImpl foc = (FunctionalOperationContractImpl) c; // todo: highly fragile
+                ProgramMethod pm = (ProgramMethod) foc.pm;
                 String pmName = pm.getName();
                 System.out.println("* " + pmName);
-                if (pmName.contains(methodName)) {
-                    relevantContract = c;
+                // TODO: Distinction failed top level vs. failed subcontract verification...
+                if (pmName.contains(methodName)) { // Top Level Method: Always needs to be verified...
+                    foundRelevantContract = true;
+                    status("Found relevant contract: " + pmName);
+                    var result = checkContract(env, c, projectionVariables);
+                    if (result.y != FailureReason.NONE) return result;
+                }
+                if (subfun!=null && pmName.contains(subfun)) { // If they exists, submethods should be verified...
+                    foundRelevantContract = true;
+                    status("Found relevant contract: " + pmName);
+                    var result = checkContract(env, c, projectionVariables);
+                    if (result.y != FailureReason.NONE) return result;
                 }
             }
-            if (relevantContract == null) return new Triple<>(false, FailureReason.UNKNOWN, null);
-            status("Found relevant contract: " + methodName);
-            List<UnclosedProof> unclosedProofs = Utility.tryClosingProofsAndListUnclosed(env, List.of(relevantContract), false, projectionVariables);
-            if (unclosedProofs.size() == 0) {
-                return new Triple<>(true, FailureReason.NONE, null);
-            } else {
-                return new Triple<>(false, FailureReason.WRONG_JML, null);
-            }
+            if (!foundRelevantContract) return new Triple<>(false, FailureReason.UNKNOWN, null);
+            status("SUCCESS: All contracts verified.");
+            return new Triple<>(true, FailureReason.NONE, null);
         } catch (ProblemLoaderException e) {
             status("Encountered Exception: " + e.getClass().getName());
             status(e.toString());
@@ -367,6 +372,15 @@ public class Gpt3Prompt {
             return new Triple<>(false, FailureReason.INVALID_JAVA, e);
         } finally {
             if (env != null) env.dispose();
+        }
+    }
+
+    private static Triple<Boolean, FailureReason, ProblemLoaderException> checkContract(KeYEnvironment<?> env, Contract relevantContract, ImmutableList<ProgramVariable> projectionVariables) {
+        List<UnclosedProof> unclosedProofs = Utility.tryClosingProofsAndListUnclosed(env, List.of(relevantContract), false, projectionVariables);
+        if (unclosedProofs.size() == 0) {
+            return new Triple<>(true, FailureReason.NONE, null);
+        } else {
+            return new Triple<>(false, FailureReason.WRONG_JML, null);
         }
     }
 
