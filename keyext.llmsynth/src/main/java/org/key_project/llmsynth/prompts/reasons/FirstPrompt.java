@@ -11,8 +11,14 @@ import java.util.function.Supplier;
 
 //todo: create FirstPrompt instances for each Tag
 public class FirstPrompt extends LegacyReasons {
-    public static FirstPrompt create(LLMTaskTag task, int trialNumber) {
-        return null;
+    private final int trialNumber;
+
+    public FirstPrompt(int trialNumber) {
+        this.trialNumber = trialNumber;
+    }
+
+    public int getTrialNumber() {
+        return trialNumber;
     }
 
     @Override

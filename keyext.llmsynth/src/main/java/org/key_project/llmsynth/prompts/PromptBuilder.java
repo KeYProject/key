@@ -4,7 +4,6 @@ import org.key_project.llmsynth.ClassInfo;
 import org.key_project.llmsynth.LineSpan;
 import org.key_project.llmsynth.MethodInfo;
 
-import javax.swing.*;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +53,13 @@ public class PromptBuilder
         return this;
     }
 
-    public PromptBuilder fullClass(ClassInfo classInfo) {
-        throw new UnsupportedOperationException("Not implemented");
+    public PromptBuilder classTextInQuotes(ClassInfo classInfo) {
+        textln("'''");
+        for(var line : classInfo.getClassLines()) {
+            textln(line);
+        }
+        textln("'''");
+        return this;
     }
 
     public PromptBuilder methodBodyAndSignature(MethodInfo methodInfo) {

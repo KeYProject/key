@@ -334,7 +334,7 @@ public class Gpt3Prompt {
             env = Utility.createKeyEnvironment(tmpfile.toFile(), null, null, null);
             ImmutableList<ProgramVariable> projectionVariables = ImmutableList.fromList(new LinkedList<>());
             List<Contract> contracts = Utility.getContracts(env);
-            Contract relevantContract = null;
+            Contract relevantContract = null; // todo: this should be a list
             status("Looking for contracts:");
             for (Contract c : contracts) {
                 if (!(c instanceof FunctionalOperationContractImpl)) continue;

@@ -10,7 +10,6 @@ public class BenchmarkParameters {
     public String name;
     public LLMChoice oracle;
     public ControlParameters controlParameters;
-    // public List<String> relatedFiles; // TODO: move this into task? (would enable full set-products for a benchmark generator)
     public LLMTask task;
 
 }

@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 
 public interface LegacyVisitor<T> {
     Iterable<Prompt> reason(UnknownReason reason, T o, Supplier<PromptBuilder> newBuilder);
-    Iterable<Prompt> reason(BadProof reason, T o, Supplier<PromptBuilder> newBuilder);
     Iterable<Prompt> reason(WrongJML reason, T o, Supplier<PromptBuilder> newBuilder);
     Iterable<Prompt> reason(InvalidJava reason, T o, Supplier<PromptBuilder> newBuilder);
     Iterable<Prompt> reason(NoJMLInRegion reason, T o, Supplier<PromptBuilder> newBuilder);

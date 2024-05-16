@@ -16,7 +16,7 @@ public class PromptResult {
     }
 
     public static PromptResult reject(PromptAnswer a, PromptReason r) {
-        return new PromptResult(a, PromptStatus.ACCEPTED, r);
+        return new PromptResult(a, PromptStatus.REJECTED, r);
     }
 
     public boolean isAccepted() {

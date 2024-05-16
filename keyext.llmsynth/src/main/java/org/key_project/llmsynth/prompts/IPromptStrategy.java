@@ -17,10 +17,6 @@ public interface IPromptStrategy<TReason extends PromptReason, TUserData> {
 //        };
 //    }
 
-    default Class<TReason> getReasonType() {
-        throw new IllegalStateException("The class instance of TReason was requested, but is not available");
-    }
-
     default IPromptStrategy<TReason, TUserData> orElse(IPromptStrategy<TReason, TUserData> other) {
         return PromptStrategy.registerAlternativeWhenEmpty(this, other);
     }
@@ -31,6 +27,7 @@ public interface IPromptStrategy<TReason extends PromptReason, TUserData> {
 
     // The class parameter is required, as Java generics do _not_ allow for instanceof checks through a mere generic parameter
     // This is because _all_ generic information is gone at runtime, as if the generic parameter was just of type "Object"
+    // This includes instanceof checks. As the type isn't known (and not stored via compiler sugar) this one of the few work-arounds.
     default IPromptStrategy<PromptReason, TUserData> broaden(Class<TReason> type) {
         return (r, d, b) -> {
             if (type.isInstance(r)) {
@@ -40,13 +37,4 @@ public interface IPromptStrategy<TReason extends PromptReason, TUserData> {
             }
         };
     }
-
-    default IPromptStrategy<PromptReason, TUserData> broaden(TReason sentinel) {
-        return broaden((Class<TReason>) sentinel.getClass());
-    }
-
-    // this may or may not be a "proper" solution, we'll find out...
-    default IPromptStrategy<PromptReason, TUserData> broaden() {
-        return broaden(getReasonType());
-    };
 }

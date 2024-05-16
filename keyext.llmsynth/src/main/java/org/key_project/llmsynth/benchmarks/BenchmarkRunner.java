@@ -1,6 +1,10 @@
 package org.key_project.llmsynth.benchmarks;
 
-import org.key_project.llmsynth.LLMTaskTag;
+import org.key_project.llmsynth.benchmarks.legacy.StrategyProvider;
+import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
+import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
+import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
+import org.key_project.llmsynth.oracles.OracleGpt3_5_Turbo;
 import org.key_project.llmsynth.prompts.*;
 import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 
@@ -9,10 +13,27 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.IntStream;
 
 public class BenchmarkRunner<TFunc, TSub, TLoop> {
+    StrategyProvider<TaskSpecifyFunction, TFunc> funcStrategyProvider;
+    StrategyProvider<TaskSpecifySubcontract, TSub> subStrategyProvider;
+    StrategyProvider<TaskSpecifyLoopInvariant, TLoop> loopStrategyProvider;
+    Function<LLMChoice, BiFunction<PromptReason, Prompt, PromptAnswer> > selectOracle;
+    BiFunction<LLMChoice, ControlParameters, Predicate<PromptResult> > selectResultAcceptor;
 
+    public BenchmarkRunner(
+            StrategyProvider<TaskSpecifyFunction, TFunc> funcStrategyProvider,
+            StrategyProvider<TaskSpecifySubcontract, TSub> subStrategyProvider,
+            StrategyProvider<TaskSpecifyLoopInvariant, TLoop> loopStrategyProvider,
+            Function<LLMChoice, BiFunction<PromptReason, Prompt, PromptAnswer>> selectOracle,
+            BiFunction<LLMChoice, ControlParameters, Predicate<PromptResult>> selectResultAcceptor
+    ) {
+        this.funcStrategyProvider = funcStrategyProvider;
+        this.subStrategyProvider = subStrategyProvider;
+        this.loopStrategyProvider = loopStrategyProvider;
+        this.selectOracle = selectOracle;
+        this.selectResultAcceptor = selectResultAcceptor;
+    }
 
     public void run(Benchmark benchmark) {
         if(benchmark.isFinished()) return;
@@ -23,19 +44,38 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
         BenchmarkParameters param = benchmark.params;
         ControlParameters ctl = param.controlParameters;
 
-        BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle = selectOracle(param.oracle);
-        Predicate<PromptResult> acceptResult = selectResultAcceptor(param.oracle, param.controlParameters);
-        Function<PromptAnswer, PromptResult> defaultVerificator = selectDefaultVerificator(param.oracle, param.task.tag);
+        BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle = selectOracle.apply(param.oracle);
+        Predicate<PromptResult> acceptResult = selectResultAcceptor.apply(param.oracle, param.controlParameters);
 
         switch(param.task.tag) {
-            case SPECIFY_FUNCTION:
-                IPromptStrategy<PromptReason, TFunc> strategy = (IPromptStrategy<PromptReason, TFunc>)selectPromptStrategy(param.oracle, param.task.tag);
-                TFunc data = (TFunc)createUserData(param.oracle, param.controlParameters, param.task.tag);
+            // todo: refactor into parameterized subfuncitoncall
+            case SPECIFY_FUNCTION: {
+                var task = (TaskSpecifyFunction) param.task;
+                IPromptStrategy<PromptReason, TFunc> strategy = funcStrategyProvider.selectStrategy(param.oracle, task);
+                TFunc data = funcStrategyProvider.createUserData();
+                Function<PromptAnswer, PromptResult> defaultVerificator =  funcStrategyProvider.createDefaultVerificator(param.oracle, task);
+
                 run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
                 break;
-            case SPECIFY_SUBCONTRACT:
-            case SPECIFY_LOOP_INVARIANT:
-                throw new UnsupportedOperationException("Not implemented!");
+            }
+            case SPECIFY_SUBCONTRACT: {
+                var task = (TaskSpecifySubcontract) param.task;
+                IPromptStrategy<PromptReason, TSub> strategy = subStrategyProvider.selectStrategy(param.oracle, task);
+                TSub data = subStrategyProvider.createUserData();
+                Function<PromptAnswer, PromptResult> defaultVerificator =  subStrategyProvider.createDefaultVerificator(param.oracle, task);
+
+                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                break;
+            }
+            case SPECIFY_LOOP_INVARIANT: {
+                var task = (TaskSpecifyLoopInvariant) param.task;
+                IPromptStrategy<PromptReason, TLoop> strategy = loopStrategyProvider.selectStrategy(param.oracle, task);
+                TLoop data = loopStrategyProvider.createUserData();
+                Function<PromptAnswer, PromptResult> defaultVerificator =  loopStrategyProvider.createDefaultVerificator(param.oracle, task);
+
+                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                break;
+            }
         }
     }
 
@@ -43,6 +83,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
             Benchmark benchmark,
             ControlParameters ctl,
             LLMTask task, // todo: this should be the concrete instance type (otherwise the visitor-hack is required)
+            // todo: actually, the strategy selector can store it ...
             BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle,
             IPromptStrategy<PromptReason, TUserData> strategy,
             Predicate<PromptResult> acceptResult,
@@ -55,7 +96,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
 
         // insert the restarts into the queue
         for (int i = 0; i < ctl.maxRestarts; i++) {
-            var start = FirstPrompt.create(task.tag, i);
+            var start = new FirstPrompt(i);
             roots.add(start);
             pq.add(start);
         }
@@ -115,36 +156,15 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
         // todo: collect the results into the benchmark
     }
 
-    public Object createUserData(LLMChoice oracle, ControlParameters controlParameters, LLMTaskTag task) {
-        return null; // Expected to be overridden by the user
+    public static <TFunc, TSub, TLoop> BenchmarkRunner<TFunc, TSub, TLoop> create(
+            String token,
+            StrategyProvider<TaskSpecifyFunction, TFunc> funcStrategyProvider,
+            StrategyProvider<TaskSpecifySubcontract, TSub> subStrategyProvider,
+            StrategyProvider<TaskSpecifyLoopInvariant, TLoop> loopStrategyProvider
+    ) {
+        var oracle = new OracleGpt3_5_Turbo(token);
+        return new BenchmarkRunner<>(funcStrategyProvider, subStrategyProvider, loopStrategyProvider,
+                choice -> oracle::answerPrompt,
+                (llmChoice, controlParameters) -> (r -> true));
     }
-
-    public Function<PromptAnswer, PromptResult> selectDefaultVerificator(LLMChoice oracle, LLMTaskTag task) {
-        // todo: KeyVerification here
-        throw new IllegalStateException("Not implemented");
-    }
-
-    public Predicate<PromptResult> selectResultAcceptor(LLMChoice oracle, ControlParameters controlParameters) {
-        return x -> true;
-    }
-
-    public IPromptStrategy<PromptReason, ?> selectPromptStrategy(LLMChoice oracle, LLMTaskTag task) {
-        // this is a no-op strategy, it will always yield an empty set
-        return PromptStrategy.getDefault();
-        // alternatively:
-        // throw new IllegalStateException("Must be user provided");
-    }
-
-    public BiFunction<PromptReason, Prompt, PromptAnswer> selectOracle(LLMChoice oracle) {
-        switch (oracle) {
-            case GPT_3_5_TURBO:
-                return null; // todo
-            default:
-                throw new IllegalStateException("Not implemented");
-        }
-    }
-
-
-
-
 }

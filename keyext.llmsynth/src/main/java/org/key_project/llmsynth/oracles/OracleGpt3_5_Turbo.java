@@ -21,6 +21,7 @@ class MessageBuffer {
 }
 
 public class OracleGpt3_5_Turbo {
+    public static boolean print_Messages = false;
     OpenAiService service;
 
     private final Map<Prompt, List<ChatMessage>> history = new HashMap<>();
@@ -59,6 +60,12 @@ public class OracleGpt3_5_Turbo {
 
         history.put(prompt, List.of(answer, question));
 
+        if (print_Messages) {
+            System.out.println("=============================================================");
+            System.out.println(prompt.toString());
+            System.out.println("-------------------------------------------------------------");
+            System.out.println(answer.getContent());
+        }
         return new PromptAnswer(prompt, answer.getContent());
     }
 

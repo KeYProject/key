@@ -22,14 +22,13 @@ public class LegacyVerificator {
     int maxTries;
     Path tmpFile;
 
-    public LegacyVerificator(List<String> classLines, String methodName, boolean isCtor, String subfun, boolean specInvariant, int maxTries, Path tmpFile) {
+    public LegacyVerificator(List<String> classLines, String methodName, boolean isCtor, String subfun, boolean specInvariant, Path tmpFile) {
         this.classLines = classLines;
         this.methodName = methodName;
         this.isCtor = isCtor;
         this.subfun = subfun;
         this.specInvariant = specInvariant;
-        this.maxTries = maxTries;
-        this.tmpFile = tmpFile;
+        this.tmpFile = tmpFile; // todo: what to do with this one...
     }
 
     class AutoClose<T> implements AutoCloseable {
@@ -114,7 +113,7 @@ public class LegacyVerificator {
                     reason = new InvalidJava();
                     break;
                 case WRONG_JML:
-                    reason = new WrongJML(failureException);
+                    reason = new WrongJML(possible_jml_text.x, failureException);
                     break;
                 case UNKNOWN:
                     reason = new UnknownReason(failureException);
