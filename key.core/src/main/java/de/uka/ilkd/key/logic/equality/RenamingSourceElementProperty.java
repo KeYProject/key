@@ -122,9 +122,7 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
                             + vs.getDimensions();
                 absMap.add(vs);
             } else if (next instanceof ProgramVariable || next instanceof ProgramElementName) {
-                // TODO: fix; somehow this returns null, meaning that something must be looked up,
-                // that is not yet in the map
-                hashCode = 31 * hashCode + absMap.getDepth(next);
+                hashCode = 31 * hashCode + absMap.getAbstractName(next);
             } else if (next instanceof JavaNonTerminalProgramElement jnte) {
                 hashCode = 31 * hashCode + jnte.getChildCount();
             } else {
@@ -284,15 +282,45 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     /* ---------- End of helper methods for special cases in equalsModThisProperty ---------- */
 
+    /**
+     * A helper class to map {@link SourceElement}s to an abstract name.
+     * <p>
+     * As names are abstracted from in this property, we need to give named elements abstract names
+     * for them to be used in the hash code. This approach is similar to
+     * {@link NameAbstractionTable}, where we collect elements with names in the order they are
+     * declared. Each element is associated with the number of previously added elements, which is
+     * then used as the abstract name.
+     */
     private static class NameAbstractionMap {
-        private final Map<SourceElement, Integer> declarationsMap = new HashMap<>();
+        /**
+         * The map that associates {@link SourceElement}s with their abstract names.
+         */
+        private final Map<SourceElement, Integer> map = new HashMap<>();
 
+        /**
+         * Adds a {@link SourceElement} to the map.
+         *
+         * @param element the {@link SourceElement} to be added
+         */
         public void add(SourceElement element) {
-            declarationsMap.put(element, declarationsMap.size());
+            map.put(element, map.size());
         }
 
-        public int getDepth(SourceElement element) {
-            return declarationsMap.get(element);
+        /**
+         * Returns the abstract name of a {@link SourceElement} or {@code -1} if the element is not
+         * in the map.
+         * <p>
+         * A common case for a look-up of an element that is not in the map, is a built-in datatype,
+         * e.g., the {@link ProgramElementName} {@code int}.
+         *
+         * @param element the {@link SourceElement} whose abstract name should be returned
+         * @return the abstract name of the {@link SourceElement} or {@code -1} if the element is
+         *         not
+         *         in the map
+         */
+        public int getAbstractName(SourceElement element) {
+            final Integer result = map.get(element);
+            return result != null ? result : -1;
         }
     }
 }
