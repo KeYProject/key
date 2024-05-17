@@ -1247,8 +1247,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 if (a.heap != null) {
                     break; // No heap on java package allowed
                 }
-                @Nullable
-                Object cur = accept(a.id);
+                @Nullable Object cur = accept(a.id);
                 if (isPackage(javaPackage + "." + cur)) {
                     javaPackage += "." + cur;
                     currentSuffix++;

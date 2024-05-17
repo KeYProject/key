@@ -501,8 +501,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     /**
      * @return A TacletApp with this.sufficientlyComplete() or null
      */
-    @Nullable
-    public final TacletApp tryToInstantiate(Services services) {
+    public final @Nullable TacletApp tryToInstantiate(Services services) {
         TacletApp app = instantiationHelper(true, services);
         if (app == null)
             return null;

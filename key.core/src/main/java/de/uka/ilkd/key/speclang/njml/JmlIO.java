@@ -47,26 +47,19 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public class JmlIO {
+
     private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
     private final Services services;
 
-    @Nullable
-    private KeYJavaType specInClass;
-    @Nullable
-    private LocationVariable selfVar;
-    @Nullable
-    private SpecMathMode specMathMode;
-    @Nullable
-    private ImmutableList<LocationVariable> paramVars;
-    @Nullable
-    private LocationVariable resultVar;
-    @Nullable
-    private LocationVariable excVar;
-    @Nullable
-    private Map<LocationVariable, Term> atPres;
-    @Nullable
-    private Map<LocationVariable, Term> atBefores;
+    private @Nullable KeYJavaType specInClass;
+    private @Nullable LocationVariable selfVar;
+    private @Nullable SpecMathMode specMathMode;
+    private @Nullable ImmutableList<LocationVariable> paramVars;
+    private @Nullable LocationVariable resultVar;
+    private @Nullable LocationVariable excVar;
+    private @Nullable Map<LocationVariable, Term> atPres;
+    private @Nullable Map<LocationVariable, Term> atBefores;
 
     /**
      * Generate an empty jml i/o instance.

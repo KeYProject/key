@@ -35,11 +35,9 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         this.services = services;
     }
 
-    @Nullable
-    protected abstract TypedOperator getOperator(Type promotedType, JMLOperator op);
+    protected abstract @Nullable TypedOperator getOperator(Type promotedType, JMLOperator op);
 
-    @Nullable
-    protected static TypedOperator getOperatorFromMap(
+    protected static @Nullable TypedOperator getOperatorFromMap(
             @Nullable Map<JMLOperator, TypedOperator> opMap,
             JMLOperator op) {
         if (opMap == null) {
@@ -51,8 +49,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         return jop;
     }
 
-    @Nullable
-    public SLExpression build(JMLOperator jop, SLExpression left, SLExpression right)
+    public @Nullable SLExpression build(JMLOperator jop, SLExpression left, SLExpression right)
             throws SLTranslationException {
         if (OverloadedOperatorHandler.UNARY_OPERATORS.contains(jop)) {
             return buildUnary(jop, left);
