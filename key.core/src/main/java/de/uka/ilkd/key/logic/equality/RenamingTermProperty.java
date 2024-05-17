@@ -64,8 +64,8 @@ public class RenamingTermProperty implements Property<Term> {
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        throw new UnsupportedOperationException(
-            "Hashing of terms modulo renaming not yet implemented!");
+        // Labels can be completely ignored
+        return helper1(term, ImmutableSLList.nil());
     }
 
     // equals modulo renaming logic
@@ -250,6 +250,14 @@ public class RenamingTermProperty implements Property<Term> {
         return true;
     }
 
+
+    /**
+     * Checks if the given {@link NameAbstractionTable} is not null. If it is null, a new
+     * {@link NameAbstractionTable} is created and returned.
+     *
+     * @param nat the {@link NameAbstractionTable} to check
+     * @return the given {@code nat} if it is not null, a new {@link NameAbstractionTable} otherwise
+     */
     private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
         if (nat == null) {
             return new NameAbstractionTable();
@@ -258,4 +266,47 @@ public class RenamingTermProperty implements Property<Term> {
     }
     // end of equals modulo renaming logic
 
+    /* -------- Helper methods for hashCodeModThisProperty --------- */
+
+    private int helper1(Term term, ImmutableList<QuantifiableVariable> list) {
+        // mirrors the implementation of unifyHelp that is responsible for equality modulo renaming
+        int hashCode = 1;
+        hashCode = 17 * hashCode + term.sort().hashCode();
+        hashCode = 17 * hashCode + term.arity();
+
+        final Operator op = term.op();
+        if (op instanceof QuantifiableVariable qv) {
+            hashCode = 17 * hashCode + hashQuantifiableVariable(qv, list);
+        } else if (op instanceof Modality mod) {
+            hashCode = 17 * hashCode + mod.kind().hashCode();
+            hashCode = 17 * hashCode + hashJavaBlock(mod);
+        } else if (op instanceof ProgramVariable pv) {
+            hashCode = 17 * hashCode + pv.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY);
+        }
+
+        return recursiveHelper(hashCode, list);
+    }
+
+    private int hashQuantifiableVariable(QuantifiableVariable qv,
+            ImmutableList<QuantifiableVariable> list) {
+        final int index = indexOf(qv, list);
+        // if the variable is not bound, it can make a big difference
+        // if the variable is bound, we just need to consider the place it is bound at
+        return index == -1 ? qv.hashCode() : index;
+    }
+
+    private int hashJavaBlock(Modality mod) {
+        final JavaBlock jb = mod.program();
+        if (!jb.isEmpty()) {
+            final JavaProgramElement jpe = jb.program();
+            return jpe != null ? jpe.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY) : 0;
+        }
+        return 0;
+    }
+
+    private int recursiveHelper(int hashCode, ImmutableList<QuantifiableVariable> list) {
+        return 0;
+    }
+
+    /* ----- End of helper methods for hashCodeModThisProperty ----- */
 }

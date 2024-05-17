@@ -315,8 +315,7 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
          *
          * @param element the {@link SourceElement} whose abstract name should be returned
          * @return the abstract name of the {@link SourceElement} or {@code -1} if the element is
-         *         not
-         *         in the map
+         *         not in the map
          */
         public int getAbstractName(SourceElement element) {
             final Integer result = map.get(element);
