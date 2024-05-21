@@ -90,7 +90,7 @@ public class Main {
         File tmpdir = Files.createTempDirectory("keyLlmSynth").toFile();
         String tmpfile = File.createTempFile("MyFile",".java", tmpdir).getAbsolutePath();
         System.out.printf("Saving temporary files in %s", tmpfile);
-        LegacyStrategyProvider lsp = new LegacyStrategyProvider(Path.of(tmpfile));
+        LegacyStrategyProviderFactory lsp = new LegacyStrategyProviderFactory(Path.of(tmpfile));
         // Task: Create a contract for the given method; we do not care about the method's surroundings
         StrategyProvider<TaskSpecifyFunction, Nothing> legacySpecifyFunctionProvider = lsp.getTaskSpecifyFunctionProvider();
         // Task: Create a contract for the given method; the contract must allow the verification of the top-level method

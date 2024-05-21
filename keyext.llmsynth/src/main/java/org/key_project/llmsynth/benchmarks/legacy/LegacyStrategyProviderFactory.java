@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public final class LegacyStrategyProvider {
+public final class LegacyStrategyProviderFactory {
     public final class SP<TTask extends LLMTask> implements StrategyProvider<TTask, Nothing> {
         BiFunction<LLMChoice, TTask, IPromptStrategy<PromptReason, Nothing>>  mkstrategy;
         BiFunction<LLMChoice, TTask, Function<PromptAnswer, PromptResult>> mkverificator;
@@ -44,7 +44,7 @@ public final class LegacyStrategyProvider {
     private final StrategyProvider<TaskSpecifySubcontract, Nothing> tss;
     private final StrategyProvider<TaskSpecifyLoopInvariant, Nothing> tsli;
 
-    public LegacyStrategyProvider(Path tmpfile) {
+    public LegacyStrategyProviderFactory(Path tmpfile) {
         tsf = new SP<>(this::specFunctionStrategy, (oracle, task) -> {
             var verificator = new LegacyVerificator(
                     task.classInfo.getClassLines(),
