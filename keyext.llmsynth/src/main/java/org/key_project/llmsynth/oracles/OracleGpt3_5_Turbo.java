@@ -38,8 +38,10 @@ public class OracleGpt3_5_Turbo {
     public PromptAnswer answerPrompt(PromptReason generatedFrom, Prompt prompt) {
         ChatMessage question = convert(prompt);
 
+        final boolean[] previousWasStop = {false};
         // todo: hasNext isn't nececcarily correct
         List<ChatMessage> chats = Stream.iterate(generatedFrom, pr -> pr.getParent() != null, PromptReason::getParent)
+                .takeWhile(pr -> { boolean sentinel = previousWasStop[0]; previousWasStop[0] = pr.getPrompt().hasRemoveHistoryFlag(); return sentinel; })
                 .map(PromptReason::getPrompt)
                 .map(history::get)
                 .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);

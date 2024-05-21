@@ -18,6 +18,7 @@ public class PromptBuilder
     boolean alreadyBuilt = false;
     String delimiter = DEFAULT_DELIM;
     Function<PromptAnswer, PromptResult> verificator;
+    boolean removeHistory = false;
 
     public void setDelimiter(String delim) {
         delimiter = delim;
@@ -95,10 +96,15 @@ public class PromptBuilder
     }
     //endregion
 
+    public PromptBuilder withoutHistory() {
+        removeHistory = true;
+        return this;
+    }
+
     public Prompt build() {
         if (alreadyBuilt) throw new IllegalStateException("The prompt builder can only be used once");
         alreadyBuilt = true;
-        return new Prompt(elements, verificator);
+        return new Prompt(elements, verificator, removeHistory);
         // TODO: make a list chain, so that this can be immutable, too
     }
 }
