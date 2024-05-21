@@ -65,7 +65,7 @@ public class RenamingTermProperty implements Property<Term> {
     @Override
     public int hashCodeModThisProperty(Term term) {
         // Labels can be completely ignored
-        return helper1(term, ImmutableSLList.nil());
+        return helper1(term, ImmutableSLList.nil(), 1);
     }
 
     // equals modulo renaming logic
@@ -268,9 +268,8 @@ public class RenamingTermProperty implements Property<Term> {
 
     /* -------- Helper methods for hashCodeModThisProperty --------- */
 
-    private int helper1(Term term, ImmutableList<QuantifiableVariable> list) {
+    private int helper1(Term term, ImmutableList<QuantifiableVariable> list, int hashCode) {
         // mirrors the implementation of unifyHelp that is responsible for equality modulo renaming
-        int hashCode = 1;
         hashCode = 17 * hashCode + term.sort().hashCode();
         hashCode = 17 * hashCode + term.arity();
 
@@ -284,7 +283,7 @@ public class RenamingTermProperty implements Property<Term> {
             hashCode = 17 * hashCode + pv.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY);
         }
 
-        return recursiveHelper(hashCode, list);
+        return recursiveHelper(term, list, hashCode);
     }
 
     private int hashQuantifiableVariable(QuantifiableVariable qv,
@@ -304,8 +303,19 @@ public class RenamingTermProperty implements Property<Term> {
         return 0;
     }
 
-    private int recursiveHelper(int hashCode, ImmutableList<QuantifiableVariable> list) {
-        return 0;
+    private int recursiveHelper(Term term, ImmutableList<QuantifiableVariable> list, int hashCode) {
+        for (int i = 0; i < term.arity(); i++) {
+            ImmutableList<QuantifiableVariable> subBoundVars = list;
+
+            for (int j = 0; j < term.varsBoundHere(i).size(); j++) {
+                final QuantifiableVariable qVar = term.varsBoundHere(i).get(j);
+                hashCode = 17 * hashCode + qVar.sort().hashCode();
+                subBoundVars = subBoundVars.prepend(qVar);
+            }
+
+            hashCode = helper1(term.sub(i), subBoundVars, hashCode);
+        }
+        return hashCode;
     }
 
     /* ----- End of helper methods for hashCodeModThisProperty ----- */
