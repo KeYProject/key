@@ -5,27 +5,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Supplier;
-
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.llmsynth.benchmarks.*;
 import org.key_project.llmsynth.benchmarks.legacy.*;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
-import org.key_project.llmsynth.old_unused.OldBenchmark;
-import org.key_project.llmsynth.old_unused.Utility;
-import org.key_project.llmsynth.old_unused.Gpt3Prompt;
 import org.key_project.llmsynth.oracles.OracleGpt3_5_Turbo;
 import org.key_project.llmsynth.prompts.*;
 import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
-import org.key_project.llmsynth.verificators.LegacyVerificator;
-import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -12,5 +12,5 @@ public interface LegacyVisitor<T> {
     Iterable<Prompt> reason(InvalidJava reason, T o, Supplier<PromptBuilder> newBuilder);
     Iterable<Prompt> reason(NoJMLInRegion reason, T o, Supplier<PromptBuilder> newBuilder);
     Iterable<Prompt> reason(NoJMlInSearchLocations reason, T o, Supplier<PromptBuilder> newBuilder);
-    Iterable<Prompt> reason(FirstPrompt reason, T o,  Supplier<PromptBuilder> newBuilder); // todo: first prompt has no job intel, thats why its here
+    Iterable<Prompt> reason(FirstPrompt reason, T o,  Supplier<PromptBuilder> newBuilder);
 }
