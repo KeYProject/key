@@ -49,7 +49,7 @@ public class TypeCast extends TypeOperator {
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (typeReference != null) {
             result++;

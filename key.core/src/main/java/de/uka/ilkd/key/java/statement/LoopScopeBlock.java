@@ -107,7 +107,7 @@ public class LoopScopeBlock extends JavaStatement
     @Override
     public PosInProgram getFirstActiveChildPos() {
         return getStatementCount() == 0 ? PosInProgram.TOP
-                : PosInProgram.TOP.down(this.getSyntaxChildCount() - 1).down(0);
+                : PosInProgram.TOP.down(this.getChildCount() - 1).down(0);
     }
 
     /**
@@ -150,7 +150,7 @@ public class LoopScopeBlock extends JavaStatement
      * @return an int giving the number of children of this node
      */
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (indexPV != null) {
             result++;

@@ -18,7 +18,7 @@ public class CcatchReturnParameterDeclaration extends CcatchNonstandardParameter
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

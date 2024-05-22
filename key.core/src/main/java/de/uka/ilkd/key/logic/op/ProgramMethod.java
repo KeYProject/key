@@ -257,7 +257,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

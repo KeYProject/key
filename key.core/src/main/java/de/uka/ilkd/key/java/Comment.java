@@ -75,7 +75,7 @@ public class Comment extends JavaSourceElement {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

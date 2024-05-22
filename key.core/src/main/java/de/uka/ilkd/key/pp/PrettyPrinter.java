@@ -410,7 +410,7 @@ public class PrettyPrinter implements Visitor {
         layouter.print("\\dl_" + x.getFunctionSymbol().name());
         layouter.print("(");
 
-        for (int i = 0; i < x.getSyntaxChildCount(); i++) {
+        for (int i = 0; i < x.getChildCount(); i++) {
             if (i != 0) {
                 layouter.print(",").brk();
             }

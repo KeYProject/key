@@ -21,5 +21,5 @@ public interface SyntaxElement {
      *
      * @return the number of children of this syntax element.
      */
-    int getSyntaxChildCount();
+    int getChildCount();
 }

@@ -65,7 +65,7 @@ public class Then extends BranchImp {
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return (body != null) ? 1 : 0;
     }
 

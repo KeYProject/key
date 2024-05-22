@@ -18,7 +18,7 @@ public class CcatchContinueParameterDeclaration extends CcatchNonstandardParamet
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

@@ -93,7 +93,7 @@ public interface Term extends LogicElement, Sorted {
     <T extends Term> void execPreOrder(Visitor<T> visitor);
 
     @Override
-    default int getSyntaxChildCount() {
+    default int getChildCount() {
         return 1 + boundVars().size() + subs().size();
     }
 
@@ -108,6 +108,6 @@ public interface Term extends LogicElement, Sorted {
         if (n < subs().size())
             return sub(n);
         throw new IndexOutOfBoundsException(
-            "Term " + this + " has only " + getSyntaxChildCount() + " children");
+            "Term " + this + " has only " + getChildCount() + " children");
     }
 }

@@ -18,7 +18,7 @@ public class CcatchBreakParameterDeclaration extends CcatchNonstandardParameterD
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

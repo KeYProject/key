@@ -63,7 +63,7 @@ public abstract class JavaASTWalker {
     protected void walk(ProgramElement node) {
         if (node instanceof NonTerminalProgramElement nonTerminalNode) {
             depth++;
-            for (int i = 0; i < nonTerminalNode.getSyntaxChildCount(); i++) {
+            for (int i = 0; i < nonTerminalNode.getChildCount(); i++) {
                 if (nonTerminalNode.getChildAt(i) != null) {
                     walk(nonTerminalNode.getChildAt(i));
                 }

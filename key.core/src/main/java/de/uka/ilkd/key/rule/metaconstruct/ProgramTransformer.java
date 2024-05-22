@@ -134,7 +134,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      *
      * @return an int giving the number of children of this node
      */
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 1;
     }
 

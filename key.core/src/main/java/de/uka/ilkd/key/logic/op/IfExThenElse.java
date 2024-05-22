@@ -47,7 +47,7 @@ public final class IfExThenElse extends AbstractOperator implements Operator {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

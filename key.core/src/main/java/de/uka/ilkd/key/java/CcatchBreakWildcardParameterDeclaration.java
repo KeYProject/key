@@ -18,7 +18,7 @@ public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardPa
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

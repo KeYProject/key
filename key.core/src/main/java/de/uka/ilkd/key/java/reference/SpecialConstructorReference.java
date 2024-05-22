@@ -77,7 +77,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      *
      * @return an int giving the number of children of this node
      */
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return getExpressionCount();
     }
 

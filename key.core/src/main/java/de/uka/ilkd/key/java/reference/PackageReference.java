@@ -63,7 +63,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      *
      * @return an int giving the number of children of this node
      */
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (prefix != null) {
             result++;

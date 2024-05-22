@@ -14,7 +14,7 @@ public interface NonTerminalProgramElement extends ProgramElement {
      *
      * @return an int giving the number of children of this node
      */
-    int getSyntaxChildCount();
+    int getChildCount();
 
     /**
      * Returns the child at the specified index in this node's "virtual" child array.

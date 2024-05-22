@@ -11,7 +11,7 @@ import org.key_project.logic.SyntaxElement;
 
 public interface TerminalProgramElement extends ProgramElement {
     @Override
-    default int getSyntaxChildCount() {
+    default int getChildCount() {
         return 0;
     }
 

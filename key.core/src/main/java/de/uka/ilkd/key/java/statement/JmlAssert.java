@@ -149,7 +149,7 @@ public class JmlAssert extends JavaStatement {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

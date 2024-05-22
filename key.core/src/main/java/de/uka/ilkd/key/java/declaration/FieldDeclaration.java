@@ -66,7 +66,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (modArray != null) {
             result += modArray.size();

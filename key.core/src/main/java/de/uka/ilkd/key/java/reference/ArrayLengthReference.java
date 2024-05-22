@@ -49,7 +49,7 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return (prefix != null) ? 1 : 0;
     }
 

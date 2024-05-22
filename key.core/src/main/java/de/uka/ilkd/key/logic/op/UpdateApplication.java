@@ -80,7 +80,7 @@ public final class UpdateApplication extends AbstractOperator implements Operato
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

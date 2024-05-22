@@ -104,7 +104,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
             Node node) {
         Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
         if (activeStatement instanceof Throw throwStatement && isEnabled()) {
-            for (int i = 0; i < throwStatement.getSyntaxChildCount(); i++) {
+            for (int i = 0; i < throwStatement.getChildCount(); i++) {
                 SourceElement childElement = throwStatement.getChildAt(i);
                 if (childElement instanceof LocationVariable locVar) {
                     if (locVar.getKeYJavaType().getSort().toString().equals(exceptionName)

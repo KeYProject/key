@@ -82,7 +82,7 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
                 ProofReferenceUtil.merge(toFill, reference);
             }
         } else if (includeExpressionContainer && pe instanceof ExpressionContainer ec) {
-            for (int i = ec.getSyntaxChildCount() - 1; i >= 0; i--) {
+            for (int i = ec.getChildCount() - 1; i >= 0; i--) {
                 ProgramElement element = ec.getChildAt(i);
                 listReferences(node, element, arrayLength, toFill, includeExpressionContainer);
             }

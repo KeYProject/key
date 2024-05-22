@@ -70,11 +70,11 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         }
 
         final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) se;
-        if (jnte.getSyntaxChildCount() != getSyntaxChildCount()) {
+        if (jnte.getChildCount() != getChildCount()) {
             return false;
         }
 
-        for (int i = 0, cc = getSyntaxChildCount(); i < cc; i++) {
+        for (int i = 0, cc = getChildCount(); i < cc; i++) {
             if (!getChildAt(i).equalsModRenaming(jnte.getChildAt(i), nat)) {
                 return false;
             }
@@ -90,7 +90,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     @Override
     protected int computeHashCode() {
         int localHash = 17 * super.computeHashCode();
-        for (int i = 0, sz = getSyntaxChildCount(); i < sz; i++) {
+        for (int i = 0, sz = getChildCount(); i < sz; i++) {
             final ProgramElement pe = getChildAt(i);
             localHash = 17 * localHash + (pe == null ? 0 : pe.hashCode());
         }
@@ -149,7 +149,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     protected MatchConditions matchChildren(SourceData source, MatchConditions matchCond,
             int offset) {
 
-        for (int i = offset, sz = getSyntaxChildCount(); i < sz; i++) {
+        for (int i = offset, sz = getChildCount(); i < sz; i++) {
             matchCond = getChildAt(i).match(source, matchCond);
             if (matchCond == null) {
                 return null;
@@ -158,7 +158,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
         final NonTerminalProgramElement ntSrc = (NonTerminalProgramElement) source.getElement();
 
-        if (!compatibleBlockSize(source.getChildPos(), ntSrc.getSyntaxChildCount())) {
+        if (!compatibleBlockSize(source.getChildPos(), ntSrc.getChildCount())) {
             return null;
         }
 

@@ -22,7 +22,7 @@ public class SyntaxElementCursor {
     }
 
     public boolean gotoFirstChild() {
-        if (node.getSyntaxChildCount() <= 0)
+        if (node.getChildCount() <= 0)
             return false;
         path.push(new ParentAndPosition(node, 0));
         node = node.getChild(0);
@@ -35,7 +35,7 @@ public class SyntaxElementCursor {
         var pnp = path.pop();
         SyntaxElement parent = pnp.parent;
         int index = pnp.index + 1;
-        if (index > parent.getSyntaxChildCount()) {
+        if (index > parent.getChildCount()) {
             return false;
         }
         path.push(new ParentAndPosition(parent, index));

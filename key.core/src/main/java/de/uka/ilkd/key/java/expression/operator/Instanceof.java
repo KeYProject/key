@@ -31,13 +31,13 @@ public class Instanceof extends TypeOperator {
 
     public Instanceof(ExtList children) {
         super(children);
-        assert this.getSyntaxChildCount() == 2 : "not 2 children but " + this.getSyntaxChildCount();
+        assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();
     }
 
 
     public Instanceof(Expression unaryChild, TypeReference typeref) {
         super(unaryChild, typeref);
-        assert this.getSyntaxChildCount() == 2 : "not 2 children but " + this.getSyntaxChildCount();
+        assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();
     }
 
     /**
@@ -46,7 +46,7 @@ public class Instanceof extends TypeOperator {
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (children != null) {
             result += children.size();

@@ -88,7 +88,7 @@ public final class IfThenElse extends AbstractOperator implements Operator {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

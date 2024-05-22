@@ -88,7 +88,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      * @return
      */
     public SourceElement getLastElement() {
-        return getChildAt(getSyntaxChildCount() - 1).getLastElement();
+        return getChildAt(getChildCount() - 1).getLastElement();
     }
 
     /**
@@ -97,7 +97,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         if (elseBranch != null) {
             return 3;
         }

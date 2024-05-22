@@ -59,7 +59,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     ExecutionContext context = extractContext(node, services);
                     LinkedHashSet<IProofReference<?>> result =
                         new LinkedHashSet<>();
-                    for (int i = 0; i < assignment.getSyntaxChildCount(); i++) {
+                    for (int i = 0; i < assignment.getChildCount(); i++) {
                         ProgramElement child = assignment.getChildAt(i);
                         if (child instanceof MethodReference) {
                             IProofReference<IProgramMethod> reference =

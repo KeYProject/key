@@ -70,7 +70,7 @@ public class ClassInitializer extends JavaDeclaration
     }
 
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (modArray != null) {
             result += modArray.size();

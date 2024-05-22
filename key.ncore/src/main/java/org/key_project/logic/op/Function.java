@@ -54,7 +54,7 @@ public abstract class Function extends org.key_project.logic.op.AbstractSortedOp
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

@@ -65,7 +65,7 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
 
     public int size() {
         if ((program() instanceof StatementBlock)) {
-            return ((StatementBlock) program()).getSyntaxChildCount();
+            return ((StatementBlock) program()).getChildCount();
         }
         return 0;
     }
@@ -131,7 +131,7 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         if (prg == null || this == EMPTY_JAVABLOCK)
             return 0;
         return 1;

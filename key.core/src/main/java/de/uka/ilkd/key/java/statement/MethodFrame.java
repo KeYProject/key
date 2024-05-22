@@ -54,7 +54,7 @@ public class MethodFrame extends JavaStatement
 
         firstActiveChildPos =
             body.isEmpty() ? PosInProgram.TOP
-                    : PosInProgram.TOP.down(getSyntaxChildCount() - 1).down(0);
+                    : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");
         Debug.assertTrue(body != null, "methodframe: body missing");
@@ -80,7 +80,7 @@ public class MethodFrame extends JavaStatement
 
         firstActiveChildPos =
             body.isEmpty() ? PosInProgram.TOP
-                    : PosInProgram.TOP.down(getSyntaxChildCount() - 1).down(0);
+                    : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
 
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");
@@ -187,7 +187,7 @@ public class MethodFrame extends JavaStatement
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (resultVar != null) {
             result++;

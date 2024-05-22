@@ -65,7 +65,7 @@ public final class Junctor extends AbstractSortedOperator {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

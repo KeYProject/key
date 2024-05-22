@@ -99,7 +99,7 @@ public class SourceData {
 
         final NonTerminalProgramElement ntpe = (NonTerminalProgramElement) element;
 
-        if (childPos < ntpe.getSyntaxChildCount()) {
+        if (childPos < ntpe.getChildCount()) {
             return ntpe.getChildAt(childPos);
         } else {
             return null;

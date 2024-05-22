@@ -63,7 +63,7 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
      * @return an int giving the number of children of this node
      */
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int count = 0;
         if (classContext != null) {
             count++;

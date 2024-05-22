@@ -43,7 +43,7 @@ public abstract class Modality extends AbstractSortedOperator {
     public abstract Program program();
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 2;
     }
 
@@ -92,7 +92,7 @@ public abstract class Modality extends AbstractSortedOperator {
         }
 
         @Override
-        public int getSyntaxChildCount() {
+        public int getChildCount() {
             return 0;
         }
 

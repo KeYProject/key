@@ -121,7 +121,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return body.size();
     }
 

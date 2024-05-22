@@ -62,7 +62,7 @@ public class SetStatement extends JavaStatement {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

@@ -163,12 +163,12 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
 
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(getSyntaxChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (modArray != null) {
             result += modArray.size();

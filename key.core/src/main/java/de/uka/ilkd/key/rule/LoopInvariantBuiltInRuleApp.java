@@ -93,7 +93,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         // try to retrieve a loop index variable
         de.uka.ilkd.key.java.statement.IGuard guard = loop.getGuard();
         // the guard is expected to be of the form "i < x" and we want to retrieve "i".
-        assert guard.getSyntaxChildCount() == 1 : "child count: " + guard.getSyntaxChildCount();
+        assert guard.getChildCount() == 1 : "child count: " + guard.getChildCount();
         ProgramElement guardStatement = guard.getChildAt(0);
         skipIndex = !(guardStatement instanceof LessThan);
         Expression loopIndex =

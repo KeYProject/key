@@ -54,7 +54,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return (children != null) ? children.size() : 0;
     }
 

@@ -54,7 +54,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      *
      * @return an int giving the number of children of this node
      */
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return (typeReference != null) ? 1 : 0;
     }
 

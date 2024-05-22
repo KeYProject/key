@@ -191,7 +191,7 @@ public final class SortDependingFunction extends JFunction {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 1;
     }
 

@@ -61,7 +61,7 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 1;
     }
 

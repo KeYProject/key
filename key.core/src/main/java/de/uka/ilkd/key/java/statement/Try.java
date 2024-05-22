@@ -137,7 +137,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
 
     public SourceElement getLastElement() {
-        return getChildAt(this.getSyntaxChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
     /**
@@ -146,7 +146,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (body != null) {
             result++;

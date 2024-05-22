@@ -76,7 +76,7 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
 
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

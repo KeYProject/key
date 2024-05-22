@@ -41,7 +41,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
         return (ProgramElementName) variable.name();
     }
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return (variable != null) ? 1 : 0;
     }
 

@@ -171,7 +171,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 1;
     }
 

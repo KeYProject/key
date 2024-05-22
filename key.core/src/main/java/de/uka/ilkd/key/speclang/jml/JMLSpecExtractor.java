@@ -281,7 +281,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
 
         // iterate over all children
-        for (int i = 0, n = td.getSyntaxChildCount(); i <= n; i++) {
+        for (int i = 0, n = td.getChildCount(); i <= n; i++) {
             // collect comments
             // (last position are comments of type declaration itself)
             Comment[] comments = null;

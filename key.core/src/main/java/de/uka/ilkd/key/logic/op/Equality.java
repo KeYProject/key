@@ -37,7 +37,7 @@ public final class Equality extends AbstractSortedOperator {
     }
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         return 0;
     }
 

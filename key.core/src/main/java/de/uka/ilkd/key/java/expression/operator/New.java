@@ -99,7 +99,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(this.getSyntaxChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
 
@@ -142,7 +142,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
 
     @Override
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (accessPath != null) {
             result++;

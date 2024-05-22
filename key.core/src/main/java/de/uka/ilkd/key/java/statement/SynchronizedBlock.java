@@ -135,7 +135,7 @@ public class SynchronizedBlock extends JavaStatement
     public PosInProgram getFirstActiveChildPos() {
         return getStatementCount() == 0 ? PosInProgram.TOP
                 : (expressionWithoutSideffects()
-                        ? PosInProgram.TOP.down(getSyntaxChildCount() - 1).down(0)
+                        ? PosInProgram.TOP.down(getChildCount() - 1).down(0)
                         : PosInProgram.ONE);
     }
 
@@ -183,7 +183,7 @@ public class SynchronizedBlock extends JavaStatement
      * @return an int giving the number of children of this node
      */
 
-    public int getSyntaxChildCount() {
+    public int getChildCount() {
         int result = 0;
         if (expression != null) {
             result++;
