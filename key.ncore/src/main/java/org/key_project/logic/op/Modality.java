@@ -5,10 +5,7 @@ package org.key_project.logic.op;
 
 import java.util.Objects;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-import org.key_project.logic.Program;
-import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.*;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
@@ -60,7 +57,7 @@ public abstract class Modality extends AbstractSortedOperator {
     /**
      * Modality kinds like box and diamond.
      */
-    public abstract static class Kind implements Named, SyntaxElement {
+    public abstract static class Kind implements Named, TerminalSyntaxElement {
         private final Name name;
 
         public Kind(Name name) {
@@ -89,16 +86,6 @@ public abstract class Modality extends AbstractSortedOperator {
         @Override
         public int hashCode() {
             return Objects.hash(name());
-        }
-
-        @Override
-        public int getChildCount() {
-            return 0;
-        }
-
-        @Override
-        public SyntaxElement getChild(int n) {
-            throw new IndexOutOfBoundsException("Modality kind " + name() + " has no children");
         }
     }
 }

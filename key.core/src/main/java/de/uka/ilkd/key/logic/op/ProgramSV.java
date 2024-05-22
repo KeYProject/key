@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * Objects of this class are schema variables matching program constructs within modal operators.
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
-public final class ProgramSV extends OperatorSV implements ProgramConstruct, UpdateableOperator , TerminalSyntaxElement {
+public final class ProgramSV extends OperatorSV implements ProgramConstruct, UpdateableOperator , SyntaxElement {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =
@@ -150,12 +150,12 @@ public final class ProgramSV extends OperatorSV implements ProgramConstruct, Upd
 
     @Override
     public SyntaxElement getChild(int n) {
-        return TerminalSyntaxElement.super.getChild(n);
+        throw new IndexOutOfBoundsException("ProgramSV " + this + " has no children");
     }
 
     @Override
     public int getChildCount() {
-        return TerminalSyntaxElement.super.getChildCount();
+        return 0;
     }
 
     @Override

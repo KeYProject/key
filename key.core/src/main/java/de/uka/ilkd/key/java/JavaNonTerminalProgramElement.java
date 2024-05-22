@@ -164,9 +164,4 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
         return matchCond;
     }
-
-    @Override
-    public SyntaxElement getChild(int n) {
-        return getChildAt(n);
-    }
 }

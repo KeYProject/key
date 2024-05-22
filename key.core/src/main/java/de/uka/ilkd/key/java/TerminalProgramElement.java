@@ -4,19 +4,12 @@
 package de.uka.ilkd.key.java;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.TerminalSyntaxElement;
 
 /**
  * Terminal program element. taken from COMPOST and changed to achieve an immutable structure
  */
 
-public interface TerminalProgramElement extends ProgramElement {
-    @Override
-    default int getChildCount() {
-        return 0;
-    }
+public interface TerminalProgramElement extends ProgramElement, TerminalSyntaxElement {
 
-    @Override
-    default SyntaxElement getChild(int n) {
-        throw new IndexOutOfBoundsException("Program element " + this + " has no children");
-    }
 }
