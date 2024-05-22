@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.declaration.modifier;
 
 import de.uka.ilkd.key.java.declaration.Modifier;
 
-import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.util.ExtList;
 
 /**

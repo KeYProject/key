@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TerminalSyntaxElement;
 
 /**

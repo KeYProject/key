@@ -96,7 +96,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
             return services.getTermBuilder().tf().createTerm(binFunc, superterm, index);
         }
 
-        private static class SuperTermGeneratedOp implements SortedOperator, Operator, TerminalSyntaxElement {
+        private static class SuperTermGeneratedOp
+                implements SortedOperator, Operator, TerminalSyntaxElement {
             private final Name NAME;
             private final IntegerLDT numbers;
 

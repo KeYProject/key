@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 import org.key_project.logic.SyntaxElement;
 
@@ -14,7 +13,7 @@ import org.key_project.logic.SyntaxElement;
  * to achieve an immutable structure
  */
 
-public interface SourceElement extends SVSubstitute, SyntaxElement {
+public interface SourceElement extends SyntaxElement {
 
 
     /**

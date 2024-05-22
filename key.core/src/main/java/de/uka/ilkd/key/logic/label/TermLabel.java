@@ -152,7 +152,7 @@ import org.key_project.logic.TerminalSyntaxElement;
  * @see TermLabelManager
  */
 // spotless:on
-public interface TermLabel extends Named, SyntaxElement, /* TODO: Remove*/ TerminalSyntaxElement {
+public interface TermLabel extends Named, SyntaxElement, /* TODO: Remove */ TerminalSyntaxElement {
 
     /**
      * Retrieves the i-th parameter object of this term label.

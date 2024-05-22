@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.WeakHashMap;
 
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TerminalSyntaxElement;
 
 public class Qualifier<T> implements TerminalSyntaxElement {

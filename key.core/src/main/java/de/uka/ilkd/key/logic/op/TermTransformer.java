@@ -6,13 +6,15 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.logic.TerminalSyntaxElement;
 
 /**
  * TermTransformer perform complex term transformation which cannot be (efficiently or at all)
  * described by taclets.
  */
-public interface TermTransformer extends org.key_project.logic.op.SortedOperator, Operator, /*TODO: check*/ TerminalSyntaxElement {
+public interface TermTransformer extends org.key_project.logic.op.SortedOperator, Operator,
+        /* TODO: check */ TerminalSyntaxElement {
 
     /**
      * initiates term transformation of <tt>term</tt>. Note the top level operator of of parameter

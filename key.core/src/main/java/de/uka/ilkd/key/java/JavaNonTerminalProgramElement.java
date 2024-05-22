@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.key_project.logic.SyntaxElement;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 

@@ -23,7 +23,6 @@ import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -34,7 +33,8 @@ import org.slf4j.LoggerFactory;
  * Objects of this class are schema variables matching program constructs within modal operators.
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
-public final class ProgramSV extends OperatorSV implements ProgramConstruct, UpdateableOperator , SyntaxElement {
+public final class ProgramSV extends OperatorSV
+        implements ProgramConstruct, UpdateableOperator, SyntaxElement {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -76,7 +77,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * A {@link Map} mapping from relevant variables for the condition to their runtime equivalent
      * in KeY
      */
-    private Map<SVSubstitute, SVSubstitute> variableNamingMap;
+    private Map<SyntaxElement, SyntaxElement> variableNamingMap;
 
     /**
      * The list of parameter variables of the method that contains the associated breakpoint
@@ -162,14 +163,14 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *
      * @return the cloned map
      */
-    private Map<SVSubstitute, SVSubstitute> getOldMap() {
-        Map<SVSubstitute, SVSubstitute> oldMap = new HashMap<>();
-        for (Entry<SVSubstitute, SVSubstitute> svSubstituteSVSubstituteEntry : getVariableNamingMap()
+    private Map<SyntaxElement, SyntaxElement> getOldMap() {
+        Map<SyntaxElement, SyntaxElement> oldMap = new HashMap<>();
+        for (Entry<SyntaxElement, SyntaxElement> svSubstituteSVSubstituteEntry : getVariableNamingMap()
                 .entrySet()) {
             Entry<?, ?> oldEntry = svSubstituteSVSubstituteEntry;
-            if (oldEntry.getKey() instanceof SVSubstitute
-                    && oldEntry.getValue() instanceof SVSubstitute) {
-                oldMap.put((SVSubstitute) oldEntry.getKey(), (SVSubstitute) oldEntry.getValue());
+            if (oldEntry.getKey() instanceof SyntaxElement
+                    && oldEntry.getValue() instanceof SyntaxElement) {
+                oldMap.put((SyntaxElement) oldEntry.getKey(), (SyntaxElement) oldEntry.getValue());
             }
         }
         return oldMap;
@@ -200,7 +201,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param oldMap the oldMap variableNamings
      */
     private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope,
-            Map<SVSubstitute, SVSubstitute> oldMap, RuleApp ruleApp) {
+            Map<SyntaxElement, SyntaxElement> oldMap, RuleApp ruleApp) {
         // look for renamings KeY did
         boolean found = false;
         // get current renaming tables
@@ -215,7 +216,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                         .getHashMap().entrySet()) {
                     Entry<?, ?> entry = value;
                     if (entry.getKey() instanceof LocationVariable
-                            && entry.getValue() instanceof SVSubstitute) {
+                            && entry.getValue() instanceof SyntaxElement) {
                         if ((VariableNamer.getBasename(((LocationVariable) entry.getKey()).name()))
                                 .equals(varForCondition.name())
                                 && ((LocationVariable) entry.getKey()).name().toString()
@@ -229,7 +230,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                             // add new value
                             toKeep.add((LocationVariable) entry.getValue());
                             getVariableNamingMap().put(varForCondition,
-                                (SVSubstitute) entry.getValue());
+                                (SyntaxElement) entry.getValue());
                             found = true;
                             break;
                         } else if (inScope && ((LocationVariable) entry.getKey()).name()
@@ -242,7 +243,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                             // add new value
                             toKeep.add((LocationVariable) entry.getValue());
                             getVariableNamingMap().put(varForCondition,
-                                (SVSubstitute) entry.getValue());
+                                (SyntaxElement) entry.getValue());
                             found = true;
                             break;
                         }
@@ -263,7 +264,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     protected void refreshVarMaps(RuleApp ruleApp, Node node) {
         boolean inScope = isInScope(node);
         // collect old values
-        Map<SVSubstitute, SVSubstitute> oldMap = getOldMap();
+        Map<SyntaxElement, SyntaxElement> oldMap = getOldMap();
         // put values into map which have to be replaced
         for (ProgramVariable varForCondition : getVarsForCondition()) {
             // put global variables only done when a variable is instantiated by
@@ -498,14 +499,14 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * @return the variableNamingMap
      */
-    public Map<SVSubstitute, SVSubstitute> getVariableNamingMap() {
+    public Map<SyntaxElement, SyntaxElement> getVariableNamingMap() {
         return variableNamingMap;
     }
 
     /**
      * @param variableNamingMap the variableNamingMap to set
      */
-    public void setVariableNamingMap(Map<SVSubstitute, SVSubstitute> variableNamingMap) {
+    public void setVariableNamingMap(Map<SyntaxElement, SyntaxElement> variableNamingMap) {
         this.variableNamingMap = variableNamingMap;
     }
 

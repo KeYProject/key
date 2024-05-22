@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+
 import org.key_project.logic.SyntaxElement;
 
 /**
@@ -31,5 +32,5 @@ public interface ProgramConstruct extends Expression, Statement, ILoopInit, IFor
     SyntaxElement getChild(int n);
 
     @Override
-    int getChildCount() ;
+    int getChildCount();
 }
