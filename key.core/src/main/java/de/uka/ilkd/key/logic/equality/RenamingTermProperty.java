@@ -65,7 +65,7 @@ public class RenamingTermProperty implements Property<Term> {
     @Override
     public int hashCodeModThisProperty(Term term) {
         // Labels can be completely ignored
-        return helper1(term, ImmutableSLList.nil(), 1);
+        return hashTermHelper(term, ImmutableSLList.nil(), 1);
     }
 
     // equals modulo renaming logic
@@ -166,6 +166,15 @@ public class RenamingTermProperty implements Property<Term> {
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
     }
 
+    /**
+     * Handles the case where the first term is a quantifiable variable.
+     *
+     * @param t0 the first term
+     * @param t1 the second term
+     * @param ownBoundVars variables bound above the current position in {@code t0}
+     * @param cmpBoundVars variables bound above the current position in {@code t1}
+     * @return <code>true</code> iff the quantifiable variables are equal modulo renaming
+     */
     private boolean handleQuantifiableVariable(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
@@ -180,6 +189,16 @@ public class RenamingTermProperty implements Property<Term> {
      */
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
 
+    /**
+     * Checks whether the given {@link JavaBlock}s are equal modulo renaming and returns the updated
+     * {@link NameAbstractionTable} or {@link #FAILED} if the {@link JavaBlock}s are not equal.
+     *
+     * @param jb0 the first {@link JavaBlock} to compare
+     * @param jb1 the second {@link JavaBlock} to compare
+     * @param nat the {@link NameAbstractionTable} used for the comparison
+     * @return the updated {@link NameAbstractionTable} if the {@link JavaBlock}s are equal modulo
+     *         renaming or {@link #FAILED} if they are not
+     */
     private static NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1,
             NameAbstractionTable nat) {
         if (!jb0.isEmpty() || !jb1.isEmpty()) {
@@ -217,6 +236,17 @@ public class RenamingTermProperty implements Property<Term> {
         return true;
     }
 
+    /**
+     * Recursively descends into the subterms of the given terms and checks if they are equal modulo
+     * renaming.
+     *
+     * @param t0 the first term
+     * @param t1 the second term
+     * @param ownBoundVars variables bound above the current position in {@code t0}
+     * @param cmpBoundVars variables bound above the current position in {@code t1}
+     * @param nat the {@link NameAbstractionTable} used for the comparison
+     * @return <code>true</code> iff the subterms are equal modulo renaming
+     */
     private boolean descendRecursively(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat) {
@@ -266,16 +296,30 @@ public class RenamingTermProperty implements Property<Term> {
     }
     // end of equals modulo renaming logic
 
+
     /* -------- Helper methods for hashCodeModThisProperty --------- */
 
-    private int helper1(Term term, ImmutableList<QuantifiableVariable> list, int hashCode) {
+    /**
+     * Helps to compute the hash code of a term modulo bound renaming.
+     * <p>
+     * This method takes care of the top level of the term and calls the recursive helper method
+     * {@link #recursiveHelper(Term, ImmutableList, int)} to take care of the subterms.
+     *
+     * @param term the term to compute the hash code for
+     * @param nameAbstractionList the list of bound variables that is used to abstract from the
+     *        variable names
+     * @param hashCode the accumulated hash code (should be 1 for the first call)
+     * @return the hash code
+     */
+    private int hashTermHelper(Term term, ImmutableList<QuantifiableVariable> nameAbstractionList,
+            int hashCode) {
         // mirrors the implementation of unifyHelp that is responsible for equality modulo renaming
         hashCode = 17 * hashCode + term.sort().hashCode();
         hashCode = 17 * hashCode + term.arity();
 
         final Operator op = term.op();
         if (op instanceof QuantifiableVariable qv) {
-            hashCode = 17 * hashCode + hashQuantifiableVariable(qv, list);
+            hashCode = 17 * hashCode + hashQuantifiableVariable(qv, nameAbstractionList);
         } else if (op instanceof Modality mod) {
             hashCode = 17 * hashCode + mod.kind().hashCode();
             hashCode = 17 * hashCode + hashJavaBlock(mod);
@@ -283,29 +327,63 @@ public class RenamingTermProperty implements Property<Term> {
             hashCode = 17 * hashCode + pv.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY);
         }
 
-        return recursiveHelper(term, list, hashCode);
+        return recursiveHelper(term, nameAbstractionList, hashCode);
     }
 
+    /**
+     * Computes the hash code of a quantifiable variable modulo bound renaming.
+     * <p>
+     * If the variable is bound, the hash code is computed based on the index of the variable in the
+     * list of bound variables.
+     * If the variable is not bound, the hash code is computed based on the variable itself.
+     *
+     * @param qv the {@link QuantifiableVariable} to compute the hash code for
+     * @param nameAbstractionList the list of bound variables that is used to abstract from the
+     *        variable names
+     * @return the hash code
+     */
     private int hashQuantifiableVariable(QuantifiableVariable qv,
-            ImmutableList<QuantifiableVariable> list) {
-        final int index = indexOf(qv, list);
-        // if the variable is not bound, it can make a big difference
-        // if the variable is bound, we just need to consider the place it is bound at
+            ImmutableList<QuantifiableVariable> nameAbstractionList) {
+        final int index = indexOf(qv, nameAbstractionList);
+        // if the variable is bound, we just need to consider the place it is bound at and abstract
+        // from the name
         return index == -1 ? qv.hashCode() : index;
     }
 
+    /**
+     * Computes the hash code of a Java block modulo bound renaming.
+     * <p>
+     * The hash code is computed based on the hash code of the program element of the Java block.
+     *
+     * @param mod the {@link Modality} to compute the hash code for
+     * @return the hash code
+     */
     private int hashJavaBlock(Modality mod) {
         final JavaBlock jb = mod.program();
         if (!jb.isEmpty()) {
             final JavaProgramElement jpe = jb.program();
             return jpe != null ? jpe.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY) : 0;
         }
+        // if the Java block is empty, we do not add anything to the hash code
         return 0;
     }
 
-    private int recursiveHelper(Term term, ImmutableList<QuantifiableVariable> list, int hashCode) {
+    /**
+     * Recursively computes the hash code of a term modulo bound renaming.
+     * <p>
+     * This method iterates over the subterms of the given term and calls
+     * {@link #hashTermHelper(Term, ImmutableList, int)} for each subterm.
+     *
+     * @param term the term to compute the hash code for
+     * @param nameAbstractionList the list of bound variables that is used to abstract from the
+     *        variable names
+     * @param hashCode the accumulated hash code
+     * @return the hash code
+     */
+    private int recursiveHelper(Term term, ImmutableList<QuantifiableVariable> nameAbstractionList,
+            int hashCode) {
         for (int i = 0; i < term.arity(); i++) {
-            ImmutableList<QuantifiableVariable> subBoundVars = list;
+            ImmutableList<QuantifiableVariable> subBoundVars = nameAbstractionList;
 
             for (int j = 0; j < term.varsBoundHere(i).size(); j++) {
                 final QuantifiableVariable qVar = term.varsBoundHere(i).get(j);
@@ -313,7 +391,7 @@ public class RenamingTermProperty implements Property<Term> {
                 subBoundVars = subBoundVars.prepend(qVar);
             }
 
-            hashCode = helper1(term.sub(i), subBoundVars, hashCode);
+            hashCode = hashTermHelper(term.sub(i), subBoundVars, hashCode);
         }
         return hashCode;
     }
