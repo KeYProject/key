@@ -75,19 +75,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final SortLDT sortLDT;
     private final SLExceptionFactory exc;
     private final JmlTermFactory termFactory;
-    private final ProgramVariable selfVar;
-    private final ImmutableList<ProgramVariable> paramVars;
-    private final ProgramVariable resultVar;
-    private final ProgramVariable excVar;
+    private final LocationVariable selfVar;
+    private final ImmutableList<LocationVariable> paramVars;
+    private final LocationVariable resultVar;
+    private final LocationVariable excVar;
     private final Map<LocationVariable, Term> atPres;
     private final Map<LocationVariable, Term> atBefores;
 
     // Helper objects
     private final JMLResolverManager resolverManager;
 
-    Translator(Services services, KeYJavaType specInClass, ProgramVariable self,
-            SpecMathMode specMathMode, ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable result, ProgramVariable exc, Map<LocationVariable, Term> atPres,
+    Translator(Services services, KeYJavaType specInClass, LocationVariable self,
+            SpecMathMode specMathMode, ImmutableList<LocationVariable> paramVars,
+            LocationVariable result, LocationVariable exc, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores) {
         assert self == null || specInClass != null;
 
@@ -2285,7 +2285,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert excType != null;
             eVar = new LogicVariable(new Name(vName), excType.getSort());
             resolverManager.pushLocalVariablesNamespace();
-            resolverManager.putIntoTopLocalVariablesNamespace(eVar, excType);
+            resolverManager.putIntoTopLogicVariablesNamespace(eVar, excType);
         }
         SLExpression result = accept(ctx.predornot());
         if (vName != null) {

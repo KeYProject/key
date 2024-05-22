@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 
@@ -21,7 +21,7 @@ public interface InitiallyClause extends SpecificationElement {
     /**
      * Returns the formula without implicit all-quantification over the receiver object.
      */
-    Term getClause(ParsableVariable selfVar, TermServices services);
+    Term getClause(LocationVariable selfVar, TermServices services);
 
     LabeledParserRuleContext getOriginalSpec();
 

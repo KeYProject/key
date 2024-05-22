@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
@@ -85,7 +84,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      */
     private static Term[] createPreconditions(final Term selfTerm, final LoopContract contract,
             final List<LocationVariable> heaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
@@ -174,7 +173,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      */
     private static Term[] createUsageAssumptions(final Term[] postconditions,
             final Map<LocationVariable, JFunction> anonOutHeaps,
-            final ImmutableSet<ProgramVariable> localOutVariables,
+            final ImmutableSet<LocationVariable> localOutVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term wellFormedAnonymisationHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonOutHeaps);
@@ -276,9 +275,9 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         contract.setInstantiationSelf(instantiation.self());
 
         final List<LocationVariable> heaps = application.getHeapContext();
-        final ImmutableSet<ProgramVariable> localInVariables =
+        final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
-        final ImmutableSet<ProgramVariable> localOutVariables =
+        final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, JFunction> anonOutHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
@@ -318,7 +317,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         configurator.setUpPreconditionGoal(result.tail().head(), updates[0], assumptions);
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(usageAssumptions, freePostcondition));
-        final ProgramVariable exceptionParameter =
+        final LocationVariable exceptionParameter =
             createLocalVariable("e", vars[0].exception.getKeYJavaType(), services);
         configurator.setUpLoopValidityGoal(goal, contract, context, updates[1],
             nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
