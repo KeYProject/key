@@ -94,7 +94,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
             } else {
                 newVar = getVariable();
             }
-            newVarTerm = tb.var(newVar);
+            newVarTerm = tb.varOfQuantVar(newVar);
         }
     }
 

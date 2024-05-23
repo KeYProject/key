@@ -78,14 +78,15 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param tb the TermBuilder to be used
      * @return an anonymizing update for the specified variables.
      */
-    private static Term createLocalAnonUpdate(final ImmutableSet<ProgramVariable> localOutVariables,
+    private static Term createLocalAnonUpdate(
+            final ImmutableSet<LocationVariable> localOutVariables,
             final Services services, final TermBuilder tb) {
         Term localAnonUpdate = null;
-        for (ProgramVariable pv : localOutVariables) {
+        for (LocationVariable pv : localOutVariables) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
             final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (localAnonUpdate == null) {
                 localAnonUpdate = elemUpd;
             } else {
@@ -199,8 +200,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     private static Term setUpValidityTerm(final List<LocationVariable> heaps,
             Map<LocationVariable, JFunction> anonHeaps,
             Map<LocationVariable, JFunction> anonOutHeaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
-            final ImmutableSet<ProgramVariable> localOutVariables,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localOutVariables,
             final ProgramVariable exceptionParameter, final Term[] assumptions,
             final Term[] postconditions, final Term[] updates, final BlockContract bc,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
@@ -231,8 +232,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      */
     private static Term addWdToValidityTerm(Term validity, final Term[] updates,
             final List<LocationVariable> heaps, Map<LocationVariable, JFunction> anonOutHeaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
-            final ImmutableSet<ProgramVariable> localOutVariables, final BlockContract bc,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localOutVariables, final BlockContract bc,
             final GoalsConfigurator configurator, final Services services, final TermBuilder tb) {
         if (WellDefinednessCheck.isOn()) {
             final Term wdUpdate = services.getTermBuilder().parallel(updates[1], updates[2]);
@@ -309,7 +310,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final IProgramMethod pm = getProgramMethod();
 
         final StatementBlock block = getBlock();
-        final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
         register(selfVar, services);
         final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
@@ -321,9 +322,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         }
 
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-        final ImmutableSet<ProgramVariable> localInVariables =
+        final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(block, services);
-        final ImmutableSet<ProgramVariable> localOutVariables =
+        final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(block, services);
 
         Map<LocationVariable, JFunction> anonOutHeaps =
@@ -453,9 +454,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param services services.
      * @return the preconditions.
      */
-    private Term[] createAssumptions(final IProgramMethod pm, final ProgramVariable selfVar,
+    private Term[] createAssumptions(final IProgramMethod pm, final LocationVariable selfVar,
             final List<LocationVariable> heaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();

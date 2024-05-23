@@ -154,7 +154,7 @@ public final class SpecificationRepository {
         // create schema terms
         final Term[] subs = new Term[limited.arity()];
         for (int i = 0; i < subs.length; i++) {
-            final SchemaVariable argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
+            final TermSV argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
                 limited.argSort(i), false, false);
             subs[i] = tb.var(argSV);
         }
@@ -179,7 +179,7 @@ public final class SpecificationRepository {
         // create schema terms
         final Term[] subs = new Term[limited.arity()];
         for (int i = 0; i < subs.length; i++) {
-            final SchemaVariable argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
+            final TermSV argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
                 limited.argSort(i), false, false);
             subs[i] = tb.var(argSV);
         }
@@ -1058,7 +1058,7 @@ public final class SpecificationRepository {
                     continue; // only non-private classes
                 }
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
-                final ProgramVariable selfVar = tb.selfVar(kjt, false);
+                final LocationVariable selfVar = tb.selfVar(kjt, false);
 
                 Term invDef = tb.tt();
                 Term staticInvDef = tb.tt();
@@ -1150,17 +1150,17 @@ public final class SpecificationRepository {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
         for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
             for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
-                final ProgramVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
+                final LocationVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
                 if (!pm.isVoid() && pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(kjt, pm);
-                    ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, false);
-                    Map<LocationVariable, ProgramVariable> atPreVars = new LinkedHashMap<>();
+                    ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, false);
+                    Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
                     List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
                     for (LocationVariable heap : heaps) {
                         atPreVars.put(heap,
                             tb.atPreVar(heap.name().toString(), heap.sort(), false));
                     }
-                    ProgramVariable resultVar = tb.resultVar(pm, false);
+                    LocationVariable resultVar = tb.resultVar(pm, false);
 
                     // This assumes there is one operation contract for each
                     // model pm per class

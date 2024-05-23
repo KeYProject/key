@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
@@ -148,11 +148,12 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 
     private final JmlIO jio;
     private static KeYJavaType containerType;
-    private static ProgramVariable self;
+    private static LocationVariable self;
 
     public TestIntLiteralParsing() {
         containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
+        self = (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable("next",
+            containerType);
         jio = new JmlIO(getServices()).classType(containerType)
                 .specMathMode(SpecMathMode.BIGINT).selfVar(self);
     }
