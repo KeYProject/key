@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Simple value object to hold two values.
  *
@@ -43,7 +45,7 @@ public class Pair<T1, T2> {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof Pair<?, ?> p)) {
             return false;
         }

@@ -57,13 +57,13 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
      * @param newFlags new flags.
      * @param services services.
      */
-    public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
+    public void replaceFlags(final Map<Label, LocationVariable> oldFlags,
             final Map<Label, S> newFlags, TermServices services) {
         if (newFlags != null) {
             if (newFlags.size() != oldFlags.size()) {
                 throw new IllegalArgumentException("flags have to have the same size");
             }
-            for (Entry<Label, ProgramVariable> oldFlag : oldFlags.entrySet()) {
+            for (Entry<Label, LocationVariable> oldFlag : oldFlags.entrySet()) {
                 replaceVariable(oldFlag.getValue(), newFlags.get(oldFlag.getKey()), services);
             }
         }

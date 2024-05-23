@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -148,8 +149,12 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             // Make sure that all other settings are unchanged.
             Map<String, String> changedSettings =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-            defaultSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
-            Assertions.assertEquals(defaultSettings, changedSettings);
+
+            Map<String, String> expectedSettings = new HashMap<>();
+            expectedSettings.putAll(defaultSettings);
+            expectedSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
+
+            Assertions.assertEquals(expectedSettings, changedSettings);
         } finally {
             if (originalValue != null) {
                 SymbolicExecutionUtil.setChoiceSetting(

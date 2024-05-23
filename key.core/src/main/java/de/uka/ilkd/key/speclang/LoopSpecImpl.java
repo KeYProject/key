@@ -545,15 +545,15 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     @Override
     public OriginalVariables getOrigVars() {
-        Map<LocationVariable, ProgramVariable> atPreVars =
+        Map<LocationVariable, LocationVariable> atPreVars =
             new LinkedHashMap<>();
         for (LocationVariable h : originalAtPres.keySet()) {
-            atPreVars.put(h, (ProgramVariable) originalAtPres.get(h).op());
+            atPreVars.put(h, (LocationVariable) originalAtPres.get(h).op());
         }
-        final ProgramVariable self;
+        final LocationVariable self;
         if (this.originalSelfTerm != null
                 && this.originalSelfTerm.op() instanceof ProgramVariable) {
-            self = (ProgramVariable) this.originalSelfTerm.op();
+            self = (LocationVariable) this.originalSelfTerm.op();
         } else if (this.originalSelfTerm != null) {
             self =
                 new LocationVariable(new ProgramElementName(originalSelfTerm.op().toString()), kjt);

@@ -106,9 +106,8 @@ public class SlicingExtension implements KeYGuiExtension,
         }
     };
 
-    @NonNull
     @Override
-    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
             @NonNull ContextMenuKind kind,
             @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
@@ -145,9 +144,8 @@ public class SlicingExtension implements KeYGuiExtension,
         });
     }
 
-    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(
+    public @NonNull Collection<TabPanel> getPanels(
             @NonNull MainWindow window, @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             leftPanel = new SlicingLeftPanel(mediator, this);

@@ -45,9 +45,8 @@ public class ScriptException extends Exception implements HasLocation {
         this.location = null;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return location;
     }
 

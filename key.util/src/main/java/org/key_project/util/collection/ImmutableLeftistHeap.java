@@ -12,6 +12,7 @@ import org.key_project.util.Strings;
  * This class implements the leftist heap, see &quot;Functional Data Structures&quot; by Chris
  * Okasaki
  */
+@SuppressWarnings("nullness")
 public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements ImmutableHeap<T> {
 
     /**

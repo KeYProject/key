@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 

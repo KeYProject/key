@@ -744,6 +744,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnSubtype(Subtype x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
         doDefaultAction(x);
     }

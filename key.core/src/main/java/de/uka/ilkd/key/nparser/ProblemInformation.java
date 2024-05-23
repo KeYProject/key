@@ -70,8 +70,7 @@ public class ProblemInformation {
         classpath = new LinkedList<>();
     }
 
-    @Nullable
-    public String getChooseContract() {
+    public @Nullable String getChooseContract() {
         return chooseContract;
     }
 
@@ -79,8 +78,7 @@ public class ProblemInformation {
         this.chooseContract = chooseContract;
     }
 
-    @Nullable
-    public String getProofObligation() {
+    public @Nullable String getProofObligation() {
         return proofObligation;
     }
 
@@ -88,8 +86,7 @@ public class ProblemInformation {
         this.proofObligation = proofObligation;
     }
 
-    @Nullable
-    public String getProfile() {
+    public @Nullable String getProfile() {
         return profile;
     }
 
@@ -97,8 +94,7 @@ public class ProblemInformation {
         this.profile = profile;
     }
 
-    @Nullable
-    public String getPreferences() {
+    public @Nullable String getPreferences() {
         return preferences;
     }
 
@@ -106,8 +102,7 @@ public class ProblemInformation {
         this.preferences = preferences;
     }
 
-    @Nullable
-    public String getBootClassPath() {
+    public @Nullable String getBootClassPath() {
         return bootClassPath;
     }
 
@@ -115,8 +110,7 @@ public class ProblemInformation {
         this.bootClassPath = bootClassPath;
     }
 
-    @Nullable
-    public String getJavaSource() {
+    public @Nullable String getJavaSource() {
         return javaSource;
     }
 
@@ -124,8 +118,7 @@ public class ProblemInformation {
         this.javaSource = javaSource;
     }
 
-    @NonNull
-    public List<String> getClasspath() {
+    public @NonNull List<String> getClasspath() {
         return classpath;
     }
 

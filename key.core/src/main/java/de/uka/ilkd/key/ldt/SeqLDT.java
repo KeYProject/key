@@ -170,9 +170,8 @@ public final class SeqLDT extends LDT {
         return null;
     }
 
-    @Nullable
     @Override
-    public JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
         if (operationName.equals("add")) {
             return getSeqConcat();
         }

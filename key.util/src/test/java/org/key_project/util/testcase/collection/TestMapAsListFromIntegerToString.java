@@ -14,8 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * JUnit test for MapAsList<Integer,String> implementation
  */
-
-
+@SuppressWarnings("initialization")
 public class TestMapAsListFromIntegerToString {
 
     private String[] entryStr;

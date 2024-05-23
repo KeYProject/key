@@ -40,14 +40,13 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Wed Jun 25 11:46:39 CEST 2014
-name=compute(int)
-addSymbolicExecutionLabel=true
-addUninterpretedPredicate=true
-class=de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO
-method=Magic42\\#compute(int)
-";
+\proofObligation {
+	"name": "compute(int)",
+	"addSymbolicExecutionLabel": true,
+	"addUninterpretedPredicate": true,
+	"class": "de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO",
+	"method": "Magic42#compute(int)",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

@@ -58,8 +58,7 @@ public final class ProofManagementDialog extends JDialog {
      * The contracts are stored by name of the {@link KeYJavaType}, method name, and contract name
      * to avoid keeping environments in the memory.
      */
-    @Nullable
-    private static ContractId previouslySelectedContracts;
+    private static @Nullable ContractId previouslySelectedContracts;
 
     private static final ImageIcon KEY_OPEN = IconFactory.keyHole(20, 20);
     private static final ImageIcon KEY_ALMOST_CLOSED = IconFactory.keyHoleAlmostClosed(20, 20);
@@ -439,8 +438,7 @@ public final class ProofManagementDialog extends JDialog {
      * @return a proof for the contract, preferring closed proofs then closed proofs needing some
      *         lemmas and then just any proof or {@code null} if there is no proof for the contract
      */
-    @Nullable
-    private Proof findPreferablyClosedProof(@NonNull Contract contract) {
+    private @Nullable Proof findPreferablyClosedProof(@NonNull Contract contract) {
         // will the contracts here always be atomic?
         // it seems that way, but not completely sure
         ImmutableSet<Proof> proofs =

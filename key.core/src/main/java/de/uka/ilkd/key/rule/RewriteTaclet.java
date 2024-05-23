@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -189,7 +188,7 @@ public class RewriteTaclet extends FindTaclet {
                     svi = svi.addUpdate(update, t.getLabels());
                 }
             } else if (getApplicationRestriction() != NONE
-                    && (op instanceof Modality || op instanceof ModalOperatorSV)) {
+                    && (op instanceof Modality)) {
                 return null;
             }
 

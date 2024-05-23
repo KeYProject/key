@@ -12,7 +12,7 @@ import org.key_project.logic.Name;
 /**
  * A schema variable that is used as placeholder for formulas.
  */
-public final class FormulaSV extends AbstractSV {
+public final class FormulaSV extends OperatorSV {
 
     /**
      * @param name the name of the SchemaVariable

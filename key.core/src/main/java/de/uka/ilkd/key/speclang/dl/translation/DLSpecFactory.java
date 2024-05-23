@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -90,7 +89,7 @@ public final class DLSpecFactory {
     }
 
 
-    private ProgramVariable extractExcVar(Term fma) {
+    private LocationVariable extractExcVar(Term fma) {
         final Term modFma =
             fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
 
@@ -128,13 +127,13 @@ public final class DLSpecFactory {
     }
 
 
-    private ProgramVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
+    private LocationVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
         if (inst.actualSelf == null) {
             assert inst.pm.isStatic();
             return null;
-        } else if (inst.actualSelf.op() instanceof ProgramVariable) {
-            return (ProgramVariable) inst.actualSelf.op();
+        } else if (inst.actualSelf.op() instanceof LocationVariable lv) {
+            return lv;
         } else {
             throw new ProofInputException(
                 "Program variable expected, " + "but found: " + inst.actualSelf);
@@ -142,12 +141,12 @@ public final class DLSpecFactory {
     }
 
 
-    private ImmutableList<ProgramVariable> extractParamVars(
+    private ImmutableList<LocationVariable> extractParamVars(
             UseOperationContractRule.Instantiation inst) throws ProofInputException {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         for (Term param : inst.actualParams) {
-            if (param.op() instanceof ProgramVariable) {
-                result = result.append((ProgramVariable) param.op());
+            if (param.op() instanceof LocationVariable lv) {
+                result = result.append(lv);
             } else {
                 throw new ProofInputException(
                     "Program variable expected, " + "but found: " + param);
@@ -157,12 +156,12 @@ public final class DLSpecFactory {
     }
 
 
-    private ProgramVariable extractResultVar(UseOperationContractRule.Instantiation inst)
+    private LocationVariable extractResultVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
         if (inst.actualResult == null) {
             return null;
-        } else if (inst.actualResult instanceof ProgramVariable) {
-            return (ProgramVariable) inst.actualResult;
+        } else if (inst.actualResult instanceof LocationVariable lv) {
+            return lv;
         } else {
             throw new ProofInputException(
                 "Program variable expected, " + "but found: " + inst.actualResult);
@@ -186,7 +185,7 @@ public final class DLSpecFactory {
      * Creates a class invariant from a formula and a designated "self".
      */
     public ClassInvariant createDLClassInvariant(String name, String displayName,
-            ParsableVariable selfVar, Term inv) throws ProofInputException {
+            LocationVariable selfVar, Term inv) throws ProofInputException {
         assert name != null;
         if (displayName == null) {
             displayName = name;
@@ -217,14 +216,14 @@ public final class DLSpecFactory {
         // extract parts of fma
         final Term pre = extractPre(fma);
         LocationVariable heapAtPreVar = extractHeapAtPre(fma);
-        ProgramVariable excVar = extractExcVar(fma);
+        LocationVariable excVar = extractExcVar(fma);
         final UseOperationContractRule.Instantiation inst = extractInst(fma);
         final IProgramMethod pm = extractProgramMethod(inst);
         final Modality.JavaModalityKind modalityKind = extractModalityKind(inst);
-        final ProgramVariable selfVar =
+        final LocationVariable selfVar =
             pm.isConstructor() ? extractResultVar(inst) : extractSelfVar(inst);
-        final ImmutableList<ProgramVariable> paramVars = extractParamVars(inst);
-        ProgramVariable resultVar = pm.isConstructor() ? null : extractResultVar(inst);
+        final ImmutableList<LocationVariable> paramVars = extractParamVars(inst);
+        LocationVariable resultVar = pm.isConstructor() ? null : extractResultVar(inst);
         Term post = extractPost(fma);
 
         // heapAtPre must not occur in precondition or in modifies clause

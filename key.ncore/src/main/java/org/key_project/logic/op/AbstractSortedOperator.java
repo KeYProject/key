@@ -7,27 +7,20 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Abstract sorted operator class offering some common functionality.
  */
 public abstract class AbstractSortedOperator extends AbstractOperator
         implements SortedOperator {
-    private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<>();
-
-    private static ImmutableArray<Sort> getEmptySortList() {
-        return EMPTY_SORT_LIST;
-    }
-
     private final Sort sort;
     private final ImmutableArray<Sort> argSorts;
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, Modifier modifier) {
-        super(name, argSorts == null ? 0 : argSorts.size(), whereToBind, modifier);
-        if (sort == null) {
-            throw new NullPointerException("Given sort is null");
-        }
-        this.argSorts = argSorts == null ? getEmptySortList() : argSorts;
+            @Nullable ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+        super(name, argSorts.size(), whereToBind, modifier);
+        this.argSorts = argSorts;
         this.sort = sort;
     }
 
@@ -47,7 +40,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     }
 
     protected AbstractSortedOperator(Name name, Sort sort, Modifier modifier) {
-        this(name, (ImmutableArray<Sort>) null, sort, null, modifier);
+        this(name, new ImmutableArray<>(), sort, null, modifier);
     }
 
     @Override

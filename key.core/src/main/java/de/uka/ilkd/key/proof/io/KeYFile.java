@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -60,10 +62,8 @@ public class KeYFile implements EnvInput {
     private final Profile profile;
     protected InitConfig initConfig;
     private KeyAst.File fileCtx = null;
-    @Nullable
-    private ProblemFinder problemFinder = null;
-    @Nullable
-    private ProblemInformation problemInformation = null;
+    private @Nullable ProblemFinder problemFinder = null;
+    private @Nullable ProblemInformation problemInformation = null;
     private Includes includes;
 
     /**
@@ -251,9 +251,8 @@ public class KeYFile implements EnvInput {
     }
 
 
-    @NonNull
     @Override
-    public List<File> readClassPath() {
+    public @NonNull List<File> readClassPath() {
         @NonNull
         ProblemInformation pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
@@ -333,14 +332,13 @@ public class KeYFile implements EnvInput {
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
-        specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
-        specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
+        specRepos.addContracts(Immutables.createSetFrom(cinvs.getContracts()));
+        specRepos.addClassInvariants(Immutables.createSetFrom(cinvs.getInvariants()));
 
         return DefaultImmutableSet.nil();
     }
 
-    @NonNull
-    protected ProblemFinder getProblemFinder() {
+    protected @NonNull ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
             problemFinder = new ProblemFinder(initConfig.getServices(), initConfig.namespaces());
             getParseContext().accept(problemFinder);
@@ -431,7 +429,7 @@ public class KeYFile implements EnvInput {
         return null;
     }
 
-    public String getProofObligation() {
+    public Configuration getProofObligation() {
         return null;
     }
 

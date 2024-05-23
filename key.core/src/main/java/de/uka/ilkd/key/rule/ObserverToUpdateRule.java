@@ -150,9 +150,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         return true;
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate(ruleApp.posInOccurrence().subTerm(), services);
         assert inst != null : "If isApplicable has been checked, this must not be null";

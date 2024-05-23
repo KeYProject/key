@@ -552,9 +552,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         return false;
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         // get instantiation
         final Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), services);

@@ -73,9 +73,8 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
         // nothing to do
     }
 
-    @NonNull
     @Override
-    public String getSearchString() {
+    public @NonNull String getSearchString() {
         return toString();
     }
 }

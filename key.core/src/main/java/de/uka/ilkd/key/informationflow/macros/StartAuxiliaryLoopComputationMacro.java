@@ -51,7 +51,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (goals == null || goals.head() == null || goals.head().node() == null
+        if (goals == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
         }

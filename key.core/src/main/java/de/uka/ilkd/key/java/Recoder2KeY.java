@@ -1206,8 +1206,7 @@ public class Recoder2KeY implements JavaReader {
     /**
      * tries to parse recoders exception position information
      */
-    @Nullable
-    private static Pair<String, Position> extractPositionInfo(String errorMessage) {
+    private static @Nullable Pair<String, Position> extractPositionInfo(String errorMessage) {
         if (errorMessage == null || errorMessage.indexOf('@') == -1) {
             return null;
         }

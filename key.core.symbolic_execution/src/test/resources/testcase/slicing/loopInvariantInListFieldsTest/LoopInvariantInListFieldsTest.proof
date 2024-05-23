@@ -41,14 +41,13 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Jul 15 10:21:18 CEST 2016
-name=main()
-addSymbolicExecutionLabel=true
-addUninterpretedPredicate=true
-class=de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO
-method=LoopInvariantInListFieldsTest\\#main()
-";
+\proofObligation {
+	"name": "main()",
+	"addSymbolicExecutionLabel": true,
+	"addUninterpretedPredicate": true,
+	"class": "de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO",
+	"method": "LoopInvariantInListFieldsTest#main()",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

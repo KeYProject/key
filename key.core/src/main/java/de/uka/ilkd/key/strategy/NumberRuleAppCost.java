@@ -56,9 +56,8 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      */
     public abstract long getValue();
 
-    @NonNull
     @Override
-    public RuleAppCost mul(@NonNull RuleAppCost cost) {
+    public @NonNull RuleAppCost mul(@NonNull RuleAppCost cost) {
         if (cost instanceof TopRuleAppCost) {
             return cost.mul(this);
         }

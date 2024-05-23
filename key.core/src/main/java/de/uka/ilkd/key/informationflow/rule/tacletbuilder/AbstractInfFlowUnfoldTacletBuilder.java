@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -82,7 +82,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // collect quantifiable variables of the find term and replacewith term
         // and replace all quantifiable variables by schema variables
-        Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+        Map<QuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
             collectQuantifiableVariables(schemaFind, services);
         quantifiableVarsToSchemaVars
                 .putAll(collectQuantifiableVariables(schemaReplaceWith, services));

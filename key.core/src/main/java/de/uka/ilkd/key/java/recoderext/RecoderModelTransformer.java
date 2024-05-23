@@ -78,6 +78,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                 case "\\locset" -> EmptySetLiteral.INSTANCE;
                 case "\\seq" -> EmptySeqLiteral.INSTANCE;
                 case "\\set" -> new DLEmbeddedExpression("emptySet", Collections.emptyList());
+                case "\\TYPE" -> new DLEmbeddedExpression("any::ssort", Collections.emptyList());
                 case "\\free" -> new DLEmbeddedExpression("atom", Collections.emptyList());
                 case "\\map" -> EmptyMapLiteral.INSTANCE;
                 default -> {

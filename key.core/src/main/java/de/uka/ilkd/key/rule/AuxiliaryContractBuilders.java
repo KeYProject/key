@@ -350,7 +350,7 @@ public final class AuxiliaryContractBuilders {
                 // In an existing PO, the outer remembrance vars already exist and refer to the
                 // current method's prestate.
                 return new BlockContract.Variables(
-                    self != null ? self.op(ProgramVariable.class) : null,
+                    self != null ? self.op(LocationVariable.class) : null,
                     createAndRegisterFlags(placeholderVariables.breakFlags),
                     createAndRegisterFlags(placeholderVariables.continueFlags),
                     createAndRegisterVariable(placeholderVariables.returnFlag),
@@ -374,7 +374,7 @@ public final class AuxiliaryContractBuilders {
                     outerRemembranceVariables);
 
                 return new BlockContract.Variables(
-                    self != null ? self.op(ProgramVariable.class) : null,
+                    self != null ? self.op(LocationVariable.class) : null,
                     createAndRegisterFlags(placeholderVariables.breakFlags),
                     createAndRegisterFlags(placeholderVariables.continueFlags),
                     createAndRegisterVariable(placeholderVariables.returnFlag),
@@ -435,10 +435,10 @@ public final class AuxiliaryContractBuilders {
          * @param placeholderFlags the placeholder flags.
          * @return newly created and registered flags with the same names.
          */
-        private Map<Label, ProgramVariable> createAndRegisterFlags(
-                final Map<Label, ProgramVariable> placeholderFlags) {
-            Map<Label, ProgramVariable> result = new LinkedHashMap<>();
-            for (Map.Entry<Label, ProgramVariable> flag : placeholderFlags.entrySet()) {
+        private Map<Label, LocationVariable> createAndRegisterFlags(
+                final Map<Label, LocationVariable> placeholderFlags) {
+            Map<Label, LocationVariable> result = new LinkedHashMap<>();
+            for (Map.Entry<Label, LocationVariable> flag : placeholderFlags.entrySet()) {
                 result.put(flag.getKey(), createAndRegisterVariable(flag.getValue()));
             }
             return result;
@@ -814,7 +814,7 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that all of those variables have valid values.
          */
         public Term buildReachableInCondition(
-                final ImmutableSet<ProgramVariable> localInVariables) {
+                final ImmutableSet<LocationVariable> localInVariables) {
             return buildReachableCondition(localInVariables);
         }
 
@@ -824,7 +824,7 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that all of those variables have valid values.
          */
         public Term buildReachableOutCondition(
-                final ImmutableSet<ProgramVariable> localOutVariables) {
+                final ImmutableSet<LocationVariable> localOutVariables) {
             final Term reachableResult =
                 (variables.result != null) ? reachableValue(variables.result)
                         : services.getTermBuilder().tt();
@@ -837,9 +837,9 @@ public final class AuxiliaryContractBuilders {
          * @param variables a set of variables.
          * @return the condition that all of those variables have valid values.
          */
-        public Term buildReachableCondition(final ImmutableSet<ProgramVariable> variables) {
+        public Term buildReachableCondition(final ImmutableSet<LocationVariable> variables) {
             Term result = tt();
-            for (ProgramVariable variable : variables) {
+            for (LocationVariable variable : variables) {
                 result = and(result, reachableValue(variable));
             }
             return result;
@@ -1074,9 +1074,9 @@ public final class AuxiliaryContractBuilders {
          * @param flags a collection of boolean variables.
          * @return the condition that all flags are {@code false}.
          */
-        private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags) {
+        private List<Term> buildFlagsNotSetConditions(final Collection<LocationVariable> flags) {
             final List<Term> result = new LinkedList<>();
-            for (ProgramVariable flag : flags) {
+            for (LocationVariable flag : flags) {
                 result.add(buildFlagNotSetCondition(flag));
             }
             return result;
@@ -1087,7 +1087,7 @@ public final class AuxiliaryContractBuilders {
          * @param flag a boolean variable.
          * @return the condition that the flag is {@code false}.
          */
-        private Term buildFlagNotSetCondition(final ProgramVariable flag) {
+        private Term buildFlagNotSetCondition(final LocationVariable flag) {
             return equals(var(flag), FALSE());
         }
     }
@@ -1183,17 +1183,17 @@ public final class AuxiliaryContractBuilders {
          * @param services services.
          * @return additional program variables necessary for loop contract rules.
          */
-        private static ProgramVariable[] createLoopVariables(final Services services) {
-            ProgramVariable conditionVariable = AbstractAuxiliaryContractRule.createLocalVariable(
+        private static LocationVariable[] createLoopVariables(final Services services) {
+            LocationVariable conditionVariable = AbstractAuxiliaryContractRule.createLocalVariable(
                 "cond", services.getJavaInfo().getKeYJavaType("boolean"), services);
 
-            ProgramVariable brokeLoopVariable = AbstractAuxiliaryContractRule.createLocalVariable(
+            LocationVariable brokeLoopVariable = AbstractAuxiliaryContractRule.createLocalVariable(
                 "brokeLoop", services.getJavaInfo().getKeYJavaType("boolean"), services);
 
-            ProgramVariable continuedLoopVariable =
+            LocationVariable continuedLoopVariable =
                 AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
                     services.getJavaInfo().getKeYJavaType("boolean"), services);
-            final ProgramVariable[] loopVariables = new ProgramVariable[] { conditionVariable,
+            final LocationVariable[] loopVariables = new LocationVariable[] { conditionVariable,
                 brokeLoopVariable, continuedLoopVariable };
             return loopVariables;
         }
@@ -1346,7 +1346,7 @@ public final class AuxiliaryContractBuilders {
          */
         public Term setUpWdGoal(final Goal goal, final BlockContract contract, final Term update,
                 final Term anonUpdate, final LocationVariable heap, final JFunction anonHeap,
-                final ImmutableSet<ProgramVariable> localIns) {
+                final ImmutableSet<LocationVariable> localIns) {
             // FIXME: Handling of \old-references needs to be investigated,
             // however only completeness is lost, soundness is guaranteed
             final BlockWellDefinedness bwd =
@@ -1447,12 +1447,12 @@ public final class AuxiliaryContractBuilders {
                 final Map<LocationVariable, Term> freeModifiesClauses,
                 final Term[] assumptions,
                 final Term decreasesCheck, final Term[] postconditions,
-                final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
+                final Term[] postconditionsNext, final LocationVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms, final AuxiliaryContract.Variables nextVars) {
             final TermBuilder tb = services.getTermBuilder();
             final Modality modality = instantiation.modality();
 
-            final ProgramVariable[] loopVariables = createLoopVariables(services);
+            final LocationVariable[] loopVariables = createLoopVariables(services);
             OuterBreakContinueAndReturnCollector collector =
                 new OuterBreakContinueAndReturnCollector(contract.getBody(), new LinkedList<>(),
                     services);
@@ -1462,7 +1462,7 @@ public final class AuxiliaryContractBuilders {
             collector.collect();
 
             boolean bodyBreakFound = false;
-            Map<Label, ProgramVariable> breakFlags = new LinkedHashMap<>(variables.breakFlags);
+            Map<Label, LocationVariable> breakFlags = new LinkedHashMap<>(variables.breakFlags);
             for (Break br : bodyBreaks) {
                 Label label = br.getLabel();
                 if (label == null || contract.getLoopLabels().contains(label)) {
@@ -1470,7 +1470,7 @@ public final class AuxiliaryContractBuilders {
                     bodyBreakFound = true;
                 }
             }
-            Map<Label, ProgramVariable> continueFlags =
+            Map<Label, LocationVariable> continueFlags =
                 collectContinueFlags(contract, loopVariables[2], bodyContinues);
             final JavaBlock[] javaBlocks = createJavaBlocks(contract, loopVariables[0],
                 exceptionParameter, breakFlags, continueFlags);
@@ -1579,8 +1579,9 @@ public final class AuxiliaryContractBuilders {
          * @return Java blocks for every program fragment.
          */
         private JavaBlock[] createJavaBlocks(final LoopContract contract,
-                ProgramVariable conditionVariable, final ProgramVariable exceptionParameter,
-                Map<Label, ProgramVariable> breakFlags, Map<Label, ProgramVariable> continueFlags) {
+                LocationVariable conditionVariable, final LocationVariable exceptionParameter,
+                Map<Label, LocationVariable> breakFlags,
+                Map<Label, LocationVariable> continueFlags) {
             AuxiliaryContract.Variables bodyVariables = new Variables(variables.self, breakFlags,
                 continueFlags, variables.returnFlag, variables.result, variables.exception,
                 variables.remembranceHeaps, variables.remembranceLocalVariables,
@@ -1643,11 +1644,11 @@ public final class AuxiliaryContractBuilders {
 
         private StatementBlock constructAbruptTerminationIfCascade() {
             List<If> ifCascade = new ArrayList<>();
-            for (Map.Entry<Label, ProgramVariable> flag : variables.breakFlags.entrySet()) {
+            for (Map.Entry<Label, LocationVariable> flag : variables.breakFlags.entrySet()) {
                 ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
                     KeYJavaASTFactory.breakStatement(flag.getKey())));
             }
-            for (Map.Entry<Label, ProgramVariable> flag : variables.continueFlags.entrySet()) {
+            for (Map.Entry<Label, LocationVariable> flag : variables.continueFlags.entrySet()) {
                 ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
                     KeYJavaASTFactory.continueStatement(flag.getKey())));
             }
@@ -1681,9 +1682,9 @@ public final class AuxiliaryContractBuilders {
             return JavaBlock.createJavaBlock(finishedBlock);
         }
 
-        private Map<Label, ProgramVariable> collectContinueFlags(final LoopContract contract,
-                ProgramVariable continuedLoopVariable, List<Continue> bodyContinues) {
-            Map<Label, ProgramVariable> continueFlags =
+        private Map<Label, LocationVariable> collectContinueFlags(final LoopContract contract,
+                LocationVariable continuedLoopVariable, List<Continue> bodyContinues) {
+            Map<Label, LocationVariable> continueFlags =
                 new LinkedHashMap<>(variables.continueFlags);
             continueFlags.remove(null);
             for (Continue cont : bodyContinues) {

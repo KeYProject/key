@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -48,7 +47,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
      * @param services the services instance
      */
     public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
-            ImmutableSet<ProgramVariable> params, Services services) {
+            ImmutableSet<LocationVariable> params, Services services) {
         super(block.getName(), block.getBlock().getStartPosition().line(), block.getMethod(),
             variables.toOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
         assert block != null;

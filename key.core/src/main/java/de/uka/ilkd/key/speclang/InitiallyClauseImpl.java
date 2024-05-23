@@ -13,8 +13,8 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
@@ -49,7 +49,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     /**
      * The original self variable of the receiver object.
      */
-    private final ParsableVariable originalSelfVar;
+    private final LocationVariable originalSelfVar;
     /**
      * The original specification.
      */
@@ -72,7 +72,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
      * @param originalSpec
      */
     public InitiallyClauseImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, ParsableVariable selfVar,
+            VisibilityModifier visibility, Term inv, LocationVariable selfVar,
             LabeledParserRuleContext originalSpec) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
@@ -94,7 +94,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, TermServices services) {
+    private Map<Operator, Operator> getReplaceMap(LocationVariable selfVar, TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
@@ -133,7 +133,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
     @Override
-    public Term getClause(ParsableVariable selfVar, TermServices services) {
+    public Term getClause(LocationVariable selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);

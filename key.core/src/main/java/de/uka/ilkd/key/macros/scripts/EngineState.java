@@ -200,8 +200,7 @@ public class EngineState {
                 "Unexpected sort for term: " + term + ". Expected: " + sort);
     }
 
-    @NonNull
-    private KeyIO getKeyIO() throws ScriptException {
+    private @NonNull KeyIO getKeyIO() throws ScriptException {
         Services services = proof.getServices();
         KeyIO io = new KeyIO(services, getFirstOpenAutomaticGoal().getLocalNamespaces());
         io.setAbbrevMap(abbrevMap);

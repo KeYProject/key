@@ -10,13 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
@@ -56,14 +50,14 @@ public class SMTTacletTranslator {
 
         Term skeleton = tacletTranslator.translate(taclet, services);
 
-        Map<SchemaVariable, LogicVariable> variables = new HashMap<>();
+        Map<OperatorSV, LogicVariable> variables = new HashMap<>();
 
         skeleton = variablify(skeleton, variables);
 
         return quantify(skeleton, variables);
     }
 
-    private Term quantify(Term smt, Map<SchemaVariable, LogicVariable> variables) {
+    private Term quantify(Term smt, Map<OperatorSV, LogicVariable> variables) {
         if (variables.isEmpty()) {
             return smt;
         }
@@ -73,12 +67,11 @@ public class SMTTacletTranslator {
         return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null);
     }
 
-    private Term variablify(Term term, Map<SchemaVariable, LogicVariable> variables)
+    private Term variablify(Term term, Map<OperatorSV, LogicVariable> variables)
             throws SMTTranslationException {
 
         Operator op = term.op();
-        if (op instanceof SchemaVariable) {
-            SchemaVariable sv = (SchemaVariable) op;
+        if (op instanceof OperatorSV sv) {
             if (!(sv instanceof TermSV || sv instanceof FormulaSV)) {
                 throw new SMTTranslationException("Only a few schema variables can be translated. "
                     + "This one cannot. Type " + sv.getClass());
@@ -102,7 +95,7 @@ public class SMTTacletTranslator {
         List<QuantifiableVariable> qvars = new ArrayList<>();
         if (op instanceof Quantifier) {
             for (QuantifiableVariable boundVar : term.boundVars()) {
-                if (boundVar instanceof SchemaVariable sv) {
+                if (boundVar instanceof OperatorSV sv) {
                     LogicVariable lv =
                         variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
                     qvars.add(lv);

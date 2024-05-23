@@ -70,9 +70,8 @@ public final class SetStatementRule implements BuiltInRule {
         return new SetStatementBuiltInRuleApp(this, occurrence);
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof SetStatementBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply SetStatementBuiltInRuleApp");

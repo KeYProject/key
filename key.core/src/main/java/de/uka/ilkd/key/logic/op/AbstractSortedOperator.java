@@ -46,7 +46,7 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
     }
 
     protected AbstractSortedOperator(Name name, Sort sort, boolean isRigid) {
-        this(name, (ImmutableArray<Sort>) null, sort, null, isRigid);
+        this(name, new ImmutableArray<>(), sort, null, isRigid);
     }
 
     /**

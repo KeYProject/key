@@ -503,6 +503,7 @@ TOKEN :
 | < TRANSIENT: "transient" >
 | < TRUE: "true" >
 | < TRY: "try" >
+| < TYPE: "\\TYPE" >
 | < VOID: "void" >
 | < VOLATILE: "volatile" >
 | < WHILE: "while" >
@@ -2028,6 +2029,7 @@ TypeReference PrimitiveType() :
   | "\\seq"
   | "\\free"
   | "\\map"
+  | "\\TYPE"
   | <DL_EMBEDDED_FUNCTION>
   )
   {

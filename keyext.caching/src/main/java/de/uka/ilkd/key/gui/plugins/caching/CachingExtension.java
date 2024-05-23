@@ -200,9 +200,8 @@ public class CachingExtension
 
     }
 
-    @NonNull
     @Override
-    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
             @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             Node node = (Node) underlyingObject;

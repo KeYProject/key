@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.model;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "nullness" })
 public class ClassA {
     private final int privateField = 1;
 
