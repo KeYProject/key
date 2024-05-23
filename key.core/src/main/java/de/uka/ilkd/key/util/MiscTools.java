@@ -81,7 +81,7 @@ public final class MiscTools {
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
-    public static Optional<LoopSpecification> getSpecForTermWithLoopStmt(final Term loopTerm,
+    public static @Nullable LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
             final Services services) {
         assert loopTerm.op() instanceof Modality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
@@ -93,7 +93,7 @@ public final class MiscTools {
 
         final LoopStatement loop = (LoopStatement) pe.getFirstElement();
 
-        return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
+        return services.getSpecificationRepository().getLoopSpec(loop);
     }
 
     /**
@@ -182,7 +182,7 @@ public final class MiscTools {
      * @return all variables read in the specified program element, excluding newly declared
      *         variables.
      */
-    public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe, Services services) {
+    public static ImmutableSet<LocationVariable> getLocalIns(ProgramElement pe, Services services) {
         final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
         rpvc.start();
         return rpvc.result();
@@ -196,7 +196,8 @@ public final class MiscTools {
      * @return all variables changed in the specified program element, excluding newly declared
      *         variables.
      */
-    public static ImmutableSet<ProgramVariable> getLocalOuts(ProgramElement pe, Services services) {
+    public static ImmutableSet<LocationVariable> getLocalOuts(ProgramElement pe,
+            Services services) {
         final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
         wpvc.start();
         return wpvc.getWrittenPVs();
@@ -210,7 +211,7 @@ public final class MiscTools {
      * @return all variables changed in the specified program element, including newly declared
      *         variables.
      */
-    public static ImmutableSet<ProgramVariable> getLocalOutsAndDeclared(ProgramElement pe,
+    public static ImmutableSet<LocationVariable> getLocalOutsAndDeclared(ProgramElement pe,
             Services services) {
         final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
         wpvc.start();
@@ -224,7 +225,7 @@ public final class MiscTools {
      * @param services services.
      * @return all variables newly declared in the specified program element.
      */
-    public static ImmutableSet<ProgramVariable> getLocallyDeclaredVars(ProgramElement pe,
+    public static ImmutableSet<LocationVariable> getLocallyDeclaredVars(ProgramElement pe,
             Services services) {
         final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
         wpvc.start();
@@ -570,15 +571,16 @@ public final class MiscTools {
     // -------------------------------------------------------------------------
 
     private static final class ReadPVCollector extends JavaASTVisitor {
+        // TODO: Is replacing PV with LV fine here?
         /**
          * The list of resulting (i.e., read) program variables.
          */
-        private ImmutableSet<ProgramVariable> result = DefaultImmutableSet.nil();
+        private ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
 
         /**
          * The declared program variables.
          */
-        private ImmutableSet<ProgramVariable> declaredPVs =
+        private ImmutableSet<LocationVariable> declaredPVs =
             DefaultImmutableSet.nil();
 
         public ReadPVCollector(ProgramElement root, Services services) {
@@ -587,13 +589,12 @@ public final class MiscTools {
 
         @Override
         protected void doDefaultAction(SourceElement node) {
-            if (node instanceof ProgramVariable) {
-                ProgramVariable pv = (ProgramVariable) node;
+            if (node instanceof LocationVariable pv) {
                 if (!pv.isMember() && !declaredPVs.contains(pv)) {
                     result = result.add(pv);
                 }
             } else if (node instanceof VariableSpecification vs) {
-                ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
+                var pv = (LocationVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
                     assert !declaredPVs.contains(pv);
                     result = result.remove(pv);
@@ -602,7 +603,7 @@ public final class MiscTools {
             }
         }
 
-        public ImmutableSet<ProgramVariable> result() {
+        public ImmutableSet<LocationVariable> result() {
             return result;
         }
     }
@@ -611,13 +612,13 @@ public final class MiscTools {
         /**
          * The written program variables.
          */
-        private ImmutableSet<ProgramVariable> writtenPVs =
+        private ImmutableSet<LocationVariable> writtenPVs =
             DefaultImmutableSet.nil();
 
         /**
          * The declared program variables.
          */
-        private ImmutableSet<ProgramVariable> declaredPVs =
+        private ImmutableSet<LocationVariable> declaredPVs =
             DefaultImmutableSet.nil();
 
         public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
@@ -628,13 +629,13 @@ public final class MiscTools {
         protected void doDefaultAction(SourceElement node) {
             if (node instanceof Assignment) {
                 ProgramElement lhs = ((Assignment) node).getChildAt(0);
-                if (lhs instanceof ProgramVariable pv) {
+                if (lhs instanceof LocationVariable pv) {
                     if (!pv.isMember() && !declaredPVs.contains(pv)) {
                         writtenPVs = writtenPVs.add(pv);
                     }
                 }
             } else if (node instanceof VariableSpecification vs) {
-                ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
+                var pv = (LocationVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
                     assert !declaredPVs.contains(pv);
                     assert !writtenPVs.contains(pv);
@@ -643,18 +644,18 @@ public final class MiscTools {
             }
         }
 
-        public ImmutableSet<ProgramVariable> getWrittenPVs() {
+        public ImmutableSet<LocationVariable> getWrittenPVs() {
             return writtenPVs;
         }
 
-        public ImmutableSet<ProgramVariable> getDeclaredPVs() {
+        public ImmutableSet<LocationVariable> getDeclaredPVs() {
             return declaredPVs;
         }
     }
 
-    public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list, TermBuilder tb) {
+    public static ImmutableList<Term> toTermList(Iterable<LocationVariable> list, TermBuilder tb) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (ProgramVariable pv : list) {
+        for (var pv : list) {
             if (pv != null) {
                 Term t = tb.var(pv);
                 result = result.append(t);
@@ -804,13 +805,11 @@ public final class MiscTools {
         // }
     }
 
-    @Nullable
-    public static URI getURIFromTokenSource(TokenSource source) {
+    public static @Nullable URI getURIFromTokenSource(TokenSource source) {
         return getURIFromTokenSource(source.getSourceName());
     }
 
-    @Nullable
-    public static URI getURIFromTokenSource(String source) {
+    public static @Nullable URI getURIFromTokenSource(String source) {
         if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
             return null;
         }

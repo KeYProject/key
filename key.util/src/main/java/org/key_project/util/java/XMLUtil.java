@@ -6,6 +6,8 @@ package org.key_project.util.java;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides static methods to work with XML.
  *
@@ -36,38 +38,36 @@ public final class XMLUtil {
      * @return The new created text.
      */
     public static String replaceTags(String text, ITagReplacer replacer) {
-        if (text != null && replacer != null) {
-            StringBuilder sb = new StringBuilder();
-            char[] signs = text.toCharArray();
-            boolean inTag = false;
-            boolean inAttribute = false;
-            StringBuilder tagSB = null;
-            for (char sign : signs) {
-                if (!inTag) {
-                    if (sign == '<') {
-                        inTag = true;
-                        tagSB = new StringBuilder();
-                        tagSB.append(sign);
-                    } else {
-                        sb.append(sign);
-                    }
-                } else {
+        StringBuilder sb = new StringBuilder();
+        char[] signs = text.toCharArray();
+        boolean inTag = false;
+        boolean inAttribute = false;
+        StringBuilder tagSB = null;
+        for (char sign : signs) {
+            if (!inTag) {
+                if (sign == '<') {
+                    inTag = true;
+                    tagSB = new StringBuilder();
                     tagSB.append(sign);
-                    if (sign == '>' && !inAttribute) {
-                        inTag = false;
-                        String replacement = replacer.replaceTag(tagSB.toString());
-                        if (replacement != null) {
-                            sb.append(replacement);
-                        }
-                    } else if (sign == '\'' || sign == '"') {
-                        inAttribute = !inAttribute;
+                } else {
+                    sb.append(sign);
+                }
+            } else {
+                assert tagSB != null
+                        : "@AssumeAssertion(nullness): tagSB must have been intialised already";
+                tagSB.append(sign);
+                if (sign == '>' && !inAttribute) {
+                    inTag = false;
+                    String replacement = replacer.replaceTag(tagSB.toString());
+                    if (replacement != null) {
+                        sb.append(replacement);
                     }
+                } else if (sign == '\'' || sign == '"') {
+                    inAttribute = !inAttribute;
                 }
             }
-            return sb.toString();
-        } else {
-            return null;
         }
+        return sb.toString();
     }
 
     /**
@@ -83,6 +83,7 @@ public final class XMLUtil {
          * @param tag The found tag.
          * @return The replacement to use or {@code null} to remove the tag.
          */
+        @Nullable
         String replaceTag(String tag);
     }
 
@@ -95,7 +96,7 @@ public final class XMLUtil {
      */
     public static class HTMLRendererReplacer implements ITagReplacer {
         @Override
-        public String replaceTag(String tag) {
+        public @Nullable String replaceTag(String tag) {
             if (tag.startsWith("<br")) {
                 return StringUtil.NEW_LINE;
             } else if (tag.startsWith("<li")) {
@@ -121,30 +122,26 @@ public final class XMLUtil {
      * @return The text without tags.
      */
     public static String removeTags(String text) {
-        if (text != null) {
-            StringBuilder sb = new StringBuilder();
-            char[] signs = text.toCharArray();
-            boolean inTag = false;
-            boolean inAttribute = false;
-            for (char sign : signs) {
-                if (!inTag) {
-                    if (sign == '<') {
-                        inTag = true;
-                    } else {
-                        sb.append(sign);
-                    }
+        StringBuilder sb = new StringBuilder();
+        char[] signs = text.toCharArray();
+        boolean inTag = false;
+        boolean inAttribute = false;
+        for (char sign : signs) {
+            if (!inTag) {
+                if (sign == '<') {
+                    inTag = true;
                 } else {
-                    if (sign == '>' && !inAttribute) {
-                        inTag = false;
-                    } else if (sign == '\'' || sign == '"') {
-                        inAttribute = !inAttribute;
-                    }
+                    sb.append(sign);
+                }
+            } else {
+                if (sign == '>' && !inAttribute) {
+                    inTag = false;
+                } else if (sign == '\'' || sign == '"') {
+                    inAttribute = !inAttribute;
                 }
             }
-            return sb.toString();
-        } else {
-            return null;
         }
+        return sb.toString();
     }
 
     /**
@@ -170,23 +167,19 @@ public final class XMLUtil {
      * @return The encoded text.
      */
     public static String encodeText(String text) {
-        if (text != null) {
-            char[] signs = text.toCharArray();
-            StringBuilder sb = new StringBuilder();
-            for (char sign : signs) {
-                switch (sign) {
-                case '"' -> sb.append("&quot;");
-                case '&' -> sb.append("&amp;");
-                case '\'' -> sb.append("&apos;");
-                case '<' -> sb.append("&lt;");
-                case '>' -> sb.append("&gt;");
-                default -> sb.append(sign);
-                }
+        char[] signs = text.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for (char sign : signs) {
+            switch (sign) {
+            case '"' -> sb.append("&quot;");
+            case '&' -> sb.append("&amp;");
+            case '\'' -> sb.append("&apos;");
+            case '<' -> sb.append("&lt;");
+            case '>' -> sb.append("&gt;");
+            default -> sb.append(sign);
             }
-            return sb.toString();
-        } else {
-            return null;
         }
+        return sb.toString();
     }
 
     /**

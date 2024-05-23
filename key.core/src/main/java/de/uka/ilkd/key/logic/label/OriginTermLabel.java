@@ -692,8 +692,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * The file the term originates from.
          */
-        @Nullable
-        private final URI fileName;
+        private final @Nullable URI fileName;
 
         /**
          * The line in the file the term originates from.

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule.match;
 
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletMatcher;
-import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 
 
@@ -16,7 +15,7 @@ import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
  * {@link #createTacletMatcher(Taclet)} to create a matcher for a {@link Taclet}
  *
  * The active factory is chosen at runtime by passing a value for the system property
- * <code>taclet.match</code> Currently supported values are: {@code legacy} and {@code vm}. The
+ * <code>taclet.match</code> Currently supported values are: {@code vm}. The
  * legacy matching algorithm is the one used since the beginning of KeY. It will soon become
  * deprecated and replaced y {@code vm} as default.
  */
@@ -33,16 +32,6 @@ public abstract class TacletMatcherKit {
     }
 
     /**
-     * The concrete factory for the legacy taclet matcher.
-     */
-    private static final class LegacyTacletMatcherKit extends TacletMatcherKit {
-        @Override
-        public TacletMatcher createTacletMatcher(Taclet taclet) {
-            return new LegacyTacletMatcher(taclet);
-        }
-    }
-
-    /**
      * sets up the concrete factory to use depending on the provided system property or the given
      * default if no property is set
      */
@@ -50,10 +39,10 @@ public abstract class TacletMatcherKit {
         System.getProperty("taclet.match", "vm");
     private static final TacletMatcherKit ACTIVE_TACLET_MATCHER_KIT;
     static {
-        if ("legacy".equals(TACLET_MATCHER_SELECTION_VALUE)) {
-            ACTIVE_TACLET_MATCHER_KIT = new LegacyTacletMatcherKit();
-        } else {
+        if ("vm".equals(TACLET_MATCHER_SELECTION_VALUE)) {
             ACTIVE_TACLET_MATCHER_KIT = new VMTacletMatcherKit();
+        } else {
+            throw new RuntimeException("Unknown taclet matcher selected.");
         }
     }
 

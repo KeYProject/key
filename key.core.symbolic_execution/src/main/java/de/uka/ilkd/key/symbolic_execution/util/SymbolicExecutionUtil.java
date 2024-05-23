@@ -4141,7 +4141,7 @@ public final class SymbolicExecutionUtil {
             Set<Term> additinalPredicates =
                 AbstractOperationPO.getAdditionalUninterpretedPredicates(node.proof());
             // Check if node can be treated as verified/closed
-            if (!CollectionUtil.isEmpty(additinalPredicates)) {
+            if (additinalPredicates != null && !additinalPredicates.isEmpty()) {
                 boolean verified = true;
                 Iterator<Node> leafsIter = node.leavesIterator();
                 while (verified && leafsIter.hasNext()) {

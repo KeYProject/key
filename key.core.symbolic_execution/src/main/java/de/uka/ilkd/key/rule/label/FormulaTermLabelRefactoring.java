@@ -384,7 +384,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         @SuppressWarnings("unchecked")
         Set<SequentFormula> sfSet =
             (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
-        return !CollectionUtil.isEmpty(sfSet);
+        return sfSet != null && !sfSet.isEmpty();
     }
 
     /**

@@ -170,14 +170,18 @@ public final class TypeConverter {
     private Term convertReferencePrefix(ReferencePrefix prefix, ExecutionContext ec) {
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
-        } else if (prefix instanceof MetaClassReference) {
+        } else if (prefix instanceof VariableReference vr) {
+            prefix = vr.getProgramVariable();
+        }
+        if (prefix instanceof MetaClassReference) {
             LOGGER.warn("WARNING: metaclass references not supported yet");
             throw new IllegalArgumentException("TypeConverter could not handle" + " this");
-        } else if (prefix instanceof ProgramVariable) {
+        } else if (prefix instanceof ProgramConstant c) {
             // the base case: the leftmost item is a local variable
-            return tb.var((ProgramVariable) prefix);
-        } else if (prefix instanceof VariableReference) {
-            return tb.var(((VariableReference) prefix).getProgramVariable());
+            return tb.var(c);
+        } else if (prefix instanceof LocationVariable lv) {
+            // the base case: the leftmost item is a local variable
+            return tb.var(lv);
         } else if (prefix instanceof ArrayReference) {
             return convertArrayReference((ArrayReference) prefix, ec);
         } else if (prefix instanceof ThisReference) {
@@ -256,8 +260,8 @@ public final class TypeConverter {
     public Term convertVariableReference(VariableReference fr, ExecutionContext ec) {
         final ReferencePrefix prefix = fr.getReferencePrefix();
         final ProgramVariable var = fr.getProgramVariable();
-        if (var instanceof ProgramConstant) {
-            return tb.var(var);
+        if (var instanceof ProgramConstant pc) {
+            return tb.var(pc);
         } else if (var == services.getJavaInfo().getArrayLength()) {
             return tb.dotLength(convertReferencePrefix(prefix, ec));
         } else if (var.isStatic()) {
@@ -271,7 +275,7 @@ public final class TypeConverter {
                 return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
                     fieldSymbol);
             } else {
-                return tb.var(var);
+                return tb.var((LocationVariable) var);
             }
         } else if (!(prefix instanceof PackageReference)) {
             final JFunction fieldSymbol =
@@ -312,8 +316,10 @@ public final class TypeConverter {
 
 
     public Term convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
-        if (pe instanceof ProgramVariable) {
-            return tb.var((ProgramVariable) pe);
+        if (pe instanceof ProgramConstant pc) {
+            return tb.var(pc);
+        } else if (pe instanceof LocationVariable lv) {
+            return tb.var(lv);
         } else if (pe instanceof FieldReference) {
             return convertVariableReference((FieldReference) pe, ec);
         } else if (pe instanceof MethodReference) {

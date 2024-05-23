@@ -76,16 +76,14 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         }
     };
 
-    @NonNull
     @Override
-    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
             @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
-    @NonNull
     @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
             explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model, mainWindow)));
@@ -132,9 +130,8 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
             e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
     }
 
-    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(@NonNull MainWindow window,
+    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
             @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             initLeftPanel(window);

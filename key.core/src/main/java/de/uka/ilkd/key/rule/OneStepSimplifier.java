@@ -576,9 +576,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             null);
     }
 
-    @NonNull
     @Override
-    public synchronized ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public synchronized @NonNull ImmutableList<Goal> apply(Goal goal, Services services,
+            RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp
                 : "The rule app must be suitable for OSS";

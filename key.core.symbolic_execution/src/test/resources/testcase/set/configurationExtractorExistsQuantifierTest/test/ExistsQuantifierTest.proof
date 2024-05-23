@@ -41,14 +41,13 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Mar 18 11:12:58 CET 2016
-name=ExistsQuantifierTest[ExistsQuantifierTest\\:\\:compute()].JML normal_behavior operation contract.0
-addSymbolicExecutionLabel=true
-contract=ExistsQuantifierTest[ExistsQuantifierTest\\:\\:compute()].JML normal_behavior operation contract.0
-addUninterpretedPredicate=true
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "ExistsQuantifierTest[ExistsQuantifierTest::compute()].JML normal_behavior operation contract.0",
+	"addSymbolicExecutionLabel": true,
+	"contract": "ExistsQuantifierTest[ExistsQuantifierTest::compute()].JML normal_behavior operation contract.0",
+	"addUninterpretedPredicate": true,
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

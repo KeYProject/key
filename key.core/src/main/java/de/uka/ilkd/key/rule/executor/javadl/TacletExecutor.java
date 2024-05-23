@@ -19,10 +19,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
@@ -343,8 +340,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             Services services, MatchConditions matchCond) {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {
-            final ProgramVariable inst =
-                (ProgramVariable) matchCond.getInstantiations().getInstantiation(sv);
+            final var inst =
+                (LocationVariable) matchCond.getInstantiations().getInstantiation(sv);
             // if the goal already contains the variable to be added
             // (not just a variable with the same name), then there is nothing to do
             Collection<IProgramVariable> progVars =
@@ -354,11 +351,11 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             }
 
             final VariableNamer vn = services.getVariableNamer();
-            final ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
+            final LocationVariable renamedInst = vn.rename(inst, goal, posOfFind);
             goal.addProgramVariable(renamedInst);
             services.addNameProposal(renamedInst.name());
 
-            final HashMap<ProgramVariable, ProgramVariable> renamingMap = vn.getRenamingMap();
+            final HashMap<LocationVariable, LocationVariable> renamingMap = vn.getRenamingMap();
             if (!renamingMap.isEmpty()) {
                 // execute renaming
                 final ProgVarReplacer pvr = new ProgVarReplacer(renamingMap, services);
@@ -366,7 +363,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 // globals
                 // we do not need to do the old assignment
                 // goal.setGlobalProgVars(pvr.replace(Immutables.createSetFrom(progVars)));
-                // as the following assertions ensure it would have no effect anyways.
+                // as the following assertions ensure it would have no effect anyway.
                 assert renamingMap.size() == 1;
                 assert renamingMap.get(inst) == renamedInst;
                 assert !progVars.contains(inst);
@@ -407,7 +404,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
 
-        // proof obligation for the if formulas
+        // proof obligation for the if-formulas
         Term ifObl = null;
 
         // always create at least one new goal
@@ -424,7 +421,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     // build the if obligation formula
                     ifPart = inst.getConstrainedFormula().formula();
 
-                    // negate formulas of the if succedent
+                    // negate formulas of the if-succedent
                     final TermServices services = p_goal.proof().getServices();
                     if (i <= 0) {
                         ifPart = services.getTermBuilder().not(ifPart);

@@ -31,7 +31,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     private final ProgramSV labelSV;
 
     public NewJumpLabelCondition(SchemaVariable sv) {
-        if (!(sv instanceof ProgramSV) || sv.sort() != ProgramSVSort.LABEL) {
+        if (!(sv instanceof ProgramSV psv) || psv.sort() != ProgramSVSort.LABEL) {
             throw new IllegalArgumentException(
                 "The new jump label " + "variable condition, must be parameterised with a "
                     + "program schemavariable of sort LABEL.");

@@ -45,20 +45,20 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         assert pe != null;
         assert pe instanceof StatementBlock;
 
-        final ImmutableSet<ProgramVariable> localOuts = //
+        final ImmutableSet<LocationVariable> localOuts = //
             MiscTools.getLocalOuts(pe, services);
         return createLocalAnonUpdate(localOuts, services);
     }
 
-    private static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+    private static Term createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Term anonUpdate = tb.skip();
-        for (ProgramVariable pv : localOuts) {
+        for (var pv : localOuts) {
             final JFunction anonFunc = anonConstForPV(pv, services);
             final Term elemUpd = //
-                tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+                tb.elementary(pv, tb.func(anonFunc));
             anonUpdate = tb.parallel(anonUpdate, elemUpd);
         }
 

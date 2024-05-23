@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (23.04.19)
  */
 public interface TabPanel {
+
     @NonNull
     String getTitle();
 

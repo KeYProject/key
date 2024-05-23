@@ -175,10 +175,10 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             if (SymbolicExecutionUtil.isHeap(eu.lhs(),
                 getServices().getTypeConverter().getHeapLDT())) {
                 remembranceHeaps.put((LocationVariable) term.sub(0).op(),
-                    getServices().getTermBuilder().var(eu.lhs()));
+                    getServices().getTermBuilder().varOfUpdateableOp(eu.lhs()));
             } else {
                 remembranceLocalVariables.put((LocationVariable) term.sub(0).op(),
-                    getServices().getTermBuilder().var(eu.lhs()));
+                    getServices().getTermBuilder().varOfUpdateableOp(eu.lhs()));
             }
         } else {
             assert false : "Unsupported update term with operator '" + term.op() + "'.";

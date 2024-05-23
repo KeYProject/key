@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
@@ -16,16 +16,14 @@ public class StatementSVWrapper extends JavaStatement implements KeYRecoderExten
      *
      */
     private static final long serialVersionUID = -4062276649575988872L;
-    protected SchemaVariable sv;
+    protected final OperatorSV sv;
 
     protected StatementSVWrapper(StatementSVWrapper proto) {
         super(proto);
+        sv = proto.getSV();
     }
 
-    public StatementSVWrapper() {
-    }
-
-    public StatementSVWrapper(SchemaVariable sv) {
+    public StatementSVWrapper(OperatorSV sv) {
         this.sv = sv;
     }
 
@@ -81,18 +79,9 @@ public class StatementSVWrapper extends JavaStatement implements KeYRecoderExten
 
 
     /**
-     * sets the schema variable of sort statement
-     *
-     * @param sv the SchemaVariable
-     */
-    public void setSV(SchemaVariable sv) {
-        this.sv = sv;
-    }
-
-    /**
      * returns a String name of this meta construct.
      */
-    public SchemaVariable getSV() {
+    public OperatorSV getSV() {
         return sv;
     }
 

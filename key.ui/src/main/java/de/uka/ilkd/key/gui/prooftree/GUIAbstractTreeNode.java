@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
 
-
 public abstract class GUIAbstractTreeNode implements TreeNode {
 
     private final GUIProofTreeModel tree;

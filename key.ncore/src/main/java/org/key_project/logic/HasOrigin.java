@@ -19,8 +19,7 @@ public interface HasOrigin {
      * <p>
      * This field is set by the parser with [url]:[lineNumber]
      */
-    @Nullable
-    default String getOrigin() {
+    default @Nullable String getOrigin() {
         return null;
     }
 }

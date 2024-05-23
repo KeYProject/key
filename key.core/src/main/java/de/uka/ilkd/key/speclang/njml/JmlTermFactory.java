@@ -156,11 +156,11 @@ public final class JmlTermFactory {
 
     // region quantification
     private Term typerestrictMinAndMax(KeYJavaType kjt, final boolean nullable,
-            Iterable<? extends QuantifiableVariable> qvs) {
+            Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();
-        for (QuantifiableVariable qv : qvs) {
+        for (var qv : qvs) {
             if (type instanceof PrimitiveType) {
                 if (type == PrimitiveType.JAVA_BYTE) {
                     res = tb.and(res, tb.inByte(tb.var(qv)));
@@ -361,8 +361,8 @@ public final class JmlTermFactory {
         Term t;
         if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
             // not interval range, create unbounded comprehension term
-            ImmutableList<QuantifiableVariable> _qvs =
-                ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
+            ImmutableList<LogicVariable> _qvs =
+                ImmutableSLList.<LogicVariable>nil().prepend(lv);
             while (it.hasNext()) {
                 _qvs = _qvs.prepend(it.next());
             }
@@ -387,8 +387,8 @@ public final class JmlTermFactory {
         return null;
     }
 
-    @NonNull
-    public SLExpression binary(OverloadedOperatorHandler.JMLOperator jmlOperator, SLExpression left,
+    public @NonNull SLExpression binary(OverloadedOperatorHandler.JMLOperator jmlOperator,
+            SLExpression left,
             SLExpression right) {
         try {
             SLExpression result = overloadedFunctionHandler.build(jmlOperator, left, right);
@@ -420,7 +420,7 @@ public final class JmlTermFactory {
 
 
     private interface UnboundedNumericalQuantifier {
-        Term apply(KeYJavaType declsType, boolean nullable, ImmutableList<QuantifiableVariable> qvs,
+        Term apply(KeYJavaType declsType, boolean nullable, ImmutableList<LogicVariable> qvs,
                 Term range, Term body);
     }
 
@@ -430,8 +430,7 @@ public final class JmlTermFactory {
     // endregion
 
 
-    @NonNull
-    public SLExpression arrayRef(SLExpression receiver, String fullyQualifiedName,
+    public @NonNull SLExpression arrayRef(SLExpression receiver, String fullyQualifiedName,
             SLExpression rangeFrom, SLExpression rangeTo) {
         SLExpression result;
         try {
@@ -503,8 +502,9 @@ public final class JmlTermFactory {
         return translateToJDLTerm(name, list);
     }
 
-    public SLExpression commentary(String desc, ProgramVariable selfVar, ProgramVariable resultVar,
-            ImmutableList<ProgramVariable> paramVars, Term heapAtPre) {
+    public SLExpression commentary(String desc, LocationVariable selfVar,
+            LocationVariable resultVar,
+            ImmutableList<LocationVariable> paramVars, Term heapAtPre) {
         // strip leading and trailing (* ... *)
         String text = desc;
         text = text.substring(2, text.length() - 2);
@@ -828,8 +828,7 @@ public final class JmlTermFactory {
      * Need to handle this one differently from INV_FOR since here static invariants may occur too.
      * For a static invariant, take the passed type as receiver.
      */
-    @NonNull
-    public SLExpression createInv(Term selfVar, KeYJavaType targetType) {
+    public @NonNull SLExpression createInv(Term selfVar, KeYJavaType targetType) {
         final boolean isStatic = selfVar == null;
         assert targetType != null || !isStatic;
         final Term result = isStatic ? tb.staticInv(targetType) : tb.inv(selfVar);
@@ -840,8 +839,7 @@ public final class JmlTermFactory {
      * Need to handle this one differently from INV_FREE_FOR since here static invariants may occur
      * too. For a static invariant, take the passed type as receiver.
      */
-    @NonNull
-    public SLExpression createInvFree(Term selfVar, KeYJavaType targetType) {
+    public @NonNull SLExpression createInvFree(Term selfVar, KeYJavaType targetType) {
         final boolean isStatic = selfVar == null;
         assert targetType != null || !isStatic;
         final Term result = isStatic ? tb.staticInvFree(targetType) : tb.invFree(selfVar);
@@ -955,8 +953,7 @@ public final class JmlTermFactory {
         return new SLExpression(tb.seqConcat(seq1, seq2), seqtype);
     }
 
-    @NonNull
-    public SLExpression seqGet(Term seq, Term idx) {
+    public @NonNull SLExpression seqGet(Term seq, Term idx) {
         return new SLExpression(tb.seqGet(JavaDLTheory.ANY, seq, idx));
     }
 
@@ -988,15 +985,14 @@ public final class JmlTermFactory {
         return createBreaks(term, label);
     }
 
-    @NonNull
-    public Pair<Label, Term> createBreaks(Term term, String label) {
+    public @NonNull Pair<Label, Term> createBreaks(Term term, String label) {
         Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
         return new Pair<>(label == null ? null : new ProgramElementName(label), formula);
     }
 
 
     // region clauses
-    public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, ProgramVariable excVar) {
+    public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, LocationVariable excVar) {
         Term result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
             JFunction instance =
@@ -1007,12 +1003,12 @@ public final class JmlTermFactory {
         return result;
     }
 
-    public Term signals(Term result, LogicVariable eVar, ProgramVariable excVar,
+    public Term signals(Term result, LogicVariable eVar, LocationVariable excVar,
             KeYJavaType excType) {
         if (result == null) {
             result = tb.tt();
         } else {
-            Map /* Operator -> Operator */<LogicVariable, ProgramVariable> replaceMap =
+            Map /* Operator -> Operator */<LogicVariable, LocationVariable> replaceMap =
                 new LinkedHashMap<>();
             replaceMap.put(eVar, excVar);
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
@@ -1182,8 +1178,8 @@ public final class JmlTermFactory {
     }
 
 
-    @NonNull
-    public SLExpression skolemExprHelper(@NonNull KeYJavaType type, @NonNull TermServices services,
+    public @NonNull SLExpression skolemExprHelper(@NonNull KeYJavaType type,
+            @NonNull TermServices services,
             @NonNull String shortName) {
         shortName = shortName.replace("\\", "");
         final Namespace<JFunction> fns = services.getNamespaces().functions();
@@ -1276,7 +1272,8 @@ public final class JmlTermFactory {
         assert symbol instanceof ProgramVariable : "Expecting a program variable";
         ProgramVariable pv = (ProgramVariable) symbol;
         try {
-            Term resultTerm = tb.var(pv);
+            Term resultTerm =
+                pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var((LocationVariable) pv);
             return new SLExpression(resultTerm);
         } catch (TermCreationException ex) {
             throw exc.createException0("Cannot create term " + pv.name(), ex);
@@ -1306,14 +1303,13 @@ public final class JmlTermFactory {
      * apply to the JML to DL translation. See also
      * {@link TermBuilder#reachableValue(Term, KeYJavaType)}.
      */
-    @NonNull
-    private Term typerestrict(
+    private @NonNull Term typerestrict(
             @NonNull KeYJavaType kjt, final boolean nullable,
-            Iterable<? extends QuantifiableVariable> qvs) {
+            Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();
-        for (QuantifiableVariable qv : qvs) {
+        for (var qv : qvs) {
             if (type instanceof PrimitiveType) {
                 if (type == PrimitiveType.JAVA_BYTE) {
                     res = tb.and(res, tb.inByte(tb.var(qv)));

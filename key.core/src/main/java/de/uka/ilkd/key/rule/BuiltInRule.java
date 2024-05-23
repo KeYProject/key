@@ -26,9 +26,8 @@ public interface BuiltInRule extends Rule {
 
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
 
-    @Nullable
     @Override
-    default String getOrigin() {
+    default @Nullable String getOrigin() {
         return "defined in Java: " + getClass().getName();
     }
 }

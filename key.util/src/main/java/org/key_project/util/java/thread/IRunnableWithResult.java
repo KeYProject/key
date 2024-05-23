@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java.thread;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A {@link Runnable} that has a result that is accessible via {@link #getResult()}.
@@ -20,6 +22,7 @@ public interface IRunnableWithResult<T> extends IRunnableWithException {
      *
      * @return The result.
      */
+    @Nullable
     T getResult();
 
     /**
@@ -27,5 +30,6 @@ public interface IRunnableWithResult<T> extends IRunnableWithException {
      *
      * @return An occurred exception.
      */
+    @Nullable
     Exception getException();
 }

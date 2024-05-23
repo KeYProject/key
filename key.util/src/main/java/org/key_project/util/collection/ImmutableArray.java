@@ -16,6 +16,7 @@ import org.key_project.util.Strings;
 
 import org.jspecify.annotations.NonNull;
 
+@SuppressWarnings("nullness")
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
     /**

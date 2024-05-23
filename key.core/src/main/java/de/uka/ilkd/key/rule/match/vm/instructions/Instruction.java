@@ -7,22 +7,12 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.collection.ImmutableArray;
 
-/** enum encoding the instructions of the matching vm */
+/** Class encoding the instructions of the matching vm */
 public abstract class Instruction<OP extends Operator> implements MatchInstruction {
 
     public static Instruction<Operator> matchOp(Operator op) {
@@ -34,9 +24,13 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
         return new MatchSortDependingFunctionInstruction(op);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchModalOperatorSV(
+    public static MatchModalOperatorSVInstruction matchModalOperatorSV(
             ModalOperatorSV sv) {
         return new MatchModalOperatorSVInstruction(sv);
+    }
+
+    public static MatchModalityInstruction matchModalOperator(Modality mod) {
+        return new MatchModalityInstruction(mod);
     }
 
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(

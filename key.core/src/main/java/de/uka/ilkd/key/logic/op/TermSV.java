@@ -13,7 +13,7 @@ import org.key_project.logic.sort.Sort;
 /**
  * A schema variable that is used as placeholder for terms.
  */
-public final class TermSV extends AbstractSV {
+public final class TermSV extends OperatorSV {
 
     /**
      * @param name the name of the schema variable

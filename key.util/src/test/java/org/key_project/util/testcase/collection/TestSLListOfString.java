@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * tests non-destructive list implementation with String
  */
+@SuppressWarnings("initialization")
 public class TestSLListOfString {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestSLListOfString.class);
 
@@ -29,8 +31,8 @@ public class TestSLListOfString {
     ImmutableList<String> b; // "A" "B"
     ImmutableList<String> c; // "A" "B" "C" "D"
     ImmutableList<String> d; // "A" "B" "A"
-    ImmutableList<String> e; // "A" "B" null
-    ImmutableList<String> e1; // "A" "B" null
+    ImmutableList<@Nullable String> e; // "A" "B" null
+    ImmutableList<@Nullable String> e1; // "A" "B" null
 
 
     @BeforeEach
@@ -40,8 +42,10 @@ public class TestSLListOfString {
         b = ImmutableSLList.<String>nil().prepend("B").prepend("A");
         c = ImmutableSLList.<String>nil().prepend("D").prepend("C").prepend("B").prepend("A");
         d = ImmutableSLList.<String>nil().prepend("A").prepend("B").prepend("A");
-        e = ImmutableSLList.<String>nil().prepend((String) null).prepend("B").prepend("A");
-        e1 = ImmutableSLList.<String>nil().prepend((String) null).prepend("B").prepend("A");
+        e = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B")
+                .prepend("A");
+        e1 = ImmutableSLList.<@Nullable String>nil().prepend((String) null).prepend("B")
+                .prepend("A");
     }
 
     // tests prepend and implicitly iterator, size

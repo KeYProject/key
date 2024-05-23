@@ -74,8 +74,7 @@ public class ChoiceSettings extends AbstractSettings {
      * <p>
      * The method name is somewhat misleading.
      */
-    @NonNull
-    public Map<String, String> getDefaultChoices() {
+    public @NonNull Map<String, String> getDefaultChoices() {
         return Collections.unmodifiableMap(category2Default);
     }
 
@@ -83,8 +82,7 @@ public class ChoiceSettings extends AbstractSettings {
     /**
      * returns the current selected choices as an immutable set
      */
-    @NonNull
-    public ImmutableSet<Choice> getDefaultChoicesAsSet() {
+    public @NonNull ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }
 

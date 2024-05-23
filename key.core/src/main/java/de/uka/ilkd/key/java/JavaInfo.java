@@ -1061,7 +1061,9 @@ public final class JavaInfo {
      */
     public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
         ImmutableList<ProgramVariable> allAttributes = getAllAttributes(fieldName, kjt, false);
-        if (kjt.getJavaType() instanceof ArrayType) {
+        if (allAttributes.isEmpty()) {
+            return null;
+        } else if (kjt.getJavaType() instanceof ArrayType) {
             return allAttributes.head();
         } else {
             return allAttributes.reverse().head();

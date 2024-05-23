@@ -13,7 +13,6 @@ import org.key_project.util.java.XMLUtil.ITagReplacer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests for {@link XMLUtil}.
@@ -26,14 +25,8 @@ public class XMLUtilTest {
      */
     @Test
     public void testReplaceTags() {
-        assertNull(XMLUtil.replaceTags(null, null));
-        assertNull(XMLUtil.replaceTags("Hello", null));
-        assertNull(XMLUtil.replaceTags(null, new LoggingReplacer("|")));
         assertReplaceTags("Hello World", "Hello World", "|");
         assertReplaceTags("<html>Hello<br> World</html>", "|Hello| World|", "|", "<html>", "<br>",
-            "</html>");
-        assertReplaceTags("Hello World", "Hello World", null);
-        assertReplaceTags("<html>Hello<br> World</html>", "Hello World", null, "<html>", "<br>",
             "</html>");
         assertReplaceTags("<html>Hello<br /> World", "|Hello| World", "|", "<html>", "<br />");
         assertReplaceTags("Hello<br/> World</html>", "Hello| World|", "|", "<br/>", "</html>");
@@ -49,7 +42,7 @@ public class XMLUtilTest {
      * @param text The text to execute
      *        {@link XMLUtil#replaceTags(String, org.key_project.util.java.XMLUtil.ITagReplacer)}
      *        on.
-     * @param expectedResult The expected result.
+     * @param expectedResult The expected result.N
      * @param fixedReplacement The fixed replacement to use.
      * @param expectedTags The expected found tags.
      */
@@ -115,7 +108,6 @@ public class XMLUtilTest {
      */
     @Test
     public void testRemoveTags() {
-        assertNull(XMLUtil.removeTags(null));
         assertEquals("Hello World", XMLUtil.removeTags("Hello World"));
         assertEquals("Hello World", XMLUtil.removeTags("<html>Hello<br> World</html>"));
         assertEquals("Hello World", XMLUtil.removeTags("<html>Hello<br /> World"));
@@ -130,8 +122,6 @@ public class XMLUtilTest {
      */
     @Test
     public void testEncodeText() {
-        // Test null
-        assertNull(XMLUtil.encodeText(null));
         // Test empty string
         assertEquals(StringUtil.EMPTY_STRING, XMLUtil.encodeText(StringUtil.EMPTY_STRING));
         // Text XML tags

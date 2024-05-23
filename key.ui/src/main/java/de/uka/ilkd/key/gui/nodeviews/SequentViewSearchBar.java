@@ -22,8 +22,6 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
-
-
 /*
  * Search bar implementing search function for SequentView.
  */

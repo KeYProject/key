@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -28,12 +27,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
 
@@ -60,7 +61,7 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  * </p>
  */
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
-    public static final Map<Boolean, String> TRANSACTION_TAGS =
+    public static final Map<Boolean, @NonNull String> TRANSACTION_TAGS =
         new LinkedHashMap<>();
 
     private final FunctionalOperationContract contract;
@@ -171,8 +172,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
+    protected Term generateMbyAtPreDef(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         final Term mbyAtPreDef;
         if (contract.hasMby()) {
             /*
@@ -195,8 +196,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         final Term freePre = contract.getFreePre(modHeaps, selfVar, paramVars, atPreVars, services);
         final Term pre = contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
@@ -207,9 +208,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         return contract.getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
             services);
@@ -226,7 +227,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Services services) {
         Term frameTerm = null;
         for (LocationVariable heap : modHeaps) {
             final Term ft;
@@ -270,7 +272,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
+    protected Term buildUpdate(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         Term update = null;
@@ -285,7 +287,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             }
         }
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-        Iterator<ProgramVariable> paramIt = paramVars.iterator();
+        Iterator<LocationVariable> paramIt = paramVars.iterator();
         while (formalParamIt.hasNext()) {
             Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
             update = tb.parallel(update, paramUpdate);
@@ -349,62 +351,16 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        super.fillSaveProperties(properties);
-        properties.setProperty("contract", contract.getName());
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("contract", contract.getName());
+        return c;
     }
 
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        String contractName = properties.getProperty("contract");
-        int proofNum = 0;
-        String baseContractName = null;
-        int ind = -1;
-        for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-            ind = contractName.indexOf("." + tag);
-            if (ind > 0) {
-                break;
-            }
-            proofNum++;
-        }
-        if (ind == -1) {
-            baseContractName = contractName;
-            proofNum = 0;
-        } else {
-            baseContractName = contractName.substring(0, ind);
-        }
-        final Contract contract = initConfig.getServices().getSpecificationRepository()
-                .getContractByName(baseContractName);
-        if (contract == null) {
-            throw new IOException("Contract not found: " + baseContractName);
-        } else {
-            ProofOblInput po;
-            boolean addUninterpretedPredicate = isAddUninterpretedPredicate(properties);
-            boolean addSymbolicExecutionLabel = isAddSymbolicExecutionLabel(properties);
-            if (addUninterpretedPredicate || addSymbolicExecutionLabel) {
-                if (!(contract instanceof FunctionalOperationContract)) {
-                    throw new IOException(
-                        "Found contract \"" + contract + "\" is no FunctionalOperationContract.");
-                }
-                po = new FunctionalOperationContractPO(initConfig,
-                    (FunctionalOperationContract) contract, addUninterpretedPredicate,
-                    addSymbolicExecutionLabel);
-            } else {
-                po = contract.createProofObl(initConfig);
-            }
-            return new LoadedPOContainer(po, proofNum);
-        }
-    }
 
     /**
      * {@inheritDoc}

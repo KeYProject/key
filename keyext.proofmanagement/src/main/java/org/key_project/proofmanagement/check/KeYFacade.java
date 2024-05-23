@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -22,16 +20,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
@@ -41,6 +31,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -52,7 +43,6 @@ import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
-import org.key_project.util.reflection.ClassLoaderUtil;
 
 /**
  * This class provides static methods to access the prover (KeY).
@@ -108,10 +98,10 @@ public final class KeYFacade {
                     }
                 }
             }
-        } catch (IOException | ProofInputException e) {
+        } catch (Exception e) {
             // TODO: exception handling: better not throw exceptions, but print to log and continue
             throw new ProofManagementException(
-                "Could not load proof! " + System.lineSeparator() + e.toString());
+                "Could not load proof! " + System.lineSeparator() + e);
         }
     }
 
@@ -134,7 +124,7 @@ public final class KeYFacade {
     }
 
     private static boolean loadProofTree(Path path, CheckerData.ProofEntry line, Logger logger)
-            throws ProofInputException, IOException {
+            throws Exception {
 
         logger.print(LogLevel.DEBUG, "Loading proof from " + path);
         line.proofFile = path;
@@ -166,7 +156,7 @@ public final class KeYFacade {
     }
 
     private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line)
-            throws ProofInputException, IOException {
+            throws Exception {
         Profile profile = AbstractProfile.getDefaultProfile();
 
         // TODO: FileRepo/InitConfig/ProblemInitializer reuse possible?
@@ -195,16 +185,14 @@ public final class KeYFacade {
         initConfig.setFileRepo(fileRepo);
 
         /////////////////// createProofObligationContainer
-        String proofObligation = keyFile.getProofObligation();
+        var proofObligation = keyFile.getProofObligation();
 
         // Load proof obligation settings
-        final Properties properties = new Properties();
-        properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
-        properties.setProperty(IPersistablePO.PROPERTY_FILENAME, path.toString());
+        proofObligation.set(IPersistablePO.PROPERTY_FILENAME, path.toString());
 
         // more generic version (works e.g. for taclet proofs)
         IPersistablePO.LoadedPOContainer poContainer =
-            createProofObligationContainer(keyFile, initConfig, properties);
+            createProofObligationContainer(keyFile, initConfig, proofObligation);
 
         ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());
         for (Proof p : proofList.getProofs()) {
@@ -235,6 +223,7 @@ public final class KeYFacade {
     }
 
     // TODO: adapted copy from AbstractProblemLoader
+
     /**
      * Creates a {@link IPersistablePO.LoadedPOContainer} if available which contains
      * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
@@ -243,19 +232,16 @@ public final class KeYFacade {
      * @throws IOException Occurred Exception.
      */
     private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
-            InitConfig initConfig, Properties properties) throws IOException {
-        final String chooseContract;
-        final String proofObligation;
-
-        chooseContract = keyFile.chooseContract();
-        proofObligation = keyFile.getProofObligation();
+            InitConfig initConfig, Configuration properties) throws Exception {
+        final String chooseContract = keyFile.chooseContract();
+        final Configuration proofObligation = keyFile.getProofObligation();
 
         // Instantiate proof obligation
         if (keyFile instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
             return new IPersistablePO.LoadedPOContainer((ProofOblInput) keyFile);
-        } else if (chooseContract != null && chooseContract.length() > 0) {
+        } else if (chooseContract != null && !chooseContract.isEmpty()) {
             int proofNum = 0;
-            String baseContractName = null;
+            String baseContractName;
             int ind = -1;
             for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
                 ind = chooseContract.indexOf("." + tag);
@@ -279,27 +265,21 @@ public final class KeYFacade {
                 return new IPersistablePO.LoadedPOContainer(contract.createProofObl(initConfig),
                     proofNum);
             }
-        } else if (proofObligation != null && proofObligation.length() > 0) {
-
-            String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
+        } else if (proofObligation != null) {
+            String poClass = properties.getString(IPersistablePO.PROPERTY_CLASS);
             if (poClass == null || poClass.isEmpty()) {
                 throw new IOException("Proof obligation class property \""
                     + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
             }
-            try {
-                // Try to instantiate proof obligation by calling static method: public static
-                // LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws
-                // IOException
-                Class<?> poClassInstance = ClassLoaderUtil.getClassforName(poClass);
-                Method loadMethod =
-                    poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
-                return (IPersistablePO.LoadedPOContainer) loadMethod.invoke(null, initConfig,
-                    properties);
-            } catch (Exception e) {
-                throw new IOException(
-                    "Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".",
-                    e);
+            ServiceLoader<ProofObligationLoader> loader =
+                ServiceLoader.load(ProofObligationLoader.class);
+            for (ProofObligationLoader poloader : loader) {
+                if (poloader.handles(poClass)) {
+                    return poloader.loadFrom(initConfig, proofObligation);
+                }
             }
+            throw new IllegalArgumentException(
+                "There is no builder that can build the PO for the id " + poClass);
         } else {
             return null;
         }
@@ -334,7 +314,7 @@ public final class KeYFacade {
                         } catch (ProofInputException e) {
                             throw new ProofManagementException(
                                 "Could not replay proof from " + envInput
-                                    + System.lineSeparator() + e.toString());
+                                    + System.lineSeparator() + e);
                         }
                     }
                 }

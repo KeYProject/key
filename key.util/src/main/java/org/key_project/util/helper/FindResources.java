@@ -10,8 +10,9 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -29,13 +30,20 @@ public final class FindResources {
      * @throws IOException
      * @author Greg Briggs
      */
-    public static <T> List<Path> getResources(String path, Class<T> clazz)
+    public static <T> @Nullable List<Path> getResources(String path, Class<T> clazz)
             throws URISyntaxException, IOException {
-        URL dirURL = clazz.getClassLoader().getResource(path);
+        final var classLoader = clazz.getClassLoader();
+
+        if (classLoader == null)
+            return null;
+
+        @Nullable
+        URL dirURL = classLoader.getResource(path);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             /* A file path: easy enough */
             File[] files = new File(dirURL.toURI()).listFiles();
-            Objects.requireNonNull(files);
+            if (files == null)
+                files = new File[0];
             return Arrays.stream(files).map(File::toPath).collect(Collectors.toList());
         }
 
@@ -45,7 +53,7 @@ public final class FindResources {
              * jar as clazz.
              */
             String me = clazz.getName().replace(".", "/") + ".class";
-            dirURL = clazz.getClassLoader().getResource(me);
+            dirURL = classLoader.getResource(me);
         }
 
         if (dirURL == null) {
@@ -57,7 +65,7 @@ public final class FindResources {
             // strip out only the JAR file
             String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!'));
             try (FileSystem fs =
-                FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader())) {
+                FileSystems.newFileSystem(Paths.get(jarPath), classLoader)) {
                 Path dir = fs.getPath(path);
                 try (var s = Files.list(dir)) {
                     return s.collect(Collectors.toList());
@@ -67,13 +75,17 @@ public final class FindResources {
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }
 
-    public static <T> List<Path> getResources(String path) throws URISyntaxException, IOException {
+    public static <T> @Nullable List<Path> getResources(String path)
+            throws URISyntaxException, IOException {
         return getResources(path, FindResources.class);
     }
 
-    public static <T> Path getResource(String path, Class<T> clazz)
+    public static <T> @Nullable Path getResource(String path, Class<T> clazz)
             throws URISyntaxException, IOException {
-        URL dirURL = clazz.getClassLoader().getResource(path);
+        final var classLoader = clazz.getClassLoader();
+        if (classLoader == null)
+            return null;
+        URL dirURL = classLoader.getResource(path);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             return new File(dirURL.toURI()).toPath();
         }
@@ -84,7 +96,7 @@ public final class FindResources {
              * jar as clazz.
              */
             String me = clazz.getName().replace(".", "/") + ".class";
-            dirURL = clazz.getClassLoader().getResource(me);
+            dirURL = classLoader.getResource(me);
         }
 
         if (dirURL == null) {
@@ -96,14 +108,15 @@ public final class FindResources {
             // strip out only the JAR file
             String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!'));
             try (FileSystem fs =
-                FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader())) {
+                FileSystems.newFileSystem(Paths.get(jarPath), classLoader)) {
                 return fs.getPath(path);
             }
         }
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }
 
-    public static <T> Path getResource(String path) throws URISyntaxException, IOException {
+    public static <T> @Nullable Path getResource(String path)
+            throws URISyntaxException, IOException {
         return getResource(path, FindResources.class);
     }
 
@@ -112,7 +125,7 @@ public final class FindResources {
      * @param candidates
      * @return
      */
-    public static File findFolder(String property, String... candidates) {
+    public static @Nullable File findFolder(String property, String... candidates) {
         return findFolder(true, property, candidates);
     }
 
@@ -131,7 +144,7 @@ public final class FindResources {
      *        user
      * @return
      */
-    public static File findFolder(boolean exists, String property, String... candidates) {
+    public static @Nullable File findFolder(boolean exists, String property, String... candidates) {
         if (System.getProperty(property) != null) {
             File f = new File(System.getProperty(property));
             if (f.exists() || !exists) {
@@ -147,23 +160,23 @@ public final class FindResources {
         return null;
     }
 
-    public static File getExampleDirectory() {
+    public static @Nullable File getExampleDirectory() {
         return findFolder("KEY_EXAMPLES_DIR", "key.ui/examples", "../key.ui/examples", "examples");
     }
 
-    public static File getTestResultForRunAllProofs() {
+    public static @Nullable File getTestResultForRunAllProofs() {
         return findFolder(false, "KEY_TESTRESULT_RUNALLPROOFS", "build/reports/runallproofs");
     }
 
-    public static File getTestCasesDirectory() {
+    public static @Nullable File getTestCasesDirectory() {
         return findFolder("TEST_CASES", "src/test/resources/testcase");
     }
 
-    public static File getTestResourcesDirectory() {
+    public static @Nullable File getTestResourcesDirectory() {
         return findFolder("TEST_RESOURCES", "src/test/resources/");
     }
 
-    public static File getTacletProofsDirectory() {
+    public static @Nullable File getTacletProofsDirectory() {
         return findFolder("TACLET_PROOFS", "key.core/tacletProofs", "../key.core/tacletProofs",
             "tacletProofs");
     }

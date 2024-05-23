@@ -373,7 +373,7 @@ class TermImpl implements Term {
             } else if (op.kind() == Modality.JavaModalityKind.BOX) {
                 sb.append("\\[").append(javaBlock()).append("\\] ");
             } else {
-                sb.append(op()).append("\\[").append(javaBlock()).append("\\] ");
+                sb.append(op()).append("|{").append(javaBlock()).append("}| ");
             }
             sb.append("(").append(sub(0)).append(")");
             return sb.toString();

@@ -524,8 +524,7 @@ public final class Goal {
      * @param n number of goals to create
      * @return the list of new created goals.
      */
-    @NonNull
-    public ImmutableList<Goal> split(int n) {
+    public @NonNull ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node

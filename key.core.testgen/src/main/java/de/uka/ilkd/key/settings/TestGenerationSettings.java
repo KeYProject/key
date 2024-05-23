@@ -296,8 +296,7 @@ public class TestGenerationSettings extends AbstractSettings {
     }
 
 
-    @Nullable
-    private static TestGenerationSettings instance;
+    private static @Nullable TestGenerationSettings instance;
 
     public static @NonNull TestGenerationSettings getInstance() {
         if (instance == null) {

@@ -12,10 +12,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
@@ -134,14 +131,14 @@ public final class PartialInvAxiom extends ClassAxiom {
 
             // create schema variables
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-            final List<SchemaVariable> heapSVs = new LinkedList<>();
+            final List<TermSV> heapSVs = new LinkedList<>();
             for (int j = 0; j < HeapContext.getModHeaps(services, false).size(); j++) {
                 heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + j),
                     heapLDT.targetSort(), false, false));
             }
-            final SchemaVariable selfSV = target.isStatic() ? null
+            final var selfSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("self"), inv.getKJT().getSort());
-            final SchemaVariable eqSV = target.isStatic() ? null
+            final var eqSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("EQ"),
                         services.getJavaInfo().objectSort());
 
@@ -163,7 +160,8 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
-        final ProgramVariable dummySelfVar = services.getTermBuilder().selfVar(inv.getKJT(), false);
+        final LocationVariable dummySelfVar =
+            services.getTermBuilder().selfVar(inv.getKJT(), false);
         return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }
 

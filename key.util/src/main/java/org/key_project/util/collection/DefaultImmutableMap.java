@@ -11,12 +11,8 @@ import org.key_project.util.Strings;
  * This class implements {@code ImmutableMap<S,T>} and provides a persistent map.
  * It is a simple implementation like lists
  */
+@SuppressWarnings("nullness")
 public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
-
-    /**
-     * generated serial
-     */
-    private static final long serialVersionUID = 3268346732418187405L;
 
     /** the empty map */
 
