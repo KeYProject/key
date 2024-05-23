@@ -1966,12 +1966,12 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     private static class LocVarReplBranchUniqueMap
-            extends HashMap<ProgramVariable, ProgramVariable> {
+            extends HashMap<LocationVariable, LocationVariable> {
         private static final long serialVersionUID = 2305410114265133879L;
 
         private final Node node;
         private final ImmutableSet<LocationVariable> doNotRename;
-        private final HashMap<LocationVariable, ProgramVariable> cache =
+        private final HashMap<LocationVariable, LocationVariable> cache =
             new HashMap<>();
 
         public LocVarReplBranchUniqueMap(Node goal, ImmutableSet<LocationVariable> doNotRename) {
@@ -1995,14 +1995,14 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public ProgramVariable get(Object key) {
+        public LocationVariable get(Object key) {
             if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) { return var; }
 
                 if (cache.containsKey(var)) { return cache.get(var); }
 
-                final ProgramVariable result = getBranchUniqueLocVar(var, node);
+                final LocationVariable result = getBranchUniqueLocVar(var, node);
                 cache.put(var, result);
 
                 return result;
@@ -2012,27 +2012,27 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public ProgramVariable put(ProgramVariable key, ProgramVariable value) {
+        public LocationVariable put(LocationVariable key, LocationVariable value) {
             return null;
         }
 
         @Override
-        public ProgramVariable remove(Object key) {
+        public LocationVariable remove(Object key) {
             return null;
         }
 
         @Override
-        public Set<ProgramVariable> keySet() {
+        public Set<LocationVariable> keySet() {
             return null;
         }
 
         @Override
-        public Collection<ProgramVariable> values() {
+        public Collection<LocationVariable> values() {
             return null;
         }
 
         @Override
-        public Set<java.util.Map.Entry<ProgramVariable, ProgramVariable>> entrySet() {
+        public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
             return null;
         }
     }

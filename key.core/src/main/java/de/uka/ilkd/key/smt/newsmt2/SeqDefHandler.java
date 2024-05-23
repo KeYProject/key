@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -98,13 +99,13 @@ public class SeqDefHandler implements SMTHandler {
             ImmutableSet<QuantifiableVariable> boundVars) {
 
         Operator op = term.op();
-        if (op instanceof LogicVariable && !boundVars.contains((QuantifiableVariable) op)) {
-            vars.add((LogicVariable) op);
+        if (op instanceof LogicVariable lv && !boundVars.contains(lv)) {
+            vars.add(lv);
             return;
         }
 
-        if (op instanceof ProgramVariable) {
-            vars.add((ProgramVariable) op);
+        if (op instanceof ProgramVariable pv) {
+            vars.add(pv);
             return;
         }
 
@@ -120,9 +121,11 @@ public class SeqDefHandler implements SMTHandler {
         List<SExpr> qvars = new ArrayList<>();
         List<SExpr> params = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            String name = var.name().toString();
-            qvars.add(LogicalVariableHandler.makeVarDecl(name, var.sort()));
-            SExpr varRef = LogicalVariableHandler.makeVarRef(name, var.sort());
+            // TODO: Better solution?
+            var op = (AbstractSortedOperator) var;
+            String name = op.name().toString();
+            qvars.add(LogicalVariableHandler.makeVarDecl(name, op.sort()));
+            SExpr varRef = LogicalVariableHandler.makeVarRef(name, op.sort());
             params.add(SExprs.coerce(varRef, Type.UNIVERSE));
         }
 
@@ -144,13 +147,15 @@ public class SeqDefHandler implements SMTHandler {
         List<SExpr> guards = new ArrayList<>();
         List<SExpr> params = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            String name = var.name().toString();
-            qvars.add(LogicalVariableHandler.makeVarDecl(name, var.sort()));
+            // TODO: Better solution?
+            var op = (AbstractSortedOperator) var;
+            String name = op.name().toString();
+            qvars.add(LogicalVariableHandler.makeVarDecl(name, op.sort()));
 
-            trans.addSort(var.sort());
+            trans.addSort(op.sort());
             SExpr smtVar = new SExpr(LogicalVariableHandler.VAR_PREFIX + name);
-            if (!var.sort().name().equals(IntegerLDT.NAME)) {
-                guards.add(SExprs.instanceOf(smtVar, SExprs.sortExpr(var.sort())));
+            if (!op.sort().name().equals(IntegerLDT.NAME)) {
+                guards.add(SExprs.instanceOf(smtVar, SExprs.sortExpr(op.sort())));
             }
             params.add(smtVar);
         }
@@ -192,7 +197,8 @@ public class SeqDefHandler implements SMTHandler {
             throws SMTTranslationException {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            SExpr varRef = LogicalVariableHandler.makeVarRef(var.name().toString(), var.sort());
+            var op = (AbstractSortedOperator) var;
+            SExpr varRef = LogicalVariableHandler.makeVarRef(op.name().toString(), op.sort());
             args.add(SExprs.coerce(varRef, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);
@@ -202,7 +208,7 @@ public class SeqDefHandler implements SMTHandler {
             throws SMTTranslationException {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            SExpr ref = trans.translate(termFactory.createTerm(var));
+            SExpr ref = trans.translate(termFactory.createTerm((Operator) var));
             args.add(SExprs.coerce(ref, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);

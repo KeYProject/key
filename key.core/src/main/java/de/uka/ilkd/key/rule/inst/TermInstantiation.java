@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
@@ -18,15 +19,15 @@ public class TermInstantiation extends InstantiationEntry<Term> {
     /**
      * creates a new ContextInstantiationEntry
      *
-     * @param sv
-     *        the SchemaVariable that is instantiated
-     * @param term
-     *        the Term the SchemaVariable is instantiated with
+     * @param sv the SchemaVariable that is instantiated
+     * @param term the Term the SchemaVariable is instantiated with
      */
     TermInstantiation(SchemaVariable sv, Term term) {
         super(term);
         // TODO: Remove the check below and move it to the matching logic
         // Done for VM based matching
-        if (!term.isRigid() && sv.isRigid()) { throw RIGIDNESS_EXCEPTION; }
+        if (sv instanceof OperatorSV asv && !term.isRigid() && asv.isRigid()) {
+            throw RIGIDNESS_EXCEPTION;
+        }
     }
 }

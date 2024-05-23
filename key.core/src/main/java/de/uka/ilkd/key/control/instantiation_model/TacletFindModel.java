@@ -315,7 +315,7 @@ public class TacletFindModel extends AbstractTableModel {
     private ProgramElement parseRow(int irow) throws SVInstantiationParserException {
 
         String instantiation = (String) getValueAt(irow, 1);
-        SchemaVariable sv = (SchemaVariable) getValueAt(irow, 0);
+        ProgramSV sv = (ProgramSV) getValueAt(irow, 0);
 
         ContextInstantiationEntry contextInstantiation =
             originalApp.instantiations().getContextInstantiation();
@@ -367,7 +367,7 @@ public class TacletFindModel extends AbstractTableModel {
                     sort = idd.sort();
                     if (sort == null) {
                         try {
-                            sort = result.getRealSort(sv, services);
+                            sort = result.getRealSort((OperatorSV) sv, services);
                         } catch (SortException e) {
                             throw new MissingSortException(String.valueOf(sv),
                                 createPosition(irow));

@@ -341,7 +341,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getMby(ProgramVariable selfVar, Services services) {
+    public Term getMby(LocationVariable selfVar, Services services) {
         return getTerm(measuredBy,
             new Variables(selfVar, null, null, null, null, null, null, null, null, null, services),
             services);
@@ -355,7 +355,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getPrecondition(final LocationVariable heap, final ProgramVariable self,
+    public Term getPrecondition(final LocationVariable heap, final LocationVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
         return getTerm(preconditions.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
@@ -403,7 +403,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getFreePrecondition(final LocationVariable heap, final ProgramVariable self,
+    public Term getFreePrecondition(final LocationVariable heap, final LocationVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
         return getTerm(freePreconditions.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
@@ -452,7 +452,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getModifiesClause(final LocationVariable heap, final ProgramVariable self,
+    public Term getModifiesClause(final LocationVariable heap, final LocationVariable self,
             final Services services) {
         return getTerm(modifiesClauses.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, null, services),
@@ -478,7 +478,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getFreeModifiesClause(final LocationVariable heap, final ProgramVariable self,
+    public Term getFreeModifiesClause(final LocationVariable heap, final LocationVariable self,
             final Services services) {
         return getTerm(
             freeModifiesClauses.get(heap),
@@ -759,7 +759,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @return a map from every variable in {@link #getVariables()} to its counterpart in
      *         {@code newVariables}.
      */
-    protected Map<ProgramVariable, ProgramVariable> createReplacementMap(
+    protected Map<LocationVariable, LocationVariable> createReplacementMap(
             final Variables newVariables, final Services services) {
         final VariableReplacementMap result = new VariableReplacementMap(services.getTermFactory());
         result.replaceSelf(variables.self, newVariables.self, services);
@@ -1348,7 +1348,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *        postconditions for abrupt termination.
          * @return a postcondition created conjunctively from the specified postconditions.
          */
-        private Term conditionPostconditions(final Map<Label, ProgramVariable> flags,
+        private Term conditionPostconditions(final Map<Label, LocationVariable> flags,
                 final Map<Label, Term> postconditions) {
             Term result = tt();
             for (Label label : flags.keySet()) {
@@ -1446,7 +1446,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *        a map containing all abrupt termination flags.
          * @return a term corresponding to {@link Behavior#NORMAL_BEHAVIOR}
          */
-        private Term buildNormalTerminationCondition(final Map<Label, ProgramVariable> flags) {
+        private Term buildNormalTerminationCondition(final Map<Label, LocationVariable> flags) {
             Term result = tt();
             for (Label label : flags.keySet()) {
                 result = and(result, buildFlagIsCondition(flags.get(label), FALSE()));
@@ -1460,7 +1460,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *        a map containing all abrupt termination flags.
          * @return a term equivalent to the negation of {@link #buildNormalTerminationCondition()}
          */
-        private Term buildAbruptTerminationCondition(final Map<Label, ProgramVariable> flags) {
+        private Term buildAbruptTerminationCondition(final Map<Label, LocationVariable> flags) {
             Term result = ff();
             for (Label label : flags.keySet()) { result = or(result, buildFlagIsCondition(flags.get(label), TRUE())); }
             return result;
@@ -1474,7 +1474,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *        a boolean term.
          * @return a term which is true iff the flag is equal to the term.
          */
-        private Term buildFlagIsCondition(final ProgramVariable flag, final Term truth) {
+        private Term buildFlagIsCondition(final LocationVariable flag, final Term truth) {
             Term result = tt();
             if (flag != null) { result = equals(var(flag), truth); }
             return result;

@@ -22,7 +22,6 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeYLexer;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -561,7 +561,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term createAttributeTerm(Term prefix, Operator attribute, ParserRuleContext ctx) {
         Term result = prefix;
 
-        if (attribute instanceof SchemaVariable sv) {
+        if (attribute instanceof OperatorSV sv) {
             /*
              * if (!inSchemaMode()) { semanticError(null,
              * "Schemavariables may only occur inside taclets."); }
@@ -600,7 +600,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
         final JavaInfo javaInfo = getJavaInfo();
 
-        Operator result = schemaVariables().lookup(new Name(attributeName));
+        Operator result = (OperatorSV) schemaVariables().lookup(new Name(attributeName));
         // if (result == null) {
 
         final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
@@ -1462,11 +1462,13 @@ public class ExpressionBuilder extends DefaultBuilder {
 
 
     private Term termForParsedVariable(ParsableVariable v, ParserRuleContext ctx) {
-        if (v instanceof LogicVariable || v instanceof ProgramVariable) {
-            return capsulateTf(ctx, () -> getTermFactory().createTerm(v));
-        } else {
-            if (v instanceof SchemaVariable) {
-                return capsulateTf(ctx, () -> getTermFactory().createTerm(v));
+        if (v instanceof LogicVariable lv) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
+        } else if (v instanceof LocationVariable lv) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
+        }else {
+            if (v instanceof OperatorSV sv) {
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(sv));
             } else {
                 String errorMessage = "";
                 if (false) {

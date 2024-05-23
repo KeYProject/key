@@ -48,7 +48,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     /**
      * stores the program variables to be replaced as keys and the new program variables as values
      */
-    protected final Map<ProgramVariable, ProgramVariable> replaceMap;
+    protected final Map<LocationVariable, LocationVariable> replaceMap;
 
     private ProgramElement result = null;
 
@@ -63,7 +63,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param services
      *        the services instance
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map<ProgramVariable, ProgramVariable> map,
+    public ProgVarReplaceVisitor(ProgramElement st, Map<LocationVariable, LocationVariable> map,
             Services services) {
         super(st, true, services);
         this.replaceMap = map;
@@ -82,7 +82,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param services
      *        the services instance
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map<ProgramVariable, ProgramVariable> map,
+    public ProgVarReplaceVisitor(ProgramElement st, Map<LocationVariable, LocationVariable> map,
             boolean replaceall, Services services) {
         this(st, map, services);
         this.replaceallbynew = replaceall;
@@ -115,7 +115,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if (node instanceof LocalVariableDeclaration vd && replaceallbynew) {
             ImmutableArray<VariableSpecification> vspecs = vd.getVariableSpecifications();
             for (int i = 0; i < vspecs.size(); i++) {
-                ProgramVariable pv = (ProgramVariable) vspecs.get(i).getProgramVariable();
+                var pv = (LocationVariable) vspecs.get(i).getProgramVariable();
                 if (!replaceMap.containsKey(pv)) { replaceMap.put(pv, copy(pv)); }
             }
         }
@@ -476,7 +476,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             replaceRemembranceLocalVariables(variables.outerRemembranceVariables), services);
     }
 
-    private ProgramVariable replaceVariable(final ProgramVariable variable) {
+    private LocationVariable replaceVariable(final LocationVariable variable) {
         if (variable != null) {
             if (replaceMap.containsKey(variable)) {
                 // TODO Can we really safely assume that replaceMap contains a
@@ -495,9 +495,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     }
 
-    private Map<Label, ProgramVariable> replaceFlags(final Map<Label, ProgramVariable> flags) {
-        final Map<Label, ProgramVariable> result = new LinkedHashMap<>();
-        for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
+    private Map<Label, LocationVariable> replaceFlags(final Map<Label, LocationVariable> flags) {
+        final Map<Label, LocationVariable> result = new LinkedHashMap<>();
+        for (Map.Entry<Label, LocationVariable> flag : flags.entrySet()) {
             result.put(flag.getKey(), replaceVariable(flag.getValue()));
         }
         return result;

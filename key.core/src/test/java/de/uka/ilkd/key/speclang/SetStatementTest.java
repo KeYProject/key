@@ -84,7 +84,8 @@ public class SetStatementTest {
         jmlIO = new JmlIO(services)
                 .context(Context.inClass(testClassType, false, services.getTermBuilder()))
                 .selfVar(selfVar)
-                .parameters(ImmutableSLList.<ProgramVariable>nil().append(ghostLocal, normalLocal));
+                .parameters(
+                    ImmutableSLList.<LocationVariable>nil().append(ghostLocal, normalLocal));
     }
 
     @Test

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 import org.key_project.util.collection.ImmutableList;
@@ -90,7 +90,7 @@ public interface SpecExtractor {
      *        TODO
      */
     ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<ProgramVariable> methodParams)
+            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException;
 
     /**

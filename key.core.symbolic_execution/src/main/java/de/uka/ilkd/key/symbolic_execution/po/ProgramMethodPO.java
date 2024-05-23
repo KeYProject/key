@@ -26,6 +26,7 @@ import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -166,8 +167,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
+    protected Term generateMbyAtPreDef(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         return tb.tt();
     }
 
@@ -175,8 +176,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         if (precondition != null && !precondition.isEmpty()) {
             var context = Context.inMethod(getProgramMethod(), services.getTermBuilder());
@@ -193,9 +194,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         return tb.tt();
     }
@@ -205,7 +206,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Services services) {
         return tb.tt();
     }
 
@@ -273,14 +275,17 @@ public class ProgramMethodPO extends AbstractOperationPO {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        super.fillSaveProperties(properties);
-        properties.setProperty("method", getProgramMethodSignature(getProgramMethod(), true));
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("method", getProgramMethodSignature(getProgramMethod(), true));
         if (getPrecondition() != null && !getPrecondition().isEmpty()) {
-            properties.setProperty("precondition", getPrecondition());
+            c.set("precondition", getPrecondition());
         }
+        return c;
     }
 
     /**
@@ -307,28 +312,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
     }
 
     /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig
-     *        The already load {@link InitConfig}.
-     * @param properties
-     *        The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException
-     *         Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        return new LoadedPOContainer(new ProgramMethodPO(initConfig, getName(properties),
-            getProgramMethod(initConfig, properties), getPrecondition(properties),
-            isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
-    }
-
-    /**
      * Searches the {@link IProgramMethod} defined by the given {@link Properties}.
      *
      * @param initConfig
-     *        The already load {@link InitConfig}.
+     *        The already loaded {@link InitConfig}.
      * @param properties
      *        The settings of the proof obligation to instantiate.
      * @return The found {@link IProgramMethod}.
@@ -336,10 +323,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
      *         Occurred Exception if it was not possible to find the
      *         {@link IProgramMethod}.
      */
-    public static IProgramMethod getProgramMethod(InitConfig initConfig, Properties properties)
+    public static IProgramMethod getProgramMethod(InitConfig initConfig, Configuration properties)
             throws IOException {
         // Get container class and method signature
-        String value = properties.getProperty("method");
+        String value = properties.getString("method");
         if (value == null) { throw new IOException("Property \"method\" is not defined."); }
         int classMethodSeparator = value.indexOf("#");
         if (classMethodSeparator < 0) {
@@ -391,8 +378,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      *        The proof obligation settings to read from.
      * @return The precondition or {@code null} if not available.
      */
-    public static String getPrecondition(Properties properties) {
-        return properties.getProperty("precondition");
+    public static String getPrecondition(Configuration properties) {
+        return properties.getString("precondition");
     }
 
     @Override

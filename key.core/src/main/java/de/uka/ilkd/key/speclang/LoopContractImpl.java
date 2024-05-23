@@ -735,7 +735,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public Term getDecreases(Variables variables, Services services) {
-        Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
+        Map<LocationVariable, LocationVariable> map = createReplacementMap(variables, services);
         return new OpReplacer(map, services.getTermFactory(), services.getProof())
                 .replace(decreases);
     }

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.*;
 
 import org.key_project.logic.sort.Sort;
@@ -149,14 +150,14 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(ProgramVariable pv, Services services) {
+    protected final void register(LocationVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) { progVarNames.addSafely(pv); }
     }
 
 
-    protected final void register(ImmutableList<ProgramVariable> pvs, Services services) {
-        for (ProgramVariable pv : pvs) { register(pv, services); }
+    protected final void register(ImmutableList<LocationVariable> pvs, Services services) {
+        for (LocationVariable pv : pvs) { register(pv, services); }
     }
 
 
@@ -505,11 +506,15 @@ public abstract class AbstractPO implements IPersistablePO {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
-        properties.setProperty(IPersistablePO.PROPERTY_NAME, name);
+    public Configuration createLoaderConfig() {
+        var c = new Configuration();
+        c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
+        c.set(IPersistablePO.PROPERTY_NAME, name);
+        return c;
     }
 
     /**
@@ -519,8 +524,8 @@ public abstract class AbstractPO implements IPersistablePO {
      *        The properties to read from.
      * @return The name value.
      */
-    public static String getName(Properties properties) {
-        return properties.getProperty(IPersistablePO.PROPERTY_NAME);
+    public static String getName(Configuration properties) {
+        return properties.getString(IPersistablePO.PROPERTY_NAME);
     }
 
     /**

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -20,22 +19,22 @@ public class ProgramVariableCollection {
     /**
      * {@code self}
      */
-    public ProgramVariable selfVar;
+    public LocationVariable selfVar;
 
     /**
      * The list of method parameters if the textual specification case is a method contract.
      */
-    public ImmutableList<ProgramVariable> paramVars;
+    public ImmutableList<LocationVariable> paramVars;
 
     /**
      * {@code result}
      */
-    public ProgramVariable resultVar;
+    public LocationVariable resultVar;
 
     /**
      * {@code exception}
      */
-    public ProgramVariable excVar;
+    public LocationVariable excVar;
 
     /**
      * A map from every variable {@code var} to {@code \old(var)}.
@@ -74,9 +73,9 @@ public class ProgramVariableCollection {
      * @param atPres
      *        a map from every variable {@code var} to {@code \old(var)}.
      */
-    public ProgramVariableCollection(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    public ProgramVariableCollection(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, Term> atPres) {
         this(selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
     }
@@ -104,9 +103,9 @@ public class ProgramVariableCollection {
      *        a map from every variable {@code var} to {@code \before(var)} (if
      *        applicable).
      */
-    public ProgramVariableCollection(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    public ProgramVariableCollection(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, Term> atPres,
             Map<LocationVariable, LocationVariable> atBeforeVars,
             Map<LocationVariable, Term> atBefores) {

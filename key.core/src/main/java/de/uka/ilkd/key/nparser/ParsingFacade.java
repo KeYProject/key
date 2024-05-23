@@ -282,5 +282,10 @@ public final class ParsingFacade {
     public static Configuration readConfigurationFile(File file) throws IOException {
         return readConfigurationFile(file.toPath());
     }
+
+    public static Configuration getConfiguration(KeYParser.TableContext ctx) {
+        final var cfg = new ConfigurationBuilder();
+        return cfg.visitTable(ctx);
+    }
     // endregion
 }

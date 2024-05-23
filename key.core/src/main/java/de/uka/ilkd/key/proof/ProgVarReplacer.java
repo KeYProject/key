@@ -31,7 +31,7 @@ public final class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    private final Map<ProgramVariable, ProgramVariable> map;
+    private final Map<LocationVariable, LocationVariable> map;
 
 
     /**
@@ -43,7 +43,7 @@ public final class ProgVarReplacer {
     /**
      * creates a ProgVarReplacer that replaces program variables as specified by the map parameter
      */
-    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplacer(Map<LocationVariable, LocationVariable> map, Services services) {
         this.map = map;
         this.services = services;
     }

@@ -79,7 +79,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
     private Term renameVariablesAndSkolemConstants(Term term) {
         final Term temp = renameFormulasWithoutPrograms(term);
-        final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
+        final Map<LocationVariable, LocationVariable> progVarReplaceMap =
             restrictToProgramVariables(replaceMap);
         return applyRenamingsToPrograms(temp, progVarReplaceMap);
     }
@@ -166,7 +166,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
     private void applyRenamingsOnUpdate(Term term) {
         final ElementaryUpdate u = (ElementaryUpdate) term.op();
-        final Term lhsTerm = var(u.lhs());
+        final Term lhsTerm = varOfUpdateableOp(u.lhs());
         final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
         final Term[] renamedSubs = renameSubs(term);
         final ElementaryUpdate renamedU =
@@ -192,7 +192,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private Term applyRenamingsToPrograms(Term term,
-            Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
+            Map<LocationVariable, LocationVariable> progVarReplaceMap) {
 
         if (term == null) {
             return null;
@@ -211,7 +211,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private Term[] applyProgramRenamingsToSubs(Term term,
-            Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
+            Map<LocationVariable, LocationVariable> progVarReplaceMap) {
         Term[] appliedSubs = new Term[term.arity()];
         for (int i = 0; i < appliedSubs.length; i++) {
             appliedSubs[i] = applyRenamingsToPrograms(term.sub(i), progVarReplaceMap);
@@ -220,7 +220,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private JavaBlock renameJavaBlock(Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
+    private JavaBlock renameJavaBlock(Map<LocationVariable, LocationVariable> progVarReplaceMap,
             JavaProgramElement program, Services services) {
         final ProgVarReplaceVisitor paramRepl =
             new ProgVarReplaceVisitor(program, progVarReplaceMap, services);
@@ -231,14 +231,14 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private Map<ProgramVariable, ProgramVariable> restrictToProgramVariables(
+    private Map<LocationVariable, LocationVariable> restrictToProgramVariables(
             Map<Term, Term> replaceMap) {
-        Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
+        Map<LocationVariable, LocationVariable> progVarReplaceMap =
             new HashMap<>();
         for (final Term t : replaceMap.keySet()) {
-            if (t.op() instanceof ProgramVariable) {
-                progVarReplaceMap.put((ProgramVariable) t.op(),
-                    (ProgramVariable) replaceMap.get(t).op());
+            if (t.op() instanceof LocationVariable lv) {
+                progVarReplaceMap.put(lv,
+                    (LocationVariable) replaceMap.get(t).op());
             }
         }
         return progVarReplaceMap;

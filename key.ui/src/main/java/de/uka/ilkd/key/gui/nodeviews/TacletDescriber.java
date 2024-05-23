@@ -22,21 +22,23 @@ import org.key_project.util.collection.ImmutableSet;
  */
 class TacletDescriber {
 
-    private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
+    private static void writeSVModifiers(StringBuffer out, SchemaVariable psv) {
         boolean started = false;
-        if (sv.isRigid() && !(sv instanceof VariableSV)) {
+        if (psv instanceof OperatorSV sv) {
+            if (sv.isRigid() && !(sv instanceof VariableSV)) {
             if (!started) { out.append("["); }
-            out.append("rigid");
-            started = true;
-        }
-        if (sv instanceof ProgramSV && ((ProgramSV) sv).isListSV()) {
-            if (!started) {
-                out.append("[");
-            } else {
-                out.append(", ");
+                out.append("rigid");
+                started = true;
             }
-            out.append("list");
-            started = true;
+            if (sv instanceof ProgramSV && ((ProgramSV) sv).isListSV()) {
+                if (!started) {
+                    out.append("[");
+                } else {
+                    out.append(", ");
+                }
+                out.append("list");
+                started = true;
+            }
         }
 
         if (started) { out.append("]"); }
@@ -69,9 +71,9 @@ class TacletDescriber {
         /*
          * TODO: Add an explanation for the following if-statement. (Kai Wallisch 01/2015)
          */
-        if (!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV
-                || schemaVar instanceof TermLabelSV)) {
-            out.append(" ").append(schemaVar.sort().declarationString());
+        if (schemaVar instanceof TermSV || schemaVar instanceof VariableSV
+                || schemaVar instanceof SkolemTermSV || schemaVar instanceof ProgramSV) {
+            out.append(" ").append(((OperatorSV) schemaVar).sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
     }

@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -564,7 +563,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     @Override
     public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<ProgramVariable> methodParams)
+            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
         return jsf.createJMLMergeContracts(method, mps);
     }

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang.jml.translation;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
  *        The containing class
  * @author Julian Wiesler
  */
-public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType classType, ProgramVariable selfVar) {
+public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType classType, LocationVariable selfVar) {
     /**
      * Constructs a self var from the given parameters
      *
@@ -35,7 +35,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      * @param isStaticContext
      *        whether this is a static context
      */
-    private static @Nullable ProgramVariable createSelfVar(TermBuilder tb, KeYJavaType classType,
+    private static @Nullable LocationVariable createSelfVar(TermBuilder tb, KeYJavaType classType,
             boolean isStaticContext) {
         return isStaticContext ? null : tb.selfVar(classType, false);
     }
@@ -62,7 +62,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      * @param selfVar
      *        self var
      */
-    public static Context inMethodWithSelfVar(@NonNull IProgramMethod pm, ProgramVariable selfVar) {
+    public static Context inMethodWithSelfVar(@NonNull IProgramMethod pm, LocationVariable selfVar) {
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(pm);
         return new Context(mode, pm.getContainerType(), selfVar);
     }

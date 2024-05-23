@@ -60,10 +60,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     private String conditionString;
 
     /**
-     * A list of {@link ProgramVariable}s containing all variables that were parsed and have to be
+     * A list of {@link LocationVariable}s containing all variables that were parsed and have to be
      * possibly replaced during runtime.
      */
-    private ImmutableList<ProgramVariable> varsForCondition;
+    private ImmutableList<LocationVariable> varsForCondition;
 
     /**
      * The KeYJavaType of the container of the element associated with the breakpoint.
@@ -87,9 +87,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     private final Set<LocationVariable> paramVars;
 
     /**
-     * A {@link ProgramVariable} representing the instance the class KeY is working on
+     * A {@link LocationVariable} representing the instance the class KeY is working on
      */
-    private ProgramVariable selfVar;
+    private LocationVariable selfVar;
 
     /**
      * The {@link IProgramMethod} this Breakpoint lies within
@@ -305,14 +305,14 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         setSelfVar(new LocationVariable(
             new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")),
             containerType, null, false, false));
-        ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> varsForCondition = ImmutableSLList.nil();
         if (getPm() != null) {
             // collect parameter variables
             for (ParameterDeclaration pd : getPm().getParameters()) {
                 for (VariableSpecification vs : pd.getVariables()) {
                     this.paramVars.add((LocationVariable) vs.getProgramVariable());
                     varsForCondition =
-                        varsForCondition.append((ProgramVariable) vs.getProgramVariable());
+                        varsForCondition.append((LocationVariable) vs.getProgramVariable());
                 }
             }
             // Collect local variables
@@ -324,7 +324,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             for (LocationVariable x : undeclaredVariables) { varsForCondition = saveAddVariable(x, varsForCondition); }
         }
         JavaInfo info = getProof().getServices().getJavaInfo();
-        ImmutableList<ProgramVariable> globalVars = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> globalVars = ImmutableSLList.nil();
         for (KeYJavaType kjtloc : info.getAllSupertypes(containerType)) {
             if (kjtloc.getJavaType() instanceof TypeDeclaration) {
                 ImmutableList<Field> fields =
@@ -333,7 +333,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                     if ((kjtloc.equals(containerType) || !field.isPrivate())
                             && !((LocationVariable) field.getProgramVariable()).isImplicit()) {
                         globalVars =
-                            globalVars.append((ProgramVariable) field.getProgramVariable());
+                            globalVars.append((LocationVariable) field.getProgramVariable());
                     }
                 }
             }
@@ -438,10 +438,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     protected abstract boolean isInScopeForCondition(Node node);
 
-    private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x,
-            ImmutableList<ProgramVariable> varsForCondition) {
+    private ImmutableList<LocationVariable> saveAddVariable(LocationVariable x,
+            ImmutableList<LocationVariable> varsForCondition) {
         boolean contains = false;
-        for (ProgramVariable paramVar : varsForCondition) {
+        for (var paramVar : varsForCondition) {
             if (paramVar.toString().equals(x.toString())) {
                 contains = true;
                 break;
@@ -529,7 +529,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * @return the selfVar
      */
-    public ProgramVariable getSelfVar() {
+    public LocationVariable getSelfVar() {
         return selfVar;
     }
 
@@ -537,14 +537,14 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param selfVar
      *        the selfVar to set
      */
-    public void setSelfVar(ProgramVariable selfVar) {
+    public void setSelfVar(LocationVariable selfVar) {
         this.selfVar = selfVar;
     }
 
     /**
      * @return the varsForCondition
      */
-    public ImmutableList<ProgramVariable> getVarsForCondition() {
+    public ImmutableList<LocationVariable> getVarsForCondition() {
         return varsForCondition;
     }
 
@@ -552,7 +552,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param varsForCondition
      *        the varsForCondition to set
      */
-    public void setVarsForCondition(ImmutableList<ProgramVariable> varsForCondition) {
+    public void setVarsForCondition(ImmutableList<LocationVariable> varsForCondition) {
         this.varsForCondition = varsForCondition;
     }
 

@@ -106,7 +106,7 @@ public abstract class TacletIndex {
             if ((indexObj instanceof TermSV && ((TermSV) indexObj).isStrict())
                     || indexObj instanceof FormulaSV || indexObj instanceof UpdateSV) {
 
-                indexObj = ((SchemaVariable) indexObj).sort();
+                indexObj = ((OperatorSV) indexObj).sort();
 
                 if (indexObj instanceof GenericSort) { indexObj = GenericSort.class; }
             } else if (indexObj instanceof ProgramSV) {

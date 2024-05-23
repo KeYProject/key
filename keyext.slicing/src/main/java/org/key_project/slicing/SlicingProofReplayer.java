@@ -109,7 +109,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             Proof originalProof,
             AnalysisResults results,
             ProgressMonitor progressMonitor)
-            throws IOException, ProofInputException, ProblemLoaderException {
+            throws Exception {
         boolean loadInUI = MainWindow.hasInstance();
         if (loadInUI) { MainWindow.getInstance().setStatusLine(
             "Preparing proof slicing", 2); }

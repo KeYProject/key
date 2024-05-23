@@ -903,7 +903,7 @@ public class IntermediateProofReplayer {
                 continue;
             }
             final String value = s.substring(eq + 1);
-            if (sv instanceof VariableSV) { app = parseSV1(app, sv, value, services); }
+            if (sv instanceof VariableSV vsv) { app = parseSV1(app, vsv, value, services); }
         }
 
         // second pass: add everything else
@@ -979,18 +979,14 @@ public class IntermediateProofReplayer {
     /**
      * Instantiates a schema variable in the given taclet application. 1st pass: only VariableSV.
      *
-     * @param app
-     *        Application to instantiate.
-     * @param sv
-     *        Schema variable (VariableSV) to instantiate.
-     * @param value
-     *        Name for the instantiated logic variable.
-     * @param services
-     *        The services object.
+     * @param app Application to instantiate.
+     * @param sv VariableSV to instantiate.
+     * @param value Name for the instantiated logic variable.
+     * @param services The services object.
      * @return An instantiated taclet application, where the schema variable has been instantiated
      *         by a logic variable of the given name.
      */
-    public static TacletApp parseSV1(TacletApp app, SchemaVariable sv, String value,
+    public static TacletApp parseSV1(TacletApp app, VariableSV sv, String value,
             Services services) {
         LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(sv, services));
         Term instance = services.getTermFactory().createTerm(lv);
@@ -1012,7 +1008,7 @@ public class IntermediateProofReplayer {
      * @return An instantiated taclet application, where the schema variable has been instantiated,
      *         depending on its type, by a Skolem constant, program element, or term of the given
      *         name.
-     * @see #parseSV1(TacletApp, SchemaVariable, String, Services)
+     * @see #parseSV1(TacletApp, VariableSV, String, Services)
      */
     public static TacletApp parseSV2(TacletApp app, SchemaVariable sv, String value,
             Goal targetGoal) {
@@ -1022,11 +1018,15 @@ public class IntermediateProofReplayer {
         if (sv instanceof VariableSV) {
             // ignore -- already done
             result = app;
-        } else if (sv instanceof ProgramSV) {
-            final ProgramElement pe = app.getProgramElement(value, sv, services);
+        } else if (sv instanceof ProgramSV psv) {
+            final ProgramElement pe = app.getProgramElement(value, psv, services);
             result = app.addCheckedInstantiation(sv, pe, services, true);
-        } else if (sv instanceof SkolemTermSV) {
-            result = app.createSkolemConstant(value, sv, true, services);
+        } else if (sv instanceof SkolemTermSV skolemSv) {
+            result = app.createSkolemConstant(value, skolemSv, true, services);
+        } else if (sv instanceof ModalOperatorSV msv) {
+            result = app.addInstantiation(
+                app.instantiations().add(msv, Modality.JavaModalityKind.getKind(value), services),
+                services);
         } else {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS =
