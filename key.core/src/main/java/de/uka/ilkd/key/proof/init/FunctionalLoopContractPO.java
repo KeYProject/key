@@ -130,7 +130,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
         contract.replaceEnhancedForVariables(services);
 
-        final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
         register(selfVar, services);
         final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
@@ -293,7 +293,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final IProgramMethod pm = getProgramMethod();
         final StatementBlock block = getBlock();
-        final ImmutableSet<ProgramVariable> localInVariables =
+        final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(block, services);
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
         final Term reachableInCondition =
@@ -408,7 +408,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             final Term wellFormedHeapsCondition, final GoalsConfigurator configurator,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder, final Services services,
             final TermBuilder tb) {
-        final ProgramVariable exceptionParameter = KeYJavaASTFactory.localVariable(
+        final LocationVariable exceptionParameter = KeYJavaASTFactory.localVariable(
             services.getVariableNamer().getTemporaryNameProposal("e"),
             variables.exception.getKeYJavaType());
 

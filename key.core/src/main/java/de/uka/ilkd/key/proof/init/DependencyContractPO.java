@@ -49,8 +49,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Term buildFreePre(List<LocationVariable> heaps, ProgramVariable selfVar,
-            KeYJavaType selfKJT, ImmutableList<ProgramVariable> paramVars, Term wellFormedHeaps,
+    private Term buildFreePre(List<LocationVariable> heaps, LocationVariable selfVar,
+            KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, Term wellFormedHeaps,
             Services services) throws ProofInputException {
         // "self != null"
         final Term selfNotNull =
@@ -81,7 +81,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = tb.tt();
-        for (ProgramVariable paramVar : paramVars) {
+        for (var paramVar : paramVars) {
             paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
         }
 
@@ -131,9 +131,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         final Services proofServices = postInit();
 
         // prepare variables
-        final ProgramVariable selfVar =
+        final LocationVariable selfVar =
             !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
-        final ImmutableList<ProgramVariable> paramVars = tb.paramVars(target, true);
+        final ImmutableList<LocationVariable> paramVars = tb.paramVars(target, true);
 
         final boolean twoState = (contract.getTarget().getStateCount() == 2);
         final int heapCount = contract.getTarget().getHeapCount(proofServices);
