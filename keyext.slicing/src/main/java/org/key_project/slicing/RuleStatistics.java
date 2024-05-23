@@ -102,6 +102,7 @@ public class RuleStatistics {
     /**
      * Named usage statistic of a rule.
      * <p>
+     *
      * @param ruleName name of the rule
      * @param values statistics for rule
      */
@@ -111,11 +112,11 @@ public class RuleStatistics {
     /**
      * Usage statistic of a rule.
      *
-     * @param numberOfApplications    counted number of applications
+     * @param numberOfApplications counted number of applications
      * @param numberOfUselessApplications counted number of useless applications
      * @param numberOfInitialUselessApplications weigl: ???
      */
     public record StatisticEntry(int numberOfApplications,
-                                 int numberOfUselessApplications,
-                                 int numberOfInitialUselessApplications) {}
+            int numberOfUselessApplications,
+            int numberOfInitialUselessApplications) {}
 }

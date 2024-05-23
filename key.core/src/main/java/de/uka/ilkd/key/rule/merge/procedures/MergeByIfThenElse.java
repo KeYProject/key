@@ -262,6 +262,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * @param elseTerm
      * @param commuteSides
      */
-    public record DistanceFormRightSide(Term distinguishingFormula, Term ifTerm, Term elseTerm, boolean commuteSides) {
+    public record DistanceFormRightSide(Term distinguishingFormula, Term ifTerm, Term elseTerm,
+            boolean commuteSides) {
     }
 }

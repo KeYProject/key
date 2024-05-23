@@ -6,10 +6,6 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
-import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
@@ -665,13 +661,14 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Tries to load a proof script entry from the given input.
+     *
      * @return null if no proof script could not be found.
      * @throws ProofInputException for some reason I do not know
      */
     public @Nullable ProofScriptEntry readProofScript() throws ProofInputException {
         if (envInput instanceof KeYUserProblemFile kupf) {
             return kupf.readProofScript();
-        }else{
+        } else {
             return null;
         }
     }

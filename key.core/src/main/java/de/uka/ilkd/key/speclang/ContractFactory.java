@@ -204,7 +204,8 @@ public class ContractFactory {
             }
         }
         // TODO: insert static invariant??
-        return dep(kjt, dep.observer(), dep.observer().getContainerType(), pres, dep.measuredBy(), accessibles,
+        return dep(kjt, dep.observer(), dep.observer().getContainerType(), pres, dep.measuredBy(),
+            accessibles,
             selfVar, paramVars, null, null);
     }
 

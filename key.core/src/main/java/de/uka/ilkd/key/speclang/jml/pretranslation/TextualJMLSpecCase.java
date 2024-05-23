@@ -196,7 +196,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     /**
      * Represents an abbreviation defined inside JML.
-     * @param typeName   class in which the abbreviation appeared
+     *
+     * @param typeName class in which the abbreviation appeared
      * @param abbrevName name of the abbreviation
      * @param abbreviatedTerm abbreviated term
      */

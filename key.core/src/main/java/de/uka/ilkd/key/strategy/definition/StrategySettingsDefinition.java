@@ -43,7 +43,7 @@ public class StrategySettingsDefinition {
      * @param factory factory supplies the strategy settings
      */
     public record StrategySettingEntry(String name, int order,
-                                       IDefaultStrategyPropertiesFactory factory) {}
+            IDefaultStrategyPropertiesFactory factory) {}
 
     private static final ArrayList<StrategySettingEntry> STD_FURTHER_DEFAULTS;
 

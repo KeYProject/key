@@ -716,7 +716,9 @@ public class MergeRule implements BuiltInRule {
     }
 
     /**
-     * An entry to be merged, covering the symbolic execution state, new variable names, and side conditions.
+     * An entry to be merged, covering the symbolic execution state, new variable names, and side
+     * conditions.
+     *
      * @param state
      * @param newNames
      * @param sideConditionsToProve

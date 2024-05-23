@@ -590,7 +590,7 @@ public final class WhileInvariantRule implements BuiltInRule {
      * Represents the guard of the loop.
      *
      * @param javaBlock the program code to evaluate the guard
-     * @param trueTerm  a term describing that the guard is true
+     * @param trueTerm a term describing that the guard is true
      * @param falseTerm the symbolical negation of {@link #trueTerm}
      */
     private record Guard(JavaBlock javaBlock, Term trueTerm, Term falseTerm) {}

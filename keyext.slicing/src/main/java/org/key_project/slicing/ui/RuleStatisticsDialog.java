@@ -88,7 +88,7 @@ public class RuleStatisticsDialog extends JDialog {
 
         statisticsPane.setText(genTable(
             statistics.sortBy(Comparator.comparing(
-                    (RuleStatisticEntry it) -> it.values().numberOfApplications())
+                (RuleStatisticEntry it) -> it.values().numberOfApplications())
                     .reversed())));
         statisticsPane.setCaretPosition(0);
         setLocationRelativeTo(window);
@@ -118,21 +118,27 @@ public class RuleStatisticsDialog extends JDialog {
         sortButton2.addActionListener(event -> {
             statisticsPane.setText(genTable(
                 statistics.sortBy(
-                    Comparator.comparing((RuleStatisticEntry it) -> it.values().numberOfApplications()).reversed())));
+                    Comparator
+                            .comparing(
+                                (RuleStatisticEntry it) -> it.values().numberOfApplications())
+                            .reversed())));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton3 = new JButton("Sort by useless");
         sortButton3.addActionListener(event -> {
             statisticsPane.setText(genTable(
                 statistics.sortBy(Comparator
-                        .comparing((RuleStatisticEntry it) -> it.values().numberOfUselessApplications()).reversed())));
+                        .comparing(
+                            (RuleStatisticEntry it) -> it.values().numberOfUselessApplications())
+                        .reversed())));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton4 = new JButton("Sort by initial useless");
         sortButton4.addActionListener(event -> {
             statisticsPane.setText(genTable(
                 statistics.sortBy(
-                    Comparator.comparing((RuleStatisticEntry it) -> it.values().numberOfInitialUselessApplications())
+                    Comparator.comparing(
+                        (RuleStatisticEntry it) -> it.values().numberOfInitialUselessApplications())
                             .reversed())));
             statisticsPane.setCaretPosition(0);
         });
@@ -205,7 +211,8 @@ public class RuleStatisticsDialog extends JDialog {
             int all = a.values().numberOfApplications();
             int useless = a.values().numberOfUselessApplications();
             int iua = a.values().numberOfInitialUselessApplications();
-            rows.add(List.of(name, Integer.toString(all), Integer.toString(useless), Integer.toString(iua)));
+            rows.add(List.of(name, Integer.toString(all), Integer.toString(useless),
+                Integer.toString(iua)));
         });
 
         return HtmlFactory.generateTable(columns, new boolean[] { false, false, false, false },
