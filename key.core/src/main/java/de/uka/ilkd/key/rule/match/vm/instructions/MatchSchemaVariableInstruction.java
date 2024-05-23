@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 
-public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
+public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
         extends Instruction<SV> {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);

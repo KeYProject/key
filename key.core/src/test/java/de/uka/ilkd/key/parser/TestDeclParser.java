@@ -8,8 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ParametricSort;
@@ -271,10 +270,9 @@ public class TestDeclParser {
      * asserts that the SchemaVariable matches to term but not to a formula
      */
     private void assertTermSV(String msg, Object o) {
-
-        assertInstanceOf(SchemaVariable.class, o, "The named object: " + o + " is of type "
-            + o.getClass() + ", but the type SchemaVariable was expected");
-        assertNotSame(((SchemaVariable) o).sort(), JavaDLTheory.FORMULA,
+        assertInstanceOf(TermSV.class, o, "The named object: " + o + " is of type "
+                + o.getClass() + ", but the type SchemaVariable was expected");
+        assertNotSame(((TermSV) o).sort(), JavaDLTheory.FORMULA,
             "Schemavariable is not allowed to match a term of sort FORMULA.");
     }
 
@@ -283,11 +281,11 @@ public class TestDeclParser {
      * Sort.FORMULA)
      */
     private void assertFormulaSV(String msg, Object o) {
-        assertInstanceOf(SchemaVariable.class, o, "The named object: " + o + " is of type "
-            + o.getClass() + ", but the type SchemaVariable was expected");
-        assertSame(((SchemaVariable) o).sort(), JavaDLTheory.FORMULA,
+        assertInstanceOf(FormulaSV.class, o, "The named object: " + o + " is of type "
+                + o.getClass() + ", but the type SchemaVariable was expected");
+        assertSame(((FormulaSV) o).sort(), JavaDLTheory.FORMULA,
             "Only matches to terms of sort FORMULA allowed. " + "But term has sort "
-                + ((SchemaVariable) o).sort());
+                + ((FormulaSV) o).sort());
 
 
     }
@@ -438,7 +436,8 @@ public class TestDeclParser {
 
         assertEquals(new Name("b"), variables.lookup(new Name("b")).name(), "find SV ");
         assertFormulaSV("SV b type", variables.lookup(new Name("b")));
-        assertEquals(JavaDLTheory.FORMULA, variables.lookup(new Name("b")).sort(), "SV b sort");
+        assertEquals(JavaDLTheory.FORMULA, variables.lookup(new Name("b")).sort(),
+            "SV b sort");
     }
 
 
