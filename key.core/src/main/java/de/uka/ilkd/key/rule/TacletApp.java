@@ -481,84 +481,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      *         be some leftover uninstantiated variables) or null if nothing changed.
      */
     public final TacletApp tryToInstantiateAsMuchAsPossible(Services services) {
-        final VariableNamer varNamer = services.getVariableNamer();
-        final TermBuilder tb = services.getTermBuilder();
-
-        TacletApp app = this;
-        ImmutableList<String> proposals = ImmutableSLList.nil();
-
-        for (final SchemaVariable usv : uninstantiatedVars()) {
-            if (!(usv instanceof AbstractSV sv)) {
-                continue;
-            }
-            if (sv.arity() != 0) {
-                continue;
-            }
-
-            if (sv.sort() == ProgramSVSort.VARIABLE) {
-                String proposal = varNamer.getSuggestiveNameProposalForProgramVariable(sv, this,
-                    services, proposals);
-                ProgramElement pe = app.getProgramElement(proposal, sv, services);
-                app = app.addCheckedInstantiation(sv, pe, services, true);
-                proposals = proposals.append(proposal);
-            } else if (sv.sort() == ProgramSVSort.LABEL) {
-                boolean nameclash;
-                do {
-                    String proposal = VariableNameProposer.DEFAULT.getProposal(this, sv, services,
-                        null, proposals);
-                    ProgramElement pe = app.getProgramElement(proposal, sv, services);
-                    proposals = proposals.prepend(proposal);
-                    try {
-                        app = app.addCheckedInstantiation(sv, pe, services, true);
-                    } catch (IllegalInstantiationException iie) {
-                        // name clash
-                        nameclash = true;
-                    }
-                    // FIXME: This loop is never executed more than once
-                    // The following line might belong to the try-block.
-                    // Leave it untouched, however, since no problems
-                    // reported with this established code. MU 10-2012
-                    nameclash = false;
-                } while (nameclash);
-            } else if (sv instanceof SkolemTermSV) {
-                // if the sort of the schema variable is generic,
-                // ensure that it is instantiated
-                app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null) {
-                    /*
-                     * NOTE (DS, 2019-02-22): Here we do return null since Skolem symbols should in
-                     * any case be instantiated.
-                     */
-                    return null;
-                }
-
-                final String proposal =
-                    VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, proposals);
-                proposals = proposals.append(proposal);
-                app = app.createSkolemConstant(proposal, sv, true, services);
-
-            } else if (sv instanceof VariableSV) {
-                // if the sort of the schema variable is generic,
-                // ensure that it is instantiated
-                app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null) {
-                    continue;
-                }
-
-                String proposal;
-                Collection<String> conflictNames = collectClashNames(sv, services);
-                do {
-                    proposal = VariableNameProposer.DEFAULT.getProposal(this, sv, services, null,
-                        proposals);
-                    proposals = proposals.prepend(proposal);
-                } while (conflictNames.contains(proposal));
-
-                LogicVariable v = new LogicVariable(new Name(proposal), getRealSort(sv, services));
-
-                app = app.addCheckedInstantiation(sv, tb.var(v), services, true);
-            } else {
-            }
-        }
+        TacletApp app = instantiationHelper(false, services);
+        if (app == null)
+            return null;
 
         if (app != this) {
             final MatchConditions appMC =
@@ -577,90 +502,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return A TacletApp with this.sufficientlyComplete() or null
      */
     public final @Nullable TacletApp tryToInstantiate(Services services) {
-        /*
-         * TODO (DS, 2019-02-22): It should be possible to unify this with
-         * tryToInstantiateAsMuchAsPossible: Apply that method, check whether the result is
-         * complete, return it if yes and else return null. Indeed, the above method is an adapted
-         * clone of this one. I just did not dare to mess with that core element of the prover at
-         * the moment...
-         */
-        final VariableNamer varNamer = services.getVariableNamer();
-        final TermBuilder tb = services.getTermBuilder();
-
-        TacletApp app = this;
-        ImmutableList<String> proposals = ImmutableSLList.nil();
-
-        for (final SchemaVariable usv : uninstantiatedVars()) {
-            if (!(usv instanceof AbstractSV sv)) {
-                continue;
-            }
-            if (sv.arity() != 0) {
-                continue;
-            }
-
-            if (sv.sort() == ProgramSVSort.VARIABLE) {
-                String proposal = varNamer.getSuggestiveNameProposalForProgramVariable(sv, this,
-                    services, proposals);
-                ProgramElement pe = app.getProgramElement(proposal, sv, services);
-                app = app.addCheckedInstantiation(sv, pe, services, true);
-                proposals = proposals.append(proposal);
-            } else if (sv.sort() == ProgramSVSort.LABEL) {
-                boolean nameclash;
-                do {
-                    String proposal = VariableNameProposer.DEFAULT.getProposal(this, sv, services,
-                        null, proposals);
-                    ProgramElement pe = app.getProgramElement(proposal, sv, services);
-                    proposals = proposals.prepend(proposal);
-                    try {
-                        app = app.addCheckedInstantiation(sv, pe, services, true);
-                    } catch (IllegalInstantiationException iie) {
-                        // name clash
-                        nameclash = true;
-                    }
-                    // FIXME: This loop is never executed more than once
-                    // The following line might belong to the try-block.
-                    // Leave it untouched, however, since no problems
-                    // reported with this established code. MU 10-2012
-                    nameclash = false;
-                } while (nameclash);
-            } else if (sv instanceof SkolemTermSV) {
-                // if the sort of the schema variable is generic,
-                // ensure that it is instantiated
-                app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null) {
-                    return null;
-                }
-
-                String proposal =
-                    VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, proposals);
-
-                proposals = proposals.append(proposal);
-
-                app = app.createSkolemConstant(proposal, sv, true, services);
-
-            } else if (sv instanceof VariableSV) {
-                // if the sort of the schema variable is generic,
-                // ensure that it is instantiated
-                app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null) {
-                    return null;
-                }
-
-                String proposal;
-                Collection<String> conflictNames = collectClashNames(sv, services);
-                do {
-                    proposal = VariableNameProposer.DEFAULT.getProposal(this, sv, services, null,
-                        proposals);
-                    proposals = proposals.prepend(proposal);
-                } while (conflictNames.contains(proposal));
-
-                LogicVariable v = new LogicVariable(new Name(proposal), getRealSort(sv, services));
-
-                app = app.addCheckedInstantiation(sv, tb.var(v), services, true);
-            } else {
-                return null;
-            }
-        }
+        TacletApp app = instantiationHelper(true, services);
+        if (app == null)
+            return null;
 
         if (app != this) {
             final MatchConditions appMC =
@@ -674,6 +518,96 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         if (!app.complete()) {
             return null;
+        }
+        return app;
+    }
+
+    private TacletApp instantiationHelper(boolean force, Services services) {
+        final VariableNamer varNamer = services.getVariableNamer();
+        final TermBuilder tb = services.getTermBuilder();
+
+        TacletApp app = this;
+        ImmutableList<String> proposals = ImmutableSLList.nil();
+
+        for (final SchemaVariable variable : uninstantiatedVars()) {
+            if (!(variable instanceof OperatorSV operatorSv)) {
+                continue;
+            }
+            if (operatorSv.arity() != 0) {
+                continue;
+            }
+
+            if (operatorSv.sort() == ProgramSVSort.VARIABLE) {
+                String proposal =
+                    varNamer.getSuggestiveNameProposalForProgramVariable(operatorSv, this,
+                        services, proposals);
+                ProgramElement pe =
+                    app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
+                app = app.addCheckedInstantiation(operatorSv, pe, services, true);
+                proposals = proposals.append(proposal);
+            } else if (operatorSv.sort() == ProgramSVSort.LABEL) {
+                boolean nameclash;
+                do {
+                    String proposal =
+                        VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services,
+                            null, proposals);
+                    ProgramElement pe =
+                        app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
+                    proposals = proposals.prepend(proposal);
+                    try {
+                        app = app.addCheckedInstantiation(operatorSv, pe, services, true);
+                    } catch (IllegalInstantiationException iie) {
+                        // name clash
+                        nameclash = true;
+                    }
+                    // FIXME: This loop is never executed more than once
+                    // The following line might belong to the try-block.
+                    // Leave it untouched, however, since no problems
+                    // reported with this established code. MU 10-2012
+                    nameclash = false;
+                } while (nameclash);
+            } else if (operatorSv instanceof SkolemTermSV) {
+                // if the sort of the schema variable is generic,
+                // ensure that it is instantiated
+                app = forceGenericSortInstantiation(app, operatorSv, services);
+                if (app == null) {
+                    return null;
+                }
+
+                String proposal =
+                    VariableNameProposer.DEFAULT.getProposal(app, operatorSv, services, null,
+                        proposals);
+
+                proposals = proposals.append(proposal);
+
+                app = app.createSkolemConstant(proposal, operatorSv, true, services);
+
+            } else if (operatorSv instanceof VariableSV) {
+                // if the sort of the schema variable is generic,
+                // ensure that it is instantiated
+                app = forceGenericSortInstantiation(app, operatorSv, services);
+                if (app == null) {
+                    return null;
+                }
+
+                String proposal;
+                Collection<String> conflictNames = collectClashNames(operatorSv, services);
+                do {
+                    proposal =
+                        VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services, null,
+                            proposals);
+                    proposals = proposals.prepend(proposal);
+                } while (conflictNames.contains(proposal));
+
+                LogicVariable v =
+                    new LogicVariable(new Name(proposal), getRealSort(operatorSv, services));
+
+                app = app.addCheckedInstantiation(operatorSv, tb.var(v), services, true);
+            } else {
+                if (force) {
+                    return null;
+                }
+            }
         }
         return app;
     }
@@ -726,7 +660,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return the new taclet app, or <code>null</code> if the sort of <code>sv</code> is generic
      *         and cannot be instantiated (at least at the time)
      */
-    private static TacletApp forceGenericSortInstantiation(TacletApp app, SchemaVariable sv,
+    private static TacletApp forceGenericSortInstantiation(TacletApp app, OperatorSV sv,
             Services services) {
         final GenericSortCondition c = GenericSortCondition.forceInstantiation(sv.sort(), false);
         if (c != null) {
@@ -745,7 +679,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      *         currently otherwise
      * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(SchemaVariable p_sv, TermServices services) {
+    public Sort getRealSort(OperatorSV p_sv, TermServices services) {
         return instantiations().getGenericSortInstantiations().getRealSort(p_sv, services);
     }
 
@@ -756,7 +690,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      *
      * @param services the Services class allowing access to the type model
      */
-    public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv,
+    public TacletApp createSkolemConstant(String instantiation, OperatorSV sv,
             boolean interesting, Services services) {
         return createSkolemConstant(instantiation, sv, getRealSort(sv, services), interesting,
             services);
@@ -1210,7 +1144,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         return taclet().admissible(interactive, ruleSets);
     }
 
-    public ProgramElement getProgramElement(String instantiation, SchemaVariable sv,
+    public ProgramElement getProgramElement(String instantiation, ProgramSV sv,
             Services services) {
         Sort svSort = sv.sort();
         if (svSort == ProgramSVSort.LABEL) {

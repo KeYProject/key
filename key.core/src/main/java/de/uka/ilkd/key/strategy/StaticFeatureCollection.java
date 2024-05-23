@@ -230,6 +230,14 @@ public abstract class StaticFeatureCollection {
         return or(a, or(b, c));
     }
 
+    protected static TermFeature or(TermFeature... features) {
+        TermFeature orFeature = inftyTermConst();
+        for (var f : features) {
+            orFeature = or(orFeature, f);
+        }
+        return orFeature;
+    }
+
     protected static Feature or(Feature a, Feature b) {
         return ifZero(a, longConst(0), b);
     }

@@ -19,7 +19,6 @@ package de.uka.ilkd.key.parser.schemajava;
 import java.io.*;
 import java.util.*;
 
-import recoder.*;
 import recoder.list.generic.*;
 import recoder.java.*;
 import recoder.java.declaration.*;
@@ -29,7 +28,6 @@ import recoder.java.expression.literal.*;
 import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
-import recoder.io.*;
 
 import recoder.abstraction.TypeArgument.WildcardMode;
 
@@ -37,6 +35,7 @@ import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.recoderext.adt.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
@@ -157,7 +156,7 @@ public class SchemaJavaParser {
 
     private static void testLeftHandSide(Expression expr) throws ParseException{
 	if (expr instanceof ExpressionSVWrapper) {
-	    SchemaVariable sv=((ExpressionSVWrapper) expr).getSV();
+	    OperatorSV sv=((ExpressionSVWrapper) expr).getSV();
 	    if ( !isLeftHandSide(sv.sort()) ) {
 		throw new ParseException
 		    ("Schema variable "+sv+" should be one of lefthandside"
@@ -237,7 +236,7 @@ public class SchemaJavaParser {
     private static void checkExpressionSVWrapper(ProgramSVSort notOfSort,
 						 ProgramElement exp) throws ParseException{
 	if (exp!=null && exp instanceof ExpressionSVWrapper) {
-	    SchemaVariable sv=((ExpressionSVWrapper)exp).getSV();
+	    OperatorSV sv=((ExpressionSVWrapper)exp).getSV();
 	    if  (sv.sort()==notOfSort) {
 		throw new ParseException(sv
 					 +": "+notOfSort
@@ -249,7 +248,7 @@ public class SchemaJavaParser {
     private static void checkLabelSVWrapper(ProgramSVSort notOfSort,
 					    ProgramElement exp) throws ParseException{
 	if (exp!=null && exp instanceof LabelSVWrapper) {
-	    SchemaVariable sv=((LabelSVWrapper)exp).getSV();
+	    OperatorSV sv=((LabelSVWrapper)exp).getSV();
 	    if  (sv.sort()==notOfSort) {
 		throw new ParseException(sv
 					 +": "+notOfSort

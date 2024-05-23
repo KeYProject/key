@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
@@ -74,18 +73,16 @@ public class TacletMatchProgram {
             SchemaVariable op) {
         MatchSchemaVariableInstruction<? extends SchemaVariable> instruction;
 
-        if (op instanceof ModalOperatorSV) {
-            instruction = Instruction.matchModalOperatorSV((ModalOperatorSV) op);
-        } else if (op instanceof FormulaSV) {
-            instruction = Instruction.matchFormulaSV((FormulaSV) op);
-        } else if (op instanceof TermSV) {
-            instruction = Instruction.matchTermSV((TermSV) op);
-        } else if (op instanceof VariableSV) {
-            instruction = Instruction.matchVariableSV((VariableSV) op);
-        } else if (op instanceof ProgramSV) {
-            instruction = Instruction.matchProgramSV((ProgramSV) op);
-        } else if (op instanceof UpdateSV) {
-            instruction = Instruction.matchUpdateSV((UpdateSV) op);
+        if (op instanceof FormulaSV formulaSV) {
+            instruction = Instruction.matchFormulaSV(formulaSV);
+        } else if (op instanceof TermSV termSV) {
+            instruction = Instruction.matchTermSV(termSV);
+        } else if (op instanceof VariableSV variableSV) {
+            instruction = Instruction.matchVariableSV(variableSV);
+        } else if (op instanceof ProgramSV programSV) {
+            instruction = Instruction.matchProgramSV(programSV);
+        } else if (op instanceof UpdateSV updateSV) {
+            instruction = Instruction.matchUpdateSV(updateSV);
         } else {
             throw new IllegalArgumentException(
                 "Do not know how to match " + op + " of type " + op.getClass());
@@ -124,27 +121,10 @@ public class TacletMatchProgram {
             program.add(Instruction.matchElementaryUpdate((ElementaryUpdate) op));
         } else if (op instanceof Modality mod) {
             final var kind = mod.kind();
-            if (kind instanceof SchemaVariable sv) {
-                program.add((termPosition, matchConditions, services) -> {
-                    Term t = termPosition.getCurrentSubterm();
-                    if (t.op() instanceof Modality mod1
-                            && ((ModalOperatorSV) kind).getModalities().contains(mod1.kind())) {
-                        SVInstantiations inst = matchConditions.getInstantiations();
-                        return matchConditions.setInstantiations(
-                            inst.add(sv, mod1.<Modality.JavaModalityKind>kind(), services));
-                    } else {
-                        return null;
-                    }
-                });
+            if (kind instanceof ModalOperatorSV sv) {
+                program.add(Instruction.matchModalOperatorSV(sv));
             } else {
-                program.add((termPosition, matchConditions, services) -> {
-                    Term t = termPosition.getCurrentSubterm();
-                    if (t.op() instanceof Modality mod1 && mod1.kind() == kind) {
-                        return matchConditions;
-                    } else {
-                        return null;
-                    }
-                });
+                program.add(Instruction.matchModalOperator(mod));
             }
             final JavaProgramElement patternPrg = pattern.javaBlock().program();
             program.add(Instruction.matchProgram(patternPrg));

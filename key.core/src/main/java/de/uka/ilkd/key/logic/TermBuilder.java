@@ -26,6 +26,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
@@ -217,9 +218,9 @@ public class TermBuilder {
     /**
      * Creates program variables for the parameters. Take care to register them in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(IObserverFunction obs,
+    public ImmutableList<LocationVariable> paramVars(IObserverFunction obs,
             boolean makeNamesUnique) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         for (int i = 0, n = obs.getNumParams(); i < n; i++) {
             final KeYJavaType paramType = obs.getParamType(i);
             String name;
@@ -238,11 +239,11 @@ public class TermBuilder {
     /**
      * Creates program variables for the parameters. Take care to register them in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(String postfix, IObserverFunction obs,
+    public ImmutableList<LocationVariable> paramVars(String postfix, IObserverFunction obs,
             boolean makeNamesUnique) {
-        final ImmutableList<ProgramVariable> paramVars = paramVars(obs, makeNamesUnique);
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
-        for (ProgramVariable paramVar : paramVars) {
+        final ImmutableList<LocationVariable> paramVars = paramVars(obs, makeNamesUnique);
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
+        for (LocationVariable paramVar : paramVars) {
             ProgramElementName pen = new ProgramElementName(paramVar.name() + postfix);
             LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
             result = result.append(formalParamVar);
@@ -359,6 +360,10 @@ public class TermBuilder {
         return tf.createTerm(v);
     }
 
+    public Term var(ProgramSV v) {
+        return tf.createTerm(v);
+    }
+
     public Term var(ProgramVariable v) {
         // if(v.isMember()) {
         // throw new TermCreationException(
@@ -377,7 +382,7 @@ public class TermBuilder {
         return result;
     }
 
-    public ImmutableList<Term> var(Iterable<ProgramVariable> vs) {
+    public ImmutableList<Term> var(Iterable<? extends ProgramVariable> vs) {
         ImmutableList<Term> result = ImmutableSLList.nil();
         for (ProgramVariable v : vs) {
             result = result.append(var(v));
@@ -385,12 +390,30 @@ public class TermBuilder {
         return result;
     }
 
-    public Term var(SchemaVariable v) {
+    public Term var(OperatorSV v) {
         return tf.createTerm(v);
     }
 
-    public Term var(ParsableVariable v) {
+    public Term var(VariableSV v) {
         return tf.createTerm(v);
+    }
+
+    public Term var(Metavariable pMv) {
+        return tf.createTerm(pMv);
+    }
+
+    // TODO: Inline?
+    public Term varOfUpdateableOp(UpdateableOperator op) {
+        if (op instanceof LocationVariable lv)
+            return var(lv);
+        return var((ProgramSV) op);
+    }
+
+    // TODO: Inline?
+    public Term varOfQuantVar(QuantifiableVariable op) {
+        if (op instanceof LogicVariable lv)
+            return var(lv);
+        return var((VariableSV) op);
     }
 
     public Term func(JFunction f) {
@@ -531,9 +554,9 @@ public class TermBuilder {
     /**
      * General (unbounded) sum
      */
-    public Term sum(ImmutableList<QuantifiableVariable> qvs, Term range, Term t) {
+    public Term sum(ImmutableList<LogicVariable> qvs, Term range, Term t) {
         final JFunction sum = services.getNamespaces().functions().lookup("sum");
-        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        final Iterator<LogicVariable> it = qvs.iterator();
         Term res = func(sum, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
@@ -553,10 +576,10 @@ public class TermBuilder {
     /**
      * General (unbounded) product
      */
-    public Term prod(ImmutableList<QuantifiableVariable> qvs, Term range, Term t,
+    public Term prod(ImmutableList<LogicVariable> qvs, Term range, Term t,
             TermServices services) {
         final JFunction prod = services.getNamespaces().functions().lookup("prod");
-        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        final Iterator<LogicVariable> it = qvs.iterator();
         Term res = func(prod, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
@@ -1609,7 +1632,7 @@ public class TermBuilder {
     }
 
     public Term getBaseHeap() {
-        return var((ProgramVariable) services.getNamespaces().programVariables()
+        return var((LocationVariable) services.getNamespaces().programVariables()
                 .lookup(HeapLDT.BASE_HEAP_NAME));
         // return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
@@ -1893,7 +1916,7 @@ public class TermBuilder {
         return reachableValue(getBaseHeap(), t, kjt);
     }
 
-    public Term reachableValue(ProgramVariable pv) {
+    public Term reachableValue(LocationVariable pv) {
         return reachableValue(var(pv), pv.getKeYJavaType());
     }
 

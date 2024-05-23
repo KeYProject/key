@@ -4,14 +4,14 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 
 import org.key_project.util.collection.ImmutableList;
 
 /**
  * @param trigger trigger related information
  */
-public record Trigger(SchemaVariable triggerVar, Term trigger, ImmutableList<Term> avoidConditions) {
+public record Trigger(OperatorSV triggerVar, Term trigger, ImmutableList<Term> avoidConditions) {
 
     public Trigger {
         assert triggerVar != null;

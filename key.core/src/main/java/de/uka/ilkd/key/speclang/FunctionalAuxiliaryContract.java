@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -151,7 +150,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+    public Term getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services) {
         return contract.getMby(selfVar, services);
     }
@@ -168,22 +167,19 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getPre(LocationVariable heap, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
-        @SuppressWarnings("unchecked")
-        Map<LocationVariable, ProgramVariable> atPreVars0 =
-            (Map<LocationVariable, ProgramVariable>) atPreVars;
-        return contract.getPrecondition(heap, selfVar, atPreVars0.entrySet().stream().collect(
+    public Term getPre(LocationVariable heap, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+        return contract.getPrecondition(heap, selfVar, atPreVars.entrySet().stream().collect(
             MapUtil.collector(
-                Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
+                Map.Entry::getKey, Map.Entry::getValue)),
             services);
     }
 
     @Override
-    public Term getPre(List<LocationVariable> heapContext, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
+    public Term getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         TermBuilder tb = services.getTermBuilder();
         Term result = null;
 
@@ -228,9 +224,9 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
+    public Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         return services.getTermBuilder().allLocs();
     }
 
@@ -251,7 +247,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getAccessible(ProgramVariable heap) {
+    public Term getAccessible(LocationVariable heap) {
         throw new UnsupportedOperationException();
     }
 

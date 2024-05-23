@@ -360,7 +360,7 @@ public final class ProblemInitializer {
         } else if (term.javaBlock() != null && !term.javaBlock().isEmpty()) {
             final ProgramElement pe = term.javaBlock().program();
             final Services serv = rootGoal.proof().getServices();
-            final ImmutableSet<ProgramVariable> freeProgVars =
+            final ImmutableSet<LocationVariable> freeProgVars =
                 MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
             for (ProgramVariable pv : freeProgVars) {
                 if (namespaces.programVariables().lookup(pv.name()) == null) {

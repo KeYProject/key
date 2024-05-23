@@ -26,11 +26,11 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     protected static final Boolean CHANGED = Boolean.TRUE;
 
     private final Break breakOut;
-    private final Map<Label, ProgramVariable> breakFlags;
-    private final Map<Label, ProgramVariable> continueFlags;
-    private final ProgramVariable returnFlag;
-    private final ProgramVariable returnValue;
-    private final ProgramVariable exception;
+    private final Map<Label, LocationVariable> breakFlags;
+    private final Map<Label, LocationVariable> continueFlags;
+    private final LocationVariable returnFlag;
+    private final LocationVariable returnValue;
+    private final LocationVariable exception;
 
     private final ArrayDeque<ExtList> stack = new ArrayDeque<>();
     private final ArrayDeque<Label> labels = new ArrayDeque<>();
@@ -41,9 +41,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     public OuterBreakContinueAndReturnReplacer(final StatementBlock block,
             final Iterable<Label> alwaysInnerLabels, final Label breakOutLabel,
-            final Map<Label, ProgramVariable> breakFlags,
-            final Map<Label, ProgramVariable> continueFlags, final ProgramVariable returnFlag,
-            final ProgramVariable returnValue, final ProgramVariable exception,
+            final Map<Label, LocationVariable> breakFlags,
+            final Map<Label, LocationVariable> continueFlags, final LocationVariable returnFlag,
+            final LocationVariable returnValue, final LocationVariable exception,
             final Services services) {
         super(block, services);
         for (Label label : alwaysInnerLabels) {
@@ -125,9 +125,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     }
 
     private void performActionOnJump(final LabelJumpStatement x,
-            final Map<Label, ProgramVariable> flags) {
+            final Map<Label, LocationVariable> flags) {
         if (isJumpToOuterLabel(x)) {
-            final ProgramVariable flag = flags.get(x.getLabel());
+            final LocationVariable flag = flags.get(x.getLabel());
             assert flag != null : "a label flag must not be null";
             final Statement assign =
                 KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE, x.getPositionInfo());

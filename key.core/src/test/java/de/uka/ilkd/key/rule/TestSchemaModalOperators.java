@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -117,7 +118,7 @@ public class TestSchemaModalOperators {
 
         RewriteTacletBuilder<RewriteTaclet> rtb = new RewriteTacletBuilder<>();
 
-        SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
+        FormulaSV fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
         ImmutableSet<Modality.JavaModalityKind> modalities = DefaultImmutableSet.nil();
         modalities =
             modalities.add(Modality.JavaModalityKind.DIA).add(Modality.JavaModalityKind.BOX);

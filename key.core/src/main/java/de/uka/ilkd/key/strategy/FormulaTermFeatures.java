@@ -53,7 +53,8 @@ class FormulaTermFeatures extends StaticFeatureCollection {
 
         cutAllowed = add(notContainsExecutable, tf.notContainsProduct,
             or(tf.eqF, OperatorClassTF.create(JFunction.class),
-                OperatorClassTF.create(ParsableVariable.class))); // XXX
+                OperatorClassTF.create(ProgramVariable.class),
+                OperatorClassTF.create(LogicVariable.class))); // XXX
         cutAllowedBelowQuantifier = add(not(propJunctor), notContainsExecutable);
         cutPriority = add(
             ifZero(tf.intInEquation, longTermConst(0),

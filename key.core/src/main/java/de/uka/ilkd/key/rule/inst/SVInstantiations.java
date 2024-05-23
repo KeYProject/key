@@ -129,11 +129,6 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
 
-    public SVInstantiations add(ModalOperatorSV sv, Operator op, Services services) {
-        return add(sv, new OperatorInstantiation(op), services);
-    }
-
-
     public SVInstantiations addInteresting(SchemaVariable sv, Term subst, Services services) {
         return addInteresting(sv, new TermInstantiation(sv, subst), services);
     }
@@ -221,15 +216,17 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
             boolean p_forceRebuild, Services services) {
-        Boolean b = getGenericSortInstantiations().checkSorts(p_sv, p_entry);
+        if (p_sv instanceof OperatorSV asv) {
+            Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
-        if (b == null) {
-            return rebuildSorts(services);
-        } else if (!b) {
-            throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
-        }
-        if (p_forceRebuild) {
-            return rebuildSorts(services);
+            if (b == null) {
+                return rebuildSorts(services);
+            } else if (!b) {
+                throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
+            }
+            if (p_forceRebuild) {
+                return rebuildSorts(services);
+            }
         }
         return this;
     }

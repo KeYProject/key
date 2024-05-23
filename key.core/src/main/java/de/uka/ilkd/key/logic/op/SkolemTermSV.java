@@ -14,7 +14,7 @@ import org.key_project.logic.sort.Sort;
  * variables have to be accompanied by a "NewDependingOn" varcond, although with the removal of the
  * meta variable mechanism, this would no longer really be necessary.
  */
-public final class SkolemTermSV extends AbstractSV {
+public final class SkolemTermSV extends OperatorSV {
 
     /**
      * Creates a new schema variable that is used as placeholder for skolem terms.

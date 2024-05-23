@@ -142,7 +142,7 @@ public class ClashFreeSubst {
                     usedVars = usedVars.add(boundVars.get(i));
                 }
                 // Get a new variable with a fitting name.
-                QuantifiableVariable qv1 = newVarFor(qv, usedVars);
+                LogicVariable qv1 = newVarFor(qv, usedVars);
 
                 // Substitute that for the old one.
                 newBoundVars[varInd] = qv1;
@@ -207,7 +207,7 @@ public class ClashFreeSubst {
      * <P>
      * Assumes that <code>var</code> is a @link{LogicVariable}.
      */
-    protected QuantifiableVariable newVarFor(QuantifiableVariable var,
+    protected LogicVariable newVarFor(QuantifiableVariable var,
             ImmutableSet<QuantifiableVariable> usedVars) {
         LogicVariable lv = (LogicVariable) var;
         String stem = var.name().toString();

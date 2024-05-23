@@ -81,9 +81,9 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
         final String prefix = WellDefinednessCheck.INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
-        final SchemaVariable heapSV =
+        final TermSV heapSV =
             SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
-        final SchemaVariable sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
+        final TermSV sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
         final Term var = TB.var(sv);
         final Term wdSelf = TB.wd(var);
         final Term[] heaps = new Term[] { TB.var(heapSV) };

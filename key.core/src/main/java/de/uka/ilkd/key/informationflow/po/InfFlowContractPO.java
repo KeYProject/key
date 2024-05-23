@@ -244,8 +244,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     @Deprecated
-    protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -254,9 +254,9 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     @Deprecated
-    protected Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -266,7 +266,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     @Override
     @Deprecated
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -274,8 +275,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     @Deprecated
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
+    protected Term generateMbyAtPreDef(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }

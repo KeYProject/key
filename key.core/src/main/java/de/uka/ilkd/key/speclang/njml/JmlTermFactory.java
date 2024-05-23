@@ -157,11 +157,11 @@ public final class JmlTermFactory {
 
     // region quantification
     private Term typerestrictMinAndMax(KeYJavaType kjt, final boolean nullable,
-            Iterable<? extends QuantifiableVariable> qvs) {
+            Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();
-        for (QuantifiableVariable qv : qvs) {
+        for (var qv : qvs) {
             if (type instanceof PrimitiveType) {
                 if (type == PrimitiveType.JAVA_BYTE) {
                     res = tb.and(res, tb.inByte(tb.var(qv)));
@@ -362,8 +362,8 @@ public final class JmlTermFactory {
         Term t;
         if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
             // not interval range, create unbounded comprehension term
-            ImmutableList<QuantifiableVariable> _qvs =
-                ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
+            ImmutableList<LogicVariable> _qvs =
+                ImmutableSLList.<LogicVariable>nil().prepend(lv);
             while (it.hasNext()) {
                 _qvs = _qvs.prepend(it.next());
             }
@@ -421,7 +421,7 @@ public final class JmlTermFactory {
 
 
     private interface UnboundedNumericalQuantifier {
-        Term apply(KeYJavaType declsType, boolean nullable, ImmutableList<QuantifiableVariable> qvs,
+        Term apply(KeYJavaType declsType, boolean nullable, ImmutableList<LogicVariable> qvs,
                 Term range, Term body);
     }
 
@@ -503,8 +503,9 @@ public final class JmlTermFactory {
         return translateToJDLTerm(name, list);
     }
 
-    public SLExpression commentary(String desc, ProgramVariable selfVar, ProgramVariable resultVar,
-            ImmutableList<ProgramVariable> paramVars, Term heapAtPre) {
+    public SLExpression commentary(String desc, LocationVariable selfVar,
+            LocationVariable resultVar,
+            ImmutableList<LocationVariable> paramVars, Term heapAtPre) {
         // strip leading and trailing (* ... *)
         String text = desc;
         text = text.substring(2, text.length() - 2);
@@ -992,7 +993,7 @@ public final class JmlTermFactory {
 
 
     // region clauses
-    public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, ProgramVariable excVar) {
+    public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, LocationVariable excVar) {
         Term result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
             JFunction instance =
@@ -1003,12 +1004,12 @@ public final class JmlTermFactory {
         return result;
     }
 
-    public Term signals(Term result, LogicVariable eVar, ProgramVariable excVar,
+    public Term signals(Term result, LogicVariable eVar, LocationVariable excVar,
             KeYJavaType excType) {
         if (result == null) {
             result = tb.tt();
         } else {
-            Map /* Operator -> Operator */<LogicVariable, ProgramVariable> replaceMap =
+            Map /* Operator -> Operator */<LogicVariable, LocationVariable> replaceMap =
                 new LinkedHashMap<>();
             replaceMap.put(eVar, excVar);
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
@@ -1273,7 +1274,8 @@ public final class JmlTermFactory {
         assert symbol instanceof ProgramVariable : "Expecting a program variable";
         ProgramVariable pv = (ProgramVariable) symbol;
         try {
-            Term resultTerm = tb.var(pv);
+            Term resultTerm =
+                pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var((LocationVariable) pv);
             return new SLExpression(resultTerm);
         } catch (TermCreationException ex) {
             throw exc.createException0("Cannot create term " + pv.name(), ex);
@@ -1305,11 +1307,11 @@ public final class JmlTermFactory {
      */
     private @NonNull Term typerestrict(
             @NonNull KeYJavaType kjt, final boolean nullable,
-            Iterable<? extends QuantifiableVariable> qvs) {
+            Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();
-        for (QuantifiableVariable qv : qvs) {
+        for (var qv : qvs) {
             if (type instanceof PrimitiveType) {
                 if (type == PrimitiveType.JAVA_BYTE) {
                     res = tb.and(res, tb.inByte(tb.var(qv)));

@@ -11,10 +11,7 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilderSchemaVarCollector;
@@ -72,7 +69,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    SchemaVariable createVariableSV(QuantifiableVariable v, String schemaPrefix,
+    VariableSV createVariableSV(QuantifiableVariable v, String schemaPrefix,
             Services services) {
         if (v == null) {
             return null;
@@ -86,7 +83,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
     void addVarconds(RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder,
-            Iterable<SchemaVariable> quantifiableSVs) throws IllegalArgumentException {
+            Iterable<? extends SchemaVariable> quantifiableSVs) throws IllegalArgumentException {
         RewriteTacletBuilderSchemaVarCollector svCollector =
             new RewriteTacletBuilderSchemaVarCollector(tacletBuilder);
         Set<SchemaVariable> schemaVars = svCollector.collectSchemaVariables();
@@ -100,12 +97,12 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    Map<QuantifiableVariable, SchemaVariable> collectQuantifiableVariables(Term replaceWithTerm,
+    Map<QuantifiableVariable, VariableSV> collectQuantifiableVariables(Term replaceWithTerm,
             Services services) {
         QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
         replaceWithTerm.execPreOrder(qvVisitor);
         LinkedList<QuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
-        final Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+        final Map<QuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
             new LinkedHashMap<>();
         for (QuantifiableVariable qv : quantifiableVariables) {
             quantifiableVarsToSchemaVars.put(qv, createVariableSV(qv, "", services));

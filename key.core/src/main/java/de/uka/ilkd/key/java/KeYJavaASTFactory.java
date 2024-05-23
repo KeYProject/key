@@ -260,7 +260,7 @@ public abstract class KeYJavaASTFactory {
     /**
      * create a local variable
      */
-    public static ProgramVariable localVariable(ProgramElementName name, KeYJavaType kjt) {
+    public static LocationVariable localVariable(ProgramElementName name, KeYJavaType kjt) {
         return new LocationVariable(name, kjt);
     }
 

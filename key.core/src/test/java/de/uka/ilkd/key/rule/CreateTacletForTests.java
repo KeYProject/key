@@ -119,8 +119,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         nss.functions().add(func_min1);
         nss.functions().add(func_plus1);
 
-        SchemaVariable var_rn = SchemaVariableFactory.createTermSV(new Name("rn"), nat);
-        SchemaVariable var_rm = SchemaVariableFactory.createTermSV(new Name("rm"), nat);
+        TermSV var_rn = SchemaVariableFactory.createTermSV(new Name("rn"), nat);
+        TermSV var_rm = SchemaVariableFactory.createTermSV(new Name("rm"), nat);
 
         Term t_rn = tf.createTerm(var_rn);
         Term t_rm = tf.createTerm(var_rm);

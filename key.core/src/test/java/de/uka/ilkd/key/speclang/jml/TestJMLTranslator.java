@@ -64,27 +64,26 @@ public class TestJMLTranslator {
                 .selfVar(buildSelfVarAsProgVar());
     }
 
-    protected ProgramVariable buildSelfVarAsProgVar() {
+    protected LocationVariable buildSelfVarAsProgVar() {
         ProgramElementName classPEN = new ProgramElementName("self");
         return new LocationVariable(classPEN, testClassType);
     }
 
 
-    protected ProgramVariable buildExcVar() {
+    protected LocationVariable buildExcVar() {
         KeYJavaType excType = javaInfo.getTypeByClassName("java.lang.Throwable");
         ProgramElementName excPEN = new ProgramElementName("exc");
         return new LocationVariable(excPEN, excType);
     }
 
 
-    protected ProgramVariable buildResultVar(IProgramMethod pm) {
+    protected LocationVariable buildResultVar(IProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
         return new LocationVariable(resPEN, pm.getReturnType());
     }
 
 
     private boolean termContains(Term t, Term sub) {
-
         for (int i = 0; i < t.arity(); i++) {
             if (t.sub(i).equals(sub) || termContains(t.sub(i), sub)) {
                 return true;
@@ -120,7 +119,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testSelfVar() {
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        LocationVariable selfVar = buildSelfVarAsProgVar();
         Term result = jmlIO.selfVar(selfVar).parseExpression("this");
         assertNotNull(result);
         assertEquals(result, TB.var(selfVar));
@@ -129,7 +128,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testLogicalExpression() {
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        LocationVariable selfVar = buildSelfVarAsProgVar();
         Term result = jmlIO.parseExpression("(b <= s &&  i > 5) ==> this != instance");
         assertNotNull(result);
         assertEquals(Junctor.IMP, result.op());
@@ -150,7 +149,7 @@ public class TestJMLTranslator {
     @Test
     public void testParenExpression() {
         ProgramElementName classPEN = new ProgramElementName("o");
-        ProgramVariable var = new LocationVariable(classPEN, testClassType);
+        LocationVariable var = new LocationVariable(classPEN, testClassType);
         jmlIO.parameters(ImmutableSLList.singleton(var)).parseExpression("(o.i)");
     }
 
@@ -283,7 +282,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testOld() {
-        ProgramVariable excVar = buildExcVar();
+        LocationVariable excVar = buildExcVar();
 
         Term result = jmlIO.exceptionVariable(excVar).atPres(atPres)
                 .parseExpression("this.i == \\old(this.i)");
@@ -297,14 +296,14 @@ public class TestJMLTranslator {
 
     @Test
     public void testResultVar() {
-        ProgramVariable excVar = buildExcVar();
+        LocationVariable excVar = buildExcVar();
 
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
 
         IProgramMethod pm =
             javaInfo.getProgramMethod(testClassType, "getOne", signature, testClassType);
 
-        ProgramVariable resultVar = buildResultVar(pm);
+        LocationVariable resultVar = buildResultVar(pm);
 
         Term result = jmlIO.atPres(atPres).resultVariable(resultVar).exceptionVariable(excVar)
                 .parseExpression("\\result == 1");
@@ -427,7 +426,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testCorrectImplicitThisResolution() {
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        LocationVariable selfVar = buildSelfVarAsProgVar();
         LocationVariable array =
             (LocationVariable) javaInfo.getAttribute("testPackage.TestClass::array");
 

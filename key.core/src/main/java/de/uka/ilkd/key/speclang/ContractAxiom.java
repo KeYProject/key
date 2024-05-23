@@ -14,7 +14,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
@@ -37,15 +36,15 @@ public final class ContractAxiom extends ClassAxiom {
     private final Term originalPost;
     private final Term originalFreePost;
     private final Term originalMby;
-    private final ProgramVariable originalSelfVar;
-    private final ProgramVariable originalResultVar;
-    private final ImmutableList<ProgramVariable> originalParamVars;
-    private final Map<LocationVariable, ProgramVariable> atPreVars;
+    private final LocationVariable originalSelfVar;
+    private final LocationVariable originalResultVar;
+    private final ImmutableList<LocationVariable> originalParamVars;
+    private final Map<LocationVariable, LocationVariable> atPreVars;
 
     public ContractAxiom(String name, IObserverFunction target, KeYJavaType kjt,
             VisibilityModifier visibility, Term pre, Term freePre, Term post, Term freePost,
-            Term mby, Map<LocationVariable, ProgramVariable> atPreVars, ProgramVariable selfVar,
-            ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
+            Term mby, Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
+            LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
         this(name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
             selfVar, resultVar, paramVars);
     }
@@ -53,8 +52,8 @@ public final class ContractAxiom extends ClassAxiom {
     public ContractAxiom(String name, String displayName, IObserverFunction target, KeYJavaType kjt,
             VisibilityModifier visibility, Term originalPre, Term originalFreePre,
             Term originalPost, Term originalFreePost, Term originalMby,
-            Map<LocationVariable, ProgramVariable> atPreVars, ProgramVariable selfVar,
-            ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
+            Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
+            LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
 
         assert name != null;
         assert kjt != null;
@@ -92,7 +91,7 @@ public final class ContractAxiom extends ClassAxiom {
 
         final boolean satisfiabilityGuard = true; // XXX
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-        ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
+        LocationVariable self = (!target.isStatic() ? originalSelfVar : null);
 
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();

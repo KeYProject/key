@@ -254,7 +254,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private static Term[] createUpdateSubs(final IObserverFunction target,
-            final ProgramVariable selfVar, final ImmutableList<ProgramVariable> paramVars,
+            final LocationVariable selfVar, final ImmutableList<LocationVariable> paramVars,
             final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Term[] updateSubs = new Term[target.arity()];
@@ -354,8 +354,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private static Term createProgPost(final IObserverFunction target,
-            final ProgramVariable selfVar, final ImmutableList<ProgramVariable> paramVars,
-            final ProgramVariable resultVar, final List<LocationVariable> modHeaps,
+            final LocationVariable selfVar, final ImmutableList<LocationVariable> paramVars,
+            final LocationVariable resultVar, final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Term saveBeforeHeaps,
             final Term representsFromContract, final Term post, final TermBuilder tb) {
         final Term progPost;
@@ -387,10 +387,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // prepare variables, program method
         boolean makeNamesUnique = isMakeNamesUnique();
-        final ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, makeNamesUnique);
-        final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
-        final ProgramVariable resultVar = tb.resultVar(pm, makeNamesUnique);
-        final ProgramVariable exceptionVar = tb.excVar(pm, makeNamesUnique);
+        final ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, makeNamesUnique);
+        final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final LocationVariable resultVar = tb.resultVar(pm, makeNamesUnique);
+        final LocationVariable exceptionVar = tb.excVar(pm, makeNamesUnique);
 
         if (pm.isModel()) {
             // before resultVar
@@ -399,7 +399,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
             collectHeapAtPres(modHeaps, atPreVars, tb);
 
-            register(paramVars, new ProgramVariable[] { selfVar, resultVar }, atPreVars.values(),
+            register(paramVars, new LocationVariable[] { selfVar, resultVar }, atPreVars.values(),
                 proofServices);
 
             final Term poTerm = createModelPOTerm(pm, selfVar, paramVars, resultVar, modHeaps,
@@ -422,7 +422,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                  * .put(tb.getBaseHeap(), tb.var(atPreVars.get(getSavedHeap()))); }
                  */
 
-                register(paramVars, new ProgramVariable[] { selfVar, resultVar, exceptionVar },
+                register(paramVars, new LocationVariable[] { selfVar, resultVar, exceptionVar },
                     atPreVars.values(), proofServices);
 
                 final Term applyGlobalUpdate = createNonModelPOTerm(pm, selfVar, paramVars,
@@ -597,8 +597,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The services instance.
      * @return The {@link Term} containing the general assumptions.
      */
-    protected Term buildFreePre(ProgramVariable selfVar, KeYJavaType selfKJT,
-            ImmutableList<ProgramVariable> paramVars, List<LocationVariable> heaps,
+    protected Term buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
+            ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
             Services services) {
         // "self != null"
         final Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
@@ -638,9 +638,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @return The term representing the general assumption.
      */
-    protected Term generateParamsOK(ImmutableList<ProgramVariable> paramVars) {
+    protected Term generateParamsOK(ImmutableList<LocationVariable> paramVars) {
         Term paramsOK = tb.tt();
-        for (ProgramVariable paramVar : paramVars) {
+        for (LocationVariable paramVar : paramVars) {
             paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
         }
         return paramsOK;
@@ -656,14 +656,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
         Term paramsOK = tb.tt();
         for (Term paramVar : paramVars) {
             assert paramVar.op() instanceof ProgramVariable;
-            ProgramVariable pv = (ProgramVariable) paramVar.op();
+            var pv = (LocationVariable) paramVar.op();
             paramsOK = tb.and(paramsOK, tb.reachableValue(pv));
         }
         return paramsOK;
     }
 
-    protected abstract Term generateMbyAtPreDef(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services);
+    protected abstract Term generateMbyAtPreDef(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
      * Creates the precondition.
@@ -676,8 +676,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The {@link Services} to use.
      * @return The {@link Term} representing the precondition.
      */
-    protected abstract Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected abstract Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
@@ -693,9 +693,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The {@link Services} to use.
      * @return The {@link Term} representing the postcondition.
      */
-    protected abstract Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+    protected abstract Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services);
 
     protected abstract Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
@@ -720,8 +720,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services services instance.
      * @return The created uninterpreted predicate.
      */
-    protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
-            ImmutableList<LocationVariable> formalParamVars, ProgramVariable exceptionVar,
+    protected Term ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
+            ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
             String name, Services services) {
         // Make sure that the predicate is not already created
         if (uninterpretedPredicate != null) {
@@ -794,8 +794,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The created {@link Term} representing the frame clause.
      */
     protected abstract Term buildFrameClause(List<LocationVariable> modHeaps,
-            Map<Term, Term> heapToAtPre, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services);
+            Map<Term, Term> heapToAtPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
      * Creates the {@link Term} which contains the modality including the complete program to
@@ -805,7 +805,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param formalParamVars Arguments from formal parameters for method call.
      * @param selfVar The self variable.
      * @param resultVar The result variable.
-     * @param exceptionVar The {@link ProgramVariable} used to store caught exceptions.
+     * @param exceptionVar The {@link LocationVariable} used to store caught exceptions.
      * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which
      *        contains the initial value.
      * @param postTerm The post condition.
@@ -813,9 +813,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services services instance.
      * @return The created {@link Term}.
      */
-    protected Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
-            ImmutableList<LocationVariable> formalParamVars, ProgramVariable selfVar,
-            ProgramVariable resultVar, ProgramVariable exceptionVar,
+    protected Term buildProgramTerm(ImmutableList<LocationVariable> paramVars,
+            ImmutableList<LocationVariable> formalParamVars, LocationVariable selfVar,
+            LocationVariable resultVar, LocationVariable exceptionVar,
             Map<LocationVariable, LocationVariable> atPreVars, Term postTerm,
             ImmutableList<StatementBlock> sb, Services services) {
 
@@ -946,7 +946,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The services instance.
      * @return The {@link Term} representing the initial updates.
      */
-    protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
+    protected Term buildUpdate(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         Term update = null;
@@ -960,7 +960,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         }
         if (isCopyOfMethodArgumentsUsed()) {
             Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-            Iterator<ProgramVariable> paramIt = paramVars.iterator();
+            Iterator<LocationVariable> paramIt = paramVars.iterator();
             while (formalParamIt.hasNext()) {
                 Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
                 update = tb.parallel(update, paramUpdate);
@@ -989,10 +989,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     protected abstract String buildPOName(boolean transactionFlag);
 
     private ImmutableList<LocationVariable> createFormalParamVars(
-            final ImmutableList<ProgramVariable> paramVars, final Services proofServices) {
+            final ImmutableList<LocationVariable> paramVars, final Services proofServices) {
         // create arguments from formal parameters for method call
         ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.nil();
-        for (ProgramVariable paramVar : paramVars) {
+        for (var paramVar : paramVars) {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
                 LocationVariable formalParamVar =
@@ -1000,7 +1000,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 formalParamVars = formalParamVars.append(formalParamVar);
                 register(formalParamVar, proofServices);
             } else {
-                formalParamVars = formalParamVars.append((LocationVariable) paramVar);
+                formalParamVars = formalParamVars.append(paramVar);
                 // The cast is ugly but legal. It is a bigger task to
                 // refactor TB.paramVars to return a list of
                 // LocationVariabe instead of ProgramVariable.
@@ -1026,8 +1026,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return lookupContracts;
     }
 
-    private Term getRepresentsFromContract(final IProgramMethod pm, final ProgramVariable selfVar,
-            final ImmutableList<ProgramVariable> paramVars, final ProgramVariable resultVar,
+    private Term getRepresentsFromContract(final IProgramMethod pm, final LocationVariable selfVar,
+            final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
             final List<LocationVariable> heaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
@@ -1043,13 +1043,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return representsFromContract;
     }
 
-    private void register(final ImmutableList<ProgramVariable> paramVars,
-            final ProgramVariable[] vars, final Collection<LocationVariable> atPreVars,
+    private void register(final ImmutableList<LocationVariable> paramVars,
+            final LocationVariable[] vars, final Collection<LocationVariable> atPreVars,
             final Services proofServices) {
         // register the variables so they are declared in proof header
         // if the proof is saved to a file
         register(paramVars, proofServices);
-        for (ProgramVariable var : vars) {
+        for (LocationVariable var : vars) {
             register(var, proofServices);
         }
         for (LocationVariable lv : atPreVars) {
@@ -1057,8 +1057,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         }
     }
 
-    private Term createApplyGlobalUpdateTerm(final ProgramVariable selfVar,
-            final ImmutableList<ProgramVariable> paramVars, final Term preImpliesProgPost,
+    private Term createApplyGlobalUpdateTerm(final LocationVariable selfVar,
+            final ImmutableList<LocationVariable> paramVars, final Term preImpliesProgPost,
             final Services proofServices) {
         final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
         final Term selfVarTerm = selfVar == null ? null : tb.var(selfVar);
@@ -1069,10 +1069,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return applyGlobalUpdate;
     }
 
-    private Term createPost(final ProgramVariable selfVar,
-            final ImmutableList<ProgramVariable> paramVars,
-            final ImmutableList<LocationVariable> formalParamVars, final ProgramVariable resultVar,
-            final ProgramVariable exceptionVar, final List<LocationVariable> modHeaps,
+    private Term createPost(final LocationVariable selfVar,
+            final ImmutableList<LocationVariable> paramVars,
+            final ImmutableList<LocationVariable> formalParamVars, final LocationVariable resultVar,
+            final LocationVariable exceptionVar, final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars,
             final List<LocationVariable> heaps, final Map<Term, Term> heapToBefore,
             final Services proofServices) {
@@ -1088,16 +1088,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return tb.and(postTerm, frameTerm);
     }
 
-    private Term createNonModelPOTerm(final IProgramMethod pm, final ProgramVariable selfVar,
-            final ImmutableList<ProgramVariable> paramVars, final ProgramVariable resultVar,
-            final ProgramVariable exceptionVar, final boolean transactionFlag,
+    private Term createNonModelPOTerm(final IProgramMethod pm, final LocationVariable selfVar,
+            final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
+            final LocationVariable exceptionVar, final boolean transactionFlag,
             final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         final ImmutableList<LocationVariable> formalParamVars =
             createFormalParamVars(paramVars, proofServices);
 
         // build program block to execute in try clause
-        // (must be done before pre condition is created).
+        // (must be done before pre-condition is created).
         final ImmutableList<StatementBlock> sb =
             buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
 
@@ -1126,8 +1126,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return applyGlobalUpdate;
     }
 
-    private Term createModelPOTerm(final IProgramMethod pm, final ProgramVariable selfVar,
-            final ImmutableList<ProgramVariable> paramVars, final ProgramVariable resultVar,
+    private Term createModelPOTerm(final IProgramMethod pm, final LocationVariable selfVar,
+            final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
             final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         final IObserverFunction target = javaInfo.getToplevelPM(getCalleeKeYJavaType(), pm);

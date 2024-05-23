@@ -64,9 +64,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param set a set of parameter variables
      * @return a list of the parameter variables
      */
-    final static ImmutableList<ProgramVariable> convertParams(ImmutableSet<ProgramVariable> set) {
-        ImmutableList<ProgramVariable> list = ImmutableSLList.nil();
-        for (ProgramVariable pv : set) {
+    final static ImmutableList<LocationVariable> convertParams(ImmutableSet<LocationVariable> set) {
+        ImmutableList<LocationVariable> list = ImmutableSLList.nil();
+        for (LocationVariable pv : set) {
             list = list.append(pv);
         }
         return list;
@@ -96,7 +96,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     final SequentTerms createSeqTerms(POTerms po, Variables vars, Term leadingUpdate,
             Term localAnon, Services services) {
         final Term pre =
-            getPre(po.pre(), vars.self, vars.heap, vars.params, false, services).term();
+            getPre(po.pre(), vars.self, vars.heap, vars.params, services).term();
         final Term post = getPost(po.post(), vars.result, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest());
         final Term updates = TB.parallel(localAnon,
@@ -121,12 +121,13 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(ProgramVariable self, ProgramVariable exception,
-            ProgramVariable result, LocationVariable heap, ProgramVariable heapAtPre, Term anonHeap,
-            ImmutableSet<ProgramVariable> ps, Term leadingUpdate, Term localAnonUpdate,
+    public SequentFormula generateSequent(LocationVariable self, LocationVariable exception,
+            LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
+            Term anonHeap,
+            ImmutableSet<LocationVariable> ps, Term leadingUpdate, Term localAnonUpdate,
             Services services) {
-        final ImmutableList<ProgramVariable> params = convertParams(ps);
-        final Map<LocationVariable, ProgramVariable> atPres =
+        final ImmutableList<LocationVariable> params = convertParams(ps);
+        final Map<LocationVariable, LocationVariable> atPres =
             new LinkedHashMap<>();
         atPres.put(heap, heapAtPre);
         final Variables vars =
@@ -152,8 +153,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(ProgramVariable self, LocationVariable heap,
-            Term anonHeap, ImmutableSet<ProgramVariable> ps, Term leadingUpdate,
+    public SequentFormula generateSequent(LocationVariable self, LocationVariable heap,
+            Term anonHeap, ImmutableSet<LocationVariable> ps, Term leadingUpdate,
             Term localAnonUpdate, Services services) {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,
             localAnonUpdate, services);

@@ -18,11 +18,7 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
@@ -67,14 +63,14 @@ public class ExpandMethodBody extends ProgramTransformer {
         // at this point all arguments should be program variables
         ImmutableArray<? extends Expression> argsAsParam = mbs.getArguments();
 
-        final HashMap<ProgramVariable, ProgramVariable> map = new LinkedHashMap<>();
+        final HashMap<LocationVariable, LocationVariable> map = new LinkedHashMap<>();
         for (int i = 0; i < argsAsParam.size(); i++) {
             IProgramVariable pv = methDecl.getParameterDeclarationAt(i).getVariableSpecification()
                     .getProgramVariable();
             assert pv instanceof ProgramVariable : "Unexpected schematic variable";
             Expression arg = argsAsParam.get(i);
             assert arg instanceof ProgramVariable : "Unexpected schematic variable";
-            map.put((ProgramVariable) pv, (ProgramVariable) argsAsParam.get(i));
+            map.put((LocationVariable) pv, (LocationVariable) argsAsParam.get(i));
         }
         ProgVarReplaceVisitor paramRepl = new ProgVarReplaceVisitor(result, map, services);
         paramRepl.start();

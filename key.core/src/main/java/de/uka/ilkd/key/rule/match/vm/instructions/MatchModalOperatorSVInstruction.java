@@ -8,42 +8,30 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-public class MatchModalOperatorSVInstruction
-        extends MatchSchemaVariableInstruction<ModalOperatorSV> {
+public class MatchModalOperatorSVInstruction implements MatchInstruction {
+
+    private ModalOperatorSV op;
 
     public MatchModalOperatorSVInstruction(ModalOperatorSV op) {
-        super(op);
+        this.op = op;
     }
 
-    @Override
-    public MatchConditions match(Term subst, MatchConditions mc, Services services) {
-        if (subst.op() instanceof Modality modality) {
-            if (op.getModalities().contains(modality.kind())) {
-                final SVInstantiations instantiations = mc.getInstantiations();
-                final Object o = instantiations.getInstantiation(op);
-                if (o == null) {
-                    return mc.setInstantiations(instantiations.add(op, modality, services));
-                } else if (o != modality) {
-                    return null;
-                } else {
-                    return mc;
-                }
-            }
+    public MatchConditions match(Term t, MatchConditions mc, Services services) {
+        if (t.op() instanceof Modality mod
+                && op.getModalities().contains(mod.kind())) {
+            return mc.setInstantiations(
+                mc.getInstantiations().add(op, mod.<Modality.JavaModalityKind>kind(), services));
+        } else {
+            return null;
         }
-        return null;
     }
 
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
-        MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) {
-            termPosition.gotoNext();
-        }
-        return result;
+        return match(termPosition.getCurrentSubterm(), mc, services);
     }
 
 }
