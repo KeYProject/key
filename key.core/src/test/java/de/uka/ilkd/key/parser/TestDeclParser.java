@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ParametricSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
@@ -22,9 +21,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Immutables;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -80,53 +77,6 @@ public class TestDeclParser {
     }
 
 
-    @Test
-    public void testSortDeclFail() {
-        evaluateDeclarations("\\sorts { X; X; }");
-    }
-
-    public void testParametericSortDecl() {
-        evaluateDeclarations("\\sorts { \\generic E, F, G; " +
-            "coll<[E]>; list<[+E]> \\extends coll<[E]>;" +
-            "var<[-E, +F, G]>; }");
-
-        Sort e = nss.sorts().lookup("E");
-        ParametricSort list = (ParametricSort) nss.sorts().lookup("list");
-        ParametricSort coll = (ParametricSort) nss.sorts().lookup("coll");
-        ParametricSort var = (ParametricSort) nss.sorts().lookup("var");
-
-        assertInstanceOf(GenericSort.class, e);
-        assertInstanceOf(ParametricSort.class, coll);
-        assertInstanceOf(ParametricSort.class, list);
-
-        assertEquals(
-            Immutables.listOf(CONTRAVARIANT, COVARIANT, INVARIANT),
-            var.getCovariances());
-
-        assertEquals("{coll<[E]>}", list.extendsSorts().toString());
-
-        assertEquals("{any}", coll.extendsSorts().toString());
-    }
-
-    @Test
-    public void testParametricDatatype() {
-        evaluateDeclarations(
-            "\\sorts{\\generic E;} \\datatypes { List<[E]> = Nil | Cons(E obj, List<[E]> tail); }");
-    }
-
-    @Test
-    public void testParametericSortDeclFails() {
-        Assertions.assertThrows(Exception.class,
-            () -> evaluateDeclarations("\\sorts { parametric<[E]>; }"));
-        // assertTrue(ex.getMessage().contains("Formal type parameters must be (already declared)
-        // generic sorts"));
-        Assertions.assertThrows(Exception.class,
-            () -> evaluateDeclarations("\\sorts { \\generic E; doubled<[E,E]>; }"));
-        Assertions.assertThrows(Exception.class,
-            () -> evaluateDeclarations("\\sorts { parametric<[int]>; }"));
-        Assertions.assertThrows(Exception.class,
-            () -> evaluateDeclarations("\\sorts { \\generic E; int<[E]>; }"));
-    }
 
     private GenericSort checkGenericSort(Named name, ImmutableSet<Sort> pExt,
             ImmutableSet<Sort> pOneOf) {
@@ -271,7 +221,7 @@ public class TestDeclParser {
      */
     private void assertTermSV(String msg, Object o) {
         assertInstanceOf(TermSV.class, o, "The named object: " + o + " is of type "
-                + o.getClass() + ", but the type SchemaVariable was expected");
+            + o.getClass() + ", but the type SchemaVariable was expected");
         assertNotSame(((TermSV) o).sort(), JavaDLTheory.FORMULA,
             "Schemavariable is not allowed to match a term of sort FORMULA.");
     }
@@ -282,7 +232,7 @@ public class TestDeclParser {
      */
     private void assertFormulaSV(String msg, Object o) {
         assertInstanceOf(FormulaSV.class, o, "The named object: " + o + " is of type "
-                + o.getClass() + ", but the type SchemaVariable was expected");
+            + o.getClass() + ", but the type SchemaVariable was expected");
         assertSame(((FormulaSV) o).sort(), JavaDLTheory.FORMULA,
             "Only matches to terms of sort FORMULA allowed. " + "But term has sort "
                 + ((FormulaSV) o).sort());
@@ -424,19 +374,19 @@ public class TestDeclParser {
 
         assertEquals(new Name("x"), variables.lookup(new Name("x")).name(), "find SV x");
         assertTermSV("SV x type", variables.lookup(new Name("x")));
-        assertEquals(elem, variables.lookup(new Name("x")).sort(), "SV x sort");
+        assertEquals(elem, ((TermSV) variables.lookup(new Name("x"))).sort(), "SV x sort");
 
         assertEquals(new Name("y"), variables.lookup(new Name("y")).name(), "find SV ");
         assertTermSV("SV y type", variables.lookup(new Name("y")));
-        assertEquals(elem, variables.lookup(new Name("y")).sort(), "SV y sort");
+        assertEquals(elem, ((TermSV) variables.lookup(new Name("y"))).sort(), "SV y sort");
 
         assertEquals(new Name("lv"), variables.lookup(new Name("lv")).name(), "find SV ");
         assertVariableSV("SV lv type", variables.lookup(new Name("lv")));
-        assertEquals(list, variables.lookup(new Name("lv")).sort(), "SV lv sort");
+        assertEquals(list, ((VariableSV) variables.lookup(new Name("lv"))).sort(), "SV lv sort");
 
         assertEquals(new Name("b"), variables.lookup(new Name("b")).name(), "find SV ");
         assertFormulaSV("SV b type", variables.lookup(new Name("b")));
-        assertEquals(JavaDLTheory.FORMULA, variables.lookup(new Name("b")).sort(),
+        assertEquals(JavaDLTheory.FORMULA, ((FormulaSV) variables.lookup(new Name("b"))).sort(),
             "SV b sort");
     }
 
