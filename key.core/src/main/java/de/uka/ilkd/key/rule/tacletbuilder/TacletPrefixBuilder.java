@@ -67,16 +67,16 @@ public class TacletPrefixBuilder {
             // TODO: Is false correct?
             prefixMap.put(msv, new TacletPrefix(ImmutableSet.empty(), false));
         }
-        if (t.op() instanceof SchemaVariable && t.arity() == 0 && !(t.op() instanceof VariableSV)
-                && !(t.op() instanceof ProgramSV) && !(t.op() instanceof SkolemTermSV)) {
-            SchemaVariable sv = (SchemaVariable) t.op();
-            ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
-            TacletPrefix prefix = prefixMap.get(sv);
-            if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
-                setPrefixOfOccurrence(sv, relevantBoundVars);
-            } else {
-                throw new InvalidPrefixException(tacletBuilder.getName().toString(), sv, prefix,
-                    relevantBoundVars);
+        if (t.op() instanceof SchemaVariable sv && t.arity() == 0) {
+            if (sv instanceof TermSV || sv instanceof FormulaSV || sv instanceof UpdateSV) {
+                ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
+                TacletPrefix prefix = prefixMap.get(sv);
+                if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
+                    setPrefixOfOccurrence(sv, relevantBoundVars);
+                } else {
+                    throw new InvalidPrefixException(tacletBuilder.getName().toString(), sv, prefix,
+                        relevantBoundVars);
+                }
             }
         }
         for (int i = 0; i < t.arity(); i++) {
@@ -85,6 +85,7 @@ public class TacletPrefixBuilder {
             visit(t.sub(i));
             currentlyBoundVars = oldBounds;
         }
+
         if (t.hasLabels()) {
             for (TermLabel l : t.getLabels()) {
                 if (l instanceof SchemaVariable sv) {
@@ -100,7 +101,6 @@ public class TacletPrefixBuilder {
             }
         }
     }
-
 
     private void visit(Sequent s) {
         for (final SequentFormula cf : s) {

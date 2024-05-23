@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
@@ -39,7 +39,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
     private final Term originalRep;
-    private final ProgramVariable originalSelfVar;
+    private final LocationVariable originalSelfVar;
 
     /**
      * JML axioms may not be declared static, but they may be used like static specifications. This
@@ -49,7 +49,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     public ClassAxiomImpl(String name, KeYJavaType kjt, VisibilityModifier visibility, Term rep,
-            ProgramVariable selfVar) {
+            LocationVariable selfVar) {
         assert name != null;
         assert kjt != null;
         this.name = name;
@@ -64,7 +64,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     public ClassAxiomImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term rep, ProgramVariable selfVar) {
+            VisibilityModifier visibility, Term rep, LocationVariable selfVar) {
         this(name, kjt, visibility, rep, selfVar);
         this.displayName = displayName;
     }
@@ -131,7 +131,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        ImmutableList<ProgramVariable> replaceVars = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> replaceVars = ImmutableSLList.nil();
         replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);

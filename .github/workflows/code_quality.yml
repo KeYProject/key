@@ -86,7 +86,7 @@ jobs:
         with:
           arguments: --continue checkstyleMainChanged
       - run: |
-          npx violations-command-line -sarif sarif-report.json -pv false \
+          npx violations-command-line -sarif sarif-report.json \
           -v "CHECKSTYLE" "." ".*/build/reports/checkstyle/main_diff.xml$" "Checkstyle"
 
       #-diff-from $(git merge-base HEAD origin/main)
@@ -116,7 +116,7 @@ jobs:
       # - run: python3 ./.github/printAnnotations.py */build/reports/pmd/main.xml
 
       - run: |
-          npx violations-command-line -sarif pmd-report.json -pv false \
+          npx violations-command-line -sarif pmd-report.json \
           -v "PMD" "." ".*/build/reports/pmd/main_diff.xml$" "PMD"
 
       # -diff-from $(git merge-base HEAD origin/main)

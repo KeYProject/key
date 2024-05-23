@@ -106,7 +106,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     public static String checkForIllegalOps(Term formula, Taclet owner,
             boolean schemaVarsAreAllowed) {
         if ((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable)
-                || formula.op() instanceof Modality || formula.op() instanceof ModalOperatorSV
+                || formula.op() instanceof Modality
                 || formula.op() instanceof ProgramSV || formula.op() instanceof SkolemTermSV
                 || formula.op() instanceof UpdateSV) {
             return "The given taclet " + owner.name()
@@ -212,7 +212,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * for JavaCard Dynamic Logic.) This method is used for both Formula schema variables and Term
      * schema variables.
      */
-    private Term createSimpleInstantiation(Taclet owner, SchemaVariable sv, TermServices services) {
+    private Term createSimpleInstantiation(Taclet owner, OperatorSV sv, TermServices services) {
         ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv).prefix();
 
         Sort[] argSorts = computeArgSorts(prefix, services);
@@ -231,8 +231,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, TermServices services) {
         Sort[] argSorts = new Sort[svSet.size()];
         int i = 0;
-        for (SchemaVariable sv : svSet) {
-            argSorts[i] = replaceSort(sv.sort(), services);
+        for (var sv : svSet) {
+            if (sv instanceof OperatorSV asv)
+                argSorts[i] = replaceSort(asv.sort(), services);
             i++;
         }
         return argSorts;
@@ -242,7 +243,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             TermServices services) {
         Term[] args = new Term[svSet.size()];
         int i = 0;
-        for (SchemaVariable sv : svSet) {
+        for (var sv : svSet) {
             args[i] = getInstantiation(owner, sv, services);
             i++;
         }
