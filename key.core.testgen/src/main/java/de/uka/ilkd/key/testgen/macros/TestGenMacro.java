@@ -18,7 +18,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.TestGenerationSettings;
 
 import org.key_project.logic.Name;
 

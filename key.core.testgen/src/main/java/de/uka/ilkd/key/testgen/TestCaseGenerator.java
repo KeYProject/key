@@ -3,7 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
-import com.squareup.javapoet.*;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.lang.model.element.Modifier;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,28 +30,21 @@ import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
-import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
-import de.uka.ilkd.key.testgen.smt.testgen.MemoryTestGenerationLogger;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
 import de.uka.ilkd.key.util.KeYConstants;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.StringUtil;
+
+import com.squareup.javapoet.*;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.lang.model.element.Modifier;
-import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static de.uka.ilkd.key.testgen.Format.JUnit4;
+import static de.uka.ilkd.key.testgen.Constants.*;
+import static de.uka.ilkd.key.testgen.Format.JUNIT_4;
 import static de.uka.ilkd.key.testgen.TestgenUtils.*;
-import static de.uka.ilkd.key.testgen.template.Constants.*;
 
 /**
  * @author gladisch
@@ -68,7 +67,7 @@ public class TestCaseGenerator {
     public static final String DONT_COPY = "aux";
     private static final ClassName JUNIT4_TEST_ANNOTATION = ClassName.get("org.junit", "Test");
     private static final ClassName JUNIT5_TEST_ANNOTATION =
-            ClassName.get("org.junit.jupiter.api", "Test");
+        ClassName.get("org.junit.jupiter.api", "Test");
     private static final ClassName TESTNG_TEST_ANNOTATION = ClassName.get("org.junit", "Test");
     private final Services services;
     private final boolean rflAsInternalClass;
@@ -79,7 +78,7 @@ public class TestCaseGenerator {
     private final Path outputModDir;
     private final Path outputDontCopy;
 
-    private final TestGenerationLogger logger;
+    private final TGReporter logger;
     private final String fileName;
     private final String packageName;
     private final String mutName;
@@ -93,14 +92,14 @@ public class TestCaseGenerator {
 
     private final TestGenerationSettings settings;
 
-    public TestCaseGenerator(Proof proof, TestGenerationSettings settings, @Nullable TestGenerationLogger log) {
-        logger = Objects.requireNonNullElse(log, new MemoryTestGenerationLogger());
+    public TestCaseGenerator(Proof proof, TestGenerationSettings settings, TGReporter log) {
+        this.logger = log;
         this.settings = settings;
 
         fileName = "TestGeneric" + TestCaseGenerator.FILE_COUNTER;
         this.rflAsInternalClass = settings.isRFLAsInternalClass();
         services = proof.getServices();
-        assignmentCreator = settings.useRFL()
+        assignmentCreator = settings.isUseRFL()
                 ? TestgenUtils::createAssignmentWithRfl
                 : TestgenUtils::createAssignmentWithoutRfl;
 
@@ -112,13 +111,13 @@ public class TestCaseGenerator {
 
         info = new ProofInfo(proof);
         String mutCall = Objects.requireNonNullElse(info.getMUTCall(),
-                "<method under test> //Manually write a call to the method under test, "
-                        + "because KeY could not determine it automatically.");
+            "<method under test> //Manually write a call to the method under test, "
+                + "because KeY could not determine it automatically.");
 
         mutName = Objects.requireNonNull(info.getMUT()).getFullName();
         rflCreator = new ReflectionClassCreator();
-        oracleGenerator = new OracleGenerator(services, rflCreator, settings.useRFL());
-        if (settings.useJunit() == JUnit4) {
+        oracleGenerator = new OracleGenerator(services, rflCreator, settings.isUseRFL());
+        if (settings.getFormat() == JUNIT_4) {
             oracleMethods = new LinkedList<>();
             oracleMethodCall = getOracleAssertion(oracleMethods);
         }
@@ -196,7 +195,7 @@ public class TestCaseGenerator {
                     boolean returnNull = true;
                     try {
                         final String retType =
-                                md.getTypeReference().getKeYJavaType().getSort().name().toString();
+                            md.getTypeReference().getKeYJavaType().getSort().name().toString();
                         if (retType.equals("java.lang.String")) {
                             ms.addStatement("{ return $S;", className);
                             returnNull = false;
@@ -284,7 +283,7 @@ public class TestCaseGenerator {
         oracleGenerator.getOracleMethods().forEach(it -> oracleMethods.add(it.build()));
 
         LOGGER.debug("Modifier Set: {}",
-                oracleGenerator.getOracleLocationSet(info.getAssignable()));
+            oracleGenerator.getOracleLocationSet(info.getAssignable()));
 
         return "assertTrue(" + oracleCall + ");";
     }
@@ -311,14 +310,14 @@ public class TestCaseGenerator {
         createDummyClasses();
 
         try {
-            if (settings.useRFL()) {
+            if (settings.isUseRFL()) {
                 writeRFLFile();
             }
         } catch (Exception ex) {
             logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT
-                    + " is either not generated or it has an error.");
+                + " is either not generated or it has an error.");
             LOGGER.error("Error: The file RFL {} is either not generated or it has an error.",
-                    JAVA_FILE_EXTENSION_WITH_DOT);
+                JAVA_FILE_EXTENSION_WITH_DOT);
         }
         TestCaseGenerator.FILE_COUNTER.incrementAndGet();
         return testSuite.toString();
@@ -344,9 +343,9 @@ public class TestCaseGenerator {
                         logger.writeln("Generate: " + originalNodeName);
                         Map<String, Sort> typeInfMap = generateTypeInferenceMap(goal.node());
                         ms.addComment(originalNodeName);
-                        switch (settings.useJunit()) {
-                            case JUnit4 -> ms.addAnnotation(JUNIT4_TEST_ANNOTATION);
-                            case JUnit5 -> ms.addAnnotation(JUNIT5_TEST_ANNOTATION);
+                        switch (settings.getFormat()) {
+                        case JUNIT_4 -> ms.addAnnotation(JUNIT4_TEST_ANNOTATION);
+                        case JUNIT_5 -> ms.addAnnotation(JUNIT5_TEST_ANNOTATION);
                         }
                         ms.addComment("Test preamble: creating objects and intializing test data");
                         generateTestCase(ms, m, typeInfMap);
@@ -355,12 +354,13 @@ public class TestCaseGenerator {
                         info.getProgramVariables(info.getPO(), vars);
                         ms.addComment("Other variables")
                                 .addStatement(
-                                        getRemainingConstants(m.getConstants().keySet(), vars))
+                                    getRemainingConstants(m.getConstants().keySet(), vars))
                                 .addComment("   //Calling the method under test   ")
                                 .addStatement(info.getCode());
 
                         if (isJunit()) {
-                            ms.addComment("calling the test oracle").addStatement(oracleMethodCall);
+                            ms.addComment("calling the test oracle").addStatement(
+                                        oracleMethodCall);
                         }
                         counter++;
                         success = true;
@@ -371,18 +371,18 @@ public class TestCaseGenerator {
                     logger.writeln("A model (test data) was not generated for:" + originalNodeName);
                 }
             } catch (final Exception ex) {
-                logger.writeException(ex);
+                logger.reportException(ex);
                 logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
             }
         }
 
         if (counter == 0) {
             logger.writeln(
-                    "Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) "
-                            + "in Options->SMT Solvers.");
+                "Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) "
+                    + "in Options->SMT Solvers.");
         } else if (counter < problemSolvers.size()) {
             logger.writeln("Warning: SMT solver could not solve all test data constraints. "
-                    + "Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+                + "Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
         }
 
         clazz.addMethod(getMainMethod(fileName, counter));
@@ -435,7 +435,7 @@ public class TestCaseGenerator {
                 }
             } else {
                 LOGGER.debug("PV {} Sort: {} KeYJavaType: {}", name, pv.sort(),
-                        pv.getKeYJavaType());
+                    pv.getKeYJavaType());
                 map.put(name, pv.sort());
             }
         } else if (op instanceof Function && !(op instanceof ObserverFunction)) {
@@ -486,7 +486,7 @@ public class TestCaseGenerator {
     }
 
     private String getRemainingConstants(Collection<String> existingConstants,
-                                         Collection<Term> newConstants) {
+            Collection<Term> newConstants) {
         StringBuilder result = new StringBuilder();
 
         for (Term c : newConstants) {
@@ -569,11 +569,11 @@ public class TestCaseGenerator {
                 String right;
                 if (type.endsWith("[]")) {
                     right =
-                            "new " + type.substring(0, type.length() - 2) + "[" + o.getLength() + "]";
+                        "new " + type.substring(0, type.length() - 2) + "[" + o.getLength() + "]";
                 } else if (o.getSort() == null || o.getSort().toString().equals("Null")) {
                     right = "null";
                 } else {
-                    if (settings.useRFL()) {
+                    if (settings.isUseRFL()) {
                         right = "RFL.new" + ReflectionClassCreator.cleanTypeName(type) + "()";
                         rflCreator.addSort(type);
                         LOGGER.debug("Adding sort (create Object): {}", type);
@@ -624,10 +624,10 @@ public class TestCaseGenerator {
                             && isInPrestate(prestate, val)) {
                         if (isLiteral) {
                             mb.addStatement(assignmentCreator.assign(declType, getPreName(c),
-                                    "(" + type + ")" + val));
+                                "(" + type + ")" + val));
                         } else {
                             mb.addStatement(assignmentCreator.assign(declType, getPreName(c),
-                                    "(" + type + ")" + getPreName(val)));
+                                "(" + type + ")" + getPreName(val)));
                         }
                     }
                 }
@@ -660,8 +660,8 @@ public class TestCaseGenerator {
                     final String rcObjType = getSafeType(o.getSort());
 
                     mb.addStatement(assignmentCreator.assign("",
-                            new RefEx(rcObjType, receiverObject, vType, fieldName),
-                            "(" + vType + ")" + val));
+                        new RefEx(rcObjType, receiverObject, vType, fieldName),
+                        "(" + vType + ")" + val));
 
 
                     if (isJunit() && isInPrestate(prestate, o)) {
@@ -673,8 +673,8 @@ public class TestCaseGenerator {
                         }
 
                         mb.addStatement(assignmentCreator.assign("",
-                                new RefEx(rcObjType, getPreName(receiverObject), vType, fieldName),
-                                "(" + vType + ")" + val));
+                            new RefEx(rcObjType, getPreName(receiverObject), vType, fieldName),
+                            "(" + vType + ")" + val));
                     }
 
                 }
@@ -690,7 +690,7 @@ public class TestCaseGenerator {
                         String val = o.getArrayValue(i);
                         val = translateValueExpression(val);
                         mb.addStatement(
-                                assignmentCreator.assign("", receiverObject + fieldName, val));
+                            assignmentCreator.assign("", receiverObject + fieldName, val));
 
                         if (isJunit() && isInPrestate(prestate, o)) {
                             if (!elementType.equals("int") && !elementType.equals("boolean")
@@ -698,7 +698,7 @@ public class TestCaseGenerator {
                                 val = getPreName(val);
                             }
                             mb.addStatement(assignmentCreator.assign("",
-                                    getPreName(receiverObject) + fieldName, val));
+                                getPreName(receiverObject) + fieldName, val));
                         }
                     }
                 }
@@ -717,7 +717,7 @@ public class TestCaseGenerator {
     private void createOldMap(MethodSpec.Builder mb, Set<String> objNames) {
         ClassName NAME_HASH_MAP = ClassName.get(HashMap.class);
         var map =
-                ParameterizedTypeName.get(NAME_HASH_MAP, ClassName.OBJECT, ClassName.OBJECT);
+            ParameterizedTypeName.get(NAME_HASH_MAP, ClassName.OBJECT, ClassName.OBJECT);
         mb.addStatement("$T $N = new $T()", map, OLDMap, map);
         for (String o : objNames) {
             mb.addStatement("$N.put($N, $L)", OLDMap, getPreName(o), o);
@@ -812,6 +812,6 @@ public class TestCaseGenerator {
     }
 
     public boolean isJunit() {
-        return settings.useJunit() == JUnit4 || settings.useJunit() == Format.JUnit5;
+        return settings.getFormat() == JUNIT_4 || settings.getFormat() == Format.JUNIT_5;
     }
 }
