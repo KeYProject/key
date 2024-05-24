@@ -16,6 +16,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The interface ProofMacro is the entry point to a general strategy extension system.
  *
