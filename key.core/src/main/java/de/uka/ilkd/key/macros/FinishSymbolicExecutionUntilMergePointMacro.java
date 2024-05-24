@@ -29,6 +29,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
  * merge point is reached (i.e. a point where a {@link MergeRule} can be applied) or there is no
