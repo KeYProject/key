@@ -37,11 +37,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Mon Dec 16 17:26:50 MET 2013
-name=seqIndexOf2
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "seqIndexOf2",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
 (keyLog "0" (keyUser "pschmitt" ) (keyVersion "cd4d244ec17586d37f1e609c330df9c3940650fc"))

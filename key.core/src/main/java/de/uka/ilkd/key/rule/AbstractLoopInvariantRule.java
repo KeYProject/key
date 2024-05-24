@@ -29,6 +29,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
  * {@link #doPreparations(Goal, Services, RuleApp)} directly at the beginning of the
@@ -89,7 +91,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         // prepare reachableOut.
         // TODO: reachableIn has been removed since it was not even used in the
         // old invariant rule. Is that OK or was there an earlier mistake?
-        final ImmutableSet<ProgramVariable> localOuts = MiscTools.getLocalOuts(inst.loop, services);
+        final ImmutableSet<LocationVariable> localOuts =
+            MiscTools.getLocalOuts(inst.loop, services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
             new LinkedHashMap<>();
@@ -171,7 +174,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @return The "...Before_LOOP" update needed for the variant.
      */
     protected static Term createBeforeLoopUpdate(Services services,
-            final List<LocationVariable> heapContext, final ImmutableSet<ProgramVariable> localOuts,
+            final List<LocationVariable> heapContext,
+            final ImmutableSet<LocationVariable> localOuts,
             final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop) {
         final TermBuilder tb = services.getTermBuilder();
         final Namespace<IProgramVariable> progVarNS = services.getNamespaces().programVariables();
@@ -214,7 +218,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @param services The {@link Services} object.
      * @return The anonymizing update.
      */
-    protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+    protected static Term createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -223,7 +227,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 new JFunction(new Name(tb.newName(pv.name().toString())), pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
 
-            return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            return tb.elementary(pv, tb.func(anonFunc));
         }).reduce(tb.skip(), tb::parallel);
     }
 
@@ -441,7 +445,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         // check for strictly pure loops
         final Term anonUpdate;
-        if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
+        if (tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
@@ -467,7 +471,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected static AdditionalHeapTerms createAdditionalHeapTerms(Services services,
             final Instantiation inst, final List<LocationVariable> heapContext,
-            final ImmutableSet<ProgramVariable> localOuts,
+            final ImmutableSet<LocationVariable> localOuts,
             final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop,
             Map<LocationVariable, Term> atPres) {
         final TermBuilder tb = services.getTermBuilder();
@@ -505,14 +509,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             final Term freeMod = freeMods.get(heap);
             final Term strictlyNothing = tb.strictlyNothing();
             final Term currentFrame;
-            if (strictlyNothing.equalsModIrrelevantTermLabels(mod)) {
-                if (strictlyNothing.equalsModIrrelevantTermLabels(freeMod)) {
+            if (strictlyNothing.equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                if (strictlyNothing.equalsModProperty(freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeMod);
                 }
             } else {
-                if (strictlyNothing.equalsModIrrelevantTermLabels(freeMod)) {
+                if (strictlyNothing.equalsModProperty(freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), mod);
                 } else {
                     currentFrame = tb.frame(
@@ -546,7 +550,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * A container for an instantiation of this {@link LoopScopeInvariantRule} application; contains
      * the update, the program with post condition, the {@link While} loop the
-     * {@link LoopScopeInvariantRule} should be applied to, the {@link LoopSpecification}, the the
+     * {@link LoopScopeInvariantRule} should be applied to, the {@link LoopSpecification}, the
      * self {@link Term}.
      *
      * @param innermostExecutionContext TODO Removed this field; was however used in old invariant rule. Could be needed for the information flow validity goal.

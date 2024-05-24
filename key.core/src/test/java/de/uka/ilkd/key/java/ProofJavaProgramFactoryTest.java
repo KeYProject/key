@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import de.uka.ilkd.key.java.recoderext.Ghost;
+import de.uka.ilkd.key.java.recoderext.SetStatement;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.helper.FindResources;
@@ -32,8 +33,6 @@ import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.java.expression.operator.CopyAssignment;
-import recoder.java.reference.VariableReference;
 import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;
@@ -93,13 +92,11 @@ public class ProofJavaProgramFactoryTest {
 
         StatementBlock loopBody = (StatementBlock) forLoop.getBody();
 
-        CopyAssignment ghost3 = (CopyAssignment) loopBody.getStatementAt(3);
-        VariableReference var3 = (VariableReference) ghost3.getChildAt(0);
-        Assertions.assertEquals("k0_old", var3.getName());
+        var ghost3 = (SetStatement) loopBody.getStatementAt(3);
+        Assertions.assertEquals("set k0_old = k0;", ghost3.getParserContext().getText());
 
-        CopyAssignment ghost4 = (CopyAssignment) loopBody.getStatementAt(5);
-        VariableReference var4 = (VariableReference) ghost4.getChildAt(0);
-        Assertions.assertEquals("k1_old", var4.getName());
+        var ghost4 = (SetStatement) loopBody.getStatementAt(5);
+        Assertions.assertEquals("set k1_old = k1;", ghost4.getParserContext().getText());
 
         EmptyStatement empty1 = (EmptyStatement) loopBody.getStatementAt(4);
         EmptyStatement lastStatementInForLoop =
@@ -121,16 +118,16 @@ public class ProofJavaProgramFactoryTest {
         MethodDeclaration m = (MethodDeclaration) ofib.get();
         assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
 
-        CopyAssignment assign1 = (CopyAssignment) m.getBody().getStatementAt(0);
-        VariableReference var1 = (VariableReference) assign1.getChildAt(0);
-        Assertions.assertEquals("message", var1.getName());
+        var assign1 = (SetStatement) m.getBody().getStatementAt(0);
+        var var1 = assign1.getParserContext();
+        Assertions.assertEquals("set message = arg0;", var1.getText());
 
         EmptyStatement empty1 = (EmptyStatement) m.getBody().getStatementAt(1);
         assertContainsComment(empty1, it -> it.equals("//@ set message = arg0;"));
 
-        CopyAssignment assign2 = (CopyAssignment) m.getBody().getStatementAt(2);
-        VariableReference var2 = (VariableReference) assign2.getChildAt(0);
-        Assertions.assertEquals("cause", var2.getName());
+        var assign2 = (SetStatement) m.getBody().getStatementAt(2);
+        var var2 = assign2.getParserContext();
+        Assertions.assertEquals("set cause = arg1;", var2.getText());
 
         EmptyStatement empty2 = (EmptyStatement) m.getBody().getStatementAt(3);
         assertContainsComment(empty2, it -> it.equals("//@ set cause = arg1;"));

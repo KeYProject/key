@@ -8,7 +8,6 @@ import org.key_project.util.java.NumberUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests for {@link NumberUtil}.
@@ -32,12 +31,6 @@ public class NumberUtilTest {
         assertEquals(123, NumberUtil.parseFullInt(NumberUtil.toFullString(123)));
         assertEquals(Integer.MAX_VALUE,
             NumberUtil.parseFullInt(NumberUtil.toFullString(Integer.MAX_VALUE)));
-        try {
-            NumberUtil.parseFullInt(null);
-            fail();
-        } catch (NumberFormatException e) {
-            assertEquals("Text not defined.", e.getMessage());
-        }
     }
 
     /**
@@ -56,12 +49,6 @@ public class NumberUtilTest {
         assertEquals(123, NumberUtil.parseFullLong(NumberUtil.toFullString(123)));
         assertEquals(Long.MAX_VALUE,
             NumberUtil.parseFullLong(NumberUtil.toFullString(Long.MAX_VALUE)));
-        try {
-            NumberUtil.parseFullInt(null);
-            fail();
-        } catch (NumberFormatException e) {
-            assertEquals("Text not defined.", e.getMessage());
-        }
     }
 
     /**

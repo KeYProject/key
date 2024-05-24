@@ -16,11 +16,9 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (10/3/21)
  */
 public class TeeReader extends Reader {
-    @NonNull
-    private final Reader source;
 
-    @NonNull
-    private final Writer sink;
+    private final @NonNull Reader source;
+    private final @NonNull Writer sink;
 
     public TeeReader(@NonNull Reader source, @NonNull Writer sink) {
         this.source = source;

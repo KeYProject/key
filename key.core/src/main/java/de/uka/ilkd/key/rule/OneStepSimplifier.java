@@ -46,6 +46,8 @@ import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 
 public final class OneStepSimplifier implements BuiltInRule {
 
@@ -574,9 +576,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             null);
     }
 
-    @NonNull
     @Override
-    public synchronized ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public synchronized @NonNull ImmutableList<Goal> apply(Goal goal, Services services,
+            RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp
                 : "The rule app must be suitable for OSS";
@@ -747,8 +749,9 @@ public final class OneStepSimplifier implements BuiltInRule {
                 obj = ((TermReplacementKey) obj).term;
             }
             if (obj instanceof Term t) {
-                return term.equalsModRenaming(t); // Ignore naming and term labels in the way a
-                                                  // taclet rule does.
+                return term.equalsModProperty(t, RENAMING_PROPERTY); // Ignore naming and term
+                                                                     // labels in the way a
+                                                                     // taclet rule does.
             } else {
                 return false;
             }

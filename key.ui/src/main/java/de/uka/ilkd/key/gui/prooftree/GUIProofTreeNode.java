@@ -91,9 +91,8 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         children = null;
     }
 
-    @NonNull
     @Override
-    public String getSearchString() {
+    public @NonNull String getSearchString() {
         return toString();
     }
 }

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
@@ -38,29 +39,13 @@ public class StaticFieldCondition extends VariableConditionAdapter {
         }
         final Operator op = f.op();
         if (op instanceof JFunction) {
-            final String name = op.name().toString();
-
-            // check for normal attribute
-            int endOfClassName = name.indexOf("::$");
-
-            int startAttributeName = endOfClassName + 3;
-
-
-            if (endOfClassName < 0) {
-                // not a normal attribute, maybe an implicit attribute like <created>?
-                endOfClassName = name.indexOf("::<");
-                startAttributeName = endOfClassName + 2;
-            }
-
-            if (endOfClassName < 0) {
+            HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
+            if (split == null) {
                 return false;
             }
 
-            final String className = name.substring(0, endOfClassName);
-            final String attributeName = name.substring(startAttributeName);
-
             final ProgramVariable attribute =
-                services.getJavaInfo().getAttribute(attributeName, className);
+                services.getJavaInfo().getAttribute(split.attributeName(), split.className());
 
             if (attribute == null) {
                 return false;

@@ -6,6 +6,10 @@ package de.uka.ilkd.key.logic;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
+import de.uka.ilkd.key.logic.equality.RenamingProperty;
+import de.uka.ilkd.key.logic.equality.TermEqualsModProperty;
+import de.uka.ilkd.key.logic.equality.TermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -16,16 +20,25 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
 /**
+ * <p>
  * The labeled term class is used for terms that have a label attached.
+ * </p>
  *
- * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast
- * the method {@link Term#equalsModRenaming(Term)} does not care about annotations and will just
- * compare the term structure alone modula renaming.
+ * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast,
+ * the method {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)} can be used to
+ * compare terms while ignoring certain given properties. E.g. by using
+ * {@link RenamingProperty#RENAMING_PROPERTY}, just the term structures modulo renaming are compared
+ * whilst ignoring annotations.
+ * <p>
+ * Prior implementations of {@link EqualsModProofIrrelevancy} are now in
+ * {@link ProofIrrelevancyProperty}.
+ * </p>
+ *
  *
  * @see Term
  * @see TermImpl
  */
-class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
+class LabeledTermImpl extends TermImpl {
 
     /**
      * @see #getLabels()
@@ -38,7 +51,7 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
      * @param op the top level operator
      * @param subs the Term that are the subterms of this term
      * @param boundVars logic variables bound by the operator
-     * @param labels the terms labels (must not be null or empty)
+     * @param labels the term's labels (must not be null or empty)
      * @param origin a String with origin information
      */
     public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
@@ -139,43 +152,6 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
         int hash = super.computeHashCode();
         for (int i = 0, sz = labels.size(); i < sz; i++) {
             hash += 7 * labels.get(i).hashCode();
-        }
-        return hash;
-    }
-
-    @Override
-    public boolean equalsModProofIrrelevancy(Object o) {
-        if (!super.equalsModProofIrrelevancy(o)) {
-            return false;
-        }
-
-        if (o instanceof LabeledTermImpl cmp) {
-            if (labels.size() == cmp.labels.size()) {
-                for (int i = 0, sz = labels.size(); i < sz; i++) {
-                    // skip irrelevant (origin) labels that differ for no real reason
-                    if (!labels.get(i).isProofRelevant()) {
-                        continue;
-                    }
-                    // this is not optimal, but as long as number of labels limited ok
-                    if (!cmp.labels.contains(labels.get(i))) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        } else {
-            return o.getClass() == TermImpl.class;
-        }
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        int hash = super.hashCodeModProofIrrelevancy();
-        for (int i = 0, sz = labels.size(); i < sz; i++) {
-            if (labels.get(i).isProofRelevant()) {
-                hash += 7 * labels.get(i).hashCode();
-            }
         }
         return hash;
     }

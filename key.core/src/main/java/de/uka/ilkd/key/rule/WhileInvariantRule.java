@@ -63,6 +63,8 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 public final class WhileInvariantRule implements BuiltInRule {
     /**
      * The hint used to refactor the initial invariant.
@@ -85,8 +87,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final Goal infFlowGoal,
             final AnonUpdateData anonUpdateData, final Term guardTerm, final Instantiation inst,
             LoopSpecification spec, Services services, LoopInvariantBuiltInRuleApp ruleApp,
-            final ImmutableSet<ProgramVariable> localIns,
-            final ImmutableSet<ProgramVariable> localOuts, final Term anonUpdate,
+            final ImmutableSet<LocationVariable> localIns,
+            final ImmutableSet<LocationVariable> localOuts, final Term anonUpdate,
             final JavaBlock guardJb) throws RuleAbortException {
         final TermBuilder tb = services.getTermBuilder();
         final Term baseHeap = anonUpdateData.loopHeapAtPre;
@@ -224,15 +226,15 @@ public final class WhileInvariantRule implements BuiltInRule {
         return result;
     }
 
-    private static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+    private static Term createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
             Services services) {
         Term anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
-        for (ProgramVariable pv : localOuts) {
+        for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
             final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {
                 anonUpdate = elemUpd;
             } else {
@@ -263,7 +265,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // check for strictly pure loops
         final Term anonUpdate;
-        if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
+        if (tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
@@ -422,8 +424,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static InfFlowData setUpInfFlowValidityGoal(Goal infFlowGoal,
             LoopInvariantBuiltInRuleApp ruleApp, final Instantiation inst, final JavaBlock guardJb,
-            final ImmutableSet<ProgramVariable> localIns,
-            final ImmutableSet<ProgramVariable> localOuts,
+            final ImmutableSet<LocationVariable> localIns,
+            final ImmutableSet<LocationVariable> localOuts,
             final ImmutableList<AnonUpdateData> anonUpdateDatas, final Term anonUpdate,
             Services services) throws RuleAbortException {
         assert anonUpdateDatas.size() == 1 : "information flow " + "extension is at the "
@@ -680,16 +682,16 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private void setupWdGoal(final Goal goal, final LoopSpecification inv, final Term update,
             final Term selfTerm, final LocationVariable heap, final Term anonHeap,
-            final Term localAnonUpdate, final ImmutableSet<ProgramVariable> localIns,
+            final Term localAnonUpdate, final ImmutableSet<LocationVariable> localIns,
             PosInOccurrence pio, Services services) {
         if (goal == null) {
             return;
         }
         goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
         final LoopWellDefinedness lwd = new LoopWellDefinedness(inv, localIns, services);
-        final ProgramVariable self;
-        if (selfTerm != null && selfTerm.op() instanceof ProgramVariable) {
-            self = (ProgramVariable) selfTerm.op();
+        final LocationVariable self;
+        if (selfTerm != null && selfTerm.op() instanceof LocationVariable) {
+            self = (LocationVariable) selfTerm.op();
         } else {
             self = null;
         }
@@ -700,9 +702,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
@@ -731,15 +732,16 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // collect input and output local variables,
         // prepare reachableIn and reachableOut
-        final ImmutableSet<ProgramVariable> localIns = MiscTools.getLocalIns(inst.loop, services);
-        final ImmutableSet<ProgramVariable> localOuts = MiscTools.getLocalOuts(inst.loop, services);
+        final ImmutableSet<LocationVariable> localIns = MiscTools.getLocalIns(inst.loop, services);
+        final ImmutableSet<LocationVariable> localOuts =
+            MiscTools.getLocalOuts(inst.loop, services);
         Term reachableIn = tb.tt();
-        for (ProgramVariable pv : localIns) {
+        for (var pv : localIns) {
             reachableIn = tb.and(reachableIn, tb.reachableValue(pv));
         }
         Term reachableOut = tb.tt();
 
-        for (ProgramVariable pv : localOuts) {
+        for (var pv : localOuts) {
             reachableOut = tb.and(reachableOut, tb.reachableValue(pv));
         }
 
@@ -826,14 +828,17 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term freeMod = freeMods.get(heap);
             final Term strictlyNothing = tb.strictlyNothing();
             final Term currentFrame;
-            if (strictlyNothing.equalsModIrrelevantTermLabels(mod)) {
-                if (strictlyNothing.equalsModIrrelevantTermLabels(freeMod)) {
+            if (strictlyNothing.equalsModProperty(
+                mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                if (strictlyNothing.equalsModProperty(
+                    freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeMod);
                 }
             } else {
-                if (strictlyNothing.equalsModIrrelevantTermLabels(freeMod)) {
+                if (strictlyNothing.equalsModProperty(
+                    freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), mod);
                 } else {
                     currentFrame = tb.frame(

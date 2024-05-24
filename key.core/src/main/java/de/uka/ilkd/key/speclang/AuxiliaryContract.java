@@ -176,7 +176,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's precondition on the specified heap.
      */
-    Term getPrecondition(LocationVariable heap, ProgramVariable self,
+    Term getPrecondition(LocationVariable heap, LocationVariable self,
             Map<LocationVariable, LocationVariable> atPres, Services services);
 
     /**
@@ -261,7 +261,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's free precondition on the specified heap.
      */
-    Term getFreePrecondition(LocationVariable heap, ProgramVariable self,
+    Term getFreePrecondition(LocationVariable heap, LocationVariable self,
             Map<LocationVariable, LocationVariable> atPres, Services services);
 
     /**
@@ -324,7 +324,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's modifies clause on the specified heap.
      */
-    Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+    Term getModifiesClause(LocationVariable heap, LocationVariable self, Services services);
 
     /**
      *
@@ -364,7 +364,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      *        services.
      * @return this contract's free modifies clause on the specified heap.
      */
-    Term getFreeModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+    Term getFreeModifiesClause(LocationVariable heap, LocationVariable self, Services services);
 
     /**
      *
@@ -501,7 +501,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
-    Term getMby(ProgramVariable selfVar, Services services);
+    Term getMby(LocationVariable selfVar, Services services);
 
     /**
      *
@@ -618,36 +618,36 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * {@code self}
          */
-        public final ProgramVariable self;
+        public final LocationVariable self;
 
         /**
          * Boolean flags that are set to {@code true} when the block terminates by a
          * {@code break label;} statement with the specified label.
          */
-        public final Map<Label, ProgramVariable> breakFlags;
+        public final Map<Label, LocationVariable> breakFlags;
 
         /**
          * Boolean flags that are set to {@code true} when the block terminates by a
          * {@code continue label;} statement with the specified label.
          */
-        public final Map<Label, ProgramVariable> continueFlags;
+        public final Map<Label, LocationVariable> continueFlags;
 
         /**
          * Boolean flag that is set to {@code true} when the block terminates by a {@code return}
          * statement.
          */
-        public final ProgramVariable returnFlag;
+        public final LocationVariable returnFlag;
 
         /**
          * Result variable to set when the block terminates by a {@code return} statement.
          */
-        public final ProgramVariable result;
+        public final LocationVariable result;
 
         /**
          * Exception variable to set when the block terminates by an uncaught {@code throw}
          * statement.
          */
-        public final ProgramVariable exception;
+        public final LocationVariable exception;
 
         /**
          * A map from every heap {@code heap} to {@code heap_Before_BLOCK}.
@@ -701,9 +701,9 @@ public interface AuxiliaryContract extends SpecificationElement {
          *        inside the block to {@code var_Before_METHOD}.
          * @param services services.
          */
-        public Variables(final ProgramVariable self, final Map<Label, ProgramVariable> breakFlags,
-                final Map<Label, ProgramVariable> continueFlags, final ProgramVariable returnFlag,
-                final ProgramVariable result, final ProgramVariable exception,
+        public Variables(final LocationVariable self, final Map<Label, LocationVariable> breakFlags,
+                final Map<Label, LocationVariable> continueFlags, final LocationVariable returnFlag,
+                final LocationVariable result, final LocationVariable exception,
                 final Map<LocationVariable, LocationVariable> remembranceHeaps,
                 final Map<LocationVariable, LocationVariable> remembranceLocalVariables,
                 final Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
@@ -794,9 +794,9 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param flags a map containing the variables to termify.
          * @return a map with all the same keys with termified values.
          */
-        private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags) {
+        private Map<Label, Term> termifyFlags(final Map<Label, LocationVariable> flags) {
             final Map<Label, Term> result = new LinkedHashMap<>();
-            for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
+            for (Map.Entry<Label, LocationVariable> flag : flags.entrySet()) {
                 result.put(flag.getKey(), termifyVariable(flag.getValue()));
             }
             return result;
@@ -823,7 +823,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param variable a variable.
          * @return a term containing the specified variable.
          */
-        private Term termifyVariable(final ProgramVariable variable) {
+        private Term termifyVariable(final LocationVariable variable) {
             if (variable != null) {
                 return services.getTermBuilder().var(variable);
             } else {
@@ -905,7 +905,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @return a conversion of this object to {@code OriginalVariables}.
          */
         public OriginalVariables toOrigVars() {
-            Map<LocationVariable, ProgramVariable> atPreVars =
+            Map<LocationVariable, LocationVariable> atPreVars =
                 new LinkedHashMap<>();
             for (LocationVariable h : remembranceLocalVariables.keySet()) {
                 atPreVars.put(h, remembranceLocalVariables.get(h));
@@ -985,17 +985,17 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * @see Variables#breakFlags
          */
-        private Map<Label, ProgramVariable> breakFlags;
+        private Map<Label, LocationVariable> breakFlags;
 
         /**
          * @see Variables#continueFlags
          */
-        private Map<Label, ProgramVariable> continueFlags;
+        private Map<Label, LocationVariable> continueFlags;
 
         /**
          * @see Variables#returnFlag
          */
-        private ProgramVariable returnFlag;
+        private LocationVariable returnFlag;
 
         /**
          * Constructor.
@@ -1075,9 +1075,9 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param baseName the base name for the flags.
          * @return
          */
-        private Map<Label, ProgramVariable> createFlags(final Set<Label> labels,
+        private Map<Label, LocationVariable> createFlags(final Set<Label> labels,
                 final String baseName) {
-            final Map<Label, ProgramVariable> result = new LinkedHashMap<>();
+            final Map<Label, LocationVariable> result = new LinkedHashMap<>();
             for (Label label : labels) {
                 final String suffix = label == null ? "" : FLAG_INFIX + label;
                 result.put(label, createFlag(baseName + suffix));
@@ -1090,7 +1090,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param name a name.
          * @return a boolean variable with the specified name.
          */
-        private ProgramVariable createFlag(final String name) {
+        private LocationVariable createFlag(final String name) {
             return createVariable(name, services.getJavaInfo().getKeYJavaType("boolean"));
         }
 
@@ -1125,7 +1125,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @see Variables#remembranceLocalVariables
          */
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
-            ImmutableSet<ProgramVariable> localOutVariables =
+            ImmutableSet<LocationVariable> localOutVariables =
                 MiscTools.getLocalOuts(statement, services);
 
             SourceElement first;
@@ -1180,7 +1180,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @see Variables#outerRemembranceVariables
          */
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
-            ImmutableSet<ProgramVariable> localInVariables =
+            ImmutableSet<LocationVariable> localInVariables =
                 MiscTools.getLocalIns(statement, services);
 
             SourceElement first;
@@ -1212,8 +1212,8 @@ public interface AuxiliaryContract extends SpecificationElement {
             Map<LocationVariable, LocationVariable> result =
                 new LinkedHashMap<>();
 
-            for (ProgramVariable var : localInVariables) {
-                result.put((LocationVariable) var,
+            for (LocationVariable var : localInVariables) {
+                result.put(var,
                     createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
             }
             return result;
@@ -1364,10 +1364,10 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param tb a term builder.
          * @return a map with all values termified.
          */
-        private static Map<Label, Term> convertFlagMap(Map<Label, ProgramVariable> map,
+        private static Map<Label, Term> convertFlagMap(Map<Label, LocationVariable> map,
                 TermBuilder tb) {
             return map.entrySet().stream().collect(
-                Collectors.<Map.Entry<Label, ProgramVariable>, Label, Term>toMap(Map.Entry::getKey,
+                Collectors.<Map.Entry<Label, LocationVariable>, Label, Term>toMap(Map.Entry::getKey,
                     entry -> tb.var(entry.getValue())));
         }
     }

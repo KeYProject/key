@@ -1,10 +1,9 @@
 // position: 12/20
 // verbose: true
 // broken: true
-// exceptionClass: XXXX
-// msgContains: XXXX
+// noException: false
 
-// currently does not report an exception
+// Originally, the problem was: currently does not report an exception
 
 class NamedAccessInContract {
 
