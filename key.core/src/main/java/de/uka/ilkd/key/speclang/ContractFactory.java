@@ -192,7 +192,7 @@ public class ContractFactory {
     }
 
     public DependencyContract dep(KeYJavaType kjt, LocationVariable targetHeap,
-                                  TranslatedDependencyContract dep, LocationVariable selfVar) {
+            TranslatedDependencyContract dep, LocationVariable selfVar) {
         final ImmutableList<LocationVariable> paramVars = tb.paramVars(dep.first(), false);
         assert (selfVar == null) == dep.first().isStatic();
         Map<LocationVariable, Term> pres = new LinkedHashMap<>();
