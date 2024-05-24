@@ -13,6 +13,8 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author christoph scheben
@@ -30,7 +32,8 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, final ProverTaskListener listener)
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+            final ProverTaskListener listener)
             throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {

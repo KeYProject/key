@@ -15,29 +15,45 @@
 		<!-- Create the build directory structure used by compile -->
 		<mkdir dir="${build}"/>
 
-		<get dest="${lib}" retries="5">
+		<get dest="${lib}" retries="5" skipexisting="true">
 			<url url="https://repo1.maven.org/maven2/org/objenesis/objenesis/3.3/objenesis-3.3.jar"/>
 			<url url="https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar"/>
+			<url url="https://repo1.maven.org/maven2/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar"/>
 		</get>
 	</target>
 
 	<target name="compile" depends="init"
 	        description="compile the source">
 		<!-- Compile the Java code from ${src} into ${build} -->
-		<javac srcdir="${src}" destdir="${build}" >
+		<javac srcdir="${src}" destdir="${build}">
 			<src path="${src}"/>
 			<src path="${test}"/>
 
 			<classpath>
-				<pathelement path="${lib}"/>
+				<pathelement location="${build}"/>
+				<pathelement path="lib/junit-4.13.2.jar"/>
+				<pathelement path="lib/objenesis-3.3.jar"/>
+				<pathelement path="lib/hamcrest-2.2.jar"/>
 			</classpath>
 		</javac>
 	</target>
 
 	<target name="run" depends="compile">
-		<java>
+		<junit>
+			<classpath>
+				<pathelement location="${build}"/>
+				<pathelement path="lib/junit-4.13.2.jar"/>
+				<pathelement path="lib/objenesis-3.3.jar"/>
+				<pathelement path="lib/hamcrest-2.2.jar"/>
+			</classpath>
+			<batchtest>
+				<fileset dir="${test}">
+					<include name="**/**"/>
+				</fileset>
+			</batchtest>
+			<formatter type="brief" usefile="false"/>
+		</junit>
 
-		</java>
 	</target>
 
 	<target name="clean"
