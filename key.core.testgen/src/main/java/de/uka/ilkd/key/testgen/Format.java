@@ -4,5 +4,5 @@
 package de.uka.ilkd.key.testgen;
 
 public enum Format {
-    JUnit4, JUnit5
+    JUNIT_4, JUNIT_5
 }

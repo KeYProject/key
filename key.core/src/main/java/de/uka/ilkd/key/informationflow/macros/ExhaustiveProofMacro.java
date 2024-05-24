@@ -25,6 +25,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply
  * the macro given by {@link #getProofMacro()} directly, or --if not directly applicable-- search on

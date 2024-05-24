@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.testgen.template.Constants.*;
+import static de.uka.ilkd.key.testgen.Constants.*;
 
 public class OracleGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(OracleGenerator.class);
@@ -48,7 +48,6 @@ public class OracleGenerator {
     private final List<OracleVariable> quantifiedVariables = new ArrayList<>();
 
     private Set<String> truePredicates = new TreeSet<>();
-
     private Set<String> falsePredicates = new TreeSet<>();
 
     private final Set<String> prestateTerms = new TreeSet<>();

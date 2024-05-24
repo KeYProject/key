@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.smt.model.Model;
 import org.jspecify.annotations.Nullable;
 

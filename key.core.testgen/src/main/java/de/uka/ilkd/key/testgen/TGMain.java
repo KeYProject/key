@@ -3,14 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
+
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
+import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -34,19 +43,20 @@ public class TGMain implements Callable<Integer> {
     @CommandLine.Parameters(description = "KeY or Java file.", arity = "1..*")
     private List<File> files = new LinkedList<>();
 
+    @CommandLine.Parameters(description = "Number of parallel jobs", defaultValue = "4")
+    private int numberOfThreads = 4;
+
     @CommandLine.Option(names = {"-s", "--symbex"},
-            description = "apply symbex", negatable = true)
+        description = "apply symbolic execution", negatable = true)
     private boolean symbex;
 
-    @CommandLine.Option(names = {"-c", "--contract"},
-            arity = "*",
-            description = "name of the contract to be loaded in the Java environment")
+    @CommandLine.Option(names = { "-c", "--contract" }, arity = "*",
+        description = "name of the contract to be loaded in the Java environment. Can be a regular expression")
     private List<String> contractNames = new ArrayList<>();
 
     @CommandLine.Option(names = {"--all-contracts"},
-            description = "name of the contract to be loaded in the Java environment")
+        description = "test case generation for all contracts")
     private boolean allContracts = false;
-
 
     @CommandLine.Option(names = {"-o", "--output"}, description = "Output folder")
     private File outputFolder = new File("out");
@@ -54,14 +64,21 @@ public class TGMain implements Callable<Integer> {
     @CommandLine.Option(names = {"-r", "--rfl"}, description = "Use Reflection class", negatable = true)
     private boolean useReflection = false;
 
-    @CommandLine.Option(names = {"-f", "--format"}, description = "Use Reflection class")
-    private Format format = Format.JUnit4;
+    @CommandLine.Option(names = { "-f", "--format" },
+        description = "use Reflection class for instantiation")
+    private Format format = Format.JUNIT_4;
 
-
-    @CommandLine.Option(names = {"--max-unwinds"}, description = "max unwinds")
+    @CommandLine.Option(names = { "--max-unwinds" }, description = "max unwinds of loops")
     private int maxUnwinds = 10;
+
     @CommandLine.Option(names = {"--dups"}, description = "remove duplicates", negatable = true)
     private boolean removeDuplicates;
+
+    @CommandLine.Option(names = { "--only-tests" },
+        description = "only put test classes directly in the output folder, no build file, no copy of sources",
+        negatable = true)
+    private boolean onlyTestClasses;
+
 
     @Override
     public Integer call() throws Exception {
@@ -73,13 +90,27 @@ public class TGMain implements Callable<Integer> {
         }
 
         var settings = new TestGenerationSettings();
-        TestGenerationLogger log = new SysoutTestGenerationLogger();
+        TestGenerationLifecycleListener log = new SysoutTestGenerationLifecycleListener();
         settings.setOutputPath(outputFolder.getAbsolutePath());
-        settings.setRFL(useReflection);
+        settings.setUseRFL(useReflection);
         settings.setFormat(format);
         settings.setApplySymbolicExecution(symbex);
         settings.setMaxUnwinds(maxUnwinds);
         settings.setRemoveDuplicates(removeDuplicates);
+        settings.setOnlyTestClasses(onlyTestClasses);
+
+        var contractNameMatcher = Pattern.compile(String.join("|", contractNames))
+                .asMatchPredicate();
+
+        if (allContracts) {
+            LOGGER.info("I accept every contract given by `--all-contracts`");
+        } else if (contractNames.isEmpty()) {
+            LOGGER.info(
+                "Only printing the contracts. You need to give contracts with `-c` or use `--all-contracts`.");
+        } else {
+            LOGGER.info("Regex matching against contract names is: {}", contractNameMatcher);
+        }
+
 
         for (File file : files) {
             List<Proof> proofs = new LinkedList<>();
@@ -93,9 +124,7 @@ public class TGMain implements Callable<Integer> {
                     final var name = contract.getName();
                     if (print) {
                         LOGGER.info("Contract found: {}", name);
-                    }
-
-                    if (allContracts || contractNames.contains(name)) {
+                    } else if (allContracts || contractNameMatcher.test(name)) {
                         proofs.add(api.startProof(contract).getProof());
                     }
                 }
@@ -103,29 +132,47 @@ public class TGMain implements Callable<Integer> {
                 proofs = List.of(proof);
             }
 
-            for (Proof p : proofs) {
-                TestgenFacade.generateTestcases(env, p, settings, log);
-                p.dispose();
-            }
+            LOGGER.info("Number of proof found: {}", proofs.size());
 
-            env.dispose();
+            var exec = Executors.newFixedThreadPool(numberOfThreads);
+            try {
+                LOGGER.info("Start processing with {} threads", numberOfThreads);
+                var tasks = proofs.stream().map(
+                    p -> TestgenFacade.generateTestcasesTask(env, p, settings, log)).toList();
+                var futures = tasks.stream().map(exec::submit).toList();
+                for (Future<?> future : futures) {
+                    future.wait();
+                }
+            } finally {
+                proofs.forEach(Proof::dispose);
+                env.dispose();
+            }
         }
         return 0;
     }
+}
 
-    private static class SysoutTestGenerationLogger implements TestGenerationLogger {
-        @Override
-        public void writeln(String message) {
-            LOGGER.info(message);
-        }
 
-        @Override
-        public void writeException(Throwable throwable) {
-            LOGGER.error("Error occurred!", throwable);
-        }
+class SysoutTestGenerationLifecycleListener implements TestGenerationLifecycleListener {
+    private final static Logger LOGGER = LoggerFactory.getLogger("main");
 
-        @Override
-        public void close() {
-        }
+    @Override
+        public void writeln(@Nullable String message) {
+            if(message!=null){ LOGGER.info(message);}
+    }
+
+    @Override
+    public void writeException(Object sender, Throwable throwable) {
+        LOGGER.error("Error occurred!", throwable);
+    }
+
+    @Override
+    public void finish(Object sender) {
+
+    }
+
+    @Override
+    public void phase(Object sender, TGPhase phase) {
+
     }
 }

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+import java.util.Objects;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
@@ -24,12 +27,13 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
+
+import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Objects;
-import java.util.Set;
 
 public record ProofInfo(Proof proof, Services services) {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);

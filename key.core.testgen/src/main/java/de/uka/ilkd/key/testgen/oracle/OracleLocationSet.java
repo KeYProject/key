@@ -7,7 +7,10 @@ import static de.uka.ilkd.key.testgen.oracle.OracleLocationSets.ALL_LOCS;
 import static de.uka.ilkd.key.testgen.oracle.OracleLocationSets.EMPTY;
 
 public sealed
-interface OracleLocationSet permits AllLocsLocationSet, EmptyOracleLocationSet, OracleDefaultLocationSet {
+
+interface OracleLocationSet
+permits AllLocsLocationSet, EmptyOracleLocationSet, OracleDefaultLocationSet
+{
 
     static OracleLocationSet singleton(OracleLocation loc) {
         var result = new OracleDefaultLocationSet();

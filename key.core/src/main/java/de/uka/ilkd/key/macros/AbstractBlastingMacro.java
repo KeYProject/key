@@ -46,6 +46,8 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {

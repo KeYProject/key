@@ -9,7 +9,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.testgen.Format;
-import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.TestGenerationSettings;
 
 public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = -2170118134719823425L;
@@ -130,7 +130,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
 
     private JCheckBox getRFLSelectionPanel() {
         return addCheckBox("Use reflection framework", INFO_RFL_SELECTION, false, val -> {
-            settings.setRFL(val);
+            settings.setUseRFL(val);
         });
     }
 
@@ -163,10 +163,10 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
         settings = new TestGenerationSettings(TestGenerationSettings.getInstance());
         includePostCondition.setSelected(settings.includePostCondition());
         invariantForAll.setSelected(settings.invariantForAll());
-        useJUnit.setSelectedItem(settings.useJunit());
+        useJUnit.setSelectedItem(settings.getFormat());
         symbolicEx.setSelected(settings.getApplySymbolicExecution());
         removeDuplicates.setSelected(settings.removeDuplicates());
-        checkboxRFL.setSelected(settings.useRFL());
+        checkboxRFL.setSelected(settings.isUseRFL());
         //objenesisPanel.setText(settings.getObjenesisPath());
         //openJMLPanel.setText(settings.getOpenjmlPath());
         saveToFilePanel.setText(settings.getOutputFolderPath());

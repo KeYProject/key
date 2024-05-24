@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -17,8 +22,8 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
-import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
+import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
@@ -26,6 +31,15 @@ import java.util.Collection;
 import java.util.List;
 
 public record TestgenFacade(TestGenerationSettings settings) {
+    public static Callable<Boolean> generateTestcasesTask(KeYEnvironment<?> env, Proof proof,
+                                                          TestGenerationSettings settings,
+                                                          TestGenerationLifecycleListener log) {
+        return () -> {
+            generateTestcases(env, proof, settings, log);
+            return true;
+        };
+    }
+
     /**
      * @param env
      * @param proof
@@ -35,8 +49,10 @@ public record TestgenFacade(TestGenerationSettings settings) {
      */
     public static void generateTestcases(KeYEnvironment<?> env, Proof proof,
                                          TestGenerationSettings settings,
-                                         @Nullable TestGenerationLogger log) throws InterruptedException {
-        final TestCaseGenerator tg = new TestCaseGenerator(proof, settings, log);
+                                         TestGenerationLifecycleListener log) throws InterruptedException {
+        final TGReporter reporter = new TGReporter(log);
+
+        final TestCaseGenerator tg = new TestCaseGenerator(proof, settings, reporter);
 
         NewSMTTranslationSettings newSettings = new NewSMTTranslationSettings();
         ProofDependentSMTSettings pdSettings = ProofDependentSMTSettings.getDefaultSettingsData();
@@ -52,18 +68,18 @@ public record TestgenFacade(TestGenerationSettings settings) {
                                         Collection<SMTSolver> finishedSolvers) {
                 try {
                     var first = finishedSolvers.iterator().next();
-                    if(first.getException()!=null) {
+                    if (first.getException() != null) {
                         throw new RuntimeException("Exception during SMT", first.getException());
                     }
 
                     tg.generateJUnitTestSuite(finishedSolvers);
                     if (tg.isJunit()) {
-                        log.writeln("Compile the generated files using a Java compiler.");
+                        reporter.writeln("Compile the generated files using a Java compiler.");
                     } else {
-                        log.writeln("Compile and run the file with openjml!");
+                        reporter.writeln("Compile and run the file with openjml!");
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    reporter.reportException(e);
                 }
             }
 
@@ -79,5 +95,8 @@ public record TestgenFacade(TestGenerationSettings settings) {
         macro.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, ptl);
         final Collection<SMTProblem> problems = SMTProblem.createSMTProblems(proof);
         launcher.launch(solvers, problems, proof.getServices());
+
+        reporter.phase(TGPhase.FINISHED);
+        reporter.finish();
     }
 }

@@ -10,7 +10,9 @@ import javax.swing.text.DefaultCaret;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
+import de.uka.ilkd.key.testgen.TGReporter;
+import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.slf4j.Logger;
@@ -65,21 +67,26 @@ public class TGInfoDialog extends JDialog {
         }
     };
 
-    private final TestGenerationLogger logger = new TestGenerationLogger() {
+    private final TestGenerationLifecycleListener logger = new TestGenerationLifecycleListener() {
         @Override
-        public void writeln(String message) {
+        public void writeln(Object sender, String message) {
             ThreadUtilities.invokeOnEventQueue(() -> textArea.append(message + "\n"));
         }
 
         @Override
-        public void writeException(Throwable throwable) {
+        public void writeException(Object sender, Throwable throwable) {
             LOGGER.warn("Exception", throwable);
             ThreadUtilities
                     .invokeOnEventQueue(() -> textArea.append("Error: " + throwable.getMessage()));
         }
 
         @Override
-        public void close() {
+        public void phase(Object sender, TGPhase phase) {
+
+        }
+
+        @Override
+        public void finish(Object sender) {
             ThreadUtilities.invokeOnEventQueue(() -> exitButton.setEnabled(true));
         }
     };
@@ -130,7 +137,7 @@ public class TGInfoDialog extends JDialog {
         return actionStart;
     }
 
-    public TestGenerationLogger getLogger() {
-        return logger;
+    public TGReporter getLogger() {
+        return new TGReporter(logger);
     }
 }

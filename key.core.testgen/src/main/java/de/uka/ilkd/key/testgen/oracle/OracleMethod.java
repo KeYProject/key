@@ -13,7 +13,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.testgen.template.Constants.TAB;
+import static de.uka.ilkd.key.testgen.Constants.TAB;
 
 public class OracleMethod {
 
