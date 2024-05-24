@@ -7,14 +7,14 @@ import org.key_project.llmsynth.prompts.PromptBuilder;
 import java.util.function.Supplier;
 
 public class UnknownReason extends LegacyReasons {
-    private ProblemLoaderException exception;
+    private Exception exception;
 
-    public UnknownReason(ProblemLoaderException failureException) {
+    public UnknownReason(Exception failureException) {
         super();
         this.exception = failureException;
     }
 
-    public ProblemLoaderException getException() {
+    public Exception getException() {
         return exception;
     }
 

@@ -45,12 +45,12 @@ public class LegacyVerificator {
         }
     }
 
-    private Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, ProblemLoaderException> getKeyCheckResult(String jml_text, Gpt3Prompt.FailureReason err_so_far) {
+    private Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, Exception> getKeyCheckResult(String jml_text, Gpt3Prompt.FailureReason err_so_far) {
         // key_result = tryKeyValidation(classLines, methodName, possible_jml_text.x, specInvariant, tmpFile, possible_jml_text.y);
         try (AutoClose<ExecutorService> executor = new AutoClose<>(Executors.newSingleThreadExecutor(), ExecutorService::shutdown)) {
             int timeout = 100; // todo: this is parameterized by the benchmark
             TimeUnit timeUnit = TimeUnit.SECONDS;
-            Future<Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, ProblemLoaderException>> fut = executor.val.submit(
+            Future<Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, Exception>> fut = executor.val.submit(
                     () -> Gpt3Prompt.tryKeyValidation(classLines, methodName, subfun, jml_text, specInvariant, tmpFile, err_so_far));
             try {
                 var kr = fut.get(timeout, timeUnit);
@@ -78,7 +78,7 @@ public class LegacyVerificator {
 
         // Perform the validation
         Gpt3Prompt.FailureReason failureReason;
-        ProblemLoaderException failureException;
+        Exception failureException;
         boolean keyVerifiedSuccessfully;
 
         if (possible_jml_text.x == null) {
@@ -88,7 +88,7 @@ public class LegacyVerificator {
         } else {
             String found_jml = possible_jml_text.x;
             Gpt3Prompt.FailureReason err_so_far = possible_jml_text.y;
-            Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, ProblemLoaderException> key_result =
+            Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, Exception> key_result =
                     getKeyCheckResult(found_jml, err_so_far);
             keyVerifiedSuccessfully = key_result.x;
             failureReason = key_result.y;

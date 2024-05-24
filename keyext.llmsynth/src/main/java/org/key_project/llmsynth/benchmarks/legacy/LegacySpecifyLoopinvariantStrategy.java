@@ -43,8 +43,7 @@ public class LegacySpecifyLoopinvariantStrategy implements IPromptStrategy<Legac
 
         if (reason.getException() != null) {
             b.textln("This might describe the reason:")
-                    .textln(reason.getException().getMessage())
-                    .newln();
+                    .textln(reason.getException().getMessage());
         }
         b.textln("Please use this to fix the following:").textln(reason.getJml());
         return List.of(b.build());

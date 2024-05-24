@@ -7,16 +7,16 @@ import org.key_project.llmsynth.prompts.PromptBuilder;
 import java.util.function.Supplier;
 
 public class WrongJML extends LegacyReasons {
-    private ProblemLoaderException exception;
+    private Exception exception;
     private String jml;
 
-    public WrongJML(String jml, ProblemLoaderException failureException) {
+    public WrongJML(String jml, Exception failureException) {
         super();
         this.jml = jml;
         this.exception = failureException;
     }
 
-    public ProblemLoaderException getException() {
+    public Exception getException() {
         return exception;
     }
 

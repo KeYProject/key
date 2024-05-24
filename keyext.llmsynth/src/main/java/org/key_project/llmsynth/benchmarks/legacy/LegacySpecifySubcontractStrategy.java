@@ -50,8 +50,7 @@ public class LegacySpecifySubcontractStrategy implements IPromptStrategy<LegacyR
 
         if (reason.getException() != null) {
             b.textln("This might describe the reason:")
-                    .textln(reason.getException().getMessage())
-                    .newln();
+                    .textln(reason.getException().getMessage());
         }
         b.textln("Please use this to fix the following:").textln(reason.getJml());
         return List.of(b.build());
@@ -76,9 +75,9 @@ public class LegacySpecifySubcontractStrategy implements IPromptStrategy<LegacyR
         b.textln("Given the following Java class:");
         b.classTextInQuotes(clazz);
         b.text("Please provide a JML annotation to the method '")
-                .text(submethod.getName())
-                .textln("' such that the contract specified by '")
-                .textln(method.getName())
+                .text(submethod.getName().trim())
+                .text("' such that the contract specified by '")
+                .text(method.getName().trim())
                 .textln("' is satisfied.");
         return List.of(b.build());
     }

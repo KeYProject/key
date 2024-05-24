@@ -308,7 +308,7 @@ public class Gpt3Prompt {
         }
     }
 
-    public static Triple<Boolean, FailureReason, ProblemLoaderException> tryKeyValidation(List<String> classLines, String methodName, String subfun, String jmlText, boolean isInvariant, Path tmpfile, FailureReason errSoFar) {
+    public static Triple<Boolean, FailureReason, Exception> tryKeyValidation(List<String> classLines, String methodName, String subfun, String jmlText, boolean isInvariant, Path tmpfile, FailureReason errSoFar) {
         if (errSoFar != FailureReason.NONE)
             return new Triple<>(false, errSoFar, null); // todo: this is hacky, but an easy way to short-circuit for now
 
@@ -378,9 +378,10 @@ public class Gpt3Prompt {
         }
     }
 
-    private static Triple<Boolean, FailureReason, ProblemLoaderException> checkContract(KeYEnvironment<?> env, Contract relevantContract, ImmutableList<ProgramVariable> projectionVariables) {
+    private static Triple<Boolean, FailureReason, Exception> checkContract(KeYEnvironment<?> env, Contract relevantContract, ImmutableList<ProgramVariable> projectionVariables) {
         List<UnclosedProof> unclosedProofs = Utility.tryClosingProofsAndListUnclosed(env, List.of(relevantContract), false, projectionVariables);
         if (unclosedProofs.isEmpty()) {
+            status("SUCCESS: No open proof found.");
             return new Triple<>(true, FailureReason.NONE, null);
         } else {
 
@@ -390,12 +391,16 @@ public class Gpt3Prompt {
 
             // For now, we just take the first open goal. Could be improved in the future (e.g.
             // scan through all open goals and prefer "Invariant Initially Valid" as feedback).
-            Goal g = p.openGoals().head();
-            String pathInfo = collectPathInformation(g.node());
+            status("FAILURE: Open proof found: ");
+            List<String> openGoalsInfo = new LinkedList<>();
+            for (Goal g: p.openGoals()) {
+                String pathInfo = collectPathInformation(g.node());
+                openGoalsInfo.add(pathInfo);
+                status("Open Goal: " + pathInfo);
+            }
 
-            // TODO: do something with path information string
 
-            return new Triple<>(false, FailureReason.WRONG_JML, null);
+            return new Triple<>(false, FailureReason.WRONG_JML, new VerificationException(openGoalsInfo));
         }
     }
 
@@ -601,5 +606,23 @@ public class Gpt3Prompt {
                 throw new RuntimeException("There is no useful response for a fatal error problem");
         }
         return "";
+    }
+}
+
+class VerificationException extends Exception {
+    private List<String> problem_paths;
+    public VerificationException(List<String> problem_paths) {
+        super();
+        this.problem_paths = problem_paths;
+    }
+
+    @Override
+    public String toString() {
+        return "During verification, the following proof branches could not be closed:\n" + String.join("\n", problem_paths);
+    }
+
+    @Override
+    public String getMessage() {
+        return toString();
     }
 }
