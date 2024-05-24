@@ -679,12 +679,14 @@ public abstract class AbstractProblemLoader {
     }
 
     public @Nullable ProofScriptEntry readProofScript() throws ProofInputException {
-        assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
         return kupf.readProofScript();
     }
 
     public @Nullable ProofScriptEntry getProofScript() throws ProblemLoaderException {
+        if (!hasProofScript()) {
+            return null;
+        }
         try {
             return readProofScript();
         } catch (ProofInputException e) {
