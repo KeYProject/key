@@ -18,6 +18,8 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros which sequentially
  * apply macros one after the other. This works only for macros which use
