@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
@@ -95,7 +96,8 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
                 || !super.equalsModProofIrrelevancy(obj)) {
             return false;
         }
-        return replacewith.equalsModProofIrrelevancy(other.replacewith);
+        return replacewith.equalsModProperty(other.replacewith,
+            ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY);
     }
 
     @Override
