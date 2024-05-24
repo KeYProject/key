@@ -6,6 +6,9 @@ import com.theokanning.openai.completion.chat.*;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
@@ -377,13 +380,62 @@ public class Gpt3Prompt {
 
     private static Triple<Boolean, FailureReason, ProblemLoaderException> checkContract(KeYEnvironment<?> env, Contract relevantContract, ImmutableList<ProgramVariable> projectionVariables) {
         List<UnclosedProof> unclosedProofs = Utility.tryClosingProofsAndListUnclosed(env, List.of(relevantContract), false, projectionVariables);
-        if (unclosedProofs.size() == 0) {
+        if (unclosedProofs.isEmpty()) {
             return new Triple<>(true, FailureReason.NONE, null);
         } else {
+
+            // Some very simple idea to extract information about the open proof from KeY:
+            var open = unclosedProofs.get(0);
+            Proof p = open.proof;
+
+            // For now, we just take the first open goal. Could be improved in the future (e.g.
+            // scan through all open goals and prefer "Invariant Initially Valid" as feedback).
+            Goal g = p.openGoals().head();
+            String pathInfo = collectPathInformation(g.node());
+
+            // TODO: do something with path information string
+
             return new Triple<>(false, FailureReason.WRONG_JML, null);
         }
     }
 
+    // Taken from class SourceView in KeY GUI
+    /**
+     * Collects the information from the tree to which branch the current node belongs:
+     * <ul>
+     * <li>Invariant Initially Valid</li>
+     * <li>Body Preserves Invariant</li>
+     * <li>Use Case</li>
+     * <li>...</li>
+     * </ul>
+     *
+     * @param node the current node
+     * @return a String containing the path information to display
+     */
+    private static String collectPathInformation(Node node) {
+        while (node != null) {
+            if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
+                String label = node.getNodeInfo().getBranchLabel();
+                /*
+                 * Are there other interesting labels? Please feel free to add them here.
+                 */
+                if (label.equals("Invariant Initially Valid")
+                    || label.equals("Invariant Preserved and Used") // for loop scope invariant
+                    || label.equals("Body Preserves Invariant") || label.equals("Use Case")
+                    || label.equals("Show Axiom Satisfiability") || label.startsWith("Pre (")
+                    || label.startsWith("Exceptional Post (") // exceptional postcondition
+                    || label.startsWith("Post (") // postcondition of a method
+                    || label.contains("Normal Execution") || label.contains("Null Reference")
+                    || label.contains("Index Out of Bounds") || label.contains("Validity")
+                    || label.contains("Precondition") || label.contains("Usage")) {
+                    return label;
+                }
+            }
+            node = node.parent();
+        }
+        // if no label was found we have to prove the postcondition
+        return "Show Postcondition/Assignable";
+    }
 
     public static boolean specifyFunction(
             String token,
