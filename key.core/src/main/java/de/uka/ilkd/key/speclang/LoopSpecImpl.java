@@ -267,7 +267,12 @@ public final class LoopSpecImpl implements LoopSpecification {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return or.replace(originalFreeModifies.get(heap));
+        final Term originalFreeModForHeap = originalFreeModifies.get(heap);
+        if (originalFreeModForHeap != null) {
+            return or.replace(originalFreeModForHeap);
+        } else {
+            return services.getTermBuilder().strictlyNothing();
+        }
     }
 
     @Override
