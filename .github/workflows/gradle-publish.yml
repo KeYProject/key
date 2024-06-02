@@ -22,14 +22,14 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
 
     - name: Assemble with Gradle
-      uses: gradle/gradle-build-action@v3
+      uses: gradle/gradle-build-action@v3.3.2
       with:
         arguments: assemble
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
     - name: Publish to GitHub Packages
-      uses: gradle/gradle-build-action@v3
+      uses: gradle/gradle-build-action@v3.3.2
       with:
         arguments: publish
       env:
