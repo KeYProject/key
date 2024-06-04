@@ -871,7 +871,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Operator originalSelfVar, ImmutableList<? extends SVSubstitute> originalParamVars,
             LocationVariable originalExcVar, boolean hasMby, Term originalMby,
             Map<LocationVariable, Term> originalModifiables,
-            Map<LocationVariable, Boolean> hasRealModifiables, Term globalDefs,
+            Map<LocationVariable, Boolean> hasRealModifiable, Term globalDefs,
             Map<LocationVariable, Term> originalPres, Map<LocationVariable, Term> originalFreePres,
             Map<LocationVariable, Term> originalPosts,
             Map<LocationVariable, Term> originalFreePosts,
