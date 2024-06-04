@@ -228,9 +228,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFrameClause(List<LocationVariable> modifiableHeaps, Map<Term, Term> heapToAtPre,
-            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-            Services services) {
+    protected Term buildFrameClause(List<LocationVariable> modifiableHeaps,
+            Map<Term, Term> heapToAtPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         Term frameTerm = null;
         for (LocationVariable heap : modifiableHeaps) {
             final Term ft;

@@ -696,10 +696,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The {@link Services} to use.
      * @return The {@link Term} representing the postcondition.
      */
-    protected abstract Term getPost(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
-            Services services);
+    protected abstract Term getPost(List<LocationVariable> modifiableHeaps,
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            LocationVariable resultVar, LocationVariable exceptionVar,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     protected abstract Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services);
