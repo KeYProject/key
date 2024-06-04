@@ -352,7 +352,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitCreateLocset(JmlParser.CreateLocsetContext ctx) {
-        return termFactory.createLocSet(requireNonNull(accept(ctx.exprList())));
+        JmlParser.ExprListContext exprList = ctx.exprList();
+        if (exprList == null) {
+            return termFactory.createLocSet(ImmutableSLList.nil());
+        } else {
+            return termFactory.createLocSet(requireNonNull(accept(exprList)));
+        }
     }
 
 
@@ -1619,8 +1624,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public SLExpression visitSequenceCreate(JmlParser.SequenceCreateContext ctx) {
         ImmutableList<SLExpression> list = accept(ctx.exprList());
-        assert list != null;
-        return termFactory.seqConst(list);
+        if (list == null) {
+            return new SLExpression(tb.seqEmpty());
+        } else {
+            return termFactory.seqConst(list);
+        }
     }
 
     @Override
