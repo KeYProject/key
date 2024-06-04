@@ -5,9 +5,9 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 
 @Deprecated

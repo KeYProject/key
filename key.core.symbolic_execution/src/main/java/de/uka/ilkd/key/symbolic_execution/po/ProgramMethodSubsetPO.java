@@ -224,10 +224,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
-        ImmutableList<ProgramVariable> paramVarsList =
+        ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.getPre(modHeaps, selfVar, paramVarsList, atPreVars, services);
     }
@@ -236,10 +236,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFreePre(ProgramVariable selfVar, KeYJavaType selfKJT,
-            ImmutableList<ProgramVariable> paramVars, List<LocationVariable> heaps,
+    protected Term buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
+            ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
             Services proofServices) {
-        ImmutableList<ProgramVariable> paramVarsList =
+        ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices);
     }
@@ -248,10 +248,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
-            ImmutableList<LocationVariable> formalParamVars, ProgramVariable exceptionVar,
+    protected Term ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
+            ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
             String name, Services proofServices) {
-        ImmutableList<ProgramVariable> paramVarsList =
+        ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.ensureUninterpretedPredicateExists(paramVarsList, formalParamVars,
             exceptionVar, name, proofServices);
@@ -263,8 +263,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @param c The {@link Collection} to convert.
      * @return The created {@link ImmutableList}.
      */
-    protected static ImmutableList<ProgramVariable> convert(Collection<LocationVariable> c) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+    protected static ImmutableList<LocationVariable> convert(Collection<LocationVariable> c) {
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         for (LocationVariable var : c) {
             result = result.append(var);
         }
