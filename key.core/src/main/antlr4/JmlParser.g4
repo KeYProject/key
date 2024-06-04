@@ -347,7 +347,7 @@ jmlprimary
   | VALUES                                                                            #primaryValues
   | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
   | EMPTYSET                                                                          #primaryEmptySet
-  | (LOCSET|STOREREF) LPAREN storeRefUnion RPAREN                                     #primaryStoreRef
+  | (LOCSET|STOREREF) LPAREN storeRefUnion? RPAREN                                    #primaryStoreRef
   | SINGLETON LPAREN expression RPAREN                                                #primaryCreateLocsetSingleton
   | UNION LPAREN storeRefUnion RPAREN                                                 #primaryUnion
   | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
