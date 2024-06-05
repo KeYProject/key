@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'antlr'
+}
+
+group = 'org.key_project'
+version = '2.13.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    antlr 'org.antlr:antlr4:4.13.1'
+}
+
+test {
+    useJUnitPlatform()
+}
