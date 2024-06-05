@@ -27,6 +27,7 @@ public class SyntaxElementCursor {
     /**
      * Advance the cursor to the current node's first child if possible.
      * Otherwise, no changes to the state occur.
+     *
      * @return true iff the current node has at least one child.
      */
     public boolean gotoFirstChild() {
@@ -40,6 +41,7 @@ public class SyntaxElementCursor {
     /**
      * Advance the cursor to the current node's next sibling if possible.
      * Otherwise, no changes to the state occur.
+     *
      * @return true iff the current node has at least one sibling not yet visited.
      */
     public boolean gotoNextSibling() {
@@ -60,6 +62,7 @@ public class SyntaxElementCursor {
     /**
      * Advance the cursor to the current node's parent if possible.
      * Otherwise, no changes to the state occur.
+     *
      * @return true iff the current node is not the root.
      */
     public boolean gotoParent() {
@@ -72,8 +75,10 @@ public class SyntaxElementCursor {
     /**
      * Advance cursor to the next node.
      * If the node has children, the cursor advances to the first child.
-     * Otherwise, if the node has unvisited siblings, the cursor advances to the next unvisited sibling.
+     * Otherwise, if the node has unvisited siblings, the cursor advances to the next unvisited
+     * sibling.
      * Otherwise, no changes to the state.
+     *
      * @return true iff the node has children or an unvisited sibling.
      */
     public boolean goToNext() {
