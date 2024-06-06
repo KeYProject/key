@@ -17,17 +17,17 @@ import java.nio.file.Path;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public final class LegacyStrategyProviderFactory {
+public final class LegacyInterfaceFactory {
     public final class SP<TTask extends LLMTask> implements StrategyProvider<TTask, Nothing> {
-        BiFunction<LLMChoice, TTask, IPromptStrategy<PromptReason, Nothing>>  mkstrategy;
+        BiFunction<LLMChoice, TTask, IPromptStrategy<Nothing>>  mkstrategy;
         BiFunction<LLMChoice, TTask, Function<PromptAnswer, PromptResult>> mkverificator;
 
-        public SP(BiFunction<LLMChoice, TTask, IPromptStrategy<PromptReason, Nothing>> mkstrategy, BiFunction<LLMChoice, TTask, Function<PromptAnswer, PromptResult>> mkverificator) {
+        public SP(BiFunction<LLMChoice, TTask, IPromptStrategy<Nothing>> mkstrategy, BiFunction<LLMChoice, TTask, Function<PromptAnswer, PromptResult>> mkverificator) {
             this.mkstrategy = mkstrategy;
             this.mkverificator = mkverificator;
         }
 
-        public IPromptStrategy<PromptReason, Nothing> selectStrategy(LLMChoice oracle, TTask task) {
+        public IPromptStrategy<Nothing> selectStrategy(LLMChoice oracle, TTask task) {
             return mkstrategy.apply(oracle, task);
         }
 
@@ -44,22 +44,22 @@ public final class LegacyStrategyProviderFactory {
     private final StrategyProvider<TaskSpecifySubcontract, Nothing> tss;
     private final StrategyProvider<TaskSpecifyLoopInvariant, Nothing> tsli;
 
-    public LegacyStrategyProviderFactory(Path tmpfile) {
-        tsf = new SP<>(this::specFunctionStrategy, (oracle, task) -> {
+    public LegacyInterfaceFactory(Path tmpfile) {
+        tsf = new SP<TaskSpecifyFunction>(this::specFunctionStrategy, (oracle, task) -> {
             var verificator = new LegacyVerificator(
                     task.classInfo.getClassLines(),
                     task.methodInfo.getName(),
                     false, null, false, tmpfile);
             return verificator::verify;
         });
-        tss = new SP<>(this::specSubcontractStrategy, (oracle, task) -> {
+        tss = new SP<TaskSpecifySubcontract>(this::specSubcontractStrategy, (oracle, task) -> {
             var verificator = new LegacyVerificator(
                     task.classInfo.getClassLines(),
                     task.methodInfo.getName(),
                     false, task.subMethodInfo.getName(), false, tmpfile);
             return verificator::verify;
         });
-        tsli = new SP<>(this::specLoopinvariantStrategy, (oracle, task) -> {
+        tsli = new SP<TaskSpecifyLoopInvariant>(this::specLoopinvariantStrategy, (oracle, task) -> {
             var verificator = new LegacyVerificator(
                     task.classInfo.getClassLines(),
                     task.methodInfo.getName(),
@@ -84,15 +84,15 @@ public final class LegacyStrategyProviderFactory {
         return Nothing.getInstance();
     }
 
-    private IPromptStrategy<PromptReason, Nothing> specFunctionStrategy(LLMChoice oracle, TaskSpecifyFunction task) {
-        return new LegacySpecifyTopLevelStrategy(task.classInfo, task.methodInfo).broaden();
+    private IPromptStrategy<Nothing> specFunctionStrategy(LLMChoice oracle, TaskSpecifyFunction task) {
+        return new LegacySpecifyTopLevelStrategy(task.classInfo, task.methodInfo);
     }
 
-    private IPromptStrategy<PromptReason, Nothing> specSubcontractStrategy(LLMChoice oracle, TaskSpecifySubcontract task) {
-        return new LegacySpecifySubcontractStrategy(task.classInfo, task.methodInfo, task.subMethodInfo).broaden();
+    private IPromptStrategy<Nothing> specSubcontractStrategy(LLMChoice oracle, TaskSpecifySubcontract task) {
+        return new LegacySpecifySubcontractStrategy(task.classInfo, task.methodInfo, task.subMethodInfo);
     }
 
-    private IPromptStrategy<PromptReason, Nothing> specLoopinvariantStrategy(LLMChoice oracle, TaskSpecifyLoopInvariant task) {
-        return new LegacySpecifyLoopinvariantStrategy(task.classInfo, task.methodInfo).broaden();
+    private IPromptStrategy<Nothing> specLoopinvariantStrategy(LLMChoice oracle, TaskSpecifyLoopInvariant task) {
+        return new LegacySpecifyLoopinvariantStrategy(task.classInfo, task.methodInfo);
     }
 }

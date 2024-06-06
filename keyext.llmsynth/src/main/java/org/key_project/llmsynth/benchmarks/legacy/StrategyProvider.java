@@ -6,18 +6,18 @@ import org.key_project.llmsynth.prompts.*;
 
 import java.util.function.Function;
 
-public interface StrategyProvider<TTask extends LLMTask, T> {
+public interface StrategyProvider<TTask extends LLMTask, TData> {
 
-    IPromptStrategy<PromptReason, T> selectStrategy(LLMChoice oracle, TTask task);
+    IPromptStrategy<TData> selectStrategy(LLMChoice oracle, TTask task);
 
-    T createUserData();
+    TData createUserData();
 
     Function<PromptAnswer, PromptResult> createDefaultVerificator(LLMChoice oracle, TTask task);
 
     static <TTask extends LLMTask, T> StrategyProvider<TTask, T> getDefault() {
         return new StrategyProvider<>() {
             @Override
-            public IPromptStrategy<PromptReason, T> selectStrategy(LLMChoice oracle, TTask task) {
+            public IPromptStrategy<T> selectStrategy(LLMChoice oracle, TTask task) {
                 return PromptStrategy.getDefault();
             }
 

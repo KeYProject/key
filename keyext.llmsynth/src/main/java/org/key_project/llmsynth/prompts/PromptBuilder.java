@@ -3,6 +3,7 @@ package org.key_project.llmsynth.prompts;
 import org.key_project.llmsynth.ClassInfo;
 import org.key_project.llmsynth.LineSpan;
 import org.key_project.llmsynth.MethodInfo;
+import org.key_project.llmsynth.prompts.reasons.DirectPrompt;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -18,23 +19,36 @@ public class PromptBuilder
     boolean alreadyBuilt = false;
     String delimiter = DEFAULT_DELIM;
     Function<PromptAnswer, PromptResult> verificator;
+    PromptType promptType = PromptType.USER;
     boolean removeHistory = false;
 
     public void setDelimiter(String delim) {
         delimiter = delim;
     }
 
-    public void setVerificator(Function<PromptAnswer, PromptResult> verificator) {
+    public PromptBuilder setVerificator(Function<PromptAnswer, PromptResult> verificator) {
         this.verificator = verificator;
+        return this;
+    }
+
+    public PromptBuilder skipVerification() {
+        setVerificator(PromptBuilder::autoReject);
+        return this;
     }
 
     public PromptBuilder clone() {
+        PromptBuilder the_clone;
+        try {
+            the_clone = (PromptBuilder) super.clone();
+        } catch (CloneNotSupportedException e) {
+            the_clone = new PromptBuilder();
+        }
 
-        PromptBuilder the_clone = new PromptBuilder();
         the_clone.elements = List.copyOf(elements);
         the_clone.alreadyBuilt = false;
         the_clone.delimiter = this.delimiter;
         the_clone.verificator = this.verificator;
+        the_clone.promptType = this.promptType;
         return the_clone;
     }
 
@@ -96,6 +110,21 @@ public class PromptBuilder
     }
     //endregion
 
+    public PromptBuilder asUserPrompt() {
+        this.promptType = PromptType.USER;
+        return this;
+    }
+
+    public PromptBuilder asAssistantPrompt() {
+        this.promptType = PromptType.ASSISTANT;
+        return this;
+    }
+
+    public PromptBuilder asSystemPrompt() {
+        this.promptType = PromptType.SYSTEM;
+        return this;
+    }
+
     public PromptBuilder withoutHistory() {
         removeHistory = true;
         return this;
@@ -104,7 +133,15 @@ public class PromptBuilder
     public Prompt build() {
         if (alreadyBuilt) throw new IllegalStateException("The prompt builder can only be used once");
         alreadyBuilt = true;
-        return new Prompt(elements, verificator, removeHistory);
+        return new Prompt(elements, verificator, promptType, removeHistory);
         // TODO: make a list chain, so that this can be immutable, too
+    }
+
+    public AnsweredPrompt answerWith(String answer) {
+        return new AnsweredPrompt(build(), answer);
+    }
+
+    private static PromptResult autoReject(PromptAnswer a) {
+        return PromptResult.reject(a, new DirectPrompt());
     }
 }

@@ -10,16 +10,6 @@ import org.key_project.llmsynth.prompts.PromptReason;
 import java.util.*;
 import java.util.stream.Stream;
 
-class MessageBuffer {
-    public ChatMessage prompt;
-    public ChatMessage answer;
-
-    public MessageBuffer(ChatMessage prompt, ChatMessage answer) {
-        this.prompt = prompt;
-        this.answer = answer;
-    }
-}
-
 public class OracleGpt3_5_Turbo {
     public static boolean print_Messages = false;
     OpenAiService service;

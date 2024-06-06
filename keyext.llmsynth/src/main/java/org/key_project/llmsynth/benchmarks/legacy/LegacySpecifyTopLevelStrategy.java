@@ -9,8 +9,8 @@ import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class LegacySpecifyTopLevelStrategy implements IPromptStrategy<LegacyReasons, Nothing>, IBroadableStrategy<LegacyReasons, Nothing>, LegacyVisitor<Nothing> {
-    IPromptStrategy<PromptReason, Nothing> fallback;
+public class LegacySpecifyTopLevelStrategy implements IPromptStrategy<Nothing>, LegacyVisitor<Nothing> {
+    IPromptStrategy<Nothing> fallback;
     MethodInfo method;
     ClassInfo clazz;
 
@@ -19,7 +19,7 @@ public class LegacySpecifyTopLevelStrategy implements IPromptStrategy<LegacyReas
         this.method = method;
         this.fallback = PromptStrategy.getDefault();
     }
-    public LegacySpecifyTopLevelStrategy(ClassInfo clazz, MethodInfo method, IPromptStrategy<PromptReason, Nothing> fallback) {
+    public LegacySpecifyTopLevelStrategy(ClassInfo clazz, MethodInfo method, IPromptStrategy<Nothing> fallback) {
         this.clazz = clazz;
         this.method = method;
         this.fallback = fallback;
@@ -82,20 +82,12 @@ public class LegacySpecifyTopLevelStrategy implements IPromptStrategy<LegacyReas
     //endregion
 
     @Override
-    public Iterable<Prompt> apply(LegacyReasons legacyReasons, Nothing o, Supplier<PromptBuilder> newBuilder) {
-        return legacyReasons.dispatch(this, o, newBuilder);
-    }
-
-    public Iterable<Prompt> broad_apply(PromptReason r, Nothing o, Supplier<PromptBuilder> newBuilder) {
+    public Iterable<Prompt> apply(PromptReason r, Nothing o, Supplier<PromptBuilder> newBuilder) {
         if (r instanceof  LegacyReasons) {
-            return apply((LegacyReasons) r, o, newBuilder);
+            return ((LegacyReasons)r).dispatch(this, o, newBuilder);
         } else {
             return fallback.apply(r, o, newBuilder);
         }
     }
 
-    @Override
-    public IPromptStrategy<PromptReason, Nothing> broaden() {
-        return this::broad_apply;
-    }
 }

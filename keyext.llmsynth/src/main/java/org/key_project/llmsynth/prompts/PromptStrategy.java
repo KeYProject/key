@@ -20,13 +20,13 @@ public final class PromptStrategy
 
     public static final Iterable<Prompt> NO_PROMPTS = () -> empty_iterator; // todo: this seems like it's in the wrong place
 
-    public static <TReason extends PromptReason, TUserData> IPromptStrategy<TReason, TUserData> getDefault() {
+    public static <TReason extends PromptReason, TUserData> IPromptStrategy<TUserData> getDefault() {
         return (reason, data, newBuilder) -> NO_PROMPTS;
     }
 
-    public static <TReason extends PromptReason, TUserData> IPromptStrategy<TReason, TUserData> combine(
-            IPromptStrategy<TReason, TUserData> left,
-            IPromptStrategy<TReason, TUserData> right) {
+    public static <TReason extends PromptReason, TUserData> IPromptStrategy<TUserData> combine(
+            IPromptStrategy<TUserData> left,
+            IPromptStrategy<TUserData> right) {
         return (reason, data, newBuilder) -> {
             var lit = left.apply(reason, data, newBuilder);
             var rit = right.apply(reason, data, newBuilder);
@@ -53,9 +53,9 @@ public final class PromptStrategy
         };
     }
 
-    public static <TReason extends PromptReason, TUserData> IPromptStrategy<TReason,TUserData> registerAlternativeWhenEmpty(
-            IPromptStrategy<TReason,TUserData> defaultStrategy,
-            IPromptStrategy<TReason,TUserData> fallbackStrategy) {
+    public static <TReason extends PromptReason, TUserData> IPromptStrategy<TUserData> registerAlternativeWhenEmpty(
+            IPromptStrategy<TUserData> defaultStrategy,
+            IPromptStrategy<TUserData> fallbackStrategy) {
         return (r, d, b) -> {
             var res = defaultStrategy.apply(r, d, b);
             if (res.iterator().hasNext()) {

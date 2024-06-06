@@ -1,6 +1,6 @@
 package org.key_project.llmsynth.prompts;
 
-public class PromptAnswer {
+public class PromptAnswer implements PromptMessage {
     private final Prompt prompt;
     private final String answer;
 
@@ -17,4 +17,8 @@ public class PromptAnswer {
         return answer;
     }
 
+    @Override
+    public PromptType getMessageType() {
+        return PromptType.ANSWER;
+    }
 }

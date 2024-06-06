@@ -51,7 +51,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
             // todo: refactor into parameterized subfuncitoncall
             case SPECIFY_FUNCTION: {
                 var task = (TaskSpecifyFunction) param.task;
-                IPromptStrategy<PromptReason, TFunc> strategy = funcStrategyProvider.selectStrategy(param.oracle, task);
+                IPromptStrategy<TFunc> strategy = funcStrategyProvider.selectStrategy(param.oracle, task);
                 TFunc data = funcStrategyProvider.createUserData();
                 Function<PromptAnswer, PromptResult> defaultVerificator =  funcStrategyProvider.createDefaultVerificator(param.oracle, task);
 
@@ -60,7 +60,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
             }
             case SPECIFY_SUBCONTRACT: {
                 var task = (TaskSpecifySubcontract) param.task;
-                IPromptStrategy<PromptReason, TSub> strategy = subStrategyProvider.selectStrategy(param.oracle, task);
+                IPromptStrategy<TSub> strategy = subStrategyProvider.selectStrategy(param.oracle, task);
                 TSub data = subStrategyProvider.createUserData();
                 Function<PromptAnswer, PromptResult> defaultVerificator =  subStrategyProvider.createDefaultVerificator(param.oracle, task);
 
@@ -69,7 +69,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
             }
             case SPECIFY_LOOP_INVARIANT: {
                 var task = (TaskSpecifyLoopInvariant) param.task;
-                IPromptStrategy<PromptReason, TLoop> strategy = loopStrategyProvider.selectStrategy(param.oracle, task);
+                IPromptStrategy<TLoop> strategy = loopStrategyProvider.selectStrategy(param.oracle, task);
                 TLoop data = loopStrategyProvider.createUserData();
                 Function<PromptAnswer, PromptResult> defaultVerificator =  loopStrategyProvider.createDefaultVerificator(param.oracle, task);
 
@@ -85,7 +85,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
             LLMTask task, // todo: this should be the concrete instance type (otherwise the visitor-hack is required)
             // todo: actually, the strategy selector can store it ...
             BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle,
-            IPromptStrategy<PromptReason, TUserData> strategy,
+            IPromptStrategy<TUserData> strategy,
             Predicate<PromptResult> acceptResult,
             Function<PromptAnswer, PromptResult> defaultVerificator,
             TUserData data
@@ -125,7 +125,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
             for(Prompt prompt : prompts) {
 
                 // todo: another for loop could be here, if the same prompt should be asked multiple times to exploit indeterminism
-                PromptAnswer answer = llm_oracle.apply(reason_to_explore, prompt);
+                PromptAnswer answer = ask_oracle(llm_oracle,reason_to_explore, prompt);
                 assert answer.getPrompt() == prompt;
 
                 // todo: FIXME results lose parent info when they are accepted?
@@ -139,6 +139,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                         tree.get(reason_to_explore).add(result);
                         // todo: stuff we do when it's correct (mainly just setting the BenchmarkResult)
                         // todo: aka: add the result as the finishing node that proves success
+                        pq.clear(); // to prevent further exploration
                         break;
                     }
                 } else {
@@ -154,6 +155,14 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
         }
 
         // todo: collect the results into the benchmark
+    }
+
+    private static PromptAnswer ask_oracle(BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle, PromptReason reason, Prompt prompt) {
+        if (prompt instanceof AnsweredPrompt) {
+            return ((AnsweredPrompt)prompt).getAnswer();
+        } else {
+            return llm_oracle.apply(reason, prompt);
+        }
     }
 
     public static <TFunc, TSub, TLoop> BenchmarkRunner<TFunc, TSub, TLoop> create(

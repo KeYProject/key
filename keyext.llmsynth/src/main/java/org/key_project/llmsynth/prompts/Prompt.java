@@ -1,21 +1,25 @@
 package org.key_project.llmsynth.prompts;
 
+import org.key_project.llmsynth.prompts.reasons.DirectPrompt;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class Prompt {
-    private final List<PromptElement> elements; // = new ArrayList<>();
-    private String promptString; // = null;
-    private boolean removeHistory;
+public class Prompt implements PromptMessage {
+    protected final List<PromptElement> elements; // = new ArrayList<>();
+    protected String promptString; // = null;
+    protected final boolean removeHistory; // only useful for normal search-tre operations, should be in subclass, and injected by a prompt builder
+    protected final PromptType promptType;
 
-    private final Function<PromptAnswer, PromptResult> verificator;
+    protected final Function<PromptAnswer, PromptResult> verificator;
 
-    Prompt(List<PromptElement> elements, Function<PromptAnswer, PromptResult> verificator, boolean removeHistory) {
+    Prompt(List<PromptElement> elements, Function<PromptAnswer, PromptResult> verificator, PromptType promptType, boolean removeHistory) {
         this.elements = elements;
         this.verificator = verificator;
+        this.promptType = promptType;
         this.removeHistory = removeHistory;
     }
 
@@ -44,5 +48,19 @@ public class Prompt {
             promptString = sw.toString();
         }
         return promptString;
+    }
+
+    @Override
+    public String getContent() {
+        return this.toString();
+    }
+
+    @Override
+    public PromptType getMessageType() {
+        return promptType;
+    }
+
+    public static Prompt from(PromptType typ, String s) {
+        return new Prompt(List.of(p -> p.println(s)), a -> PromptResult.reject(a, new DirectPrompt()), typ, false);
     }
 }

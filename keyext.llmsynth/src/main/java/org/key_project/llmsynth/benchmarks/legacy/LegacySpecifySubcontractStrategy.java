@@ -9,11 +9,11 @@ import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class LegacySpecifySubcontractStrategy implements IPromptStrategy<LegacyReasons, Nothing>, IBroadableStrategy<LegacyReasons, Nothing>, LegacyVisitor<Nothing> {
+public class LegacySpecifySubcontractStrategy implements IPromptStrategy<Nothing>, LegacyVisitor<Nothing> {
     private final ClassInfo clazz;
     private final MethodInfo method;
     private final MethodInfo submethod;
-    private final IPromptStrategy<PromptReason, Nothing> fallback;
+    private final IPromptStrategy<Nothing> fallback;
 
     public LegacySpecifySubcontractStrategy(ClassInfo clazz, MethodInfo method, MethodInfo submethod) {
         this.clazz = clazz;
@@ -21,7 +21,7 @@ public class LegacySpecifySubcontractStrategy implements IPromptStrategy<LegacyR
         this.submethod = submethod;
         this.fallback = PromptStrategy.getDefault();
     }
-    public LegacySpecifySubcontractStrategy(ClassInfo clazz, MethodInfo method, MethodInfo submethod, IPromptStrategy<PromptReason, Nothing> fallback) {
+    public LegacySpecifySubcontractStrategy(ClassInfo clazz, MethodInfo method, MethodInfo submethod, IPromptStrategy<Nothing> fallback) {
         this.clazz = clazz;
         this.method = method;
         this.submethod = submethod;
@@ -82,19 +82,9 @@ public class LegacySpecifySubcontractStrategy implements IPromptStrategy<LegacyR
         return List.of(b.build());
     }
 
-    @Override
-    public IPromptStrategy<PromptReason, Nothing> broaden() {
-        return this::broad_apply;
-    }
-
-    @Override
-    public Iterable<Prompt> apply(LegacyReasons reason, Nothing nothing, Supplier<PromptBuilder> newBuilder) {
-        return reason.dispatch(this, nothing, newBuilder);
-    }
-
-    public Iterable<Prompt> broad_apply(PromptReason r, Nothing o, Supplier<PromptBuilder> newBuilder) {
+    public Iterable<Prompt> apply(PromptReason r, Nothing o, Supplier<PromptBuilder> newBuilder) {
         if (r instanceof  LegacyReasons) {
-            return apply((LegacyReasons) r, o, newBuilder);
+            return ((LegacyReasons)r).dispatch(this, o, newBuilder);
         } else {
             return fallback.apply(r, o, newBuilder);
         }

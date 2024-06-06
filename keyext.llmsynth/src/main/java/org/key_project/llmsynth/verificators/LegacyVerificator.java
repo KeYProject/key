@@ -1,7 +1,14 @@
 package org.key_project.llmsynth.verificators;
 
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import jdk.dynalink.linker.MethodHandleTransformer;
+import org.key_project.llmsynth.ClassInfo;
+import org.key_project.llmsynth.MethodInfo;
+import org.key_project.llmsynth.benchmarks.LLMChoice;
 import org.key_project.llmsynth.benchmarks.legacy.*;
+import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
+import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
+import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
 import org.key_project.llmsynth.old_unused.Gpt3Prompt;
 import org.key_project.llmsynth.prompts.PromptAnswer;
 import org.key_project.llmsynth.prompts.PromptReason;
@@ -12,8 +19,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-public class LegacyVerificator {
+public class LegacyVerificator implements Function<PromptAnswer, PromptResult> {
     List<String> classLines;
     String methodName;
     boolean isCtor;
@@ -125,5 +133,9 @@ public class LegacyVerificator {
             }
             return PromptResult.reject(answer, reason);
         }
+    }
+
+    public PromptResult apply(PromptAnswer answer) {
+        return verify(answer);
     }
 }
