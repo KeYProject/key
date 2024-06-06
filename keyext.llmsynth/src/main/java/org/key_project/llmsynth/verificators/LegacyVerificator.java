@@ -138,4 +138,25 @@ public class LegacyVerificator implements Function<PromptAnswer, PromptResult> {
     public PromptResult apply(PromptAnswer answer) {
         return verify(answer);
     }
+
+    public static LegacyVerificator fromTask(LLMChoice oracle, TaskSpecifyLoopInvariant task, Path tmpfile) {
+        return new LegacyVerificator(
+                task.classInfo.getClassLines(),
+                task.methodInfo.getName(),
+                false, null, true, tmpfile);
+    }
+
+    public static LegacyVerificator fromTask(LLMChoice oracle, TaskSpecifySubcontract task, Path tmpfile) {
+        return new LegacyVerificator(
+                task.classInfo.getClassLines(),
+                task.methodInfo.getName(),
+                false, task.subMethodInfo.getName(), false, tmpfile);
+    }
+
+    public static LegacyVerificator fromTask(LLMChoice oracle, TaskSpecifyFunction task, Path tmpfile) {
+        return new LegacyVerificator(
+                task.classInfo.getClassLines(),
+                task.methodInfo.getName(),
+                false, null, false, tmpfile);
+    }
 }
