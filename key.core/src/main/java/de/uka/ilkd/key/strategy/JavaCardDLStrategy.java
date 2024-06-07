@@ -15,10 +15,7 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
@@ -525,7 +522,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
         }
 
+        setupTracingStrategy(d);
         return d;
+    }
+
+    private void setupTracingStrategy(RuleSetDispatchFeature d) {
+        bindRuleSet(d, "tracing", longConst(-200));
+        bindRuleSet(d, "traceIndexDelete", longConst(-50000));
+        bindRuleSet(d, "traceIndexInc", longConst(-500));
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
