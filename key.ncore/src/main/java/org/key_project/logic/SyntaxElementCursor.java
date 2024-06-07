@@ -82,6 +82,20 @@ public class SyntaxElementCursor {
      * @return true iff the node has children or an unvisited sibling.
      */
     public boolean goToNext() {
-        return gotoFirstChild() || gotoNextSibling();
+        var ancestors = new ArrayDeque<ParentAndPosition>();
+        if (gotoFirstChild())
+            return true;
+        if (gotoNextSibling())
+            return true;
+        while (!path.isEmpty()) {
+            ancestors.add(path.pop());
+            if (gotoNextSibling())
+                return true;
+        }
+        // Nothing found; re-build stack
+        for (var ancestor : ancestors) {
+            path.push(ancestor);
+        }
+        return false;
     }
 }
