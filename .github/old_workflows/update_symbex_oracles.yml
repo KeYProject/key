@@ -16,16 +16,16 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'corretto'
           cache: 'gradle'
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: --continue -D UPDATE_TEST_ORACLE=true -D ORACLE_DIRECTORY=key.core.symbolic_execution/src/test/resources/testcase :key.core.symbolic_execution:test
 

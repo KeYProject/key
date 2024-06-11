@@ -217,7 +217,7 @@ storeRefUnion: list = storeRefList;
 storeRefList: storeref (COMMA storeref)*;
 storeRefIntersect: storeRefList;
 storeref: (NOTHING | EVERYTHING | NOT_SPECIFIED |  STRICTLY_NOTHING | storeRefExpr);
-createLocset: (LOCSET | SINGLETON) LPAREN exprList RPAREN;
+createLocset: (LOCSET | SINGLETON) LPAREN exprList? RPAREN;
 exprList: expression (COMMA expression)*;
 storeRefExpr: expression;
 predornot: (predicate |NOT_SPECIFIED | SAME);
@@ -347,8 +347,7 @@ jmlprimary
   | VALUES                                                                            #primaryValues
   | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
   | EMPTYSET                                                                          #primaryEmptySet
-  | STOREREF LPAREN storeRefUnion RPAREN                                              #primaryStoreRef
-  | LOCSET LPAREN fieldarrayaccess (COMMA fieldarrayaccess)* RPAREN                   #primaryCreateLocset
+  | (LOCSET|STOREREF) LPAREN storeRefUnion? RPAREN                                    #primaryStoreRef
   | SINGLETON LPAREN expression RPAREN                                                #primaryCreateLocsetSingleton
   | UNION LPAREN storeRefUnion RPAREN                                                 #primaryUnion
   | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
@@ -363,18 +362,10 @@ jmlprimary
   | sequence                                                                         #primaryignore10
   ;
 
-fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;
-fieldarrayaccess_suffix
-    : DOT (ident | inv | inv_free | this_ | super_ | TRANSIENT | INV | INV_FREE)
-    | LBRACKET (expression) RBRACKET
-;
-
-super_: SUPER;
-
 sequence
   : SEQEMPTY                                                              #sequenceEmpty
   | seqdefterm                                                            #sequenceIgnore1
-  | (SEQSINGLETON | SEQ) LPAREN exprList RPAREN                           #sequenceCreate
+  | (SEQSINGLETON | SEQ) LPAREN exprList? RPAREN                          #sequenceCreate
   | SEQSUB LPAREN expression COMMA expression COMMA expression RPAREN     #sequenceSub
   | SEQREVERSE LPAREN expression RPAREN                                   #sequenceReverse
   | SEQREPLACE LPAREN expression COMMA expression COMMA expression RPAREN #sequenceReplace

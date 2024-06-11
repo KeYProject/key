@@ -17,6 +17,7 @@ import java.util.Set;
  * @param <E> edge type
  * @author Arne Keller
  */
+@SuppressWarnings("nullness")
 public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
     /**
      * Set of vertices in this graph.

@@ -46,8 +46,7 @@ public class RunAllProofsAction extends MainWindowAction {
     /**
      * Filename of the user-defined input files.
      */
-    @Nullable
-    private static final String RUN_ALL_PROOFS_UI = System.getenv(ENV_VARIABLE);
+    private static final @Nullable String RUN_ALL_PROOFS_UI = System.getenv(ENV_VARIABLE);
 
     /**
      * Default file name for lookup in the classpath.
@@ -70,8 +69,7 @@ public class RunAllProofsAction extends MainWindowAction {
      * content of {@link #ENV_VARIABLE} ({@link #RUN_ALL_PROOFS_UI}) is null, then
      * {@link #DEFAULT_FILE} is used.
      */
-    @NonNull
-    private List<File> loadFiles() throws IOException {
+    private @NonNull List<File> loadFiles() throws IOException {
         LOGGER.info("Use 'export {}=<...>' to set the input file for {}.", ENV_VARIABLE,
             getClass().getSimpleName());
 
