@@ -1,4 +1,4 @@
-// Generated from /home/daniel/Documents/key/drodt-key/ncore.rusty_while/src/main/antlr/RustyWhileLexer.g4 by ANTLR 4.13.1
+// Generated from /home/daniel/Documents/key/drodt-key/keyext.rusty_while/src/main/antlr/RustyWhileLexer.g4 by ANTLR 4.13.1
 
     package org.key_project.rusty.parsing;
 
