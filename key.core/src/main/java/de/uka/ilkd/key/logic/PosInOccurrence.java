@@ -122,6 +122,7 @@ public final class PosInOccurrence {
         return posInTerm.getIndex();
     }
 
+    @Override
     public int hashCode() {
         return hashCode;
     }
@@ -185,6 +186,13 @@ public final class PosInOccurrence {
             subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
         }
         return subTermCache;
+    }
+
+    /**
+     * @return whether this PiO is a valid reference
+     */
+    public boolean subTermExists() {
+        return posInTerm.existsSubTerm(sequentFormula.formula());
     }
 
     /**
