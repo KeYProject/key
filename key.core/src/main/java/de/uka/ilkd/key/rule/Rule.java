@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.HasOrigin;
-import org.key_project.logic.Name;
 import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.util.collection.ImmutableList;
 
@@ -32,18 +31,9 @@ public interface Rule extends org.key_project.ncore.rules.Rule, HasOrigin {
     ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException;
 
+
     @NonNull
     default ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
-      return apply(goal, goal.proof().getServices(), ruleApp);
+        return apply(goal, goal.proof().getServices(), ruleApp);
     };
-
-    /**
-     * the name of the rule
-     */
-    Name name();
-
-    /**
-     * returns the display name of the rule
-     */
-    String displayName();
 }
