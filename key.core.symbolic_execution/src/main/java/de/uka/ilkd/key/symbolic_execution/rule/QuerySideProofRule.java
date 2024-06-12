@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.RuleAbortException;
+import org.key_project.ncore.rules.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.util.Triple;

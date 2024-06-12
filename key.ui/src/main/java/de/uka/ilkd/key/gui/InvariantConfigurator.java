@@ -26,7 +26,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
-import de.uka.ilkd.key.rule.RuleAbortException;
+import org.key_project.ncore.rules.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
