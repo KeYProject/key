@@ -70,8 +70,9 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
             Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
-        return !"andLeft".equals(ruleName)
-                || !(pio.sequentFormula().formula().op() instanceof UpdateApplication);
+        if (!"andLeft".equals(ruleName))
+            return true;
+        return !(pio.sequentLevelFormula().op() instanceof UpdateApplication);
     }
 
 

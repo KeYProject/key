@@ -6,7 +6,6 @@ package de.uka.ilkd.key.macros;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -79,8 +78,8 @@ public class ModalityCache {
         }
 
         var result = false;
-        for (SequentFormula sequentFormula : sequent) {
-            if (termHasModality(sequentFormula.formula())) {
+        for (Term fml : sequent) {
+            if (termHasModality(fml)) {
                 result = true;
                 break;
             }

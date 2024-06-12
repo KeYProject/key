@@ -6,7 +6,8 @@ package org.key_project.slicing.graph;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
 
@@ -30,7 +31,7 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
     /**
      * The formula.
      */
-    public final SequentFormula formula;
+    public final Term formula;
     /**
      * Whether the formula is in the antecedent.
      */
@@ -49,7 +50,7 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
      * @param services services
      */
     public TrackedFormula(
-            SequentFormula formula,
+            Term formula,
             BranchLocation branchLocation,
             boolean inAntec,
             Services services) {
@@ -70,7 +71,7 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
             return Integer.toHexString(hashCode());
         }
         String term = LogicPrinter.quickPrintTerm(
-            formula.formula(),
+            formula,
             services,
             true, // pretty print
             true // using unicode symbols
@@ -110,12 +111,15 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
         }
         TrackedFormula that = (TrackedFormula) o;
         return inAntec == that.inAntec
-                && formula.equalsModProofIrrelevancy(that.formula)
+                && ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY
+                        .equalsModThisProperty(formula, that.formula)
                 && Objects.equals(branchLocation, that.branchLocation);
     }
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(inAntec, formula.hashCodeModProofIrrelevancy(), branchLocation);
+        return Objects.hash(inAntec,
+            ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty(formula),
+            branchLocation);
     }
 }

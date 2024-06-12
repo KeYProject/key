@@ -67,8 +67,8 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     private static boolean containsFreeVarSV(Sequent sequent) {
-        for (final SequentFormula cf : sequent) {
-            if (containsFreeVarSV(cf.formula())) {
+        for (final Term cf : sequent) {
+            if (containsFreeVarSV(cf)) {
                 return true;
             }
         }

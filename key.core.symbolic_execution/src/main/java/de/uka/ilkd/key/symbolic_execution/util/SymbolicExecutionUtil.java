@@ -189,7 +189,7 @@ public final class SymbolicExecutionUtil {
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true);
         // Create Sequent to prove
         Sequent sequentToProve =
-            Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true).sequent();
+            Sequent.EMPTY_SEQUENT.addFormula(term, false, true).sequent();
         // Return created Sequent and the used predicate to identify the value interested in.
         ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(parentProof,
             sideProofEnv, sequentToProve);
@@ -245,8 +245,8 @@ public final class SymbolicExecutionUtil {
     public static ImmutableList<Term> listSemisequentTerms(Semisequent semisequent) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
         if (semisequent != null) {
-            for (SequentFormula sf : semisequent) {
-                terms = terms.append(sf.formula());
+            for (Term sf : semisequent) {
+                terms = terms.append(sf);
             }
         }
         return terms;
@@ -487,7 +487,7 @@ public final class SymbolicExecutionUtil {
         Term modalityTerm = services.getTermBuilder().dia(newJavaBlock, newTerm);
         // Get the updates from the return node which includes the value interested in.
         Term originalModifiedFormula =
-            methodReturnNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
+            methodReturnNode.getAppliedRuleApp().posInOccurrence().sequentLevelFormula();
         ImmutableList<Term> originalUpdates =
             TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
         // Create Sequent to prove with new succedent.
@@ -668,16 +668,16 @@ public final class SymbolicExecutionUtil {
             List<IExecutionConstraint> constraints = new LinkedList<>();
             Node proofNode = node.getProofNode();
             Sequent sequent = proofNode.sequent();
-            for (SequentFormula sf : sequent.antecedent()) {
-                if (!containsSymbolicExecutionLabel(sf.formula())) {
+            for (Term sf : sequent.antecedent()) {
+                if (!containsSymbolicExecutionLabel(sf)) {
                     constraints.add(new ExecutionConstraint(node.getSettings(), proofNode,
-                        node.getModalityPIO(), sf.formula()));
+                        node.getModalityPIO(), sf));
                 }
             }
-            for (SequentFormula sf : sequent.succedent()) {
-                if (!containsSymbolicExecutionLabel(sf.formula())) {
+            for (Term sf : sequent.succedent()) {
+                if (!containsSymbolicExecutionLabel(sf)) {
                     constraints.add(new ExecutionConstraint(node.getSettings(), proofNode,
-                        node.getModalityPIO(), tb.not(sf.formula())));
+                        node.getModalityPIO(), tb.not(sf)));
                 }
             }
             return constraints.toArray(new IExecutionConstraint[0]);
@@ -820,11 +820,11 @@ public final class SymbolicExecutionUtil {
         if (node != null) {
             Services services = node.proof().getServices();
             List<IProgramVariable> result = new LinkedList<>();
-            for (SequentFormula sf : node.sequent().antecedent()) {
-                internalCollectAllElementaryUpdateTerms(services, result, sf.formula());
+            for (Term sf : node.sequent().antecedent()) {
+                internalCollectAllElementaryUpdateTerms(services, result, sf);
             }
-            for (SequentFormula sf : node.sequent().succedent()) {
-                internalCollectAllElementaryUpdateTerms(services, result, sf.formula());
+            for (Term sf : node.sequent().succedent()) {
+                internalCollectAllElementaryUpdateTerms(services, result, sf);
             }
             return result;
         } else {
@@ -1339,8 +1339,8 @@ public final class SymbolicExecutionUtil {
         if (semisequent != null) {
             int maxId = Integer.MIN_VALUE;
             PosInOccurrence maxPio = null;
-            for (SequentFormula sf : semisequent) {
-                PosInTerm current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
+            for (Term sf : semisequent) {
+                PosInTerm current = findModalityWithMaxSymbolicExecutionLabelId(sf);
                 if (current != null) {
                     PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
                     SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
@@ -1424,8 +1424,8 @@ public final class SymbolicExecutionUtil {
         if (semisequent != null) {
             int maxId = Integer.MIN_VALUE;
             PosInOccurrence minPio = null;
-            for (SequentFormula sf : semisequent) {
-                PosInTerm current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
+            for (Term sf : semisequent) {
+                PosInTerm current = findModalityWithMinSymbolicExecutionLabelId(sf);
                 if (current != null) {
                     PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
                     SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
@@ -2085,8 +2085,8 @@ public final class SymbolicExecutionUtil {
     public static ContractPostOrExcPostExceptionVariableResult searchContractPostOrExcPostExceptionVariable(
             Node node, Services services) throws ProofInputException {
         Semisequent antecedent = node.sequent().antecedent();
-        SequentFormula sf = antecedent.get(antecedent.size() - 1);
-        Term workingTerm = sf.formula();
+        Term sf = antecedent.get(antecedent.size() - 1);
+        Term workingTerm = sf;
         Pair<ImmutableList<Term>, Term> updatesAndTerm = TermBuilder.goBelowUpdates2(workingTerm);
         workingTerm = updatesAndTerm.second;
         if (workingTerm.op() != Junctor.AND) {
@@ -2257,7 +2257,7 @@ public final class SymbolicExecutionUtil {
             Services services = parent.proof().getServices();
             Node useNode = parent.child(2);
             Semisequent antecedent = useNode.sequent().antecedent();
-            Term invTerm = antecedent.get(antecedent.size() - 1).formula();
+            Term invTerm = antecedent.get(antecedent.size() - 1);
             // Extract loop condition from child
             Term loopConditionModalityTerm =
                 posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
@@ -2371,7 +2371,7 @@ public final class SymbolicExecutionUtil {
             // Compute invariant (last antecedent formula of the use branch)
             Services services = parent.proof().getServices();
             Semisequent antecedent = node.sequent().antecedent();
-            Term condition = antecedent.get(antecedent.size() - 1).formula();
+            Term condition = antecedent.get(antecedent.size() - 1);
             if (simplify) {
                 // New OneStepSimplifier is required because it has an internal state and the
                 // default instance can't be used parallel.
@@ -2469,7 +2469,7 @@ public final class SymbolicExecutionUtil {
             PosInOccurrence pio, Sequent toApplyTo) {
         if (original != null && pio != null && toApplyTo != null) {
             // Search index of formula in original sequent
-            SequentFormula originalSF = pio.sequentFormula();
+            Term originalSF = pio.sequentLevelFormula();
             boolean antecendet = pio.isInAntec();
             int index;
             if (antecendet) {
@@ -2478,7 +2478,7 @@ public final class SymbolicExecutionUtil {
                 index = original.succedent().indexOf(originalSF);
             }
             if (index >= 0) {
-                final SequentFormula toApplyToSF =
+                final Term toApplyToSF =
                     (antecendet ? toApplyTo.antecedent() : toApplyTo.succedent()).get(index);
                 return new PosInOccurrence(toApplyToSF, pio.posInTerm(), antecendet);
             } else {
@@ -2535,8 +2535,8 @@ public final class SymbolicExecutionUtil {
                 // Remove replace part of symbolic execution rules
                 if (NodeInfo.isSymbolicExecution(app.taclet())) {
                     Sequent sequent = (Sequent) goalTemplate.replaceWithExpressionAsObject();
-                    for (SequentFormula sf : sequent.antecedent()) {
-                        Term replaceTerm = instantiateTerm(node, sf.formula(), app, services);
+                    for (Term sf : sequent.antecedent()) {
+                        Term replaceTerm = instantiateTerm(node, sf, app, services);
                         replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(
                             app.instantiations().getUpdateContext(), replaceTerm);
                         Term originalTerm = findReplacement(node.sequent().antecedent(),
@@ -2544,8 +2544,8 @@ public final class SymbolicExecutionUtil {
                         assert originalTerm != null;
                         newAntecedents = newAntecedents.removeFirst(originalTerm);
                     }
-                    for (SequentFormula sf : sequent.succedent()) {
-                        Term replaceTerm = instantiateTerm(node, sf.formula(), app, services);
+                    for (Term sf : sequent.succedent()) {
+                        Term replaceTerm = instantiateTerm(node, sf, app, services);
                         replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(
                             app.instantiations().getUpdateContext(), replaceTerm);
                         Term originalTerm = findReplacement(node.sequent().succedent(),
@@ -2637,7 +2637,7 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Lists the {@link Term}s of all new {@link SequentFormula} in the child {@link Semisequent}.
+     * Lists the {@link Term}s of all new {@link Term} in the child {@link Semisequent}.
      *
      * @param parent The parent {@link Semisequent}.
      * @param child The child {@link Semisequent}.
@@ -2645,14 +2645,14 @@ public final class SymbolicExecutionUtil {
      */
     private static ImmutableList<Term> listNewSemisequentTerms(Semisequent parent,
             Semisequent child) {
-        Set<SequentFormula> parentSFs = new HashSet<>();
-        for (SequentFormula sf : parent) {
+        Set<Term> parentSFs = new HashSet<>();
+        for (Term sf : parent) {
             parentSFs.add(sf);
         }
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (SequentFormula sf : child) {
+        for (Term sf : child) {
             if (!parentSFs.contains(sf)) {
-                result = result.append(sf.formula());
+                result = result.append(sf);
             }
         }
         return result;
@@ -2669,9 +2669,15 @@ public final class SymbolicExecutionUtil {
      */
     private static Term findReplacement(Semisequent semisequent,
             final PosInOccurrence posInOccurrence, final Term replaceTerm) {
-        SequentFormula sf = CollectionUtil.search(semisequent,
-            element -> checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm));
-        return sf != null ? sf.formula() : null;
+        Term sf = CollectionUtil.search(semisequent,
+            element -> {
+                return checkReplaceTerm(element, posInOccurrence, replaceTerm);
+            });
+        if (sf != null) {
+            return sf;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -2931,7 +2937,7 @@ public final class SymbolicExecutionUtil {
             if (node.proof().root() == node) {
                 originalUpdates = computeRootElementaryUpdates(node);
             } else {
-                Term originalModifiedFormula = pio.sequentFormula().formula();
+                Term originalModifiedFormula = pio.sequentLevelFormula();
                 originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
             }
             // Create new sequent
@@ -2952,8 +2958,8 @@ public final class SymbolicExecutionUtil {
     public static ImmutableList<Term> computeRootElementaryUpdates(Node root) {
         ImmutableList<Term> result = ImmutableSLList.nil();
         Sequent sequent = root.sequent();
-        for (SequentFormula sf : sequent.succedent()) {
-            Term term = sf.formula();
+        for (Term sf : sequent.succedent()) {
+            Term term = sf;
             if (Junctor.IMP.equals(term.op())) {
                 result = result.prepend(collectElementaryUpdates(term.sub(1)));
             }
@@ -3031,7 +3037,7 @@ public final class SymbolicExecutionUtil {
         // were not modified by the applied rule
         Sequent originalSequentWithoutMethodFrame =
             SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(node.sequent(),
-                pio != null ? pio.sequentFormula() : null);
+                pio != null ? pio.sequentLevelFormula() : null);
         Set<Term> skolemTerms = newSuccedentToProve != null
                 ? collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve)
                 : collectSkolemConstants(originalSequentWithoutMethodFrame, tb.parallel(updates));
@@ -3045,13 +3051,13 @@ public final class SymbolicExecutionUtil {
             newSuccedentToProve =
                 addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, RESULT_LABEL);
         }
-        Sequent sequentToProve = newSuccedentToProve != null
-                ? originalSequentWithoutMethodFrame
-                        .addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent()
+        Sequent sequentToProve;
+        sequentToProve = newSuccedentToProve != null ? originalSequentWithoutMethodFrame
+                .addFormula(newSuccedentToProve, false, true).sequent()
                 : originalSequentWithoutMethodFrame;
         if (additionalAntecedent != null) {
             sequentToProve = sequentToProve
-                    .addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
+                    .addFormula(additionalAntecedent, true, false).sequent();
         }
         return sequentToProve;
     }
@@ -3067,10 +3073,10 @@ public final class SymbolicExecutionUtil {
     private static Sequent labelSkolemConstants(
             Sequent sequent, Set<Term> constantsToLabel,
             TermFactory factory) {
-        for (SequentFormula sf : sequent.antecedent()) {
+        for (Term sf : sequent.antecedent()) {
             int skolemEquality = checkSkolemEquality(sf);
             if (skolemEquality == -1) {
-                Term equality = sf.formula();
+                Term equality = sf;
                 if (constantsToLabel.contains(equality.sub(0))) {
                     Term definition =
                         addLabelRecursiveToNonSkolem(factory, equality.sub(1), RESULT_LABEL);
@@ -3082,11 +3088,11 @@ public final class SymbolicExecutionUtil {
                     Term newEquality =
                         factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
                             equality.boundVars(), equality.getLabels());
-                    sequent = sequent.changeFormula(new SequentFormula(newEquality),
+                    sequent = sequent.changeFormula(newEquality,
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
             } else if (skolemEquality == 1) {
-                Term equality = sf.formula();
+                Term equality = sf;
                 if (constantsToLabel.contains(equality.sub(1))) {
                     Term definition =
                         addLabelRecursiveToNonSkolem(factory, equality.sub(0), RESULT_LABEL);
@@ -3098,7 +3104,7 @@ public final class SymbolicExecutionUtil {
                     Term newEquality =
                         factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
                             equality.boundVars(), equality.getLabels());
-                    sequent = sequent.changeFormula(new SequentFormula(newEquality),
+                    sequent = sequent.changeFormula(newEquality,
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
             }
@@ -3225,7 +3231,7 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Removes all {@link SequentFormula}s with a skolem equality from the given {@link Sequent} if
+     * Removes all {@link Term}s with a skolem equality from the given {@link Sequent} if
      * the skolem {@link Term} is not contained in the given {@link Collection}.
      *
      * @param sequent The {@link Sequent} to modify.
@@ -3236,10 +3242,10 @@ public final class SymbolicExecutionUtil {
     private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent,
             Collection<Term> skolemConstants) {
         Sequent result = sequent;
-        for (SequentFormula sf : sequent.antecedent()) {
+        for (Term sf : sequent.antecedent()) {
             result = removeAllUnusedSkolemEqualities(result, sf, true, skolemConstants);
         }
-        for (SequentFormula sf : sequent.succedent()) {
+        for (Term sf : sequent.succedent()) {
             result = removeAllUnusedSkolemEqualities(result, sf, false, skolemConstants);
         }
         return result;
@@ -3247,17 +3253,17 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Helper method of {@link #removeAllUnusedSkolemEqualities(Sequent, Collection)} which removes
-     * the given {@link SequentFormula} if required.
+     * the given {@link Term} if required.
      *
      * @param sequent The {@link Sequent} to modify.
-     * @param sf The {@link SequentFormula} to remove if its skolem {@link Term} is not listed.
+     * @param sf The {@link Term} to remove if its skolem {@link Term} is not listed.
      * @param antecedent {@code true} antecedent, {@code false} succedent.
      * @param skolemConstants The allowed skolem {@link Term}s.
-     * @return The modified {@link Sequent} in which the {@link SequentFormula} might be removed.
+     * @return The modified {@link Sequent} in which the {@link Term} might be removed.
      */
-    private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent, SequentFormula sf,
+    private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent, Term sf,
             boolean antecedent, Collection<Term> skolemConstants) {
-        Term term = sf.formula();
+        Term term = sf;
         boolean remove = false;
         if (term.op() == Equality.EQUALS) {
             if (isSkolemConstant(term.sub(0))) {
@@ -3274,17 +3280,6 @@ public final class SymbolicExecutionUtil {
         } else {
             return sequent;
         }
-    }
-
-    /**
-     * Checks if the given {@link SequentFormula} is a skolem equality.
-     *
-     * @param sf The {@link SequentFormula} to check.
-     * @return {@code -1} left side of skolem equality, {@code 0} no skolem equality, {@code 1}
-     *         right side of skolem equality.
-     */
-    public static int checkSkolemEquality(SequentFormula sf) {
-        return checkSkolemEquality(sf.formula());
     }
 
     /**
@@ -3427,8 +3422,8 @@ public final class SymbolicExecutionUtil {
     private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemConstant,
             Term skolemEquality) {
         List<Term> result = new LinkedList<>();
-        for (SequentFormula sf : sequent) {
-            Term term = sf.formula();
+        for (Term sf : sequent) {
+            Term term = sf;
             if (term != skolemEquality) {
                 int skolemCheck = checkSkolemEquality(term);
                 if (skolemCheck == -1) {
@@ -4111,10 +4106,12 @@ public final class SymbolicExecutionUtil {
                     Node leaf = leafsIter.next();
                     if (!leaf.isClosed()) {
                         final Term toSearch = predicate;
-                        SequentFormula topLevelPredicate = CollectionUtil
+                        Term topLevelPredicate = CollectionUtil
                                 .search(leaf.sequent().succedent(),
-                                    element -> Operator.opEquals(toSearch.op(),
-                                        element.formula().op()));
+                                    element -> {
+                                        return Operator.opEquals(toSearch.op(),
+                                            element.op());
+                                    });
                         if (topLevelPredicate == null) {
                             verified = false;
                         }
@@ -4151,9 +4148,11 @@ public final class SymbolicExecutionUtil {
                         for (Term term : additinalPredicates) {
                             additinalOperatos.add(term.op());
                         }
-                        SequentFormula topLevelPredicate =
+                        Term topLevelPredicate =
                             CollectionUtil.search(leaf.sequent().succedent(),
-                                element -> additinalOperatos.contains(element.formula().op()));
+                                element -> {
+                                    return additinalOperatos.contains(element.op());
+                                });
                         if (topLevelPredicate == null) {
                             verified = false;
                         }
@@ -4199,8 +4198,8 @@ public final class SymbolicExecutionUtil {
             // Search final value of the exceptional variable which is used to check if the verified
             // program terminates normally
             ImmutableArray<Term> value = null;
-            for (SequentFormula f : node.sequent().succedent()) {
-                Pair<ImmutableList<Term>, Term> updates = TermBuilder.goBelowUpdates2(f.formula());
+            for (Term f : node.sequent().succedent()) {
+                Pair<ImmutableList<Term>, Term> updates = TermBuilder.goBelowUpdates2(f);
                 Iterator<Term> iter = updates.first.iterator();
                 while (value == null && iter.hasNext()) {
                     value = extractValueFromUpdate(iter.next(), exceptionVariable);

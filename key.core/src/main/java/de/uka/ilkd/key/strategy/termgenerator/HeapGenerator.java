@@ -9,7 +9,6 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -40,8 +39,8 @@ public class HeapGenerator implements TermGenerator {
             MutableState mState) {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
-        for (SequentFormula sf : seq) {
-            collectHeaps(sf.formula(), heaps, goal.proof().getServices());
+        for (Term sf : seq) {
+            collectHeaps(sf, heaps, goal.proof().getServices());
         }
         return heaps.iterator();
     }

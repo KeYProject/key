@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -50,7 +49,7 @@ public class EditFormulaAction extends ExplorationAction {
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
         Term term = pio.subTerm();
-        SequentFormula sf = pio.sequentFormula();
+        Term sf = pio.sequentLevelFormula();
         Goal g = getMediator().getSelectedGoal();
         Term newTerm = promptForTerm(mainWindow, term);
 
@@ -59,8 +58,8 @@ public class EditFormulaAction extends ExplorationAction {
         }
 
         ProofExplorationService api = ProofExplorationService.get(getMediator());
-        Node toBeSelected = api.applyChangeFormula(g, pio, sf.formula(),
-            tb.replace(sf.formula(), pio.posInTerm(), newTerm));
+        Node toBeSelected = api.applyChangeFormula(g, pio, sf,
+            tb.replace(sf, pio.posInTerm(), newTerm));
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

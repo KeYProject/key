@@ -140,7 +140,7 @@ public class FocussedRuleApplicationManager
 
     private boolean isSameFormula(PosInOccurrence pio1, PosInOccurrence pio2) {
         return pio2.isInAntec() == pio1.isInAntec()
-                && pio2.sequentFormula().equals(pio1.sequentFormula());
+                && pio2.sequentLevelFormula().equals(pio1.sequentLevelFormula());
     }
 
     private PosInOccurrence getPIOForFocussedSubterm() {
@@ -150,7 +150,7 @@ public class FocussedRuleApplicationManager
             return null;
         }
 
-        return focussedSubterm.replaceConstrainedFormula(formula.sequentFormula());
+        return focussedSubterm.replaceConstrainedFormula(formula.sequentLevelFormula());
     }
 
     private boolean isBelow(PosInOccurrence over, PosInOccurrence under) {

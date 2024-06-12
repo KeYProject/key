@@ -30,7 +30,7 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final ClausesGraph graph = ClausesGraph.create(pos.sequentFormula().formula(),
+        final ClausesGraph graph = ClausesGraph.create(pos.sequentLevelFormula(),
             goal.proof().getServices().getCaches());
 
         return graph.connected(for0.toTerm(app, pos, goal, mState),

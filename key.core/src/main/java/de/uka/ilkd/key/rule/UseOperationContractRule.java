@@ -40,7 +40,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -430,13 +429,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet(goal);
 
         // add term and taclet to post goal
-        goal.addFormula(new SequentFormula(contractApplPredTerm), true, false);
+        goal.addFormula(contractApplPredTerm, true, false);
         goal.addTaclet(informationFlowContractApp, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
         // information flow proofs might get easier if we add the (proved)
         // method contract precondition as an assumption to the post goal
         // (in case the precondition cannot be proved easily)
-        goal.addFormula(new SequentFormula(finalPreTerm), true, false);
+        goal.addFormula(finalPreTerm, true, false);
         final InfFlowProof proof = (InfFlowProof) goal.proof();
         proof.addIFSymbol(contractApplPredTerm);
         proof.addIFSymbol(informationFlowContractApp);
@@ -745,7 +744,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm,
             this, preGoal, FINAL_PRE_TERM_HINT, null);
-        preGoal.changeFormula(new SequentFormula(finalPreTerm), ruleApp.posInOccurrence());
+        preGoal.changeFormula(finalPreTerm, ruleApp.posInOccurrence());
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
             preGoal, null, null);
@@ -769,10 +768,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                         new ImmutableArray<>(inst.progPost.sub(0)), null,
                         inst.progPost.getLabels()))),
             null);
-        postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
-        postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
+        postGoal.addFormula(wellFormedAnon, true, false);
+        Term uAssumptions2 = tb.apply(inst.u, normalPost, null);
+        postGoal.changeFormula(uAssumptions2,
             ruleApp.posInOccurrence());
-        postGoal.addFormula(new SequentFormula(postAssumption), true, false);
+        postGoal.addFormula(postAssumption, true, false);
 
         applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
             tb.var(excVar), mby, atPreUpdates, finalPreTerm, anonUpdateDatas, services);
@@ -791,15 +791,17 @@ public final class UseOperationContractRule implements BuiltInRule {
             null);
         final Term excPost =
             globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);
-        excPostGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
-        excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
+        excPostGoal.addFormula(wellFormedAnon, true, false);
+        Term uAssumptions1 = tb.apply(inst.u, excPost, null);
+        excPostGoal.changeFormula(uAssumptions1,
             ruleApp.posInOccurrence());
-        excPostGoal.addFormula(new SequentFormula(excPostAssumption), true, false);
+        excPostGoal.addFormula(excPostAssumption, true, false);
 
         // create "Null Reference" branch
         if (nullGoal != null) {
             final Term actualSelfNotNull = tb.not(tb.equals(inst.actualSelf, tb.NULL()));
-            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, actualSelfNotNull, null)),
+            Term uAssumptions = tb.apply(inst.u, actualSelfNotNull, null);
+            nullGoal.changeFormula(uAssumptions,
                 ruleApp.posInOccurrence());
         }
 

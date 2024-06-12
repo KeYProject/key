@@ -23,10 +23,27 @@ public interface RuleApp extends EqualsModProofIrrelevancy {
     Rule rule();
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula and a position in the
+     * returns the PositionInOccurrence (representing a Term and a position in the
      * corresponding formula) of this rule application
      */
     PosInOccurrence posInOccurrence();
+
+    /**
+     * applies the specified rule at the specified position if all schema variables have been
+     * instantiated
+     *
+     * @param goal the Goal where to apply the rule
+     * @return list of new created goals
+     */
+    // @Nullable
+    // <G extends ProofGoal> ImmutableList<G> execute(G goal);
+
+    /**
+     * returns true if all variables are instantiated
+     *
+     * @return true if all variables are instantiated
+     */
+    boolean complete();
 
     /**
      * applies the specified rule at the specified position if all schema variables have been
@@ -38,13 +55,6 @@ public interface RuleApp extends EqualsModProofIrrelevancy {
      */
     @Nullable
     ImmutableList<Goal> execute(Goal goal, Services services);
-
-    /**
-     * returns true if all variables are instantiated
-     *
-     * @return true if all variables are instantiated
-     */
-    boolean complete();
 
     /**
      * @return user-friendly name for this rule-application

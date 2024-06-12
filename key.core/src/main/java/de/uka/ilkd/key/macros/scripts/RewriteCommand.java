@@ -111,21 +111,23 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
         // filter taclets that are applicable on the given formula
         // filter taclets that are applicable on the given formula in the antecedent
-        for (SequentFormula sf : g.node().sequent().antecedent()) {
+        for (Term sf : g.node().sequent().antecedent()) {
 
-            if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) {
-                continue;
+            if (p.formula != null) {
+                if (!sf.equalsModProperty(p.formula, RENAMING_PROPERTY)) {
+                    continue;
+                }
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         // filter taclets that are applicable on the given formula in the succedent
-        for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) {
-                continue;
+        for (Term sf : g.node().sequent().succedent()) {
+            if (p.formula != null) {
+                if (!sf.equalsModProperty(p.formula, RENAMING_PROPERTY)) {
+                    continue;
+                }
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
@@ -159,7 +161,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
                             RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if (pta.complete()) {
-                                SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(
+                                Term rewriteResult = rw.getExecutor().getRewriteResult(
                                     goalold, null, goalold.proof().getServices(), pta);
 
                                 executeRewriteTaclet(p, pta, goalold, rewriteResult);
@@ -187,8 +189,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param rewriteResult
      */
     private void executeRewriteTaclet(Parameters p, PosTacletApp pta, Goal goalold,
-            SequentFormula rewriteResult) {
-        if (rewriteResult.formula().equals(p.replace)
+            Term rewriteResult) {
+        if (rewriteResult.equals(p.replace)
                 || getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)) {
             failposInOccs.remove(pta.posInOccurrence());
             succposInOccs.add(pta.posInOccurrence());
@@ -207,13 +209,13 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pio PosInOccurrence of the to be returned term
      * @return term at pio
      */
-    public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
+    public Term getTermAtPos(Term sf, PosInOccurrence pio) {
         if (pio.isTopLevel()) {
-            return sf.formula();
+            return sf;
 
         } else {
             PosInTerm pit = pio.posInTerm();
-            return getSubTerm(sf.formula(), pit.iterator());
+            return getSubTerm(sf, pit.iterator());
         }
 
     }

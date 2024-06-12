@@ -379,10 +379,10 @@ public final class Goal {
      * adds a formula to the sequent before the given position and informs the rule application
      * index about this change
      *
-     * @param cf the SequentFormula to be added
+     * @param cf the Term to be added
      * @param p PosInOccurrence encodes the position
      */
-    public void addFormula(SequentFormula cf, PosInOccurrence p) {
+    public void addFormula(Term cf, PosInOccurrence p) {
         setSequent(sequent().addFormula(cf, p));
     }
 
@@ -390,12 +390,12 @@ public final class Goal {
      * adds a formula to the antecedent or succedent of a sequent. Either at its front or back and
      * informs the rule application index about this change
      *
-     * @param cf the SequentFormula to be added
-     * @param inAntec boolean true(false) if SequentFormula has to be added to antecedent
+     * @param cf the Term to be added
+     * @param inAntec boolean true(false) if Term has to be added to antecedent
      *        (succedent)
      * @param first boolean true if at the front, if false then cf is added at the back
      */
-    public void addFormula(SequentFormula cf, boolean inAntec, boolean first) {
+    public void addFormula(Term cf, boolean inAntec, boolean first) {
         setSequent(sequent().addFormula(cf, inAntec, first));
     }
 
@@ -403,10 +403,10 @@ public final class Goal {
      * replaces a formula at the given position and informs the rule application index about this
      * change
      *
-     * @param cf the SequentFormula replacing the old one
+     * @param cf the Term replacing the old one
      * @param p the PosInOccurrence encoding the position
      */
-    public void changeFormula(SequentFormula cf, PosInOccurrence p) {
+    public void changeFormula(Term cf, PosInOccurrence p) {
         setSequent(sequent().changeFormula(cf, p));
     }
 
@@ -607,10 +607,10 @@ public final class Goal {
          * caught.
          */
         NamespaceSet originalNamespaces = getLocalNamespaces();
-        Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
         try {
+            Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
             goalList = ruleApp.execute(this, overlayServices);
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
@@ -702,12 +702,12 @@ public final class Goal {
     public List<RuleApp> getAllBuiltInRuleApps() {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
         LinkedList<RuleApp> ruleApps = new LinkedList<>();
-        for (SequentFormula sf : node().sequent().antecedent()) {
+        for (Term sf : node().sequent().antecedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             t.forEach(ruleApps::add);
         }
-        for (SequentFormula sf : node().sequent().succedent()) {
+        for (Term sf : node().sequent().succedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
             t.forEach(ruleApps::add);
@@ -725,13 +725,13 @@ public final class Goal {
                 return true;
             }
         };
-        for (SequentFormula sf : node().sequent().antecedent()) {
+        for (Term sf : node().sequent().antecedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
 
-        for (SequentFormula sf : node().sequent().succedent()) {
+        for (Term sf : node().sequent().succedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
             tacletAppAtAndBelow.forEach(allApps::add);

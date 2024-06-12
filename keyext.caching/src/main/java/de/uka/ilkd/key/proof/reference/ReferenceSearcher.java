@@ -5,12 +5,11 @@ package de.uka.ilkd.key.proof.reference;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.swing.*;
 
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -146,10 +145,11 @@ public final class ReferenceSearcher {
      * @return whether all formulas are present
      */
     private static boolean containedIn(Semisequent superset, Semisequent subset) {
-        for (SequentFormula sf : subset) {
+        for (Term sf : subset) {
             boolean found = false;
-            for (SequentFormula sf2 : superset) {
-                if (sf2.equalsModProofIrrelevancy(sf)) {
+            for (Term sf2 : superset) {
+                if (ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY.equalsModThisProperty(sf2,
+                    sf)) {
                     found = true;
                     break;
                 }
@@ -173,7 +173,7 @@ public final class ReferenceSearcher {
         ProgramMethodFinder f = new ProgramMethodFinder();
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {
-            Term term = seq.getFormulabyNr(i).formula();
+            Term term = seq.getFormulabyNr(i);
             // first, check for a java block
             if (term.containsJavaBlockRecursive()) {
                 // not suitable for caching

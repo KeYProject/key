@@ -9,7 +9,6 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -76,8 +75,8 @@ class Instantiation {
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
         ImmutableList<Term> res = ImmutableSLList.nil();
-        for (final SequentFormula cf : seq) {
-            res = res.prepend(cf.formula());
+        for (final Term cf : seq) {
+            res = res.prepend(cf);
         }
         return DefaultImmutableSet.fromImmutableList(res);
     }
@@ -148,15 +147,15 @@ class Instantiation {
      */
     private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
         ImmutableList<Term> assertLits = ImmutableSLList.nil();
-        for (final SequentFormula cf : seq.antecedent()) {
-            final Term atom = cf.formula();
+        for (final Term cf : seq.antecedent()) {
+            final Term atom = cf;
             final Operator op = atom.op();
             if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
                 assertLits = assertLits.prepend(atom);
             }
         }
-        for (final SequentFormula cf : seq.succedent()) {
-            final Term atom = cf.formula();
+        for (final Term cf : seq.succedent()) {
+            final Term atom = cf;
             final Operator op = atom.op();
             if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
                 assertLits = assertLits.prepend(services.getTermBuilder().not(atom));

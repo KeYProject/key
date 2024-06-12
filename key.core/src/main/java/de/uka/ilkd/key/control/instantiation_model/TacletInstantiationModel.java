@@ -125,14 +125,14 @@ public class TacletInstantiationModel {
             ImmutableArray<IfFormulaInstantiation> succCand =
                 IfFormulaInstSeq.createList(seq, false, services);
 
-            Iterator<SequentFormula> it = ifseq.iterator();
+            Iterator<Term> it = ifseq.iterator();
             Term ifFma;
             MatchConditions matchCond = app.matchConditions();
 
             ifChoiceModel = new TacletAssumesModel[size];
 
             for (int i = 0; i < size; i++) {
-                ifFma = it.next().formula();
+                ifFma = it.next();
                 ifChoiceModel[i] =
                     new TacletAssumesModel(
                         ifFma, taclet().getMatcher().matchIf((i < asize ? antecCand : succCand),

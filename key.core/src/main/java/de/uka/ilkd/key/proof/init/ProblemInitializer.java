@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
@@ -377,8 +376,8 @@ public final class ProblemInitializer {
     private void populateNamespaces(Proof proof) {
         final NamespaceSet namespaces = proof.getNamespaces();
         final Goal rootGoal = proof.openGoals().head();
-        for (SequentFormula cf : proof.root().sequent()) {
-            populateNamespaces(cf.formula(), namespaces, rootGoal);
+        for (Term cf : proof.root().sequent()) {
+            populateNamespaces(cf, namespaces, rootGoal);
         }
     }
 

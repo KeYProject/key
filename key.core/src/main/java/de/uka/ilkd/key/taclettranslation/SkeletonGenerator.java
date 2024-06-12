@@ -5,7 +5,6 @@ package de.uka.ilkd.key.taclettranslation;
 
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -72,8 +71,8 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      */
     private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
-        for (SequentFormula cf : s) {
-            terms = terms.append(cf.formula());
+        for (Term cf : s) {
+            terms = terms.append(cf);
         }
         return terms;
 

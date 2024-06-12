@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AntecTaclet;
@@ -60,7 +60,7 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
     /**
      * applies the {@code add}-expressions of taclet goal descriptions
      *
-     * @param add the {@link Sequent} with the uninstantiated {@link SequentFormula}'s to be added
+     * @param add the {@link Sequent} with the uninstantiated {@link Term}'s to be added
      *        to the goal's sequent
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate)

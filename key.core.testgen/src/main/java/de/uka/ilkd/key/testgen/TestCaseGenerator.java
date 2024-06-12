@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
@@ -602,17 +601,15 @@ public class TestCaseGenerator {
 
     protected Map<String, Sort> generateTypeInferenceMap(Node n) {
         HashMap<String, Sort> typeInfMap = new HashMap<>();
-        for (SequentFormula sequentFormula : n.sequent()) {
-            Term t = sequentFormula.formula();
-            generateTypeInferenceMapHelper(t, typeInfMap);
+        for (Term seqFml : n.sequent()) {
+            generateTypeInferenceMapHelper(seqFml, typeInfMap);
         }
         return typeInfMap;
     }
 
     private void generateTypeInferenceMapHelper(Term t, Map<String, Sort> map) {
         Operator op = t.op();
-        if (op instanceof ProgramVariable) {
-            ProgramVariable pv = (ProgramVariable) t.op();
+        if (op instanceof ProgramVariable pv) {
             final String name = pv.name().toString();
             if (map.containsKey(name)) {
                 if (map.get(name) != pv.sort()) {

@@ -72,11 +72,12 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
         }
         if (ruleApp instanceof TacletApp ta) {
             if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
-                Map<SequentFormula, FormulaTermLabel> ifLabels =
+                Map<Term, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<>();
                 for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
+                    final Term assumesFml = ifInst.getConstrainedFormula();
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
-                        ifInst.getConstrainedFormula().formula().getLabels());
+                        assumesFml.getLabels());
                     if (ifLabel != null) {
                         ifLabels.put(ifInst.getConstrainedFormula(), ifLabel);
                     }
@@ -85,14 +86,14 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                     if (TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())
                     // || TruthValueEvaluationUtil.isPredicate(newTermOp)
                     ) {
-                        for (Entry<SequentFormula, FormulaTermLabel> ifEntry : ifLabels
+                        for (Entry<Term, FormulaTermLabel> ifEntry : ifLabels
                                 .entrySet()) {
                             FormulaTermLabel ifLabel = ifEntry.getValue();
                             int labelSubID = FormulaTermLabel.newLabelSubID(services, ifLabel);
                             FormulaTermLabel newLabel = new FormulaTermLabel(ifLabel.getMajorId(),
                                 labelSubID, Collections.singletonList(ifLabel.getId()));
                             labels.add(newLabel);
-                            FormulaTermLabelRefactoring.addSequentFormulaToRefactor(state,
+                            FormulaTermLabelRefactoring.addTermToRefactor(state,
                                 ifEntry.getKey());
                         }
                     }

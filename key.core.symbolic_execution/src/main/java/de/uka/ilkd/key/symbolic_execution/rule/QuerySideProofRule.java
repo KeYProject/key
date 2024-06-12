@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -45,12 +44,12 @@ import org.jspecify.annotations.NonNull;
  * </ul>
  * </p>
  * <p>
- * The original {@link SequentFormula} which contains the equality is always removed in the
+ * The original {@link Term} which contains the equality is always removed in the
  * following {@link Goal}. How the result of the query computed in the side proof is represented
  * depends on the occurrence of the equality:
  * <ol>
  * <li><b>top level {@code <something> = <query>} or {@code <query> = <something>}</b><br>
- * For each possible result value is a {@link SequentFormula} added to the {@link Sequent} of the
+ * For each possible result value is a {@link Term} added to the {@link Sequent} of the
  * form:
  * <ul>
  * <li>Antecedent: {@code <resultCondition> -> <something> = <result>} or</li>
@@ -62,7 +61,7 @@ import org.jspecify.annotations.NonNull;
  * <li><b>right side of an implication on top level
  * {@code <queryCondition> -> <something> = <query>} or
  * {@code <queryCondition> -> <query> = <something>}</b><br>
- * For each possible result value is a {@link SequentFormula} added to the {@link Sequent} of the
+ * For each possible result value is a {@link Term} added to the {@link Sequent} of the
  * form:
  * <ul>
  * <li>Antecedent: {@code
@@ -93,9 +92,9 @@ import org.jspecify.annotations.NonNull;
  * </li>
  * <li><b>everywhere else {@code ...(<something> = <query>)...} or
  * {@code ...(<query> = <something>)...}</b><br>
- * In the original {@link SequentFormula} is the {@code <query>} replaced by a new constant function
+ * In the original {@link Term} is the {@code <query>} replaced by a new constant function
  * named {@code QueryResult} and added to the antecedent/succedent in which it was contained before.
- * For each possible result value is an additional {@link SequentFormula} added to the
+ * For each possible result value is an additional {@link Term} added to the
  * <b>antecedent</b> of the form:
  * <ul>
  * <li>{@code <resultCondition> -> QueryResult = <result>} or</li>
@@ -196,7 +195,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             // Extract required Terms from goal
             PosInOccurrence pio = ruleApp.posInOccurrence();
             Sequent goalSequent = goal.sequent();
-            SequentFormula equalitySF = pio.sequentFormula();
+            Term equalitySF = pio.sequentLevelFormula();
             Term equalityTerm = pio.subTerm();
             Term queryTerm;
             Term varTerm;
@@ -211,9 +210,10 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 varFirst = false;
             }
             Term queryConditionTerm = null;
-            if (equalitySF.formula().op() == Junctor.IMP
-                    && equalitySF.formula().sub(1) == equalityTerm) {
-                queryConditionTerm = equalitySF.formula().sub(0);
+            if (equalitySF.op() == Junctor.IMP) {
+                if (equalitySF.sub(1) == equalityTerm) {
+                    queryConditionTerm = equalitySF.sub(0);
+                }
             }
             // Compute sequent for side proof to compute query in.
             // New OneStepSimplifier is required because it has an internal state and the default
@@ -226,7 +226,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             JFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =
-                sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
+                sequentToProve.addFormula(newTerm, false, false).sequent();
             // Compute results and their conditions
             List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
                 computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
@@ -246,7 +246,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                     if (queryConditionTerm != null) {
                         resultTerm = tb.imp(queryConditionTerm, resultTerm);
                     }
-                    resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
+                    resultGoal.addFormula(resultTerm, pio.isInAntec(), false);
                 }
             } else {
                 JFunction resultFunction = createResultConstant(services, varTerm.sort());
@@ -261,7 +261,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                     Term resultTerm = tb.imp(conditionTerm,
                         varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first)
                                 : tb.equals(conditionsAndResult.first, resultFunctionTerm));
-                    resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
+                    resultGoal.addFormula(resultTerm, true, false);
                 }
             }
             return goals;

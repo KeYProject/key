@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -188,7 +187,7 @@ public final class QueryAxiom extends ClassAxiom {
             ifSeq = null;
         } else {
             final Term ifFormula = tb.exactInstance(kjt.getSort(), tb.var(selfSV));
-            final SequentFormula ifCf = new SequentFormula(ifFormula);
+            final Term ifCf = ifFormula;
             final Semisequent ifSemiSeq =
                 Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
             ifSeq = Sequent.createAnteSequent(ifSemiSeq);
@@ -217,7 +216,7 @@ public final class QueryAxiom extends ClassAxiom {
         // create added sequent
         final Term addedFormula =
             tb.apply(update, tb.prog(Modality.JavaModalityKind.BOX, jb, post), null);
-        final SequentFormula addedCf = new SequentFormula(addedFormula);
+        final Term addedCf = addedFormula;
         final Semisequent addedSemiSeq =
             Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
         final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);

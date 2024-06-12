@@ -59,10 +59,14 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
         Goal goal = state.getFirstOpenAutomaticGoal();
 
         Set<Term> antes = new HashSet<>();
-        args.sequent.antecedent().forEach(sf -> antes.add(sf.formula()));
+        args.sequent.antecedent().forEach(sf -> {
+            antes.add(sf);
+        });
 
         Set<Term> succs = new HashSet<>();
-        args.sequent.succedent().forEach(sf -> succs.add(sf.formula()));
+        args.sequent.succedent().forEach(sf -> {
+            succs.add(sf);
+        });
 
         RuleAppIndex index = goal.ruleAppIndex();
         ImmutableList<NoPosTacletApp> apps = index.getNoFindTaclet(FILTER, service);

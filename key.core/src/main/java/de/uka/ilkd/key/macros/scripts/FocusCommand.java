@@ -73,23 +73,27 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         assert goal != null : "not null by contract of the method";
 
         // The formulas to keep in the antecedent
-        ImmutableList<Term> keepAnte = toKeep.antecedent().asList().map(SequentFormula::formula);
-        ImmutableList<SequentFormula> ante = goal.sequent().antecedent().asList();
+        ImmutableList<Term> keepAnte = toKeep.antecedent().asList().map(term1 -> term1);
+        ImmutableList<Term> ante = goal.sequent().antecedent().asList();
 
-        for (SequentFormula seqFormula : ante) {
+        for (Term seqFormula : ante) {
             // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
             if (!keepAnte.exists(
-                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_PROPERTY))) {
+                it -> {
+                    return it.equalsModProperty(seqFormula, RENAMING_PROPERTY);
+                })) {
                 Taclet tac = getHideTaclet("left");
                 makeTacletApp(goal, seqFormula, tac, true);
             }
         }
 
-        ImmutableList<Term> keepSucc = toKeep.succedent().asList().map(SequentFormula::formula);
-        ImmutableList<SequentFormula> succ = goal.sequent().succedent().asList();
-        for (SequentFormula seqFormula : succ) {
+        ImmutableList<Term> keepSucc = toKeep.succedent().asList().map(term -> term);
+        ImmutableList<Term> succ = goal.sequent().succedent().asList();
+        for (Term seqFormula : succ) {
             if (!keepSucc.exists(
-                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_PROPERTY))) {
+                it -> {
+                    return it.equalsModProperty(seqFormula, RENAMING_PROPERTY);
+                })) {
                 Taclet tac = getHideTaclet("right");
                 makeTacletApp(goal, seqFormula, tac, false);
             }
@@ -110,7 +114,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param tac the taclet top apply (either hide_left or hide_right)
      * @param antec whether the formula is in the antecedent
      */
-    private void makeTacletApp(Goal g, SequentFormula toHide, Taclet tac, boolean antec) {
+    private void makeTacletApp(Goal g, Term toHide, Taclet tac, boolean antec) {
 
         // hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();
@@ -126,7 +130,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
         TacletApp app =
             PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
-        app = app.addCheckedInstantiation(sv, toHide.formula(), proof.getServices(), true);
+        app = app.addCheckedInstantiation(sv, toHide, proof.getServices(), true);
         g.apply(app);
 
     }

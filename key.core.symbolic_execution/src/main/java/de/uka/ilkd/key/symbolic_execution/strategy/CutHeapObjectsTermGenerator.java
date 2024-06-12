@@ -12,7 +12,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
@@ -38,13 +37,13 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
         // Compute collect terms of sequent formulas
         Sequent sequent = goal.sequent();
         Set<Term> topTerms = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
-            topTerms.add(sf.formula());
+        for (Term sf : sequent) {
+            topTerms.add(sf);
         }
         // Compute equality terms
         HeapLDT heapLDT = goal.node().proof().getServices().getTypeConverter().getHeapLDT();
         Set<Term> equalityTerms = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
+        for (Term sf : sequent) {
             collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT,
                 goal.node().proof().getServices());
         }
@@ -52,19 +51,19 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     }
 
     /**
-     * Computes all possible equality terms between objects in the given {@link SequentFormula}.
+     * Computes all possible equality terms between objects in the given {@link Term}.
      *
-     * @param sf The {@link SequentFormula} to work with.
+     * @param sf The {@link Term} to work with.
      * @param equalityTerms The result {@link Set} with the equality {@link Term}s to fill.
      * @param topTerms The terms of all sequent formulas
      * @param heapLDT The {@link HeapLDT} to use.
      * @param services TODO
      */
-    protected void collectEqualityTerms(SequentFormula sf, Set<Term> equalityTerms,
+    protected void collectEqualityTerms(Term sf, Set<Term> equalityTerms,
             Set<Term> topTerms, HeapLDT heapLDT, Services services) {
         // Collect objects (target of store operations on heap)
         Set<Term> storeLocations = new LinkedHashSet<>();
-        collectStoreLocations(sf.formula(), storeLocations, heapLDT);
+        collectStoreLocations(sf, storeLocations, heapLDT);
         // Check if equality checks are possible
         if (storeLocations.size() >= 2) {
             // Generate all possible equality checks

@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -87,8 +86,8 @@ public class JoinIsApplicable {
             referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(1)
                     : referenceFormula;
 
-        for (SequentFormula sf : g2.sequent().succedent()) {
-            Term formula = sf.formula();
+        for (Term sf : g2.sequent().succedent()) {
+            Term formula = sf;
             Term update2 = tb.skip();
             if (formula.op() instanceof UpdateApplication
                     && !formula.equalsModProperty(referenceFormula, RENAMING_PROPERTY)) {
@@ -98,7 +97,8 @@ public class JoinIsApplicable {
 
             }
             if (formula.equalsModProperty(referenceFormula, RENAMING_PROPERTY)) {
-                return new ProspectivePartner(referenceFormula, g1.node(), pio.sequentFormula(),
+                return new ProspectivePartner(referenceFormula, g1.node(),
+                    pio.sequentLevelFormula(),
                     update1, g2.node(), sf, update2);
             }
         }

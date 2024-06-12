@@ -78,7 +78,7 @@ public class TestTacletBuild {
         Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Sequent seq = Sequent.createSuccSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1)).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, t1).semisequent());
         Term t2 = tb.ex((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
@@ -100,8 +100,8 @@ public class TestTacletBuild {
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Term t2 = tb.ex((QuantifiableVariable) u, A);
         Sequent seq = Sequent
-                .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1))
-                        .semisequent().insert(1, new SequentFormula(t2)).semisequent());
+                .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, t1)
+                        .semisequent().insert(1, t2).semisequent());
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
         sb.setFind(A);

@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 import org.key_project.util.collection.ImmutableSLList;
@@ -32,7 +32,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
     @Override
     protected void filterSequent() {
-        Iterator<SequentFormula> it;
+        Iterator<Term> it;
 
         if (antec != null) {
             // Result has already been computed. No need to recompute.
@@ -53,7 +53,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
         antec = ImmutableSLList.nil();
         it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
-            SequentFormula sf = it.next();
+            Term sf = it.next();
             lp.reset();
             lp.printConstrainedFormula(sf);
             String formString = lp.result();
@@ -66,7 +66,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
         succ = ImmutableSLList.nil();
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
-            SequentFormula sf = it.next();
+            Term sf = it.next();
             lp.reset();
             lp.printConstrainedFormula(sf);
             String formString = lp.result();

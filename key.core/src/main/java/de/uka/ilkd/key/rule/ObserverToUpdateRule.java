@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -194,8 +193,9 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
             final Term actualSelfNotNull = tb.not(tb.equals(inst.receiver, tb.NULL()));
+            Term uAssumptions = tb.apply(inst.update, actualSelfNotNull, null);
             nullGoal.changeFormula(
-                new SequentFormula(tb.apply(inst.update, actualSelfNotNull, null)),
+                uAssumptions,
                 ruleApp.posInOccurrence());
         }
 
@@ -215,7 +215,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         Term update = tb.elementary(lhs,
             makeCall(services, inst.observerSymbol, inst.receiver, ImmutableList.of()));
         Term normalPost = tb.apply(update, modTerm);
-        contGoal.changeFormula(new SequentFormula(tb.apply(inst.update, normalPost, null)),
+        Term uAssumptions = tb.apply(inst.update, normalPost, null);
+        contGoal.changeFormula(uAssumptions,
             ruleApp.posInOccurrence());
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
@@ -255,7 +256,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
             final Term actualSelfNotNull = tb.not(tb.equals(inst.actualSelf, tb.NULL()));
-            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, actualSelfNotNull, null)),
+            Term uAssumptions = tb.apply(inst.u, actualSelfNotNull, null);
+            nullGoal.changeFormula(uAssumptions,
                 ruleApp.posInOccurrence());
         }
 
@@ -273,7 +275,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         Term update =
             tb.elementary(lhs, makeCall(services, inst.pm, inst.actualSelf, inst.actualParams));
         Term normalPost = tb.apply(update, modTerm);
-        contGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
+        Term uAssumptions = tb.apply(inst.u, normalPost, null);
+        contGoal.changeFormula(uAssumptions,
             ruleApp.posInOccurrence());
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,

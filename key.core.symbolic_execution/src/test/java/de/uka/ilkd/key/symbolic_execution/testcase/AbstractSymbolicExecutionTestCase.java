@@ -1638,7 +1638,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         Node node = proof.root();
         Sequent sequent = node.sequent();
         assertEquals(1, sequent.succedent().size());
-        Term succedent = sequent.succedent().get(0).formula();
+        Term succedent = sequent.succedent().get(0);
         assertEquals(2, succedent.arity());
         Term updateApplication = succedent.subs().get(1);
         assertEquals(2, updateApplication.arity());

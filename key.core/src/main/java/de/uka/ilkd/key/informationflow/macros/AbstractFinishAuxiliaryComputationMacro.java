@@ -10,7 +10,6 @@ import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -120,11 +119,11 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
         final TermFactory tf = symbExecGoal.proof().getServices().getTermFactory();
         Term result = tb.tt();
-        for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
-            result = tb.and(result, f.formula());
+        for (final Term f : symbExecGoal.sequent().antecedent()) {
+            result = tb.and(result, f);
         }
-        for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
-            result = tb.and(result, tb.not(f.formula()));
+        for (final Term f : symbExecGoal.sequent().succedent()) {
+            result = tb.and(result, tb.not(f));
         }
         result = TermLabelManager.removeIrrelevantLabels(result, tf);
         return result;

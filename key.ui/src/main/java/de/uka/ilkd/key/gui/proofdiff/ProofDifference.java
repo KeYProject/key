@@ -45,7 +45,9 @@ public class ProofDifference {
 
     private static List<String> initialise(Function<Term, String> printer,
             Semisequent semisequent) {
-        return semisequent.asList().stream().map(it -> printer.apply(it.formula()))
+        return semisequent.asList().stream().map(it -> {
+            return printer.apply(it);
+        })
                 .collect(Collectors.toList());
     }
 

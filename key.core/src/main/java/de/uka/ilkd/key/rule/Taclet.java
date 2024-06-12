@@ -7,6 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -492,10 +493,14 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
                 || (ifSequent != null && t2.ifSequent == null)) {
             return false;
         } else {
-            ImmutableList<SequentFormula> if1 = ifSequent.asList();
-            ImmutableList<SequentFormula> if2 = t2.ifSequent.asList();
-            while (!if1.isEmpty() && !if2.isEmpty()
-                    && if1.head().equalsModProofIrrelevancy(if2.head())) {
+            ImmutableList<Term> if1 = ifSequent.asList();
+            ImmutableList<Term> if2 = t2.ifSequent.asList();
+            while (!if1.isEmpty() && !if2.isEmpty()) {
+                Term term = if1.head();
+                Term head = if2.head();
+                if (!(boolean) ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY
+                        .equalsModThisProperty(term, head))
+                    break;
                 if1 = if1.tail();
                 if2 = if2.tail();
             }
@@ -529,7 +534,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     @Override
     public int hashCodeModProofIrrelevancy() {
         if (hashcode2 == 0) {
-            hashcode2 = ifSequent.getFormulabyNr(1).hashCodeModProofIrrelevancy();
+            Term term = ifSequent.getFormulabyNr(1);
+            hashcode2 =
+                ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty(term);
             if (hashcode2 == 0) {
                 hashcode2 = -1;
             }
@@ -740,8 +747,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
 
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-        for (SequentFormula cf : s) {
-            cf.formula().execPostOrder(oc);
+        for (Term cf : s) {
+            cf.execPostOrder(oc);
         }
     }
 
@@ -762,9 +769,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         private final Sequent sequent;
 
         /**
-         * The optional {@link SequentFormula} contained in {@link #getSequent()}.
+         * The optional {@link Term} contained in {@link #getSequent()}.
          */
-        private final SequentFormula sequentFormula;
+        private final Term seqFormula;
 
         /**
          * The optional replace {@link Term} of the taclet.
@@ -788,7 +795,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             assert sequent != null;
             this.tacletOperation = tacletOperation;
             this.sequent = sequent;
-            this.sequentFormula = null;
+            this.seqFormula = null;
             this.term = null;
         }
 
@@ -796,30 +803,30 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
          * Constructor creating a hint indicating
          * {@link TacletOperation#REPLACE_TERM} as the currently performed operation.
          *
-         * @param term The optional replace {@link Term} of the taclet.
+         * @param replaceTerm The optional replace {@link Term} of the taclet.
          */
-        public TacletLabelHint(Term term) {
-            assert term != null;
+        public TacletLabelHint(Term replaceTerm) {
+            assert replaceTerm != null;
             this.tacletOperation = TacletOperation.REPLACE_TERM;
             this.sequent = null;
-            this.sequentFormula = null;
-            this.term = term;
+            this.seqFormula = null;
+            this.term = seqFormula;
         }
 
         /**
          * Constructor.
          *
          * @param labelHint The previous {@link TacletLabelHint} which is now specialised.
-         * @param sequentFormula The optional {@link SequentFormula} contained in
+         * @param formula The optional {@link Term} contained in
          *        {@link #getSequent()}.
          */
-        public TacletLabelHint(TacletLabelHint labelHint, SequentFormula sequentFormula) {
+        public TacletLabelHint(TacletLabelHint labelHint, Term formula) {
             assert labelHint != null;
             assert !TacletOperation.REPLACE_TERM.equals(labelHint.getTacletOperation());
-            assert sequentFormula != null;
+            assert formula != null;
             this.tacletOperation = labelHint.getTacletOperation();
             this.sequent = labelHint.getSequent();
-            this.sequentFormula = sequentFormula;
+            this.seqFormula = formula;
             this.term = labelHint.getTerm();
         }
 
@@ -842,12 +849,12 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         }
 
         /**
-         * Returns the optional {@link SequentFormula} contained in {@link #getSequent()}.
+         * Returns the optional {@link Term} contained in {@link #getSequent()}.
          *
-         * @return The optional {@link SequentFormula} contained in {@link #getSequent()}.
+         * @return The optional {@link Term} contained in {@link #getSequent()}.
          */
-        public SequentFormula getSequentFormula() {
-            return sequentFormula;
+        public Term getSeqFormula() {
+            return seqFormula;
         }
 
         /**
@@ -883,7 +890,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         @Override
         public String toString() {
             return tacletOperation + ", sequent = " + sequent + ", sequent formula = "
-                + sequentFormula + ", term = " + term;
+                + seqFormula + ", term = " + term;
         }
 
         /**
@@ -894,20 +901,20 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         public enum TacletOperation {
             /**
              * Add clause of a {@link Taclet} applied to the antecedent. Available information are
-             * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
+             * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSeqFormula()}.
              */
             ADD_ANTECEDENT,
 
             /**
              * Add clause of a {@link Taclet} applied to the succedent. Available information are
-             * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
+             * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSeqFormula()}.
              */
             ADD_SUCCEDENT,
 
             /**
              * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently
              * additional adds to the antecedent are performed. Available information are
-             * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
+             * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSeqFormula()}.
              */
             REPLACE_TO_ANTECEDENT,
 
@@ -915,7 +922,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
              * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the
              * current {@link PosInOccurrence} on the succedent is modified. Available information
              * are {@link TacletLabelHint#getSequent()} and
-             * {@link TacletLabelHint#getSequentFormula()}.
+             * {@link TacletLabelHint#getSeqFormula()}.
              */
             REPLACE_AT_SUCCEDENT,
 
@@ -923,21 +930,21 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
              * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the
              * current {@link PosInOccurrence} on the antecedent is modified. Available information
              * are {@link TacletLabelHint#getSequent()} and
-             * {@link TacletLabelHint#getSequentFormula()}.
+             * {@link TacletLabelHint#getSeqFormula()}.
              */
             REPLACE_AT_ANTECEDENT,
 
             /**
              * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently
              * additional adds to the succedent are performed. Available information are
-             * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
+             * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSeqFormula()}.
              */
             REPLACE_TO_SUCCEDENT,
 
             /**
              * Replace clause of a {@link Taclet} provides a {@link Term} which is currently used to
              * modify the {@link PosInOccurrence}. Available information are
-             * {@link TacletLabelHint#getTerm()}.
+             * {@link TacletLabelHint#getSeqFormula()}.
              */
             REPLACE_TERM
         }
@@ -955,7 +962,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      */
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
-        return getExecutor().apply(goal, services, tacletApp);
+        return getExecutor().apply((Goal) goal, services, tacletApp);
     }
 
     public TacletExecutor<? extends Taclet> getExecutor() {

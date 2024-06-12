@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -43,8 +43,9 @@ public class TestGoal {
 
     @Test
     public void testSetBack0() {
+        Term uAssumptions = TacletForTests.parseTerm("A");
         Sequent seq = Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());
+                .insert(0, uAssumptions).semisequent());
 
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
@@ -85,8 +86,9 @@ public class TestGoal {
 
     @Test
     public void testSetBack1() throws Exception {
+        Term uAssumptions = TacletForTests.parseTerm("A");
         Sequent seq = Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());
+                .insert(0, uAssumptions).semisequent());
         Node root = new Node(proof, seq);
         proof.setRoot(root);
         Goal g = new Goal(root, TacletIndexKit.getKit().createTacletIndex(),

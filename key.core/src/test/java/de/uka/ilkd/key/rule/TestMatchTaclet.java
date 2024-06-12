@@ -125,8 +125,9 @@ public class TestMatchTaclet {
         // test at the subformula p(z) -> A that has a free variable
         // therefore no match should be found
 
+        Term uAssumptions = match.sub(0);
         Sequent seq = Sequent.createSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(match.sub(0))).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, uAssumptions).semisequent(),
             Semisequent.EMPTY_SEMISEQUENT);
 
         assertEquals(0,
@@ -137,7 +138,7 @@ public class TestMatchTaclet {
 
         // we bind the free variable now a match should be found
         seq = Sequent.createSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(match)).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, match).semisequent(),
             Semisequent.EMPTY_SEMISEQUENT);
 
         assertNotEquals(0,
@@ -159,7 +160,7 @@ public class TestMatchTaclet {
             find_addrule_conflict.getMatcher()
                     .matchFind(match.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, services)
                     .getInstantiations(),
-            new PosInOccurrence(new SequentFormula(match), PosInTerm.getTopLevel().down(0), true),
+            new PosInOccurrence(match, PosInTerm.getTopLevel().down(0), true),
             services);
 
 
@@ -173,7 +174,7 @@ public class TestMatchTaclet {
             find_addrule_conflict.getMatcher()
                     .matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services)
                     .getInstantiations(),
-            new PosInOccurrence(new SequentFormula(match), PosInTerm.getTopLevel(), true),
+            new PosInOccurrence(match, PosInTerm.getTopLevel(), true),
             services);
         assertNotNull(app, "A match should have been found,"
             + " because here there formerly free variable is bound.");
@@ -188,13 +189,14 @@ public class TestMatchTaclet {
         // seq contains term that can match but has a free variable, so
         // matching to a should be not possible
         Term match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
+        Term uAssumptions = match.sub(0);
         TacletApp app = PosTacletApp
                 .createPosTacletApp(if_find_clash,
                     if_find_clash.getMatcher()
                             .matchFind(match.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS,
                                 services)
                             .getInstantiations(),
-                    new PosInOccurrence(new SequentFormula(match.sub(0)),
+                    new PosInOccurrence(uAssumptions,
                         PosInTerm.getTopLevel().down(0), true),
                     services);
 
@@ -247,14 +249,14 @@ public class TestMatchTaclet {
         Term closeable_one = TacletForTests.parseTerm("\\forall testSort z; p(z)");
         Term closeable_two = TacletForTests.parseTerm("\\forall testSort y; p(y)");
         Sequent seq = Sequent.createSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(closeable_one))
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, closeable_one)
                     .semisequent(),
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(closeable_two))
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, closeable_two)
                     .semisequent());
         TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
         index.add(close_rule.taclet());
         PosInOccurrence pio =
-            new PosInOccurrence(new SequentFormula(closeable_two), PosInTerm.getTopLevel(), false);
+            new PosInOccurrence(closeable_two, PosInTerm.getTopLevel(), false);
 
         TacletApp tacletApp =
             index.getSuccedentTaclet(pio, new IHTacletFilter(true, ImmutableSLList.nil()), services)

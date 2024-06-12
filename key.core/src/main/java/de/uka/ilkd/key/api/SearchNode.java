@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -12,13 +11,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Created by sarah on 5/2/17.
  */
 public final class SearchNode {
-    private final SequentFormula[] pattern;
+    private final Term[] pattern;
     private final int pos;
     private final int succAntPos;
     private final MatchConditions mc;
 
 
-    public SearchNode(SequentFormula[] pattern, int succAntPos) {
+    public SearchNode(Term[] pattern, int succAntPos) {
         this.pattern = pattern;
         this.pos = 0;
         this.succAntPos = succAntPos;
@@ -38,7 +37,7 @@ public final class SearchNode {
     }
 
     public Term getPatternTerm() {
-        return pattern[pos].formula();
+        return pattern[pos];
     }
 
     public boolean isFinished() {

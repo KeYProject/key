@@ -10,7 +10,6 @@ import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
@@ -50,8 +49,8 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         String position =
             cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? "antecedent" : "succedent";
 
-        for (SequentFormula sf : semisequent) {
-            if (sf.formula() == term) {
+        for (Term sf : semisequent) {
+            if (sf == term) {
                 return "Formula already exists in " + position + ".";
             }
         }

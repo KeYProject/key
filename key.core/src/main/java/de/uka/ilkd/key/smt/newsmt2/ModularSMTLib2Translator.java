@@ -13,7 +13,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.smt.SMTSettings;
@@ -226,11 +225,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
         TermBuilder tb = serv.getTermBuilder();
         List<Term> res = new LinkedList<>();
-        for (SequentFormula sf : seq.antecedent()) {
-            res.add(sf.formula());
+        for (Term sf : seq.antecedent()) {
+            res.add(sf);
         }
-        for (SequentFormula sf : seq.succedent()) {
-            res.add(tb.not(sf.formula()));
+        for (Term sf : seq.succedent()) {
+            res.add(tb.not(sf));
         }
         return res;
     }

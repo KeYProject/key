@@ -115,7 +115,7 @@ public class TestTacletIndex {
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
         listofHeuristic = listofHeuristic.prepend(h3);
         PosInOccurrence pos =
-            new PosInOccurrence(new SequentFormula(term_p1), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(term_p1, PosInTerm.getTopLevel(), true);
         assertTrue(
             isRuleIn(variante_one.getAntecedentTaclet(pos,
                 new IHTacletFilter(true, listofHeuristic), null), ruleRewriteNonH1H2),
@@ -150,7 +150,7 @@ public class TestTacletIndex {
 
         Term term_p1 = TacletForTests.parseTerm("p(one, zero)");
 
-        SequentFormula cfma = new SequentFormula(term_p1);
+        Term cfma = term_p1;
 
         PosInOccurrence posSucc = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
 
@@ -183,9 +183,9 @@ public class TestTacletIndex {
         Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 
         PosInOccurrence posAntec =
-            new PosInOccurrence(new SequentFormula(term_p2), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(term_p2, PosInTerm.getTopLevel(), true);
         PosInOccurrence posSucc =
-            new PosInOccurrence(new SequentFormula(term_p2), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(term_p2, PosInTerm.getTopLevel(), true);
 
 
         assertFalse(
@@ -216,7 +216,7 @@ public class TestTacletIndex {
 
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
         PosInOccurrence posAntec =
-            new PosInOccurrence(new SequentFormula(term_p4), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(term_p4, PosInTerm.getTopLevel(), true);
 
         assertFalse(
             isRuleIn(ruleIdx.getAntecedentTaclet(posAntec,
@@ -231,7 +231,7 @@ public class TestTacletIndex {
         ruleIdx.add(notfreeconflict);
 
         Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
-        SequentFormula cfma_p5 = new SequentFormula(term_p5);
+        Term cfma_p5 = term_p5;
         Sequent seq_p5 = Sequent.createAnteSequent(
             Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
         PosInOccurrence pio_p5 = new PosInOccurrence(cfma_p5, PosInTerm.getTopLevel(), true);
@@ -243,7 +243,7 @@ public class TestTacletIndex {
 
         Term term_p6 = TacletForTests.parseTerm("\\forall nat z; p(zero, z)");
 
-        SequentFormula cfma_p6 = new SequentFormula(term_p6);
+        Term cfma_p6 = term_p6;
         Sequent seq_p6 = Sequent.createAnteSequent(
             Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
         PosInOccurrence pio_p6 = new PosInOccurrence(cfma_p6, PosInTerm.getTopLevel(), true);

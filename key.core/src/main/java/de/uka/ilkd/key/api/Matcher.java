@@ -7,7 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -85,9 +85,9 @@ public class Matcher {
             ImmutableArray<IfFormulaInstantiation> succCand =
                 IfFormulaInstSeq.createList(currentSeq, false, copyServices);
 
-            SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
+            Term[] patternArray = new Term[patternSeq.size()];
             int i = 0;
-            for (SequentFormula fm : patternSeq) {
+            for (Term fm : patternSeq) {
                 patternArray[i++] = fm;
             }
 

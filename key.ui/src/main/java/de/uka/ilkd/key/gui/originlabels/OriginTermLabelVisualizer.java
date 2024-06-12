@@ -409,7 +409,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         if (termPio == null) {
             return pio;
         } else if (pio == null) {
-            return new PosInOccurrence(termPio.sequentFormula(), termPio.posInTerm(),
+            return new PosInOccurrence(termPio.sequentLevelFormula(), termPio.posInTerm(),
                 termPio.isInAntec());
         } else {
             PosInTerm completePos = termPio.posInTerm();
@@ -419,7 +419,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 completePos = completePos.down(it.next());
             }
 
-            return new PosInOccurrence(termPio.sequentFormula(), completePos, termPio.isInAntec());
+            return new PosInOccurrence(termPio.sequentLevelFormula(), completePos,
+                termPio.isInAntec());
         }
     }
 
@@ -435,9 +436,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         if (parentPos == null) {
             int index = 0;
 
-            ImmutableList<SequentFormula> children = sequent.antecedent().asList();
+            ImmutableList<Term> children = sequent.antecedent().asList();
 
-            for (SequentFormula child : children) {
+            for (Term child : children) {
                 PosInOccurrence childPos =
                     new PosInOccurrence(child, PosInTerm.getTopLevel(), true);
                 TreeNode childNode = new TreeNode(childPos);
@@ -450,7 +451,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
             children = sequent.succedent().asList();
 
-            for (SequentFormula child : children) {
+            for (Term child : children) {
                 PosInOccurrence childPos =
                     new PosInOccurrence(child, PosInTerm.getTopLevel(), false);
                 TreeNode childNode = new TreeNode(childPos);

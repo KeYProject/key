@@ -50,7 +50,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
  * <ul>
  * <li>{@link #refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, Term)}:
  * The full sequent</li>
- * <li>{@link #refactorSequentFormula(TermLabelState, Services, Term, PosInOccurrence, Rule, Goal, Object, Term)}
+ * <li>{@link #refactorTerm(TermLabelState, Services, Term, PosInOccurrence, Rule, Goal, Object, Term)}
  * : The sequent formula which contains the application term on which the rule is applied</li>
  * <li>{@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term)}
  * : The current term.</li>
@@ -955,8 +955,8 @@ public class TermLabelManager {
     }
 
     /**
-     * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} of a
-     * {@link SequentFormula}.
+     * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} representing a
+     * sequent level formula
      *
      * @param state The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -970,21 +970,21 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      * @return The updated application {@link Term}.
      */
-    public static Term refactorSequentFormula(TermLabelState state, Services services,
-            Term sequentFormula, PosInOccurrence applicationPosInOccurrence, Rule rule, Goal goal,
+    public static Term refactorTerm(TermLabelState state, Services services,
+            Term seqLevelFml, PosInOccurrence applicationPosInOccurrence, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
-            return manager.refactorSequentFormula(state, services, sequentFormula,
+            return manager.refactorTerm(state, services, seqLevelFml,
                 applicationPosInOccurrence, goal, hint, rule, tacletTerm);
         } else {
-            return sequentFormula;
+            return seqLevelFml;
         }
     }
 
     /**
-     * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} of a
-     * {@link SequentFormula}.
+     * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} representing
+     * a sequent level formula.
      *
      * @param state The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -998,11 +998,11 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      * @return The updated application {@link Term}.
      */
-    public Term refactorSequentFormula(TermLabelState state, Services services, Term sequentFormula,
+    public Term refactorTerm(TermLabelState state, Services services, Term seqLevelFml,
             PosInOccurrence applicationPosInOccurrence, Goal goal, Object hint, Rule rule,
             Term tacletTerm) {
         final PosInTerm pos = applicationPosInOccurrence.posInTerm();
-        final Term oldTerm = pos.getSubTerm(sequentFormula);
+        final Term oldTerm = pos.getSubTerm(seqLevelFml);
         // Compute active refactorings
         RefactoringsContainer refactorings = computeRefactorings(state, services,
             applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
@@ -1020,7 +1020,7 @@ public class TermLabelManager {
                 refactorings.childAndGrandchildRefactoringsAndParents(), services,
                 applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
         } else {
-            return sequentFormula;
+            return seqLevelFml;
         }
     }
 
@@ -1159,12 +1159,12 @@ public class TermLabelManager {
             Term root = replaceTerm(state, applicationPosInOccurrence, newApplicationTerm, tf,
                 refactorings.childAndGrandchildRefactoringsAndParents(), services,
                 applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
-            goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
+            goal.changeFormula(root, applicationPosInOccurrence.topLevel());
         } else if (!refactorings.childAndGrandchildRefactoringsAndParents().isEmpty()) {
             Term root = replaceTerm(state, applicationPosInOccurrence, applicationTerm, tf,
                 refactorings.childAndGrandchildRefactoringsAndParents(), services,
                 applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
-            goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
+            goal.changeFormula(root, applicationPosInOccurrence.topLevel());
         }
         // Do sequent refactoring if required
         if (!refactorings.sequentRefactorings().isEmpty() && goal != null) {
@@ -1669,13 +1669,13 @@ public class TermLabelManager {
             Object hint, Term tacletTerm, Semisequent semisequent, boolean inAntec,
             Set<TermLabelRefactoring> activeRefactorings) {
         if (!activeRefactorings.isEmpty()) {
-            for (SequentFormula sfa : semisequent) {
+            for (Term sfa : semisequent) {
                 Term updatedTerm =
                     refactorLabelsRecursive(state, services, applicationPosInOccurrence,
-                        applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(),
+                        applicationTerm, rule, goal, hint, tacletTerm, sfa,
                         activeRefactorings);
-                if (!sfa.formula().equals(updatedTerm)) {
-                    goal.changeFormula(new SequentFormula(updatedTerm),
+                if (!sfa.equals(updatedTerm)) {
+                    goal.changeFormula(updatedTerm,
                         new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
                 }
             }
@@ -1962,11 +1962,11 @@ public class TermLabelManager {
     }
 
     /**
-     * Merges the {@link TermLabel}s of the rejected {@link SequentFormula}s into the resulting
+     * Merges the {@link TermLabel}s of the rejected {@link Term}s into the resulting
      * {@link Sequent}.
      *
      * @param currentSequent The {@link SequentChangeInfo} which lists the rejected
-     *        {@link SequentFormula}s.
+     *        {@link Term}s.
      * @param services The {@link Services} to use.
      */
     public static void mergeLabels(SequentChangeInfo currentSequent, Services services) {
@@ -1977,47 +1977,49 @@ public class TermLabelManager {
     }
 
     /**
-     * Merges the {@link TermLabel}s of the rejected {@link SequentFormula}s into the resulting
+     * Merges the {@link TermLabel}s of the rejected {@link Term}s into the resulting
      * {@link Sequent}.
      *
      * @param services The {@link Services} to use.
      * @param currentSequent The {@link SequentChangeInfo} which lists the rejected
-     *        {@link SequentFormula}s.
+     *        {@link Term}s.
      */
     public void mergeLabels(Services services, SequentChangeInfo currentSequent) {
-        for (SequentFormula rejectedSF : currentSequent.getSemisequentChangeInfo(true)
+        for (Term rejectedSF : currentSequent.getSemisequentChangeInfo(true)
                 .rejectedFormulas()) {
             mergeLabels(currentSequent, services, rejectedSF, true);
         }
-        for (final SequentFormula rejectedSF : currentSequent.getSemisequentChangeInfo(false)
+        for (final Term rejectedSF : currentSequent.getSemisequentChangeInfo(false)
                 .rejectedFormulas()) {
             mergeLabels(currentSequent, services, rejectedSF, false);
         }
     }
 
     /**
-     * Merges the {@link TermLabel}s of the given {@link SequentFormula} into the resulting
+     * Merges the {@link TermLabel}s of the given {@link Term} into the resulting
      * {@link Sequent}.
      *
      * @param currentSequent The {@link SequentChangeInfo} which lists the rejected
-     *        {@link SequentFormula}s.
+     *        {@link Term}s.
      * @param services The {@link Services} to use.
-     * @param rejectedSF The rejected {@link SequentFormula} to work with.
-     * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent,
+     * @param rejectedSF The rejected {@link Term} to work with.
+     * @param inAntecedent {@code true} rejected {@link Term} is in antecedent,
      *        {@code false} it is in succedent.
      */
     protected void mergeLabels(SequentChangeInfo currentSequent, Services services,
-            SequentFormula rejectedSF, boolean inAntecedent) {
-        final Term rejectedTerm = rejectedSF.formula();
+            Term rejectedSF, boolean inAntecedent) {
+        final Term rejectedTerm = rejectedSF;
         if (rejectedTerm.hasLabels()) {
-            // Search existing SequentFormula
+            // Search existing Term
             Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
-            SequentFormula existingSF = CollectionUtil.search(s,
-                element -> element.formula().equalsModProperty(rejectedTerm,
-                    RENAMING_PROPERTY));
+            Term existingSF = CollectionUtil.search(s,
+                element -> {
+                    return element.equalsModProperty(rejectedTerm,
+                        RENAMING_PROPERTY);
+                });
             if (existingSF != null) {
                 // Create list of new labels
-                Term existingTerm = existingSF.formula();
+                Term existingTerm = existingSF;
                 List<TermLabel> mergedLabels = new LinkedList<>();
                 CollectionUtil.addAll(mergedLabels, existingTerm.getLabels());
                 boolean labelsChanged = false;
@@ -2039,7 +2041,7 @@ public class TermLabelManager {
                         existingTerm.subs(), existingTerm.boundVars(),
                         new ImmutableArray<>(mergedLabels));
                     SequentChangeInfo sci =
-                        currentSequent.sequent().changeFormula(new SequentFormula(newTerm),
+                        currentSequent.sequent().changeFormula(newTerm,
                             new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));
                     currentSequent.combine(sci);
                 }

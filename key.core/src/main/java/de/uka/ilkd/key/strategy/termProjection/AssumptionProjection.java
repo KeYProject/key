@@ -36,6 +36,6 @@ public class AssumptionProjection implements ProjectionToTerm {
                 : "Projection is only applicable to taclet apps with assumptions," + " but got "
                     + app;
 
-        return tapp.ifFormulaInstantiations().take(no).head().getConstrainedFormula().formula();
+        return tapp.ifFormulaInstantiations().take(no).head().getConstrainedFormula();
     }
 }

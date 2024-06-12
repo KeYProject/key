@@ -68,8 +68,8 @@ public class TestApplyTaclet {
         if ("".equals(t)) {
             return Semisequent.EMPTY_SEMISEQUENT;
         }
-        SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+        return Semisequent.EMPTY_SEMISEQUENT.insert(0,
+            TacletForTests.parseTerm(t)).semisequent();
     }
 
     @BeforeEach
@@ -100,7 +100,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testSuccTacletWithoutIf() {
-        Term fma = proof[0].root().sequent().succedent().getFirst().formula();
+        Term fma = proof[0].root().sequent().succedent().getFirst();
         NoPosTacletApp impright = TacletForTests.getRules().lookup("imp_right");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(impright);
@@ -115,16 +115,16 @@ public class TestApplyTaclet {
         ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
         assertEquals(1, goals.size(), "Too many or zero goals for imp-right.");
         Sequent seq = goals.head().sequent();
-        assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
+        assertEquals(seq.antecedent().getFirst(), fma.sub(0),
             "Wrong antecedent after imp-right");
-        assertEquals(seq.succedent().getFirst().formula(), fma.sub(1),
+        assertEquals(seq.succedent().getFirst(), fma.sub(1),
             "Wrong succedent after imp-right");
     }
 
 
     @Test
     public void testAddingRule() {
-        Term fma = proof[0].root().sequent().succedent().getFirst().formula();
+        Term fma = proof[0].root().sequent().succedent().getFirst();
         NoPosTacletApp imprightadd =
             TacletForTests.getRules().lookup("TestApplyTaclet_imp_right_add");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
@@ -140,9 +140,9 @@ public class TestApplyTaclet {
         ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
         assertEquals(1, goals.size(), "Too many or zero goals for imp_right_add.");
         Sequent seq = goals.head().sequent();
-        assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
+        assertEquals(seq.antecedent().getFirst(), fma.sub(0),
             "Wrong antecedent after imp_right_add");
-        assertEquals(seq.succedent().getFirst().formula(), fma.sub(1),
+        assertEquals(seq.succedent().getFirst(), fma.sub(1),
             "Wrong succedent after imp_right_add");
         ImmutableList<NoPosTacletApp> nfapp = goals.head().indexOfTaclets()
                 .getNoFindTaclet(new IHTacletFilter(true, ImmutableSLList.nil()), null);
@@ -157,13 +157,17 @@ public class TestApplyTaclet {
         Sequent seq1 = goals.head().sequent();
         Sequent seq2 = goals.tail().head().sequent();
         assertEquals(2, goals.size(), "Preinstantiated cut-rule should be executed");
+        Term fml = seq2.succedent().get(1);
+        Term fml1 = seq1.succedent().get(1);
+        Term fml2 = seq2.succedent().getFirst();
+        Term fml3 = seq1.succedent().getFirst();
         assertTrue(
-            seq1.succedent().getFirst().formula().equals(aimpb)
-                    || seq2.succedent().getFirst().formula().equals(aimpb)
+            fml3.equals(aimpb)
+                    || fml2.equals(aimpb)
                     || (seq1.succedent().get(1) != null
-                            && seq1.succedent().get(1).formula().equals(aimpb))
+                            && fml1.equals(aimpb))
                     || (seq2.succedent().get(1) != null
-                            && seq2.succedent().get(1).formula().equals(aimpb)),
+                            && fml.equals(aimpb)),
             "A->B should be in the succedent of one of the new goals now, "
                 + "it's in the antecedent, anyway.");
     }
@@ -188,7 +192,7 @@ public class TestApplyTaclet {
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent(), Semisequent.EMPTY_SEMISEQUENT,
             "Wrong antecedent after all-right");
-        assertEquals(seq.succedent().getFirst().formula().op(),
+        assertEquals(seq.succedent().getFirst().op(),
             TacletForTests.getFunctions().lookup(new Name("p")),
             "Wrong succedent after all-right (op mismatch)");
     }
@@ -230,7 +234,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testAntecTacletWithoutIf() {
-        Term fma = proof[3].root().sequent().antecedent().getFirst().formula();
+        Term fma = proof[3].root().sequent().antecedent().getFirst();
         NoPosTacletApp impleft = TacletForTests.getRules().lookup("imp_left");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(impleft);
@@ -246,19 +250,19 @@ public class TestApplyTaclet {
         assertEquals(2, goals.size(), "Too many or zero goals for imp-left.");
         Sequent seq = goals.head().sequent();
         if (!seq.succedent().isEmpty()) {
-            assertEquals(seq.succedent().getFirst().formula(), fma.sub(0),
+            assertEquals(seq.succedent().getFirst(), fma.sub(0),
                 "Wrong succedent after imp-left");
             goals = goals.tail();
             seq = goals.head().node().sequent();
-            assertEquals(seq.antecedent().getFirst().formula(), fma.sub(1),
+            assertEquals(seq.antecedent().getFirst(), fma.sub(1),
                 "Wrong antecedent after imp-left");
         } else {
-            assertEquals(seq.antecedent().getFirst().formula(), fma.sub(1),
+            assertEquals(seq.antecedent().getFirst(), fma.sub(1),
                 "Wrong antecedent after imp-left");
             goals = goals.tail();
             seq = goals.head().node().sequent();
 
-            assertEquals(seq.succedent().getFirst().formula(), fma.sub(0),
+            assertEquals(seq.succedent().getFirst(), fma.sub(0),
                 "Wrong succedent after imp-left");
         }
     }
@@ -282,7 +286,7 @@ public class TestApplyTaclet {
         ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
         assertEquals(1, goals.size(), "Too many or zero goals for contradiction.");
         Sequent seq = goals.head().sequent();
-        Term term = seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
+        Term term = seq.succedent().getFirst().sub(1).sub(0).sub(0);
         assertEquals(term, TacletForTests.parseTerm("!B -> !A"));
     }
 
@@ -308,17 +312,17 @@ public class TestApplyTaclet {
         Sequent seq1 = goals.head().sequent();
         goals = goals.tail();
         Sequent seq2 = goals.head().sequent();
-        if (!seq1.antecedent().isEmpty() && seq1.antecedent().getFirst().formula().equals(t_c)) {
+        if (!seq1.antecedent().isEmpty() && seq1.antecedent().getFirst().equals(t_c)) {
             assertTrue(
-                seq2.succedent().getFirst().formula().equals(t_c)
-                        || seq2.succedent().get(1).formula().equals(t_c),
+                seq2.succedent().getFirst().equals(t_c)
+                        || seq2.succedent().get(1).equals(t_c),
                 "D is in antecedent of 1st goal but not in succedent of 2nd");
         } else {
             assertTrue(
-                seq1.succedent().getFirst().formula().equals(t_c)
-                        || seq1.succedent().get(1).formula().equals(t_c),
+                seq1.succedent().getFirst().equals(t_c)
+                        || seq1.succedent().get(1).equals(t_c),
                 "D is not in antecedent and not in succedent " + "of first new goal");
-            assertEquals(seq2.antecedent().getFirst().formula(), t_c,
+            assertEquals(seq2.antecedent().getFirst(), t_c,
                 "D is in succedent of first new goal, but not in antecedent "
                     + "of second new goal");
         }
@@ -330,10 +334,10 @@ public class TestApplyTaclet {
      * public String automaticProof(Sequent initSeq, TacletIndex index){ String out=""; Proof
      * proof=new Proof(); proof.setRoot(new Node(proof, initSeq)); IList<Goal>
      * goals=ImmSLList.<Goal>nil(); Goal goal=new Goal(proof.root(),new RuleAppIndex(index));
-     * goals=goals.prepend(goal); while (goals.size()!=0) { SequentFormula cfma=null; SequentFormula
+     * goals=goals.prepend(goal); while (goals.size()!=0) { Term cfma=null; Term
      * userCfma=null; // in the real system the //user would select this IList<TacletApp>
      * rapplist=ImmSLList.<TacletApp>nil(); out="\n"+out+("Goals: "+goals+"\n"); goal=goals.head();
-     * Iterator<SequentFormula> it=goal.node().sequent().antecedent().iterator(); while
+     * Iterator<Term> it=goal.node().sequent().antecedent().iterator(); while
      * (it.hasNext()) { userCfma=it.next(); rapplist=rapplist.prepend(goal.ruleAppIndex().
      * getTacletAppAtAndBelow(TacletFilter.TRUE, new PosInOccurrence(userCfma, PosInTerm.TOP_LEVEL,
      * goal.node().sequent()))); } if (rapplist.isEmpty()) {
@@ -446,19 +450,22 @@ public class TestApplyTaclet {
         ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services);
 
         assertEquals(2, goals.size(), "Expected two goals");
+        Term fml1 = goals.head().sequent().succedent().iterator().next();
+        Term fml2 = goals.head().sequent().antecedent().iterator().next();
         assertTrue(
             goals.head().sequent().antecedent().size() == 1
-                    && goals.head().sequent().antecedent().iterator().next().formula()
+                    && fml2
                             .op() == Quantifier.ALL
                     && goals.head().sequent().succedent().size() == 1
-                    && goals.head().sequent().succedent().iterator().next().formula()
+                    && fml1
                             .op() == Quantifier.ALL,
             "First goal should be 'b==>b', but is " + goals.head().sequent());
         goals = goals.tail();
+        Term succFml = goals.head().sequent().succedent().iterator().next();
         assertTrue(
             goals.head().sequent().antecedent().size() == 0
                     && goals.head().sequent().succedent().size() == 1
-                    && goals.head().sequent().succedent().iterator().next().formula()
+                    && succFml
                             .op() == Quantifier.ALL,
             "Second goal should be '==>b', but is " + goals.head().sequent());
 
@@ -506,11 +513,13 @@ public class TestApplyTaclet {
 
 
         assertEquals(1, goals.size(), "Expected one goal");
-        Iterator<SequentFormula> it = goals.head().sequent().antecedent().iterator();
+        Iterator<Term> it = goals.head().sequent().antecedent().iterator();
+        Term fml = it.next();
+        Term fml1 = it.next();
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
-                    && it.next().formula().equals(TacletForTests.parseTerm("A"))
-                    && it.next().formula().equals(TacletForTests.parseTerm("B")),
+                    && fml1.equals(TacletForTests.parseTerm("A"))
+                    && fml.equals(TacletForTests.parseTerm("B")),
             "Expected 'A, B ==>', but is " + goals.head().sequent());
     }
 
@@ -546,13 +555,15 @@ public class TestApplyTaclet {
 
         assertEquals(1, goals.size(), "Expected one goal");
 
-        Iterator<SequentFormula> it = goals.head().sequent().antecedent().iterator();
+        Iterator<Term> it = goals.head().sequent().antecedent().iterator();
 
+        Term fml = it.next();
+        Term fml1 = it.next();
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
                     && goals.head().sequent().succedent().size() == 0
-                    && it.next().formula().equals(TacletForTests.parseTerm("A"))
-                    && it.next().formula().equals(TacletForTests.parseTerm("B")),
+                    && fml1.equals(TacletForTests.parseTerm("A"))
+                    && fml.equals(TacletForTests.parseTerm("B")),
             "Expected 'A, B ==>', but is " + goals.head().sequent());
     }
 
@@ -611,10 +622,9 @@ public class TestApplyTaclet {
 
         assertEquals(0, appList.size(), "Did not expect a match.");
 
-        Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
-        SequentFormula ifformula = new SequentFormula(ifterm);
+        Term assumesFormula = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
         ImmutableList<IfFormulaInstantiation> ifInsts = ImmutableSLList
-                .<IfFormulaInstantiation>nil().prepend(new IfFormulaInstDirect(ifformula));
+                .<IfFormulaInstantiation>nil().prepend(new IfFormulaInstDirect(assumesFormula));
         appIt = rApplist.iterator();
         while (appIt.hasNext()) {
             TacletApp a =
@@ -632,13 +642,13 @@ public class TestApplyTaclet {
 
         { // Goal one
             Sequent correctSeq =
-                proof[11].root().sequent().addFormula(ifformula, true, true).sequent();
+                proof[11].root().sequent().addFormula(assumesFormula, true, true).sequent();
             assertEquals(goals.head().sequent(), correctSeq, "Wrong result");
         }
 
         { // Goal two
             Sequent correctSeq =
-                proof[10].root().sequent().addFormula(ifformula, false, true).sequent();
+                proof[10].root().sequent().addFormula(assumesFormula, false, true).sequent();
             assertEquals(goals.tail().head().sequent(), correctSeq, "Wrong result");
         }
     }
@@ -737,8 +747,8 @@ public class TestApplyTaclet {
 
         Sequent correctSeq = proof[p_proof + 1].root().sequent();
 
-        Term resultFormula = goals.head().sequent().getFormulabyNr(1).formula();
-        Term correctFormula = correctSeq.getFormulabyNr(1).formula();
+        Term resultFormula = goals.head().sequent().getFormulabyNr(1);
+        Term correctFormula = correctSeq.getFormulabyNr(1);
 
         assertTrue(resultFormula.equalsModProperty(correctFormula, RENAMING_PROPERTY),
             "Wrong result. Expected:"
@@ -808,10 +818,12 @@ public class TestApplyTaclet {
         assertEquals(1, goals.size(), "Expected one goal.");
 
         // the content of the diamond must not have changed
+        Term fml1 = proof[22].root().sequent().getFormulabyNr(1);
         ProgramElement expected =
-            proof[22].root().sequent().getFormulabyNr(1).formula().javaBlock().program();
+            fml1.javaBlock().program();
+        Term fml = goals.head().sequent().getFormulabyNr(1);
         ProgramElement is =
-            goals.head().sequent().getFormulabyNr(1).formula().sub(0).javaBlock().program();
+            fml.sub(0).javaBlock().program();
         assertEquals(expected, is, "Context has been thrown away.");
 
     }
@@ -844,8 +856,9 @@ public class TestApplyTaclet {
             TacletForTests.parsePrg("{try{ ; while (1==1) {if (1==2) {break;}} return 1==3; "
                 + "int i=17; } catch (Exception e) { return null;}}");
 
+        Term fml = goals.head().sequent().getFormulabyNr(1);
         ProgramElement is =
-            goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
+            fml.javaBlock().program();
         // FIXME weigl: This test case is spurious:
         // actual.toString() == expected.toString() but internally there is a difference.
         assertTrue(expected.equalsModRenaming(is, new NameAbstractionTable()),
@@ -880,8 +893,7 @@ public class TestApplyTaclet {
             TacletForTests.parsePrg("{try{while (1==1) {if (1==2) {break;}} return 1==3; "
                 + "int i=17; } catch (Exception e) { return null;}}");
 
-        ProgramElement is =
-            goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
+        ProgramElement is = goals.head().sequent().getFormulabyNr(1).javaBlock().program();
         assertTrue(expected.equalsModRenaming(is, new NameAbstractionTable()),
             "Expected:" + expected + "\n but was:" + is);
     }

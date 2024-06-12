@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -277,7 +278,7 @@ public class PosTacletApp extends TacletApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula and a position in the
+     * returns the PositionInOccurrence (representing a Term and a position in the
      * corresponding formula)
      *
      * @return the PosInOccurrence
@@ -319,7 +320,8 @@ public class PosTacletApp extends TacletApp {
     @Override
     public int hashCodeModProofIrrelevancy() {
         return Objects.hash(super.hashCodeModProofIrrelevancy(),
-            pos.sequentFormula().hashCodeModProofIrrelevancy(),
+            ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY
+                    .hashCodeModThisProperty(pos.sequentLevelFormula()),
             pos.posInTerm());
     }
 

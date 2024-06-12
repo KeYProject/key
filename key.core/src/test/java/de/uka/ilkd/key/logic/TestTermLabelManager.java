@@ -119,9 +119,11 @@ public class TestTermLabelManager {
         one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
         two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
         Sequent sequent = Sequent.EMPTY_SEQUENT;
-        sequent = sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
-        sequent = sequent.addFormula(pos.sequentFormula(), true, false).sequent();
-        sequent = sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
+        Term uAssumptions1 = TB.inInt(one);
+        sequent = sequent.addFormula(uAssumptions1, true, true).sequent();
+        sequent = sequent.addFormula(pos.sequentLevelFormula(), true, false).sequent();
+        Term uAssumptions = TB.inInt(two);
+        sequent = sequent.addFormula(uAssumptions, false, true).sequent();
         // Test supported rule
         Rule rule = new DummyRule("rule");
         Term taclet = TB.tt();
@@ -147,12 +149,12 @@ public class TestTermLabelManager {
 
     protected void compareSequents(Sequent expected, Sequent current, boolean changed,
             RefactoringScope scope) {
-        Iterator<SequentFormula> expectedIter = expected.iterator();
-        Iterator<SequentFormula> currentIter = current.iterator();
+        Iterator<Term> expectedIter = expected.iterator();
+        Iterator<Term> currentIter = current.iterator();
         while (expectedIter.hasNext() && currentIter.hasNext()) {
-            SequentFormula expectedSF = expectedIter.next();
-            SequentFormula currentSF = currentIter.next();
-            compareTerms(expectedSF.formula(), currentSF.formula(), changed, scope);
+            Term expectedSF = expectedIter.next();
+            Term currentSF = currentIter.next();
+            compareTerms(expectedSF, currentSF, changed, scope);
         }
         assertFalse(expectedIter.hasNext());
         assertFalse(currentIter.hasNext());
@@ -450,7 +452,7 @@ public class TestTermLabelManager {
         Term updateApp = TB.apply(update, modality,
             new ImmutableArray<>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
         PosInOccurrence pos =
-            new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(updateApp, PosInTerm.getTopLevel(), true);
         Term taclet = TB.tt();
         Rule rule = new DummyRule("rule");
         // Create labels
@@ -526,7 +528,7 @@ public class TestTermLabelManager {
     protected PosInOccurrence createTestPosInOccurrence(Services services) {
         Term testTerm = createTestTerm(services);
         Term inInt = services.getTermBuilder().inInt(testTerm);
-        return new PosInOccurrence(new SequentFormula(inInt), PosInTerm.parseReverseString("0"),
+        return new PosInOccurrence(inInt, PosInTerm.parseReverseString("0"),
             true);
     }
 

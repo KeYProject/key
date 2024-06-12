@@ -160,10 +160,10 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         SMTRuleApp app = RULE.createApp(pio, goal.proof().getServices());
         Sequent seq = goal.sequent();
         List<PosInOccurrence> ifInsts = new ArrayList<>();
-        for (SequentFormula ante : seq.antecedent()) {
+        for (Term ante : seq.antecedent()) {
             ifInsts.add(new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
         }
-        for (SequentFormula succ : seq.succedent()) {
+        for (Term succ : seq.succedent()) {
             ifInsts.add(new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
         }
         return app.setIfInsts(ImmutableList.fromList(ifInsts));

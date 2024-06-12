@@ -18,12 +18,12 @@ import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
  * future versions it can be enhanced to do other simplifications. A sequent and so a semisequent
  * has to be immutable.
  */
-public class Semisequent implements Iterable<SequentFormula> {
+public class Semisequent implements Iterable<Term> {
 
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
-    /** list with the {@link SequentFormula}s of the Semisequent */
-    private final ImmutableList<SequentFormula> seqList;
+    /** list with the {@link Term}s of the Semisequent */
+    private final ImmutableList<Term> seqList;
 
     /** used by inner class Empty */
     private Semisequent() {
@@ -37,7 +37,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      *
      * @param seqList list of sequent formulas
      */
-    public Semisequent(ImmutableList<SequentFormula> seqList) {
+    public Semisequent(ImmutableList<Term> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
     }
@@ -49,7 +49,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      *
      * @param seqList list of sequent formulas
      */
-    public Semisequent(Collection<SequentFormula> seqList) {
+    public Semisequent(Collection<Term> seqList) {
         assert !seqList.isEmpty();
         this.seqList = ImmutableList.fromList(seqList);
     }
@@ -62,7 +62,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      *
      * @param seqList list of sequent formulas
      */
-    public static Semisequent create(Collection<SequentFormula> seqList) {
+    public static Semisequent create(Collection<Term> seqList) {
         if (seqList.isEmpty()) {
             return EMPTY_SEMISEQUENT;
         }
@@ -73,9 +73,9 @@ public class Semisequent implements Iterable<SequentFormula> {
     /**
      * creates a new Semisequent with the Semisequent elements in seqList
      */
-    public Semisequent(SequentFormula seqFormula) {
+    public Semisequent(Term seqFormula) {
         assert seqFormula != null;
-        this.seqList = ImmutableSLList.<SequentFormula>nil().append(seqFormula);
+        this.seqList = ImmutableSLList.<Term>nil().append(seqFormula);
     }
 
 
@@ -84,23 +84,23 @@ public class Semisequent implements Iterable<SequentFormula> {
      * returning same semisequent if inserting would create redundancies
      *
      * @param idx int encoding the place the element has to be put
-     * @param sequentFormula {@link SequentFormula} to be inserted
+     * @param fml {@link Term} to be inserted
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
-    public SemisequentChangeInfo insert(int idx, SequentFormula sequentFormula) {
-        return removeRedundance(idx, sequentFormula);
+    public SemisequentChangeInfo insert(int idx, Term fml) {
+        return removeRedundance(idx, fml);
     }
 
     /**
      * inserts the elements of the list at the specified index performing redundancy checks
      *
      * @param idx int encoding the place where the insertion starts
-     * @param insertionList IList<SequentFormula> to be inserted starting at idx
+     * @param insertionList IList<Term> to be inserted starting at idx
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
-    public SemisequentChangeInfo insert(int idx, ImmutableList<SequentFormula> insertionList) {
+    public SemisequentChangeInfo insert(int idx, ImmutableList<Term> insertionList) {
         return removeRedundance(idx, insertionList);
     }
 
@@ -108,23 +108,23 @@ public class Semisequent implements Iterable<SequentFormula> {
      * inserts element at index 0 performing redundancy checks, this may result in returning same
      * semisequent if inserting would create redundancies
      *
-     * @param sequentFormula SequentFormula to be inserted
+     * @param fml the Term to be inserted
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
-        return insert(0, sequentFormula);
+    public SemisequentChangeInfo insertFirst(Term fml) {
+        return insert(0, fml);
     }
 
     /**
      * inserts element at index 0 performing redundancy checks, this may result in returning same
      * semisequent if inserting would create redundancies
      *
-     * @param insertions IList<SequentFormula> to be inserted
+     * @param insertions IList<Term> to be inserted
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertFirst(ImmutableList<SequentFormula> insertions) {
+    public SemisequentChangeInfo insertFirst(ImmutableList<Term> insertions) {
         return insert(0, insertions);
     }
 
@@ -132,23 +132,23 @@ public class Semisequent implements Iterable<SequentFormula> {
      * inserts element at the end of the semisequent performing redundancy checks, this may result
      * in returning same semisequent if inserting would create redundancies
      *
-     * @param sequentFormula {@link SequentFormula} to be inserted
+     * @param fml {@link Term} to be inserted
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertLast(SequentFormula sequentFormula) {
-        return insert(size(), sequentFormula);
+    public SemisequentChangeInfo insertLast(Term fml) {
+        return insert(size(), fml);
     }
 
     /**
      * inserts the formulas of the list at the end of the semisequent performing redundancy checks,
      * this may result in returning same semisequent if inserting would create redundancies
      *
-     * @param insertions the IList<SequentFormula> to be inserted
+     * @param insertions the IList<Term> to be inserted
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertLast(ImmutableList<SequentFormula> insertions) {
+    public SemisequentChangeInfo insertLast(ImmutableList<Term> insertions) {
         return insert(size(), insertions);
     }
 
@@ -163,21 +163,21 @@ public class Semisequent implements Iterable<SequentFormula> {
 
 
     /**
-     * inserts new SequentFormula at index idx and removes duplicates, perform simplifications etc.
+     * inserts new fml at index idx and removes duplicates, perform simplifications etc.
      *
      * @param fci null if the formula to be added is new, otherwise an object telling which formula
-     *        is replaced with the new formula <code>sequentFormula</code>, and what are the
+     *        is replaced with the new formula <code>fml</code>, and what are the
      *        differences between the two formulas
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
     private SemisequentChangeInfo insertAndRemoveRedundancyHelper(int idx,
-            SequentFormula sequentFormula, SemisequentChangeInfo semiCI, FormulaChangeInfo fci) {
+            Term fml, SemisequentChangeInfo semiCI, FormulaChangeInfo fci) {
 
         // Search for equivalent formulas and weakest constraint
-        ImmutableList<SequentFormula> searchList = semiCI.getFormulaList();
-        final SequentFormula[] newSeqList = new SequentFormula[searchList.size()];
-        SequentFormula cf;
+        ImmutableList<Term> searchList = semiCI.getFormulaList();
+        final Term[] newSeqList = new Term[searchList.size()];
+        Term cf;
         int pos = -1;
 
         while (!searchList.isEmpty()) {
@@ -185,12 +185,13 @@ public class Semisequent implements Iterable<SequentFormula> {
             cf = searchList.head();
             searchList = searchList.tail();
 
-            if (sequentFormula != null
-                    && cf.formula().equalsModProperty(sequentFormula.formula(),
-                        RENAMING_PROPERTY)) {
-                semiCI.rejectedFormula(sequentFormula);
-                return semiCI; // semisequent already contains formula
+            if (fml != null) {
+                if (cf.equalsModProperty(fml,
+                    RENAMING_PROPERTY)) {
+                    semiCI.rejectedFormula(fml);
+                    return semiCI; // semisequent already contains formula
 
+                }
             }
             newSeqList[pos] = cf;
         }
@@ -198,15 +199,15 @@ public class Semisequent implements Iterable<SequentFormula> {
 
         // compose resulting formula list
         if (fci == null) {
-            semiCI.addedFormula(idx, sequentFormula);
+            semiCI.addedFormula(idx, fml);
         } else {
             semiCI.modifiedFormula(idx, fci);
         }
 
-        final ImmutableList<SequentFormula> orig = semiCI.getFormulaList();
+        final ImmutableList<Term> orig = semiCI.getFormulaList();
         pos = Math.min(idx, orig.size());
 
-        searchList = semiCI.getFormulaList().take(pos).prepend(sequentFormula);
+        searchList = semiCI.getFormulaList().take(pos).prepend(fml);
 
         while (pos > 0) {
             --pos;
@@ -223,23 +224,23 @@ public class Semisequent implements Iterable<SequentFormula> {
      * . inserts new ConstrainedFormulas starting at index idx and removes duplicates, perform
      * simplifications etc.
      *
-     * @param sequentFormulasToBeInserted the {@link ImmutableList<SequentFormula>} to be inserted
+     * @param TermsToBeInserted the {@link ImmutableList<Term>} to be inserted
      *        at position idx
-     * @param idx an int that means insert sequentFormula at the idx-th position in the semisequent
+     * @param idx an int that means insert Term at the idx-th position in the semisequent
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
     private SemisequentChangeInfo insertAndRemoveRedundancy(int idx,
-            ImmutableList<SequentFormula> sequentFormulasToBeInserted, SemisequentChangeInfo sci) {
+            ImmutableList<Term> TermsToBeInserted, SemisequentChangeInfo sci) {
 
         int pos = idx;
-        ImmutableList<SequentFormula> oldFormulas = sci.getFormulaList();
+        ImmutableList<Term> oldFormulas = sci.getFormulaList();
 
-        while (!sequentFormulasToBeInserted.isEmpty()) {
-            final SequentFormula aSequentFormula = sequentFormulasToBeInserted.head();
-            sequentFormulasToBeInserted = sequentFormulasToBeInserted.tail();
+        while (!TermsToBeInserted.isEmpty()) {
+            final Term aTerm = TermsToBeInserted.head();
+            TermsToBeInserted = TermsToBeInserted.tail();
 
-            sci = insertAndRemoveRedundancyHelper(pos, aSequentFormula, sci, null);
+            sci = insertAndRemoveRedundancyHelper(pos, aTerm, sci, null);
 
             if (sci.getFormulaList() != oldFormulas) {
                 pos = sci.getIndex() + 1;
@@ -253,55 +254,55 @@ public class Semisequent implements Iterable<SequentFormula> {
      * . inserts new ConstrainedFormulas starting at index idx and removes duplicates, perform
      * simplifications etc.
      *
-     * @param sequentFormula the IList<SequentFormula> to be inserted at position idx
-     * @param idx an int that means insert sequentFormula at the idx-th position in the semisequent
+     * @param Term the IList<Term> to be inserted at position idx
+     * @param idx an int that means insert Term at the idx-th position in the semisequent
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
     private SemisequentChangeInfo removeRedundance(int idx,
-            ImmutableList<SequentFormula> sequentFormula) {
-        return insertAndRemoveRedundancy(idx, sequentFormula, new SemisequentChangeInfo(seqList));
+            ImmutableList<Term> Term) {
+        return insertAndRemoveRedundancy(idx, Term, new SemisequentChangeInfo(seqList));
     }
 
 
     /**
-     * . inserts new SequentFormula at index {@code idx} and removes duplicates, perform
+     * . inserts new fml at index {@code idx} and removes duplicates, perform
      * simplifications etc.
      *
-     * @param sequentFormula the SequentFormula to be inserted at position idx
-     * @param idx an int that means insert sequentFormula at the idx-th position in the semisequent
-     * @return new Semisequent with sequentFormula at index idx and removed redundancies
+     * @param fml the fml to be inserted at position idx
+     * @param idx an int that means insert fml at the idx-th position in the semisequent
+     * @return new Semisequent with fml at index idx and removed redundancies
      */
-    private SemisequentChangeInfo removeRedundance(int idx, SequentFormula sequentFormula) {
-        return insertAndRemoveRedundancyHelper(idx, sequentFormula,
+    private SemisequentChangeInfo removeRedundance(int idx, Term fml) {
+        return insertAndRemoveRedundancyHelper(idx, fml,
             new SemisequentChangeInfo(seqList), null);
     }
 
 
     /**
-     * replaces the element at place idx with sequentFormula
+     * replaces the element at place idx with fml
      *
      * @param pos the PosInOccurrence describing the position of and within the formula below which
-     *        the formula differs from the new formula <code>sequentFormula</code>
-     * @param sequentFormula the SequentFormula replacing the old element at index idx
+     *        the formula differs from the new formula <code>fml</code>
+     * @param fml the fml replacing the old element at index idx
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
-    public SemisequentChangeInfo replace(PosInOccurrence pos, SequentFormula sequentFormula) {
-        final int idx = indexOf(pos.sequentFormula());
-        final FormulaChangeInfo fci = new FormulaChangeInfo(pos, sequentFormula);
-        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
+    public SemisequentChangeInfo replace(PosInOccurrence pos, Term fml) {
+        final int idx = indexOf(pos.sequentLevelFormula());
+        final FormulaChangeInfo fci = new FormulaChangeInfo(pos, fml);
+        return insertAndRemoveRedundancyHelper(idx, fml, remove(idx), fci);
     }
 
     /**
-     * replaces the <tt>idx</tt>-th formula by <tt>sequentFormula</tt>
+     * replaces the <tt>idx</tt>-th formula by <tt>fml</tt>
      *
      * @param idx the int with the position of the formula to be replaced
-     * @param sequentFormula the SequentFormula replacing the formula at the given position
+     * @param fml the fml replacing the formula at the given position
      * @return a SemisequentChangeInfo containing the new sequent and a diff to the old one
      */
-    public SemisequentChangeInfo replace(int idx, SequentFormula sequentFormula) {
-        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), null);
+    public SemisequentChangeInfo replace(int idx, Term fml) {
+        return insertAndRemoveRedundancyHelper(idx, fml, remove(idx), null);
     }
 
     /**
@@ -309,14 +310,14 @@ public class Semisequent implements Iterable<SequentFormula> {
      * of the list to the semisequent behind the replaced formula
      *
      * @param pos the formula to be replaced
-     * @param replacements the IList<SequentFormula> whose head replaces the element at index idx
+     * @param replacements the IList<Term> whose head replaces the element at index idx
      *        and the tail is added to the semisequent
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
     public SemisequentChangeInfo replace(PosInOccurrence pos,
-            ImmutableList<SequentFormula> replacements) {
-        final int idx = indexOf(pos.sequentFormula());
+            ImmutableList<Term> replacements) {
+        final int idx = indexOf(pos.sequentLevelFormula());
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 
@@ -327,7 +328,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      * @param replacements the new formulas
      * @return change information including the resulting semisequent after the replacement
      */
-    public SemisequentChangeInfo replace(int idx, ImmutableList<SequentFormula> replacements) {
+    public SemisequentChangeInfo replace(int idx, ImmutableList<Term> replacements) {
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 
@@ -346,14 +347,14 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     public SemisequentChangeInfo remove(int idx) {
 
-        ImmutableList<SequentFormula> newList = seqList;
+        ImmutableList<Term> newList = seqList;
         int index = 0;
 
         if (idx < 0 || idx >= size()) {
             return new SemisequentChangeInfo(seqList);
         }
 
-        final SequentFormula[] temp = new SequentFormula[idx];
+        final Term[] temp = new Term[idx];
 
         while (index < idx) {// go to idx
             temp[index] = newList.head();
@@ -362,7 +363,7 @@ public class Semisequent implements Iterable<SequentFormula> {
         }
 
         // remove the element that is at head of newList
-        final SequentFormula removedFormula = newList.head();
+        final Term removedFormula = newList.head();
         newList = newList.tail();
 
         for (int k = index - 1; k >= 0; k--) {
@@ -377,18 +378,18 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
 
     /**
-     * returns the index of the given {@link SequentFormula} or {@code -1} if the sequent formula is
+     * returns the index of the given {@link Term} or {@code -1} if the sequent formula is
      * not found. Equality of sequent formulas is checked sing the identy check (i.e.,
      * <code>==</code>)
      *
-     * @param sequentFormula the {@link SequentFormula} to look for
-     * @return index of sequentFormula (-1 if not found)
+     * @param fml the {@link Term} to look for
+     * @return index of fml (-1 if not found)
      */
-    public int indexOf(SequentFormula sequentFormula) {
-        ImmutableList<SequentFormula> searchList = seqList;
+    public int indexOf(Term fml) {
+        ImmutableList<Term> searchList = seqList;
         int index = 0;
         while (!searchList.isEmpty()) {
-            if (searchList.head() == sequentFormula) {
+            if (searchList.head() == fml) {
                 return index;
             }
             searchList = searchList.tail();
@@ -401,53 +402,53 @@ public class Semisequent implements Iterable<SequentFormula> {
      * gets the element at a specific index
      *
      * @param idx int representing the index of the element we want to have
-     * @return {@link SequentFormula} found at index idx
+     * @return {@link Term} found at index idx
      * @throws IndexOutOfBoundsException if idx is negative or greater or equal to
      *         {@link Sequent#size()}
      */
-    public SequentFormula get(int idx) {
+    public Term get(int idx) {
         if (idx < 0 || idx >= seqList.size()) {
             throw new IndexOutOfBoundsException();
         }
         return seqList.take(idx).head();
     }
 
-    /** @return the first {@link SequentFormula} of this Semisequent */
-    public SequentFormula getFirst() {
+    /** @return the first {@link Term} of this Semisequent */
+    public Term getFirst() {
         return seqList.head();
     }
 
     /**
-     * checks if the {@link SequentFormula} occurs in this Semisequent (identity check)
+     * checks if the {@link Term} occurs in this Semisequent (identity check)
      *
-     * @param sequentFormula the {@link SequentFormula} to look for
-     * @return true iff. sequentFormula has been found in this Semisequent
+     * @param fml the {@link Term} to look for
+     * @return true iff. fml has been found in this Semisequent
      */
-    public boolean contains(SequentFormula sequentFormula) {
-        return indexOf(sequentFormula) != -1;
+    public boolean contains(Term fml) {
+        return indexOf(fml) != -1;
     }
 
     /**
-     * checks if a {@link SequentFormula} is in this Semisequent (equality check)
+     * checks if a {@link Term} is in this Semisequent (equality check)
      *
-     * @param sequentFormula the {@link SequentFormula} to look for
-     * @return true iff. sequentFormula has been found in this Semisequent
+     * @param fml the {@link Term} to look for
+     * @return true iff. fml has been found in this Semisequent
      */
-    public boolean containsEqual(SequentFormula sequentFormula) {
-        return seqList.contains(sequentFormula);
+    public boolean containsEqual(Term fml) {
+        return seqList.contains(fml);
     }
 
     /**
      * returns iterator about the elements of the sequent
      *
-     * @return Iterator<SequentFormula>
+     * @return Iterator<Term>
      */
     @Override
-    public Iterator<SequentFormula> iterator() {
+    public Iterator<Term> iterator() {
         return seqList.iterator();
     }
 
-    public ImmutableList<SequentFormula> asList() {
+    public ImmutableList<Term> asList() {
         return seqList;
     }
 
@@ -459,20 +460,16 @@ public class Semisequent implements Iterable<SequentFormula> {
         return seqList.equals(((Semisequent) o).seqList);
     }
 
-
     @Override
     public int hashCode() {
         return seqList.hashCode();
     }
-
 
     /** @return String representation of this Semisequent */
     @Override
     public String toString() {
         return seqList.toString();
     }
-
-
 
     // inner class used to represent an empty semisequent
     private static class Empty extends Semisequent {
@@ -485,40 +482,40 @@ public class Semisequent implements Iterable<SequentFormula> {
          * inserts the element always at index 0 ignores the first argument
          *
          * @param idx int encoding the place the element has to be put
-         * @param sequentFormula {@link SequentFormula} to be inserted
-         * @return semisequent change information object with new semisequent with sequentFormula at
+         * @param fml {@link Term} to be inserted
+         * @return semisequent change information object with new semisequent with fml at
          *         place idx
          */
         @Override
-        public SemisequentChangeInfo insert(int idx, SequentFormula sequentFormula) {
-            return insertFirst(sequentFormula);
+        public SemisequentChangeInfo insert(int idx, Term fml) {
+            return insertFirst(fml);
         }
 
         /**
          * inserts the element at index 0
          *
-         * @param sequentFormula {@link SequentFormula} to be inserted
-         * @return semisequent change information object with new semisequent with sequentFormula at
+         * @param fml {@link Term} to be inserted
+         * @return semisequent change information object with new semisequent with Term at
          *         place idx
          */
         @Override
-        public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
+        public SemisequentChangeInfo insertFirst(Term fml) {
             final SemisequentChangeInfo sci = new SemisequentChangeInfo(
-                ImmutableSLList.<SequentFormula>nil().prepend(sequentFormula));
-            sci.addedFormula(0, sequentFormula);
+                ImmutableSLList.<Term>nil().prepend(fml));
+            sci.addedFormula(0, fml);
             return sci;
         }
 
         /**
          * inserts the element at the end of the semisequent
          *
-         * @param sequentFormula {@link SequentFormula} to be inserted
-         * @return semisequent change information object with new semisequent with sequentFormula at
+         * @param fml {@link Term} to be inserted
+         * @return semisequent change information object with new semisequent with fml at
          *         place idx
          */
         @Override
-        public SemisequentChangeInfo insertLast(SequentFormula sequentFormula) {
-            return insertFirst(sequentFormula);
+        public SemisequentChangeInfo insertLast(Term fml) {
+            return insertFirst(fml);
         }
 
 
@@ -533,16 +530,16 @@ public class Semisequent implements Iterable<SequentFormula> {
         }
 
         /**
-         * replaces the element at place idx with sequentFormula
+         * replaces the element at place idx with Term
          *
          * @param idx an int specifying the index of the element that has to be replaced
-         * @param sequentFormula the {@link SequentFormula} replacing the old element at index idx
-         * @return semisequent change information object with new semisequent with sequentFormula at
+         * @param fml the {@link Term} replacing the old element at index idx
+         * @return semisequent change information object with new semisequent with Term at
          *         place idx
          */
         @Override
-        public SemisequentChangeInfo replace(int idx, SequentFormula sequentFormula) {
-            return insertFirst(sequentFormula);
+        public SemisequentChangeInfo replace(int idx, Term fml) {
+            return insertFirst(fml);
         }
 
         /** @return int counting the elements of this semisequent */
@@ -563,13 +560,13 @@ public class Semisequent implements Iterable<SequentFormula> {
         }
 
         /**
-         * returns index of a {@link SequentFormula}
+         * returns index of a {@link Term}
          *
-         * @param sequentFormula the {@link SequentFormula} the index want to be determined
-         * @return index of sequentFormula
+         * @param fml the {@link Term} the index want to be determined
+         * @return index of Term
          */
         @Override
-        public int indexOf(SequentFormula sequentFormula) {
+        public int indexOf(Term fml) {
             return -1;
         }
 
@@ -577,29 +574,29 @@ public class Semisequent implements Iterable<SequentFormula> {
          * gets the element at a specific index
          *
          * @param idx int representing the index of the element we want to have
-         * @return {@link SequentFormula} found at index idx
+         * @return {@link Term} found at index idx
          */
         @Override
-        public SequentFormula get(int idx) {
+        public Term get(int idx) {
             return null;
         }
 
         /**
-         * @return the first SequentFormula of this Semisequent
+         * @return the first Term of this Semisequent
          */
         @Override
-        public SequentFormula getFirst() {
+        public Term getFirst() {
             return null;
         }
 
         /**
-         * checks if a {@link SequentFormula} is in this Semisequent
+         * checks if a {@link Term} is in this Semisequent
          *
-         * @param sequentFormula the {@link SequentFormula} to look for
-         * @return true iff. sequentFormula has been found in this Semisequent
+         * @param fml the {@link Term} to look for
+         * @return true iff. Term has been found in this Semisequent
          */
         @Override
-        public boolean contains(SequentFormula sequentFormula) {
+        public boolean contains(Term fml) {
             return false;
         }
 

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -41,11 +40,11 @@ public class NodeData {
 
     private static int countAST(Sequent sequent) {
         int sum = 0;
-        for (SequentFormula f : sequent.antecedent().asList()) {
-            sum += countAST(f.formula());
+        for (Term f : sequent.antecedent().asList()) {
+            sum += countAST(f);
         }
-        for (SequentFormula f : sequent.succedent().asList()) {
-            sum += countAST(f.formula());
+        for (Term f : sequent.succedent().asList()) {
+            sum += countAST(f);
         }
         return sum;
     }

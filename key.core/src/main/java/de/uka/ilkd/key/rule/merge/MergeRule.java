@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -235,13 +234,13 @@ public class MergeRule implements BuiltInRule {
 
         // Add new antecedent (path condition)
         for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            final SequentFormula newAntecedent = new SequentFormula(antecedentFormula);
+            final Term newAntecedent = antecedentFormula;
             newGoal.addFormula(newAntecedent, true, false);
         }
 
         // Add new succedent (symbolic state & program counter)
         final Term succedentFormula = tb.apply(mergedState.first, thisSEState.third);
-        final SequentFormula newSuccedent = new SequentFormula(succedentFormula);
+        final Term newSuccedent = succedentFormula;
         newGoal.addFormula(newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
 
@@ -276,7 +275,7 @@ public class MergeRule implements BuiltInRule {
                 clearSemisequent(sideConditionGoal, false);
                 final Term sideCondition = sideCondIt.next();
 
-                sideConditionGoal.addFormula(new SequentFormula(sideCondition),
+                sideConditionGoal.addFormula(sideCondition,
                     new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
 
                 i++;
@@ -686,7 +685,7 @@ public class MergeRule implements BuiltInRule {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
                 for (int i = 0; i < succedent.size(); i++) {
-                    final SequentFormula f = succedent.get(i);
+                    final Term f = succedent.get(i);
 
                     final PosInTerm pit = PosInTerm.getTopLevel();
 

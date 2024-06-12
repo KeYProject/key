@@ -5,7 +5,6 @@ package de.uka.ilkd.key.informationflow.proof;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Proof;
@@ -98,11 +97,11 @@ public class InfFlowProof extends Proof {
         ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
         assert temps != null;
         for (TacletGoalTemplate tgt : temps) {
-            for (SequentFormula sf : tgt.sequent().antecedent().asList()) {
-                addLabeledTotalTerm(sf.formula());
+            for (Term sf : tgt.sequent().antecedent().asList()) {
+                addLabeledTotalTerm(sf);
             }
-            for (SequentFormula sf : tgt.sequent().succedent().asList()) {
-                addLabeledTotalTerm(sf.formula());
+            for (Term sf : tgt.sequent().succedent().asList()) {
+                addLabeledTotalTerm(sf);
             }
         }
     }

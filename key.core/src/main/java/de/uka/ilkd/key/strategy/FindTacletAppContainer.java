@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -79,8 +78,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
             final FormulaChangeInfo info = infoList.head();
             infoList = infoList.tail();
 
-            final SequentFormula newFormula = info.newFormula();
-            if (newFormula == applicationPosition.sequentFormula()) {
+            final Term newFormula = info.newFormula();
+            if (newFormula == applicationPosition.sequentLevelFormula()) {
                 // then there were no relevant modifications since the creation
                 // of the rule app object
                 return false;
@@ -106,7 +105,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         formulas) and no indirect relationship exists which is established by a modification
      *         that occurred inside an update
      */
-    private boolean independentSubformulas(PosInOccurrence changePos, SequentFormula newFormula) {
+    private boolean independentSubformulas(PosInOccurrence changePos, Term newFormula) {
         final PIOPathIterator changePIO = changePos.iterator();
         final PIOPathIterator appPIO = applicationPosition.iterator();
 
@@ -172,7 +171,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
         final PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
         assert topPos != null;
-        return applicationPosition.replaceConstrainedFormula(topPos.sequentFormula());
+        return applicationPosition.replaceConstrainedFormula(topPos.sequentLevelFormula());
     }
 
 }

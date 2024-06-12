@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSemisequent {
 
-    private SequentFormula[] con;
+    private Term[] con;
 
     @BeforeEach
     public void setUp() {
@@ -48,14 +48,14 @@ public class TestSemisequent {
         Term t_c = TB.func(c, new Term[] {});
 
 
-        con = new SequentFormula[7];
-        con[0] = new SequentFormula(t_p);
-        con[1] = new SequentFormula(t_q);
-        con[2] = new SequentFormula(t_r);
-        con[3] = new SequentFormula(t_r);
-        con[4] = new SequentFormula(t_a);
-        con[5] = new SequentFormula(t_b);
-        con[6] = new SequentFormula(t_c);
+        con = new Term[7];
+        con[0] = t_p;
+        con[1] = t_q;
+        con[2] = t_r;
+        con[3] = t_r;
+        con[4] = t_a;
+        con[5] = t_b;
+        con[6] = t_c;
 
         Sort s = new SortImpl(new Name("test"));
         Function f = new JFunction(new Name("f"), s, new Sort[] {});
@@ -75,7 +75,7 @@ public class TestSemisequent {
         Semisequent seq = Semisequent.EMPTY_SEMISEQUENT;
         seq = extract(seq.insert(0, con[0]));
         seq = extract(seq.insert(1, con[1]));
-        SequentFormula eq2con0 = new SequentFormula(con[0].formula());
+        Term eq2con0 = con[0];
         assertFalse(seq.contains(eq2con0), "Contains should test of identity and not equality.");
     }
 
@@ -84,7 +84,7 @@ public class TestSemisequent {
         Semisequent seq = Semisequent.EMPTY_SEMISEQUENT;
         seq = extract(seq.insert(0, con[0]));
         seq = extract(seq.insert(1, con[1]));
-        SequentFormula eq2con0 = new SequentFormula(con[0].formula());
+        Term eq2con0 = con[0];
         assertTrue(seq.containsEqual(eq2con0),
             "Contains tests of equality and should find the formula.");
     }
@@ -238,7 +238,7 @@ public class TestSemisequent {
 
         Semisequent expected = extract(
             extract(extract(origin.insertLast(con[4])).insertLast(con[5])).insertLast(con[6]));
-        ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil()
+        ImmutableList<Term> insertionList = ImmutableSLList.<Term>nil()
                 .prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
         Semisequent result = extract(origin.insert(origin.size(), insertionList));
         assertEquals(expected, result, "Both semisequents should be equal.");
@@ -252,7 +252,7 @@ public class TestSemisequent {
                     .insertLast(con[2]));
         Semisequent expected =
             extract(extract(extract(origin.insert(2, con[4])).insert(3, con[5])).insert(4, con[6]));
-        ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil()
+        ImmutableList<Term> insertionList = ImmutableSLList.<Term>nil()
                 .prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
         Semisequent result = extract(origin.insert(origin.size() - 1, insertionList));
         assertEquals(expected, result, "Both semisequents should be equal.");
@@ -270,16 +270,16 @@ public class TestSemisequent {
             extract(extract(extract(origin.remove(2)).insertLast(con[4])).insertLast(con[5]))
                     .insertLast(con[6]));
         // insert: [a,b,c,q,p]
-        ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil()
+        ImmutableList<Term> insertionList = ImmutableSLList.<Term>nil()
                 .prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 
         SemisequentChangeInfo result = origin.replace(origin.size() - 1, insertionList);
 
         assertEquals(
-            ImmutableSLList.<SequentFormula>nil().prepend(con[4]).prepend(con[5]).prepend(con[6]),
+            ImmutableSLList.<Term>nil().prepend(con[4]).prepend(con[5]).prepend(con[6]),
             result.addedFormulas(),
             "SemisequentChangeInfo is corrupt due to wrong added formula list:");
-        assertEquals(ImmutableSLList.<SequentFormula>nil().prepend(con[2]),
+        assertEquals(ImmutableSLList.<Term>nil().prepend(con[2]),
             result.removedFormulas(),
             "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
         assertEquals(expected, extract(result), "Both semisequents should be equal.");
@@ -296,17 +296,17 @@ public class TestSemisequent {
             extract(extract(origin.insertLast(con[4])).insertLast(con[5])).insertLast(con[6]))
                     .insertLast(con[2]));
         // insert:[a,b,c,r,r,q,p]
-        ImmutableList<SequentFormula> insertionList =
-            ImmutableSLList.<SequentFormula>nil().prepend(con[0]).prepend(con[1]).prepend(con[2])
+        ImmutableList<Term> insertionList =
+            ImmutableSLList.<Term>nil().prepend(con[0]).prepend(con[1]).prepend(con[2])
                     .prepend(con[3]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 
         SemisequentChangeInfo sci = origin.replace(origin.size(), insertionList);
         assertEquals(
-            ImmutableSLList.<SequentFormula>nil().prepend(con[4]).prepend(con[5]).prepend(con[6])
+            ImmutableSLList.<Term>nil().prepend(con[4]).prepend(con[5]).prepend(con[6])
                     .prepend(con[3]),
             sci.addedFormulas(),
             "SemisequentChangeInfo is corrupt due to wrong added formula list:");
-        assertEquals(ImmutableSLList.<SequentFormula>nil(), sci.removedFormulas(),
+        assertEquals(ImmutableSLList.<Term>nil(), sci.removedFormulas(),
             "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
         assertEquals(expected, extract(sci), "Both semisequents should be equal.");
     }

@@ -7,7 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -86,8 +85,8 @@ public class RewriteTacletBuilderSchemaVarCollector {
     private Set<SchemaVariable> collectSchemaVariables(Sequent s) {
         Set<SchemaVariable> result = new LinkedHashSet<>();
 
-        for (final SequentFormula cf : s) {
-            result.addAll(collectSchemaVariables(cf.formula()));
+        for (final Term cf : s) {
+            result.addAll(collectSchemaVariables(cf));
         }
 
         return result;

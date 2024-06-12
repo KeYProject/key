@@ -88,7 +88,7 @@ public class QueryExpand implements BuiltInRule {
         tb.addRuleSet(new RuleSet(new Name("concrete")));
 
         // move the query call directly to the succedent. Use box instead of diamond?
-        g.addFormula(new SequentFormula(queryEval.first), true, true);
+        g.addFormula(queryEval.first, true, true);
         g.addTaclet(tb.getTaclet(), SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         return newGoal;
     }

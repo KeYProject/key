@@ -8,7 +8,6 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -48,12 +47,12 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, TermServices services) {
+    Term generateSequent(SequentTerms seq, TermServices services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
         final Term imp =
             TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
         final Term wdPre = TB.wd(seq.pre);
-        return new SequentFormula(TB.apply(seq.context, TB.and(wdPre, imp)));
+        return TB.apply(seq.context, TB.and(wdPre, imp));
     }
 
     @Override

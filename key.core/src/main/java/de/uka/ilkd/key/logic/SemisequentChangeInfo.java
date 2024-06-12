@@ -13,18 +13,18 @@ import org.key_project.util.collection.ImmutableSLList;
 public class SemisequentChangeInfo {
 
     /** contains the added formulas to the semisequent */
-    private ImmutableList<SequentFormula> added = ImmutableSLList.nil();
+    private ImmutableList<Term> added = ImmutableSLList.nil();
     /** contains the removed formulas from the semisequent */
-    private ImmutableList<SequentFormula> removed = ImmutableSLList.nil();
+    private ImmutableList<Term> removed = ImmutableSLList.nil();
     /** contains the modified formulas from the semisequent */
     private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.nil();
     /** stores the redundance free formula list of the semisequent */
-    private ImmutableList<SequentFormula> modifiedSemisequent = ImmutableSLList.nil();
+    private ImmutableList<Term> modifiedSemisequent = ImmutableSLList.nil();
     /**
      * contains formulas that have been tried to add, but which have been rejected due to already
      * existing formulas in the sequent subsuming these formulas
      */
-    private ImmutableList<SequentFormula> rejected = ImmutableSLList.nil();
+    private ImmutableList<Term> rejected = ImmutableSLList.nil();
 
     /** */
     private int lastFormulaIndex = -1;
@@ -32,7 +32,7 @@ public class SemisequentChangeInfo {
     public SemisequentChangeInfo() {
     }
 
-    public SemisequentChangeInfo(ImmutableList<SequentFormula> formulas) {
+    public SemisequentChangeInfo(ImmutableList<Term> formulas) {
         this.modifiedSemisequent = formulas;
     }
 
@@ -60,21 +60,21 @@ public class SemisequentChangeInfo {
      * sets the list of constrained formula containing all formulas of the semisequent after the
      * operation
      */
-    public void setFormulaList(ImmutableList<SequentFormula> list) {
+    public void setFormulaList(ImmutableList<Term> list) {
         modifiedSemisequent = list;
     }
 
     /**
      * returns the list of constrained formula of the new semisequent
      */
-    public ImmutableList<SequentFormula> getFormulaList() {
+    public ImmutableList<Term> getFormulaList() {
         return modifiedSemisequent;
     }
 
     /**
      * logs an added formula at position idx
      */
-    public void addedFormula(int idx, SequentFormula cf) {
+    public void addedFormula(int idx, Term cf) {
         added = added.prepend(cf);
         lastFormulaIndex = idx;
     }
@@ -85,7 +85,7 @@ public class SemisequentChangeInfo {
     public void modifiedFormula(int idx, FormulaChangeInfo fci) {
         // This information can overwrite older records about removed
         // formulas
-        removed = removed.removeAll(fci.positionOfModification().sequentFormula());
+        removed = removed.removeAll(fci.positionOfModification().sequentLevelFormula());
         modified = modified.prepend(fci);
         lastFormulaIndex = idx;
     }
@@ -93,18 +93,18 @@ public class SemisequentChangeInfo {
     /**
      * returns the list of all added constrained formulas
      *
-     * @return IList<SequentFormula> added to the semisequent
+     * @return IList<Term> added to the semisequent
      */
-    public ImmutableList<SequentFormula> addedFormulas() {
+    public ImmutableList<Term> addedFormulas() {
         return added;
     }
 
     /**
      * returns the list of all removed constrained formulas
      *
-     * @return IList<SequentFormula> removed from the semisequent
+     * @return IList<Term> removed from the semisequent
      */
-    public ImmutableList<SequentFormula> removedFormulas() {
+    public ImmutableList<Term> removedFormulas() {
         return removed;
     }
 
@@ -114,7 +114,7 @@ public class SemisequentChangeInfo {
      *
      * @return list of formulas rejected due to redundancy
      */
-    public ImmutableList<SequentFormula> rejectedFormulas() {
+    public ImmutableList<Term> rejectedFormulas() {
         return this.rejected;
     }
 
@@ -123,16 +123,16 @@ public class SemisequentChangeInfo {
      * adding formula <tt>f</tt> to the semisequent failed due to a redundance check. This means an
      * equal or stronger formula is already present in the semisequent
      *
-     * @param f the SequentFormula
+     * @param f the Term
      */
-    public void rejectedFormula(SequentFormula f) {
+    public void rejectedFormula(Term f) {
         this.rejected = this.rejected.append(f);
     }
 
     /**
      * returns the list of all modification positions
      *
-     * @return IList<SequentFormula> modified within the semisequent
+     * @return IList<Term> modified within the semisequent
      */
     public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
         return modified;
@@ -141,7 +141,7 @@ public class SemisequentChangeInfo {
     /**
      * logs an added formula at position idx
      */
-    public void removedFormula(int idx, SequentFormula cf) {
+    public void removedFormula(int idx, Term cf) {
         removed = removed.prepend(cf);
 
         lastFormulaIndex = (lastFormulaIndex == idx) ? -1
@@ -166,7 +166,7 @@ public class SemisequentChangeInfo {
             return;
         }
 
-        for (SequentFormula sf : succ.removed) {
+        for (Term sf : succ.removed) {
             predecessor.added = predecessor.added.removeAll(sf);
 
             boolean skip = false;
@@ -194,14 +194,14 @@ public class SemisequentChangeInfo {
             }
         }
 
-        for (SequentFormula sf : succ.added) {
+        for (Term sf : succ.added) {
             predecessor.removed = predecessor.removed.removeAll(sf);
             if (!predecessor.added.contains(sf)) {
                 predecessor.addedFormula(succ.lastFormulaIndex, sf);
             }
         }
 
-        for (SequentFormula sf : succ.rejected) {
+        for (Term sf : succ.rejected) {
             if (!predecessor.rejected.contains(sf)) {
                 predecessor.rejectedFormula(sf);
             }

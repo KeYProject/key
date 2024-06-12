@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -28,7 +28,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         assert pos != null : "Feature is only applicable to rules with find";
 
         ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();
-        final SequentFormula findFormula = pos.sequentFormula();
+        final Term findFormula = pos.sequentLevelFormula();
         final boolean findIsInAntec = pos.isInAntec();
 
         assert list != null;
@@ -36,7 +36,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         for (final IfFormulaInstantiation aList : list) {
             final IfFormulaInstSeq iffi = (IfFormulaInstSeq) aList;
             assert iffi != null;
-            final SequentFormula ifFormula = iffi.getConstrainedFormula();
+            final Term ifFormula = iffi.getConstrainedFormula();
 
             final boolean result =
                 findIsInAntec != iffi.inAntec() || !findFormula.equals(ifFormula);

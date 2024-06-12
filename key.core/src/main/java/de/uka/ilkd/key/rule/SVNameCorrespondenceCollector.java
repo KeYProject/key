@@ -7,7 +7,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -84,8 +83,8 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (SequentFormula cf : semiseq) {
-            cf.formula().execPostOrder(this);
+        for (Term cf : semiseq) {
+            cf.execPostOrder(this);
         }
     }
 

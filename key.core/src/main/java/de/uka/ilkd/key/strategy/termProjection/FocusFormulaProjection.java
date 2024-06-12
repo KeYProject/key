@@ -18,7 +18,7 @@ public class FocusFormulaProjection implements ProjectionToTerm {
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
-        return pos.sequentFormula().formula();
+        return pos.sequentLevelFormula();
     }
 
 }

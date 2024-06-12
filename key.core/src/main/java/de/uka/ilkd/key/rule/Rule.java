@@ -39,5 +39,7 @@ public interface Rule extends HasOrigin {
     /**
      * returns the display name of the rule
      */
-    String displayName();
+    default String displayName() {
+        return name().toString();
+    }
 }

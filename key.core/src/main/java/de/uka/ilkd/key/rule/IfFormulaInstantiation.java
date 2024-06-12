@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 
@@ -18,7 +19,7 @@ public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
     /**
      * @return the cf this is pointing to
      */
-    SequentFormula getConstrainedFormula();
+    Term getConstrainedFormula();
 
     String toString(Services services);
 
@@ -27,11 +28,13 @@ public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
         if (!(obj instanceof IfFormulaInstantiation that)) {
             return false;
         }
-        return getConstrainedFormula().equalsModProofIrrelevancy(that.getConstrainedFormula());
+        return getConstrainedFormula().equalsModProperty(that.getConstrainedFormula(),
+            ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY);
     }
 
     @Override
     default int hashCodeModProofIrrelevancy() {
-        return getConstrainedFormula().hashCodeModProofIrrelevancy();
+        return getConstrainedFormula()
+                .hashCodeModProperty(ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY);
     }
 }

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -240,9 +239,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             uBeforeLoopDefAnonVariant, invTerm);
 
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
-        presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-        presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
-        presrvAndUCGoal.changeFormula(new SequentFormula(newFormula), ruleApp.posInOccurrence());
+        presrvAndUCGoal.addFormula(uAnonInv, true, false);
+        presrvAndUCGoal.addFormula(wellFormedAnon, true, false);
+        presrvAndUCGoal.changeFormula(newFormula, ruleApp.posInOccurrence());
     }
 
     // -------------------------------------------------------------------------
@@ -323,7 +322,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     }
 
     /**
-     * Creates the {@link SequentFormula} for the "initially valid" goal.
+     * Creates the {@link Term} for the "initially valid" goal.
      *
      * @param termLabelState The {@link TermLabelState}.
      * @param inst The {@link Instantiation} for this rule application.
@@ -331,9 +330,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @param reachableState The reachable state formula.
      * @param services The {@link Services} object.
      * @param initGoal The goal containing the "initially valid" PO.
-     * @return The {@link SequentFormula} for the "initially valid" goal.
+     * @return The {@link Term} for the "initially valid" goal.
      */
-    private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
+    private Term initFormula(TermLabelState termLabelState, Instantiation inst,
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -341,7 +340,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
             initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
 
-        return new SequentFormula(sfTerm);
+        return sfTerm;
     }
 
     /**

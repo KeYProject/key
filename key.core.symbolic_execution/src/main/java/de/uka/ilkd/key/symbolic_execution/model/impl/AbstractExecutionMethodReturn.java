@@ -9,7 +9,6 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
@@ -180,11 +179,11 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         assert proofNode.childrenCount() == 1;
         PosInOccurrence originalPIO = methodCall.getModalityPIO();
         int index = originalPIO.isInAntec()
-                ? proofNode.sequent().antecedent().indexOf(originalPIO.sequentFormula())
-                : proofNode.sequent().succedent().indexOf(originalPIO.sequentFormula());
+                ? proofNode.sequent().antecedent().indexOf(originalPIO.sequentLevelFormula())
+                : proofNode.sequent().succedent().indexOf(originalPIO.sequentLevelFormula());
         // Search relevant position in child node
         Node childNode = proofNode.child(0);
-        SequentFormula nodeSF =
+        Term nodeSF =
             originalPIO.isInAntec() ? childNode.sequent().antecedent().get(index)
                     : childNode.sequent().succedent().get(index);
         PosInOccurrence modalityPIO =

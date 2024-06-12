@@ -71,7 +71,7 @@ public final class SMTFocusResults {
         Semisequent succedent = goalNode.sequent().succedent();
 
         int i = 1;
-        for (SequentFormula sf : antecedent) {
+        for (Term sf : antecedent) {
             PosInOccurrence pio =
                 PosInOccurrence.findInSequent(goalNode.sequent(), i, PosInTerm.getTopLevel());
             if (!unsatCore.contains(pio)) {
@@ -80,13 +80,13 @@ public final class SMTFocusResults {
                 TacletApp app = PosTacletApp.createPosTacletApp(hideLeft, new MatchConditions(),
                     new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
                     services);
-                app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
+                app = app.addCheckedInstantiation(schema, sf, services, true);
                 goal = goal.apply(app).iterator().next();
             }
             i++;
         }
 
-        for (SequentFormula sf : succedent) {
+        for (Term sf : succedent) {
             PosInOccurrence pio =
                 PosInOccurrence.findInSequent(goalNode.sequent(), i, PosInTerm.getTopLevel());
             if (!unsatCore.contains(pio)) {
@@ -96,7 +96,7 @@ public final class SMTFocusResults {
                     PosTacletApp.createPosTacletApp(hideRight, new MatchConditions(),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
                         services);
-                app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
+                app = app.addCheckedInstantiation(schema, sf, services, true);
                 goal = goal.apply(app).iterator().next();
             }
             i++;
@@ -146,7 +146,7 @@ public final class SMTFocusResults {
 
         Semisequent antecedent = goalNode.sequent().antecedent();
         int i = 1;
-        for (SequentFormula sf : antecedent) {
+        for (Term sf : antecedent) {
             if (unsatCore.contains(i)) {
                 unsatCoreFormulas = unsatCoreFormulas.prepend(PosInOccurrence
                         .findInSequent(goalNode.sequent(), i, PosInTerm.getTopLevel()));
@@ -155,7 +155,7 @@ public final class SMTFocusResults {
         }
 
         Semisequent succedent = goalNode.sequent().succedent();
-        for (SequentFormula sf : succedent) {
+        for (Term sf : succedent) {
             if (unsatCore.contains(i)) {
                 unsatCoreFormulas = unsatCoreFormulas.prepend(PosInOccurrence
                         .findInSequent(goalNode.sequent(), i, PosInTerm.getTopLevel()));

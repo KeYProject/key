@@ -172,8 +172,8 @@ public class OutputStreamProofSaver {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                     StrategyProperties.INF_FLOW_CHECK_TRUE);
                 strategySettings.setActiveStrategyProperties(strategyProperties);
-                for (final SequentFormula s : proof.root().sequent().succedent().asList()) {
-                    ((InfFlowProof) proof).addLabeledTotalTerm(s.formula());
+                for (final Term s : proof.root().sequent().succedent().asList()) {
+                    ((InfFlowProof) proof).addLabeledTotalTerm(s);
                 }
             } else {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
@@ -694,7 +694,8 @@ public class OutputStreamProofSaver {
         if (pos == null) {
             return "";
         }
-        return " (formula \"" + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
+        return " (formula \""
+            + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentLevelFormula())
             + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
@@ -754,15 +755,16 @@ public class OutputStreamProofSaver {
         StringBuilder s = new StringBuilder();
         for (final IfFormulaInstantiation aL : l) {
             if (aL instanceof IfFormulaInstSeq) {
-                final SequentFormula f = aL.getConstrainedFormula();
+                final Term f = aL.getConstrainedFormula();
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
                                 .formulaNumberInSequent(((IfFormulaInstSeq) aL).inAntec(), f))
                         .append("\")");
             } else if (aL instanceof IfFormulaInstDirect) {
 
+                Term fml = aL.getConstrainedFormula();
                 final String directInstantiation =
-                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices());
+                    printTerm(fml, node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");

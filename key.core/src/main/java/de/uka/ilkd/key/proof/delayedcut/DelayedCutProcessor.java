@@ -186,7 +186,7 @@ public class DelayedCutProcessor implements Runnable {
      */
     private ImmutableList<Goal> hide(DelayedCut cut, Goal goal) {
 
-        SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
+        Term sf = getTerm(goal, cut.isDecisionPredicateInAntecendet());
 
         PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel(), cut.isDecisionPredicateInAntecendet());
@@ -208,9 +208,9 @@ public class DelayedCutProcessor implements Runnable {
             String side = cut.isDecisionPredicateInAntecendet() ? "TRUE" : "FALSE";
 
             if (goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)) {
-                SequentFormula formula =
-                    getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
-                if (formula.formula() == cut.getFormula()) {
+                Term formula =
+                    getTerm(goal[i], cut.isDecisionPredicateInAntecendet());
+                if (formula == cut.getFormula()) {
                     return i;
                 }
             }
@@ -223,7 +223,7 @@ public class DelayedCutProcessor implements Runnable {
         return cut.isDecisionPredicateInAntecendet() ? HIDE_LEFT_TACLET : HIDE_RIGHT_TACLET;
     }
 
-    private SequentFormula getSequentFormula(Goal goal, boolean decPredInAnte) {
+    private Term getTerm(Goal goal, boolean decPredInAnte) {
         return decPredInAnte ? goal.sequent().antecedent().get(DEC_PRED_INDEX)
                 : goal.sequent().succedent().get(DEC_PRED_INDEX);
 
@@ -390,7 +390,7 @@ public class DelayedCutProcessor implements Runnable {
         }
         int formulaNumber =
             pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
-                oldRuleApp.posInOccurrence().sequentFormula());
+                oldRuleApp.posInOccurrence().sequentLevelFormula());
         return PosInOccurrence.findInSequent(pair.goal.sequent(), formulaNumber,
             oldRuleApp.posInOccurrence().posInTerm());
     }

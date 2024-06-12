@@ -91,7 +91,7 @@ public class ProveSMTLemmasTest {
                     // and check if proofs are actually for the right theorem!
                     KeyIO io = new KeyIO(loadedProof.getServices());
                     Term parsedLemma = io.parseExpression(lemmaString);
-                    Term actual = loadedProof.root().sequent().succedent().get(0).formula();
+                    Term actual = loadedProof.root().sequent().succedent().get(0);
                     if (!actual.equalsModProperty(parsedLemma, RENAMING_PROPERTY)) {
                         LOGGER.info("Stored : {}", parsedLemma);
                         LOGGER.warn("Proven : {}", actual);

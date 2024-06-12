@@ -24,7 +24,7 @@
  * {@link de.uka.ilkd.key.logic.Sequent}s consist of two {@link
  * de.uka.ilkd.key.logic.Semisequent}s which represent a
  * duplicate-free list of a {@link
- * de.uka.ilkd.key.logic.SequentFormula}s. The latter consist of
+ * de.uka.ilkd.key.logic.Term}s. The latter consist of
  * a {@link de.uka.ilkd.key.logic.Constraint} and a {@link
  * de.uka.ilkd.key.logic.Term} of a special sort {@link
  * de.uka.ilkd.key.logic.sort.Sort#FORMULA}.

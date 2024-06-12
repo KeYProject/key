@@ -7,7 +7,8 @@ import java.io.File;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -48,9 +49,10 @@ class TestEqualsModProofIrrelevancy {
             Assertions.assertNotNull(node1);
             Assertions.assertNotNull(node2);
             for (int j = 1; j <= node1.sequent().size(); j++) {
-                SequentFormula sf1 = node1.sequent().getFormulabyNr(j);
-                SequentFormula sf2 = node2.sequent().getFormulabyNr(j);
-                Assertions.assertTrue(sf1.equalsModProofIrrelevancy(sf2));
+                Term sf1 = node1.sequent().getFormulabyNr(j);
+                Term sf2 = node2.sequent().getFormulabyNr(j);
+                Assertions.assertTrue(ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY
+                        .equalsModThisProperty(sf1, sf2));
             }
             if (node1.getAppliedRuleApp() != null) {
                 Assertions.assertTrue(

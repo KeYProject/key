@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -96,9 +95,9 @@ public class LoopApplyHeadRule implements BuiltInRule {
         }
 
         Goal result = goal.split(1).head();
+        Term uAssumptions = tb.apply(update, tb.prog(modality.kind(), newJavaBlock, target.sub(0)));
         result.changeFormula(
-            new SequentFormula(
-                tb.apply(update, tb.prog(modality.kind(), newJavaBlock, target.sub(0)))),
+            uAssumptions,
             ruleApp.pio);
         return ImmutableSLList.<Goal>nil().append(goal);
     }

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof.join;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 
@@ -16,11 +15,11 @@ import de.uka.ilkd.key.proof.Node;
 public class ProspectivePartner {
     private final Term[] updates = new Term[2];
     private final Term commonFormula;
-    private final SequentFormula[] formula = new SequentFormula[2];
+    private final Term[] formula = new Term[2];
     private final Node[] nodes = new Node[2];
     private Term commonPredicate = null;
     private Node commonParent = null;
-    private SequentFormula formulaForHiding = null;
+    private Term formulaForHiding = null;
 
     /**
      * Constructs a new prospective partner object, i.e. a structure comprising the information
@@ -35,8 +34,8 @@ public class ProspectivePartner {
      * @param formula2 The second join formula.
      * @param update2 The second symbolic state.
      */
-    public ProspectivePartner(Term commonFormula, Node node1, SequentFormula formula1, Term update1,
-            Node node2, SequentFormula formula2, Term update2) {
+    public ProspectivePartner(Term commonFormula, Node node1, Term formula1, Term update1,
+            Node node2, Term formula2, Term update2) {
         super();
         this.commonFormula = commonFormula;
         formula[0] = formula1;
@@ -72,15 +71,15 @@ public class ProspectivePartner {
         if (commonParent.getAppliedRuleApp() != null
                 && commonParent.getAppliedRuleApp().posInOccurrence() != null) {
             setFormulaForHiding(
-                commonParent.getAppliedRuleApp().posInOccurrence().sequentFormula());
+                commonParent.getAppliedRuleApp().posInOccurrence().sequentLevelFormula());
         }
     }
 
-    private void setFormulaForHiding(SequentFormula formulaForHiding) {
+    private void setFormulaForHiding(Term formulaForHiding) {
         this.formulaForHiding = formulaForHiding;
     }
 
-    public SequentFormula getFormulaForHiding() {
+    public Term getFormulaForHiding() {
         return formulaForHiding;
     }
 
@@ -92,7 +91,7 @@ public class ProspectivePartner {
         return getNode(index).sequent();
     }
 
-    public SequentFormula getFormula(int i) {
+    public Term getFormula(int i) {
         return formula[i];
     }
 

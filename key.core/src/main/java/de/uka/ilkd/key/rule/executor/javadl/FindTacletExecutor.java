@@ -52,7 +52,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
     /**
      * applies the {@code add}-expressions of taclet goal descriptions
      *
-     * @param add the {@link Sequent} with the uninstantiated {@link SequentFormula}'s to be added
+     * @param add the {@link Sequent} with the uninstantiated {@link Term}'s to be added
      *        to the goal's sequent
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate)

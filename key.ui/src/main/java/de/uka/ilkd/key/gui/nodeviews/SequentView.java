@@ -761,7 +761,7 @@ public abstract class SequentView extends JEditorPane {
             }
         } else { // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
             for (SequentPrintFilterEntry entry : entryList) {
-                SequentFormula form = entry.getFilteredFormula();
+                Term form = entry.getFilteredFormula();
                 int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
                     form, max_age + 2);
                 if (age < max_age) {
@@ -806,15 +806,15 @@ public abstract class SequentView extends JEditorPane {
         while (it.hasNext()) {
             node = it.next();
             if (node.getNodeInfo().getSequentChangeInfo() != null) {
-                ImmutableList<SequentFormula> added_ante =
+                ImmutableList<Term> added_ante =
                     node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
-                ImmutableList<SequentFormula> added_succ =
+                ImmutableList<Term> added_succ =
                     node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
-                for (SequentFormula sf : added_ante) {
+                for (Term sf : added_ante) {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
                 }
-                for (SequentFormula sf : added_succ) {
+                for (Term sf : added_succ) {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
                 }
@@ -824,7 +824,7 @@ public abstract class SequentView extends JEditorPane {
                     PosInOccurrence positionOfMod = fci.positionOfModification();
                     pio_age_list.add(new PIO_age(positionOfMod, age));
                     for (PIO_age pair : pio_age_list) {
-                        if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
+                        if (pair.get_pio().sequentLevelFormula().equals(fci.getOriginalFormula())) {
                             if (positionOfMod.posInTerm().isPrefixOf(pair.get_pio().posInTerm())) {
                                 pair.active = false;
                             } else {
@@ -834,19 +834,19 @@ public abstract class SequentView extends JEditorPane {
                         }
                     }
                 }
-                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo()
+                for (Term sf : node.getNodeInfo().getSequentChangeInfo()
                         .removedFormulas(true)) {
                     for (PIO_age pair : pio_age_list) {
-                        if (pair.get_pio().sequentFormula().equals(sf)
+                        if (pair.get_pio().sequentLevelFormula().equals(sf)
                                 && pair.get_pio().isInAntec()) {
                             pair.active = false;
                         }
                     }
                 }
-                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo()
+                for (Term sf : node.getNodeInfo().getSequentChangeInfo()
                         .removedFormulas(false)) {
                     for (PIO_age pair : pio_age_list) {
-                        if (pair.get_pio().sequentFormula().equals(sf)
+                        if (pair.get_pio().sequentLevelFormula().equals(sf)
                                 && !pair.get_pio().isInAntec()) {
                             pair.active = false;
                         }
@@ -930,7 +930,7 @@ public abstract class SequentView extends JEditorPane {
      * @param max_age the maximum age, specified in viewSettings
      * @return the sf's age
      */
-    private int computeSeqFormulaAge(Node node, SequentFormula form, int max_age) {
+    private int computeSeqFormulaAge(Node node, Term form, int max_age) {
         int age = -1;
         while (age < max_age && node != null && node.sequent().contains(form)) {
             age++;

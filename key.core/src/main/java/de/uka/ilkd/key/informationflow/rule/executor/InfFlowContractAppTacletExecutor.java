@@ -43,12 +43,13 @@ public class InfFlowContractAppTacletExecutor
             TacletLabelHint labelHint, SequentChangeInfo currentSequent, PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             RuleApp tacletApp, Services services) {
-        final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
+        final ImmutableList<Term> replacements = instantiateSemisequent(semi,
             termLabelState, labelHint, pos, matchCond, goal, tacletApp, services);
         assert replacements.size() == 1
                 : "information flow taclets must have " + "exactly one add!";
+        final Term replacement = replacements.iterator().next();
         updateStrategyInfo(services.getProof().openEnabledGoals().head(),
-            replacements.iterator().next().formula());
+            replacement);
         super.addToAntec(semi, termLabelState, labelHint, currentSequent, pos,
             applicationPosInOccurrence, matchCond, goal, tacletApp, services);
     }

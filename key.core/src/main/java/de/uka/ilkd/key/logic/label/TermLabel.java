@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.label;
 
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -57,14 +56,14 @@ import org.key_project.logic.TerminalSyntaxElement;
  * </p>
  * <p>
  * Antecedent and succedent of a {@link Sequent} are sets. The equality check if a
- * {@link SequentFormula} is already contained ignores {@link TermLabel}s. To ensure that
+ * {@link Term} is already contained ignores {@link TermLabel}s. To ensure that
  * {@link TermLabel}s are not lost,
  * {@link TermLabelManager#mergeLabels(de.uka.ilkd.key.java.Services,
  *         de.uka.ilkd.key.logic.SequentChangeInfo)}
- * merges the labels of the existing {@link SequentFormula} with those of the rejected
- * {@link SequentFormula}. How this is done in detail is implemented by a {@link TermLabelMerger}.
+ * merges the labels of the existing {@link Term} with those of the rejected
+ * {@link Term}. How this is done in detail is implemented by a {@link TermLabelMerger}.
  * If no {@link TermLabelMerger} is available, the {@link TermLabel} of the rejected
- * {@link SequentFormula} are lost.
+ * {@link Term} are lost.
  * </p>
  * <p>
  * To implement a new {@link TermLabel} follow the following steps:
@@ -126,7 +125,7 @@ import org.key_project.logic.TerminalSyntaxElement;
  *              which works on {@link RefactoringScope#SEQUENT} to freely add or remove
  *              {@link TermLabel}s on any {@link Term} of the {@link Sequent}.</li>
  *          <li>Implement a {@link TermLabelMerger} to ensure that {@link TermLabel}s are maintained
- *              in case of rejected {@link SequentFormula}s.</li>
+ *              in case of rejected {@link Term}s.</li>
  *       </ul>
  *    </li>
  *    <li>

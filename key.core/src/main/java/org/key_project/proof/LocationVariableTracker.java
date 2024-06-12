@@ -56,9 +56,9 @@ public class LocationVariableTracker implements RuleAppListener {
                 var it = x.getNodeChanges();
                 while (it.hasNext()) {
                     var change = it.next();
-                    var sf = change.getPos().sequentFormula();
+                    var sf = change.getPos().sequentLevelFormula();
                     var collect = new OpCollectorJavaBlock();
-                    sf.formula().execPreOrder(collect);
+                    sf.execPreOrder(collect);
                     for (var op : collect.ops()) {
                         if (!(op instanceof LocationVariable) || createdBy.containsKey(op)) {
                             continue;

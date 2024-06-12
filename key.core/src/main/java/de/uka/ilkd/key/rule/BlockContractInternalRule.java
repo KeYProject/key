@@ -10,7 +10,6 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -355,7 +354,8 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
                     updates[1], updates[2], tb);
             } else {
                 // nothing to prove -> set up trivial goal
-                validityGoal.addFormula(new SequentFormula(tb.tt()), false, true);
+                Term uAssumptions = tb.tt();
+                validityGoal.addFormula(uAssumptions, false, true);
             }
         }
     }

@@ -150,7 +150,7 @@ public class ProofExplorationServiceTest {
         Sequent sequent = goals.head().node().sequent();
         PosInOccurrence pio =
             new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
-        expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0).formula(),
+        expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0),
             change);
         ImmutableList<Goal> newCreatedGoals = currentProof.openGoals();
 
@@ -199,7 +199,7 @@ public class ProofExplorationServiceTest {
 
         assertSame(semiSeqAdded.size(), parentSemiSeqOfAdded.size() + 1,
             "The size of the added semisequent has changed");
-        assertEquals(semiSeqAdded.get(0).formula(), added, "Added Term is indeed added");
+        assertEquals(semiSeqAdded.get(0), added, "Added Term is indeed added");
         assertFalse(justification.isAutomatic(), "Justification branch is marked as interactive");
 
         assertSame(semiSeqUntouched.size(), parentSemiSeqOfUntouched.size(),

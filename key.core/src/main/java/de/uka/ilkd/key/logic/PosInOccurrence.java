@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.logic;
 
 /**
- * This class describes a position in an occurrence of a term. A SequentFormula and a PosInTerm
+ * This class describes a position in an occurrence of a term. A Term and a PosInTerm
  * determine an object of this class exactly.
  */
 public final class PosInOccurrence {
@@ -17,7 +17,7 @@ public final class PosInOccurrence {
     /**
      * the constrained formula the pos in occurrence describes
      */
-    private final SequentFormula sequentFormula;
+    private final Term sequentLevelFormula;
 
     // saves 8 bytes (due to alignment issues) per instance if we use a
     // short here instead of an int
@@ -28,7 +28,7 @@ public final class PosInOccurrence {
      */
     private final boolean inAntec;
 
-    /** the position in sequentFormula.formula() */
+    /** the position in Term.formula() */
     private final PosInTerm posInTerm;
 
     /**
@@ -36,20 +36,20 @@ public final class PosInOccurrence {
      */
     private volatile Term subTermCache = null;
 
-    public PosInOccurrence(SequentFormula sequentFormula, PosInTerm posInTerm, boolean inAntec) {
+    public PosInOccurrence(Term sequentLevelFormula, PosInTerm posInTerm, boolean inAntec) {
         assert posInTerm != null;
-        assert sequentFormula != null;
+        assert sequentLevelFormula != null;
         this.inAntec = inAntec;
-        this.sequentFormula = sequentFormula;
+        this.sequentLevelFormula = sequentLevelFormula;
         this.posInTerm = posInTerm;
-        this.hashCode = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
+        this.hashCode = (short) (sequentLevelFormula.hashCode() * 13 + posInTerm.hashCode());
     }
 
     /**
-     * returns the SequentFormula that determines the occurrence of this PosInOccurrence
+     * returns the Term that determines the occurrence of this PosInOccurrence
      */
-    public SequentFormula sequentFormula() {
-        return sequentFormula;
+    public Term sequentLevelFormula() {
+        return sequentLevelFormula;
     }
 
     /**
@@ -66,7 +66,7 @@ public final class PosInOccurrence {
      * {@link de.uka.ilkd.key.logic.PosInTerm}.
      */
     public PosInOccurrence down(int i) {
-        return new PosInOccurrence(sequentFormula, posInTerm.down(i), inAntec);
+        return new PosInOccurrence(sequentLevelFormula, posInTerm.down(i), inAntec);
     }
 
     /**
@@ -78,7 +78,7 @@ public final class PosInOccurrence {
             return false;
         }
 
-        if (!sequentFormula.equals(cmp.sequentFormula)) {
+        if (!sequentLevelFormula.equals(cmp.sequentLevelFormula)) {
             return false;
         }
 
@@ -100,7 +100,7 @@ public final class PosInOccurrence {
 
         // NB: the class <code>NonDuplicateAppFeature</code> depends on the usage
         // of <code>!=</code> in this condition
-        if (sequentFormula() != cmp.sequentFormula()) {
+        if (sequentLevelFormula() != cmp.sequentLevelFormula()) {
             return false;
         }
 
@@ -139,7 +139,7 @@ public final class PosInOccurrence {
 
     /**
      * List all subterms between the root and the position this objects points to; the first term is
-     * the whole term <code>constrainedFormula().formula()</code>, the last one
+     * the whole sequent level <code>formula</code>, the last one
      * <code>subTerm()</code>
      *
      * @return an iterator that walks from the root of the term to the position this
@@ -151,10 +151,9 @@ public final class PosInOccurrence {
 
     /**
      * The usage of this method is strongly discouraged, use {@link PosInOccurrence#iterator}
-     * instead. describes the exact occurrence of the referred term inside
-     * {@link SequentFormula#formula()}
+     * instead. describes the exact occurrence of the referred term
      *
-     * @return the position in the formula of the SequentFormula of this PosInOccurrence.
+     * @return the position in the formula of the Term of this PosInOccurrence.
      */
     public PosInTerm posInTerm() {
         return posInTerm;
@@ -169,9 +168,9 @@ public final class PosInOccurrence {
      *         <code>constrainedFormula()</code>. It is not tested whether this position exists
      *         within <code>p_newFormula</code>
      */
-    public PosInOccurrence replaceConstrainedFormula(SequentFormula p_newFormula) {
+    public PosInOccurrence replaceConstrainedFormula(Term p_newFormula) {
         assert p_newFormula != null;
-        if (p_newFormula == sequentFormula) {
+        if (p_newFormula == sequentLevelFormula) {
             return this;
         }
         return new PosInOccurrence(p_newFormula, posInTerm, inAntec);
@@ -182,7 +181,7 @@ public final class PosInOccurrence {
      */
     public Term subTerm() {
         if (subTermCache == null) {
-            subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
+            subTermCache = posInTerm.getSubTerm(sequentLevelFormula);
         }
         return subTermCache;
     }
@@ -194,13 +193,13 @@ public final class PosInOccurrence {
         if (isTopLevel()) {
             return this;
         }
-        return new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), inAntec);
+        return new PosInOccurrence(sequentLevelFormula, PosInTerm.getTopLevel(), inAntec);
     }
 
 
     /** toString */
     public String toString() {
-        return "Term " + posInTerm() + " of " + sequentFormula();
+        return "Term " + posInTerm() + " of " + sequentLevelFormula();
     }
 
 
@@ -211,7 +210,7 @@ public final class PosInOccurrence {
     public PosInOccurrence up() {
         assert !isTopLevel() : "not possible to go up from top level position";
 
-        return new PosInOccurrence(sequentFormula, posInTerm.up(), inAntec);
+        return new PosInOccurrence(sequentLevelFormula, posInTerm.up(), inAntec);
 
     }
 
@@ -244,7 +243,7 @@ public final class PosInOccurrence {
             // <code>next()</code> faster
 
             final PosInOccurrence pio;
-            pio = new PosInOccurrence(sequentFormula, posInTerm.firstN(count - 1), inAntec);
+            pio = new PosInOccurrence(sequentLevelFormula, posInTerm.firstN(count - 1), inAntec);
 
 
             return pio;
@@ -271,7 +270,7 @@ public final class PosInOccurrence {
             int res;
 
             if (currentSubTerm == null) {
-                currentSubTerm = sequentFormula.formula();
+                currentSubTerm = sequentLevelFormula;
             } else {
                 currentSubTerm = currentSubTerm.sub(child);
             }

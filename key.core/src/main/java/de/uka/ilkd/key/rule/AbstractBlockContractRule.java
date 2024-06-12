@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -294,7 +293,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         return afterAssumptions;
     }
 
-    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
+    static Term buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
         Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
@@ -304,7 +303,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             tb.imp(tb.label(selfComposedExec, ParameterlessTermLabel.SELF_COMPOSITION_LABEL), post);
         proof.addLabeledIFSymbol(selfComposedExec);
 
-        return new SequentFormula(finalTerm);
+        return finalTerm;
     }
 
     private static ProofObligationVars generateProofObligationVariables(
@@ -347,7 +346,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         InfFlowPOSnippetFactory infFlowFactory =
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, ec, services);
 
-        final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
+        final Term poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
 
         // add proof obligation to goal
         infFlowGoal.addFormula(poFormula, false, true);
@@ -399,7 +398,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             tb.applySequential(new Term[] { contextUpdate, remembranceUpdate },
                 tb.and(infFlowValitidyData.preAssumption,
                     tb.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
-        usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
+        usageGoal.addFormula(uAssumptions, true, false);
     }
 
     protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,

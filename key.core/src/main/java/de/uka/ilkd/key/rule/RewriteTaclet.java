@@ -258,7 +258,7 @@ public class RewriteTaclet extends FindTaclet {
         return (RewriteTacletExecutor<? extends RewriteTaclet>) executor;
     }
 
-    public SequentFormula getRewriteResult(Goal goal, TermLabelState termLabelState,
+    public Term getRewriteResult(Goal goal, TermLabelState termLabelState,
             Services services, TacletApp app) {
         return getExecutor().getRewriteResult(goal, termLabelState, services, app);
     }

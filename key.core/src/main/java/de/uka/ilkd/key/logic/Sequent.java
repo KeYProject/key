@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
@@ -23,7 +22,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#createSuccSequent} or by inserting formulas directly into
  * {@link Sequent#EMPTY_SEQUENT}.
  */
-public class Sequent implements Iterable<SequentFormula> {
+public class Sequent implements Iterable<Term> {
 
     public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
 
@@ -95,7 +94,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * first the formulas are inserted at the beginning or end of the ante-/succedent.
      * (NOTICE:Sequent determines index using identy (==) not equality.)
      *
-     * @param cf the SequentFormula to be added
+     * @param cf the Term to be added
      * @param antec boolean selecting the correct semisequent where to insert the formulas. If set
      *        to true, the antecedent is taken otherwise the succedent.
      * @param first boolean if true the formula is added at the beginning of the ante-/succedent,
@@ -103,7 +102,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo addFormula(SequentFormula cf, boolean antec, boolean first) {
+    public SequentChangeInfo addFormula(Term cf, boolean antec, boolean first) {
 
         final Semisequent seq = antec ? antecedent : succedent;
 
@@ -117,15 +116,15 @@ public class Sequent implements Iterable<SequentFormula> {
      * adds a formula to the sequent at the given position. (NOTICE:Sequent determines index using
      * identy (==) not equality.)
      *
-     * @param cf a SequentFormula to be added
+     * @param cf a Term to be added
      * @param p a PosInOccurrence describes position in the sequent
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo addFormula(SequentFormula cf, PosInOccurrence p) {
+    public SequentChangeInfo addFormula(Term cf, PosInOccurrence p) {
         final Semisequent seq = getSemisequent(p);
 
-        final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.sequentFormula()), cf);
+        final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.sequentLevelFormula()), cf);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
             composeSequent(p.isInAntec(), semiCI.semisequent()), this);
@@ -136,7 +135,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * of first the formulas are inserted at the beginning or end of the ante-/succedent.
      * (NOTICE:Sequent determines index using identity (==) not equality.)
      *
-     * @param insertions the IList<SequentFormula> to be added
+     * @param insertions the IList<Term> to be added
      * @param antec boolean selecting the correct semisequent where to insert the formulas. If set
      *        to true, the antecedent is taken otherwise the succedent.
      * @param first boolean if true the formulas are added at the beginning of the ante-/succedent,
@@ -144,7 +143,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions, boolean antec,
+    public SequentChangeInfo addFormula(ImmutableList<Term> insertions, boolean antec,
             boolean first) {
 
         final Semisequent seq = antec ? antecedent : succedent;
@@ -160,17 +159,17 @@ public class Sequent implements Iterable<SequentFormula> {
      * adds the formulas of list insertions to the sequent starting at position p. (NOTICE:Sequent
      * determines index using identy (==) not equality.)
      *
-     * @param insertions a IList<SequentFormula> with the formulas to be added
+     * @param insertions a IList<Term> with the formulas to be added
      * @param p the PosInOccurrence describing the position where to insert the formulas
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions,
+    public SequentChangeInfo addFormula(ImmutableList<Term> insertions,
             PosInOccurrence p) {
         final Semisequent seq = getSemisequent(p);
 
         final SemisequentChangeInfo semiCI =
-            seq.insert(seq.indexOf(p.sequentFormula()), insertions);
+            seq.insert(seq.indexOf(p.sequentLevelFormula()), insertions);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
             composeSequent(p.isInAntec(), semiCI.semisequent()), this);
@@ -184,7 +183,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo replaceFormula(int formulaNr, SequentFormula replacement) {
+    public SequentChangeInfo replaceFormula(int formulaNr, Term replacement) {
         checkFormulaIndex(formulaNr);
         formulaNr--;
         boolean inAntec = formulaNr < antecedent.size();
@@ -207,12 +206,12 @@ public class Sequent implements Iterable<SequentFormula> {
      * replaces the formula at the given position with another one (NOTICE:Sequent determines index
      * using identity (==) not equality.)
      *
-     * @param newCF the SequentFormula replacing the old one
+     * @param newCF the Term replacing the old one
      * @param p a PosInOccurrence describes position in the sequent
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo changeFormula(SequentFormula newCF, PosInOccurrence p) {
+    public SequentChangeInfo changeFormula(Term newCF, PosInOccurrence p) {
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, newCF);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
@@ -224,13 +223,13 @@ public class Sequent implements Iterable<SequentFormula> {
      * list elements to the sequent (NOTICE:Sequent determines index using identity (==) not
      * equality.)
      *
-     * @param replacements the IList<SequentFormula> whose head replaces the formula at position p
+     * @param replacements the IList<Term> whose head replaces the formula at position p
      *        and adds the rest of the list behind the changed formula
      * @param p a PosInOccurrence describing the position of the formula to be replaced
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo changeFormula(ImmutableList<SequentFormula> replacements,
+    public SequentChangeInfo changeFormula(ImmutableList<Term> replacements,
             PosInOccurrence p) {
 
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, replacements);
@@ -292,9 +291,9 @@ public class Sequent implements Iterable<SequentFormula> {
      * @return an integer strictly greater than zero for the position of the given sequent formula
      *         on the proof sequent.
      */
-    public int formulaNumberInSequent(boolean inAntec, SequentFormula cfma) {
+    public int formulaNumberInSequent(boolean inAntec, Term cfma) {
         int n = inAntec ? 0 : antecedent.size();
-        final Iterator<SequentFormula> formIter =
+        final Iterator<Term> formIter =
             inAntec ? antecedent.iterator() : succedent.iterator();
         while (formIter.hasNext()) {
             n++;
@@ -315,7 +314,7 @@ public class Sequent implements Iterable<SequentFormula> {
      */
     public int formulaNumberInSequent(PosInOccurrence pio) {
         var inAntec = pio.isInAntec();
-        var formula = pio.sequentFormula();
+        var formula = pio.sequentLevelFormula();
         return formulaNumberInSequent(inAntec, formula);
     }
 
@@ -326,7 +325,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * @param formulaNumber formula number
      * @return the sequent formula at that position
      */
-    public SequentFormula getFormulabyNr(int formulaNumber) {
+    public Term getFormulabyNr(int formulaNumber) {
         checkFormulaIndex(formulaNumber);
         if (formulaNumber <= antecedent.size()) {
             return antecedent.get(formulaNumber - 1);
@@ -335,7 +334,7 @@ public class Sequent implements Iterable<SequentFormula> {
     }
 
     /**
-     * returns the semisequent in which the SequentFormula described by PosInOccurrence p lies
+     * returns the semisequent in which the Term described by PosInOccurrence p lies
      */
     private Semisequent getSemisequent(PosInOccurrence p) {
         return p.isInAntec() ? antecedent() : succedent();
@@ -352,7 +351,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * @return iterator about all ConstrainedFormulae of the sequent
      */
     @Override
-    public Iterator<SequentFormula> iterator() {
+    public Iterator<Term> iterator() {
         return new SequentIterator(antecedent(), succedent());
     }
 
@@ -376,7 +375,7 @@ public class Sequent implements Iterable<SequentFormula> {
     public SequentChangeInfo removeFormula(PosInOccurrence p) {
         final Semisequent seq = getSemisequent(p);
 
-        final SemisequentChangeInfo semiCI = seq.remove(seq.indexOf(p.sequentFormula()));
+        final SemisequentChangeInfo semiCI = seq.remove(seq.indexOf(p.sequentLevelFormula()));
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
             semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
@@ -406,23 +405,6 @@ public class Sequent implements Iterable<SequentFormula> {
         return antecedent().toString() + "==>" + succedent().toString();
     }
 
-    /**
-     * returns true iff the given variable is bound in a formula of a SequentFormula in this
-     * sequent.
-     *
-     * @param v the bound variable to search for
-     */
-    public boolean varIsBound(QuantifiableVariable v) {
-        for (SequentFormula sequentFormula : this) {
-            final BoundVarsVisitor bvv = new BoundVarsVisitor();
-            sequentFormula.formula().execPostOrder(bvv);
-            if (bvv.getBoundVariables().contains(v)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static final class NILSequent extends Sequent {
         private static final NILSequent INSTANCE = new NILSequent();
 
@@ -435,27 +417,22 @@ public class Sequent implements Iterable<SequentFormula> {
         }
 
         @Override
-        public Iterator<SequentFormula> iterator() {
-            return ImmutableSLList.<SequentFormula>nil().iterator();
-        }
-
-        @Override
-        public boolean varIsBound(QuantifiableVariable v) {
-            return false;
+        public Iterator<Term> iterator() {
+            return ImmutableSLList.<Term>nil().iterator();
         }
 
     }
 
-    static class SequentIterator implements Iterator<SequentFormula> {
+    static class SequentIterator implements Iterator<Term> {
 
         /**
          * The iterator over the ancedent of the proof sequent.
          */
-        private final Iterator<SequentFormula> anteIt;
+        private final Iterator<Term> anteIt;
         /**
          * The iterator over the succedent of the proof sequent.
          */
-        private final Iterator<SequentFormula> succIt;
+        private final Iterator<Term> succIt;
 
         /**
          * Constructs a new iterator over a proof sequent.
@@ -474,7 +451,7 @@ public class Sequent implements Iterable<SequentFormula> {
         }
 
         @Override
-        public SequentFormula next() {
+        public Term next() {
             if (anteIt.hasNext()) {
                 return anteIt.next();
             }
@@ -514,8 +491,8 @@ public class Sequent implements Iterable<SequentFormula> {
      */
     public Set<Name> getOccuringTermLabels() {
         final Set<Name> result = new HashSet<>();
-        for (final SequentFormula sf : this) {
-            result.addAll(getLabelsForTermRecursively(sf.formula()));
+        for (final Term sf : this) {
+            result.addAll(getLabelsForTermRecursively(sf));
         }
         return result;
     }
@@ -526,16 +503,16 @@ public class Sequent implements Iterable<SequentFormula> {
      * @param form the given formula
      * @return true if this sequent contains the given formula
      */
-    public boolean contains(SequentFormula form) {
+    public boolean contains(Term form) {
         return antecedent.contains(form) || succedent.contains(form);
     }
 
     /**
-     * Returns a list containing every {@link SequentFormula} in this sequent.
+     * Returns a list containing every {@link Term} in this sequent.
      *
-     * @return a list containing every {@link SequentFormula} in this sequent.
+     * @return a list containing every {@link Term} in this sequent.
      */
-    public ImmutableList<SequentFormula> asList() {
+    public ImmutableList<Term> asList() {
         return antecedent.asList().append(succedent.asList());
     }
 

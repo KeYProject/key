@@ -495,7 +495,7 @@ public class IntermediateProofReplayer {
             NamespaceSet nss = currGoal.getLocalNamespaces();
             Term term = parseTerm(ifFormulaStr, proof, nss.variables(), nss.programVariables(),
                 nss.functions());
-            ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(new SequentFormula(term)));
+            ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(term));
         }
 
         if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {

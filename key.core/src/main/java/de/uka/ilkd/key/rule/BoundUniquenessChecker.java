@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
@@ -52,8 +51,8 @@ public class BoundUniquenessChecker {
      * @param seq the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
-        for (final SequentFormula cf : seq) {
-            terms = terms.prepend(cf.formula());
+        for (final Term cf : seq) {
+            terms = terms.prepend(cf);
         }
     }
 

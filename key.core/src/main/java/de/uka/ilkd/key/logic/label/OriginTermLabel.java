@@ -251,9 +251,9 @@ public class OriginTermLabel implements TermLabel {
         SequentChangeInfo changes = null;
 
         for (int i = 1; i <= seq.size(); ++i) {
-            SequentFormula oldFormula = seq.getFormulabyNr(i);
-            SequentFormula newFormula = new SequentFormula(
-                OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
+            Term oldFormula = seq.getFormulabyNr(i);
+            Term uAssumptions = OriginTermLabel.removeOriginLabels(oldFormula, services);
+            Term newFormula = uAssumptions;
             SequentChangeInfo change = seq.changeFormula(newFormula,
                 PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel()));
 

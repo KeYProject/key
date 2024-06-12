@@ -234,7 +234,7 @@ public final class SourceView extends JComponent {
             proof.register(sources, ProofJavaSourceCollection.class);
             proof.root().sequent().forEach(formula -> {
                 OriginTermLabel originLabel =
-                    (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
+                    (OriginTermLabel) formula.getLabel(OriginTermLabel.NAME);
                 if (originLabel != null) {
                     if (originLabel.getOrigin() instanceof OriginTermLabel.FileOrigin) {
                         ((OriginTermLabel.FileOrigin) originLabel.getOrigin())
@@ -736,64 +736,71 @@ public final class SourceView extends JComponent {
             // proof obligation belongs to is always loaded.
 
             node.sequent().forEach(
-                formula -> formula.formula().execPostOrder(new Visitor<Term>() {
+                formula -> {
+                    formula.execPostOrder(new Visitor<Term>() {
 
-                    @Override
-                    public boolean visitSubtree(Term visited) {
-                        return visited.containsJavaBlockRecursive();
-                    }
+                        @Override
+                        public boolean visitSubtree(Term visited) {
+                            return visited.containsJavaBlockRecursive();
+                        }
 
-                    @Override
-                    public void visit(Term visited) {}
+                        @Override
+                        public void visit(Term visited) {}
 
-                    @Override
-                    public void subtreeLeft(Term subtreeRoot) {}
+                        @Override
+                        public void subtreeLeft(Term subtreeRoot) {}
 
-                    @Override
-                    public void subtreeEntered(Term subtreeRoot) {
-                        if (subtreeRoot.javaBlock() != null) {
-                            JavaASTVisitor visitor =
-                                new JavaASTVisitor(subtreeRoot.javaBlock().program(),
-                                    mainWindow.getMediator().getServices()) {
+                        @Override
+                        public void subtreeEntered(Term subtreeRoot) {
+                            if (subtreeRoot.javaBlock() != null) {
+                                JavaASTVisitor visitor =
+                                    new JavaASTVisitor(subtreeRoot.javaBlock().program(),
+                                        mainWindow.getMediator().getServices()) {
 
-                                    @Override
-                                    protected void doDefaultAction(SourceElement el) {
-                                        if (el instanceof MethodBodyStatement mb) {
-                                            Statement body = mb.getBody(services);
-                                            PositionInfo posInf = null;
-                                            // try to find position information of the source
-                                            // element
-                                            if (body != null) {
-                                                posInf = body.getPositionInfo();
-                                            } else {
-                                                // the method is declared without a body
-                                                // -> we try to show the file either way
-                                                IProgramMethod pm = mb.getProgramMethod(services);
-                                                if (pm != null) {
-                                                    posInf = pm.getPositionInfo();
+                                        @Override
+                                        protected void doDefaultAction(SourceElement el) {
+                                            if (el instanceof MethodBodyStatement mb) {
+                                                Statement body = mb.getBody(services);
+                                                PositionInfo posInf = null;
+                                                // try to find position information of the source
+                                                // element
+                                                if (body != null) {
+                                                    posInf = body.getPositionInfo();
+                                                } else {
+                                                    // the method is declared without a body
+                                                    // -> we try to show the file either way
+                                                    IProgramMethod pm =
+                                                        mb.getProgramMethod(services);
+                                                    if (pm != null) {
+                                                        posInf = pm.getPositionInfo();
+                                                    }
                                                 }
-                                            }
-                                            if (posInf != null && posInf.getURI().isPresent()) {
-                                                // sometimes the useful file info is only stored in
-                                                // parentClassURI for some reason ...
-                                                if (posInf.getURI().isPresent()) {
-                                                    node.proof()
-                                                            .lookup(ProofJavaSourceCollection.class)
-                                                            .addRelevantFile(posInf.getURI().get());
-                                                } else if (posInf.getParentClassURI() != null) {
-                                                    node.proof()
-                                                            .lookup(ProofJavaSourceCollection.class)
-                                                            .addRelevantFile(
-                                                                posInf.getParentClassURI());
+                                                if (posInf != null && posInf.getURI().isPresent()) {
+                                                    // sometimes the useful file info is only stored
+                                                    // in
+                                                    // parentClassURI for some reason ...
+                                                    if (posInf.getURI().isPresent()) {
+                                                        node.proof()
+                                                                .lookup(
+                                                                    ProofJavaSourceCollection.class)
+                                                                .addRelevantFile(
+                                                                    posInf.getURI().get());
+                                                    } else if (posInf.getParentClassURI() != null) {
+                                                        node.proof()
+                                                                .lookup(
+                                                                    ProofJavaSourceCollection.class)
+                                                                .addRelevantFile(
+                                                                    posInf.getParentClassURI());
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                };
-                            visitor.start();
+                                    };
+                                visitor.start();
+                            }
                         }
-                    }
-                }));
+                    });
+                });
         }
 
         return list;

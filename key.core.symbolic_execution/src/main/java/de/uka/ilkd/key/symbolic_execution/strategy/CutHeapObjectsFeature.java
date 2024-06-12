@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -27,7 +26,7 @@ import org.key_project.logic.Name;
  * <p>
  * This means the cut is only applied if the cut formula is not an equality or if it is not a
  * negated formula or if the (negated) equality is not contained as top term
- * ({@link SequentFormula}) in the {@link Sequent} ignoring the order of the equality children.
+ * ({@link Term}) in the {@link Sequent} ignoring the order of the equality children.
  * </p>
  *
  * @author Martin Hentschel
@@ -49,9 +48,9 @@ public class CutHeapObjectsFeature extends BinaryFeature {
                 Term cutFormulaC0 = cutFormula.sub(0);
                 Term cutFormulaC1 = cutFormula.sub(1);
                 boolean contains = false;
-                Iterator<SequentFormula> iter = goal.sequent().iterator();
+                Iterator<Term> iter = goal.sequent().iterator();
                 while (!contains && iter.hasNext()) {
-                    Term formula = iter.next().formula();
+                    Term formula = iter.next();
                     if (formula.op() == Junctor.NOT) {
                         formula = formula.sub(0);
                     }

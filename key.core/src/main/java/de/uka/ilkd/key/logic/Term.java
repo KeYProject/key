@@ -43,6 +43,7 @@ import org.jspecify.annotations.Nullable;
  */
 public interface Term
         extends Sorted, TermEqualsModProperty, org.key_project.logic.Term {
+
     @Override
     Operator op();
 
