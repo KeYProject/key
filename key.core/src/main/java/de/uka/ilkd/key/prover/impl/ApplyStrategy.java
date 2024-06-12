@@ -267,9 +267,9 @@ public class ApplyStrategy extends AbstractProverCore {
         ProofTreeListener treeListener = new ProofTreeAdapter() {
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
-                ImmutableList<Goal> newGoals = e.getGoals();
+                Iterable<Goal> newGoals = e.getGoals();
                 // Check for a closed goal ...
-                if (newGoals.size() == 0) {
+                if (!newGoals.iterator().hasNext()) {
                     // No new goals have been generated ...
                     closedGoals++;
                 }

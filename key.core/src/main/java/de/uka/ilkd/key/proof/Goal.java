@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -46,7 +47,7 @@ import org.jspecify.annotations.NonNull;
  * methods for setting back several proof steps. The sequent has to be changed using the methods of
  * Goal.
  */
-public final class Goal {
+public final class Goal implements ProofGoal {
 
     public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
