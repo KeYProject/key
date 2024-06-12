@@ -133,7 +133,7 @@ public class CloseAfterMerge implements BuiltInRule {
                 // a closed goal when loading a proof without the GUI (e.g.
                 // in a JUnit test).
 
-                if (e.getGoals().size() == 0 && mergeNodeF.isClosed()) {
+                if (e.getGoals().isEmpty() && mergeNodeF.isClosed()) {
                     // The merged node was closed; now also close this node.
 
                     e.getSource().closeGoal(linkedGoal);
