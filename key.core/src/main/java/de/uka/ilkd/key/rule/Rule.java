@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.HasOrigin;
 import org.key_project.logic.Name;
+import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -15,7 +16,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * This interface has to be implemented by all classes that want to act as a rule in the calculus.
  */
-public interface Rule extends HasOrigin {
+public interface Rule extends org.key_project.ncore.rules.Rule, HasOrigin {
 
     /**
      * the rule is applied on the given goal using the information of rule application.
@@ -30,6 +31,11 @@ public interface Rule extends HasOrigin {
     @NonNull
     ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException;
+
+    @NonNull
+    default ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
+      return apply(goal, goal.proof().getServices(), ruleApp);
+    };
 
     /**
      * the name of the rule

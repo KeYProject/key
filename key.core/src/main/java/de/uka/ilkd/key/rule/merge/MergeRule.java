@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
+import org.key_project.ncore.rules.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeProcedure.ValuesMergeResult;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;

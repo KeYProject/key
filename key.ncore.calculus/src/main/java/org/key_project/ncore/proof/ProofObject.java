@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.proof;
 
-
 /**
  * <p>
  * A proof object provides an interface to the current proof status.
