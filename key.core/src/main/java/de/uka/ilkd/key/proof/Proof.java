@@ -515,8 +515,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param oldGoal the old goal that has to be removed from list
      * @param newGoals the Iterable<Goal> with the new goals that were result of a rule application
-     *        on
-     *        goal
+     *        on goal
      */
     @Override
     public void replace(Goal oldGoal, Iterable<Goal> newGoals) {
