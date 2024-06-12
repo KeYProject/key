@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.rules;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 public interface Rule extends Named {
     /**
@@ -28,5 +32,7 @@ public interface Rule extends Named {
     /**
      * returns the display name of the rule
      */
-    String displayName();
+    default String displayName() {
+        return name().toString();
+    }
 }

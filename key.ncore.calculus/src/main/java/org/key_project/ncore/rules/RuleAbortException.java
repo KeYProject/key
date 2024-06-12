@@ -10,9 +10,7 @@ package org.key_project.ncore.rules;
  *         This Exception signals the abort of a rule Application
  *
  */
-
-
-public class RuleAbortException extends Exception {
+public class RuleAbortException extends RuntimeException {
 
     private static final long serialVersionUID = -645034125571021135L;
 

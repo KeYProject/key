@@ -608,10 +608,10 @@ public final class Goal implements ProofGoal {
          * caught.
          */
         NamespaceSet originalNamespaces = getLocalNamespaces();
-        Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
         try {
+            Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
             goalList = ruleApp.execute(this, overlayServices);
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
