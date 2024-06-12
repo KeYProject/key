@@ -20,5 +20,5 @@ include 'keyext.rusty_while'
 // ENABLE NULLNESS here or on the CLI
 // This flag is activated to enable the checker framework.
 // System.setProperty("ENABLE_NULLNESS", "true")
-
+include 'key.ncore.calculus'
 
