@@ -59,7 +59,7 @@ public class MainBenchmarking {
         var benchmarkConfig = new ControlParameters().setMaxRestarts(1).setMaxSeachDepth(8).setKeyTimeoutSeconds(100);
 
         System.out.printf("Saving temporary files in %s", tmpfile);
-        LegacyStrategyProviderFactory lsp = new LegacyStrategyProviderFactory(Path.of(tmpfile));
+        LegacyInterfaceFactory lsp = new LegacyInterfaceFactory(Path.of(tmpfile));
         // Task: Create a contract for the given method; we do not care about the method's surroundings
         StrategyProvider<TaskSpecifyFunction, Nothing> legacySpecifyFunctionProvider = lsp.getTaskSpecifyFunctionProvider();
         // Task: Create a contract for the given method; the contract must allow the verification of the top-level method
@@ -148,7 +148,7 @@ public class MainBenchmarking {
                 // Create ClassInfo object
                 ClassInfo ci;
                 try {
-                    ci = new ClassInfo(javaFile.toPath());
+                    ci = new ClassInfo(javaFile.getName(),javaFile.toPath());
                 } catch (IOException e) {
                     LOGGER.error("Failed to read Java file {}", javaFile.getAbsolutePath());
                     continue;

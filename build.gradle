@@ -76,8 +76,8 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
+    sourceCompatibility = 17
+    targetCompatibility = 17
 
     repositories {
         mavenCentral()
@@ -108,7 +108,7 @@ subprojects {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
         // Setting the release to Java 11
-        options.release = 11
+        options.release = 17
     }
 
     tasks.withType(Javadoc) {

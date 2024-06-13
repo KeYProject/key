@@ -113,9 +113,9 @@ public final class Utility {
                 StrategyProperties.QUERY_ON);
         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                 StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        // Important: We want to unroll the proof as much as possible and not stop at the first unclosable goal!
+        // Important: We want to stop at the first non-closed goal
         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-                StrategyProperties.STOPMODE_DEFAULT);
+                StrategyProperties.STOPMODE_NONCLOSE);
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
         // Make sure that the new options are used
         int maxSteps = MAX_STEPS;
