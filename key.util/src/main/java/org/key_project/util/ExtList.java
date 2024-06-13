@@ -8,12 +8,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extends java.util.LinkedList in order to collect elements according to their type.
  * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
  */
-public class ExtList extends LinkedList<Object> {
+public final class ExtList extends LinkedList<Object> {
 
     private static final long serialVersionUID = 9182017368310263908L;
 
@@ -60,7 +61,7 @@ public class ExtList extends LinkedList<Object> {
      * @return the first element with type cl in list
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(Class<T> cl) {
+    public <T> @Nullable T get(Class<T> cl) {
         for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {
                 return (T) next;
@@ -78,7 +79,7 @@ public class ExtList extends LinkedList<Object> {
      * @return the first element with type cl in list
      */
     @SuppressWarnings("unchecked")
-    public <T> T removeFirstOccurrence(Class<T> cl) {
+    public <T> @Nullable T removeFirstOccurrence(Class<T> cl) {
         Iterator<Object> it = iterator();
         while (it.hasNext()) {
             Object next = it.next();

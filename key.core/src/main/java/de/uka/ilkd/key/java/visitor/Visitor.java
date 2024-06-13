@@ -406,4 +406,6 @@ public interface Visitor {
      * @param jmlAssert the statement to perform the action on.
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
+
+    void performActionOnSubtype(Subtype subtype);
 }

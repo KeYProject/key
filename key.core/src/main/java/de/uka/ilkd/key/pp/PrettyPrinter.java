@@ -54,13 +54,11 @@ public class PrettyPrinter implements Visitor {
     private final PosTableLayouter layouter;
 
     private boolean startAlreadyMarked;
-    @Nullable
-    private Object firstStatement;
+    private @Nullable Object firstStatement;
     private boolean endAlreadyMarked;
 
     private final SVInstantiations instantiations;
-    @Nullable
-    private final Services services;
+    private final @Nullable Services services;
     private boolean usePrettyPrinting;
     private boolean useUnicodeSymbols;
 
@@ -590,6 +588,11 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnMergeContract(MergeContract x) {
         layouter.print("//@ merge-contract");
+    }
+
+    @Override
+    public void performActionOnSubtype(Subtype x) {
+        printOperator(x, "<:");
     }
 
     @Override

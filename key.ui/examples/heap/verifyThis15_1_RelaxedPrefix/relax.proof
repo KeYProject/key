@@ -44,12 +44,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Dec 08 19:31:27 CET 2022
-contract=Relaxed[Relaxed\\:\\:isRelaxedPrefix([I,[I)].JML operation contract.0
-name=Relaxed[Relaxed\\:\\:isRelaxedPrefix([I,[I)].JML operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"contract": "Relaxed[Relaxed::isRelaxedPrefix([I,[I)].JML operation contract.0",
+	"name": "Relaxed[Relaxed::isRelaxedPrefix([I,[I)].JML operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "kirsten" ) (keyVersion "4ff10e41cd53bfad321ed01e040d352805d54545"))

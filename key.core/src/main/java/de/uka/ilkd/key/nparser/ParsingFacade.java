@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (19.08.19)
  */
+@NullMarked
 public final class ParsingFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParsingFacade.class);
 
@@ -52,8 +54,8 @@ public final class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-    @NonNull
-    public static <T extends ParserRuleContext> T getParseRuleContext(@NonNull KeyAst<T> ast) {
+    public static <T extends ParserRuleContext> @NonNull T getParseRuleContext(
+            @NonNull KeyAst<T> ast) {
         return ast.ctx;
     }
 
@@ -190,8 +192,7 @@ public final class ParsingFacade {
         return p.id_declaration();
     }
 
-    @Nullable
-    public static String getValueDocumentation(@Nullable TerminalNode docComment) {
+    public static @Nullable String getValueDocumentation(@Nullable TerminalNode docComment) {
         if (docComment == null) {
             return null;
         }
@@ -274,6 +275,11 @@ public final class ParsingFacade {
      */
     public static Configuration readConfigurationFile(File file) throws IOException {
         return readConfigurationFile(file.toPath());
+    }
+
+    public static Configuration getConfiguration(KeYParser.TableContext ctx) {
+        final var cfg = new ConfigurationBuilder();
+        return cfg.visitTable(ctx);
     }
     // endregion
 }
