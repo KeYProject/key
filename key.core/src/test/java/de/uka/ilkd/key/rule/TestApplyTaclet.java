@@ -157,17 +157,13 @@ public class TestApplyTaclet {
         Sequent seq1 = goals.head().sequent();
         Sequent seq2 = goals.tail().head().sequent();
         assertEquals(2, goals.size(), "Preinstantiated cut-rule should be executed");
-        Term fml = seq2.succedent().get(1);
-        Term fml1 = seq1.succedent().get(1);
-        Term fml2 = seq2.succedent().getFirst();
-        Term fml3 = seq1.succedent().getFirst();
         assertTrue(
-            fml3.equals(aimpb)
-                    || fml2.equals(aimpb)
+            seq1.succedent().getFirst().equals(aimpb)
+                    || seq2.succedent().getFirst().equals(aimpb)
                     || (seq1.succedent().get(1) != null
-                            && fml1.equals(aimpb))
+                            && seq1.succedent().get(1).equals(aimpb))
                     || (seq2.succedent().get(1) != null
-                            && fml.equals(aimpb)),
+                            && seq2.succedent().get(1).equals(aimpb)),
             "A->B should be in the succedent of one of the new goals now, "
                 + "it's in the antecedent, anyway.");
     }
@@ -514,12 +510,10 @@ public class TestApplyTaclet {
 
         assertEquals(1, goals.size(), "Expected one goal");
         Iterator<Term> it = goals.head().sequent().antecedent().iterator();
-        Term fml = it.next();
-        Term fml1 = it.next();
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
-                    && fml1.equals(TacletForTests.parseTerm("A"))
-                    && fml.equals(TacletForTests.parseTerm("B")),
+                    && it.next().equals(TacletForTests.parseTerm("A"))
+                    && it.next().equals(TacletForTests.parseTerm("B")),
             "Expected 'A, B ==>', but is " + goals.head().sequent());
     }
 
@@ -556,14 +550,11 @@ public class TestApplyTaclet {
         assertEquals(1, goals.size(), "Expected one goal");
 
         Iterator<Term> it = goals.head().sequent().antecedent().iterator();
-
-        Term fml = it.next();
-        Term fml1 = it.next();
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
                     && goals.head().sequent().succedent().size() == 0
-                    && fml1.equals(TacletForTests.parseTerm("A"))
-                    && fml.equals(TacletForTests.parseTerm("B")),
+                    && it.next().equals(TacletForTests.parseTerm("A"))
+                    && it.next().equals(TacletForTests.parseTerm("B")),
             "Expected 'A, B ==>', but is " + goals.head().sequent());
     }
 

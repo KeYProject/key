@@ -75,7 +75,8 @@ public class TestSemisequent {
         Semisequent seq = Semisequent.EMPTY_SEMISEQUENT;
         seq = extract(seq.insert(0, con[0]));
         seq = extract(seq.insert(1, con[1]));
-        Term eq2con0 = con[0];
+        TermBuilder TB = TacletForTests.services().getTermBuilder(false);
+        Term eq2con0 = TB.func((JFunction) con[0].op(), new Term[] {});
         assertFalse(seq.contains(eq2con0), "Contains should test of identity and not equality.");
     }
 
