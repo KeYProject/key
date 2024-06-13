@@ -11,9 +11,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -194,21 +192,26 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     private Set<PosInOccurrence> formulasRemovedBy(Node node) {
-        Set<PosInOccurrence> removed = new HashSet<>();
         // compare parent sequent to new sequent
         Node parent = node.parent();
         if (parent == null) {
-            return removed;
+            return new HashSet<>();
         }
-        Sequent seqParent = parent.sequent();
-        var seqNew = new IdentityHashSet<>(node.sequent().asList());
-        int i = 1;
-        for (final var parentFormula : seqParent) {
+        var removed = computeRemovedFormulas(node.sequent().antecedent(),
+            parent.sequent().antecedent(), true);
+        removed.addAll(computeRemovedFormulas(node.sequent().succedent(),
+            parent.sequent().succedent(), false));
+        return removed;
+    }
+
+    private Set<PosInOccurrence> computeRemovedFormulas(Semisequent newSemi, Semisequent parentSemi,
+            boolean inAntec) {
+        final Set<PosInOccurrence> removed = new HashSet<>();
+        final var seqNew = new IdentityHashSet<>(newSemi.asList());
+        for (final var parentFormula : parentSemi) {
             if (!seqNew.contains(parentFormula)) {
-                removed.add(new PosInOccurrence(parentFormula, PosInTerm.getTopLevel(),
-                    seqParent.numberInAntec(i)));
+                removed.add(new PosInOccurrence(parentFormula, PosInTerm.getTopLevel(), inAntec));
             }
-            i++;
         }
         return removed;
     }
@@ -240,20 +243,25 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         int sibling = 0;
         for (Node b : node.children()) {
             // compare sequents
-            var oldSeq = new IdentityHashSet<>(node.sequent().asList());
-            Sequent newSeq = b.sequent();
-            int index = 1;
-            for (var f : newSeq) {
-                if (!oldSeq.contains(f)) {
-                    var pio = new PosInOccurrence(f, PosInTerm.getTopLevel(),
-                        newSeq.numberInAntec(index));
-                    outputs.add(new Pair<>(pio, node.childrenCount() > 1 ? sibling : -1));
-                }
-                index++;
-            }
+            computeOutputForSemisequent(node, b, true, outputs, sibling);
+            computeOutputForSemisequent(node, b, false, outputs, sibling);
             sibling++;
         }
         return outputs;
+    }
+
+    private void computeOutputForSemisequent(Node parent, Node child, boolean inAntec,
+            List<Pair<PosInOccurrence, Integer>> outputs, int sibling) {
+        ImmutableList<Term> oldSemi = inAntec ? parent.sequent().antecedent().asList()
+                : parent.sequent().succedent().asList();
+        Semisequent newSeq = inAntec ? child.sequent().antecedent() : child.sequent().succedent();
+        var oldSeq = new IdentityHashSet<>(oldSemi);
+        for (var f : newSeq) {
+            if (!oldSeq.contains(f)) {
+                var pio = new PosInOccurrence(f, PosInTerm.getTopLevel(), inAntec);
+                outputs.add(new Pair<>(pio, parent.childrenCount() > 1 ? sibling : -1));
+            }
+        }
     }
 
     @Override
@@ -273,14 +281,15 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // record any rules added by this rule application
         for (NodeReplacement newNode : ruleAppInfo.getReplacementNodes()) {
             for (NoPosTacletApp newRule : newNode.getNode().getLocalIntroducedRules()) {
+                Taclet newTaclet = newRule.taclet();
                 final var justification =
                     newNode.getNode().proof().getInitConfig().getJustifInfo()
-                            .getJustification(newRule.taclet());
+                            .getJustification(newTaclet);
                 if (justification instanceof RuleJustificationByAddRules justAddRule &&
                         justAddRule.node() == n) {
-                    AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
+                    AddedRule ruleNode = new AddedRule(newTaclet.name().toString());
                     output.add(ruleNode);
-                    dynamicRules.put((Taclet) newRule.rule(), ruleNode);
+                    dynamicRules.put(newTaclet, ruleNode);
                 }
             }
         }

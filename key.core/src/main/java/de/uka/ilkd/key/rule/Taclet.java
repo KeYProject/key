@@ -492,20 +492,18 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         if ((ifSequent == null && t2.ifSequent != null)
                 || (ifSequent != null && t2.ifSequent == null)) {
             return false;
+        } else if (ifSequent.size() != t2.ifSequent.size()) {
+            return false;
         } else {
             ImmutableList<Term> if1 = ifSequent.asList();
             ImmutableList<Term> if2 = t2.ifSequent.asList();
-            while (!if1.isEmpty() && !if2.isEmpty()) {
-                Term term = if1.head();
-                Term head = if2.head();
-                if (!(boolean) ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY
-                        .equalsModThisProperty(term, head))
-                    break;
+            while (!if1.isEmpty()) {
+                if (!ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY
+                        .equalsModThisProperty(if1.head(), if2.head())) {
+                    return false;
+                }
                 if1 = if1.tail();
                 if2 = if2.tail();
-            }
-            if (!if1.isEmpty() || !if2.isEmpty()) {
-                return false;
             }
         }
 

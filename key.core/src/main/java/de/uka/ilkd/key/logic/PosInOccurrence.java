@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 /**
- * This class describes a position in an occurrence of a term. A Term and a PosInTerm
- * determine an object of this class exactly.
+ * This class describes the position of an occurrence of a term within a formula.
+ * The top level formula and a {@link PosInTerm} which describes the exact occurrence.
  */
 public final class PosInOccurrence {
 
@@ -28,7 +30,7 @@ public final class PosInOccurrence {
      */
     private final boolean inAntec;
 
-    /** the position in Term.formula() */
+    /** the position in sequentLevelFormula */
     private final PosInTerm posInTerm;
 
     /**
@@ -42,7 +44,7 @@ public final class PosInOccurrence {
         this.inAntec = inAntec;
         this.sequentLevelFormula = sequentLevelFormula;
         this.posInTerm = posInTerm;
-        this.hashCode = (short) (sequentLevelFormula.hashCode() * 13 + posInTerm.hashCode());
+        this.hashCode = (short) Objects.hash(sequentLevelFormula, inAntec, posInTerm);
     }
 
     /**
@@ -153,7 +155,7 @@ public final class PosInOccurrence {
      * The usage of this method is strongly discouraged, use {@link PosInOccurrence#iterator}
      * instead. describes the exact occurrence of the referred term
      *
-     * @return the position in the formula of the Term of this PosInOccurrence.
+     * @return the position of the occurrence within the sequent level formula.
      */
     public PosInTerm posInTerm() {
         return posInTerm;
