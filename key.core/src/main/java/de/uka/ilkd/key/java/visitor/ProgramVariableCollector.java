@@ -126,20 +126,20 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             }
         }
 
-        // modifies
+        // modifiable
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term mod = x.getModifies(heap, selfTerm, atPres, services);
-            if (mod != null) {
-                mod.execPostOrder(tpvc);
+            Term modifiable = x.getModifiable(heap, selfTerm, atPres, services);
+            if (modifiable != null) {
+                modifiable.execPostOrder(tpvc);
             }
         }
 
-        // free modifies
+        // free modifiable
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
-            Term freeMod = x.getFreeModifies(heap, selfTerm, atPres, services);
-            if (freeMod != null) {
-                freeMod.execPostOrder(tpvc);
+            Term freeModifiable = x.getFreeModifiable(heap, selfTerm, atPres, services);
+            if (freeModifiable != null) {
+                freeModifiable.execPostOrder(tpvc);
             }
         }
 
@@ -197,9 +197,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term modifiesClause = x.getModifiesClause(heap, services);
-            if (modifiesClause != null) {
-                modifiesClause.execPostOrder(collector);
+            Term modifiableClause = x.getModifiableClause(heap, services);
+            if (modifiableClause != null) {
+                modifiableClause.execPostOrder(collector);
             }
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
@@ -243,9 +243,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term modifiesClause = x.getModifiesClause(heap, services);
-            if (modifiesClause != null) {
-                modifiesClause.execPostOrder(collector);
+            Term modifiableClause = x.getModifiableClause(heap, services);
+            if (modifiableClause != null) {
+                modifiableClause.execPostOrder(collector);
             }
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();

@@ -134,7 +134,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         register(selfVar, services);
         final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
-        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         final Map<LocationVariable, JFunction> anonOutHeaps =
             createAnonOutHeaps(heaps, services, tb);
 
@@ -154,22 +154,23 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term[] assumptions = createAssumptions(selfVar, heaps, wellFormedHeapsCondition,
             services, conditionsAndClausesBuilder);
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
-        final Map<LocationVariable, Term> modifiesClauses =
-            conditionsAndClausesBuilder.buildModifiesClauses();
-        final Map<LocationVariable, Term> freeModifiesClauses =
-            conditionsAndClausesBuilder.buildFreeModifiesClauses();
+        final Map<LocationVariable, Term> modifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
+        final Map<LocationVariable, Term> freeModifiableClauses =
+            conditionsAndClausesBuilder.buildFreeModifiableClauses();
         final Term[] postconditionsNext =
             createPostconditionsNext(
-                selfTerm, heaps, nextVariables, modifiesClauses, freeModifiesClauses, services);
+                selfTerm, heaps, nextVariables, modifiableClauses, freeModifiableClauses, services);
         final Term[] postconditions =
-            createPostconditions(modifiesClauses, freeModifiesClauses, conditionsAndClausesBuilder);
+            createPostconditions(modifiableClauses, freeModifiableClauses,
+                conditionsAndClausesBuilder);
         final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
 
         final GoalsConfigurator configurator =
             createGoalConfigurator(selfVar, selfTerm, variables, services, tb);
 
         Term validity = setUpValidityGoal(selfTerm, heaps, anonOutHeaps, variables, nextVariables,
-            modifiesClauses, freeModifiesClauses, ArrayUtil.add(assumptions, freePrecondition),
+            modifiableClauses, freeModifiableClauses, ArrayUtil.add(assumptions, freePrecondition),
             decreasesCheck, postconditions, postconditionsNext, wellFormedHeapsCondition,
             configurator, conditionsAndClausesBuilder, services, tb);
 
@@ -235,19 +236,19 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     /**
      * Creates postconditions for the current loop iteration.
      *
-     * @param modifiesClauses the contract's modifies clauses.
-     * @param freeModifiesClauses the loop's free modifies clauses.
+     * @param modifiableClauses the contract's modifiable clauses.
+     * @param freeModifiableClauses the loop's free modifiable clauses.
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
      * @return the postconditions for the current loop iteration.
      */
     private Term[] createPostconditions(
-            final Map<LocationVariable, Term> modifiesClauses,
-            final Map<LocationVariable, Term> freeModifiesClauses,
+            final Map<LocationVariable, Term> modifiableClauses,
+            final Map<LocationVariable, Term> freeModifiableClauses,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition =
             conditionsAndClausesBuilder.buildFrameCondition(
-                modifiesClauses, freeModifiesClauses);
+                modifiableClauses, freeModifiableClauses);
         return new Term[] { postcondition, frameCondition };
     }
 
@@ -257,8 +258,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param selfTerm the self term.
      * @param heaps the heaps.
      * @param nextVariables the variables for the next loop iteration.
-     * @param modifiesClauses the modified clauses.
-     * @param freeModifiesClauses the free modified clauses.
+     * @param modifiableClauses the modifiable clauses.
+     * @param freeModifiableClauses the free modifiable clauses.
      * @param services services.
      * @return the postconditions for the next loop iteration.
      */
@@ -266,15 +267,15 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             final Term selfTerm,
             final List<LocationVariable> heaps,
             final LoopContract.Variables nextVariables,
-            final Map<LocationVariable, Term> modifiesClauses,
-            final Map<LocationVariable, Term> freeModifiesClauses,
+            final Map<LocationVariable, Term> modifiableClauses,
+            final Map<LocationVariable, Term> freeModifiableClauses,
             final Services services) {
         final Term nextPostcondition =
             new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, nextVariables,
                 selfTerm, services).buildPostcondition();
         final Term nextFrameCondition =
             new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, nextVariables,
-                selfTerm, services).buildFrameCondition(modifiesClauses, freeModifiesClauses);
+                selfTerm, services).buildFrameCondition(modifiableClauses, freeModifiableClauses);
         return new Term[] { nextPostcondition, nextFrameCondition };
     }
 
@@ -340,7 +341,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         Map<LocationVariable, JFunction> anonOutHeaps =
             new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
-            if (contract.hasModifiesClause(heap)) {
+            if (contract.hasModifiableClause(heap)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
                 final JFunction anonymisationFunction =
@@ -387,7 +388,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param anonOutHeaps the heaps used in the anonOut update.
      * @param variables the contract's variables.
      * @param nextVariables the variables for the next loop iteration.
-     * @param modifiesClauses the modified clauses.
+     * @param modifiableClauses the modifiable clauses.
      * @param assumptions the preconditions.
      * @param decreasesCheck the decreases check.
      * @param postconditions the postconditions for the current loop iteration.
@@ -402,8 +403,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private Term setUpValidityGoal(final Term selfTerm, final List<LocationVariable> heaps,
             final Map<LocationVariable, JFunction> anonOutHeaps,
             final BlockContract.Variables variables, final LoopContract.Variables nextVariables,
-            final Map<LocationVariable, Term> modifiesClauses,
-            final Map<LocationVariable, Term> freeModifiesClauses, final Term[] assumptions,
+            final Map<LocationVariable, Term> modifiableClauses,
+            final Map<LocationVariable, Term> freeModifiableClauses, final Term[] assumptions,
             final Term decreasesCheck, final Term[] postconditions, final Term[] postconditionsNext,
             final Term wellFormedHeapsCondition, final GoalsConfigurator configurator,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder, final Services services,
@@ -424,8 +425,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term context = tb.sequential(outerRemembranceUpdate, anonInUpdate);
 
         Term validity = configurator.setUpLoopValidityGoal(null, contract.getAuxiliaryContract(),
-            context, remembranceUpdate, nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
-            freeModifiesClauses, assumptions, decreasesCheck, postconditions, postconditionsNext,
+            context, remembranceUpdate, nextRemembranceUpdate, anonOutHeaps, modifiableClauses,
+            freeModifiableClauses, assumptions, decreasesCheck, postconditions, postconditionsNext,
             exceptionParameter, variables.termify(selfTerm), nextVariables);
 
         Term wellFormedAnonymisationHeapsCondition =
