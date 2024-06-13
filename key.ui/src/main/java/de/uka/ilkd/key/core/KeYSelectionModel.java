@@ -54,12 +54,12 @@ public class KeYSelectionModel {
      */
     public synchronized void setProof(Proof p) {
         proof = Objects.requireNonNull(p);
-        Goal g = proof.openGoals().iterator().next();
-        if (g == null) {
+        if (proof.openGoals().isEmpty()) {
             selectedNode = proof.root().leavesIterator().next();
             selectedSequent = selectedNode.sequent();
             selectedRuleApp = selectedNode.getAppliedRuleApp();
         } else {
+            final Goal g = proof.openGoals().iterator().next();
             goalIsValid = true;
             selectedNode = g.node();
             selectedSequent = selectedNode.sequent();
@@ -81,12 +81,12 @@ public class KeYSelectionModel {
         proof = p;
         primary.setProof(p, previousProof);
         if (proof != null) {
-            Goal g = proof.openGoals().iterator().next();
-            if (g == null) {
+            if (proof.openGoals().isEmpty()) {
                 selectedNode = proof.root().leavesIterator().next();
                 selectedSequent = selectedNode.sequent();
                 selectedRuleApp = selectedNode.getAppliedRuleApp();
             } else {
+                final Goal g = proof.openGoals().iterator().next();
                 goalIsValid = true;
                 selectedNode = g.node();
                 selectedSequent = selectedNode.sequent();
