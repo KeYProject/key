@@ -1,14 +1,13 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.logic.util;
+package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.Property;
-import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.util.collection.Pair;
 
