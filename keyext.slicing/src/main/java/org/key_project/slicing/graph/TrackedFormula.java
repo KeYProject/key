@@ -111,15 +111,15 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
         }
         TrackedFormula that = (TrackedFormula) o;
         return inAntec == that.inAntec
-                && ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY
-                        .equalsModThisProperty(formula, that.formula)
+                && formula.equalsModProperty(that.formula,
+                    ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY)
                 && Objects.equals(branchLocation, that.branchLocation);
     }
 
     @Override
     public int hashCodeModProofIrrelevancy() {
         return Objects.hash(inAntec,
-            ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty(formula),
+            formula.hashCodeModProperty(ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY),
             branchLocation);
     }
 }

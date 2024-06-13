@@ -379,7 +379,7 @@ public class Semisequent implements Iterable<Term> {
 
     /**
      * returns the index of the given {@link Term} or {@code -1} if the sequent formula is
-     * not found. Equality of sequent formulas is checked sing the identy check (i.e.,
+     * not found. Identity (not equality) of sequent formulas is checked (i.e.,
      * <code>==</code>)
      *
      * @param fml the {@link Term} to look for
