@@ -204,21 +204,21 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 self = null;
             }
             final Term newVariant = spec.getVariant(self, atPres, services);
-            Map<LocationVariable, Term> newMods = new LinkedHashMap<>();
-            Map<LocationVariable, Term> newFreeMods = new LinkedHashMap<>();
+            Map<LocationVariable, Term> newModifiables = new LinkedHashMap<>();
+            Map<LocationVariable, Term> newFreeModifiables = new LinkedHashMap<>();
             Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
                 new LinkedHashMap<>();
             Map<LocationVariable, Term> newInvariants = new LinkedHashMap<>();
             Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                final Term term = spec.getInternalModifies().getOrDefault(
+                final Term term = spec.getInternalModifiable().getOrDefault(
                     services.getTypeConverter().getHeapLDT().getHeap(), tb.allLocs());
-                final Term freeTerm = spec.getInternalFreeModifies().getOrDefault(
+                final Term freeTerm = spec.getInternalFreeModifiable().getOrDefault(
                     services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
                         || !tb.strictlyNothing().equalsModProperty(term,
                             IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    final Term m = spec.getModifies(heap, self, atPres, services);
+                    final Term m = spec.getModifiable(heap, self, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, self, atPres, services);
                     final Term inv = spec.getInvariant(heap, self, atPres, services);
@@ -226,14 +226,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         newInvariants.put(heap, inv);
                     }
                     if (m != null) {
-                        newMods.put(heap, m);
+                        newModifiables.put(heap, m);
                     }
                     newInfFlowSpecs.put(heap, infFlowSpecs);
                 }
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
                         || !tb.strictlyNothing().equalsModProperty(
                             freeTerm, IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    final Term m = spec.getFreeModifies(heap, selfTerm, atPres, services);
+                    final Term m = spec.getFreeModifiable(heap, selfTerm, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
                     final Term freeInv = spec.getFreeInvariant(heap, self, atPres, services);
@@ -241,7 +241,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         newFreeInvariants.put(heap, freeInv);
                     }
                     if (m != null) {
-                        newFreeMods.put(heap, m);
+                        newFreeModifiables.put(heap, m);
                     }
                     newInfFlowSpecs.put(heap, infFlowSpecs);
                 }
@@ -252,7 +252,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, services));
             final LoopSpecification newInv = spec.create(loop, frame.getProgramMethod(),
                 frame.getProgramMethod().getContainerType(), newInvariants, newFreeInvariants,
-                newMods, newFreeMods, newInfFlowSpecs, newVariant, self, newLocalIns,
+                newModifiables, newFreeModifiables, newInfFlowSpecs, newVariant, self, newLocalIns,
                 newLocalOuts, atPres);
             services.getSpecificationRepository().addLoopInvariant(newInv);
         }
@@ -325,8 +325,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final Map<LocationVariable, Term> newFreePreconditions = new LinkedHashMap<>();
         final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<>();
         final Map<LocationVariable, Term> newFreePostconditions = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreeModifiesClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newModifiableClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newFreeModifiableClauses = new LinkedHashMap<>();
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             // why does the saved heap just get ignored here?
@@ -340,16 +340,16 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             newPostconditions.put(heap, contract.getPostcondition(heap, newVariables, services));
             newFreePostconditions.put(heap,
                 contract.getFreePostcondition(heap, newVariables, services));
-            newModifiesClauses.put(heap,
-                contract.getModifiesClause(heap, newVariables.self, services));
-            newFreeModifiesClauses.put(heap,
-                contract.getFreeModifiesClause(heap, newVariables.self, services));
+            newModifiableClauses.put(heap,
+                contract.getModifiableClause(heap, newVariables.self, services));
+            newFreeModifiableClauses.put(heap,
+                contract.getFreeModifiableClause(heap, newVariables.self, services));
         }
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract = ((BlockContract) contract).update(
                 (StatementBlock) statement, newPreconditions, newFreePreconditions,
                 newPostconditions, newFreePostconditions,
-                newModifiesClauses, newFreeModifiesClauses,
+                newModifiableClauses, newFreeModifiableClauses,
                 contract.getInfFlowSpecs(), newVariables, contract.getMby(newVariables, services));
 
             services.getSpecificationRepository().removeBlockContract((BlockContract) contract);
@@ -360,14 +360,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             if (statement instanceof StatementBlock) {
                 newLoopContract = ((LoopContract) contract).update((StatementBlock) statement,
                     newPreconditions, newFreePreconditions, newPostconditions,
-                    newFreePostconditions, newModifiesClauses,
-                    newFreeModifiesClauses, contract.getInfFlowSpecs(),
+                    newFreePostconditions, newModifiableClauses,
+                    newFreeModifiableClauses, contract.getInfFlowSpecs(),
                     newVariables, contract.getMby(newVariables, services),
                     ((LoopContract) contract).getDecreases(newVariables, services));
             } else {
                 newLoopContract = ((LoopContract) contract).update((LoopStatement) statement,
                     newPreconditions, newFreePreconditions, newPostconditions,
-                    newFreePostconditions, newModifiesClauses, newFreeModifiesClauses,
+                    newFreePostconditions, newModifiableClauses, newFreeModifiableClauses,
                     contract.getInfFlowSpecs(), newVariables,
                     contract.getMby(newVariables, services),
                     ((LoopContract) contract).getDecreases(newVariables, services));
