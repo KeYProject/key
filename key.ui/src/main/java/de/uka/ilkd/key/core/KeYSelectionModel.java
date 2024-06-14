@@ -50,25 +50,6 @@ public class KeYSelectionModel {
     }
 
     /**
-     * Does not take care of GUI effects
-     */
-    public synchronized void setProof(Proof p) {
-        proof = Objects.requireNonNull(p);
-        if (proof.openGoals().isEmpty()) {
-            selectedNode = proof.root().leavesIterator().next();
-            selectedSequent = selectedNode.sequent();
-            selectedRuleApp = selectedNode.getAppliedRuleApp();
-        } else {
-            final Goal g = proof.openGoals().iterator().next();
-            goalIsValid = true;
-            selectedNode = g.node();
-            selectedSequent = selectedNode.sequent();
-            selectedRuleApp = selectedNode.getAppliedRuleApp();
-            selectedGoal = g;
-        }
-    }
-
-    /**
      * Sets the selected proof.
      *
      * @param p the proof to select.
@@ -99,7 +80,6 @@ public class KeYSelectionModel {
             selectedRuleApp = null;
             selectedGoal = null;
         }
-
 
         fireSelectedProofChanged(previousProof);
     }
