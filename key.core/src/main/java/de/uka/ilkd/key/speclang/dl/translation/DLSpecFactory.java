@@ -123,7 +123,7 @@ public final class DLSpecFactory {
     private Modality.JavaModalityKind extractModalityKind(
             UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        return inst.mod.kind();
+        return inst.modality.kind();
     }
 
 
@@ -203,13 +203,13 @@ public final class DLSpecFactory {
     /**
      * Creates an operation contract from an implication formula of the form "pre -> {heapAtPre :=
      * heap} [#catchAll(java.lang.Throwable exc){m();}]post", (where the update and/or the #catchAll
-     * may be omitted) and a modifies clause.
+     * may be omitted) and a modifiable clause.
      */
     public FunctionalOperationContract createDLOperationContract(String name, Term fma,
-            Term modifies) throws ProofInputException {
+            Term modifiable) throws ProofInputException {
         assert name != null;
         assert fma != null;
-        assert modifies != null;
+        assert modifiable != null;
 
         final ContractFactory cf = new ContractFactory(services);
 
@@ -226,17 +226,17 @@ public final class DLSpecFactory {
         LocationVariable resultVar = pm.isConstructor() ? null : extractResultVar(inst);
         Term post = extractPost(fma);
 
-        // heapAtPre must not occur in precondition or in modifies clause
+        // heapAtPre must not occur in precondition or in modifiables clause
         if (heapAtPreVar != null) {
             final OpCollector oc = new OpCollector();
             pre.execPostOrder(oc);
 
-            modifies.execPostOrder(oc);
+            modifiable.execPostOrder(oc);
 
             if (oc.contains(heapAtPreVar)) {
                 throw new ProofInputException(
                     "variable \"" + heapAtPreVar + "\" used for pre-state heap"
-                        + " must not occur in precondition or in modifies clause");
+                        + " must not occur in precondition or in modifiable clause");
             }
         }
 
@@ -250,8 +250,8 @@ public final class DLSpecFactory {
         Map<LocationVariable, LocationVariable> atPreVars =
             new LinkedHashMap<>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
-        Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        mods.put(heapLDT.getHeap(), modifies);
+        Map<LocationVariable, Term> modifiables = new LinkedHashMap<>();
+        modifiables.put(heapLDT.getHeap(), modifiable);
 
         // result variable may be omitted
         if (resultVar == null && !pm.isVoid()) {
@@ -278,12 +278,12 @@ public final class DLSpecFactory {
         Map<LocationVariable, Term> posts = new LinkedHashMap<>();
         posts.put(heapLDT.getHeap(), post);
 
-        Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
-        hasMod.put(heapLDT.getHeap(), modifies.op() != tb.ff().op());
+        Map<LocationVariable, Boolean> hasModifiable = new LinkedHashMap<>();
+        hasModifiable.put(heapLDT.getHeap(), modifiable.op() != tb.ff().op());
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (h != heapLDT.getHeap()) {
-                hasMod.put(heapLDT.getSavedHeap(), true); // different heaps not supported yet in DL
-                                                          // contracts
+                hasModifiable.put(heapLDT.getSavedHeap(), true); // different heaps not supported
+                                                                 // yet in DL contracts
             }
         }
 
@@ -294,10 +294,10 @@ public final class DLSpecFactory {
                                          // not supported yet
             posts, new LinkedHashMap<>(), null, // TODO no model methods in DL
                                                 // contracts
-            mods, new LinkedHashMap<>(),
+            modifiables, new LinkedHashMap<>(),
             new LinkedHashMap<>(),
-            hasMod, new LinkedHashMap<>(), // TODO strictly pure in DL
-                                           // contracts not supported yet
+            hasModifiable, new LinkedHashMap<>(), // TODO strictly pure in DL
+            // contracts not supported yet
             selfVar, paramVars, resultVar, excVar, atPreVars, !isLibraryClass);
     }
 }

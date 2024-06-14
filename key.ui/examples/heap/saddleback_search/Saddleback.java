@@ -1,7 +1,7 @@
 class Saddleback {
 
     /*@ public normal_behaviour
-      @ requires (\forall int i; 0<=i && i<array.length; 
+      @ requires (\forall int i; 0<=i && i<array.length;
       @     array[i].length == array[0].length);
       @
       @ requires array.length > 0;
@@ -10,12 +10,12 @@ class Saddleback {
       @ requires (\forall int k,i,j;
       @    0<=k && k < i && i < array.length && 0<=j && j < array[0].length;
       @      array[k][j] <= array[i][j]);
-      @ 
+      @
       @ requires (\forall int k,j,i;
       @    0<=i && i < array.length && 0<=k && k<j && j < array[i].length;
       @      array[i][k] <= array[i][j]);
       @
-      @ ensures \result == null ==> 
+      @ ensures \result == null ==>
       @     (\forall int i; 0<=i && i<array.length;
       @       (\forall int j; 0<=j && j<array[i].length;
       @         array[i][j] != value));
@@ -23,8 +23,8 @@ class Saddleback {
       @ ensures \result != null ==>
       @     \result.length == 2 &&
       @     array[\result[0]][\result[1]] == value;
-      @ 
-      @ modifies \nothing;
+      @
+      @ assignable \nothing;
       @*/
     public /*@nullable*/ int[] search(int[][] array, int value) {
         int x = 0;
@@ -39,7 +39,7 @@ class Saddleback {
           @      (i < x || j > y) ==> array[i][j] != value);
           @
           @ decreases array.length - x + y;
-          @ modifies \nothing;
+          @ assignable \nothing;
           @*/
         while(x < array.length && y >= 0) {
 

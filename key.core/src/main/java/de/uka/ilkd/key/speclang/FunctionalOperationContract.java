@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableList;
 
 /**
  * A contract about an operation (i.e., a method or a constructor), consisting of a precondition, a
- * postcondition, a modifies clause, a measured-by clause, and a modality.
+ * postcondition, a modifiable clause, a measured-by clause, and a modality.
  */
 public interface FunctionalOperationContract extends OperationContract {
 
@@ -113,7 +113,7 @@ public interface FunctionalOperationContract extends OperationContract {
 
     Term getPost();
 
-    Term getMod();
+    Term getModifiable();
 
     @Override
     Term getMby();
