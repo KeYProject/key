@@ -1,32 +1,30 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.ast;
+package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
 
-public class IdentPattern implements Pattern {
-    private final SyntaxElement ident;
+public class BooleanLiteralExpression extends LiteralExpression {
+    private final boolean value;
 
-    public IdentPattern(SyntaxElement ident) {
-        this.ident = ident;
+    public BooleanLiteralExpression(boolean value) {
+        this.value = value;
     }
+
 
     @Override
     public SyntaxElement getChild(int n) {
-        if (n == 0) {
-            return ident;
-        }
-        throw new IndexOutOfBoundsException("IdentPattern has only one child");
+        throw new IndexOutOfBoundsException("BooleanLiteralExpression has no children");
     }
 
     @Override
     public int getChildCount() {
-        return 1;
+        return 0;
     }
 
     @Override
     public String toString() {
-        return ident.toString();
+        return "" + value;
     }
 }

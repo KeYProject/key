@@ -1,8 +1,11 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.ast;
+package org.key_project.rusty.ast.stmt;
 
+import org.key_project.rusty.ast.pat.Pattern;
+import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.logic.SyntaxElement;
 
 public class LetStatement implements Statement {
@@ -21,9 +24,8 @@ public class LetStatement implements Statement {
     public SyntaxElement getChild(int n) {
         return switch (n) {
         case 0 -> pat;
-        case 1 -> type;
-        case 2 -> init;
-        default -> throw new IndexOutOfBoundsException("LetStatement has three children");
+        case 1 -> init;
+        default -> throw new IndexOutOfBoundsException("LetStatement has two children");
         };
     }
 
