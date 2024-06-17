@@ -42,9 +42,8 @@ public final class SideProofUtil {
      *         {@link Proof} but with its own {@link OneStepSimplifier} instance.
      */
     @SuppressWarnings("unchecked")
-    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source,
-            final Choice... enableChoices) {
-        assert source != null;
+    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(
+            final Proof source, final Choice... enableChoices) {
         assert !source.isDisposed();
         // Get required source instances
         final InitConfig sourceInitConfig = source.getInitConfig();
@@ -124,7 +123,6 @@ public final class SideProofUtil {
     public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
             Sequent sequentToProve, String proofName) throws ProofInputException {
         // Make sure that valid parameters are given
-        assert sequentToProve != null;
         // Create ProofStarter
         ProofStarter starter = new ProofStarter(false);
         // Configure ProofStarter

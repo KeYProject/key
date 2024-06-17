@@ -7,13 +7,15 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.parser.schemajava.ParseException;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
+
+import org.key_project.logic.Name;
 
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;
@@ -127,7 +129,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new PassiveExpression();
     }
 
-    public static void throwSortInvalid(SchemaVariable sv, String s) throws ParseException {
+    public static void throwSortInvalid(OperatorSV sv, String s) throws ParseException {
         throw new ParseException("Sort of declared schema variable " + sv.name().toString() + " "
             + sv.sort().name().toString() + " does not comply with expected type " + s
             + " in Java program.");
@@ -139,18 +141,18 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             return false;
         }
         SchemaVariable n = svns.lookup(new Name(s));
-        if (n instanceof SchemaVariable) {
-            return n.sort() == sort;
+        if (n instanceof OperatorSV asv) {
+            return asv.sort() == sort;
         }
         return false;
     }
 
 
-    public SchemaVariable lookupSchemaVariable(String s) throws ParseException {
-        SchemaVariable sv = null;
+    public OperatorSV lookupSchemaVariable(String s) throws ParseException {
+        OperatorSV sv;
         SchemaVariable n = svns.lookup(new Name(s));
-        if (n instanceof SchemaVariable) {
-            sv = n;
+        if (n instanceof OperatorSV asv) {
+            sv = asv;
         } else {
             throw new ParseException("Schema variable not declared: " + s);
         }
@@ -158,7 +160,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public StatementSVWrapper getStatementSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "Statement");
         }
@@ -167,7 +169,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public ExpressionSVWrapper getExpressionSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "Expression");
         }
@@ -176,7 +178,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
 
     public LabelSVWrapper getLabelSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "Label");
         }
@@ -184,7 +186,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public MethodSignatureSVWrapper getMethodSignatureSVWrapper(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "MethodSignature");
         }
@@ -192,7 +194,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public JumpLabelSVWrapper getJumpLabelSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV) || sv.sort() != ProgramSVSort.LABEL) {
             throwSortInvalid(sv, "Label");
         }
@@ -200,7 +202,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public TypeSVWrapper getTypeSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "Type");
         }
@@ -208,7 +210,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public ExecCtxtSVWrapper getExecutionContextSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "Type");
         }
@@ -216,7 +218,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public ProgramVariableSVWrapper getProgramVariableSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "Program Variable");
         }
@@ -224,7 +226,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public CatchSVWrapper getCatchSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "Catch");
         }
@@ -232,7 +234,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public CcatchSVWrapper getCcatchSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        var sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "Ccatch");
         }

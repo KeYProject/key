@@ -3,19 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.util.pp.Layouter;
+
+import org.key_project.logic.Name;
 
 
 /**
  * A schema variable that is used as placeholder for updates.
  */
-public final class UpdateSV extends AbstractSV {
+public final class UpdateSV extends OperatorSV {
 
 
     UpdateSV(Name name) {
-        super(name, Sort.UPDATE, false, true);
+        super(name, JavaDLTheory.UPDATE, false, true);
     }
 
 

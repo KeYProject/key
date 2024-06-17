@@ -44,13 +44,12 @@
 
 \javaSource ".";
 
-\proofObligation "#Proof Obligation Settings
-#Tue Jul 25 22:57:42 CEST 2023
-addSymbolicExecutionLabel=true
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-contract=AllNodeTypesTest[AllNodeTypesTest\\:\\:main(AllNodeTypesTest)].JML normal_behavior operation contract.0
-name=AllNodeTypesTest[AllNodeTypesTest\\:\\:main(AllNodeTypesTest)].JML normal_behavior operation contract.0
-";
+\proofObligation {
+	"addSymbolicExecutionLabel": true,
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+	"contract": "AllNodeTypesTest[AllNodeTypesTest::main(AllNodeTypesTest)].JML normal_behavior operation contract.0",
+	"name": "AllNodeTypesTest[AllNodeTypesTest::main(AllNodeTypesTest)].JML normal_behavior operation contract.0",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

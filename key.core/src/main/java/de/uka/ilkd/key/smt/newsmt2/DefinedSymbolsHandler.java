@@ -12,15 +12,13 @@ import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -29,6 +27,9 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.SortedOperator;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
@@ -125,7 +126,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        return op instanceof Function && supportedFunctions.contains(op.name().toString());
+        return op instanceof JFunction && supportedFunctions.contains(op.name().toString());
     }
 
     private void introduceSymbol(MasterHandler trans, String name) throws SMTTranslationException {
@@ -152,7 +153,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
         }
         trans.addDeclaration(decls);
 
-        if (op.sort() != Sort.FORMULA) {
+        if (op.sort() != JavaDLTheory.FORMULA) {
             // Lookup a typing axiom in the snippets or use default if not present
             Writable typing;
             if (snippets.contains(name + TYPING_SUFFIX)) {
@@ -187,12 +188,12 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        SortedOperator op = (SortedOperator) term.op();
+        final SortedOperator op = (SortedOperator) term.op();
         String name = op.name().toString();
         String prefixedname = PREFIX + name;
 
         List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
-        SExpr.Type exprType = term.sort() == Sort.FORMULA ? BOOL : UNIVERSE;
+        SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
         SExpr result = new SExpr(prefixedname, exprType, children);
 
         if (!introduceSymbol(trans, name, op)) {
@@ -246,8 +247,9 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 // Since the SMT machines run in parallel, this may cause
                 // ConcurrentModificationExceptions. To avoid such exceptions,
                 // a wrapper services object is used.
-                Term axiom = tp.parse(new StringReader(dl), Sort.FORMULA, localServices, nss,
-                    new AbbrevMap());
+                Term axiom =
+                    tp.parse(new StringReader(dl), JavaDLTheory.FORMULA, localServices, nss,
+                        new AbbrevMap());
                 trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
             } catch (ParserException e) {
                 throw new SMTTranslationException("Error while translating snippet " + snipName, e);

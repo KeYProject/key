@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -47,11 +47,12 @@ public class SchemaVariableFactory {
      * creates a SchemaVariable representing an operator
      *
      * @param name the Name of the SchemaVariable
+     * @param modalityKinds
      * @return the SchemaVariable
      */
     public static ModalOperatorSV createModalOperatorSV(Name name, Sort sort,
-            ImmutableSet<Modality> modalities) {
-        return new ModalOperatorSV(name, modalities);
+            ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
+        return new ModalOperatorSV(name, modalityKinds);
     }
 
 

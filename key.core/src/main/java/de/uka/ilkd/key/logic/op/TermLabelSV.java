@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.pp.Layouter;
+
+import org.key_project.logic.Name;
 
 /**
  * A schema variable which matches term labels
  */
-public final class TermLabelSV extends AbstractSV implements SchemaVariable, TermLabel {
+public final class TermLabelSV extends OperatorSV implements SchemaVariable, TermLabel {
 
     TermLabelSV(Name name) {
-        super(name, Sort.TERMLABEL, true, false);
+        super(name, JavaDLTheory.TERMLABEL, true, false);
     }
 
     @Override
@@ -26,11 +26,6 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, Ter
     @Override
     public String toString() {
         return toString("termLabel");
-    }
-
-    @Override
-    public boolean validTopLevel(Term term) {
-        return true;
     }
 
     @Override

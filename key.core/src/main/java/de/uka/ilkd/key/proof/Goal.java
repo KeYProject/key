@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -524,8 +524,7 @@ public final class Goal {
      * @param n number of goals to create
      * @return the list of new created goals.
      */
-    @NonNull
-    public ImmutableList<Goal> split(int n) {
+    public @NonNull ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node
@@ -579,7 +578,7 @@ public final class Goal {
         for (IProgramVariable pv : node.getLocalProgVars()) {
             newNS.programVariables().add(pv);
         }
-        for (Function op : node.getLocalFunctions()) {
+        for (JFunction op : node.getLocalFunctions()) {
             newNS.functions().add(op);
         }
 
@@ -650,7 +649,7 @@ public final class Goal {
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
-        Collection<Function> newFunctions = localNamespaces.functions().elements();
+        Collection<JFunction> newFunctions = localNamespaces.functions().elements();
 
         localNamespaces.flushToParent();
 

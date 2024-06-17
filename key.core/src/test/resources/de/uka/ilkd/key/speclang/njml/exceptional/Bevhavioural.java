@@ -1,9 +1,9 @@
 // exceptionClass: PosConvertException
 // msgContains: no viable alternative at input 'normal_bevhaviour
 // verbose: true
-// broken: true
+// broken: false
 
-// This is broken since it currently reports the wrong location
+// Originally, the problem was: This is broken since it currently reports the wrong location
 
 
 class Bevhavioural {

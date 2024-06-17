@@ -19,10 +19,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Extracts the current state and represents it as {@link IExecutionVariable}s.

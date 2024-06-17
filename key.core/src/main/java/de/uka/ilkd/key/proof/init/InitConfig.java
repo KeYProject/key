@@ -7,13 +7,11 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -26,6 +24,8 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -346,7 +346,7 @@ public class InitConfig {
      *
      * @return a non-null namespace
      */
-    public Namespace<Function> funcNS() {
+    public Namespace<JFunction> funcNS() {
         return namespaces().functions();
     }
 

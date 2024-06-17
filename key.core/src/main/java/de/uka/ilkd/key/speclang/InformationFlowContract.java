@@ -39,7 +39,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return whether this contract is strictly pure.
      */
-    boolean hasModifiesClause();
+    boolean hasModifiableClause();
 
 
     /**
@@ -57,9 +57,9 @@ public interface InformationFlowContract extends Contract {
 
 
     /**
-     * Returns the original modifies clause of the contract.
+     * Returns the original modifiable clause of the contract.
      */
-    Term getMod();
+    Term getModifiable();
 
 
     /**
@@ -85,16 +85,16 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the modality of the contract.
      */
-    Modality getModality();
+    Modality.JavaModalityKind getModalityKind();
 
 
     InformationFlowContract setName(String name);
 
 
-    InformationFlowContract setModality(Modality modality);
+    InformationFlowContract setModality(Modality.JavaModalityKind modalityKind);
 
 
-    InformationFlowContract setModifies(Term modifies);
+    InformationFlowContract setModifiable(Term modifiable);
 
 
     /**

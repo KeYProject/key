@@ -17,11 +17,10 @@ import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.pp.*;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
-
-
 
 /*
  * Search bar implementing search function for SequentView.

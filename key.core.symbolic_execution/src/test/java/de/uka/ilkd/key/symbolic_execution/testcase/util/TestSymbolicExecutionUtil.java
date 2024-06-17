@@ -4,21 +4,23 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -147,8 +149,12 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             // Make sure that all other settings are unchanged.
             Map<String, String> changedSettings =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-            defaultSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
-            Assertions.assertEquals(defaultSettings, changedSettings);
+
+            Map<String, String> expectedSettings = new HashMap<>();
+            expectedSettings.putAll(defaultSettings);
+            expectedSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
+
+            Assertions.assertEquals(expectedSettings, changedSettings);
         } finally {
             if (originalValue != null) {
                 SymbolicExecutionUtil.setChoiceSetting(

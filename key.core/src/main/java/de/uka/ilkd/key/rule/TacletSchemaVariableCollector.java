@@ -12,15 +12,8 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -39,7 +32,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class to determine all
  * uninstantiated schemavariables.
  */
-public class TacletSchemaVariableCollector extends DefaultVisitor {
+public class TacletSchemaVariableCollector implements DefaultVisitor {
 
     /** collects all found variables */
     protected ImmutableList<SchemaVariable> varList;
@@ -79,23 +72,27 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
 
 
     /**
-     * visits the Term in post order {@link Term#execPostOrder(Visitor)} and collects all found
+     * visits the Term in post order {@link Term#execPostOrder(org.key_project.logic.Visitor)} and
+     * collects all found
      * schema variables
      *
-     * @param t the Term whose schema variables are collected
+     * @param visited the Term whose schema variables are collected
      */
     @Override
-    public void visit(Term t) {
-        final Operator op = t.op();
-        if (op instanceof Modality || op instanceof ModalOperatorSV) {
-            varList = collectSVInProgram(t.javaBlock(), varList);
+    public void visit(Term visited) {
+        final Operator op = visited.op();
+        if (op instanceof Modality mod) {
+            if (mod.kind() instanceof ModalOperatorSV msv) {
+                varList = varList.prepend(msv);
+            }
+            varList = collectSVInProgram(visited.javaBlock(), varList);
         } else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate) op, varList);
         }
 
-        for (int j = 0, ar = t.arity(); j < ar; j++) {
-            for (int i = 0, sz = t.varsBoundHere(j).size(); i < sz; i++) {
-                final QuantifiableVariable qVar = t.varsBoundHere(j).get(i);
+        for (int j = 0, ar = visited.arity(); j < ar; j++) {
+            for (int i = 0, sz = visited.varsBoundHere(j).size(); i < sz; i++) {
+                final QuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
                 if (qVar instanceof SchemaVariable) {
                     varList = varList.prepend((SchemaVariable) qVar);
                 }
@@ -106,7 +103,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
             varList = varList.prepend((SchemaVariable) op);
         }
 
-        for (TermLabel label : t.getLabels()) {
+        for (TermLabel label : visited.getLabels()) {
             if (label instanceof TermLabelSV) {
                 varList = varList.prepend((SchemaVariable) label);
             }

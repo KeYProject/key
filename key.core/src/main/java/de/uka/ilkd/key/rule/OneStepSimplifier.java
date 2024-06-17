@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -38,6 +37,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -45,6 +45,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
 
 
 public final class OneStepSimplifier implements BuiltInRule {
@@ -361,7 +363,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
             if (changed) {
                 return services.getTermBuilder().tf().createTerm(in.op(), subs, in.boundVars(),
-                    in.javaBlock(), in.getLabels());
+                    in.getLabels());
             } else {
                 return in;
             }
@@ -574,9 +576,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             null);
     }
 
-    @NonNull
     @Override
-    public synchronized ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public synchronized @NonNull ImmutableList<Goal> apply(Goal goal, Services services,
+            RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp
                 : "The rule app must be suitable for OSS";
@@ -747,8 +749,9 @@ public final class OneStepSimplifier implements BuiltInRule {
                 obj = ((TermReplacementKey) obj).term;
             }
             if (obj instanceof Term t) {
-                return term.equalsModRenaming(t); // Ignore naming and term labels in the way a
-                                                  // taclet rule does.
+                return term.equalsModProperty(t, RENAMING_PROPERTY); // Ignore naming and term
+                                                                     // labels in the way a
+                                                                     // taclet rule does.
             } else {
                 return false;
             }

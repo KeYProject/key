@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -48,6 +47,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -194,21 +195,16 @@ public class OutputStreamProofSaver {
             ps.print(header);
 
             // \problem or \proofObligation
-            if (po instanceof IPersistablePO
+            if (po instanceof IPersistablePO ppo
                     && (!(po instanceof AbstractInfFlowPO) || (!(po instanceof InfFlowCompositePO)
                             && ((InfFlowProof) proof).getIFSymbols().isFreshContract()))) {
-                final Properties properties = new Properties();
-                ((IPersistablePO) po).fillSaveProperties(properties);
-                try (StringWriter writer = new StringWriter()) {
-                    properties.store(writer, "Proof Obligation Settings");
-                    ps.println(
-                        "\\proofObligation \"" + escapeCharacters(writer.toString()) + "\";\n");
-                }
+                var loadingConfig = ppo.createLoaderConfig();
+                ps.println("\\proofObligation ");
+                loadingConfig.save(ps, "Proof-Obligation settings");
+                ps.println("\n");
             } else {
                 if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
                         || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
-                    final Properties properties = new Properties();
-                    ((IPersistablePO) po).fillSaveProperties(properties);
                     ps.print(((InfFlowProof) proof).printIFSymbols());
                 }
                 final Sequent problemSeq = proof.root().sequent();

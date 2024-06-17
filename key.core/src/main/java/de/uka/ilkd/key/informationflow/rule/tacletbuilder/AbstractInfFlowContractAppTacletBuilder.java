@@ -11,7 +11,7 @@ import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -233,7 +234,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         // collect quantifiable variables of the post term and replace them
         // by schema variables
-        Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+        Map<QuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
             collectQuantifiableVariables(schemaFind, services);
         quantifiableVarsToSchemaVars.putAll(collectQuantifiableVariables(schemaAssumes, services));
         quantifiableVarsToSchemaVars

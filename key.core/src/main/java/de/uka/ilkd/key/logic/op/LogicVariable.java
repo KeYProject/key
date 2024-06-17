@@ -5,9 +5,11 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 
@@ -19,8 +21,8 @@ public final class LogicVariable extends AbstractSortedOperator
 
     public LogicVariable(Name name, Sort sort) {
         super(name, sort, true);
-        assert sort != Sort.FORMULA;
-        assert sort != Sort.UPDATE;
+        assert sort != JavaDLTheory.FORMULA;
+        assert sort != JavaDLTheory.UPDATE;
     }
 
 

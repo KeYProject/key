@@ -10,6 +10,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -19,7 +20,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -30,16 +31,20 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,7 +154,7 @@ public final class SpecificationRepository {
         // create schema terms
         final Term[] subs = new Term[limited.arity()];
         for (int i = 0; i < subs.length; i++) {
-            final SchemaVariable argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
+            final TermSV argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
                 limited.argSort(i), false, false);
             subs[i] = tb.var(argSV);
         }
@@ -174,7 +179,7 @@ public final class SpecificationRepository {
         // create schema terms
         final Term[] subs = new Term[limited.arity()];
         for (int i = 0; i < subs.length; i++) {
-            final SchemaVariable argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
+            final TermSV argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
                 limited.argSort(i), false, false);
             subs[i] = tb.var(argSV);
         }
@@ -197,11 +202,13 @@ public final class SpecificationRepository {
         return tacletBuilder.getTaclet();
     }
 
-    private static Modality getMatchModality(final Modality modality) {
-        if (modality.transaction()) {
-            return modality == Modality.DIA_TRANSACTION ? Modality.DIA : Modality.BOX;
+    private static Modality.JavaModalityKind getMatchModalityKind(
+            final Modality.JavaModalityKind kind) {
+        if (kind.transaction()) {
+            return kind == Modality.JavaModalityKind.DIA_TRANSACTION ? Modality.JavaModalityKind.DIA
+                    : Modality.JavaModalityKind.BOX;
         } else {
-            return modality;
+            return kind;
         }
     }
 
@@ -756,15 +763,17 @@ public final class SpecificationRepository {
      * the passed modality.
      */
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(KeYJavaType kjt,
-            IProgramMethod pm, Modality modality) {
+            IProgramMethod pm, Modality.JavaModalityKind modalityKind) {
         ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
         final boolean transactionModality =
-            (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
-        final Modality matchModality = transactionModality
-                ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA : Modality.BOX)
-                : modality;
+            modalityKind.transaction();
+        final Modality.JavaModalityKind matchModality = transactionModality
+                ? ((modalityKind == Modality.JavaModalityKind.DIA_TRANSACTION)
+                        ? Modality.JavaModalityKind.DIA
+                        : Modality.JavaModalityKind.BOX)
+                : modalityKind;
         for (FunctionalOperationContract contract : result) {
-            if (!contract.getModality().equals(matchModality)
+            if (!contract.getModalityKind().equals(matchModality)
                     || (transactionModality && !contract.transactionApplicableContract())) {
                 result = result.remove(contract);
             }
@@ -777,7 +786,7 @@ public final class SpecificationRepository {
      * null.
      */
     public Contract getContractByName(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return null;
         }
         String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);
@@ -876,7 +885,7 @@ public final class SpecificationRepository {
      */
     public FunctionalOperationContract combineOperationContracts(
             ImmutableSet<FunctionalOperationContract> toCombine) {
-        assert toCombine != null && toCombine.size() > 0;
+        assert toCombine != null && !toCombine.isEmpty();
         for (Contract contract : toCombine) {
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
                     : "Please combine only atomic contracts!";
@@ -1049,7 +1058,7 @@ public final class SpecificationRepository {
                     continue; // only non-private classes
                 }
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
-                final ProgramVariable selfVar = tb.selfVar(kjt, false);
+                final LocationVariable selfVar = tb.selfVar(kjt, false);
 
                 Term invDef = tb.tt();
                 Term staticInvDef = tb.tt();
@@ -1141,17 +1150,17 @@ public final class SpecificationRepository {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
         for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
             for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
-                final ProgramVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
+                final LocationVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
                 if (!pm.isVoid() && pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(kjt, pm);
-                    ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, false);
-                    Map<LocationVariable, ProgramVariable> atPreVars = new LinkedHashMap<>();
-                    List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+                    ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, false);
+                    Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
+                    List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
                     for (LocationVariable heap : heaps) {
                         atPreVars.put(heap,
                             tb.atPreVar(heap.name().toString(), heap.sort(), false));
                     }
-                    ProgramVariable resultVar = tb.resultVar(pm, false);
+                    LocationVariable resultVar = tb.resultVar(pm, false);
 
                     // This assumes there is one operation contract for each
                     // model pm per class
@@ -1422,7 +1431,7 @@ public final class SpecificationRepository {
             ImmutableSet<Proof> sop = entry.getValue();
             if (sop.contains(proof)) {
                 sop = sop.remove(proof);
-                if (sop.size() == 0) {
+                if (sop.isEmpty()) {
                     proofs.remove(entry.getKey());
                 } else {
                     proofs.put(entry.getKey(), sop);
@@ -1540,15 +1549,14 @@ public final class SpecificationRepository {
      * Returns block contracts for according block statement and modality.
      *
      * @param block the given block.
-     * @param modality the given modality.
-     * @return
+     * @param modalityKind the given modality.
      */
     public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
-            final Modality modality) {
+            final Modality.JavaModalityKind modalityKind) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
-        final Modality matchModality = getMatchModality(modality);
+        final Modality.JavaModalityKind matchModality = getMatchModalityKind(modalityKind);
         for (BlockContract contract : result) {
-            if (!contract.getModality().equals(matchModality) || (modality.transaction()
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
                     && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
@@ -1557,11 +1565,11 @@ public final class SpecificationRepository {
     }
 
     public ImmutableSet<LoopContract> getLoopContracts(final StatementBlock block,
-            final Modality modality) {
+            final Modality.JavaModalityKind modalityKind) {
         ImmutableSet<LoopContract> result = getLoopContracts(block);
-        final Modality matchModality = getMatchModality(modality);
+        final Modality.JavaModalityKind matchModality = getMatchModalityKind(modalityKind);
         for (LoopContract contract : result) {
-            if (!contract.getModality().equals(matchModality) || (modality.transaction()
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
                     && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
@@ -1573,15 +1581,15 @@ public final class SpecificationRepository {
      * Returns loop contracts for according loop statement and modality.
      *
      * @param loop the given loop.
-     * @param modality the given modality.
+     * @param modalityKind the given modality.
      * @return the set of resulting loop statements.
      */
     public ImmutableSet<LoopContract> getLoopContracts(final LoopStatement loop,
-            final Modality modality) {
+            final Modality.JavaModalityKind modalityKind) {
         ImmutableSet<LoopContract> result = getLoopContracts(loop);
-        final Modality matchModality = getMatchModality(modality);
+        final Modality.JavaModalityKind matchModality = getMatchModalityKind(modalityKind);
         for (LoopContract contract : result) {
-            if (!contract.getModality().equals(matchModality) || (modality.transaction()
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
                     && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
@@ -1847,4 +1855,93 @@ public final class SpecificationRepository {
         }
         return result;
     }
+
+
+    // region Support SetStatement and JmlAssert
+    private final Map<Statement, JmlStatementSpec> statementMap = new IdentityHashMap<>();
+
+    public @Nullable JmlStatementSpec getStatementSpec(Statement statement) {
+        return statementMap.get(statement);
+    }
+
+    public JmlStatementSpec addStatementSpec(Statement statement, JmlStatementSpec spec) {
+        return statementMap.put(statement, spec);
+    }
+
+    /**
+     * This record represents information which are necessary to evaluate JML statements.
+     * JML statements need to maintain the current variable set as well as the updated information for the KeY terms
+     * they describe. This record represents this information, i.e., the scope of variables, and a list of terms, in
+     * an immutable fasion. Updates require to create instances.
+     * <p>
+     * <b>Note:</b> There is a immutability hole in {@link ProgramVariableCollection} due to mutable {@link Map}
+     * <p>
+     * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert.
+     * For {@link de.uka.ilkd.key.java.statement.SetStatement} this is the target and the value terms.
+     * You may want to use the index constant for accessing them:
+     * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_TARGET},
+     * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_VALUE},
+     * {@link de.uka.ilkd.key.java.statement.JmlAssert#INDEX_CONDITION}
+     *
+     * @param vars
+     * @param terms
+     */
+    public record JmlStatementSpec(
+            ProgramVariableCollection vars,
+            ImmutableList<Term> terms
+    ){
+        /**
+         * Retrieve a term
+         * @param index a index to the list of {@code terms}.
+         * @return the term at {@code index} in the {@code terms} list
+         * @throws IndexOutOfBoundsException if the given {@code index} is negative or {@code >= terms().size()}
+         */
+        public Term term(int index) {
+            return terms.get(index);
+        }
+
+        /**
+         * Retrieve a term with a update to the given {@code self} term.
+         * @param services the corresponding services instance
+         * @param self a term which describes the {@code self} object aka. this on the current sequence
+         * @param index the index of the term in {@code terms()}
+         * @return a term updated with {@code self} and the {@code vars()}.
+         */
+        public Term getTerm(Services services, Term self, int index) {
+            var term = term(index);
+
+            final TermFactory termFactory = services.getTermFactory();
+            final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
+            if (self != null) {
+                replacementMap.replaceSelf(vars().selfVar, self, services);
+            }
+            replacementMap.replaceRemembranceLocalVariables(vars().atPreVars, vars().atPres, services);
+            replacementMap.replaceRemembranceLocalVariables(vars().atBeforeVars, vars().atBefores, services);
+            final OpReplacer replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
+            return replacer.replace(term);
+        }
+
+        /**
+         * Updates the variables given the new {@code atPres} (variable in pre state) map and the services.
+         * The update is applied directly and an updated specification is returned. You need to add
+         * the updated spec to the statement in the {@link SpecificationRepository} by yourself.
+         *
+         * @param atPres a non-null map of a map of program variable to a term which describes
+         *               the value of this variable in the pre-state.
+         * @param services the corresponding services object
+         * @return a fresh {@link JmlStatementSpec} instance, non-registered.
+         */
+        public JmlStatementSpec updateVariables(Map<LocationVariable, Term> atPres, Services services) {
+            var termFactory = services.getTermFactory();
+            var replacementMap = new TermReplacementMap(termFactory);
+            replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
+            var replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
+            var newTerms = terms().map(replacer::replace);
+            return new JmlStatementSpec(
+                    new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
+                            vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
+                    newTerms);
+        }
+    }
+    // endregion
 }

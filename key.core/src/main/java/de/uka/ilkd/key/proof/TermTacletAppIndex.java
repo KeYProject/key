@@ -16,9 +16,9 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.*;
+import org.key_project.util.collection.Pair;
 
 /**
  * Class whose objects represent an index of taclet apps for one particular position within a
@@ -288,7 +288,10 @@ public class TermTacletAppIndex {
         final Term newTerm = pos.subTerm();
         final Operator newOp = newTerm.op();
 
-        if (newOp instanceof Modality && newOp == term.op() && newTerm.sub(0).equals(term.sub(0))) {
+        if (newOp instanceof Modality mod
+                && term.op() instanceof Modality termMod
+                && mod.kind() == termMod.kind()
+                && newTerm.sub(0).equals(term.sub(0))) {
             // only the program within a modal operator has changed, but not the
             // formula after the modal operator. in this case, the formula after
             // the modality does not have to be rematched. also consider

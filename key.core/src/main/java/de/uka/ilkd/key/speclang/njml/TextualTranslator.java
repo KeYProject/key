@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,10 +27,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
     private ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
-    @Nullable
-    private TextualJMLSpecCase methodContract;
-    @Nullable
-    private TextualJMLLoopSpec loopContract;
+    private @Nullable TextualJMLSpecCase methodContract;
+    private @Nullable TextualJMLLoopSpec loopContract;
 
     /**
      * Translates a token to a JMLModifier
@@ -255,8 +254,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
-            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free")
-                    || ctx.MODIFIES() != null && ctx.MODIFIES().getText().endsWith("_free");
+            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
@@ -266,6 +264,28 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             if (methodContract != null) {
                 methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2);
             }
+            if (loopContract != null) {
+                loopContract.addClause(
+                    isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
+                            : TextualJMLLoopSpec.ClauseHd.ASSIGNABLE,
+                    heap, ctx2);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        final boolean isFree =
+            (ctx.LOOP_ASSIGNABLE() != null && ctx.LOOP_ASSIGNABLE().getText().endsWith("_free"))
+                    || (ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free"));
+        final LabeledParserRuleContext ctx2 =
+            LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
+                    ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
+                    : OriginTermLabel.SpecType.ASSIGNABLE,
+                attachOriginLabel);
+        for (Name heap : heaps) {
             if (loopContract != null) {
                 loopContract.addClause(
                     isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
@@ -492,8 +512,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
-                LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
-                    OriginTermLabel.SpecType.ASSUME, attachOriginLabel));
+                new KeyAst.Expression(ctx.expression()));
         constructs = constructs.append(b);
         return null;
     }
@@ -501,10 +520,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        TextualJMLAssertStatement b =
-            new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
-                LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
-                    OriginTermLabel.SpecType.ASSERT, attachOriginLabel));
+        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
+            TextualJMLAssertStatement.Kind.ASSERT, new KeyAst.Expression(ctx.expression()));
         constructs = constructs.append(b);
         return null;
     }

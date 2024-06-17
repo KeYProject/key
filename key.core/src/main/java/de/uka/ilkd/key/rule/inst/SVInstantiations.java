@@ -8,19 +8,16 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
@@ -28,6 +25,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 
 /**
  * This class wraps an {@link ImmutableMap} from {@link SchemaVariable} to
@@ -129,11 +129,6 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
 
-    public SVInstantiations add(ModalOperatorSV sv, Operator op, Services services) {
-        return add(sv, new OperatorInstantiation(op), services);
-    }
-
-
     public SVInstantiations addInteresting(SchemaVariable sv, Term subst, Services services) {
         return addInteresting(sv, new TermInstantiation(sv, subst), services);
     }
@@ -148,6 +143,14 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         return add(sv, new TermLabelInstantiationEntry(labels), services);
     }
 
+    /**
+     * Add the given additional condition for the generic sort instantiations
+     */
+    public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind,
+            Services services) throws SortException {
+        return add(sv, new InstantiationEntry<>(kind) {
+        }, services);
+    }
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
         return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
@@ -213,15 +216,17 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
             boolean p_forceRebuild, Services services) {
-        Boolean b = getGenericSortInstantiations().checkSorts(p_sv, p_entry);
+        if (p_sv instanceof OperatorSV asv) {
+            Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
-        if (b == null) {
-            return rebuildSorts(services);
-        } else if (!b) {
-            throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
-        }
-        if (p_forceRebuild) {
-            return rebuildSorts(services);
+            if (b == null) {
+                return rebuildSorts(services);
+            } else if (!b) {
+                throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
+            }
+            if (p_forceRebuild) {
+                return rebuildSorts(services);
+            }
         }
         return this;
     }
@@ -426,7 +431,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      */
     public SVInstantiations addUpdate(Term update,
             ImmutableArray<TermLabel> updateApplicationlabels) {
-        assert update.sort() == Sort.UPDATE;
+        assert update.sort() == JavaDLTheory.UPDATE;
         return new SVInstantiations(map, interesting(),
             updateContext.append(new UpdateLabelPair(update, updateApplicationlabels)),
             getGenericSortInstantiations(), getGenericSortConditions());
@@ -544,7 +549,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
-                if (!instAsTerm.equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+                if (!instAsTerm.equalsModProperty(cmp.getInstantiation(e.key()),
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
@@ -574,7 +580,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
-                if (!instAsTerm.equalsModProofIrrelevancy(cmp.getInstantiation(e.key()))) {
+                if (!instAsTerm.equalsModProperty(
+                    cmp.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY)) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
