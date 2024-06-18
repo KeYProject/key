@@ -98,15 +98,6 @@ public class TestLinkedHashMapWrapper {
     }
 
     @Test
-    public void testRenamingSourceElementProperty() {
-        LinkedHashMapWrapper<SourceElement, Integer> renamingSourceElementMap =
-            new LinkedHashMapWrapper<>(RENAMING_SOURCE_ELEMENT_PROPERTY);
-        LinkedHashMap<SourceElement, Integer> basicMap = new LinkedHashMap<>();
-
-
-    }
-
-    @Test
     public void testTermLabelProperties() {
         LinkedHashMap<Term, Integer> basicMap = new LinkedHashMap<>();
         LinkedHashMapWrapper<Term, Integer> termLabelsMap =
@@ -114,12 +105,50 @@ public class TestLinkedHashMapWrapper {
         LinkedHashMapWrapper<Term, Integer> irrelevantTermLabelsMap =
             new LinkedHashMapWrapper<>(IRRELEVANT_TERM_LABELS_PROPERTY);
 
+        Term noLabelTT = tb.tt();
+        Term noLabelFF = tb.ff();
 
-        Term noLabelTerm = tb.tt();
-        ImmutableArray<TermLabel> labels = new ImmutableArray<>(irrelevantLabel);
-        Term irrelevantLabelTerm = tb.label(noLabelTerm, labels);
-        labels = new ImmutableArray<>(relevantLabel1);
-        Term relevantLabelTerm = tb.label(noLabelTerm, labels);
+        Term irrelevantLabelTT = tb.label(noLabelTT, irrelevantLabel);
+        Term irrelevantLabelFF = tb.label(noLabelFF, irrelevantLabel);
+        Term relevantLabelTT = tb.label(noLabelTT, relevantLabel1);
+        Term relevantLabelFF = tb.label(noLabelFF, relevantLabel2);
+
+        // add mappings without labels to all maps
+        basicMap.put(noLabelTT, 1);
+        basicMap.put(noLabelFF, 2);
+        assertEquals(2, basicMap.size());
+
+        termLabelsMap.put(noLabelTT, 1);
+        termLabelsMap.put(noLabelFF, 2);
+        assertEquals(2, termLabelsMap.size());
+
+        irrelevantTermLabelsMap.put(noLabelTT, 1);
+        irrelevantTermLabelsMap.put(noLabelFF, 2);
+        assertEquals(2, irrelevantTermLabelsMap.size());
+
+        // add mappings with irrelevant labels to all maps
+        assertNull(basicMap.put(irrelevantLabelTT, 3), "Nothing should be returned as basicMap should not contain the key");
+        assertEquals(3, basicMap.size());
+
+        assertEquals(1, termLabelsMap.put(irrelevantLabelTT, 3), "Old value should be returned as termLabelsMap should already contain the key");
+        assertEquals(2, termLabelsMap.size(), "Size should not increase as the key is already in the map");
+        assertEquals(3, termLabelsMap.get(noLabelTT), "Checking key without label should return new value");
+
+        assertEquals(1, irrelevantTermLabelsMap.put(irrelevantLabelTT, 3), "Old value should be returned as irrelevantTermLabelsMap should already contain the key");
+        assertEquals(2, irrelevantTermLabelsMap.size(), "Size should not increase as the key is already in the map");
+        assertEquals(3, irrelevantTermLabelsMap.get(irrelevantLabelTT), "Checking key without label should return new value");
+
+        // add mappings with relevant labels to all maps
+
+        assertNull(basicMap.put(relevantLabelTT, 4), "Nothing should be returned as basicMap should not contain the key");
+        assertEquals(4, basicMap.size());
+
+        assertEquals(3, termLabelsMap.put(relevantLabelTT, 4), "Value 3 should be returned as termLabelsMap was previously updated with irrelevantLabelTT");
+        assertEquals(3, termLabelsMap.size(), "Size should not increase as the key is already in the map");
+        assertEquals(4, termLabelsMap.get(noLabelTT), "Checking key without label should return new value");
+        assertEquals(4, termLabelsMap.get(irrelevantLabelTT), "Checking key with irrelevant label should return new value");
+
+
     }
 
     @Test
@@ -137,13 +166,23 @@ public class TestLinkedHashMapWrapper {
     }
 
     @Test
-    public void testConstructors() {
+    public void testRenamingSourceElementProperty() {
+        LinkedHashMapWrapper<SourceElement, Integer> renamingSourceElementMap =
+                new LinkedHashMapWrapper<>(RENAMING_SOURCE_ELEMENT_PROPERTY);
+        LinkedHashMap<SourceElement, Integer> basicMap = new LinkedHashMap<>();
+
 
     }
 
     @Test
-    public void testPutAll() {
+    public void testConstructors() {
+        LinkedHashMapWrapper<Term, Integer> wrappedMap =
+                new LinkedHashMapWrapper<>(tb.tt(), 1, TERM_LABELS_PROPERTY);
+        assertFalse(wrappedMap.isEmpty());
+        assertEquals(1, wrappedMap.size());
+        assertTrue(wrappedMap.containsKey(tb.tt()));
 
+        // putAll is also tested with these constructor calls
     }
 
     @Test
