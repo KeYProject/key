@@ -97,10 +97,17 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         return next1 == null && next2 == null;
     }
 
+    // TODO: hashCodeModThisProperty currently does not take a NameAbstractionTable as an argument.
+    // This is because the current implementation of hashCodeModThisProperty is not parameterized
+    // with a vararg. Variables occurring in multiple formulas and JavaBlocks are considered in
+    // isolation as a newly created NameAbstractionTable that does not contain entries from previous
+    // JavaBlocks is used. This could possibly lead to more collisions but if this is a concern, the
+    // method can be changed to also take a generic vararg. That way, the NameAbstractionTable can
+    // be passed to the method and hash codes can take previous usage of variables into account.
     @Override
     public int hashCodeModThisProperty(SourceElement sourceElement) {
         /*
-         * Currently, the best approach seems to walk through the sourceElement with a
+         * Currently, the best approach seems to be to walk through the SourceElement with a
          * JavaASTTreeWalker and sum up hash codes.
          */
         JavaASTTreeWalker tw = new JavaASTTreeWalker(sourceElement);
@@ -111,7 +118,7 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         int hashCode = 1;
 
         while (next != null) {
-            // Handle special cases so that hashCodeModThisProperty fits equalsModThisProperty
+            // Handle special cases so that hashCodeModThisProperty follows equalsModThisProperty
             if (next instanceof LabeledStatement ls) {
                 hashCode = 31 * hashCode + ls.getChildCount();
                 absMap.add(ls);
