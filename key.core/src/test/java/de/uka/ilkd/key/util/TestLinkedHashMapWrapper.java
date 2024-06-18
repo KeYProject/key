@@ -6,12 +6,16 @@ package de.uka.ilkd.key.util;
 
 import java.util.Arrays;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -25,7 +29,8 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestLinkedHashMapWrapper {
+public class
+TestLinkedHashMapWrapper {
     private TermBuilder tb;
 
     private TermFactory tf;
@@ -115,40 +120,41 @@ public class TestLinkedHashMapWrapper {
 
         // add mappings without labels to all maps
         basicMap.put(noLabelTT, 1);
-        basicMap.put(noLabelFF, 2);
-        assertEquals(2, basicMap.size());
+        assertEquals(1, basicMap.size());
 
         termLabelsMap.put(noLabelTT, 1);
-        termLabelsMap.put(noLabelFF, 2);
-        assertEquals(2, termLabelsMap.size());
+        assertEquals(1, termLabelsMap.size());
 
         irrelevantTermLabelsMap.put(noLabelTT, 1);
-        irrelevantTermLabelsMap.put(noLabelFF, 2);
-        assertEquals(2, irrelevantTermLabelsMap.size());
+        assertEquals(1, irrelevantTermLabelsMap.size());
 
         // add mappings with irrelevant labels to all maps
-        assertNull(basicMap.put(irrelevantLabelTT, 3), "Nothing should be returned as basicMap should not contain the key");
-        assertEquals(3, basicMap.size());
+        assertNull(basicMap.put(irrelevantLabelTT, 2), "Nothing should be returned as basicMap should not contain the key");
+        assertEquals(2, basicMap.size());
 
-        assertEquals(1, termLabelsMap.put(irrelevantLabelTT, 3), "Old value should be returned as termLabelsMap should already contain the key");
-        assertEquals(2, termLabelsMap.size(), "Size should not increase as the key is already in the map");
-        assertEquals(3, termLabelsMap.get(noLabelTT), "Checking key without label should return new value");
+        assertEquals(1, termLabelsMap.put(irrelevantLabelTT, 2), "Old value should be returned as termLabelsMap should already contain the key");
+        assertEquals(1, termLabelsMap.size(), "Size should not increase as the key is already in the map");
+        assertEquals(2, termLabelsMap.get(noLabelTT), "Checking key without label should return new value");
 
-        assertEquals(1, irrelevantTermLabelsMap.put(irrelevantLabelTT, 3), "Old value should be returned as irrelevantTermLabelsMap should already contain the key");
-        assertEquals(2, irrelevantTermLabelsMap.size(), "Size should not increase as the key is already in the map");
-        assertEquals(3, irrelevantTermLabelsMap.get(irrelevantLabelTT), "Checking key without label should return new value");
+        assertEquals(1, irrelevantTermLabelsMap.put(irrelevantLabelTT, 2), "Old value should be returned as irrelevantTermLabelsMap should already contain the key");
+        assertEquals(1, irrelevantTermLabelsMap.size(), "Size should not increase as the key is already in the map");
+        assertEquals(2, irrelevantTermLabelsMap.get(irrelevantLabelTT), "Checking key without label should return new value");
 
         // add mappings with relevant labels to all maps
 
-        assertNull(basicMap.put(relevantLabelTT, 4), "Nothing should be returned as basicMap should not contain the key");
-        assertEquals(4, basicMap.size());
+        assertNull(basicMap.put(relevantLabelTT, 3), "Nothing should be returned as basicMap should not contain the key");
+        assertEquals(3, basicMap.size());
 
-        assertEquals(3, termLabelsMap.put(relevantLabelTT, 4), "Value 3 should be returned as termLabelsMap was previously updated with irrelevantLabelTT");
-        assertEquals(3, termLabelsMap.size(), "Size should not increase as the key is already in the map");
-        assertEquals(4, termLabelsMap.get(noLabelTT), "Checking key without label should return new value");
-        assertEquals(4, termLabelsMap.get(irrelevantLabelTT), "Checking key with irrelevant label should return new value");
+        assertEquals(2, termLabelsMap.put(relevantLabelTT, 3), "Value 3 should be returned as termLabelsMap was previously updated with irrelevantLabelTT");
+        assertEquals(1, termLabelsMap.size(), "Size should not increase as the key is already in the map");
+        assertEquals(3, termLabelsMap.get(noLabelTT), "Checking key without label should return new value");
+        assertEquals(3, termLabelsMap.get(irrelevantLabelTT), "Checking key with irrelevant label should return new value");
 
-
+        assertNull(irrelevantTermLabelsMap.put(relevantLabelTT, 3), "Nothing should be returned as irrelevantTermLabelsMap should not contain the key");
+        assertEquals(2, irrelevantTermLabelsMap.size(), "Size should increase as the key is not in the map");
+        assertEquals(2, irrelevantTermLabelsMap.get(irrelevantLabelTT), "Checking key with irrelevant label should return old value");
+        assertEquals(2, irrelevantTermLabelsMap.get(noLabelTT), "Checking key without label should return old value");
+        assertEquals(3, irrelevantTermLabelsMap.get(relevantLabelTT), "Checking key with relevant label should return new value");
     }
 
     @Test
@@ -162,15 +168,55 @@ public class TestLinkedHashMapWrapper {
     public void testRenamingTermProperty() {
         LinkedHashMapWrapper<Term, Integer> renamingTermMap =
             new LinkedHashMapWrapper<>(RENAMING_TERM_PROPERTY);
+        final Sort sort = new SortImpl(new Name("sort"));
+        final LogicVariable x = new LogicVariable(new Name("x"), sort);
+        final LogicVariable y = new LogicVariable(new Name("y"), sort);
+        Term t1 = tb.all(x, tb.and(tf.createTerm(x), tf.createTerm(x)));
+        Term t2 = tb.all(y, tb.and(tf.createTerm(y), tf.createTerm(y)));
+        Term t3 = tb.all(y, tb.and(tf.createTerm(y), tf.createTerm(x)));
 
+        // adding \forall x. x && x
+        assertEquals(0, renamingTermMap.size(), "Map should be empty");
+        renamingTermMap.put(t1, 1);
+        assertEquals(1, renamingTermMap.size(), "Map should contain one element");
+
+        // adding \forall y. y && y
+        assertEquals(1, renamingTermMap.put(t2, 2), "Old value should be returned");
+        assertEquals(1, renamingTermMap.size(), "Map should still contain one element");
+        assertTrue(renamingTermMap.containsKey(t1), "As renaming is ignored, t1 should be in the map");
+        assertTrue(renamingTermMap.containsKey(t2), "As renaming is ignored, t2 should be in the map");
+
+        // adding \forall y. y && x
+        assertNull(renamingTermMap.put(t3, 3), "Nothing should be returned as the key is not in the map");
+        assertEquals(2, renamingTermMap.size(), "Map should contain two elements");
+        assertEquals(2, renamingTermMap.get(t1), "Value for t1 should be 2");
+        assertEquals(2, renamingTermMap.get(t2), "Value for t2 should be 2");
+        assertEquals(3, renamingTermMap.get(t3), "Value for t3 should be 3");
     }
 
     @Test
     public void testRenamingSourceElementProperty() {
         LinkedHashMapWrapper<SourceElement, Integer> renamingSourceElementMap =
                 new LinkedHashMapWrapper<>(RENAMING_SOURCE_ELEMENT_PROPERTY);
-        LinkedHashMap<SourceElement, Integer> basicMap = new LinkedHashMap<>();
 
+        ProgramElement match1 = TacletForTests.parsePrg("{ int i; int j; /*Test*/ }");
+        ProgramElement match2 = TacletForTests.parsePrg("{ int i; /*Another test*/ int k; }");
+        ProgramElement match3 = TacletForTests.parsePrg("{ int i = 3; int k; }");
+
+        // adding { int i; int j; /*Test*/ }
+        assertNull(renamingSourceElementMap.put(match1, 1));
+        assertEquals(1, renamingSourceElementMap.size(), "Map should contain one element");
+
+        // adding { int i = 3; int k; }
+        assertNull(renamingSourceElementMap.put(match3, 2), "Nothing should be returned as the key is not in the map");
+        assertEquals(2, renamingSourceElementMap.size(), "Map should contain two elements");
+
+        // adding { int i; /*Another test*/ int k; }
+        assertEquals(1, renamingSourceElementMap.put(match2, 3), "Old value should be returned");
+        assertEquals(2, renamingSourceElementMap.size(), "Map should still contain two elements");
+        assertEquals(3, renamingSourceElementMap.get(match1), "Value for match1 should be new value 3");
+        assertEquals(3, renamingSourceElementMap.get(match3), "Value for match3 should be 3");
+        assertEquals(2, renamingSourceElementMap.get(match2), "Value for match2 should be 2");
 
     }
 
@@ -183,10 +229,6 @@ public class TestLinkedHashMapWrapper {
         assertTrue(wrappedMap.containsKey(tb.tt()));
 
         // putAll is also tested with these constructor calls
-    }
-
-    @Test
-    public void testSpecialCases() {
 
     }
 }
