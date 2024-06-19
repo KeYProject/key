@@ -65,7 +65,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
             if (!tacletApp.ifInstsComplete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
-                        tacletApp.findIfFormulaInstantiations(g.sequent(), g.proof().getServices());
+                    tacletApp.findIfFormulaInstantiations(g.sequent(), g.proof().getServices());
 
                 if (ifSeqCandidates.size() == 1) {
                     theApp = ifSeqCandidates.head();
