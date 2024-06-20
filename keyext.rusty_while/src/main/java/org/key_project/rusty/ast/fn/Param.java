@@ -4,10 +4,11 @@
 package org.key_project.rusty.ast.fn;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.Type;
 
-public class Param implements SyntaxElement {
+public class Param implements RustyProgramElement {
     private final Pattern pattern;
     private final Type type;
 

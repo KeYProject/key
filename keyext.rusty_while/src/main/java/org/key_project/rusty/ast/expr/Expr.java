@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.expr;
 
-import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.RustyProgramElement;
 
-public interface Expr extends SyntaxElement {
+public interface Expr extends RustyProgramElement {
 }

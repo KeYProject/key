@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 
-public class Crate implements SyntaxElement {
+public class Crate implements RustyProgramElement {
     private final ImmutableList<Item> items;
 
     public Crate(ImmutableList<Item> items) {

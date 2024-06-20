@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast;
 
-import org.key_project.logic.SyntaxElement;
 
-public interface Item extends SyntaxElement {
+public interface Item extends RustyProgramElement {
 }

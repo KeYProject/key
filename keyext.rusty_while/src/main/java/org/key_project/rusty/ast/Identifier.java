@@ -7,7 +7,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 
-public record Identifier(Name name) implements Named, SyntaxElement {
+public record Identifier(Name name) implements Named, RustyProgramElement {
 
     @Override
     public Name name() {
