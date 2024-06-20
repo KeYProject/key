@@ -5,15 +5,17 @@ package org.key_project.rusty.ast.expr;
 
 import java.util.stream.Collectors;
 
-import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.util.collection.ImmutableList;
 
 public class BlockExpression implements Expr {
     private final ImmutableList<? extends Statement> statements;
+    private final Expr value;
 
-    public BlockExpression(ImmutableList<? extends Statement> statements) {
+    public BlockExpression(ImmutableList<? extends Statement> statements, Expr value) {
         this.statements = statements;
+        this.value = value;
     }
 
 
@@ -29,7 +31,9 @@ public class BlockExpression implements Expr {
 
     @Override
     public String toString() {
-        return "{" + statements.stream().map(Statement::toString).collect(Collectors.joining("; "))
-            + "}";
+        return "{\n"
+            + statements.stream().map(s -> "\t" + s.toString()).collect(Collectors.joining("\n"))
+            + "\n\t" + value.toString()
+            + "\n}";
     }
 }

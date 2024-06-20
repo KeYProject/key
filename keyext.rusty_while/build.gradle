@@ -21,3 +21,7 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+generateGrammarSource {
+    arguments += ["-visitor"]
+}

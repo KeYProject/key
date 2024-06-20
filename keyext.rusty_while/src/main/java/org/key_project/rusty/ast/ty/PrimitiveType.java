@@ -1,23 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.ty;
-
-import org.key_project.logic.Name;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public final class PrimitiveType implements  Type{
+import org.key_project.logic.Name;
+
+public final class PrimitiveType implements Type {
     private static final Map<Name, PrimitiveType> typeMap =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
 
     public static final PrimitiveType U8 = new PrimitiveType(new Name("u8"));
     public static final PrimitiveType U16 = new PrimitiveType(new Name("u16"));
     public static final PrimitiveType U32 = new PrimitiveType(new Name("u32"));
     public static final PrimitiveType U64 = new PrimitiveType(new Name("u64"));
+    public static final PrimitiveType U128 = new PrimitiveType(new Name("u128"));
     public static final PrimitiveType USIZE = new PrimitiveType(new Name("usize"));
     public static final PrimitiveType I8 = new PrimitiveType(new Name("i8"));
     public static final PrimitiveType I16 = new PrimitiveType(new Name("i16"));
     public static final PrimitiveType I32 = new PrimitiveType(new Name("i32"));
     public static final PrimitiveType I64 = new PrimitiveType(new Name("i64"));
+    public static final PrimitiveType I128 = new PrimitiveType(new Name("i128"));
     public static final PrimitiveType ISIZE = new PrimitiveType(new Name("isize"));
     public static final PrimitiveType BOOL = new PrimitiveType(new Name("bool"));
     public static final PrimitiveType CHAR = new PrimitiveType(new Name("char"));

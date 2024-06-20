@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.stmt;
 
-import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.expr.Expr;
 
 public class ExpressionStatement implements Statement {
     private final Expr expression;
@@ -28,6 +28,6 @@ public class ExpressionStatement implements Statement {
 
     @Override
     public String toString() {
-        return expression.toString();
+        return expression.toString() + ";";
     }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op;
 
 import org.key_project.logic.Name;
@@ -10,7 +13,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator implements 
     private final KeYRustyType type;
 
     protected ProgramVariable(Name name, Sort s, KeYRustyType t,
-                              KeYRustyType containingType) {
+            KeYRustyType containingType) {
         super(name, s == null ? t.getSort() : s, Modifier.NONE);
         this.type = t;
     }

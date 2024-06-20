@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.stmt;
 
+import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.Type;
-import org.key_project.rusty.ast.expr.Expr;
-import org.key_project.logic.SyntaxElement;
 
 public class LetStatement implements Statement {
     private final Pattern pat;
