@@ -11,6 +11,9 @@ import de.uka.ilkd.key.logic.equality.Property;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.Nullable;
+
+
 /**
  * This class is a wrapper for {@link LinkedHashMap} where the keys are elements that implement
  * {@link EqualsModProperty}.
@@ -27,7 +30,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /**
      * The wrapped {@link LinkedHashMap}.
      */
-    private final LinkedHashMap<ElementWrapper<K>, V> map;
+    private final LinkedHashMap<ElementWrapper<K>, @Nullable V> map;
 
     /**
      * The {@link Property<K>} that is used for equality checks and hash codes.
@@ -127,7 +130,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @param key the key whose associated value is to be returned
      * @return the value to which the specified key is mapped
      */
-    public V get(K key) {
+    public @Nullable V get(K key) {
         return map.get(wrapKey(key));
     }
 
@@ -142,7 +145,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @return the previous value associated with {@code key}, or {@code null} if there was no
      *         mapping for {@code key}
      */
-    public V put(K key, V value) {
+    public @Nullable V put(K key, @Nullable V value) {
         return map.put(wrapKey(key), value);
     }
 
@@ -195,7 +198,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @return the previous value associated with {@code key}, or {@code null} if there was no
      *         mapping for {@code key}
      */
-    public V remove(K key) {
+    public @Nullable V remove(K key) {
         return map.remove(wrapKey(key));
     }
 
@@ -309,7 +312,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         /**
          * The last key-value pair that was returned by {@link #next()}.
          */
-        private ElementWrapper<K> last = null;
+        private @Nullable ElementWrapper<K> last = null;
 
         /**
          * Creates a new iterator over the key-value pairs in the {@link LinkedHashMapWrapper}.
