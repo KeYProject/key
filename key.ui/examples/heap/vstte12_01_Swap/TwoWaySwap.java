@@ -6,7 +6,7 @@ public class TwoWaySwap {
 
     /*@ public normal_behavior
       @ ensures a == _a;
-      @ modifies a;
+      @ assignable a;
       @*/
     public void set(boolean[] _a) {
         a = _a;
@@ -25,7 +25,7 @@ public class TwoWaySwap {
     }
 
     /*@ public normal_behavior
-      @ ensures (\forall int k; 
+      @ ensures (\forall int k;
       @   (\forall int l; k>=0 && k < l && l<a.length; a[k] == a[l] || !a[k]));
       @ ensures \dl_seqPerm(\old(seq), seq);
       @ assignable a[*];

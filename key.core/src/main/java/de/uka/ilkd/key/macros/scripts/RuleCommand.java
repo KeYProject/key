@@ -61,8 +61,20 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         RuleApp theApp = makeRuleApp(args, state);
         Goal g = state.getFirstOpenAutomaticGoal();
 
-        if (theApp instanceof TacletApp) {
-            RuleApp completeApp = ((TacletApp) theApp).tryToInstantiate(g.proof().getServices());
+        if (theApp instanceof TacletApp tacletApp) {
+
+            if (!tacletApp.ifInstsComplete()) {
+                ImmutableList<TacletApp> ifSeqCandidates =
+                    tacletApp.findIfFormulaInstantiations(g.sequent(), g.proof().getServices());
+
+                if (ifSeqCandidates.size() == 1) {
+                    theApp = ifSeqCandidates.head();
+                    assert theApp != null;
+                    tacletApp = (TacletApp) theApp;
+                }
+            }
+
+            RuleApp completeApp = tacletApp.tryToInstantiate(g.proof().getServices());
             theApp = completeApp == null ? theApp : completeApp;
         }
         assert theApp != null;

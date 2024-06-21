@@ -402,7 +402,7 @@ public final class ProgramSV extends OperatorSV implements ProgramConstruct, Upd
 
     @Override
     public int getHeapCount(Services services) {
-        return HeapContext.getModHeaps(services, false).size();
+        return HeapContext.getModifiableHeaps(services, false).size();
     }
 
     @Override

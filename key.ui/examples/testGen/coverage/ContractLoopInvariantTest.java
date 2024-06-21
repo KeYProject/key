@@ -1,15 +1,15 @@
-/* 
+/*
 Attention: To generate correct tests (tests that satisfy the precondition)
  for the methods foo1 and foo2, the Integer Bound in Options -> SMT Solver Options must be
- set to at least 6 (the default is 3). 
- 
+ set to at least 6 (the default is 3).
+
 By default KeY does not know the classes of the standard Java runtime environment,
- therefore the statements "System.out.println(...)" are commented out for 
+ therefore the statements "System.out.println(...)" are commented out for
  symbolic execution. After test case generation this file is copied to a subfolder
  of the testFiles folder specified in the Test Suite Generation window.
  You can uncomment the "System.out.println(...)" statements when compiling the file
  for test execution in order to see which branches are executed by the tests.
- 
+
 @author Christoph Gladisch
 */
 
@@ -41,7 +41,7 @@ class ContractLoopInvariantTest {
   public int i;
   /*@ public normal_behavior
     requires i<=n; ensures i==n;
-    modifies i; @*/
+    assignable i; @*/
   public void D(int n){
     /*System.out.println("D");*/
     while(i < n){ i++; A(); }
@@ -49,7 +49,7 @@ class ContractLoopInvariantTest {
 
   /*@ public normal_behavior
     requires i<=n; ensures i==n;
-    modifies i; @*/
+    assignable i; @*/
   public void foo2(int n){
     D(n);
     if(i==20){ C(); }
