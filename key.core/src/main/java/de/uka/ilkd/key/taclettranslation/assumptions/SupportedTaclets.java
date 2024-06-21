@@ -41,9 +41,7 @@ public final class SupportedTaclets {
 
         for (String taclet : selected) {
             TreeItem item = tacletNames.get(taclet);
-            if (item != null) {
-                item.setMode(SelectionMode.all);
-            }
+            if (item != null) { item.setMode(SelectionMode.all); }
         }
         this.validateSelectionModes();
     }
@@ -70,9 +68,7 @@ public final class SupportedTaclets {
     public void selectTaclets(String... taclets) {
         for (String taclet : taclets) {
             TreeItem item = tacletNames.get(taclet);
-            if (item != null) {
-                item.setMode(SelectionMode.all);
-            }
+            if (item != null) { item.setMode(SelectionMode.all); }
         }
         validateSelectionMode((TreeItem) model.getRoot());
     }
@@ -82,9 +78,7 @@ public final class SupportedTaclets {
         Enumeration<?> en = ((TreeItem) model.getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             TreeItem item = (TreeItem) en.nextElement();
-            if (item.isLeaf() && item.isSelected()) {
-                list.add(item.text);
-            }
+            if (item.isLeaf() && item.isSelected()) { list.add(item.text); }
 
         }
         String[] result = new String[list.size()];
@@ -139,7 +133,8 @@ public final class SupportedTaclets {
     /**
      * Checks whether a taclet specified by its name can be used for external provers.
      *
-     * @param tacletname the name of the taclet
+     * @param tacletname
+     *        the name of the taclet
      * @return <code>true</code> if the taclet can be used for external provers.
      */
     public boolean contains(String tacletname, boolean mustBeSelected) {
@@ -151,9 +146,7 @@ public final class SupportedTaclets {
     }
 
     private void selectNothing() {
-        for (TreeItem item : tacletNames.values()) {
-            item.setMode(TreeItem.SelectionMode.nothing);
-        }
+        for (TreeItem item : tacletNames.values()) { item.setMode(TreeItem.SelectionMode.nothing); }
 
     }
 
@@ -169,18 +162,14 @@ public final class SupportedTaclets {
             return true;
         }
         for (int i = 0; i < node.getChildCount(); i++) {
-            if (selectCategory(cat, (TreeItem) node.getChildAt(i))) {
-                return true;
-            }
+            if (selectCategory(cat, (TreeItem) node.getChildAt(i))) { return true; }
         }
         return false;
     }
 
     private void selectAll(TreeItem node) {
         node.setMode(TreeItem.SelectionMode.all);
-        for (int i = 0; i < node.getChildCount(); i++) {
-            selectAll((TreeItem) node.getChildAt(i));
-        }
+        for (int i = 0; i < node.getChildCount(); i++) { selectAll((TreeItem) node.getChildAt(i)); }
     }
 
     public void validateSelectionModes() {
@@ -207,9 +196,7 @@ public final class SupportedTaclets {
             TreeItem.SelectionMode childMode = validateSelectionMode((TreeItem) child);
             if (childMode.equals(TreeItem.SelectionMode.all)) {
                 iAll++;
-            } else if (childMode.equals(TreeItem.SelectionMode.nothing)) {
-                iNothing++;
-            }
+            } else if (childMode.equals(TreeItem.SelectionMode.nothing)) { iNothing++; }
             TreeItem childItem = (TreeItem) child;
 
 
@@ -238,17 +225,17 @@ public final class SupportedTaclets {
     /**
      * Adds a taclet to the list of supported taclets.
      *
-     * @param node the TreeNode the taclet belongs to.
-     * @param taclet the name of the taclet.
+     * @param node
+     *        the TreeNode the taclet belongs to.
+     * @param taclet
+     *        the name of the taclet.
      */
     private void addTaclet(TreeItem node, String taclet) {
         addTaclet(node, taclet, 0);
     }
 
     private void addTaclet(TreeItem node, String... taclets) {
-        for (String taclet : taclets) {
-            addTaclet(node, taclet);
-        }
+        for (String taclet : taclets) { addTaclet(node, taclet); }
     }
 
     private void addTaclet(TreeItem node, String taclet, boolean checked, int genericCount) {
@@ -263,8 +250,10 @@ public final class SupportedTaclets {
      * Adds an inner node to the tree. Inner nodes do not represents taclets but the category
      * taclets belonging to.
      *
-     * @param root the parent of the node.
-     * @param text the description of the node.
+     * @param root
+     *        the parent of the node.
+     * @param text
+     *        the description of the node.
      * @return returns the created node.
      */
     private TreeItem newNode(TreeItem root, String text, Category cat) {
@@ -295,9 +284,7 @@ public final class SupportedTaclets {
      */
     public TreeModel getTreeModel() {
 
-        if (model != null) {
-            return model;
-        }
+        if (model != null) { return model; }
 
         TreeItem root = new TreeItem("Supported taclets", Category.ALL_SUPPORTED);
 
@@ -499,9 +486,7 @@ public final class SupportedTaclets {
                     break;
                 }
             }
-            if (!found) {
-                list.add(name);
-            }
+            if (!found) { list.add(name); }
         }
         return list;
     }

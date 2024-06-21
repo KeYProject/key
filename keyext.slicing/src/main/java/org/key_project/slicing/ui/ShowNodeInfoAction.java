@@ -47,9 +47,12 @@ public class ShowNodeInfoAction extends MainWindowAction {
      * Construct a new debug dialog. Call {@link #showDialog(Window)} afterwards to make it visible
      * to the user.
      *
-     * @param mw main window
-     * @param tracker dependency tracker
-     * @param node node to show info on
+     * @param mw
+     *        main window
+     * @param tracker
+     *        dependency tracker
+     * @param node
+     *        node to show info on
      */
     public ShowNodeInfoAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
@@ -66,7 +69,8 @@ public class ShowNodeInfoAction extends MainWindowAction {
     /**
      * Show a dialog with dependency graph information on the {@link #node}.
      *
-     * @param parentWindow the parent window to center this dialog on
+     * @param parentWindow
+     *        the parent window to center this dialog on
      */
     private void showDialog(Window parentWindow) {
         List<GraphNode> graphNodes = new ArrayList<>();
@@ -106,18 +110,16 @@ public class ShowNodeInfoAction extends MainWindowAction {
         var graphNode = node;
         while (!graphNode.getBranchLocation().isEmpty()) {
             graphNode = graphNode.popLastBranchID();
-            if (tracker.getDependencyGraph().containsNode(graphNode)) {
-                previousDerivations++;
-            }
+            if (tracker.getDependencyGraph().containsNode(graphNode)) { previousDerivations++; }
         }
         var html = "<h1>Produced by</h1>" + html1
-            + "<h1>This node</h1>" + "<p>" + node.toString(false, false) + "</p>"
-            + "<p><small>" + previousDerivations + "x derived in previous branches" + "</small></p>"
-            + "<p><small>" + "Identity: " + System.identityHashCode(node) + "</small></p>"
-            + "<h1>Used by</h1>"
-            + extraInfo
-            + html2
-            + "<p>strikethrough rule name = useless rule app</p>";
+                + "<h1>This node</h1>" + "<p>" + node.toString(false, false) + "</p>"
+                + "<p><small>" + previousDerivations + "x derived in previous branches" + "</small></p>"
+                + "<p><small>" + "Identity: " + System.identityHashCode(node) + "</small></p>"
+                + "<h1>Used by</h1>"
+                + extraInfo
+                + html2
+                + "<p>strikethrough rule name = useless rule app</p>";
         new HtmlDialog(parentWindow,
             "Dependency graph node info", html, event -> {
                 var parts = event.substring(1).split("_");
@@ -178,13 +180,13 @@ public class ShowNodeInfoAction extends MainWindowAction {
         var html2 =
             HtmlFactory.generateTable(headers2, clickable2, Optional.empty(), outputs, idxFactory);
         var html = "<h1>Inputs</h1>"
-            + html1
-            + "<h1>This step</h1>" + "<p>" + proofStep.getAppliedRuleApp().rule().displayName()
-            + "</p>"
-            // TODO: useful / useless / unknown
-            + "<h1>Outputs</h1>"
-            + html2
-            + "<p>strikethrough label = useless node</p>";
+                + html1
+                + "<h1>This step</h1>" + "<p>" + proofStep.getAppliedRuleApp().rule().displayName()
+                + "</p>"
+                // TODO: useful / useless / unknown
+                + "<h1>Outputs</h1>"
+                + html2
+                + "<p>strikethrough label = useless node</p>";
         new HtmlDialog(parentWindow,
             "Dependency graph edge info", html, event -> {
                 var parts = event.substring(1).split("_");

@@ -77,9 +77,7 @@ public class SimpleSettingsPanel extends JPanel {
 
     protected void demarkComponentAsErrornous(JComponent component) {
         Object col = component.getClientProperty("saved_background_color");
-        if (col instanceof Color) {
-            component.setBackground((Color) col);
-        }
+        if (col instanceof Color) { component.setBackground((Color) col); }
     }
 
     protected void markComponentAsErrornous(JComponent component, String error) {
@@ -93,9 +91,7 @@ public class SimpleSettingsPanel extends JPanel {
         JCheckBox checkBox = new JCheckBox(title, value);
         checkBox.addActionListener(e -> {
             try {
-                if (validator != null) {
-                    validator.validate(checkBox.isSelected());
-                }
+                if (validator != null) { validator.validate(checkBox.isSelected()); }
                 demarkComponentAsErrornous(checkBox);
             } catch (Exception ex) {
                 markComponentAsErrornous(checkBox, ex.getMessage());
@@ -141,12 +137,17 @@ public class SimpleSettingsPanel extends JPanel {
      * {@link javax.swing.text.NumberFormatter#stringToValue(String)}). Entered values have to be
      * Numbers, otherwise the Number-Validator will fail.
      *
-     * @param min the minimum value of the JSpinner
-     * @param max the maximum value of the JSpinner
-     * @param step the step size of the JSpinner
-     * @param validator a validator used to check the entered values for additional restrictions
+     * @param min
+     *        the minimum value of the JSpinner
+     * @param max
+     *        the maximum value of the JSpinner
+     * @param step
+     *        the step size of the JSpinner
+     * @param validator
+     *        a validator used to check the entered values for additional restrictions
      * @return the created JSpinner
-     * @param <T> the class of the minimum value
+     * @param <T>
+     *        the class of the minimum value
      */
     protected <T extends Number & Comparable<T>> JSpinner createNumberTextField(T min,
             Comparable<T> max, Number step, final @Nullable Validator<Number> validator) {
@@ -181,7 +182,7 @@ public class SimpleSettingsPanel extends JPanel {
         } else {
             String brokenLines = StringUtil.wrapLines(s);
             s = "<html>"
-                + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+                    + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
         }
 
         JLabel infoButton =
@@ -252,9 +253,7 @@ public class SimpleSettingsPanel extends JPanel {
 
         void update() {
             try {
-                if (validator != null) {
-                    validator.validate(field.getText());
-                }
+                if (validator != null) { validator.validate(field.getText()); }
                 demarkComponentAsErrornous(field);
             } catch (Exception ex) {
                 markComponentAsErrornous(field, ex.getMessage());

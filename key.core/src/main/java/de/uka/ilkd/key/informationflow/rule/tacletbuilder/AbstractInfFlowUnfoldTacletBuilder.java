@@ -201,10 +201,10 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             Term svTerm = schemaVarsIt.next();
             if (origTerm != null && svTerm != null) {
                 assert svTerm.sort().equals(origTerm.sort())
-                        || svTerm.sort().extendsSorts().contains(origTerm.sort())
-                        : "mismatch of sorts: orignal term " + origTerm + ", sort "
-                            + origTerm.sort() + "; replacement term" + svTerm + ", sort "
-                            + svTerm.sort();
+                        || svTerm.sort().extendsSorts().contains(origTerm.sort()) : "mismatch of sorts: orignal term "
+                                + origTerm + ", sort "
+                                + origTerm.sort() + "; replacement term" + svTerm + ", sort "
+                                + svTerm.sort();
                 map.put(origTerm, svTerm);
             }
         }
@@ -224,9 +224,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
 
     private static StateVars filterSchemaVars(StateVars origVars, StateVars schemaVars) {
-        if (origVars.termList.size() == schemaVars.termList.size()) {
-            return schemaVars;
-        }
+        if (origVars.termList.size() == schemaVars.termList.size()) { return schemaVars; }
         Term self = schemaVars.self;
         Term guard = schemaVars.guard;
         ImmutableList<Term> localVars = schemaVars.localVars;
@@ -234,29 +232,15 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         Term exception = schemaVars.exception;
         Term heap = schemaVars.heap;
         Term mbyAtPre = schemaVars.mbyAtPre;
-        if (origVars.self == null) {
-            self = null;
-        }
-        if (origVars.guard == null) {
-            guard = null;
-        }
+        if (origVars.self == null) { self = null; }
+        if (origVars.guard == null) { guard = null; }
         if (origVars.localVars == null) {
             localVars = null;
-        } else if (origVars.localVars.isEmpty()) {
-            localVars = ImmutableSLList.nil();
-        }
-        if (origVars.result == null) {
-            result = null;
-        }
-        if (origVars.exception == null) {
-            exception = null;
-        }
-        if (origVars.heap == null) {
-            heap = null;
-        }
-        if (origVars.mbyAtPre == null) {
-            mbyAtPre = null;
-        }
+        } else if (origVars.localVars.isEmpty()) { localVars = ImmutableSLList.nil(); }
+        if (origVars.result == null) { result = null; }
+        if (origVars.exception == null) { exception = null; }
+        if (origVars.heap == null) { heap = null; }
+        if (origVars.mbyAtPre == null) { mbyAtPre = null; }
         return new StateVars(self, guard, localVars, result, exception, heap, mbyAtPre);
     }
 

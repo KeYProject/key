@@ -37,9 +37,11 @@ public class ContainsTermFeature implements Feature {
     /**
      * checks whether the second term is a subterm of the first one
      *
-     * @param proj1 the ProjectionToTerm resolving to the term in which to search for the second
+     * @param proj1
+     *        the ProjectionToTerm resolving to the term in which to search for the second
      *        term
-     * @param proj2 the ProjectionToTerm resolving to the term to be checked whether it is a subterm
+     * @param proj2
+     *        the ProjectionToTerm resolving to the term to be checked whether it is a subterm
      *        of the first one
      */
     private ContainsTermFeature(ProjectionToTerm proj1, ProjectionToTerm proj2) {

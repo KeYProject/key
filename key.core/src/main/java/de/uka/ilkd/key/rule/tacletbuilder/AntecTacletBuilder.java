@@ -22,9 +22,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
      * @return this AntecTacletBuilder
      */
     public AntecTacletBuilder setFind(Term findTerm) {
-        if (findTerm.sort() == JavaDLTheory.FORMULA) {
-            find = findTerm;
-        }
+        if (findTerm.sort() == JavaDLTheory.FORMULA) { find = findTerm; }
         checkContainsFreeVarSV(findTerm, getName(), "find term");
         return this;
     }

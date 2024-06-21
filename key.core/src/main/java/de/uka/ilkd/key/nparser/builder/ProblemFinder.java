@@ -8,7 +8,7 @@ import java.io.StringReader;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -92,9 +92,7 @@ public class ProblemFinder extends ExpressionBuilder {
                     "Found a proof obligation entry, but the value is not a string or a JSON object");
             }
         }
-        if (ctx.PROBLEM() != null) {
-            problem = accept(ctx.termorseq());
-        }
+        if (ctx.PROBLEM() != null) { problem = accept(ctx.termorseq()); }
         return null;
     }
 

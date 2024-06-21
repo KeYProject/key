@@ -65,12 +65,17 @@ public class SimplePipe implements Pipe {
     /**
      * Creates a new SimplePipe.
      *
-     * @param input the InputStream connected to the merged stdout and stderr of the external
+     * @param input
+     *        the InputStream connected to the merged stdout and stderr of the external
      *        process
-     * @param messageDelimiters the delimiters which separate one message from another
-     * @param output the OutputStream connected to stdin of the external process
-     * @param session the message list where to log the messages to
-     * @param process the external process this pipe is connected to
+     * @param messageDelimiters
+     *        the delimiters which separate one message from another
+     * @param output
+     *        the OutputStream connected to stdin of the external process
+     * @param session
+     *        the message list where to log the messages to
+     * @param process
+     *        the external process this pipe is connected to
      */
     public SimplePipe(@NonNull InputStream input, @NonNull String[] messageDelimiters,
             @NonNull OutputStream output, @NonNull SolverCommunication session,
@@ -104,7 +109,7 @@ public class SimplePipe implements Pipe {
                 tryToReadExhaustively();
                 int exit = process.exitValue();
                 throw new IllegalStateException("Process terminated (exit code " + exit
-                    + "). Process report:\n" + getReadMessages());
+                        + "). Process report:\n" + getReadMessages());
             } else {
                 throw e;
             }

@@ -48,11 +48,16 @@ class LabeledTermImpl extends TermImpl {
     /**
      * creates an instance of a labeled term.
      *
-     * @param op the top level operator
-     * @param subs the Term that are the subterms of this term
-     * @param boundVars logic variables bound by the operator
-     * @param labels the term's labels (must not be null or empty)
-     * @param origin a String with origin information
+     * @param op
+     *        the top level operator
+     * @param subs
+     *        the Term that are the subterms of this term
+     * @param boundVars
+     *        logic variables bound by the operator
+     * @param labels
+     *        the term's labels (must not be null or empty)
+     * @param origin
+     *        a String with origin information
      */
     public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
@@ -66,10 +71,14 @@ class LabeledTermImpl extends TermImpl {
     /**
      * creates an instance of a labeled term.
      *
-     * @param op the top level operator
-     * @param subs the Term that are the subterms of this term
-     * @param boundVars logic variables bound by the operator
-     * @param labels the terms labels (must not be null or empty)
+     * @param op
+     *        the top level operator
+     * @param subs
+     *        the Term that are the subterms of this term
+     * @param boundVars
+     *        logic variables bound by the operator
+     * @param labels
+     *        the terms labels (must not be null or empty)
      */
     public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
@@ -105,41 +114,30 @@ class LabeledTermImpl extends TermImpl {
     /**
      * returns true if the given label is attached
      *
-     * @param label the TermLabel for which to look (must not be null)
+     * @param label
+     *        the TermLabel for which to look (must not be null)
      * @return true iff. the label is attached to this term
      */
     @Override
     public boolean containsLabel(TermLabel label) {
         assert label != null : "Label must not be null";
-        for (int i = 0, sz = labels.size(); i < sz; i++) {
-            if (label.equals(labels.get(i))) {
-                return true;
-            }
-        }
+        for (int i = 0, sz = labels.size(); i < sz; i++) { if (label.equals(labels.get(i))) { return true; } }
         return false;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
+        if (o == this) { return true; }
 
         if (o instanceof final LabeledTermImpl cmp) {
-            if (labels.size() != cmp.labels.size()) {
-                return false;
-            }
+            if (labels.size() != cmp.labels.size()) { return false; }
 
-            if (!super.equals(o)) {
-                return false;
-            }
+            if (!super.equals(o)) { return false; }
 
             if (labels.size() == cmp.labels.size()) {
                 for (int i = 0, sz = labels.size(); i < sz; i++) {
                     // this is not optimal, but as long as number of labels limited ok
-                    if (!cmp.labels.contains(labels.get(i))) {
-                        return false;
-                    }
+                    if (!cmp.labels.contains(labels.get(i))) { return false; }
                 }
                 return true;
             }
@@ -150,9 +148,7 @@ class LabeledTermImpl extends TermImpl {
     @Override
     public int computeHashCode() {
         int hash = super.computeHashCode();
-        for (int i = 0, sz = labels.size(); i < sz; i++) {
-            hash += 7 * labels.get(i).hashCode();
-        }
+        for (int i = 0, sz = labels.size(); i < sz; i++) { hash += 7 * labels.get(i).hashCode(); }
         return hash;
     }
 

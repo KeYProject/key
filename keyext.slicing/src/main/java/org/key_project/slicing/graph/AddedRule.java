@@ -21,7 +21,8 @@ public class AddedRule extends GraphNode {
     /**
      * Construct a new graph node for a dynamically added rule.
      *
-     * @param name the name of the rule (must be unique per proof)
+     * @param name
+     *        the name of the rule (must be unique per proof)
      */
     public AddedRule(String name) {
         super(BranchLocation.ROOT); // branch location does not matter since the rule name is
@@ -36,12 +37,8 @@ public class AddedRule extends GraphNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         AddedRule addedRule = (AddedRule) o;
         return Objects.equals(name, addedRule.name);
     }

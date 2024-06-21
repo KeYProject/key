@@ -40,9 +40,7 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     public static ElementaryUpdate getInstance(UpdateableOperator lhs) {
         WeakReference<ElementaryUpdate> ref = instances.get(lhs);
         ElementaryUpdate result = null;
-        if (ref != null) {
-            result = ref.get();
-        }
+        if (ref != null) { result = ref.get(); }
         if (result == null) {
             result = new ElementaryUpdate(lhs);
             ref = new WeakReference<>(result);

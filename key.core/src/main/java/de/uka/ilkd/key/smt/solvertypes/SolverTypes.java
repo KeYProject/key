@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.solvertypes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.jspecify.annotations.NonNull;
 
@@ -54,9 +55,7 @@ public final class SolverTypes {
      * @return the available legacy solver types
      */
     public static @NonNull Collection<SolverType> getLegacySolvers() {
-        if (SOLVERS.isEmpty()) {
-            getSolverTypes();
-        }
+        if (SOLVERS.isEmpty()) { getSolverTypes(); }
         return new ArrayList<>(LEGACY_SOLVERS);
     }
 

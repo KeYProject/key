@@ -18,8 +18,10 @@ public interface Operator
     /**
      * comparator to compare operators; for modalities only their kind is compared
      *
-     * @param fst the first Operator
-     * @param snd th second Operator
+     * @param fst
+     *        the first Operator
+     * @param snd
+     *        th second Operator
      * @return true iff both operators have same identity and for modalities if both are of the same
      *         kind
      */
@@ -31,12 +33,8 @@ public interface Operator
 
     @Override
     default boolean equalsModProofIrrelevancy(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Operator that)) {
-            return false;
-        }
+        if (this == obj) { return true; }
+        if (!(obj instanceof Operator that)) { return false; }
         // assume name and arity uniquely identifies operator
         return arity() == that.arity() && name().equals(that.name());
     }

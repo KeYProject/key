@@ -21,8 +21,7 @@ public class BoundVarsVisitor implements DefaultVisitor {
      * creates a Visitor that collects all bound variables for the subterms of the term it is called
      * from.
      */
-    public BoundVarsVisitor() {
-    }
+    public BoundVarsVisitor() {}
 
     /**
      * only called by execPostOrder in Term.
@@ -40,9 +39,7 @@ public class BoundVarsVisitor implements DefaultVisitor {
      * visits a sequent
      */
     public void visit(Sequent visited) {
-        for (SequentFormula cf : visited) {
-            visit(cf.formula());
-        }
+        for (SequentFormula cf : visited) { visit(cf.formula()); }
     }
 
     /**

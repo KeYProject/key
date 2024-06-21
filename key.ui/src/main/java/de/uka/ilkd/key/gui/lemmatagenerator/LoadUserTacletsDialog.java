@@ -74,9 +74,7 @@ public class LoadUserTacletsDialog extends JPanel {
             this.title = title;
             Box box = Box.createHorizontalBox();
 
-            if (title != null) {
-                this.setBorder(BorderFactory.createTitledBorder(title));
-            }
+            if (title != null) { this.setBorder(BorderFactory.createTitledBorder(title)); }
 
             box.add(getFileField());
             box.add(Box.createHorizontalStrut(5));
@@ -111,9 +109,7 @@ public class LoadUserTacletsDialog extends JPanel {
         }
 
         protected void fileHasBeenChosen() {
-            if (okButton != null) {
-                okButton.setEnabled(true);
-            }
+            if (okButton != null) { okButton.setEnabled(true); }
         }
 
         public void setChosenFile(File file) {
@@ -154,7 +150,8 @@ public class LoadUserTacletsDialog extends JPanel {
     /**
      * Creates a new dialog for loading user-defined taclets
      *
-     * @param mode either {@link Mode#PROVE} or {@link Mode#LOAD}
+     * @param mode
+     *        either {@link Mode#PROVE} or {@link Mode#LOAD}
      */
     public LoadUserTacletsDialog(Mode mode) {
 
@@ -170,9 +167,7 @@ public class LoadUserTacletsDialog extends JPanel {
         if (mode == Mode.LOAD) {
             // with a checkbox and the background to choose.
             this.add(getJustificationBox());
-        } else if (mode == Mode.PROVE) {
-            this.add(getAxiomFilePanel());
-        }
+        } else if (mode == Mode.PROVE) { this.add(getAxiomFilePanel()); }
         this.add(Box.createVerticalGlue());
         this.add(Box.createVerticalStrut(5));
     }
@@ -180,11 +175,7 @@ public class LoadUserTacletsDialog extends JPanel {
     public List<File> getFilesForAxioms() {
         List<File> files = new LinkedList<>();
         Object[] objects = listModel.toArray();
-        if (objects != null) {
-            for (Object file : objects) {
-                files.add((File) file);
-            }
-        }
+        if (objects != null) { for (Object file : objects) { files.add((File) file); } }
         return files;
     }
 
@@ -296,9 +287,7 @@ public class LoadUserTacletsDialog extends JPanel {
     }
 
     private UserTacletFileBox getUserTacletFileBox() {
-        if (userTacletFileBox == null) {
-            userTacletFileBox = new UserTacletFileBox("File with user-defined taclets");
-        }
+        if (userTacletFileBox == null) { userTacletFileBox = new UserTacletFileBox("File with user-defined taclets"); }
         return userTacletFileBox;
     }
 
@@ -318,9 +307,7 @@ public class LoadUserTacletsDialog extends JPanel {
                         !infoDialog.showDialog(INFO_TEXT, LoadUserTacletsDialog.this);
                     ProofIndependentSettings.DEFAULT_INSTANCE.getLemmaGeneratorSettings()
                             .setShowDialogAddingAxioms(infoDialog.showThisDialogNextTime());
-                    if (firstTimeAddingAxioms) {
-                        return;
-                    }
+                    if (firstTimeAddingAxioms) { return; }
                 }
                 File file = chooseFiles("File containing the axioms.");
                 if (file != null) {
@@ -337,9 +324,7 @@ public class LoadUserTacletsDialog extends JPanel {
             removeAxiomFileButton = new JButton("Remove");
             removeAxiomFileButton.addActionListener(e -> {
                 List<File> values = getAxiomsList().getSelectedValuesList();
-                for (File o : values) {
-                    listModel.removeElement(o);
-                }
+                for (File o : values) { listModel.removeElement(o); }
             });
         }
         return removeAxiomFileButton;
@@ -429,9 +414,7 @@ public class LoadUserTacletsDialog extends JPanel {
             dialog = new JDialog(MainWindow.getInstance());
             if (mode == Mode.LOAD) {
                 dialog.setTitle("Load user-defined taclets into proof");
-            } else if (mode == Mode.PROVE) {
-                dialog.setTitle("Prove user-defined taclets");
-            }
+            } else if (mode == Mode.PROVE) { dialog.setTitle("Prove user-defined taclets"); }
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             Container pane = dialog.getContentPane();
 

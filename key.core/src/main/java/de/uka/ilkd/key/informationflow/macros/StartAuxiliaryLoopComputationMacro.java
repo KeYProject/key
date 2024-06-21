@@ -10,7 +10,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
@@ -43,10 +43,10 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition "
-            + "proofs, this macro starts a side calculation which does "
-            + "the symbolic execution only once. The result is "
-            + "instantiated twice with the variable to be used in the "
-            + "two executions of the self-composition.";
+                + "proofs, this macro starts a side calculation which does "
+                + "the symbolic execution only once. The result is "
+                + "instantiated twice with the variable to be used in the "
+                + "two executions of the self-composition.";
     }
 
     @Override
@@ -55,20 +55,14 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
                 || goals.head().node().parent() == null) {
             return false;
         }
-        if (posInOcc == null || posInOcc.subTerm() == null) {
-            return false;
-        }
+        if (posInOcc == null || posInOcc.subTerm() == null) { return false; }
         final Services services = proof.getServices();
 
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof LoopInvariantBuiltInRuleApp loopInvRuleApp)) {
-            return false;
-        }
+        if (!(app instanceof LoopInvariantBuiltInRuleApp loopInvRuleApp)) { return false; }
         final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
-        if (ifVars == null) {
-            return false;
-        }
+        if (ifVars == null) { return false; }
         final ExecutionContext executionContext = loopInvRuleApp.getExecutionContext();
         final Term guardTerm = loopInvRuleApp.getGuard();
 

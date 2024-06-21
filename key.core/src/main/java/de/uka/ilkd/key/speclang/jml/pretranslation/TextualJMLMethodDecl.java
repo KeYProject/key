@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
@@ -45,8 +45,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         String paramsString = methodDefinition.param_list().param_decl().stream()
                 .map(it -> (it.NULLABLE() != null ? "/*@ nullable @*/"
                         : it.NON_NULL() != null ? "/*@ non_null @*/" : "")
-                    + " " + it.typespec().getText() + " " + it.p.getText()
-                    + StringUtil.repeat("[]", it.LBRACKET().size()))
+                        + " " + it.typespec().getText() + " " + it.p.getText()
+                        + StringUtil.repeat("[]", it.LBRACKET().size()))
                 .collect(Collectors.joining(","));
         return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
             getMethodName(), paramsString);

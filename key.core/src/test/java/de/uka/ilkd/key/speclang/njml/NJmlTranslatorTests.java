@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
@@ -31,12 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class NJmlTranslatorTests {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "speclang" + File.separator + "testFile.key";
+            + "speclang" + File.separator + "testFile.key";
     private final PreParser preParser;
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =
-            new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
+            HelperClassForTests.parse(new File(testFile)).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
         services.setOriginFactory(new OriginTermLabelFactory());
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
@@ -92,8 +92,8 @@ public class NJmlTranslatorTests {
         PositionedString message = warnings.head();
         assertEquals(
             "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
-                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
-                + Path.of("Test.java").toUri() + ", 5/38)",
+                    + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
+                    + Path.of("Test.java").toUri() + ", 5/38)",
             message.toString());
     }
 

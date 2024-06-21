@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.ReferenceSuffix;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
@@ -29,7 +30,8 @@ public class ProgramElementName extends Name
     /**
      * create a new name
      *
-     * @param name the String with the name of the program element
+     * @param name
+     *        the String with the name of the program element
      */
     public ProgramElementName(String name) {
         super(name);
@@ -42,7 +44,8 @@ public class ProgramElementName extends Name
     /**
      * create a new name
      *
-     * @param name the String with the name of the program element
+     * @param name
+     *        the String with the name of the program element
      */
     public ProgramElementName(String name, Comment[] c) {
         super(name);
@@ -106,7 +109,8 @@ public class ProgramElementName extends Name
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnProgramElementName(this);
@@ -133,17 +137,6 @@ public class ProgramElementName extends Name
         return Position.UNDEFINED;
     }
 
-    /**
-     * Returns the relative position (number of blank heading lines and columns) of the primary
-     * token of this element. To get the relative position of the syntactical first token, call the
-     * corresponding method of <CODE>getFirstElement()</CODE>.
-     *
-     * @return the relative position of the primary token.
-     */
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
-    }
-
 
     public PositionInfo getPositionInfo() {
         return PositionInfo.UNDEFINED;
@@ -156,9 +149,7 @@ public class ProgramElementName extends Name
      * elements are assigned to the same name, otherwise the names have to be equal
      */
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof ProgramElementName)) {
-            return false;
-        }
+        if (!(se instanceof ProgramElementName)) { return false; }
         return nat.sameAbstractName(this, se);
     }
 

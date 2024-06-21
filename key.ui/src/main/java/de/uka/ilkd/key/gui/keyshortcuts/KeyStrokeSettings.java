@@ -132,9 +132,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         super(""); // no category, separate file
         this.properties.putAll(DEFAULT_KEYSTROKES);
         init.forEach((key, value) -> {
-            if (value != null && !value.toString().isEmpty()) {
-                this.properties.put(key.toString(), value);
-            }
+            if (value != null && !value.toString().isEmpty()) { this.properties.put(key.toString(), value); }
         });
         save();
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
@@ -197,9 +195,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     KeyStroke getKeyStroke(String key, KeyStroke defaultValue) {
         try {
             KeyStroke ks = KeyStroke.getKeyStroke(properties.get(key).toString());
-            if (ks != null) {
-                return ks;
-            }
+            if (ks != null) { return ks; }
         } catch (Exception ignored) {
         }
         return defaultValue;

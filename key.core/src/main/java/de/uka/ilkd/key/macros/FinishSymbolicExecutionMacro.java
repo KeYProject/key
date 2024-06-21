@@ -51,7 +51,8 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     /**
      * Checks if a rule is forbidden for symbolic execution macros.
      *
-     * @param rule the rule to check
+     * @param rule
+     *        the rule to check
      * @return true if this rule should not be executed by a symbolic execution macro
      */
     public static boolean isForbiddenRule(Rule rule) {
@@ -61,11 +62,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
         if (rule instanceof Taclet taclet) {
-            for (RuleSet rs : taclet.getRuleSets()) {
-                if (ruleSetName.equals(rs.name())) {
-                    return true;
-                }
-            }
+            for (RuleSet rs : taclet.getRuleSets()) { if (ruleSetName.equals(rs.name())) { return true; } }
         }
         return false;
     }
@@ -99,12 +96,8 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if (!modalityCache.hasModality(goal.node().sequent())) {
-                return false;
-            }
-            if (isForbiddenRule(app.rule())) {
-                return false;
-            }
+            if (!modalityCache.hasModality(goal.node().sequent())) { return false; }
+            if (isForbiddenRule(app.rule())) { return false; }
 
             return super.isApprovedApp(app, pio, goal);
         }

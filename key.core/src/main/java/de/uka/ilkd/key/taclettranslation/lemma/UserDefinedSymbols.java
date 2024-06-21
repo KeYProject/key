@@ -59,17 +59,13 @@ public class UserDefinedSymbols {
             Namespace<T> excludeNamespace) {
         if (!contains(symbol, set)) {
             if (symbol instanceof SchemaVariable
-                    || excludeNamespace.lookup(symbol.name()) == null) {
-                set.add(symbol);
-            }
+                    || excludeNamespace.lookup(symbol.name()) == null) { set.add(symbol); }
         }
 
     }
 
     private <T extends Named> boolean contains(T symbol, Set<T> set) {
-        if (parent != null && parent.contains(symbol, set)) {
-            return true;
-        }
+        if (parent != null && parent.contains(symbol, set)) { return true; }
 
         return set.contains(symbol);
     }
@@ -85,11 +81,7 @@ public class UserDefinedSymbols {
     public void addSort(Named symbol) {
         if (symbol != JavaDLTheory.FORMULA) {
             Sort sort = (Sort) symbol;
-            if (!(sort instanceof NullSort)) {
-                for (Sort parentSort : sort.extendsSorts()) {
-                    addSort(parentSort);
-                }
-            }
+            if (!(sort instanceof NullSort)) { for (Sort parentSort : sort.extendsSorts()) { addSort(parentSort); } }
             addUserDefinedSymbol(sort, usedExtraSorts, referenceNamespaces.sorts());
         }
     }
@@ -114,9 +106,7 @@ public class UserDefinedSymbols {
 
     private <T extends Named> void addSymbolsToNamespace(Namespace<T> namespace,
             Collection<T> symbols) {
-        for (T symbol : symbols) {
-            namespace.addSafely(symbol);
-        }
+        for (T symbol : symbols) { namespace.addSafely(symbol); }
     }
 
     public void replaceGenericByProxySorts() {
@@ -137,21 +127,13 @@ public class UserDefinedSymbols {
 
     public String toString() {
         StringBuilder symbols = new StringBuilder("functions:\n");
-        for (Named named : usedExtraFunctions) {
-            symbols.append(named.name()).append(", ");
-        }
+        for (Named named : usedExtraFunctions) { symbols.append(named.name()).append(", "); }
         symbols.append("\npredicates:\n");
-        for (Named named : usedExtraPredicates) {
-            symbols.append(named.name()).append(", ");
-        }
+        for (Named named : usedExtraPredicates) { symbols.append(named.name()).append(", "); }
         symbols.append("\nsorts:\n");
-        for (Named named : usedExtraSorts) {
-            symbols.append(named.name()).append(", ");
-        }
+        for (Named named : usedExtraSorts) { symbols.append(named.name()).append(", "); }
         symbols.append("\nschema variables:\n");
-        for (Named named : usedSchemaVariables) {
-            symbols.append(named.name()).append(", ");
-        }
+        for (Named named : usedSchemaVariables) { symbols.append(named.name()).append(", "); }
         symbols.append(parent != null ? "\n\n Parent: " + parent : "");
         return symbols.toString();
     }

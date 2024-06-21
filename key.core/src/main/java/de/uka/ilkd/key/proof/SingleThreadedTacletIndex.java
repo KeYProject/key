@@ -64,18 +64,12 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     protected ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
             RuleFilter p_filter, PosInOccurrence pos, Services services) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
-        if (tacletApps == null) {
-            return result;
-        }
+        if (tacletApps == null) { return result; }
 
         for (final NoPosTacletApp tacletApp : tacletApps) {
-            if (!p_filter.filter(tacletApp.taclet())) {
-                continue;
-            }
+            if (!p_filter.filter(tacletApp.taclet())) { continue; }
             final NoPosTacletApp newTacletApp = tacletApp.matchFind(pos, services);
-            if (newTacletApp != null) {
-                result = result.prepend(newTacletApp);
-            }
+            if (newTacletApp != null) { result = result.prepend(newTacletApp); }
         }
 
         return result;

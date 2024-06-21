@@ -6,8 +6,8 @@ package de.uka.ilkd.key.logic.sort;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
@@ -46,7 +46,7 @@ public final class ArraySort extends SortImpl {
 
         if (extendsSorts.isEmpty()) {
             throw new IllegalArgumentException("An ArraySort extends typically three sorts"
-                + " (java.lang.Object, java.lang.Serializable, java.lang.Cloneable). You gave 0 sorts.");
+                    + " (java.lang.Object, java.lang.Serializable, java.lang.Cloneable). You gave 0 sorts.");
         }
 
         if (sk.elemSort instanceof GenericSort) {
@@ -69,15 +69,9 @@ public final class ArraySort extends SortImpl {
 
         if (elemDirectSuperSorts.size() == 1
                 && elemDirectSuperSorts.iterator().next().equals(JavaDLTheory.ANY)) {
-            if (objectSort != null) {
-                result = result.add(objectSort);
-            }
-            if (cloneableSort != null) {
-                result = result.add(cloneableSort);
-            }
-            if (serializableSort != null) {
-                result = result.add(serializableSort);
-            }
+            if (objectSort != null) { result = result.add(objectSort); }
+            if (cloneableSort != null) { result = result.add(cloneableSort); }
+            if (serializableSort != null) { result = result.add(serializableSort); }
         } else {
             for (Sort s : elemDirectSuperSorts) {
                 result = result.add(getArraySort(s, objectSort, cloneableSort, serializableSort));
@@ -134,10 +128,7 @@ public final class ArraySort extends SortImpl {
         assert n > 0;
         Sort result = getArraySort(elemSort, elemType, objectSort, cloneableSort, serializableSort);
 
-        while (n > 1) {
-            result = getArraySort(result, objectSort, cloneableSort, serializableSort);
-            n--;
-        }
+        while (n > 1) { result = getArraySort(result, objectSort, cloneableSort, serializableSort); n--; }
         return result;
     }
 
@@ -150,12 +141,11 @@ public final class ArraySort extends SortImpl {
     }
 
 
-    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
-                           Sort javaLangSerializable) {
+    private record SortKey(
+            Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
+            Sort javaLangSerializable) {
         public boolean equals(Object o) {
-            if (!(o instanceof SortKey sk)) {
-                return false;
-            }
+            if (!(o instanceof SortKey sk)) { return false; }
             return elemSort == sk.elemSort && elemType == sk.elemType
                     && javaLangObjectSort == sk.javaLangObjectSort
                     && javaLangSerializable == sk.javaLangSerializable

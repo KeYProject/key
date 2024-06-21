@@ -50,10 +50,12 @@ public final class BackTrackingManager {
      * Method that has to be invoked by each feature that represents a choice point, each time the
      * feature is invoked during evaluation of the feature term
      *
-     * @param cp the <code>ChoicePoint</code> in question (which does not have to be the same object
+     * @param cp
+     *        the <code>ChoicePoint</code> in question (which does not have to be the same object
      *        as the feature, and which does not have to be the same object over different
      *        evaluations of the feature term)
-     * @param ticket a unique object (as unique as possible) that has to be provided by the feature
+     * @param ticket
+     *        a unique object (as unique as possible) that has to be provided by the feature
      *        in order to ensure that the same sequence of choice points occurs during the next
      *        evaluation run (after backtracking). The <code>ticket</code> must not change between
      *        two evaluation runs of the feature term
@@ -80,7 +82,8 @@ public final class BackTrackingManager {
     /**
      * Method that has to be called before a sequence of evaluation runs of a feature term.
      *
-     * @param initialApp the original rule application in question
+     * @param initialApp
+     *        the original rule application in question
      */
     public void setup(RuleApp initialApp) {
         this.initialApp = initialApp;
@@ -178,13 +181,9 @@ public final class BackTrackingManager {
     }
 
     private RuleApp getOldRuleApp() {
-        if (chosenBranches.isEmpty()) {
-            return initialApp;
-        }
+        if (chosenBranches.isEmpty()) { return initialApp; }
         final CPBranch branch = chosenBranches.get(position - 1);
-        if (branch == null) {
-            return null;
-        }
+        if (branch == null) { return null; }
         return branch.getRuleAppForBranch();
     }
 

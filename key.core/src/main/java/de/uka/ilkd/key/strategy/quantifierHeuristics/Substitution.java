@@ -40,11 +40,7 @@ public class Substitution {
     }
 
     public boolean isTotalOn(ImmutableSet<QuantifiableVariable> vars) {
-        for (QuantifiableVariable var : vars) {
-            if (!varMap.containsKey(var)) {
-                return false;
-            }
-        }
+        for (QuantifiableVariable var : vars) { if (!varMap.containsKey(var)) { return false; } }
         return true;
     }
 
@@ -117,9 +113,7 @@ public class Substitution {
     }
 
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof Substitution s)) {
-            return false;
-        }
+        if (!(arg0 instanceof Substitution s)) { return false; }
         return varMap.equals(s.varMap);
     }
 
@@ -133,11 +127,7 @@ public class Substitution {
 
     public boolean termContainsValue(Term term) {
         Iterator<Term> it = varMap.valueIterator();
-        while (it.hasNext()) {
-            if (recOccurCheck(it.next(), term)) {
-                return true;
-            }
-        }
+        while (it.hasNext()) { if (recOccurCheck(it.next(), term)) { return true; } }
         return false;
     }
 
@@ -145,14 +135,8 @@ public class Substitution {
      * check whether term "sub" is in term "term"
      */
     private boolean recOccurCheck(Term sub, Term term) {
-        if (sub.equals(term)) {
-            return true;
-        }
-        for (int i = 0; i < term.arity(); i++) {
-            if (recOccurCheck(sub, term.sub(i))) {
-                return true;
-            }
-        }
+        if (sub.equals(term)) { return true; }
+        for (int i = 0; i < term.arity(); i++) { if (recOccurCheck(sub, term.sub(i))) { return true; } }
         return false;
     }
 }

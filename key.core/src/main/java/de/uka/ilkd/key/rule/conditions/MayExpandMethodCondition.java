@@ -5,17 +5,17 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.ClassType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -81,10 +81,14 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     /**
      * Instantiate a new variable condition.
      *
-     * @param receiver program schema var for the receiver, may be null for class-local calls
-     * @param methname non-null program schema var for the methodname
-     * @param args non-null program schema var for the arguments of the call
-     * @param negation {@code true} iff the condition is to be negated
+     * @param receiver
+     *        program schema var for the receiver, may be null for class-local calls
+     * @param methname
+     *        non-null program schema var for the methodname
+     * @param args
+     *        non-null program schema var for the arguments of the call
+     * @param negation
+     *        {@code true} iff the condition is to be negated
      */
     public MayExpandMethodCondition(SchemaVariable receiver, SchemaVariable methname,
             SchemaVariable args, boolean negation) {
@@ -102,9 +106,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     private static ImmutableArray<Expression> toExpArray(
             ImmutableArray<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
-        for (int i = 0; i < a.size(); i++) {
-            result[i] = (Expression) a.get(i);
-        }
+        for (int i = 0; i < a.size(); i++) { result[i] = (Expression) a.get(i); }
         return new ImmutableArray<>(result);
     }
 
@@ -116,23 +118,17 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         Map<String, String> tacletOptions =
             services.getProof().getSettings().getChoiceSettings().getDefaultChoices();
 
-        if (tacletOptions.getOrDefault(TACLET_OPTION_KEY, "").equals(RELAXED_VALUE)) {
-            return !negation;
-        }
+        if (tacletOptions.getOrDefault(TACLET_OPTION_KEY, "").equals(RELAXED_VALUE)) { return !negation; }
 
         ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
         ReferencePrefix rp = null;
-        if (receiver != null) {
-            rp = (ReferencePrefix) svInst.getInstantiation(receiver);
-        }
+        if (receiver != null) { rp = (ReferencePrefix) svInst.getInstantiation(receiver); }
 
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
 
         ImmutableArray<Expression> ar =
             toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
-        if (var == args) {
-            ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
-        }
+        if (var == args) { ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst); }
 
         if (mn == null) {
             // unusable method name falsifies the condition
@@ -158,31 +154,26 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         } else {
             // no execution context
             method =
-                mr.method(services, prefixType, mr.getMethodSignature(services, ec), prefixType);
+                mr.method(services, prefixType, mr.getMethodSignature(services, ec));
         }
 
-        if (method == null) {
-            return false;
-        }
+        if (method == null) { return false; }
         return negation ^ cannotBeOverriden(method, services);
     }
 
     private boolean cannotBeOverriden(IProgramMethod method, Services services) {
 
-        if (method.isStatic() || method.isPrivate() || method.isFinal()) {
-            return true;
-        }
+        if (method.isStatic() || method.isPrivate() || method.isFinal()) { return true; }
 
         // bugfix (contributing to gitlab #1493)
         // see MethodCall.handleInstanceInvocation(...)
         if ((method.isImplicit() && method.getName()
-                .equals(ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
+                .equals(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             return true;
         }
 
         Type type = method.getContainerType().getJavaType();
-        assert type instanceof ClassType
-                : "Calling a method on sth that does not have a class type";
+        assert type instanceof ClassType : "Calling a method on sth that does not have a class type";
 
         ClassType classType = (ClassType) type;
 
@@ -193,6 +184,6 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     @Override
     public String toString() {
         return (negation ? "\\not " : "") + NAME + "(" + receiver + ", " + methname + ", " + args
-            + ")";
+                + ")";
     }
 }

@@ -48,9 +48,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
                     .getDefaultChoices().values()) {
                 message.append(choice).append("\n");
                 rows++;
-                if (columns < choice.length()) {
-                    columns = choice.length();
-                }
+                if (columns < choice.length()) { columns = choice.length(); }
             }
             final JTextComponent activeOptions = new JTextArea(message.toString(), rows, columns);
             activeOptions.setEditable(false);

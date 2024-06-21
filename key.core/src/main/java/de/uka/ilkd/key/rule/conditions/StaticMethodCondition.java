@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -49,9 +49,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
     private static ImmutableArray<Expression> toExpArray(
             ImmutableArray<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
-        for (int i = 0; i < a.size(); i++) {
-            result[i] = (Expression) a.get(i);
-        }
+        for (int i = 0; i < a.size(); i++) { result[i] = (Expression) a.get(i); }
         return new ImmutableArray<>(result);
     }
 
@@ -69,9 +67,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
         if (rp != null && mn != null && ape != null) {
             ImmutableArray<Expression> ar =
                 toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
-            if (var == args) {
-                ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
-            }
+            if (var == args) { ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst); }
             ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
             MethodReference mr = new MethodReference(ar, mn, rp);
             IProgramMethod method = null;
@@ -86,12 +82,9 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
                 // we are only interested in the signature. The method
                 // must be declared in the static context.
             } else { // no execution context
-                method = mr.method(services, prefixType, mr.getMethodSignature(services, ec),
-                    prefixType);
+                method = mr.method(services, prefixType, mr.getMethodSignature(services, ec));
             }
-            if (method == null) {
-                return false;
-            }
+            if (method == null) { return false; }
             return negation ^ method.isStatic();
         }
         return true;
@@ -101,6 +94,6 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
     @Override
     public String toString() {
         return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller + ", " + methname
-            + ", " + args + ")";
+                + ", " + args + ")";
     }
 }

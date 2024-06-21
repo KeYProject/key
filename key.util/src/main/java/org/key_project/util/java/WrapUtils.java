@@ -126,9 +126,7 @@ public class WrapUtils {
             }
 
             if (0 <= nextNewLine && nextNewLine < nextSpace) {
-                if (nextNewLine - lastChange > length && lastSpace >= 0) {
-                    s[lastSpace] = '\n';
-                }
+                if (nextNewLine - lastChange > length && lastSpace >= 0) { s[lastSpace] = '\n'; }
                 lastChange = lastSpace = nextNewLine;
             } else {
                 if (nextSpace - lastChange > length) {
@@ -179,11 +177,7 @@ public class WrapUtils {
          *
          * @
          */
-        for (int k = from; k < s.length; k++) {
-            if (s[k] == c) {
-                return k;
-            }
-        }
+        for (int k = from; k < s.length; k++) { if (s[k] == c) { return k; } }
         return -1;
     }
 }

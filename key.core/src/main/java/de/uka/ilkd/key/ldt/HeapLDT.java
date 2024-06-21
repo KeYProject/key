@@ -3,14 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -101,13 +98,13 @@ public final class HeapLDT extends LDT {
         anon = addFunction(services, "anon");
         memset = addFunction(services, "memset");
         arr = addFunction(services, "arr");
-        created = addFunction(services, "java.lang.Object::<created>");
-        initialized = addFunction(services, "java.lang.Object::<initialized>");
-        classPrepared = addSortDependingFunction(services, "<classPrepared>");
-        classInitialized = addSortDependingFunction(services, "<classInitialized>");
+        created = addFunction(services, "java.lang.Object::#$created");
+        initialized = addFunction(services, "java.lang.Object::#$initialized");
+        classPrepared = addSortDependingFunction(services, "#$classPrepared");
+        classInitialized = addSortDependingFunction(services, "#$classInitialized");
         classInitializationInProgress =
-            addSortDependingFunction(services, "<classInitializationInProgress>");
-        classErroneous = addSortDependingFunction(services, "<classErroneous>");
+            addSortDependingFunction(services, "#$classInitializationInProgress");
+        classErroneous = addSortDependingFunction(services, "#$classErroneous");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
         acc = addFunction(services, "acc");
@@ -150,15 +147,18 @@ public final class HeapLDT extends LDT {
     /**
      * Wrapper class
      *
-     * @param className the class name
-     * @param attributeName the attribute name
+     * @param className
+     *        the class name
+     * @param attributeName
+     *        the attribute name
      */
     public record SplitFieldName(String className, String attributeName) {}
 
     /**
      * Splits a field name.
      *
-     * @param symbol the field name to split.
+     * @param symbol
+     *        the field name to split.
      * @return the split field name
      */
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
@@ -175,9 +175,7 @@ public final class HeapLDT extends LDT {
             startAttributeName = endOfClassName + 2;
         }
 
-        if (endOfClassName < 0) {
-            return null;
-        }
+        if (endOfClassName < 0) { return null; }
 
         String className = name.substring(0, endOfClassName);
         String attributeName = name.substring(startAttributeName);
@@ -195,9 +193,7 @@ public final class HeapLDT extends LDT {
             return name;
         } else {
             String result = name.substring(index + 2);
-            if (result.charAt(0) == '$') {
-                result = result.substring(1);
-            }
+            if (result.charAt(0) == '$') { result = result.substring(1); }
             return result;
         }
     }
@@ -351,11 +347,7 @@ public final class HeapLDT extends LDT {
     }
 
     public LocationVariable getHeapForName(Name name) {
-        for (LocationVariable h : getAllHeaps()) {
-            if (h.name().equals(name)) {
-                return h;
-            }
-        }
+        for (LocationVariable h : getAllHeaps()) { if (h.name().equals(name)) { return h; } }
         return null;
     }
 
@@ -390,9 +382,7 @@ public final class HeapLDT extends LDT {
                 if (fieldPV.isModel()) {
                     int heapCount = 0;
                     for (LocationVariable heap : getAllHeaps()) {
-                        if (heap == getSavedHeap()) {
-                            continue;
-                        }
+                        if (heap == getSavedHeap()) { continue; }
                         heapCount++;
                     }
                     result = new ObserverFunction(kind.toString(), fieldPV.sort(),
@@ -418,31 +408,28 @@ public final class HeapLDT extends LDT {
 
     @Override
     public boolean containsFunction(Function op) {
-        if (super.containsFunction(op)) {
-            return true;
-        }
-        if (op instanceof SortDependingFunction) {
-            return ((SortDependingFunction) op).isSimilar(select);
-        }
+        if (super.containsFunction(op)) { return true; }
+        if (op instanceof SortDependingFunction) { return ((SortDependingFunction) op).isSimilar(select); }
         return op.isUnique() && op.sort() == getFieldSort();
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term left,
+            Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -456,7 +443,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public JFunction getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op, Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -480,9 +467,7 @@ public final class HeapLDT extends LDT {
             ReferencePrefix prefix = (ReferencePrefix) children.remove(0);
             ProgramVariable field = (ProgramVariable) children.remove(0);
 
-            if (prefix instanceof NullLiteral) {
-                return new FieldReference(field, null);
-            }
+            if (prefix instanceof NullLiteral) { return new FieldReference(field, null); }
             return new FieldReference(field, prefix);
         } else if (t.sort() == getFieldSort() && t.op() instanceof JFunction
                 && ((Function) t.op()).isUnique()) {

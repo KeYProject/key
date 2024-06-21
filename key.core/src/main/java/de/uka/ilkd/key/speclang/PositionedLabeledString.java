@@ -52,17 +52,14 @@ public class PositionedLabeledString extends PositionedString {
     /**
      * returns true if the given label is attached
      *
-     * @param label the ITermLabel for which to look (must not be null)
+     * @param label
+     *        the ITermLabel for which to look (must not be null)
      * @return true iff. the label is attached to this positioned string
      */
     @Override
     public boolean containsLabel(TermLabel label) {
         assert label != null : "Label must not be null";
-        for (TermLabel l : labels) {
-            if (label.equals(l)) {
-                return true;
-            }
-        }
+        for (TermLabel l : labels) { if (label.equals(l)) { return true; } }
         return false;
     }
 
@@ -71,18 +68,12 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PositionedLabeledString cmp)) {
-            return false;
-        }
+        if (!(o instanceof PositionedLabeledString cmp)) { return false; }
         if (labels.size() == cmp.labels.size()) {
-            if (!super.equals(o)) {
-                return false;
-            }
+            if (!super.equals(o)) { return false; }
             for (TermLabel l : labels) { // this is not optimal, but as long as number of labels
                                          // limited ok
-                if (!cmp.labels.contains(l)) {
-                    return false;
-                }
+                if (!cmp.labels.contains(l)) { return false; }
             }
             return true;
         }

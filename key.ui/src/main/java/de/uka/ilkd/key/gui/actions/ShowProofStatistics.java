@@ -78,7 +78,8 @@ public class ShowProofStatistics extends MainWindowAction {
     /**
      * Gets the CSV statistics message.
      *
-     * @param proof the proof
+     * @param proof
+     *        the proof
      * @return the CSV statistics message
      */
     public static String getCSVStatisticsMessage(Proof proof) {
@@ -101,9 +102,7 @@ public class ShowProofStatistics extends MainWindowAction {
                 new TreeSet<>(
                     (o1, o2) -> {
                         int cmpRes = o2.getValue().compareTo(o1.getValue());
-                        if (cmpRes == 0) {
-                            cmpRes = o1.getKey().compareTo(o2.getKey());
-                        }
+                        if (cmpRes == 0) { cmpRes = o1.getKey().compareTo(o2.getKey()); }
                         return cmpRes;
                     });
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
@@ -147,8 +146,8 @@ public class ShowProofStatistics extends MainWindowAction {
     private static String getHTMLStatisticsMessage(int openGoals, int cachedGoals,
             Statistics statistics) {
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
-            + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
-            + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");
+                + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
+                + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");
         // sadly something like: .tooltip {text-decoration: underline dashed;}
         // is not possible, the underline is solid...
 
@@ -205,9 +204,7 @@ public class ShowProofStatistics extends MainWindowAction {
                     (o1, o2) -> {
                         int cmpRes = o2.getValue().compareTo(o1.getValue());
 
-                        if (cmpRes == 0) {
-                            cmpRes = o1.getKey().compareTo(o2.getKey());
-                        }
+                        if (cmpRes == 0) { cmpRes = o1.getKey().compareTo(o2.getKey()); }
 
                         return cmpRes;
                     });
@@ -237,8 +234,10 @@ public class ShowProofStatistics extends MainWindowAction {
         /**
          * Creates a new (initially invisible) proof statistics window.
          *
-         * @param mainWindow the main windown.
-         * @param proof the proof whose statistics to show.
+         * @param mainWindow
+         *        the main windown.
+         * @param proof
+         *        the proof whose statistics to show.
          */
         public Window(MainWindow mainWindow, Proof proof) {
             super(mainWindow, "Proof Statistics");
@@ -256,8 +255,10 @@ public class ShowProofStatistics extends MainWindowAction {
         /**
          * Creates a new (initially invisible) proof statistics window.
          *
-         * @param mainWindow the main windown.
-         * @param node the node for which to show subtree statistics
+         * @param mainWindow
+         *        the main windown.
+         * @param node
+         *        the node for which to show subtree statistics
          */
         public Window(MainWindow mainWindow, Node node) {
             super(mainWindow, "Proof Statistics");
@@ -343,9 +344,7 @@ public class ShowProofStatistics extends MainWindowAction {
 
                 @Override
                 public void keyTyped(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                        getRootPane().getDefaultButton().doClick();
-                    }
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) { getRootPane().getDefaultButton().doClick(); }
                 }
             });
 
@@ -372,9 +371,7 @@ public class ShowProofStatistics extends MainWindowAction {
         @Override
         public void setVisible(boolean visible) {
             super.setVisible(visible);
-            if (visible) {
-                requestFocus();
-            }
+            if (visible) { requestFocus(); }
         }
 
         private void export(String fileExtension, String fileName, String text) {

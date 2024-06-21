@@ -26,15 +26,22 @@ public class SuccTaclet extends FindTaclet {
      * creates a {@link Taclet} (old name Schematic Theory Specific Rule) with the given parameters
      * that works on the succedent.
      *
-     * @param name the name of the {@link Taclet}
-     * @param applPart contains the application part of a taclet that is the if-sequent, the
+     * @param name
+     *        the name of the {@link Taclet}
+     * @param applPart
+     *        contains the application part of a taclet that is the if-sequent, the
      *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param heuristics a list of heuristics for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a non-interactive
+     * @param goalTemplates
+     *        a list of goal descriptions.
+     * @param heuristics
+     *        a list of heuristics for the Taclet
+     * @param attrs
+     *        attributes for the Taclet; these are boolean values indicating a non-interactive
      *        or recursive use of the Taclet.
-     * @param find the find term of the Taclet
-     * @param prefixMap an ImmutableMap from {@link SchemaVariable} to {@link TacletPrefix} that
+     * @param find
+     *        the find term of the Taclet
+     * @param prefixMap
+     *        an ImmutableMap from {@link SchemaVariable} to {@link TacletPrefix} that
      *        contains
      *        the prefix for each SchemaVariable in the taclet
      */

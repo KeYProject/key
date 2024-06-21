@@ -22,11 +22,7 @@ public class TestSetAsListOfString {
 
     // test if String is SAME as one in the array arr
     private boolean isInArray(String str, String[] arr) {
-        for (String anArr : arr) {
-            if (anArr == str) {
-                return true;
-            }
-        }
+        for (String anArr : arr) { if (anArr == str) { return true; } }
         return false;
     }
 
@@ -38,9 +34,7 @@ public class TestSetAsListOfString {
         ImmutableSet<String>[] newSet = new ImmutableSet[str.length + 1];
         newSet[0] = DefaultImmutableSet.nil();
 
-        for (int i = 1; i < str.length + 1; i++) {
-            newSet[i] = newSet[i - 1].add(str[i - 1]);
-        }
+        for (int i = 1; i < str.length + 1; i++) { newSet[i] = newSet[i - 1].add(str[i - 1]); }
         // Test elements in set
         for (int i = 0; i < str.length + 1; i++) {
             Iterator<String> it = newSet[i].iterator();
@@ -53,10 +47,7 @@ public class TestSetAsListOfString {
                 assertEquals(0, size, "Wrong cardinality.");
             }
             int nr = 0;
-            while (it.hasNext()) {
-                assertTrue(isInArray(it.next(), str), "Set has wrong elements");
-                nr++;
-            }
+            while (it.hasNext()) { assertTrue(isInArray(it.next(), str), "Set has wrong elements"); nr++; }
             // has right number of elements
             assertEquals(nr, size, "Set has iterated to less/often");
         }
@@ -78,9 +69,7 @@ public class TestSetAsListOfString {
         ImmutableSet<String> union = newSet[1].union(newSet[0]);
         assertEquals(3, union.size());
         // test if set has all elements
-        for (int i = 0; i < 3; i++) {
-            assertTrue(union.contains(str[0]));
-        }
+        for (int i = 0; i < 3; i++) { assertTrue(union.contains(str[0])); }
         // just to check that contains can say no too
         assertFalse(union.contains(str[3]));
     }
@@ -132,9 +121,7 @@ public class TestSetAsListOfString {
     @Test
     public void testToString() {
         ImmutableSet<String> newSet = DefaultImmutableSet.nil();
-        for (int i = 0; i < str.length; i++) {
-            newSet = newSet.add(str[str.length - 1 - i]);
-        }
+        for (int i = 0; i < str.length; i++) { newSet = newSet.add(str[str.length - 1 - i]); }
         assertEquals("{Dies,ist,ein,Test}", newSet.toString());
     }
 

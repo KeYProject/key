@@ -30,23 +30,25 @@ public class JoinIsApplicable {
     }
 
     /**
-     * @param goal The goal to join.
-     * @param pio Selected formula (symblic state - program counter part) for the join.
+     * @param goal
+     *        The goal to join.
+     * @param pio
+     *        Selected formula (symblic state - program counter part) for the join.
      * @return The list of possible join partner objects -- may be empty (then, the join is not
      *         applicable).
      */
     public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-            return new LinkedList<>();
-        }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) { return new LinkedList<>(); }
         return computeProspecitvePartner(goal, pio);
     }
 
     /**
      * Computes the partners for the given selection.
      *
-     * @param goal Goal which should be joined.
-     * @param pio Selected formula (symblic state - program counter part) for the join.
+     * @param goal
+     *        Goal which should be joined.
+     * @param pio
+     *        Selected formula (symblic state - program counter part) for the join.
      * @return The list of possible join partners.
      */
     public List<ProspectivePartner> computeProspecitvePartner(Goal goal, PosInOccurrence pio) {
@@ -56,9 +58,7 @@ public class JoinIsApplicable {
         for (Goal g2 : goal.proof().openGoals()) {
             if (g2 != goal) {
                 ProspectivePartner pair = areProspectivePartners(goal, pio, g2);
-                if (pair != null) {
-                    partners.add(pair);
-                }
+                if (pair != null) { partners.add(pair); }
             }
         }
 
@@ -69,9 +69,12 @@ public class JoinIsApplicable {
      * Checks if two given goals are possible join partners for a given selected sequent formula
      * (defined by pio); returns a ProspectivePartner object if this is the case and null otherwise.
      *
-     * @param g1 Goal for the first node to join.
-     * @param pio Selected formula (symbolic state - program counter part) for the join.
-     * @param g2 Second goal for the join.
+     * @param g1
+     *        Goal for the first node to join.
+     * @param pio
+     *        Selected formula (symbolic state - program counter part) for the join.
+     * @param g2
+     *        Second goal for the join.
      * @return A ProspectivePartner object if the given goals may be joined or null otherwise.
      */
     private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio, Goal g2) {

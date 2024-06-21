@@ -6,10 +6,10 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 
 /**
  * Collects all labels found in a given program.
@@ -28,15 +28,11 @@ public class LabelCollector extends JavaASTVisitor {
     }
 
     protected void doDefaultAction(SourceElement node) {
-        if (node instanceof Label) {
-            labels.add((Label) node);
-        }
+        if (node instanceof Label) { labels.add((Label) node); }
     }
 
     protected void doAction(ProgramElement node) {
-        if (node instanceof Label) {
-            labels.add((Label) node);
-        }
+        if (node instanceof Label) { labels.add((Label) node); }
     }
 
 }

@@ -131,17 +131,11 @@ public class TestProofTree {
 
         Iterator<Node> it = p.root().leavesIterator();
         int i = 0;
-        while (it.hasNext()) {
-            assertEquals(it.next().toString(), (new Node[] { n2, n6, n7, n4 })[i].toString());
-            i++;
-        }
+        while (it.hasNext()) { assertEquals(it.next().toString(), (new Node[] { n2, n6, n7, n4 })[i].toString()); i++; }
         it = p.root().childrenIterator();
 
         i = 0;
-        while (it.hasNext()) {
-            assertEquals(it.next().toString(), (new Node[] { n2, n3, n4 })[i].toString());
-            i++;
-        }
+        while (it.hasNext()) { assertEquals(it.next().toString(), (new Node[] { n2, n3, n4 })[i].toString()); i++; }
 
         n3.remove();
         assertEquals(-1, n3.siblingNr(), "n3 is no longer a sibling and should have sibling nr -1");
@@ -150,10 +144,7 @@ public class TestProofTree {
 
         it = p.root().childrenIterator();
         i = 0;
-        while (it.hasNext()) {
-            assertEquals(it.next().toString(), (new Node[] { n2, n4 })[i].toString());
-            i++;
-        }
+        while (it.hasNext()) { assertEquals(it.next().toString(), (new Node[] { n2, n4 })[i].toString()); i++; }
 
         n1.remove(n2);
         assertEquals(-1, n2.siblingNr(), "n2 is no longer a sibling and should have sibling nr -1");
@@ -161,10 +152,7 @@ public class TestProofTree {
 
         it = p.root().childrenIterator();
         i = 0;
-        while (it.hasNext()) {
-            assertEquals(it.next().toString(), (new Node[] { n4 })[i].toString());
-            i++;
-        }
+        while (it.hasNext()) { assertEquals(it.next().toString(), (new Node[] { n4 })[i].toString()); i++; }
 
         n1.remove(n4);
         assertEquals(-1, n4.siblingNr(), "n4 is no longer a sibling and should have sibling nr -1");

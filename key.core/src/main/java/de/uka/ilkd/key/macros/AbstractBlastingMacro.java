@@ -10,10 +10,10 @@ import java.util.Set;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -57,9 +57,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws InterruptedException {
-        for (Goal goal : goals) {
-            addInvariantFormula(goal);
-        }
+        for (Goal goal : goals) { addInvariantFormula(goal); }
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
 
@@ -68,9 +66,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         SortCollector sortCollector = new SortCollector();
 
-        for (SequentFormula sf : goal.sequent()) {
-            sf.formula().execPreOrder(sortCollector);
-        }
+        for (SequentFormula sf : goal.sequent()) { sf.formula().execPreOrder(sortCollector); }
 
         Set<Sort> sorts = sortCollector.getSorts();
         sorts.remove(nullSort);
@@ -78,9 +74,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         for (SequentFormula sf : formulae) {
             Sequent s = goal.sequent();
             Semisequent antecedent = s.antecedent();
-            if (!antecedent.containsEqual(sf)) {
-                goal.addFormula(sf, true, true);
-            }
+            if (!antecedent.containsEqual(sf)) { goal.addFormula(sf, true, true); }
         }
     }
 
@@ -90,11 +84,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     private boolean containsSubTypes(Sort s, Set<Sort> sorts) {
-        for (Sort st : sorts) {
-            if (st.extendsTrans(s)) {
-                return true;
-            }
-        }
+        for (Sort st : sorts) { if (st.extendsTrans(s)) { return true; } }
         return false;
     }
 
@@ -112,9 +102,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
             Sort sort = kjt.getSort();
 
-            if (!containsSubTypes(sort, sorts)) {
-                continue;
-            }
+            if (!containsSubTypes(sort, sorts)) { continue; }
 
             if (!(kjt.getJavaType() instanceof ClassDeclaration
                     || kjt.getJavaType() instanceof InterfaceDeclaration
@@ -164,9 +152,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                     result.add(new SequentFormula(exactInstanceEquiv));
 
-                    if (!right.equals(tb.tt())) {
-                        result.add(new SequentFormula(instanceImpl));
-                    }
+                    if (!right.equals(tb.tt())) { result.add(new SequentFormula(instanceImpl)); }
                 } else if (right.op().name().equals(inv.op().name())) {
 
                     Term exactInstanceEquiv = tb.imp(exactInstance, equivalence);
@@ -178,9 +164,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                     result.add(new SequentFormula(exactInstanceEquiv));
 
-                    if (!left.equals(tb.tt())) {
-                        result.add(new SequentFormula(instanceImpl));
-                    }
+                    if (!left.equals(tb.tt())) { result.add(new SequentFormula(instanceImpl)); }
 
                 } else {
                     Term f = t;
@@ -233,9 +217,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
 
-            if (app.rule() instanceof OneStepSimplifier) {
-                return true;
-            }
+            if (app.rule() instanceof OneStepSimplifier) { return true; }
 
             Rule rule = app.rule();
 
@@ -251,8 +233,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
-        }
+                RuleAppCostCollector collector) {}
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {

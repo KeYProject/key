@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -35,9 +35,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
     protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
             Services services) {
 
-        if (op.isRigid() && !term.isRigid()) {
-            return null;
-        }
+        if (op.isRigid() && !term.isRigid()) { return null; }
 
         final SVInstantiations inst = matchCond.getInstantiations();
 
@@ -62,10 +60,13 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * {@link ProgramElement} {@code instantiationCandidate} w.r.t. the given constraints by
      * {@link MatchConditions}
      *
-     * @param instantiationCandidate the {@link ProgramElement} to be matched
-     * @param mc the {@link MatchConditions} with additional constraints (e.g. previous matches of
+     * @param instantiationCandidate
+     *        the {@link ProgramElement} to be matched
+     * @param mc
+     *        the {@link MatchConditions} with additional constraints (e.g. previous matches of
      *        this instructions {@link SchemaVariable})
-     * @param services the {@link Services}
+     * @param services
+     *        the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair ({@link SchemaVariable}, {@link ProgramElement}) added
      */

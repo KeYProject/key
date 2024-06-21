@@ -34,8 +34,10 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
      * irrelevant
      * labels.
      *
-     * @param term1 a term
-     * @param term2 the term compared to {@code term1}
+     * @param term1
+     *        a term
+     * @param term2
+     *        the term compared to {@code term1}
      * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}, except
      *         for
      *         their irrelevant labels.
@@ -43,9 +45,7 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
      */
     @Override
     public Boolean equalsModThisProperty(Term term1, Term term2) {
-        if (term2 == term1) {
-            return true;
-        }
+        if (term2 == term1) { return true; }
 
         if (!(term1.op().equals(term2.op()) && term1.boundVars().equals(term2.boundVars())
                 && term1.javaBlock().equals(term2.javaBlock()))) {
@@ -55,14 +55,10 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
         final ImmutableArray<TermLabel> term1Labels = term1.getLabels();
         final ImmutableArray<TermLabel> term2Labels = term2.getLabels();
         for (TermLabel label : term1Labels) {
-            if (label.isProofRelevant() && !term2Labels.contains(label)) {
-                return false;
-            }
+            if (label.isProofRelevant() && !term2Labels.contains(label)) { return false; }
         }
         for (TermLabel label : term2Labels) {
-            if (label.isProofRelevant() && !term1Labels.contains(label)) {
-                return false;
-            }
+            if (label.isProofRelevant() && !term1Labels.contains(label)) { return false; }
         }
 
         final ImmutableArray<Term> termSubs = term1.subs();
@@ -70,9 +66,7 @@ public class IrrelevantTermLabelsProperty implements TermProperty {
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
             if (!termSubs.get(i).equalsModProperty(term2Subs.get(i),
-                IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                return false;
-            }
+                IRRELEVANT_TERM_LABELS_PROPERTY)) { return false; }
         }
 
         return true;

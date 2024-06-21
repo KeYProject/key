@@ -52,9 +52,7 @@ public class XMLResources {
         Properties ret = new Properties();
 
         try (InputStream is = XMLResources.class.getResourceAsStream(xmlFile)) {
-            if (is == null) {
-                throw new FileNotFoundException("Descriptions file " + xmlFile + " not found.");
-            }
+            if (is == null) { throw new FileNotFoundException("Descriptions file " + xmlFile + " not found."); }
             ret.loadFromXML(is);
         } catch (IOException e) {
             LOGGER.error("Cannot not load help messages in info view", e);

@@ -26,14 +26,21 @@ public class ProspectivePartner {
      * Constructs a new prospective partner object, i.e. a structure comprising the information
      * about two partners of a join operation.
      *
-     * @param commonFormula The common formula of a join operation, i.e. the "symbolic state -
+     * @param commonFormula
+     *        The common formula of a join operation, i.e. the "symbolic state -
      *        program counter" part of the join.
-     * @param node1 The first node of the join.
-     * @param formula1 The first join formula.
-     * @param update1 The first symbolic state.
-     * @param node2 The second node of the join.
-     * @param formula2 The second join formula.
-     * @param update2 The second symbolic state.
+     * @param node1
+     *        The first node of the join.
+     * @param formula1
+     *        The first join formula.
+     * @param update1
+     *        The first symbolic state.
+     * @param node2
+     *        The second node of the join.
+     * @param formula2
+     *        The second join formula.
+     * @param update2
+     *        The second symbolic state.
      */
     public ProspectivePartner(Term commonFormula, Node node1, SequentFormula formula1, Term update1,
             Node node2, SequentFormula formula2, Term update2) {

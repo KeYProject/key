@@ -34,22 +34,16 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
             Services services) {
         final Object o = instMap.getInstantiation(field);
-        if (!(o instanceof Term f)) {
-            return false;
-        }
+        if (!(o instanceof Term f)) { return false; }
         final Operator op = f.op();
         if (op instanceof JFunction) {
             HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
-            if (split == null) {
-                return false;
-            }
+            if (split == null) { return false; }
 
             final ProgramVariable attribute =
                 services.getJavaInfo().getAttribute(split.attributeName(), split.className());
 
-            if (attribute == null) {
-                return false;
-            }
+            if (attribute == null) { return false; }
             final boolean result = attribute.isStatic();
             return negated != result;
         }

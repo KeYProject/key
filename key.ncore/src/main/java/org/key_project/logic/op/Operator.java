@@ -19,7 +19,8 @@ public interface Operator extends Named {
      * level operator and sub terms of sorts `sorts`. The assumption that the constructed term
      * would be allowed is not checked.
      *
-     * @param sorts an array of Sort containing the sort of the subterms of a (potential) term with
+     * @param sorts
+     *        an array of Sort containing the sort of the subterms of a (potential) term with
      *        this
      *        operator as top level operator
      * @return sort of the term with this operator as top level operator of the given substerms
@@ -47,7 +48,8 @@ public interface Operator extends Named {
      * the assumption that the top level operator of the term is the same as this Operator. The
      * assumption that the top level operator and the term are equal is NOT checked.
      *
-     * @throws TermCreationException if a construction error was recognised
+     * @throws TermCreationException
+     *         if a construction error was recognised
      */
     <T extends Term> void validTopLevelException(T term) throws TermCreationException;
 }

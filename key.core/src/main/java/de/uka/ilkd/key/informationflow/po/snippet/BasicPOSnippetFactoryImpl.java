@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -107,7 +107,8 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
             return m.produce(data, poVars);
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " + "snippet \""
-                + snippet.name() + " threw " + "TermCreationException: " + e.getMessage(), e);
+                    + snippet.name() + " threw " + "TermCreationException: " + e.getMessage(),
+                e);
         }
     }
 

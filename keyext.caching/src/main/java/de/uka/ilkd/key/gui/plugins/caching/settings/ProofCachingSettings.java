@@ -57,7 +57,8 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
     /**
      * Set whether proof caching is enabled.
      *
-     * @param enabled value
+     * @param enabled
+     *        value
      */
     public void setEnabled(boolean enabled) {
         this.enabled.set(enabled);
@@ -71,7 +72,8 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      * Set the operation to be done when disposing a referenced proof.
      * Allowed operations: {@link #DISPOSE_COPY}, {@link #DISPOSE_REOPEN}.
      *
-     * @param operation the operation
+     * @param operation
+     *        the operation
      */
     public void setDispose(String operation) {
         dispose.set(operation);
@@ -90,7 +92,8 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      * Set the operation to be done when a referenced proof is pruned.
      * Allowed operations: {@link #PRUNE_REOPEN}, {@link #PRUNE_COPY}.
      *
-     * @param operation the operation
+     * @param operation
+     *        the operation
      */
     public void setPrune(String operation) {
         prune.set(operation);

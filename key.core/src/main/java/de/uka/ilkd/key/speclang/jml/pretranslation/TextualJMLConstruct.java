@@ -26,7 +26,7 @@ import org.jspecify.annotations.NonNull;
  */
 public abstract class TextualJMLConstruct {
 
-    protected final ImmutableList<JMLModifier> modifiers;
+    protected final ImmutableList<JMLModifier> mods;
     private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 

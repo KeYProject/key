@@ -50,17 +50,21 @@ public class JavaCompilerCheckFacade {
      * and
      * reports any issues to the provided <code>listener</code>
      *
-     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
+     * @param listener
+     *        the {@link ProblemInitializer.ProblemInitializerListener} to be informed
      *        about any issues found in the target Java program
-     * @param bootClassPath the {@link File} referring to the path containing the core Java classes
-     * @param classPath the {@link List} of {@link File}s referring to the directory that make up
+     * @param bootClassPath
+     *        the {@link File} referring to the path containing the core Java classes
+     * @param classPath
+     *        the {@link List} of {@link File}s referring to the directory that make up
      *        the target Java programs classpath
-     * @param javaPath the {@link String} with the path to the source of the target Java program
+     * @param javaPath
+     *        the {@link String} with the path to the source of the target Java program
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
-            File bootClassPath, List<File> classPath, File javaPath) {
+            Path bootClassPath, List<Path> classPath, Path javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -85,20 +89,14 @@ public class JavaCompilerCheckFacade {
         List<String> classes = new ArrayList<>();
 
         // gather configured bootstrap classpath and regular classpath
-        List<File> paths = new ArrayList<>();
-        if (bootClassPath != null) {
-            paths.add(bootClassPath);
-        }
-        if (classPath != null && !classPath.isEmpty()) {
-            paths.addAll(classPath);
-        }
+        List<Path> paths = new ArrayList<>();
+        if (bootClassPath != null) { paths.add(bootClassPath); }
+        if (classPath != null && !classPath.isEmpty()) { paths.addAll(classPath); }
         paths.add(javaPath);
         ArrayList<Path> files = new ArrayList<>();
-        for (File path : paths) {
-            if (!path.isDirectory()) {
-                continue;
-            }
-            try (var s = Files.walk(path.toPath())) {
+        for (Path path : paths) {
+            if (!Files.isDirectory(path)) { continue; }
+            try (var s = Files.walk(path)) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))
                         .forEachOrdered(files::add);
@@ -123,7 +121,7 @@ public class JavaCompilerCheckFacade {
                 it -> new PositionedIssueString(
                     it.getMessage(Locale.ENGLISH),
                     new Location(
-                        fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
+                        fileManager.asPath(it.getSource()).toUri(),
                         Position.newOneBased((int) it.getLineNumber(),
                             (int) it.getColumnNumber())),
                     it.getCode() + " " + it.getKind()))
@@ -149,7 +147,8 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     /**
      * Construct a new wrapper.
      *
-     * @param jfm file manager
+     * @param jfm
+     *        file manager
      */
     public JavaFileManagerDelegate(StandardJavaFileManager jfm) {
         this.fileManager = jfm;

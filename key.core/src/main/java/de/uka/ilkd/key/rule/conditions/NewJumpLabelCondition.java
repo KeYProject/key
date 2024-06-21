@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -34,7 +34,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
         if (!(sv instanceof ProgramSV psv) || psv.sort() != ProgramSVSort.LABEL) {
             throw new IllegalArgumentException(
                 "The new jump label " + "variable condition, must be parameterised with a "
-                    + "program schemavariable of sort LABEL.");
+                        + "program schemavariable of sort LABEL.");
         }
 
         labelSV = (ProgramSV) sv;
@@ -49,14 +49,10 @@ public final class NewJumpLabelCondition implements VariableCondition {
         }
 
         if (var == labelSV) {
-            if (!(instCandidate instanceof Label)) {
-                return null;
-            }
+            if (!(instCandidate instanceof Label)) { return null; }
             final List<ProgramElement> programs = collect(matchCond.getInstantiations());
             programs.add(matchCond.getInstantiations().getContextInstantiation().contextProgram());
-            if (!isUnique((Label) instCandidate, programs, services)) {
-                return null;
-            }
+            if (!isUnique((Label) instCandidate, programs, services)) { return null; }
         }
         return matchCond;
     }
@@ -79,9 +75,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
         for (final ProgramElement pe : programs) {
             final LabelCollector lc = new LabelCollector(pe, services);
             lc.start();
-            if (lc.contains(label)) {
-                return false;
-            }
+            if (lc.contains(label)) { return false; }
         }
         return true;
     }

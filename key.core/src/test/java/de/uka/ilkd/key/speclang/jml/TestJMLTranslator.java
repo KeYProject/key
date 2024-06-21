@@ -9,9 +9,9 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJMLTranslator {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "speclang" + File.separator + "testFile.key";
+            + "speclang" + File.separator + "testFile.key";
     private static TermBuilder TB;
     private static JavaInfo javaInfo;
     private static Services services;
@@ -52,7 +52,7 @@ public class TestJMLTranslator {
     public synchronized void setUp() {
         if (javaInfo == null) {
             javaInfo =
-                new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
+                HelperClassForTests.parse(new File(testFile)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             TB = services.getTermBuilder();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
@@ -85,9 +85,7 @@ public class TestJMLTranslator {
 
     private boolean termContains(Term t, Term sub) {
         for (int i = 0; i < t.arity(); i++) {
-            if (t.sub(i).equals(sub) || termContains(t.sub(i), sub)) {
-                return true;
-            }
+            if (t.sub(i).equals(sub) || termContains(t.sub(i), sub)) { return true; }
         }
 
         return false;
@@ -96,15 +94,9 @@ public class TestJMLTranslator {
 
     private boolean termContains(Term t, Operator op) {
 
-        if (t.op().arity() == op.arity() && t.op().name().equals(op.name())) {
-            return true;
-        }
+        if (t.op().arity() == op.arity() && t.op().name().equals(op.name())) { return true; }
 
-        for (int i = 0; i < t.arity(); i++) {
-            if (termContains(t.sub(i), op)) {
-                return true;
-            }
-        }
+        for (int i = 0; i < t.arity(); i++) { if (termContains(t.sub(i), op)) { return true; } }
 
         return false;
     }
@@ -165,7 +157,7 @@ public class TestJMLTranslator {
     public void testSimpleQuery() {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         IProgramMethod getOne = javaInfo.getProgramMethod(testClassType, "getOne",
-            ImmutableSLList.<KeYJavaType>nil(), testClassType);
+            ImmutableSLList.<KeYJavaType>nil());
         Term result = jmlIO.parseExpression("this.getOne()");
         assertNotNull(result);
         assertTrue(termContains(result, selfVar));
@@ -301,7 +293,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
 
         IProgramMethod pm =
-            javaInfo.getProgramMethod(testClassType, "getOne", signature, testClassType);
+            javaInfo.getProgramMethod(testClassType, "getOne", signature);
 
         LocationVariable resultVar = buildResultVar(pm);
 
@@ -332,7 +324,7 @@ public class TestJMLTranslator {
         assertNotNull(result);
         assertEquals(Equality.EQUALS, result.op());
         assertTrue(termContains(result, TB.var(
-            javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, testClassType))));
+            javaInfo.getAttribute(PipelineConstants.IMPLICIT_CLASS_INITIALIZED, testClassType))));
     }
 
     @Test
@@ -349,7 +341,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
 
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature);
 
         Term result = jmlIO.parseExpression("this.m((int)4 + 2) == this.m(i)");
 
@@ -364,7 +356,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG));
 
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature);
 
         Term result = jmlIO.parseExpression("this.m(l) == this.m((long)i + 3)");
 
@@ -379,7 +371,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
 
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature);
 
         Term result = jmlIO.parseExpression("this.m(s + 4) == this.m(+b)");
 
@@ -394,7 +386,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
 
         IProgramMethod pm =
-            javaInfo.getProgramMethod(testClassType, "staticMethod", signature, testClassType);
+            javaInfo.getProgramMethod(testClassType, "staticMethod", signature);
 
         Term result = jmlIO.parseExpression("testPackage.TestClass.staticMethod() == 4");
 

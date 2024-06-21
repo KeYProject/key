@@ -52,9 +52,7 @@ public final class Junctor extends AbstractSortedOperator {
 
     private static Sort[] createFormulaSortArray(int arity) {
         Sort[] result = new Sort[arity];
-        for (int i = 0; i < arity; i++) {
-            result[i] = JavaDLTheory.FORMULA;
-        }
+        for (int i = 0; i < arity; i++) { result[i] = JavaDLTheory.FORMULA; }
         return result;
     }
 

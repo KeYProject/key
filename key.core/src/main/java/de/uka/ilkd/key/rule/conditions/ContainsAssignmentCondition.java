@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -37,9 +37,12 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
     /**
      * creates an instance of the variable condition
      *
-     * @param x the schemavariable whose instantiation is to be checked
-     * @param negated true iff the check should ensure the absence of an assignment statement
-     * @throws IllegalArgumentException if the given schemavariable is not a {@link ProgramSV}
+     * @param x
+     *        the schemavariable whose instantiation is to be checked
+     * @param negated
+     *        true iff the check should ensure the absence of an assignment statement
+     * @throws IllegalArgumentException
+     *         if the given schemavariable is not a {@link ProgramSV}
      */
     public ContainsAssignmentCondition(SchemaVariable x, boolean negated) {
         if (!(x instanceof ProgramSV)) {
@@ -58,9 +61,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
             Services services) {
-        if (var != expression) {
-            return true;
-        }
+        if (var != expression) { return true; }
 
 
 
@@ -97,9 +98,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
 
         @Override
         protected void doDefaultAction(SourceElement node) {
-            if (node instanceof Assignment) {
-                result = true;
-            }
+            if (node instanceof Assignment) { result = true; }
         }
 
         public boolean result() {

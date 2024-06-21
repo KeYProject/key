@@ -39,9 +39,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     @Override
     public String check(String toBeChecked) {
-        if (toBeChecked.isEmpty()) {
-            return CheckedUserInputInspector.NO_USER_INPUT;
-        }
+        if (toBeChecked.isEmpty()) { return CheckedUserInputInspector.NO_USER_INPUT; }
         Term term = translate(services, toBeChecked);
 
         Semisequent semisequent =
@@ -51,23 +49,17 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
             cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? "antecedent" : "succedent";
 
         for (SequentFormula sf : semisequent) {
-            if (sf.formula() == term) {
-                return "Formula already exists in " + position + ".";
-            }
+            if (sf.formula() == term) { return "Formula already exists in " + position + "."; }
         }
 
         // if(term == null){
         // return NO_USER_INPUT;
         // }
 
-        if (term == null || term.sort() != JavaDLTheory.FORMULA) {
-            return "Not a formula.";
-        }
+        if (term == null || term.sort() != JavaDLTheory.FORMULA) { return "Not a formula."; }
         for (ApplicationCheck check : additionalChecks) {
             String result = check.check(node, term);
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
         return null;
 

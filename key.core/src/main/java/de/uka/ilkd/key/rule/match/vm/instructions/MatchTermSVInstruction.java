@@ -27,9 +27,7 @@ public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermS
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) {
-            termPosition.gotoNextSibling();
-        }
+        if (result != null) { termPosition.gotoNextSibling(); }
         return result;
     }
 

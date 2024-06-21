@@ -5,12 +5,12 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -29,9 +29,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.nil();
-        if (poVars.post.self != null) {
-            posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
-        }
+        if (poVars.post.self != null) { posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self)); }
 
         if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
@@ -43,9 +41,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         while (localVars.hasNext()) {
             Term i = localVars.next();
             Term o = localVarsAtPost.next();
-            if (i != null && o != null) {
-                posts = posts.append(d.tb.equals(o, i));
-            }
+            if (i != null && o != null) { posts = posts.append(d.tb.equals(o, i)); }
         }
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
 

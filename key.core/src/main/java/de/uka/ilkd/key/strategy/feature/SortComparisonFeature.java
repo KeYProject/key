@@ -43,9 +43,7 @@ public class SortComparisonFeature extends BinaryFeature {
      * @param sort2
      */
     protected boolean compare(final Sort sort1, final Sort sort2) {
-        if (comparator == SUBSORT) {
-            return sort1.extendsTrans(sort2);
-        }
+        if (comparator == SUBSORT) { return sort1.extendsTrans(sort2); }
         return false;
     }
 

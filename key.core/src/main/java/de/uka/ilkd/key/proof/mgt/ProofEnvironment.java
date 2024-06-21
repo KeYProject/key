@@ -80,15 +80,11 @@ public class ProofEnvironment {
     }
 
     public void addProofEnvironmentListener(ProofEnvironmentListener l) {
-        if (l != null) {
-            listeners.add(l);
-        }
+        if (l != null) { listeners.add(l); }
     }
 
     public void removeProofEnvironmentListener(ProofEnvironmentListener l) {
-        if (l != null) {
-            listeners.remove(l);
-        }
+        if (l != null) { listeners.remove(l); }
     }
 
     public ProofEnvironmentListener[] getProofEnvironmentListeners() {
@@ -96,15 +92,11 @@ public class ProofEnvironment {
     }
 
     protected void fireProofRegistered(ProofEnvironmentEvent e) {
-        for (ProofEnvironmentListener l : getProofEnvironmentListeners()) {
-            l.proofRegistered(e);
-        }
+        for (ProofEnvironmentListener l : getProofEnvironmentListeners()) { l.proofRegistered(e); }
     }
 
     protected void fireProofUnregistered(ProofEnvironmentEvent e) {
-        for (ProofEnvironmentListener l : getProofEnvironmentListeners()) {
-            l.proofUnregistered(e);
-        }
+        for (ProofEnvironmentListener l : getProofEnvironmentListeners()) { l.proofUnregistered(e); }
     }
 
     /**
@@ -118,14 +110,10 @@ public class ProofEnvironment {
         proofs.remove(pl);
 
         // TODO: the above line should be enough
-        for (ProofAggregate paChild : pl.getChildren()) {
-            proofs.remove(paChild);
-        }
+        for (ProofAggregate paChild : pl.getChildren()) { proofs.remove(paChild); }
         //
 
-        for (Proof p : pl.getProofs()) {
-            getServicesForEnvironment().getSpecificationRepository().removeProof(p);
-        }
+        for (Proof p : pl.getProofs()) { getServicesForEnvironment().getSpecificationRepository().removeProof(p); }
 
         fireProofUnregistered(new ProofEnvironmentEvent(this, null, pl));
     }
@@ -136,9 +124,7 @@ public class ProofEnvironment {
      * to available rules and specs.
      */
     public boolean equals(Object cmp) {
-        if (!(cmp instanceof ProofEnvironment pe)) {
-            return false;
-        }
+        if (!(cmp instanceof ProofEnvironment pe)) { return false; }
         return pe.getJavaModel().equals(getJavaModel())
                 && pe.initConfig.getActivatedChoices().equals(initConfig.getActivatedChoices());
     }

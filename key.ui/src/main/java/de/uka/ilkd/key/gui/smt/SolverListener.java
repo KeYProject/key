@@ -196,9 +196,7 @@ public class SolverListener implements SolverLauncherListener {
         progressModel.setEditable(true);
         refreshDialog();
         progressDialog.setModus(Modus.SOLVERS_DONE);
-        for (InternSMTProblem problem : problems) {
-            problem.createInformation();
-        }
+        for (InternSMTProblem problem : problems) { problem.createInformation(); }
         if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.ProgressMode.CLOSE) {
             applyEvent(launcher);
         }
@@ -271,10 +269,7 @@ public class SolverListener implements SolverLauncherListener {
         String[] captions = new String[smtProblems.size()];
 
         int i = 0;
-        for (SMTProblem problem : smtproblems) {
-            captions[i] = problem.getName();
-            i++;
-        }
+        for (SMTProblem problem : smtproblems) { captions[i] = problem.getName(); i++; }
 
         progressModel.addColumn(new ProgressModel.TitleColumn(captions));
         String[] titles = new String[solverTypes.size() + 1];
@@ -312,9 +307,7 @@ public class SolverListener implements SolverLauncherListener {
 
     private InternSMTProblem getProblem(int col, int row) {
         for (InternSMTProblem problem : problems) {
-            if (problem.problemIndex == row && problem.solverIndex == col) {
-                return problem;
-            }
+            if (problem.problemIndex == row && problem.solverIndex == col) { return problem; }
         }
         // This case will be entered if the columns or rows of the ProgressDialog table are moved!
         return null;
@@ -356,9 +349,7 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     private void refreshDialog() {
-        for (InternSMTProblem problem : problems) {
-            refreshProgessOfProblem(problem);
-        }
+        for (InternSMTProblem problem : problems) { refreshProgessOfProblem(problem); }
     }
 
     private long calculateProgress(InternSMTProblem problem) {
@@ -380,18 +371,18 @@ public class SolverListener implements SolverLauncherListener {
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
         return switch (state) {
-            case Running -> {
-                running(problem);
-                yield true;
-            }
-            case Stopped -> {
-                stopped(problem);
-                yield false;
-            }
-            case Waiting -> {
-                waiting(problem);
-                yield true;
-            }
+        case Running -> {
+            running(problem);
+            yield true;
+        }
+        case Stopped -> {
+            stopped(problem);
+            yield false;
+        }
+        case Waiting -> {
+            waiting(problem);
+            yield true;
+        }
         };
 
     }
@@ -509,9 +500,7 @@ public class SolverListener implements SolverLauncherListener {
 
         if (settings.storeSMTTranslationToFile()
                 || (settings.makesUseOfTaclets() && settings.storeTacletTranslationToFile())) {
-            for (InternSMTProblem problem : problems) {
-                storeInformation(problem.getProblem());
-            }
+            for (InternSMTProblem problem : problems) { storeInformation(problem.getProblem()); }
         }
 
     }
@@ -561,7 +550,7 @@ public class SolverListener implements SolverLauncherListener {
         String date =
             c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DATE);
         String time = c.get(Calendar.HOUR_OF_DAY) + "-" + c.get(Calendar.MINUTE) + "-"
-            + c.get(Calendar.SECOND);
+                + c.get(Calendar.SECOND);
 
         path = path.replaceAll("%d", date);
         path = path.replaceAll("%s", solver.name());
@@ -618,9 +607,7 @@ public class SolverListener implements SolverLauncherListener {
         public void discardButtonClicked() {
             discardEvent(launcher);
             // remove semantics blasting proof for ce dialog
-            if (counterexample && smtProof != null) {
-                smtProof.dispose();
-            }
+            if (counterexample && smtProof != null) { smtProof.dispose(); }
 
         }
 
@@ -629,9 +616,7 @@ public class SolverListener implements SolverLauncherListener {
             if (obj instanceof String) {
                 JOptionPane.showOptionDialog(progressDialog, obj, "Warning",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
-            } else if (obj instanceof InternSMTProblem) {
-                showInformation((InternSMTProblem) obj);
-            }
+            } else if (obj instanceof InternSMTProblem) { showInformation((InternSMTProblem) obj); }
 
         }
 
@@ -644,7 +629,8 @@ public class SolverListener implements SolverLauncherListener {
     /**
      * Checks if the given {@link Term} contains a modality, query, or update.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */
@@ -672,9 +658,7 @@ public class SolverListener implements SolverLauncherListener {
          */
         @Override
         public void visit(Term visited) {
-            if (visited.op() instanceof Modality || visited.op() instanceof IProgramMethod) {
-                containsModQuery = true;
-            }
+            if (visited.op() instanceof Modality || visited.op() instanceof IProgramMethod) { containsModQuery = true; }
         }
 
         /**

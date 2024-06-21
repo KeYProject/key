@@ -65,21 +65,12 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
         Goal goal;
         if (node.leaf() && //
-                (goal = EngineState.getGoal(proof.openGoals(), node)) != null) {
-            return goal;
-        }
+                (goal = EngineState.getGoal(proof.openGoals(), node)) != null) { return goal; }
 
-        if (node.childrenCount() == 0) {
-            return null;
-        }
+        if (node.childrenCount() == 0) { return null; }
 
         final Iterable<Node> children = (node::childrenIterator);
-        for (Node child : children) {
-            goal = getFirstSubtreeGoal(child, proof);
-            if (goal != null) {
-                return goal;
-            }
-        }
+        for (Node child : children) { goal = getFirstSubtreeGoal(child, proof); if (goal != null) { return goal; } }
 
         return null;
     }
@@ -100,9 +91,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
             if (filter.apply(node)) {
                 final Goal g = goalRetriever.apply(node);
-                if (g.isAutomatic()) {
-                    return g;
-                }
+                if (g.isAutomatic()) { return g; }
             }
 
             switch (childCount) {
@@ -135,9 +124,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private boolean contains(Semisequent semiseq, Term formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            if (sf.formula().equalsModProperty(formula, RENAMING_PROPERTY)) {
-                return true;
-            }
+            if (sf.formula().equalsModProperty(formula, RENAMING_PROPERTY)) { return true; }
         }
         return false;
     }

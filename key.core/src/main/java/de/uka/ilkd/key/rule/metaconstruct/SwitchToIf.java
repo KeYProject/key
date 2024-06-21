@@ -6,19 +6,19 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.Equals;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -37,7 +37,8 @@ public class SwitchToIf extends ProgramTransformer {
     /**
      * creates a switch-to-if ProgramTransformer
      *
-     * @param _switch the Statement contained by the meta construct
+     * @param _switch
+     *        the Statement contained by the meta construct
      */
     public SwitchToIf(SchemaVariable _switch) {
         super("switch-to-if", (ProgramSV) _switch);
@@ -64,9 +65,7 @@ public class SwitchToIf extends ProgramTransformer {
         sw = changeBreaks(sw, newBreak);
         Statement currentBlock = null;
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
-            if (sw.getBranchAt(i) instanceof Default) {
-                currentBlock = collectStatements(sw, i);
-            }
+            if (sw.getBranchAt(i) instanceof Default) { currentBlock = collectStatements(sw, i); }
         }
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
             if (sw.getBranchAt(i) instanceof Case) {
@@ -132,16 +131,12 @@ public class SwitchToIf extends ProgramTransformer {
     private Switch changeBreaks(Switch sw, Break b) {
         int n = sw.getBranchCount();
         Branch[] branches = new Branch[n];
-        for (int i = 0; i < n; i++) {
-            branches[i] = (Branch) recChangeBreaks(sw.getBranchAt(i), b);
-        }
+        for (int i = 0; i < n; i++) { branches[i] = (Branch) recChangeBreaks(sw.getBranchAt(i), b); }
         return KeYJavaASTFactory.switchBlock(sw.getExpression(), branches);
     }
 
     private ProgramElement recChangeBreaks(ProgramElement p, Break b) {
-        if (p == null) {
-            return null;
-        }
+        if (p == null) { return null; }
         if (p instanceof Break && ((Break) p).getLabel() == null) {
             noNewBreak = false;
             return b;
@@ -151,24 +146,12 @@ public class SwitchToIf extends ProgramTransformer {
             for (int i = 0; i < ((Branch) p).getStatementCount(); i++) {
                 s[i] = (Statement) recChangeBreaks(((Branch) p).getStatementAt(i), b);
             }
-            if (p instanceof Case) {
-                return KeYJavaASTFactory.caseBlock(((Case) p).getExpression(), s);
-            }
-            if (p instanceof Default) {
-                return KeYJavaASTFactory.defaultBlock(s);
-            }
-            if (p instanceof Catch) {
-                return KeYJavaASTFactory.catchClause(((Catch) p).getParameterDeclaration(), s);
-            }
-            if (p instanceof Finally) {
-                return KeYJavaASTFactory.finallyBlock(s);
-            }
-            if (p instanceof Then) {
-                return KeYJavaASTFactory.thenBlock(s);
-            }
-            if (p instanceof Else) {
-                return KeYJavaASTFactory.elseBlock(s);
-            }
+            if (p instanceof Case) { return KeYJavaASTFactory.caseBlock(((Case) p).getExpression(), s); }
+            if (p instanceof Default) { return KeYJavaASTFactory.defaultBlock(s); }
+            if (p instanceof Catch) { return KeYJavaASTFactory.catchClause(((Catch) p).getParameterDeclaration(), s); }
+            if (p instanceof Finally) { return KeYJavaASTFactory.finallyBlock(s); }
+            if (p instanceof Then) { return KeYJavaASTFactory.thenBlock(s); }
+            if (p instanceof Else) { return KeYJavaASTFactory.elseBlock(s); }
         }
         if (p instanceof If) {
             return KeYJavaASTFactory.ifElse(((If) p).getExpression(),
@@ -185,9 +168,7 @@ public class SwitchToIf extends ProgramTransformer {
         if (p instanceof Try) {
             int n = ((Try) p).getBranchCount();
             Branch[] branches = new Branch[n];
-            for (int i = 0; i < n; i++) {
-                branches[i] = (Branch) recChangeBreaks(((Try) p).getBranchAt(i), b);
-            }
+            for (int i = 0; i < n; i++) { branches[i] = (Branch) recChangeBreaks(((Try) p).getBranchAt(i), b); }
             return KeYJavaASTFactory
                     .tryBlock((StatementBlock) recChangeBreaks(((Try) p).getBody(), b), branches);
         }
@@ -197,8 +178,10 @@ public class SwitchToIf extends ProgramTransformer {
     /**
      * Collects the Statements in a switch statement from branch <code>count</code> downward.
      *
-     * @param s the switch statement.
-     * @param count the branch where the collecting of statements starts.
+     * @param s
+     *        the switch statement.
+     * @param count
+     *        the branch where the collecting of statements starts.
      */
     private StatementBlock collectStatements(Switch s, int count) {
         List<Statement> stats = new ArrayList<>();

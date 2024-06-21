@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -101,23 +101,25 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     /**
      * loads the problem or proof from the given file
      *
-     * @param file the File with the problem description or the proof
+     * @param file
+     *        the File with the problem description or the proof
      */
-    public abstract void loadProblem(File file);
+    public abstract void loadProblem(Path file);
 
     /**
      * Loads the proof with the given filename from the proof bundle with the given path.
      *
-     * @param proofBundle the File with the problem description or the proof
-     * @param proofFilename the filename of the proof in the bundle
+     * @param proofBundle
+     *        the File with the problem description or the proof
+     * @param proofFilename
+     *        the filename of the proof in the bundle
      */
-    public abstract void loadProofFromBundle(File proofBundle, File proofFilename);
+    public abstract void loadProofFromBundle(Path proofBundle, Path proofFilename);
 
-    public ProblemLoader getProblemLoader(File file, List<File> classPath, File bootClassPath,
-            List<File> includes, KeYMediator mediator) {
-        final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
+    public ProblemLoader getProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes, KeYMediator mediator) {
+        return new ProblemLoader(file, classPath, bootClassPath, includes,
             AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
-        return pl;
     }
 
     public boolean applyMacro() {
@@ -205,19 +207,18 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         String proofName = proof.name().toString();
         proofName = MiscTools.removeFileExtension(proofName);
         final String filename = MiscTools.toValidFileName(proofName) + ".proof";
-        final File proofFolder;
+        final Path proofFolder;
         if (proof.getProofFile() != null) {
-            proofFolder = proof.getProofFile().getParentFile();
+            proofFolder = proof.getProofFile().getParent();
         } else { // happens when a Java file is loaded
             proofFolder = Main.getWorkingDir();
         }
-        final File toSave = new File(proofFolder, filename);
+        final var toSave = proofFolder.resolve(filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
-        final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
+        final ProofSaver ps =
+            new ProofSaver(proof, toSave.toAbsolutePath().toString(), krm.getSHA1());
         final String errorMsg = ps.save();
-        if (errorMsg != null) {
-            reportException(this, null, new IOException(errorMsg));
-        }
+        if (errorMsg != null) { reportException(this, null, new IOException(errorMsg)); }
     }
 
     /**
@@ -234,24 +235,20 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
 
     @Override
     public void proofUnregistered(ProofEnvironmentEvent event) {
-        if (event.getSource().getProofs().isEmpty()) {
-            event.getSource().removeProofEnvironmentListener(this);
-        }
+        if (event.getSource().getProofs().isEmpty()) { event.getSource().removeProofEnvironmentListener(this); }
     }
 
     /**
      * these methods are called immediately before automode is started to ensure that the GUI can
      * respond in a reasonable way, e.g., change the cursor to a waiting cursor
      */
-    public void notifyAutoModeBeingStarted() {
-    }
+    public void notifyAutoModeBeingStarted() {}
 
     /**
      * these methods are called when automode has been stopped to ensure that the GUI can respond in
      * a reasonable way, e.g., change the cursor to the default
      */
-    public void notifyAutomodeStopped() {
-    }
+    public void notifyAutomodeStopped() {}
 
     public abstract void notify(NotificationEvent event);
 
@@ -259,7 +256,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * asks if removal of a task is completed. This is useful to display a dialog to the user and
      * asking her or if on command line to allow it always.
      *
-     * @param message to be displayed asking for confirmation
+     * @param message
+     *        to be displayed asking for confirmation
      * @return true if removal has been granted
      */
     public boolean confirmTaskRemoval(String message) {
@@ -295,8 +293,6 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
-        for (Proof proof : pa.getProofs()) {
-            proof.addProofDisposedListener(this);
-        }
+        for (Proof proof : pa.getProofs()) { proof.addProofDisposedListener(this); }
     }
 }

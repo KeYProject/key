@@ -18,7 +18,8 @@ public interface ProverTaskListener {
      *
      * This method is called after every single step of the task
      *
-     * @param position indicates how much work has been done relative to the value of {@code size}
+     * @param position
+     *        indicates how much work has been done relative to the value of {@code size}
      *        passed in {@link #taskStarted(TaskStartedInfo)}.
      */
     void taskProgress(int position);
@@ -27,7 +28,8 @@ public interface ProverTaskListener {
     /**
      * Called when a task is finished.
      *
-     * @param info a TaskFinishedInfo object with additional information
+     * @param info
+     *        a TaskFinishedInfo object with additional information
      */
     void taskFinished(TaskFinishedInfo info);
 }

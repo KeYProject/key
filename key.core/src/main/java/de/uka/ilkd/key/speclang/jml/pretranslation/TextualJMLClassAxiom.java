@@ -8,6 +8,8 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import java.util.Objects;
+
 
 /**
  * A JML axiom declaration in textual form. According to Sect. 8 of the JML reference manual, axioms
@@ -60,7 +62,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
 
     @Override
     public int hashCode() {
-        return modifiers.hashCode() + inv.hashCode();
+        return Objects.hash(modifiers, inv);
     }
 
     public String getName() {

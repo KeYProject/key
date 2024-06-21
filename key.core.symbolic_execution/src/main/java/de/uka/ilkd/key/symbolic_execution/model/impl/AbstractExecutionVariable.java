@@ -49,14 +49,21 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param programVariable The represented {@link IProgramVariable} which value is shown.
-     * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
-     * @param arrayIndex The index in the parent array.
-     * @param additionalCondition An optional additional condition to consider.
-     * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
+     * @param programVariable
+     *        The represented {@link IProgramVariable} which value is shown.
+     * @param parentValue
+     *        The parent {@link IExecutionValue} or {@code null} if not available.
+     * @param arrayIndex
+     *        The index in the parent array.
+     * @param additionalCondition
+     *        An optional additional condition to consider.
+     * @param modalityPIO
+     *        The {@link PosInOccurrence} of the modality of interest.
      */
     public AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
             IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,

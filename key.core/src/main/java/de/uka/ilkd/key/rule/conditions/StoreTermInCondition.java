@@ -32,9 +32,7 @@ public class StoreTermInCondition implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        if (svInst.getInstantiation(storeInSV) != null) {
-            return matchCond;
-        }
+        if (svInst.getInstantiation(storeInSV) != null) { return matchCond; }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
             new LightweightSyntacticalReplaceVisitor(svInst, services);

@@ -9,8 +9,10 @@ import java.util.function.Function;
 /**
  * Caches a computation using a single value cache
  *
- * @param <A> arguments for the computation
- * @param <T> return type
+ * @param <A>
+ *        arguments for the computation
+ * @param <T>
+ *        return type
  */
 public class Cached<A, T> {
     private A args = null;
@@ -20,7 +22,8 @@ public class Cached<A, T> {
     /**
      * Constructor
      *
-     * @param update the computation
+     * @param update
+     *        the computation
      */
     public Cached(Function<A, T> update) {
         this.update = update;
@@ -29,13 +32,12 @@ public class Cached<A, T> {
     /**
      * Gets a possibly cached value
      *
-     * @param args the arguments
+     * @param args
+     *        the arguments
      * @return the value
      */
     public T get(A args) {
-        if (Objects.equals(args, this.args)) {
-            return value;
-        }
+        if (Objects.equals(args, this.args)) { return value; }
         value = update.apply(args);
         this.args = args;
         return value;

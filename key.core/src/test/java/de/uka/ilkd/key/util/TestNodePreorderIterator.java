@@ -120,8 +120,10 @@ public class TestNodePreorderIterator {
      * Makes sure that a {@link NodePreorderIterator} which iterates over the given {@link Node}
      * returns nodes in preorder iteration over the expected trees.
      *
-     * @param element The {@link Node} to iterate over.
-     * @param expectedRoots The expected values.
+     * @param element
+     *        The {@link Node} to iterate over.
+     * @param expectedRoots
+     *        The expected values.
      */
     protected void assertRoot(Node element, ExpectedNode[] expectedRoots) {
         NodePreorderIterator iter = new NodePreorderIterator(element);
@@ -135,10 +137,14 @@ public class TestNodePreorderIterator {
      * Makes sure that the nodes returned by the given {@link NodePreorderIterator} are equal to the
      * defined model.
      *
-     * @param iter The {@link NodePreorderIterator} to test.
-     * @param expectedRoots The expected model.
-     * @param iterateOverSubtree Start new sub tree iteration at the current node?
-     * @param expectedParentReturns The number of expected parent returns.
+     * @param iter
+     *        The {@link NodePreorderIterator} to test.
+     * @param expectedRoots
+     *        The expected model.
+     * @param iterateOverSubtree
+     *        Start new sub tree iteration at the current node?
+     * @param expectedParentReturns
+     *        The number of expected parent returns.
      */
     protected int assertExpectedNodes(NodePreorderIterator iter, ExpectedNode[] expectedRoots,
             boolean iterateOverSubtree, int expectedParentReturns) {
@@ -154,9 +160,7 @@ public class TestNodePreorderIterator {
                 assertEquals(computeChildIndexOnParent(next), childIndexOnParent);
                 Assertions.assertNotNull(next);
                 assertEquals(node.getExpectedSerialNr(), next.serialNr());
-                if (iterateOverSubtree) {
-                    assertRoot(next, new ExpectedNode[] { node });
-                }
+                if (iterateOverSubtree) { assertRoot(next, new ExpectedNode[] { node }); }
                 previousChildrenDepth = assertExpectedNodes(iter, node.getExpectedChildren(), true,
                     expectedParentReturns + 1);
             }
@@ -194,7 +198,8 @@ public class TestNodePreorderIterator {
         /**
          * Constructor.
          *
-         * @param expectedSerialNr The expected serialnr.
+         * @param expectedSerialNr
+         *        The expected serialnr.
          */
         public ExpectedNode(int expectedSerialNr) {
             this.expectedSerialNr = expectedSerialNr;
@@ -203,8 +208,10 @@ public class TestNodePreorderIterator {
         /**
          * Constructor.
          *
-         * @param expectedSerialNr The expected serialnr.
-         * @param expectedChildren The expected children.
+         * @param expectedSerialNr
+         *        The expected serialnr.
+         * @param expectedChildren
+         *        The expected children.
          */
         public ExpectedNode(int expectedSerialNr, ExpectedNode[] expectedChildren) {
             this.expectedSerialNr = expectedSerialNr;
@@ -235,45 +242,46 @@ public class TestNodePreorderIterator {
         @Override
         public String toString() {
             return expectedSerialNr + " with "
-                + (expectedChildren != null ? expectedChildren.length : 0) + " children";
+                    + (expectedChildren != null ? expectedChildren.length : 0) + " children";
         }
     }
 
     /**
      * Creates new {@link ExpectedNode}s with the given serialnrs and children.
      *
-     * @param serialNrs The given serialnrs.
-     * @param children The given children.
+     * @param serialNrs
+     *        The given serialnrs.
+     * @param children
+     *        The given children.
      * @return The created {@link ExpectedNode}s.
      */
     protected ExpectedNode[] createExpectedNodes(int[] serialNrs, ExpectedNode[]... children) {
         assertEquals(serialNrs.length, children.length);
         List<ExpectedNode> result = new LinkedList<>();
-        for (int i = 0; i < serialNrs.length; i++) {
-            result.add(new ExpectedNode(serialNrs[i], children[i]));
-        }
+        for (int i = 0; i < serialNrs.length; i++) { result.add(new ExpectedNode(serialNrs[i], children[i])); }
         return result.toArray(new ExpectedNode[0]);
     }
 
     /**
      * Creates new {@link ExpectedNode}s with the given serialNrs.
      *
-     * @param serialNrs The given serialNrs.
+     * @param serialNrs
+     *        The given serialNrs.
      * @return The created {@link ExpectedNode}s.
      */
     protected ExpectedNode[] createExpectedNodes(int... serialNrs) {
         List<ExpectedNode> result = new LinkedList<>();
-        for (int serialNr : serialNrs) {
-            result.add(new ExpectedNode(serialNr));
-        }
+        for (int serialNr : serialNrs) { result.add(new ExpectedNode(serialNr)); }
         return result.toArray(new ExpectedNode[0]);
     }
 
     /**
      * Appends a new node to the given parent {@link Node}.
      *
-     * @param proof The {@link Proof} which forms the test model.
-     * @param parent The parent {@link Node} to add to.
+     * @param proof
+     *        The {@link Proof} which forms the test model.
+     * @param parent
+     *        The parent {@link Node} to add to.
      * @return The new created child {@link Node}.
      */
     protected Node appendNode(Proof proof, Node parent) {
@@ -285,7 +293,8 @@ public class TestNodePreorderIterator {
     /**
      * Sets a new root {@link Node} on the proof.
      *
-     * @param proof The {@link Proof} to set root on.
+     * @param proof
+     *        The {@link Proof} to set root on.
      * @return The created root {@link Node}.
      */
     protected Node appendRoot(Proof proof) {

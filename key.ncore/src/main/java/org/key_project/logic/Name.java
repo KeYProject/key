@@ -34,9 +34,7 @@ public class Name implements Comparable<Name> {
     @SuppressWarnings("all") // Suppress String comparison ==-warning, which is unnecessary due to
                              // interning
     public boolean equals(Object o) {
-        if (!(o instanceof Name other)) {
-            return false;
-        }
+        if (!(o instanceof Name other)) { return false; }
         // since ALL nameStrings are interned, equality can be safely reduced to
         // identity in THIS case:
         return this.nameString == other.nameString;

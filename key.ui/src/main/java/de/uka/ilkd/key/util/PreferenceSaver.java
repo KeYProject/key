@@ -31,7 +31,8 @@ public class PreferenceSaver {
     /**
      * Every Component class has its own Saver class.
      *
-     * @param <C> the type of Components to store/read.
+     * @param <C>
+     *        the type of Components to store/read.
      */
     private interface Saver<C extends Component> {
         Class<C> supportedClass();
@@ -52,11 +53,7 @@ public class PreferenceSaver {
      */
     @SuppressWarnings("unchecked")
     private static <C extends Component> Saver<C> getSaver(C component) {
-        for (Saver<?> saver : SAVERS) {
-            if (saver.supportedClass().isInstance(component)) {
-                return (Saver<C>) saver;
-            }
-        }
+        for (Saver<?> saver : SAVERS) { if (saver.supportedClass().isInstance(component)) { return (Saver<C>) saver; } }
         return null;
     }
 
@@ -66,7 +63,8 @@ public class PreferenceSaver {
     /**
      * Create a new instance allowing to store and load UI properties from the user's preferences.
      *
-     * @param prefs a non-null preference object.
+     * @param prefs
+     *        a non-null preference object.
      */
     public PreferenceSaver(Preferences prefs) {
         assert prefs != null;
@@ -90,9 +88,11 @@ public class PreferenceSaver {
      *
      * The preferences are {@linkplain Preferences#flush() flushed} after writing them.
      *
-     * @param component component to store.
+     * @param component
+     *        component to store.
      *
-     * @throws BackingStoreException possibly thrown by {@link Preferences}.
+     * @throws BackingStoreException
+     *         possibly thrown by {@link Preferences}.
      */
     public void save(Component component) {
         assert component != null;
@@ -105,28 +105,22 @@ public class PreferenceSaver {
         String name = component.getName();
         if (name != null) {
             Saver<C> saver = getSaver(component);
-            if (saver != null) {
-                saver.save(component, prefs);
-            }
+            if (saver != null) { saver.save(component, prefs); }
         }
     }
 
     private void saveChildren(Component component) {
         if (component instanceof Container) {
             Component[] children = getChildren(component);
-            if (children != null) {
-                for (Component child : children) {
-                    saveComponent(child);
-                    saveChildren(child);
-                }
-            }
+            if (children != null) { for (Component child : children) { saveComponent(child); saveChildren(child); } }
         }
     }
 
     /**
      * Load the properties of the argument and all its children (in depth).
      *
-     * @param component component to load.
+     * @param component
+     *        component to load.
      */
     public void load(Component component) {
         assert component != null;
@@ -139,20 +133,14 @@ public class PreferenceSaver {
         String name = component.getName();
         if (name != null) {
             Saver<C> saver = getSaver(component);
-            if (saver != null) {
-                saver.load(component, prefs);
-            }
+            if (saver != null) { saver.load(component, prefs); }
         }
     }
 
     private void loadChildren(Component component) {
         if (component instanceof Container) {
             Component[] children = getChildren(component);
-            if (children != null) {
-                for (Component child : children) {
-                    load(child);
-                }
-            }
+            if (children != null) { for (Component child : children) { load(child); } }
         }
     }
 

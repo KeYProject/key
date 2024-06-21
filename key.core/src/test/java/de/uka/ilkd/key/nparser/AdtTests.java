@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -35,7 +35,7 @@ public class AdtTests {
 
     @Test
     public void destructorTest() throws ProblemLoaderException {
-        var path = new File("../key.ui/examples/standard_key/adt/dt_nat.key");
+        var path = Paths.get("../key.ui/examples/standard_key/adt/dt_nat.key");
         var env = KeYEnvironment.load(path);
         var taclets = env.getInitConfig().activatedTaclets();
 

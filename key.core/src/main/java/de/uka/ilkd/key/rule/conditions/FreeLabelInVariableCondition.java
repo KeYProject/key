@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.visitor.FreeLabelFinder;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -55,6 +55,6 @@ public final class FreeLabelInVariableCondition extends VariableConditionAdapter
     @Override
     public String toString() {
         return (negated ? "\\not" : "") + "\\freeLabelIn (" + label.name() + "," + statement.name()
-            + ")";
+                + ")";
     }
 }

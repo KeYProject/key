@@ -57,8 +57,10 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Constructor.
      *
-     * @param id The unique ID of this term label in the {@link Sequent}.
-     * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
+     * @param id
+     *        The unique ID of this term label in the {@link Sequent}.
+     * @throws TermLabelException
+     *         Occurred Exception in case that the given ID is not valid.
      */
     public FormulaTermLabel(String id) throws TermLabelException {
         this(getMajorId(id), getMinorId(id));
@@ -67,10 +69,13 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Constructor.
      *
-     * @param id The unique ID of this term label in the {@link Sequent}.
-     * @param beforeIds The optional previous IDs of the label this one is derived from separated by
+     * @param id
+     *        The unique ID of this term label in the {@link Sequent}.
+     * @param beforeIds
+     *        The optional previous IDs of the label this one is derived from separated by
      *        {@value #BEFORE_ID_SEPARATOR}.
-     * @throws TermLabelException Occurred Exception in case that the given IDs are not valid.
+     * @throws TermLabelException
+     *         Occurred Exception in case that the given IDs are not valid.
      */
     public FormulaTermLabel(String id, String beforeIds) throws TermLabelException {
         this(getMajorId(id), getMinorId(id), getValidBeforeIds(beforeIds)); // Ensure that before
@@ -80,8 +85,10 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Constructor.
      *
-     * @param majorId The major part of the unique ID.
-     * @param minorId The minor part of the unique ID.
+     * @param majorId
+     *        The major part of the unique ID.
+     * @param minorId
+     *        The minor part of the unique ID.
      */
     public FormulaTermLabel(int majorId, int minorId) {
         this(majorId, minorId, null);
@@ -90,9 +97,12 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Constructor.
      *
-     * @param majorId The major part of the unique ID.
-     * @param minorId The minor part of the unique ID.
-     * @param beforeIds The optional previous ID of the label this one is derived from.
+     * @param majorId
+     *        The major part of the unique ID.
+     * @param minorId
+     *        The minor part of the unique ID.
+     * @param beforeIds
+     *        The optional previous ID of the label this one is derived from.
      */
     public FormulaTermLabel(int majorId, int minorId, Collection<String> beforeIds) {
         this.majorId = majorId;
@@ -136,9 +146,9 @@ public class FormulaTermLabel implements TermLabel {
     @Override
     public Object getChild(int i) {
         return switch (i) {
-        case 0 -> getId();
-        case 1 -> beforeIds;
-        default -> null;
+            case 0 -> getId();
+            case 1 -> beforeIds;
+            default -> null;
         };
     }
 
@@ -175,9 +185,11 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Returns the major part of the given ID.
      *
-     * @param id The ID to extract its major part.
+     * @param id
+     *        The ID to extract its major part.
      * @return The major part of the given ID.
-     * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
+     * @throws TermLabelException
+     *         Occurred Exception in case that the given ID is not valid.
      */
     public static int getMajorId(String id) throws TermLabelException {
         int index = id.indexOf('.');
@@ -204,9 +216,11 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Returns the minor part of the given ID.
      *
-     * @param id The ID to extract its minor part.
+     * @param id
+     *        The ID to extract its minor part.
      * @return The minor part of the given ID.
-     * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
+     * @throws TermLabelException
+     *         Occurred Exception in case that the given ID is not valid.
      */
     public static int getMinorId(String id) throws TermLabelException {
         int index = id.indexOf('.');
@@ -233,7 +247,8 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Returns the optional previous IDs of the label this one is derived from.
      *
-     * @param beforeIds The {@link String} with the before IDs.
+     * @param beforeIds
+     *        The {@link String} with the before IDs.
      * @return The optional previous IDs of the label this one is derived from.
      */
     private static String[] getBeforeIds(String beforeIds) {
@@ -243,14 +258,14 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Returns the optional previous IDs if they are all valid.
      *
-     * @param beforeIds The {@link String} with the before IDs to analyze.
+     * @param beforeIds
+     *        The {@link String} with the before IDs to analyze.
      * @return The valid before IDs.
-     * @throws TermLabelException Occurred Exception in case that the given IDs are not valid.
+     * @throws TermLabelException
+     *         Occurred Exception in case that the given IDs are not valid.
      */
     public static List<String> getValidBeforeIds(String beforeIds) throws TermLabelException {
-        if (beforeIds == null || beforeIds.isEmpty()) {
-            throw new TermLabelException("No before IDs defined.");
-        }
+        if (beforeIds == null || beforeIds.isEmpty()) { throw new TermLabelException("No before IDs defined."); }
         List<String> result = new LinkedList<>();
         String[] candidates = getBeforeIds(beforeIds);
         for (String id : candidates) {
@@ -276,8 +291,10 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Creates a new label sub ID.
      *
-     * @param services The {@link Services} to use.
-     * @param label The parent {@link FormulaTermLabel} which provides the major ID.
+     * @param services
+     *        The {@link Services} to use.
+     * @param label
+     *        The parent {@link FormulaTermLabel} which provides the major ID.
      * @return The new label sub ID.
      */
     public static int newLabelSubID(Services services, FormulaTermLabel label) {
@@ -287,8 +304,10 @@ public class FormulaTermLabel implements TermLabel {
     /**
      * Creates a new label sub ID.
      *
-     * @param services The {@link Services} to use.
-     * @param labelId The parent {@link FormulaTermLabel} which provides the major ID.
+     * @param services
+     *        The {@link Services} to use.
+     * @param labelId
+     *        The parent {@link FormulaTermLabel} which provides the major ID.
      * @return The new label sub ID.
      */
     public static int newLabelSubID(Services services, int labelId) {

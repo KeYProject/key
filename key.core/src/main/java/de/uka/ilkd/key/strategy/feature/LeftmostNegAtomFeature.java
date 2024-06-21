@@ -43,13 +43,9 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
             }
 
             if (op == (positive ? Junctor.OR : Junctor.AND)) {
-                if (containsNegAtom(subTerm.sub(0), positive, caches)) {
-                    return BinaryFeature.TOP_COST;
-                }
+                if (containsNegAtom(subTerm.sub(0), positive, caches)) { return BinaryFeature.TOP_COST; }
             } else if (positive && op == Junctor.IMP) {
-                if (containsNegAtom(subTerm.sub(0), false, caches)) {
-                    return BinaryFeature.TOP_COST;
-                }
+                if (containsNegAtom(subTerm.sub(0), false, caches)) { return BinaryFeature.TOP_COST; }
             } else if (op == Equality.EQV) {
                 return BinaryFeature.ZERO_COST; // TODO
             }

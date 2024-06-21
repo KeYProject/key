@@ -17,9 +17,7 @@ public abstract class TacletFilter implements RuleFilter {
     public static final TacletFilter TRUE = new TacletFilterTrue();
 
     public boolean filter(Rule rule) {
-        if (rule instanceof Taclet) {
-            return filter((Taclet) rule);
-        }
+        if (rule instanceof Taclet) { return filter((Taclet) rule); }
         return false;
     }
 

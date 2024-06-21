@@ -18,9 +18,7 @@ public class GenericTermReplacer {
     public static Term replace(final Term t, final Predicate<Term> filter,
             final Function<Term, Term> replacer, Services services) {
         Term newTopLevelTerm = t;
-        if (filter.test(t)) {
-            newTopLevelTerm = replacer.apply(t);
-        }
+        if (filter.test(t)) { newTopLevelTerm = replacer.apply(t); }
 
         final Term[] newSubs =
             newTopLevelTerm.subs().stream().map(sub -> replace(sub, filter, replacer, services))

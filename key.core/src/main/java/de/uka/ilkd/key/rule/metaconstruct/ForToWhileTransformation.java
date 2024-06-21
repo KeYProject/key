@@ -4,16 +4,16 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.ILoopInit;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
+import de.uka.ilkd.key.java.ast.statement.For;
+import de.uka.ilkd.key.java.ast.statement.Guard;
+import de.uka.ilkd.key.java.ast.statement.IForUpdates;
+import de.uka.ilkd.key.java.ast.statement.ILoopInit;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
@@ -49,31 +49,23 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
         if (replaceBreakWithNoLabel == 0) {
             // most outer for loop
 
-            if (changeList.getFirst() == CHANGED) {
-                changeList.removeFirst();
-            }
+            if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
 
             ILoopInit inits = null;
             IForUpdates updates = null;
             Statement body = null;
 
-            if (changeList.get(0) instanceof ILoopInit) {
-                inits = (ILoopInit) changeList.removeFirst();
-            }
+            if (changeList.get(0) instanceof ILoopInit) { inits = (ILoopInit) changeList.removeFirst(); }
 
             Guard guard;
             if (x.getGuard() != null) {
                 guard = (Guard) changeList.removeFirst();
-                if (guard.getExpression() == null) {
-                    guard = KeYJavaASTFactory.trueGuard();
-                }
+                if (guard.getExpression() == null) { guard = KeYJavaASTFactory.trueGuard(); }
             } else {
                 guard = KeYJavaASTFactory.trueGuard();
             }
 
-            if (changeList.get(0) instanceof IForUpdates) {
-                updates = (IForUpdates) changeList.removeFirst();
-            }
+            if (changeList.get(0) instanceof IForUpdates) { updates = (IForUpdates) changeList.removeFirst(); }
 
             body = (Statement) changeList.removeFirst();
 

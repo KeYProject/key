@@ -40,7 +40,8 @@ public class SMTTermUnaryOp extends SMTTerm {
     }
 
     /**
-     * @param operator the operator to set
+     * @param operator
+     *        the operator to set
      */
     public void setOperator(Op operator) {
         this.operator = operator;
@@ -54,7 +55,8 @@ public class SMTTermUnaryOp extends SMTTerm {
     }
 
     /**
-     * @param subForm the subForm to set
+     * @param subForm
+     *        the subForm to set
      */
     public void setSub(SMTTerm subForm) {
         this.sub = subForm;
@@ -113,9 +115,7 @@ public class SMTTermUnaryOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
-        if (this.equals(a)) {
-            return b;
-        }
+        if (this.equals(a)) { return b; }
 
         // return new TermUnaryOp(operator, (Term) sub.substitute(a, b));
         return sub.substitute(a, b).unaryOp(operator);
@@ -142,17 +142,11 @@ public class SMTTermUnaryOp extends SMTTerm {
 
     @Override
     public boolean equals(Object term) {
-        if (term == null) {
-            return false;
-        }
+        if (term == null) { return false; }
 
-        if (this == term) {
-            return true;
-        }
+        if (this == term) { return true; }
 
-        if (!(term instanceof SMTTermUnaryOp ut)) {
-            return false;
-        }
+        if (!(term instanceof SMTTermUnaryOp ut)) { return false; }
 
         return this.operator.equals(ut.operator) && this.sub.equals(ut.sub);
     }
@@ -194,9 +188,7 @@ public class SMTTermUnaryOp extends SMTTerm {
 
     public String toString(int nestPos) {
         StringBuffer tab = new StringBuffer();
-        for (int i = 0; i < nestPos; i++) {
-            tab = tab.append(" ");
-        }
+        for (int i = 0; i < nestPos; i++) { tab = tab.append(" "); }
 
         return switch (operator) {
         case NOT -> tab + "(not" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";

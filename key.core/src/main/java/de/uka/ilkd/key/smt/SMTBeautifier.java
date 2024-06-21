@@ -21,8 +21,7 @@ import java.util.List;
  */
 public abstract class SMTBeautifier {
 
-    private SMTBeautifier() {
-    }
+    private SMTBeautifier() {}
 
     // A kind of "int*" in Java.
     private static class MutableInt {
@@ -36,13 +35,9 @@ public abstract class SMTBeautifier {
 
         public int length() {
             int result = 0;
-            if (head != null) {
-                result += head.length();
-            }
+            if (head != null) { result += head.length(); }
             if (children != null) {
-                for (Element child : children) {
-                    result += child.length();
-                }
+                for (Element child : children) { result += child.length(); }
                 result += 2 + children.size(); // "(", ")" and spaces
             }
             return result;
@@ -81,7 +76,8 @@ public abstract class SMTBeautifier {
      * The code may crash with some {@link IndexOutOfBoundsException} or
      * {@link NullPointerException} if invoked on illegal smt code.
      *
-     * @param smtCode the code to indent.
+     * @param smtCode
+     *        the code to indent.
      * @return a string representation equivalent to the input
      */
     public static String indent(String smtCode) {
@@ -97,8 +93,10 @@ public abstract class SMTBeautifier {
      * The code may crash with some {@link IndexOutOfBoundsException} or
      * {@link NullPointerException} if invoked on illegal smt code.
      *
-     * @param smtCode the code to indent.
-     * @param lineLength the number of characters per line, > 0
+     * @param smtCode
+     *        the code to indent.
+     * @param lineLength
+     *        the number of characters per line, > 0
      * @return a string representation equivalent to the input
      */
     public static String indent(String smtCode, int lineLength) {
@@ -127,9 +125,7 @@ public abstract class SMTBeautifier {
             case '|':
                 int start = pos.val;
                 pos.val++;
-                while (s.charAt(pos.val) != '|') {
-                    pos.val++;
-                }
+                while (s.charAt(pos.val) != '|') { pos.val++; }
                 Element result = new Element();
                 pos.val++;
                 result.head = s.substring(start, pos.val);
@@ -138,9 +134,7 @@ public abstract class SMTBeautifier {
             case ';':
                 start = pos.val;
                 pos.val++;
-                while (pos.val < s.length() && s.charAt(pos.val) != '\n') {
-                    pos.val++;
-                }
+                while (pos.val < s.length() && s.charAt(pos.val) != '\n') { pos.val++; }
                 result = new Element();
                 result.head = s.substring(start, pos.val);
                 pos.val++;
@@ -149,9 +143,7 @@ public abstract class SMTBeautifier {
             default:
                 start = pos.val;
                 pos.val++;
-                while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) {
-                    pos.val++;
-                }
+                while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) { pos.val++; }
                 result = new Element();
                 result.head = s.substring(start, pos.val);
                 return result;
@@ -169,9 +161,7 @@ public abstract class SMTBeautifier {
         pos.val++;
         while (pos.val < s.length() && s.charAt(pos.val) != ')') {
             result.children.add(parse(s, pos));
-            while (pos.val < s.length() && Character.isWhitespace(s.charAt(pos.val))) {
-                pos.val++;
-            }
+            while (pos.val < s.length() && Character.isWhitespace(s.charAt(pos.val))) { pos.val++; }
         }
         pos.val++;
         return result;

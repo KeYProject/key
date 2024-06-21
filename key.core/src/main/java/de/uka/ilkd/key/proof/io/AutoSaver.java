@@ -55,15 +55,15 @@ public class AutoSaver implements ProverTaskListener {
     /**
      * Set default values.
      *
-     * @param saveInterval the interval (= number of proof steps) to periodically save
-     * @param saveClosedProof whether to save the final closed proof
+     * @param saveInterval
+     *        the interval (= number of proof steps) to periodically save
+     * @param saveClosedProof
+     *        whether to save the final closed proof
      */
     public static void setDefaultValues(int saveInterval, boolean saveClosedProof) {
         defaultSaveInterval = saveInterval;
         defaultSaveClosedProof = saveClosedProof;
-        if (defaultSaveInterval > 0) {
-            DEFAULT_INSTANCE = new AutoSaver();
-        }
+        if (defaultSaveInterval > 0) { DEFAULT_INSTANCE = new AutoSaver(); }
     }
 
     /**
@@ -85,9 +85,7 @@ public class AutoSaver implements ProverTaskListener {
      * @param saveClosedProof
      */
     public AutoSaver(int saveInterval, boolean saveClosedProof) {
-        if (saveInterval <= 0) {
-            throw new IllegalArgumentException("Save interval must be positive");
-        }
+        if (saveInterval <= 0) { throw new IllegalArgumentException("Save interval must be positive"); }
         interval = saveInterval;
         saveClosed = saveClosedProof;
     }
@@ -96,7 +94,8 @@ public class AutoSaver implements ProverTaskListener {
      * Set the proof to be saved. Call this method <b>before</b> adding this listener to the
      * strategy.
      *
-     * @param p proof to save, must not be null
+     * @param p
+     *        proof to save, must not be null
      */
     public void setProof(Proof p) {
         proof = p;
@@ -105,16 +104,13 @@ public class AutoSaver implements ProverTaskListener {
     /**
      * Saves the proof at the end of an interval.
      *
-     * @throws IllegalStateException if no proof was set
+     * @throws IllegalStateException
+     *         if no proof was set
      */
     @Override
     public void taskProgress(int progress) {
-        if (interval == 0) {
-            return;
-        }
-        if (proof == null) {
-            return;
-        }
+        if (interval == 0) { return; }
+        if (proof == null) { return; }
         if (progress > 0 && progress % interval == 0) {
             final int quot = progress / interval;
             final String filename = PREFIX + quot + ".key";
@@ -131,12 +127,8 @@ public class AutoSaver implements ProverTaskListener {
     public void taskFinished(TaskFinishedInfo info) {
         // save proof if closed
         if (saveClosed) {
-            if (proof == null) {
-                return;
-            }
-            if (proof.closed()) {
-                save(PREFIX + "proof", proof);
-            }
+            if (proof == null) { return; }
+            if (proof.closed()) { save(PREFIX + "proof", proof); }
         }
 
         // unset proof

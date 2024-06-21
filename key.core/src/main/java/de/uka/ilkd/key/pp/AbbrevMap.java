@@ -37,19 +37,21 @@ public class AbbrevMap {
     /**
      * Associates a Term and its abbreviation in this map.
      *
-     * @param t a term
-     * @param abbreviation the abbreviation for of this term
-     * @param enabled true if the abbreviation should be used (e.g. when printing the term), false
+     * @param t
+     *        a term
+     * @param abbreviation
+     *        the abbreviation for of this term
+     * @param enabled
+     *        true if the abbreviation should be used (e.g. when printing the term), false
      *        otherwise.
      */
     public void put(Term t, String abbreviation, boolean enabled) throws AbbrevException {
         AbbrevWrapper scw;
-        if (containsTerm(t)) {
-            throw new AbbrevException("A abbreviation for " + t + " already exists", true);
-        }
+        if (containsTerm(t)) { throw new AbbrevException("A abbreviation for " + t + " already exists", true); }
         if (containsAbbreviation(abbreviation)) {
             throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                + " in use for: " + getTerm(abbreviation), false);
+                    + " in use for: " + getTerm(abbreviation),
+                false);
         }
         scw = new AbbrevWrapper(t);
         termstring.put(scw, abbreviation);
@@ -61,14 +63,16 @@ public class AbbrevMap {
      * Changes the abbreviation of t to abbreviation. If the AbbrevMap doesn't contain t nothing
      * happens.
      *
-     * @throws AbbrevException if the abbreviation is already in use.
+     * @throws AbbrevException
+     *         if the abbreviation is already in use.
      */
     public void changeAbbrev(Term t, String abbreviation) throws AbbrevException {
         if (containsTerm(t)) {
             AbbrevWrapper scw;
             if (containsAbbreviation(abbreviation)) {
                 throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                    + " in use for: " + getTerm(abbreviation), false);
+                        + " in use for: " + getTerm(abbreviation),
+                    false);
             }
             scw = new AbbrevWrapper(t);
             stringterm.remove(termstring.get(scw));
@@ -81,14 +85,13 @@ public class AbbrevMap {
      * Changes the abbreviation <code>abbreviation</code> to <code>t</code>. If the AbbrevMap
      * doesn't contain <code>abbreviation</code> nothing happens.
      *
-     * @throws AbbrevException If an abbreviation for t already exists.
+     * @throws AbbrevException
+     *         If an abbreviation for t already exists.
      */
     public void changeAbbrev(String abbreviation, Term t, boolean enabled) throws AbbrevException {
         if (containsAbbreviation(abbreviation)) {
             AbbrevWrapper scw;
-            if (containsTerm(t)) {
-                throw new AbbrevException("A abbreviation for " + t + " already exists", true);
-            }
+            if (containsTerm(t)) { throw new AbbrevException("A abbreviation for " + t + " already exists", true); }
             scw = new AbbrevWrapper(t);
             stringterm.remove(termstring.get(scw));
             termstring.put(scw, abbreviation);
@@ -133,17 +136,17 @@ public class AbbrevMap {
      */
     public boolean isEnabled(Term t) {
         Boolean b = termenabled.get(new AbbrevWrapper(t));
-        if (b != null) {
-            return b;
-        }
+        if (b != null) { return b; }
         return false;
     }
 
     /**
      * Sets the mapping of the term t to its abbreviation enabled or disabled
      *
-     * @param t a Term
-     * @param enabled true if the abbreviation of t may be used.
+     * @param t
+     *        a Term
+     * @param enabled
+     *        true if the abbreviation of t may be used.
      */
     public void setEnabled(Term t, boolean enabled) {
         termenabled.put(new AbbrevWrapper(t), enabled ? Boolean.TRUE : Boolean.FALSE);
@@ -162,18 +165,14 @@ public class AbbrevMap {
     public record AbbrevWrapper(Term t) {
 
         @Override
-            public boolean equals(Object o) {
-                if (!(o instanceof AbbrevWrapper scw)) {
-                    return false;
-                }
-                if (scw.getTerm() == t) {
-                    return true;
-                }
-                return t.equals(scw.getTerm());
-            }
-
-            public Term getTerm() {
-                return t;
-            }
+        public boolean equals(Object o) {
+            if (!(o instanceof AbbrevWrapper scw)) { return false; }
+            if (scw.getTerm() == t) { return true; }
+            return t.equals(scw.getTerm());
         }
+
+        public Term getTerm() {
+            return t;
+        }
+    }
 }

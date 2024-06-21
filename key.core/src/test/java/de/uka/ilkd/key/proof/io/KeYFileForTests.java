@@ -33,7 +33,7 @@ public class KeYFileForTests extends KeYFile {
      * the physical source of the .key file.
      */
     public KeYFileForTests(String name, File file, Profile profile) {
-        super(name, file, null, profile);
+        super(name, file.toPath(), null, profile);
     }
 
     /**
@@ -43,9 +43,7 @@ public class KeYFileForTests extends KeYFile {
      */
     @Override
     public ImmutableSet<PositionedString> read() throws ProofInputException {
-        if (initConfig == null) {
-            throw new IllegalStateException("KeYFile: InitConfig not set.");
-        }
+        if (initConfig == null) { throw new IllegalStateException("KeYFile: InitConfig not set."); }
         CountingBufferedReader cinp = null;
         try {
             cinp = new CountingBufferedReader(getNewStream(), monitor, getNumberOfChars() / 100);

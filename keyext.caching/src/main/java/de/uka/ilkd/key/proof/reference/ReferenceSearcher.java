@@ -32,16 +32,16 @@ public final class ReferenceSearcher {
     /**
      * Try to find a closed branch in another proof that is equivalent to the <code>newNode</code>.
      *
-     * @param previousProofs old proofs
-     * @param newNode new node (must be an open goal)
+     * @param previousProofs
+     *        old proofs
+     * @param newNode
+     *        new node (must be an open goal)
      * @return a reference (or null, if none found)
      */
     public static ClosedBy findPreviousProof(List<Proof> previousProofs, Node newNode) {
         // first verify that the new node does not contain any terms that depend on external
         // influences
-        if (!suitableForCloseByReference(newNode)) {
-            return null;
-        }
+        if (!suitableForCloseByReference(newNode)) { return null; }
         for (int i = 0; i < previousProofs.size(); i++) {
             Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
@@ -64,9 +64,7 @@ public final class ReferenceSearcher {
                     break;
                 }
             }
-            if (!tacletsOk) {
-                continue;
-            }
+            if (!tacletsOk) { continue; }
 
             // only search in compatible proofs
             if (!p.getSettings().getChoiceSettings()
@@ -99,37 +97,25 @@ public final class ReferenceSearcher {
                 // for each node, check that the sequent in the reference is
                 // a subset of the new sequent
                 Node n = nodesToCheck.remove();
-                if (checkedNodes.contains(n) || !n.isClosed()) {
-                    continue;
-                }
+                if (checkedNodes.contains(n) || !n.isClosed()) { continue; }
                 checkedNodes.add(n);
 
                 // find the first node in the branch
-                while (n.parent() != null && n.parent().childrenCount() == 1) {
-                    n = n.parent();
-                }
-                if (n.parent() != null) {
-                    nodesToCheck.add(n.parent());
-                }
+                while (n.parent() != null && n.parent().childrenCount() == 1) { n = n.parent(); }
+                if (n.parent() != null) { nodesToCheck.add(n.parent()); }
                 Sequent seq = n.sequent();
-                if (results != null) {
-                    seq = results.reduceSequent(n);
-                }
+                if (results != null) { seq = results.reduceSequent(n); }
                 Semisequent ante = seq.antecedent();
                 Semisequent succ = seq.succedent();
                 Semisequent anteNew = newNode.sequent().antecedent();
                 Semisequent succNew = newNode.sequent().succedent();
-                if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
-                    continue;
-                }
+                if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) { continue; }
                 Set<Node> toSkip = new HashSet<>();
                 if (results != null) {
                     // computed skipped nodes by iterating through all nodes
                     AnalysisResults finalResults = results;
                     n.subtreeIterator().forEachRemaining(x -> {
-                        if (!finalResults.usefulSteps.contains(x)) {
-                            toSkip.add(x);
-                        }
+                        if (!finalResults.usefulSteps.contains(x)) { toSkip.add(x); }
                     });
                 }
                 return new ClosedBy(p, n, toSkip);
@@ -141,8 +127,10 @@ public final class ReferenceSearcher {
     /**
      * Check whether all formulas in {@code subset} are conatined in {@code superset}.
      *
-     * @param superset Semisequent supposed to contain {@code subset}
-     * @param subset Semisequent supposed to be in {@code superset}
+     * @param superset
+     *        Semisequent supposed to contain {@code subset}
+     * @param subset
+     *        Semisequent supposed to be in {@code superset}
      * @return whether all formulas are present
      */
     private static boolean containedIn(Semisequent superset, Semisequent subset) {
@@ -154,9 +142,7 @@ public final class ReferenceSearcher {
                     break;
                 }
             }
-            if (!found) {
-                return false;
-            }
+            if (!found) { return false; }
         }
         return true;
     }
@@ -166,7 +152,8 @@ public final class ReferenceSearcher {
      * This is not the case if it contains any terms influenced by external factors:
      * Java blocks or program methods (query terms).
      *
-     * @param node the node to check
+     * @param node
+     *        the node to check
      * @return whether it can be closed by reference
      */
     public static boolean suitableForCloseByReference(Node node) {
@@ -182,9 +169,7 @@ public final class ReferenceSearcher {
             // then, check for program methods
             // (may expand differently depending on Java code associated with proofs)
             term.execPreOrder(f);
-            if (f.getFoundProgramMethod()) {
-                return false;
-            }
+            if (f.getFoundProgramMethod()) { return false; }
         }
         return true;
     }

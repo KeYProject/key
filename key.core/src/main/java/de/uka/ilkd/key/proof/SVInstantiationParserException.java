@@ -24,14 +24,10 @@ public class SVInstantiationParserException extends SVInstantiationExceptionWith
     }
 
     private Optional<String> getInstantiationRow() {
-        if (getPosition().column() <= 0) {
-            return Optional.empty();
-        }
+        if (getPosition().column() <= 0) { return Optional.empty(); }
         String[] rows = instantiation.split("\n");
         var line = getPosition().line() - 1;
-        if (!(line < rows.length)) {
-            return Optional.empty();
-        }
+        if (!(line < rows.length)) { return Optional.empty(); }
         return Optional.of(rows[line]);
     }
 
