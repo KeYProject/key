@@ -260,27 +260,6 @@ public class LabeledStatement extends JavaStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
-
-        final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
-        if (jnte.getChildCount() != getChildCount()) {
-            return false;
-        }
-        for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equals(jnte.getChildAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element

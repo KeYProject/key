@@ -25,6 +25,11 @@ public class EmptyMapLiteral extends Literal {
     }
 
     @Override
+    protected int computeHashCode() {
+        return System.identityHashCode(this);
+    }
+
+    @Override
     public void visit(Visitor v) {
         v.performActionOnEmptyMapLiteral(this);
     }

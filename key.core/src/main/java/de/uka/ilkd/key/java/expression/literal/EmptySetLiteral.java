@@ -23,6 +23,11 @@ public class EmptySetLiteral extends Literal {
         return o == this;
     }
 
+    @Override
+    protected int computeHashCode() {
+        return System.identityHashCode(this);
+    }
+
     public void visit(Visitor v) {
         v.performActionOnEmptySetLiteral(this);
     }

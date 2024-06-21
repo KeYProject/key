@@ -36,6 +36,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
         return getList(ASSIGNABLE_FREE, toString);
     }
@@ -65,6 +69,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(REQUIRES, heap);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignable(Name heap) {
         return getList(ASSIGNABLE, heap);
     }
@@ -83,6 +91,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     /**
      * Heap-dependent clauses
+     * Note that the name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
     public enum ClauseHd {
         ACCESSIBLE, ASSIGNABLE, ASSIGNABLE_FREE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE,
@@ -108,8 +118,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(ImmutableList<JMLModifier> mods, @NonNull Behavior behavior) {
-        super(mods);
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
+        super(modifiers);
         if (behavior == null) {
             throw new IllegalArgumentException();
         }
@@ -164,7 +174,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public @NonNull TextualJMLSpecCase clone() {
-        TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
+        TextualJMLSpecCase res = new TextualJMLSpecCase(getModifiers(), getBehavior());
         res.name = name;
         res.clauses = new ArrayList<>(clauses);
         return res;
@@ -185,8 +195,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses + ", mods="
-            + mods + ", name='" + name + '\'' + '}';
+        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
+            + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
 
 
@@ -239,6 +249,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return ImmutableList.fromList(seq);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ASSIGNABLE);
     }

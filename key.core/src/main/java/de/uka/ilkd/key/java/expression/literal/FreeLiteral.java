@@ -26,6 +26,11 @@ public class FreeLiteral extends Literal {
     }
 
     @Override
+    protected int computeHashCode() {
+        return System.identityHashCode(this);
+    }
+
+    @Override
     public void visit(Visitor v) {
         // TODO Auto-generated method stub
     }
