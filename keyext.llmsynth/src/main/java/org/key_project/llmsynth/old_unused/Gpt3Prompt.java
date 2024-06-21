@@ -1,5 +1,8 @@
 package org.key_project.llmsynth.old_unused;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.jml.clauses.JmlContract;
 import com.theokanning.openai.service.OpenAiService;
 import com.theokanning.openai.completion.chat.*;
 
@@ -14,7 +17,8 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import io.reactivex.Flowable;
 import org.key_project.llmsynth.UnclosedProof;
-import org.key_project.llmsynth.old_unused.Utility;
+import org.key_project.llmsynth.jml.JmlHelper;
+import org.key_project.llmsynth.jml.ParsingException;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
@@ -23,6 +27,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -308,37 +313,65 @@ public class Gpt3Prompt {
         }
     }
 
+    static class AutoClose<T> implements AutoCloseable {
+        public final T val;
+        private final Consumer<T> close;
+        public AutoClose(T inner, Consumer<T> close) {
+            this.val = inner;
+            this.close = close;
+        }
+
+        @Override
+        public void close() {
+            System.err.println("Closing KeY Environment");
+            if (close != null) { close.accept(val);}
+            System.out.flush();
+            System.err.flush();
+        }
+    }
+
     public static Triple<Boolean, FailureReason, Exception> tryKeyValidation(List<String> classLines, String methodName, String subfun, String jmlText, boolean isInvariant, Path tmpfile, FailureReason errSoFar) {
         if (errSoFar != FailureReason.NONE)
             return new Triple<>(false, errSoFar, null); // todo: this is hacky, but an easy way to short-circuit for now
-
-        int ml = 0;
+        NodeList<com.github.javaparser.ast.Node> gptContracts;
         try {
-            ml = isInvariant ? lineOfFirstInvariantPlaceInMethod(classLines, methodName) : (subfun == null) ? lineOfMethod(classLines, methodName) : lineOfMethod(classLines, subfun);
-        } catch (RuntimeException e) {
-            return new Triple<>(false, FailureReason.UNKNOWN, null);
+            gptContracts = JmlHelper.parseFragment(jmlText);
+        } catch (ParsingException e) {
+            return new Triple<>(false, FailureReason.INVALID_JAVA, new Exception("Error during JML parsing: " + e.getMessage()));
         }
-        {
-            String before = classLines.stream().limit(ml).collect(Collectors.joining("\n"));
-            String after = classLines.stream().skip(ml).collect(Collectors.joining("\n"));
-            String classToTest = before + "\n" + jmlText + "\n" + after;
-            try {
-                Files.writeString(tmpfile, classToTest);
-            } catch (IOException e) {
-                status(e.toString());
-                return new Triple<>(false, FailureReason.UNKNOWN_FATAL, null);
-            }
+        CompilationUnit cu;
+        try {
+            cu = JmlHelper.parseFile(String.join("\n", classLines));
+        } catch (ParsingException e) {
+            throw new RuntimeException("Original Java File not parseable: " +e.getMessage());
+        }
+
+        if (isInvariant) {
+            cu = JmlHelper.addLoopInvariant(cu, methodName, gptContracts);
+        } else if (subfun != null) {
+            cu = JmlHelper.addMethodContract(cu, subfun, gptContracts);
+        } else {
+            cu = JmlHelper.addMethodContract(cu, methodName, gptContracts);
+        }
+        String classToTest = cu.toString();
+        try {
+            Files.writeString(tmpfile, classToTest);
+        } catch (IOException e) {
+            status(e.toString());
+            return new Triple<>(false, FailureReason.UNKNOWN_FATAL, null);
         }
 
         KeYEnvironment<?> env = null;
         // Path to the source code folder/file or to a *.proof file
-        try {
+        boolean foundRelevantContract = false;
+        Triple<Boolean, FailureReason, Exception> preparedResult = null;
+        try (AutoClose<KeYEnvironment<?>> envAuto = new AutoClose<>(Utility.createKeyEnvironment(tmpfile.toFile(), null, null, null), KeYEnvironment::dispose)) {
             // Ensure that Taclets are parsed
-            env = Utility.createKeyEnvironment(tmpfile.toFile(), null, null, null);
+            //env = Utility.createKeyEnvironment(tmpfile.toFile(), null, null, null);
+            env = envAuto.val;
             ImmutableList<ProgramVariable> projectionVariables = ImmutableList.fromList(new LinkedList<>());
             List<Contract> contracts = Utility.getContracts(env);
             status("Looking for contracts:");
-            boolean foundRelevantContract = false;
             for (Contract c : contracts) {
                 if (!(c instanceof FunctionalOperationContractImpl)) continue;
                 FunctionalOperationContractImpl foc = (FunctionalOperationContractImpl) c; // todo: highly fragile
@@ -350,18 +383,25 @@ public class Gpt3Prompt {
                     foundRelevantContract = true;
                     status("Found relevant contract: " + pmName);
                     var result = checkContract(env, c, projectionVariables);
-                    if (result.y != FailureReason.NONE) return result;
+                    if (result.y != FailureReason.NONE){
+                        preparedResult = result;
+                        break;
+                    }
                 }
                 if (subfun!=null && pmName.contains(subfun)) { // If they exists, submethods should be verified...
                     foundRelevantContract = true;
                     status("Found relevant contract: " + pmName);
                     var result = checkContract(env, c, projectionVariables);
-                    if (result.y != FailureReason.NONE) return result;
+                    if (result.y != FailureReason.NONE){
+                        preparedResult = result;
+                        break;
+                    }
+                }
+                if (Thread.interrupted()) {
+                    status("Verification interrupted");
+                    return new Triple<>(false, FailureReason.UNKNOWN, null);
                 }
             }
-            if (!foundRelevantContract) return new Triple<>(false, FailureReason.UNKNOWN, null);
-            status("SUCCESS: All contracts verified.");
-            return new Triple<>(true, FailureReason.NONE, null);
         } catch (ProblemLoaderException e) {
             status("Encountered Exception: " + e.getClass().getName());
             status(e.toString());
@@ -372,16 +412,18 @@ public class Gpt3Prompt {
 //                return new Pair<>(true, FailureReason.NONE);
 //                // todo: here more sophisticated failure reasons AND prompts should be possible, as we already asked a person
 //            }
-            return new Triple<>(false, FailureReason.INVALID_JAVA, e);
-        } finally {
-            if (env != null) env.dispose();
+            preparedResult = new Triple<>(false, FailureReason.INVALID_JAVA, e);
         }
+        if (preparedResult != null) return preparedResult;
+        if (!foundRelevantContract) return new Triple<>(false, FailureReason.UNKNOWN, null);
+        status("All contracts verified or procedure was aborted.");
+        return new Triple<>(true, FailureReason.NONE, null);
     }
 
     private static Triple<Boolean, FailureReason, Exception> checkContract(KeYEnvironment<?> env, Contract relevantContract, ImmutableList<ProgramVariable> projectionVariables) {
         List<UnclosedProof> unclosedProofs = Utility.tryClosingProofsAndListUnclosed(env, List.of(relevantContract), false, projectionVariables);
         if (unclosedProofs.isEmpty()) {
-            status("SUCCESS: No open proof found.");
+            status("No open proof found.");
             return new Triple<>(true, FailureReason.NONE, null);
         } else {
 
@@ -524,14 +566,20 @@ public class Gpt3Prompt {
                     int timeout = 100;
                     TimeUnit tou = TimeUnit.SECONDS;
                     Future<Triple<Boolean, FailureReason, ProblemLoaderException>> fut = executor.submit((Callable) () -> {
-                        return tryKeyValidation(classLines, methodName, subfun, possible_jml_text.x, specInvariant, tmpFile, possible_jml_text.y);
+                        try {
+                            return tryKeyValidation(classLines, methodName, subfun, possible_jml_text.x, specInvariant, tmpFile, possible_jml_text.y);
+                        } catch (Exception e) {
+                            System.out.println("KeY validation failed: " + e.toString());
+                            e.printStackTrace();
+                            return new Triple<>(false, FailureReason.UNKNOWN_FATAL, null);
+                        }
                     });
                     try {
                         var kr = fut.get(timeout, tou);
                         key_result = new Triple<>(kr.x, kr.y, kr.z);
                     } catch (TimeoutException | InterruptedException | RuntimeException | ExecutionException e) {
                         System.out.println(e.toString());
-                        System.out.println(e.getStackTrace());
+                        e.printStackTrace();
                         key_result = new Triple<>(false, FailureReason.INVALID_JAVA, null);
                     } finally {
                         executor.shutdown();

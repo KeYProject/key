@@ -4,6 +4,7 @@ import org.key_project.llmsynth.benchmarks.legacy.StrategyProvider;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
+import org.key_project.llmsynth.old_unused.Gpt3Prompt;
 import org.key_project.llmsynth.oracles.OracleGpt3_5_Turbo;
 import org.key_project.llmsynth.prompts.*;
 import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
@@ -21,61 +22,71 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
     Function<LLMChoice, BiFunction<PromptReason, Prompt, PromptAnswer> > selectOracle;
     BiFunction<LLMChoice, ControlParameters, Predicate<PromptResult> > selectResultAcceptor;
 
+    OracleGpt3_5_Turbo oracle;
+
+
+
     public BenchmarkRunner(
             StrategyProvider<TaskSpecifyFunction, TFunc> funcStrategyProvider,
             StrategyProvider<TaskSpecifySubcontract, TSub> subStrategyProvider,
             StrategyProvider<TaskSpecifyLoopInvariant, TLoop> loopStrategyProvider,
             Function<LLMChoice, BiFunction<PromptReason, Prompt, PromptAnswer>> selectOracle,
-            BiFunction<LLMChoice, ControlParameters, Predicate<PromptResult>> selectResultAcceptor
+            BiFunction<LLMChoice, ControlParameters, Predicate<PromptResult>> selectResultAcceptor,
+            OracleGpt3_5_Turbo oracle
     ) {
         this.funcStrategyProvider = funcStrategyProvider;
         this.subStrategyProvider = subStrategyProvider;
         this.loopStrategyProvider = loopStrategyProvider;
         this.selectOracle = selectOracle;
         this.selectResultAcceptor = selectResultAcceptor;
+        this.oracle = oracle;
     }
 
     public void run(Benchmark benchmark) {
-        if(benchmark.isFinished()) return;
-        // this method is essentially only here to select the correct strategies and types
-        // todo: this can be made fully independent of Type by yet another indirection, which may be added later
-        // todo: it should be typesafe after making it independent
+        try {
+            if (benchmark.isFinished()) return;
+            // this method is essentially only here to select the correct strategies and types
+            // todo: this can be made fully independent of Type by yet another indirection, which may be added later
+            // todo: it should be typesafe after making it independent
 
-        BenchmarkParameters param = benchmark.params;
-        ControlParameters ctl = param.controlParameters;
+            BenchmarkParameters param = benchmark.params;
+            ControlParameters ctl = param.controlParameters;
 
-        BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle = selectOracle.apply(param.oracle);
-        Predicate<PromptResult> acceptResult = selectResultAcceptor.apply(param.oracle, param.controlParameters);
+            BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle = selectOracle.apply(param.oracle);
+            Predicate<PromptResult> acceptResult = selectResultAcceptor.apply(param.oracle, param.controlParameters);
 
-        switch(param.task.tag) {
-            // todo: refactor into parameterized subfuncitoncall
-            case SPECIFY_FUNCTION: {
-                var task = (TaskSpecifyFunction) param.task;
-                IPromptStrategy<TFunc> strategy = funcStrategyProvider.selectStrategy(param.oracle, task);
-                TFunc data = funcStrategyProvider.createUserData();
-                Function<PromptAnswer, PromptResult> defaultVerificator =  funcStrategyProvider.createDefaultVerificator(param.oracle, task);
+            switch (param.task.tag) {
+                // todo: refactor into parameterized subfuncitoncall
+                case SPECIFY_FUNCTION: {
+                    var task = (TaskSpecifyFunction) param.task;
+                    IPromptStrategy<TFunc> strategy = funcStrategyProvider.selectStrategy(param.oracle, task);
+                    TFunc data = funcStrategyProvider.createUserData();
+                    Function<PromptAnswer, PromptResult> defaultVerificator = funcStrategyProvider.createDefaultVerificator(param.oracle, task);
 
-                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
-                break;
+                    run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                    break;
+                }
+                case SPECIFY_SUBCONTRACT: {
+                    var task = (TaskSpecifySubcontract) param.task;
+                    IPromptStrategy<TSub> strategy = subStrategyProvider.selectStrategy(param.oracle, task);
+                    TSub data = subStrategyProvider.createUserData();
+                    Function<PromptAnswer, PromptResult> defaultVerificator = subStrategyProvider.createDefaultVerificator(param.oracle, task);
+
+                    run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                    break;
+                }
+                case SPECIFY_LOOP_INVARIANT: {
+                    var task = (TaskSpecifyLoopInvariant) param.task;
+                    IPromptStrategy<TLoop> strategy = loopStrategyProvider.selectStrategy(param.oracle, task);
+                    TLoop data = loopStrategyProvider.createUserData();
+                    Function<PromptAnswer, PromptResult> defaultVerificator = loopStrategyProvider.createDefaultVerificator(param.oracle, task);
+
+                    run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                    break;
+                }
             }
-            case SPECIFY_SUBCONTRACT: {
-                var task = (TaskSpecifySubcontract) param.task;
-                IPromptStrategy<TSub> strategy = subStrategyProvider.selectStrategy(param.oracle, task);
-                TSub data = subStrategyProvider.createUserData();
-                Function<PromptAnswer, PromptResult> defaultVerificator =  subStrategyProvider.createDefaultVerificator(param.oracle, task);
-
-                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
-                break;
-            }
-            case SPECIFY_LOOP_INVARIANT: {
-                var task = (TaskSpecifyLoopInvariant) param.task;
-                IPromptStrategy<TLoop> strategy = loopStrategyProvider.selectStrategy(param.oracle, task);
-                TLoop data = loopStrategyProvider.createUserData();
-                Function<PromptAnswer, PromptResult> defaultVerificator =  loopStrategyProvider.createDefaultVerificator(param.oracle, task);
-
-                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
-                break;
-            }
+        } finally {
+            oracle.shutdown();
         }
     }
 
@@ -106,6 +117,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
         // Exact search order is not set in stone
         // This implementation explores each child, but then descends the first child, repeating this behaviour.
         // So it's not exacly  a DFS.
+        int global_steps = 0;
         while (!pq.isEmpty()) {
             PromptReason reason_to_explore = pq.poll();
 
@@ -123,9 +135,10 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
 
             // todo: do not expand the tree, if it's already too wide
             for(Prompt prompt : prompts) {
+                System.out.println("STEP " + global_steps++);
 
                 // todo: another for loop could be here, if the same prompt should be asked multiple times to exploit indeterminism
-                PromptAnswer answer = ask_oracle(llm_oracle,reason_to_explore, prompt);
+                PromptAnswer answer = llm_oracle.apply(reason_to_explore, prompt);
                 assert answer.getPrompt() == prompt;
 
                 // todo: FIXME results lose parent info when they are accepted?
@@ -139,7 +152,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                         tree.get(reason_to_explore).add(result);
                         // todo: stuff we do when it's correct (mainly just setting the BenchmarkResult)
                         // todo: aka: add the result as the finishing node that proves success
-                        pq.clear(); // to prevent further exploration
+                        System.out.println("[BENCHMARK_RUNNER] SUCCESSFUL RESULT");
                         break;
                     }
                 } else {
@@ -153,16 +166,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                 tree.get(reason_to_explore).add(result);
             }
         }
-
         // todo: collect the results into the benchmark
-    }
-
-    private static PromptAnswer ask_oracle(BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle, PromptReason reason, Prompt prompt) {
-        if (prompt instanceof AnsweredPrompt) {
-            return ((AnsweredPrompt)prompt).getAnswer();
-        } else {
-            return llm_oracle.apply(reason, prompt);
-        }
     }
 
     public static <TFunc, TSub, TLoop> BenchmarkRunner<TFunc, TSub, TLoop> create(
@@ -174,6 +178,6 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
         var oracle = new OracleGpt3_5_Turbo(token);
         return new BenchmarkRunner<>(funcStrategyProvider, subStrategyProvider, loopStrategyProvider,
                 choice -> oracle::answerPrompt,
-                (llmChoice, controlParameters) -> (r -> true));
+                (llmChoice, controlParameters) -> (r -> true), oracle);
     }
 }

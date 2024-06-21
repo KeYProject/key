@@ -46,7 +46,7 @@ public final class Utility {
         }
     }
 
-    static final int MAX_STEPS = 50000;
+    static final int MAX_STEPS = 10000;
     /**
      * Creates a KeY environment loading the given file
      *
@@ -107,15 +107,17 @@ public final class Utility {
         // We want to use method contracts instead of expanding the method
         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
                 StrategyProperties.METHOD_CONTRACT);
+        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
+                StrategyProperties.LOOP_INVARIANT);
         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
                 StrategyProperties.DEP_ON);
         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
                 StrategyProperties.QUERY_ON);
         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                 StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        // Important: We want to stop at the first non-closed goal
+        // Important: We want to unroll the proof as much as possible and not stop at the first unclosable goal!
         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-                StrategyProperties.STOPMODE_NONCLOSE);
+                StrategyProperties.STOPMODE_DEFAULT);
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
         // Make sure that the new options are used
         int maxSteps = MAX_STEPS;
@@ -128,21 +130,28 @@ public final class Utility {
         proof.setActiveStrategy(proof.getServices().getProfile().getDefaultStrategyFactory().create(proof, sp));
         // Start auto mode
         env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+        if (Thread.interrupted()) {Thread.currentThread().interrupt();return proof;}
         AbstractProofMacro closeProvable = new TryCloseMacro();
         // Close Closables
         closeProvable.applyTo(env.getUi(), proof.root(), null, null);
+        if (Thread.interrupted()) {Thread.currentThread().interrupt();return proof;}
         // Simplify heaps
         HeapSimplificationMacro heapSimplifier = new HeapSimplificationMacro();
         heapSimplifier.applyTo(env.getUi(), proof.root(), null, null);
+        if (Thread.interrupted()) {Thread.currentThread().interrupt();return proof;}
         // Resolve Variables through ApplyEqReverse
         Strategy strat = proof.getServices().getProfile().getDefaultStrategyFactory().create(proof, sp);
         proof.setActiveStrategy(strat);
+        if (Thread.interrupted()) {Thread.currentThread().interrupt();return proof;}
 //                    proof.setActiveStrategy(new ResolveIntermediateVariablesStrategy(projectionVariablesList));
         env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+        if (Thread.interrupted()) {Thread.currentThread().interrupt();return proof;}
         // Simplify heaps again
         heapSimplifier.applyTo(env.getUi(), proof.root(), null, null);
+        if (Thread.interrupted()) {Thread.currentThread().interrupt();return proof;}
         // Close Closables
         closeProvable.applyTo(env.getUi(), proof.root(), null, null);
+        if (Thread.interrupted()) {Thread.currentThread().interrupt();return proof;}
 
         return proof;
     }

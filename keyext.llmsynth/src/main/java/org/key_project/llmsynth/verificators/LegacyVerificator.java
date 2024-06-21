@@ -59,17 +59,50 @@ public class LegacyVerificator implements Function<PromptAnswer, PromptResult> {
             int timeout = 100; // todo: this is parameterized by the benchmark
             TimeUnit timeUnit = TimeUnit.SECONDS;
             Future<Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, Exception>> fut = executor.val.submit(
-                    () -> Gpt3Prompt.tryKeyValidation(classLines, methodName, subfun, jml_text, specInvariant, tmpFile, err_so_far));
+                    () -> {
+                        System.out.flush();
+                        System.err.flush();
+                        System.out.println("[VERIFICATOR] Running KeY Verification...");
+                        System.out.flush();
+                        Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, Exception> key_result;
+                        try {
+                            key_result = Gpt3Prompt.tryKeyValidation(classLines, methodName, subfun, jml_text, specInvariant, tmpFile, err_so_far);
+                        } catch (Exception e) {
+                            System.err.println("[VERIFICATOR] KeY Verification failed: " + e.toString());
+                            System.err.println(e.getMessage());
+                            e.printStackTrace();
+                            key_result = new Gpt3Prompt.Triple<>(false, Gpt3Prompt.FailureReason.UNKNOWN, e);
+                        } finally {
+                            System.out.flush();
+                            System.err.flush();
+                            System.out.println("[VERIFICATOR] KeY Verification finished.");
+                            System.out.flush();
+                        }
+                        return key_result;
+                    });
             try {
                 var kr = fut.get(timeout, timeUnit);
                 return new Gpt3Prompt.Triple<>(kr.x, kr.y, kr.z);
             } catch (TimeoutException | InterruptedException | RuntimeException | ExecutionException e) {
+                fut.cancel(true);
+                try {
+                    System.out.println("[VERIFICATOR] KeY Verification timed out.");
+                    fut.get();
+                } catch (Exception ignored) {}
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ignored) {}
+                System.out.flush();
+                System.err.flush();
                 System.out.println(e);
-                System.out.println(e.getStackTrace());
-                return new Gpt3Prompt.Triple<>(false, Gpt3Prompt.FailureReason.INVALID_JAVA, null);
+                e.printStackTrace();
+                System.out.flush();
+                System.err.flush();
+                return new Gpt3Prompt.Triple<>(false, Gpt3Prompt.FailureReason.INVALID_JAVA, e);
             }
         }
     }
+
 
     public PromptResult verify(PromptAnswer answer) {
         String content = answer.getContent();
@@ -118,7 +151,7 @@ public class LegacyVerificator implements Function<PromptAnswer, PromptResult> {
                     reason = new NoJMLInRegion();
                     break;
                 case INVALID_JAVA:
-                    reason = new InvalidJava();
+                    reason = new InvalidJava(failureException);
                     break;
                 case WRONG_JML:
                     reason = new WrongJML(possible_jml_text.x, failureException);

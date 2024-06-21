@@ -25,7 +25,7 @@ public class MainBenchmarking {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainBenchmarking.class);
 
     //private static final int ATTEMPTS = 3;
-    private static final int ATTEMPTS = 10;
+    private static final int ATTEMPTS = 1;
 
     public static void main(String[] args) {
         File benchmark_dir = new File(args[0]);

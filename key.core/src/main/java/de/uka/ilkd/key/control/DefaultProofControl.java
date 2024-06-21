@@ -82,6 +82,9 @@ public class DefaultProofControl extends AbstractProofControl {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                this.stopAutoMode();
+                Thread.currentThread().interrupt();
+                return;
             }
         }
     }
