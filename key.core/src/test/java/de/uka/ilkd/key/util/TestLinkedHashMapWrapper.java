@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util;
 
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.Pair;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -293,5 +295,16 @@ public class TestLinkedHashMapWrapper {
         assertEquals(2, wrappedMap3.size(), "Map should contain two elements, as tt is repeated");
         assertFalse(wrappedMap3.containsValue(1),
             "Map should not contain value 1 as it should be overwritten by 3");
+
+        Iterator<Pair<Term, Integer>> it = wrappedMap3.iterator();
+        it.forEachRemaining(pair -> {
+            if (pair.first.equals(tb.tt())) {
+                assertEquals(3, pair.second, "Value for tt should be 3");
+            } else if (pair.first.equals(tb.ff())) {
+                assertEquals(2, pair.second, "Value for ff should be 2");
+            } else {
+                fail("Unexpected key in map");
+            }
+        });
     }
 }
