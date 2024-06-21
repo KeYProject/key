@@ -25,7 +25,18 @@ plugins {
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.39"
+
+    id("org.sonarqube") version "5.0.0.4638"
 }
+
+sonar {
+  properties {
+    property "sonar.projectKey", "KeYProject_key"
+    property "sonar.organization", "keyproject"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
 
 // Configure this project for use inside IntelliJ:
 idea {

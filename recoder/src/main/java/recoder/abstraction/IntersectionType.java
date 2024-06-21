@@ -11,7 +11,7 @@ import recoder.ModelException;
 import recoder.service.ProgramModelInfo;
 
 /**
- * Represents an intersection type, which was introduced in java 5. See JLS, 3rd edition, �4.9 for
+ * Represents an intersection type, which was introduced in java 5. See JLS, 3rd edition, §4.9 for
  * details.
  *
  * @author Tobias Gutzmann
