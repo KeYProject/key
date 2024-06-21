@@ -231,8 +231,8 @@ public class TestLinkedHashMapWrapper {
         assertEquals(2, renamingSourceElementMap.size(), "Map should still contain two elements");
         assertEquals(3, renamingSourceElementMap.get(match1),
             "Value for match1 should be new value 3");
-        assertEquals(3, renamingSourceElementMap.get(match3), "Value for match3 should be 3");
-        assertEquals(2, renamingSourceElementMap.get(match2), "Value for match2 should be 2");
+        assertEquals(2, renamingSourceElementMap.get(match3), "Value for match3 should be 2");
+        assertEquals(3, renamingSourceElementMap.get(match2), "Value for match2 should be 3");
 
     }
 
