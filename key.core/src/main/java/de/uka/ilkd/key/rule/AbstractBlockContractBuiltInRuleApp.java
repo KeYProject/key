@@ -72,7 +72,7 @@ public abstract class AbstractBlockContractBuiltInRuleApp
             }
         }
         contract = BlockContractImpl.combine(cons, services);
-        heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
+        heaps = HeapContext.getModifiableHeaps(services, instantiation.isTransactional());
         return this;
     }
 

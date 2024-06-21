@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 
 
 /**
- * A loop invariant, consisting of an invariant formula, a set of loop predicates, a modifies
+ * A loop invariant, consisting of an invariant formula, a set of loop predicates, a modifiable
  * clause, and a variant term.
  */
 public interface LoopSpecification extends SpecificationElement {
@@ -61,49 +61,49 @@ public interface LoopSpecification extends SpecificationElement {
     Term getFreeInvariant(Services services);
 
     /**
-     * Returns the modifies clause.
+     * Returns the modifiable clause.
      *
      * @param heap the heap variable.
      * @param selfTerm the self term.
      * @param atPres the operators used for the pre-heap.
      * @param services the Services object.
-     * @return The modifies clause as a term.
+     * @return The modifiable clause as a term.
      */
-    Term getModifies(LocationVariable heap, Term selfTerm,
+    Term getModifiable(LocationVariable heap, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services);
 
     /**
-     * Returns the modifies clause.
+     * Returns the modifiable clause.
      *
      * @param selfTerm the self term.
      * @param atPres the operators used for the pre-heap.
      * @param services the Services object.
-     * @return The modifies clause as a term.
+     * @return The modifiable clause as a term.
      */
-    Term getModifies(Term selfTerm, Map<LocationVariable, Term> atPres, Services services);
+    Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres, Services services);
 
     /**
-     * Returns the free modifies clause.
+     * Returns the free modifiable clause.
      *
      * @param heap the heap variable.
      * @param selfTerm the self term.
      * @param atPres the operators used for the pre-heap.
      * @param services the Services object.
-     * @return The modifies clause as a term.
+     * @return The modifiable clause as a term.
      */
-    Term getFreeModifies(LocationVariable heap, Term selfTerm,
+    Term getFreeModifiable(LocationVariable heap, Term selfTerm,
             Map<LocationVariable, Term> atPres,
             Services services);
 
     /**
-     * Returns the free modifies clause.
+     * Returns the free modifiable clause.
      *
      * @param selfTerm the self term.
      * @param atPres the operators used for the pre-heap.
      * @param services the Services object.
-     * @return The modifies clause as a term.
+     * @return The modifiable clause as a term.
      */
-    Term getFreeModifies(Term selfTerm,
+    Term getFreeModifiable(Term selfTerm,
             Map<LocationVariable, Term> atPres,
             Services services);
 
@@ -135,7 +135,7 @@ public interface LoopSpecification extends SpecificationElement {
      */
     Term getInternalSelfTerm();
 
-    Term getModifies();
+    Term getModifiable();
 
     /**
      * Returns operators internally used for the pre-heap.
@@ -169,20 +169,20 @@ public interface LoopSpecification extends SpecificationElement {
     Term getInternalVariant();
 
     /**
-     * Returns the term internally used for the modifies clause. Use with care - it is likely that
+     * Returns the term internally used for the modifiable clause. Use with care - it is likely that
      * this is *not* the right "self" for you.
      *
-     * @return The map with a modifies clause for each heap location.
+     * @return The map with a modifiable clause for each heap location.
      */
-    Map<LocationVariable, Term> getInternalModifies();
+    Map<LocationVariable, Term> getInternalModifiable();
 
     /**
-     * Returns the term internally used for the modifies clause.
+     * Returns the term internally used for the modifiable clause.
      * Use with care - it is likely that this is *not* the right "self" for you.
      *
-     * @return The map with a modifies clause for each heap location.
+     * @return The map with a modifiable clause for each heap location.
      */
-    Map<LocationVariable, Term> getInternalFreeModifies();
+    Map<LocationVariable, Term> getInternalFreeModifiable();
 
 
     Map<LocationVariable, ImmutableList<InfFlowSpec>> getInternalInfFlowSpec();
@@ -196,8 +196,8 @@ public interface LoopSpecification extends SpecificationElement {
      * @param kjt the new KeYJavaType.
      * @param invariants the new loop invariant clauses.
      * @param freeInvariants the new "free" loop invariant clauses.
-     * @param modifies the new modifies clauses.
-     * @param freeModifies the new free modifies clauses.
+     * @param modifiable the new modifiable clauses.
+     * @param freeModifiable the new free modifiable clauses.
      * @param infFlowSpecs the new information flow specification elements.
      * @param variant the new loop variant term.
      * @param selfTerm the new self term.
@@ -208,7 +208,7 @@ public interface LoopSpecification extends SpecificationElement {
      */
     LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
             Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
-            Map<LocationVariable, Term> modifies, Map<LocationVariable, Term> freeModifies,
+            Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
             Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
             Map<LocationVariable, Term> atPres);
@@ -220,8 +220,8 @@ public interface LoopSpecification extends SpecificationElement {
      * @param loop the new loop statement.
      * @param invariants the new loop invariant clauses.
      * @param freeInvariants the new "free" loop invariant clauses.
-     * @param modifies the new modifies clauses.
-     * @param freeModifies the new free modifies clauses.
+     * @param modifiable the new modifiable clauses.
+     * @param freeModifiable the new free modifiable clauses.
      * @param infFlowSpecs the new information flow specification elements.
      * @param variant the new loop variant term.
      * @param selfTerm the new self term.
@@ -232,7 +232,7 @@ public interface LoopSpecification extends SpecificationElement {
      */
     LoopSpecification create(LoopStatement loop,
             Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
-            Map<LocationVariable, Term> modifies, Map<LocationVariable, Term> freeModifies,
+            Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
             Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
             Map<LocationVariable, Term> atPres);
@@ -251,20 +251,20 @@ public interface LoopSpecification extends SpecificationElement {
 
     /**
      * Configure the existing loop specification element with new elements, i.e., loop invariant
-     * clauses, a loop variant, modifies clauses, information flow specification elements, and a
+     * clauses, a loop variant, modifiable clauses, information flow specification elements, and a
      * loop variant, possibly together with (if any) "free" loop invariant clauses.
      *
      * @param invariants the new loop invariant clauses.
      * @param freeInvariants the new "free" loop invariant clauses.
-     * @param modifies the new modifies clauses.
-     * @param freeModifies the new free modifies clauses.
+     * @param modifiable the new modifiable clauses.
+     * @param freeModifiable the new free modifiable clauses.
      * @param infFlowSpecs the new information flow specification elements.
      * @param variant the new loop variant.
      * @return The configured loop specification.
      */
     LoopSpecification configurate(
             Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
-            Map<LocationVariable, Term> modifies, Map<LocationVariable, Term> freeModifies,
+            Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant);
 
     /**

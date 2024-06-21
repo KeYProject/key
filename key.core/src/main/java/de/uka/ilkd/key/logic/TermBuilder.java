@@ -440,12 +440,12 @@ public class TermBuilder {
         return tf.createTerm(f, s, boundVars, null);
     }
 
-    // public Term prog(Modality mod, Term t) {
-    // return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock());
+    // public Term prog(Modality modality, Term t) {
+    // return tf.createTerm(modality, new Term[] { t }, null, t.javaBlock());
     // }
     //
-    // public Term prog(Modality mod, Term t, ImmutableArray<TermLabel> labels) {
-    // return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock(), labels);
+    // public Term prog(Modality modality, Term t, ImmutableArray<TermLabel> labels) {
+    // return tf.createTerm(modality, new Term[] { t }, null, t.javaBlock(), labels);
     // }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t) {
@@ -1560,7 +1560,7 @@ public class TermBuilder {
     }
 
     public Term inv(Term o) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -1574,7 +1574,7 @@ public class TermBuilder {
     }
 
     public Term staticInv(KeYJavaType t) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -1591,7 +1591,7 @@ public class TermBuilder {
     }
 
     public Term invFree(Term o) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -1605,7 +1605,7 @@ public class TermBuilder {
     }
 
     public Term staticInvFree(KeYJavaType t) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -1920,7 +1920,7 @@ public class TermBuilder {
         return reachableValue(var(pv), pv.getKeYJavaType());
     }
 
-    public Term frame(Term heapTerm, Map<Term, Term> normalToAtPre, Term mod) {
+    public Term frame(Term heapTerm, Map<Term, Term> normalToAtPre, Term modifiable) {
         final Sort objectSort = services.getJavaInfo().objectSort();
         final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
 
@@ -1932,7 +1932,7 @@ public class TermBuilder {
         final Term fieldVarTerm = var(fieldVar);
 
         final OpReplacer or = new OpReplacer(normalToAtPre, tf);
-        final Term modAtPre = or.replace(mod);
+        final Term modifiableAtPre = or.replace(modifiable);
         final Term createdAtPre = or.replace(created(heapTerm, objVarTerm));
 
         ImmutableList<QuantifiableVariable> quantVars = ImmutableSLList.nil();
@@ -1943,7 +1943,7 @@ public class TermBuilder {
         // does not follow Java typing for the permission heap
         boolean permissionHeap =
             heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
-        return all(quantVars, or(elementOf(objVarTerm, fieldVarTerm, modAtPre),
+        return all(quantVars, or(elementOf(objVarTerm, fieldVarTerm, modifiableAtPre),
             and(not(equals(objVarTerm, NULL())), not(createdAtPre)),
             equals(
                 select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort()
@@ -1991,8 +1991,8 @@ public class TermBuilder {
                     or.replace(heapTerm), objVarTerm, fieldVarTerm)));
     }
 
-    public Term anonUpd(LocationVariable heap, Term mod, Term anonHeap) {
-        return elementary(heap, anon(var(heap), mod, anonHeap));
+    public Term anonUpd(LocationVariable heap, Term modifiable, Term anonHeap) {
+        return elementary(heap, anon(var(heap), modifiable, anonHeap));
     }
 
     public Term forallHeaps(Services services, Term t) {

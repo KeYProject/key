@@ -237,7 +237,7 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
+    public Term getModifiable(LocationVariable heap) {
         throw new UnsupportedOperationException("Not applicable for dependency contracts.");
     }
 
