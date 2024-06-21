@@ -58,8 +58,7 @@ public class JavaCompilerCheckFacade {
      * @param javaPath the {@link String} with the path to the source of the target Java program
      * @return future providing the list of diagnostics
      */
-    @NonNull
-    public static CompletableFuture<List<PositionedIssueString>> check(
+    public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
             File bootClassPath, List<File> classPath, File javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {

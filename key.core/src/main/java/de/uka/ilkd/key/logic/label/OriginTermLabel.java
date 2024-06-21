@@ -692,8 +692,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * The file the term originates from.
          */
-        @Nullable
-        private final URI fileName;
+        private final @Nullable URI fileName;
 
         /**
          * The line in the file the term originates from.
@@ -786,12 +785,16 @@ public class OriginTermLabel implements TermLabel {
         ASSERT("assert"),
 
         /**
-         * assignable
+         * assignable.
+         * The name 'assignable' is kept here for legacy reasons.
+         * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
          */
         ASSIGNABLE("assignable"),
 
         /**
          * assignable_free
+         * The name 'assignable' is kept here for legacy reasons.
+         * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
          */
         ASSIGNABLE_FREE("assignable_free"),
 

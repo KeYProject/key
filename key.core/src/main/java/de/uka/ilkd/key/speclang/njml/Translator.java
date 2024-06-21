@@ -65,6 +65,9 @@ import static java.util.Objects.requireNonNull;
  */
 class Translator extends JmlParserBaseVisitor<Object> {
 
+    private final static String[] DISCOURAGED_CLAUSE_NAMES =
+        { "assigning", "assigns", "modifying", "modifies", "writing", "writes" };
+
     private final Services services;
     private final TermBuilder tb;
     private final JavaInfo javaInfo;
@@ -72,21 +75,22 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final HeapLDT heapLDT;
     private final LocSetLDT locSetLDT;
     private final BooleanLDT booleanLDT;
+    private final SortLDT sortLDT;
     private final SLExceptionFactory exc;
     private final JmlTermFactory termFactory;
-    private final ProgramVariable selfVar;
-    private final ImmutableList<ProgramVariable> paramVars;
-    private final ProgramVariable resultVar;
-    private final ProgramVariable excVar;
+    private final LocationVariable selfVar;
+    private final ImmutableList<LocationVariable> paramVars;
+    private final LocationVariable resultVar;
+    private final LocationVariable excVar;
     private final Map<LocationVariable, Term> atPres;
     private final Map<LocationVariable, Term> atBefores;
 
     // Helper objects
     private final JMLResolverManager resolverManager;
 
-    Translator(Services services, KeYJavaType specInClass, ProgramVariable self,
-            SpecMathMode specMathMode, ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable result, ProgramVariable exc, Map<LocationVariable, Term> atPres,
+    Translator(Services services, KeYJavaType specInClass, LocationVariable self,
+            SpecMathMode specMathMode, ImmutableList<LocationVariable> paramVars,
+            LocationVariable result, LocationVariable exc, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores) {
         assert self == null || specInClass != null;
 
@@ -98,6 +102,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT = services.getTypeConverter().getBooleanLDT();
+        this.sortLDT = services.getTypeConverter().getSortLDT();
         this.exc = new SLExceptionFactory(null, 1, 0);
 
         this.selfVar = self;
@@ -350,7 +355,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitCreateLocset(JmlParser.CreateLocsetContext ctx) {
-        return termFactory.createLocSet(requireNonNull(accept(ctx.exprList())));
+        JmlParser.ExprListContext exprList = ctx.exprList();
+        if (exprList == null) {
+            return termFactory.createLocSet(ImmutableSLList.nil());
+        } else {
+            return termFactory.createLocSet(requireNonNull(accept(exprList)));
+        }
     }
 
 
@@ -569,11 +579,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (floatResult != null) {
                 return floatResult;
             }
+
+            SLExpression other = expr.get(i);
+            if (other.isType() && !result.isType()) {
+                JFunction ssortFunc = sortLDT.getSsort(other.getType().getSort(), services);
+                other = new SLExpression(tb.func(ssortFunc));
+            }
+
             exc.updatePosition(ctx.getStart());
             if (tok.getText().equals("==")) {
-                result = termFactory.eq(result, expr.get(i));
+                result = termFactory.eq(result, other);
             } else {
-                result = termFactory.neq(result, expr.get(i));
+                result = termFactory.neq(result, other);
             }
         }
         return result;
@@ -621,33 +638,35 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSt_expr(JmlParser.St_exprContext ctx) {
-        SLExpression result = accept(ctx.shiftexpr(0));
+        SLExpression left = accept(ctx.shiftexpr(0));
         SLExpression right = accept(ctx.shiftexpr(1));
-        assert result != null && right != null;
+        assert left != null && right != null;
 
-        if (result.isTerm() || right.isTerm()) {
-            raiseError("Cannot build subtype expression from terms.", ctx);
-        }
-        assert result.isType();
-        assert right.isType();
-        if (result.getTerm() == null) {
-            exc.addIgnoreWarning("subtype expression <: only supported for"
-                + " \\typeof() arguments on the left side.", ctx.ST().getSymbol());
-            final Namespace<JFunction> fns = services.getNamespaces().functions();
-            int x = -1;
-            Name name;
-            do {
-                name = new Name("subtype_" + ++x);
-            } while (fns.lookup(name) != null);
-            final JFunction z = new JFunction(name, JavaDLTheory.FORMULA);
-            fns.add(z);
-            result = new SLExpression(tb.func(z));
+        if (left.isType() && left.getTerm() != null && right.isType()) {
+            Sort os = right.getType().getSort();
+            JFunction ioFunc = services.getJavaDLTheory().getInstanceofSymbol(os, services);
+            left = new SLExpression(tb.equals(tb.func(ioFunc, left.getTerm()), tb.TRUE()));
         } else {
-            final JFunction ioFunc =
-                services.getJavaDLTheory().getInstanceofSymbol(right.getType().getSort(), services);
-            result = new SLExpression(tb.equals(tb.func(ioFunc, result.getTerm()), tb.TRUE()));
+            Term leftSort;
+            if (left.isTerm()) {
+                leftSort = left.getTerm();
+            } else {
+                JFunction ssortFunc = sortLDT.getSsort(left.getType().getSort(), services);
+                leftSort = tb.func(ssortFunc);
+            }
+
+            Term rightSort;
+            if (right.isTerm()) {
+                rightSort = right.getTerm();
+            } else {
+                JFunction ssortFunc = sortLDT.getSsort(right.getType().getSort(), services);
+                rightSort = tb.func(ssortFunc);
+            }
+
+            left = new SLExpression(tb.func(sortLDT.getSsubsort(), leftSort, rightSort));
         }
-        return result;
+
+        return left;
     }
 
 
@@ -917,8 +936,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return getThisReceiver();
     }
 
-    @NonNull
-    private SLExpression getThisReceiver() {
+    private @NonNull SLExpression getThisReceiver() {
         return new SLExpression(tb.var(selfVar), selfVar.getKeYJavaType());
     }
 
@@ -1095,7 +1113,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     private SLParameters getSlParametersWithHeap(ImmutableList<SLExpression> params) {
         ImmutableList<SLExpression> preHeapParams = ImmutableSLList.nil();
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             Term p;
             if (atPres == null || atPres.get(heap) == null) {
                 p = tb.var(heap);
@@ -1501,8 +1519,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrimaryStoreRef(JmlParser.PrimaryStoreRefContext ctx) {
+        if (ctx.storeRefUnion() == null) {
+            return new SLExpression(termFactory.createLocSet(ImmutableSLList.nil()));
+        }
         Term t = accept(ctx.storeRefUnion());
-        assert t != null;
         return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
     }
 
@@ -1558,8 +1578,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             ctx.predicate(), ctx.storeref());
     }
 
-    @NonNull
-    private Object createInfiniteUnion(JmlParser.BoundvarmodifiersContext boundvarmodifiers,
+    private @NonNull Object createInfiniteUnion(
+            JmlParser.BoundvarmodifiersContext boundvarmodifiers,
             JmlParser.QuantifiedvardeclsContext quantifiedvardecls,
             JmlParser.PredicateContext predicate, JmlParser.StorerefContext storeref) {
         Boolean nullable = accept(boundvarmodifiers);
@@ -1609,8 +1629,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public SLExpression visitSequenceCreate(JmlParser.SequenceCreateContext ctx) {
         ImmutableList<SLExpression> list = accept(ctx.exprList());
-        assert list != null;
-        return termFactory.seqConst(list);
+        if (list == null) {
+            return new SLExpression(tb.seqEmpty());
+        } else {
+            return termFactory.seqConst(list);
+        }
     }
 
     @Override
@@ -1861,7 +1884,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public KeYJavaType visitType(JmlParser.TypeContext ctx) {
         if (ctx.TYPE() != null) {
-            raiseError("Only the function \\TYPE is supported", ctx);
+            return javaInfo.getKeYJavaType(PrimitiveType.JAVA_TYPE);
         }
         return oneOf(ctx.builtintype(), ctx.referencetype());
     }
@@ -1946,6 +1969,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
+        warnPotentiallyUnintendedFramingSemantics(ctx, ctx.ASSIGNABLE());
         if (ctx.STRICTLY_NOTHING() != null) {
             t = tb.strictlyNothing();
         } else {
@@ -1959,6 +1983,25 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return new SLExpression(t);
     }
 
+    @Override
+    public SLExpression visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
+        Term t;
+        LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (TerminalNode n : new TerminalNode[] { ctx.ASSIGNABLE(), ctx.LOOP_ASSIGNABLE() }) {
+            warnPotentiallyUnintendedFramingSemantics(ctx, n);
+        }
+        if (ctx.STRICTLY_NOTHING() != null) {
+            t = tb.strictlyNothing();
+        } else {
+            final Term storeRef = accept(ctx.storeRefUnion());
+            assert storeRef != null;
+            t = termFactory.assignable(storeRef);
+        }
+        for (LocationVariable heap : heaps) {
+            contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
+        }
+        return new SLExpression(t);
+    }
 
     @Override
     public SLExpression visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
@@ -2275,7 +2318,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert excType != null;
             eVar = new LogicVariable(new Name(vName), excType.getSort());
             resolverManager.pushLocalVariablesNamespace();
-            resolverManager.putIntoTopLocalVariablesNamespace(eVar, excType);
+            resolverManager.putIntoTopLogicVariablesNamespace(eVar, excType);
         }
         SLExpression result = accept(ctx.predornot());
         if (vName != null) {
@@ -2480,6 +2523,26 @@ class Translator extends JmlParserBaseVisitor<Object> {
     // region exception helper
     protected void addWarning(ParserRuleContext node, String description) {
         exc.addWarning(description, node.start);
+    }
+
+    private void warnPotentiallyUnintendedFramingSemantics(
+            ParserRuleContext ctx, TerminalNode clauseHeader) {
+        final String clauseName =
+            clauseHeader != null && clauseHeader.getText().startsWith("loop_")
+                    ? clauseHeader.getText().replaceFirst("loop_", "")
+                    : clauseHeader != null ? clauseHeader.getText() : null;
+        for (final String s : DISCOURAGED_CLAUSE_NAMES) {
+            if (clauseName != null && clauseName.startsWith(s)) {
+                // Actually, KeY only talks about what is modifiable and not assignable in general,
+                // but for legacy reasons, we use the name 'assignable'.
+                addWarning(ctx, clauseName + " does not conform to KeY's supported JML dialect, "
+                    + "but is interpreted by KeY as \"assignable\" clause in order to deal with "
+                    + "other JML dialects. "
+                    + "However, this interpretation may not correspond to the semantics "
+                    + "which you actually intended. Please consult KeY's official documentation "
+                    + "of the \"assignable\" clause.");
+            }
+        }
     }
 
     public List<PositionedString> getWarnings() {

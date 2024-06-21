@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * Objects of this class are schema variables matching program constructs within modal operators.
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
-public final class ProgramSV extends AbstractSV implements ProgramConstruct, UpdateableOperator {
+public final class ProgramSV extends OperatorSV implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =
@@ -402,7 +402,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
 
     @Override
     public int getHeapCount(Services services) {
-        return HeapContext.getModHeaps(services, false).size();
+        return HeapContext.getModifiableHeaps(services, false).size();
     }
 
     @Override

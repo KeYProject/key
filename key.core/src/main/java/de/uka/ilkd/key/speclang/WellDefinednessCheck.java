@@ -40,7 +40,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 /**
  * A contract for checking the well-definedness of a jml specification element (i.e. a class
  * invariant, a method contract, a model field or any jml statement), consisting of precondition,
- * assignable-clause, postcondition, accessible-clause, measured-by-clause and represents-clause.
+ * modifiable-clause, postcondition, accessible-clause, measured-by-clause and represents-clause.
  *
  * @author Michael Kirsten
  */
@@ -63,7 +63,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private final OriginalVariables origVars;
 
     private Condition requires;
-    private Term assignable;
+    private Term modifiable;
     private Condition ensures;
     private Term accessible;
     private Term mby;
@@ -83,7 +83,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     WellDefinednessCheck(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term assignable,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
             Term accessible, Condition ensures, Term mby, Term represents, TermBuilder tb) {
         this.name = name;
         this.id = id;
@@ -92,7 +92,7 @@ public abstract class WellDefinednessCheck implements Contract {
         this.heap = heap;
         this.origVars = origVars;
         this.requires = requires;
-        this.assignable = assignable;
+        this.modifiable = modifiable;
         this.accessible = accessible;
         this.ensures = ensures;
         this.mby = mby;
@@ -178,36 +178,35 @@ public abstract class WellDefinednessCheck implements Contract {
         return new Pair<>(implicit, explicit);
     }
 
-    private Term replaceSV(Term t, SchemaVariable self, ImmutableList<ParsableVariable> params) {
+    private Term replaceSV(Term t, OperatorSV self, ImmutableList<OperatorSV> params) {
         return replaceSV(t, self, null, null, null, params, getOrigVars(), getHeaps());
     }
 
-    private Term replaceSV(Term t, SchemaVariable selfVar, SchemaVariable resultVar,
-            SchemaVariable excVar, Map<LocationVariable, SchemaVariable> atPreVars,
-            ImmutableList<ParsableVariable> paramVars, OriginalVariables origVars,
+    private Term replaceSV(Term t, OperatorSV selfVar, OperatorSV resultVar,
+            OperatorSV excVar, Map<LocationVariable, OperatorSV> atPreVars,
+            ImmutableList<OperatorSV> paramVars, OriginalVariables origVars,
             ImmutableList<LocationVariable> heaps) {
-        Map<ProgramVariable, SchemaVariable> map =
-            getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
+        var map = getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
     }
 
-    private Term replace(Term t, ProgramVariable selfVar, ProgramVariable resultVar,
-            ProgramVariable excVar, Map<LocationVariable, ProgramVariable> atPreVars,
-            ImmutableList<ProgramVariable> paramVars, OriginalVariables origVars,
+    private Term replace(Term t, LocationVariable selfVar, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            ImmutableList<LocationVariable> paramVars, OriginalVariables origVars,
             ImmutableList<LocationVariable> heaps) {
-        Map<ProgramVariable, ProgramVariable> map =
+        Map<LocationVariable, LocationVariable> map =
             getReplaceMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
     }
 
-    private static Map<ProgramVariable, SchemaVariable> getSchemaMap(SchemaVariable selfVar,
-            SchemaVariable resultVar, SchemaVariable excVar,
-            Map<LocationVariable, SchemaVariable> atPreVars,
-            ImmutableList<ParsableVariable> paramVars, OriginalVariables vars,
+    private static Map<LocationVariable, OperatorSV> getSchemaMap(OperatorSV selfVar,
+            OperatorSV resultVar, OperatorSV excVar,
+            Map<LocationVariable, OperatorSV> atPreVars,
+            ImmutableList<OperatorSV> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
-        final Map<ProgramVariable, SchemaVariable> result =
+        final Map<LocationVariable, OperatorSV> result =
             new LinkedHashMap<>();
         // self
         if (selfVar != null && vars.self != null) {
@@ -218,15 +217,13 @@ public abstract class WellDefinednessCheck implements Contract {
         if (paramVars != null && vars.params != null && !paramVars.isEmpty()
                 && !vars.params.isEmpty()) {
             assert vars.params.size() == paramVars.size();
-            final Iterator<ProgramVariable> it1 = vars.params.iterator();
-            final Iterator<ParsableVariable> it2 = paramVars.iterator();
+            final Iterator<LocationVariable> it1 = vars.params.iterator();
+            final Iterator<OperatorSV> it2 = paramVars.iterator();
             while (it1.hasNext()) {
-                ProgramVariable originalParamVar = it1.next();
-                ParsableVariable paramVar = it2.next();
-                assert paramVar instanceof SchemaVariable;
-                SchemaVariable paramSV = (SchemaVariable) paramVar;
-                assert originalParamVar.sort().equals(paramSV.sort());
-                result.put(originalParamVar, paramSV);
+                var originalParamVar = it1.next();
+                var paramVar = it2.next();
+                assert originalParamVar.sort().equals(paramVar.sort());
+                result.put(originalParamVar, paramVar);
             }
         }
         // result
@@ -251,12 +248,12 @@ public abstract class WellDefinednessCheck implements Contract {
         return result;
     }
 
-    private static Map<ProgramVariable, ProgramVariable> getReplaceMap(ProgramVariable selfVar,
-            ProgramVariable resultVar, ProgramVariable excVar,
-            Map<LocationVariable, ProgramVariable> atPreVars,
-            ImmutableList<ProgramVariable> paramVars, OriginalVariables vars,
+    private static Map<LocationVariable, LocationVariable> getReplaceMap(LocationVariable selfVar,
+            LocationVariable resultVar, LocationVariable excVar,
+            Map<LocationVariable, LocationVariable> atPreVars,
+            ImmutableList<LocationVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
-        final Map<ProgramVariable, ProgramVariable> result =
+        final Map<LocationVariable, LocationVariable> result =
             new LinkedHashMap<>();
         // self
         if (selfVar != null && vars.self != null) {
@@ -268,11 +265,11 @@ public abstract class WellDefinednessCheck implements Contract {
         if (paramVars != null && vars.params != null && !paramVars.isEmpty()
                 && !vars.params.isEmpty()) {
             assert vars.params.size() == paramVars.size();
-            final Iterator<ProgramVariable> it1 = vars.params.iterator();
-            final Iterator<ProgramVariable> it2 = paramVars.iterator();
+            final Iterator<LocationVariable> it1 = vars.params.iterator();
+            final Iterator<LocationVariable> it2 = paramVars.iterator();
             while (it1.hasNext()) {
-                ProgramVariable originalParamVar = it1.next();
-                ProgramVariable paramVar = it2.next();
+                LocationVariable originalParamVar = it1.next();
+                LocationVariable paramVar = it2.next();
                 assert originalParamVar.sort().equals(paramVar.sort());
                 result.put(originalParamVar, paramVar);
             }
@@ -386,24 +383,25 @@ public abstract class WellDefinednessCheck implements Contract {
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMby, false) : printMby.trim());
         }
-        String mods = "";
+        String modifiables = "";
         final boolean isInv = type().equals(Type.CLASS_INVARIANT);
         final boolean isLoop = type().equals(Type.LOOP_INVARIANT);
         final boolean showSig = !isInv && !modelField();
-        if (getAssignable() != null && showSig) {
-            String printMods = LogicPrinter.quickPrintTerm(
-                getAssignable(null).equalsModProperty(TB.strictlyNothing(),
+        if (getModifiable() != null && showSig) {
+            String printModifiables = LogicPrinter.quickPrintTerm(
+                getModifiable(null).equalsModProperty(TB.strictlyNothing(),
                     IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.empty()
-                            : this.getAssignable(null),
+                            : this.getModifiable(null),
                 services);
-            mods = mods + (includeHtmlMarkup ? "<br><b>" : "\n") + "mod"
+            modifiables += (includeHtmlMarkup ? "<br><b>" : "\n") + "modifiable"
                 + (includeHtmlMarkup ? "</b> " : ": ")
-                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false)
-                        : printMods.trim());
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printModifiables, false)
+                        : printModifiables.trim());
         }
-        if (getAssignable().equals(TB.strictlyNothing()) && showSig) {
-            mods = mods + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
-                + (includeHtmlMarkup ? "</b>" : "");
+        if (getModifiable() != null && getModifiable().equals(TB.strictlyNothing()) && showSig) {
+            modifiables +=
+                (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
+                    + (includeHtmlMarkup ? "</b>" : "");
         }
         String globalUpdates = "";
         if (getGlobalDefs() != null) {
@@ -416,7 +414,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String pres = "";
         if (getRequires(null) != null) {
             String printPres = LogicPrinter.quickPrintTerm(getRequires(null), services);
-            pres = pres + (includeHtmlMarkup ? "<br><b>" : "\n")
+            pres += (includeHtmlMarkup ? "<br><b>" : "\n")
                     + ((!isInv && !isLoop) ? "pre" : "inv") + (includeHtmlMarkup ? "</b> " : ": ")
                     + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPres, false)
                             : printPres);
@@ -424,7 +422,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String deps = "";
         if (getAccessible() != null) {
             String printDeps = LogicPrinter.quickPrintTerm(getAccessible(), services);
-            deps = deps + (includeHtmlMarkup ? "<br><b>" : "\n") + "dep"
+            deps += (includeHtmlMarkup ? "<br><b>" : "\n") + "dep"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printDeps, false)
                         : printDeps);
@@ -432,7 +430,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String reps = "";
         if (getRepresents() != null) {
             String printReps = LogicPrinter.quickPrintTerm(getRepresents(), services);
-            reps = reps + (includeHtmlMarkup ? "<br><b>" : "\n") + "rep"
+            reps += (includeHtmlMarkup ? "<br><b>" : "\n") + "rep"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printReps, false)
                         : printReps);
@@ -440,7 +438,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String posts = "";
         if (getEnsures(null) != null && showSig && !isLoop) {
             String printPosts = LogicPrinter.quickPrintTerm(getEnsures(null), services);
-            posts = posts + (includeHtmlMarkup ? "<br><b>" : "\n") + "post"
+            posts += (includeHtmlMarkup ? "<br><b>" : "\n") + "post"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
                         : printPosts);
@@ -448,7 +446,7 @@ public abstract class WellDefinednessCheck implements Contract {
         String axioms = "";
         if (getAxiom() != null) {
             String printAxioms = LogicPrinter.quickPrintTerm(getAxiom(), services);
-            axioms = axioms + (includeHtmlMarkup ? "<br><b>" : "\n") + "axiom"
+            axioms += (includeHtmlMarkup ? "<br><b>" : "\n") + "axiom"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
                         : printAxioms);
@@ -461,11 +459,11 @@ public abstract class WellDefinednessCheck implements Contract {
         if (includeHtmlMarkup) {
             return "<html>"
                 + (showSig ? ("<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>") : "")
-                + globalUpdates + pres + deps + reps + posts + axioms + mods + mby
+                + globalUpdates + pres + deps + reps + posts + axioms + modifiables + mby
                 + transactionApplicable + "</html>";
         } else {
             return (showSig ? sig.toString() : "") + globalUpdates + pres + deps + reps + posts
-                    + axioms + mods + mby + transactionApplicable;
+                    + axioms + modifiables + mby + transactionApplicable;
         }
     }
 
@@ -478,7 +476,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param services
      * @return specified precondition appended with free precondition
      */
-    private Term appendFreePre(Term pre, ParsableVariable self, ParsableVariable heap,
+    private Term appendFreePre(Term pre, ProgramVariable self, ProgramVariable heap,
             TermServices services) {
         final IObserverFunction target = getTarget();
         final KeYJavaType selfKJT = target.getContainerType();
@@ -495,9 +493,9 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    private Term generateSelfNotNull(ParsableVariable selfVar) {
+    private Term generateSelfNotNull(AbstractSortedOperator selfVar) {
         return selfVar == null || isConstructor() ? TB.tt()
-                : TB.not(TB.equals(TB.var(selfVar), TB.NULL()));
+                : TB.not(TB.equals(TB.tf().createTerm(selfVar), TB.NULL()));
     }
 
     /**
@@ -506,11 +504,11 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    private Term generateSelfCreated(ParsableVariable selfVar, ParsableVariable heap) {
+    private Term generateSelfCreated(AbstractSortedOperator selfVar, AbstractSortedOperator heap) {
         if (selfVar == null || isConstructor()) {
             return TB.tt();
         } else {
-            return TB.created(TB.var(heap), TB.var(selfVar));
+            return TB.created(TB.tf().createTerm(heap), TB.tf().createTerm(selfVar));
         }
     }
 
@@ -521,33 +519,36 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    private Term generateSelfExactType(ParsableVariable selfVar) {
+    private Term generateSelfExactType(AbstractSortedOperator selfVar) {
         return selfVar == null || isConstructor() ? TB.tt()
-                : TB.exactInstance(getKJT().getSort(), TB.var(selfVar));
+                : TB.exactInstance(getKJT().getSort(), TB.tf().createTerm(selfVar));
     }
 
     /**
      * Generates the general assumption that all parameter arguments are valid.
      *
-     * @param paramVars The parameters {@link ProgramVariable}s.
+     * @param paramVars The parameters {@link LocationVariable}s.
      * @return The term representing the general assumption.
      */
-    private Term generateParamsOK(ImmutableList<ParsableVariable> paramVars) {
+    private Term generateParamsOK(ImmutableList<? extends AbstractSortedOperator> paramVars) {
         Term paramsOK = TB.tt();
         if (paramVars.size() == getOrigVars().params.size()) {
-            final Iterator<ProgramVariable> origParams = getOrigVars().params.iterator();
-            for (ParsableVariable paramVar : paramVars) {
+            final Iterator<LocationVariable> origParams = getOrigVars().params.iterator();
+            for (AbstractSortedOperator paramVar : paramVars) {
                 assert origParams.hasNext();
                 paramsOK = TB.and(paramsOK,
-                    TB.reachableValue(TB.var(paramVar), origParams.next().getKeYJavaType()));
+                    TB.reachableValue(TB.tf().createTerm(paramVar),
+                        origParams.next().getKeYJavaType()));
             }
         } else {
-            for (ParsableVariable paramVar : paramVars) {
-                assert paramVar instanceof ProgramVariable;
-                ProgramVariable pv = (ProgramVariable) paramVar;
-                paramsOK =
-                    TB.and(paramsOK, TB.reachableValue(TB.var(paramVar), pv.getKeYJavaType()));
-            }
+            throw new RuntimeException("Unequal number of params!");
+            /*
+             * for (AbstractSortedOperator paramVar : paramVars) {
+             * paramsOK =
+             * TB.and(paramsOK,
+             * TB.reachableValue(TB.var(paramVar), paramVar.getKeYJavaType()));
+             * }
+             */
         }
         return paramsOK;
     }
@@ -559,12 +560,11 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param self self variable
      * @param heap heap variable
      * @param params list of parameter variables
-     * @param taclet boolean is true if used for a wd-taclet
      * @param services
      * @return The {@link Term} containing the general assumptions.
      */
-    private TermListAndFunc buildFreePre(Term implicitPre, ParsableVariable self,
-            ParsableVariable heap, ImmutableList<ParsableVariable> params, boolean taclet,
+    private TermListAndFunc buildFreePre(Term implicitPre, LocationVariable self,
+            LocationVariable heap, ImmutableList<LocationVariable> params,
             Services services) {
         ImmutableList<Term> resList = ImmutableSLList.nil();
 
@@ -585,7 +585,7 @@ public abstract class WellDefinednessCheck implements Contract {
         // initial value of measured_by clause
         final JFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
         final Term mbyAtPreDef;
-        if (!taclet && type().equals(Type.OPERATION_CONTRACT)) {
+        if (type().equals(Type.OPERATION_CONTRACT)) {
             MethodWellDefinedness mwd = (MethodWellDefinedness) this;
             mbyAtPreDef = mwd.generateMbyAtPreDef(self, params, mbyAtPreFunc, services);
         } else {
@@ -598,13 +598,53 @@ public abstract class WellDefinednessCheck implements Contract {
                 ? TB.inv(new Term[] { TB.var(heap) }, TB.var(self))
                 : TB.tt();
 
-        final Term[] result;
-        if (!taclet) {
-            result = new Term[] { wellFormed, selfNotNull, selfCreated, selfExactType, invTerm,
+        final Term[] result =
+            new Term[] { wellFormed, selfNotNull, selfCreated, selfExactType, invTerm,
                 paramsOK, implicitPre, mbyAtPreDef };
-        } else {
-            result = new Term[] { wellFormed, paramsOK, implicitPre };
+
+        for (Term t : result) {
+            resList = resList.append(t);
         }
+        return new TermListAndFunc(resList, mbyAtPreFunc);
+    }
+
+    /**
+     * Builds the "general assumption"
+     *
+     * @param implicitPre the implicit precondition
+     * @param self self variable
+     * @param heap heap variable
+     * @param params list of parameter variables
+     * @param services
+     * @return The {@link Term} containing the general assumptions.
+     */
+    private TermListAndFunc buildFreePreForTaclet(Term implicitPre, TermSV self,
+            TermSV heap, ImmutableList<OperatorSV> params,
+            Services services) {
+        ImmutableList<Term> resList = ImmutableSLList.nil();
+
+        // "self != null"
+        final Term selfNotNull = generateSelfNotNull(self);
+
+        // "self.<created> = TRUE"
+        final Term selfCreated = generateSelfCreated(self, heap);
+
+        // "MyClass::exactInstance(self) = TRUE"
+        final Term selfExactType = generateSelfExactType(self);
+
+        // conjunction of...
+        // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
+        // - "inBounds(p_i)" for integer parameters
+        final Term paramsOK = generateParamsOK(params);
+
+        // initial value of measured_by clause
+        final JFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
+
+        final Term wellFormed = TB.wellFormed(TB.var(heap));
+
+        final Term[] result;
+        result = new Term[] { wellFormed, paramsOK, implicitPre };
+
         for (Term t : result) {
             resList = resList.append(t);
         }
@@ -629,11 +669,11 @@ public abstract class WellDefinednessCheck implements Contract {
         assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
         assert find1.sub(0).arity() == find2.sub(0).arity();
 
-        Map<ParsableVariable, ParsableVariable> map =
+        Map<ProgramVariable, ProgramVariable> map =
             new LinkedHashMap<>();
         int i = 0;
         for (Term sub : find1.sub(0).subs()) {
-            map.put((ParsableVariable) find2.sub(0).sub(i).op(), (ParsableVariable) sub.op());
+            map.put((ProgramVariable) find2.sub(0).sub(i).op(), (ProgramVariable) sub.op());
             i++;
         }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory());
@@ -697,8 +737,8 @@ public abstract class WellDefinednessCheck implements Contract {
             newVars.params, getOrigVars(), getHeaps());
     }
 
-    final Condition replaceSV(Condition pre, SchemaVariable self,
-            ImmutableList<ParsableVariable> params) {
+    final Condition replaceSV(Condition pre, OperatorSV self,
+            ImmutableList<OperatorSV> params) {
         final Term implicit = replaceSV(pre.implicit, self, params);
         final Term explicit = replaceSV(pre.explicit, self, params);
         return new Condition(implicit, explicit);
@@ -723,31 +763,32 @@ public abstract class WellDefinednessCheck implements Contract {
         this.requires = split(req);
     }
 
-    final void setAssignable(Term ass, TermServices services) {
-        this.assignable = ass;
-        if (ass == null
+    final void setModifiable(Term modifiables, TermServices services) {
+        this.modifiable = modifiables;
+        if (modifiables == null
                 || TB.strictlyNothing().equalsModProperty(
-                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)
+                    modifiables, IRRELEVANT_TERM_LABELS_PROPERTY)
                 || TB.FALSE().equalsModProperty(
-                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
-            this.assignable = TB.strictlyNothing();
+                    modifiables, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            this.modifiable = TB.strictlyNothing();
         } else if (TB.tt().equalsModProperty(
-            ass, IRRELEVANT_TERM_LABELS_PROPERTY)
+            modifiables, IRRELEVANT_TERM_LABELS_PROPERTY)
                 || TB.TRUE().equalsModProperty(
-                    ass, IRRELEVANT_TERM_LABELS_PROPERTY)) {
-            this.assignable = TB.allLocs();
+                    modifiables, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            this.modifiable = TB.allLocs();
         }
     }
 
-    final void combineAssignable(Term ass1, Term ass2, TermServices services) {
-        if (ass1 == null || TB.strictlyNothing().equalsModProperty(
-            ass1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
-            setAssignable(ass2, services);
-        } else if (ass2 == null || TB.strictlyNothing().equalsModProperty(
-            ass2, IRRELEVANT_TERM_LABELS_PROPERTY)) {
-            setAssignable(ass1, services);
+    final void combineModifiable(Term modifiables1, Term modifiables2,
+            TermServices services) {
+        if (modifiables1 == null || TB.strictlyNothing().equalsModProperty(
+            modifiables1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            setModifiable(modifiables2, services);
+        } else if (modifiables2 == null || TB.strictlyNothing().equalsModProperty(
+            modifiables2, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            setModifiable(modifiables1, services);
         } else {
-            setAssignable(TB.union(ass1, ass2), services);
+            setModifiable(TB.union(modifiables1, modifiables2), services);
         }
     }
 
@@ -795,8 +836,8 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     /**
-     * Collects all remaining (implicitly or explicity) specified clauses (except for pre-condition,
-     * post-condition and assignable-clause).
+     * Collects all remaining (implicitly or explicitly) specified clauses (except for
+     * pre-condition, post-condition and modifiable-clause).
      *
      * @return a list of all remaining clauses
      */
@@ -868,12 +909,12 @@ public abstract class WellDefinednessCheck implements Contract {
             final Term acc = wdc.replace(wdc.getAccessible(), this.getOrigVars());
             setAccessible(acc);
         }
-        if (this.getAssignable() != null && wdc.getAssignable() != null) {
-            final Term ass = wdc.replace(wdc.getAssignable(), this.getOrigVars());
-            combineAssignable(ass, this.getAssignable(), services);
-        } else if (wdc.getAssignable() != null) {
-            final Term ass = wdc.replace(wdc.getAssignable(), this.getOrigVars());
-            setAssignable(ass, services);
+        if (this.getModifiable() != null && wdc.getModifiable() != null) {
+            final Term ass = wdc.replace(wdc.getModifiable(), this.getOrigVars());
+            combineModifiable(ass, this.getModifiable(), services);
+        } else if (wdc.getModifiable() != null) {
+            final Term ass = wdc.replace(wdc.getModifiable(), this.getOrigVars());
+            setModifiable(ass, services);
         }
         final Condition ens = wdc.replace(wdc.getEnsures(), this.getOrigVars());
         addEnsures(ens);
@@ -918,15 +959,15 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     /**
-     * collects terms for precondition, assignable clause and other specification elements, and
+     * collects terms for precondition, modifiable clause and other specification elements, and
      * postcondition and signals-clause
      */
     public final POTerms createPOTerms() {
         final Condition pre = this.getRequires();
-        final Term mod = this.getAssignable();
+        final Term modifiable = this.getModifiable();
         final ImmutableList<Term> rest = this.getRest();
         final Condition post = this.getEnsures();
-        return new POTerms(pre, mod, rest, post);
+        return new POTerms(pre, modifiable, rest, post);
     }
 
     public final WellDefinednessCheck addRepresents(Term rep) {
@@ -946,30 +987,46 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param self the new self variable
      * @param heap the new heap variable
      * @param parameters the new parameter list
-     * @param taclet is true if the precondition will be used in a taclet
      * @param services
      * @return the full valid pre-condition assumed in the pre-state including the measured-by
      *         function
      */
-    public final TermAndFunc getPre(final Condition pre, ParsableVariable self,
-            ParsableVariable heap, ImmutableList<? extends ParsableVariable> parameters,
-            boolean taclet, Services services) {
-        ImmutableList<ParsableVariable> params = ImmutableSLList.nil();
-        for (ParsableVariable pv : parameters) {
-            params = params.append(pv);
-        }
+    public final TermAndFunc getPre(final Condition pre, LocationVariable self,
+            LocationVariable heap, ImmutableList<LocationVariable> parameters,
+            Services services) {
         final IObserverFunction target = getTarget();
         final TermListAndFunc freePre =
-            buildFreePre(pre.implicit, self, heap, params, taclet, services);
+            buildFreePre(pre.implicit, self, heap, parameters, services);
         final ImmutableList<Term> preTerms = freePre.terms.append(pre.explicit);
         Term res = TB.andSC(preTerms);
-        if (!taclet && target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor()
+        if (target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor()
                 && !JMLInfoExtractor.isHelper((IProgramMethod) target)) {
             final Term constructorPre = appendFreePre(res, self, heap, services);
             return new TermAndFunc(constructorPre, freePre.func);
         } else {
             return new TermAndFunc(res, freePre.func);
         }
+    }
+
+    /**
+     * Gets the full valid precondition, which holds in the element's pre-state.
+     *
+     * @param pre the precondition with the original variables
+     * @param self the new self variable
+     * @param heap the new heap variable
+     * @param parameters the new parameter list
+     * @param services
+     * @return the full valid pre-condition assumed in the pre-state including the measured-by
+     *         function
+     */
+    public final TermAndFunc getPreForTaclet(final Condition pre, TermSV self,
+            TermSV heap, ImmutableList<OperatorSV> parameters,
+            Services services) {
+        final TermListAndFunc freePre =
+            buildFreePreForTaclet(pre.implicit, self, heap, parameters, services);
+        final ImmutableList<Term> preTerms = freePre.terms.append(pre.explicit);
+
+        return new TermAndFunc(TB.andSC(preTerms), freePre.func);
     }
 
     /**
@@ -980,7 +1037,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param services
      * @return the full valid post-condition
      */
-    public final Term getPost(final Condition post, ParsableVariable result,
+    public final Term getPost(final Condition post, ProgramVariable result,
             TermServices services) {
         final Term reachable;
         if (result != null) {
@@ -994,7 +1051,7 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Gets the necessary updates applicable to the post-condition
      *
-     * @param mod the assignable-clause
+     * @param modifiable the modifiable-clause
      * @param heap the current heap variable
      * @param heapAtPre the current variable for the heap of the pre-state
      * @param anonHeap the anonymous heap term
@@ -1002,14 +1059,16 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return the applicable update term including an update for old-expressions and the
      *         anonymisation update
      */
-    public final Term getUpdates(Term mod, LocationVariable heap, ProgramVariable heapAtPre,
+    public final Term getUpdates(Term modifiable, LocationVariable heap, ProgramVariable heapAtPre,
             Term anonHeap, TermServices services) {
-        assert mod != null;
+        assert modifiable != null;
         assert anonHeap != null
-                || TB.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY);
+                || TB.strictlyNothing().equalsModProperty(modifiable,
+                    IRRELEVANT_TERM_LABELS_PROPERTY);
         final Term havocUpd =
-            TB.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY) ? TB.skip()
-                    : TB.elementary(heap, TB.anon(TB.var(heap), mod, anonHeap));
+            TB.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)
+                    ? TB.skip()
+                    : TB.elementary(heap, TB.anon(TB.var(heap), modifiable, anonHeap));
         final Term oldUpd =
             heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();
         return TB.parallel(oldUpd, havocUpd);
@@ -1022,10 +1081,10 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public final POTerms replace(POTerms po, Variables vars) {
         final Condition pre = replace(po.pre, vars);
-        final Term mod = replace(po.mod, vars);
+        final Term modifiable = replace(po.modifiable, vars);
         final ImmutableList<Term> rest = replace(po.rest, vars);
         final Condition post = replace(po.post, vars);
-        return new POTerms(pre, mod, rest, post);
+        return new POTerms(pre, modifiable, rest, post);
     }
 
     public final LocationVariable getHeap() {
@@ -1041,9 +1100,9 @@ public abstract class WellDefinednessCheck implements Contract {
         return this.requires;
     }
 
-    public final Term getAssignable() {
-        assert this.assignable != null;
-        return this.assignable;
+    public final Term getModifiable() {
+        assert this.modifiable != null;
+        return this.modifiable;
     }
 
     public final Term getAccessible() {
@@ -1099,12 +1158,12 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Override
-    public final Term getAssignable(LocationVariable heap) {
-        return getAssignable();
+    public final Term getModifiable(LocationVariable heap) {
+        return getModifiable();
     }
 
     @Override
-    public final Term getAccessible(ProgramVariable heap) {
+    public final Term getAccessible(LocationVariable heap) {
         return getAccessible();
     }
 
@@ -1202,18 +1261,18 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     @Deprecated
-    public final Term getPre(LocationVariable heap, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services)
+    public final Term getPre(LocationVariable heap, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services)
             throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Override
     @Deprecated
-    public final Term getPre(List<LocationVariable> heapContext, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services)
+    public final Term getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services)
             throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
@@ -1237,9 +1296,9 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     @Deprecated
-    public final Term getDep(LocationVariable heap, boolean atPre, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
+    public final Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
@@ -1259,7 +1318,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     @Deprecated
-    public final Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+    public final Term getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
@@ -1316,11 +1375,12 @@ public abstract class WellDefinednessCheck implements Contract {
 
     /**
      * A data structure for storing and passing all specifications of a specification element
-     * includinf pre- and post-condition, an assignable-clause and a list of all other clauses
+     * including pre- and post-condition, a modifiable-clause and a list of all other clauses
      * specified.
      *
      * @author Michael Kirsten
      */
-    public record POTerms(Condition pre, Term mod, ImmutableList<Term> rest, Condition post) {
+    public record POTerms(Condition pre, Term modifiable, ImmutableList<Term> rest,
+            Condition post) {
     }
 }

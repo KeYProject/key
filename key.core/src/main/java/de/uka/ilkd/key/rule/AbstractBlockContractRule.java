@@ -179,7 +179,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
-            if (contract.hasModifiesClause(variable)) {
+            if (contract.hasModifiableClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
                 final JFunction anonymisationFunction =
@@ -407,8 +407,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             final Map<LocationVariable, JFunction> anonymisationHeaps,
             final Services services, final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
-            final ImmutableSet<ProgramVariable> localOutVariables,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localOutVariables,
             final BlockContractInternalBuiltInRuleApp application,
             final Instantiation instantiation) {
         assert heaps.size() == 1 && anonymisationHeaps.size() <= 1

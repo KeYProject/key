@@ -5,7 +5,7 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
@@ -29,8 +29,8 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
          * changed if needed.
          */
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        ProgramVariable self =
-            services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
+        var self = (LocationVariable) services.getJavaInfo()
+                .getCanonicalFieldProgramVariable("next", containerType);
         JmlIO io = new JmlIO(getServices()).classType(containerType)
                 .specMathMode(SpecMathMode.BIGINT).selfVar(self);
         return io.parseExpression(p);

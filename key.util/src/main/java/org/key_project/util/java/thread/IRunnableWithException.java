@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java.thread;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A {@link Runnable} that provides access to an exception that occurred during execution
@@ -21,5 +23,6 @@ public interface IRunnableWithException extends Runnable {
      *
      * @return An occurred exception.
      */
+    @Nullable
     Exception getException();
 }

@@ -7,4 +7,7 @@
  * @date 2019-04-18
  * @see "https://dzone.com/articles/closer-look-junit-categories"
  */
+@NullMarked
 package org.key_project.util.testcategories;
+
+import org.jspecify.annotations.NullMarked;

@@ -15,7 +15,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
-
 /**
  * A JML depends / accessible clause for a model field in textual form. Note that such clauses for
  * *methods* are part of TextualJMLSpecCase.
@@ -24,9 +23,9 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
     private final Map<Name, ImmutableList<LabeledParserRuleContext>> depends =
         new LinkedHashMap<>();
 
-    public TextualJMLDepends(ImmutableList<JMLModifier> mods, Name[] heaps,
+    public TextualJMLDepends(ImmutableList<JMLModifier> modifiers, Name[] heaps,
             @NonNull LabeledParserRuleContext depends) {
-        super(mods);
+        super(modifiers);
         setPosition(depends);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
             this.depends.put(hName, ImmutableSLList.nil());
@@ -56,12 +55,12 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
         if (!(o instanceof TextualJMLDepends a)) {
             return false;
         }
-        return mods.equals(a.mods) && depends.equals(a.depends);
+        return modifiers.equals(a.modifiers) && depends.equals(a.depends);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + depends.hashCode();
+        return modifiers.hashCode() + depends.hashCode();
     }
 }
