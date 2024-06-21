@@ -20,7 +20,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
  */
 public class HeapContext {
 
-    public static List<LocationVariable> getModHeaps(Services services, boolean transaction) {
+    public static List<LocationVariable> getModifiableHeaps(Services services,
+            boolean transaction) {
         List<LocationVariable> result = new ArrayList<>();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {

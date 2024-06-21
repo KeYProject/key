@@ -15,9 +15,9 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
     private final JmlParser.Set_statementContext assignment;
 
 
-    public TextualJMLSetStatement(ImmutableList<JMLModifier> mods,
+    public TextualJMLSetStatement(ImmutableList<JMLModifier> modifiers,
             JmlParser.Set_statementContext assignment) {
-        super(mods);
+        super(modifiers);
         assert assignment != null;
         this.assignment = assignment;
         setPosition(assignment);
@@ -37,13 +37,15 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLSetStatement ss)) { return false; }
-        return mods.equals(ss.mods) && assignment.equals(ss.assignment);
+        if (!(o instanceof TextualJMLSetStatement ss)) {
+            return false;
+        }
+        return modifiers.equals(ss.modifiers) && assignment.equals(ss.assignment);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + assignment.hashCode();
+        return modifiers.hashCode() + assignment.hashCode();
     }
 }

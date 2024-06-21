@@ -90,15 +90,21 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
     public UseDependencyContractApp tryToInstantiate(Goal goal) {
-        if (heapContext == null) { heapContext = HeapContext.getModHeaps(goal.proof().getServices(), false); }
-        if (complete()) { return this; }
+        if (heapContext == null) {
+            heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), false);
+        }
+        if (complete()) {
+            return this;
+        }
         UseDependencyContractApp app = this;
 
         final Services services = goal.proof().getServices();
 
         app = tryToInstantiateContract(services);
 
-        if (!app.complete() && app.isSufficientlyComplete()) { app = app.computeStep(goal.sequent(), services); }
+        if (!app.complete() && app.isSufficientlyComplete()) {
+            app = app.computeStep(goal.sequent(), services);
+        }
         return app;
     }
 
@@ -106,8 +112,10 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         final Term focus = posInOccurrence().subTerm();
         if (!(focus.op() instanceof IObserverFunction target))
         // TODO: find more appropriate exception
-        { throw new RuntimeException(
-            "Dependency contract rule is not applicable to term " + focus); }
+        {
+            throw new RuntimeException(
+                "Dependency contract rule is not applicable to term " + focus);
+        }
 
         final Term selfTerm;
         final KeYJavaType kjt;
@@ -116,7 +124,9 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
             selfTerm = null;
             kjt = target.getContainerType();
         } else {
-            if (getHeapContext() == null) { heapContext = HeapContext.getModHeaps(services, false); }
+            if (getHeapContext() == null) {
+                heapContext = HeapContext.getModifiableHeaps(services, false);
+            }
             selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
             kjt = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
         }
@@ -125,7 +135,9 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
         if (contracts.size() > 0) {
             UseDependencyContractApp r = setContract(contracts.iterator().next());
-            if (r.getHeapContext() == null) { r.heapContext = HeapContext.getModHeaps(services, false); }
+            if (r.getHeapContext() == null) {
+                r.heapContext = HeapContext.getModifiableHeaps(services, false);
+            }
             return r;
         }
         return this;

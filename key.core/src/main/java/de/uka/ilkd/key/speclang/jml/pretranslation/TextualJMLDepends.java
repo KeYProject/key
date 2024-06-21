@@ -23,13 +23,17 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
     private final Map<Name, ImmutableList<LabeledParserRuleContext>> depends =
         new LinkedHashMap<>();
 
-    public TextualJMLDepends(ImmutableList<JMLModifier> mods, Name[] heaps,
+    public TextualJMLDepends(ImmutableList<JMLModifier> modifiers, Name[] heaps,
             @NonNull LabeledParserRuleContext depends) {
-        super(mods);
+        super(modifiers);
         setPosition(depends);
-        for (Name hName : HeapLDT.VALID_HEAP_NAMES) { this.depends.put(hName, ImmutableSLList.nil()); }
+        for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
+            this.depends.put(hName, ImmutableSLList.nil());
+        }
 
-        for (Name heap : heaps) { this.depends.put(heap, ImmutableSLList.singleton(depends)); }
+        for (Name heap : heaps) {
+            this.depends.put(heap, ImmutableSLList.singleton(depends));
+        }
     }
 
     public ImmutableList<LabeledParserRuleContext> getDepends() {
@@ -48,13 +52,15 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLDepends a)) { return false; }
-        return mods.equals(a.mods) && depends.equals(a.depends);
+        if (!(o instanceof TextualJMLDepends a)) {
+            return false;
+        }
+        return modifiers.equals(a.modifiers) && depends.equals(a.depends);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + depends.hashCode();
+        return modifiers.hashCode() + depends.hashCode();
     }
 }

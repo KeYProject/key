@@ -41,7 +41,9 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term loopTerm = term.sub(0);
         final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
-        if (loopSpec == null) { return null; }
+        if (loopSpec == null) {
+            return null;
+        }
 
         final Term anonHeapTerm = term.sub(1);
         final Term anonSavedHeapTerm = term.sub(2);
@@ -56,22 +58,15 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     /**
      * Creates the anonymizing update for the given loop specification.
      *
-     * @param loopSpec
-     *        The {@link LoopSpecification}.
-     * @param isTransaction
-     *        set to true iff we're in a transaction modality (then, there are more
+     * @param loopSpec The {@link LoopSpecification}.
+     * @param isTransaction set to true iff we're in a transaction modality (then, there are more
      *        heaps available).
-     * @param isPermissions
-     *        set to true if the permissions profile is active (then, the permissions
+     * @param isPermissions set to true if the permissions profile is active (then, the permissions
      *        heap is available).
-     * @param anonHeapTerm
-     *        The term with the Skolem heap.
-     * @param anonSavedHeapTerm
-     *        The term with the Skolem saved heap.
-     * @param anonPermissionsHeapTerm
-     *        The term with the Skolem permissions heap.
-     * @param services
-     *        The {@link Services} object (for the {@link TermBuilder}).
+     * @param anonHeapTerm The term with the Skolem heap.
+     * @param anonSavedHeapTerm The term with the Skolem saved heap.
+     * @param anonPermissionsHeapTerm The term with the Skolem permissions heap.
+     * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
     private static Term createHeapAnonUpdate(LoopSpecification loopSpec, boolean isTransaction,
@@ -81,16 +76,16 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
         final List<LocationVariable> heapContext = //
-            HeapContext.getModHeaps(services, isTransaction);
+            HeapContext.getModifiableHeaps(services, isTransaction);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        // The call to MiscTools.removeSingletonPVs removes from the assignable clause
+        // The call to MiscTools.removeSingletonPVs removes from the modifiable clause
         // the program variables which of course should not be part of an anonymizing
         // heap expression. The reason why they're there at all is that for Abstract
-        // Execution, it actually makes sense to have program variables in assignable
+        // Execution, it actually makes sense to have program variables in modifiable
         // clauses, since for an abstract statement they cannot be extracted like for
         // concrete statements (such as loop bodies). (DS, 2019-07-05)
         heapContext.forEach(heap -> mods.put(heap,
-            loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
+            loopSpec.getModifiable(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
@@ -117,15 +112,11 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * Creates an elementary "heap := anon_heap_LOOP<<anonHeapFunction>>" update, or a Skip update
      * if the mod signals that nothing is modified.
      *
-     * @param heap
-     *        The heap variable.
-     * @param anonHeap
-     *        The anonymized heap term.
-     * @param mod
-     *        The modifies clause, only for checking whether it's strictly nothing (then the
+     * @param heap The heap variable.
+     * @param anonHeap The anonymized heap term.
+     * @param mod The modifiable clause, only for checking whether it's strictly nothing (then the
      *        elementary update is a skip).
-     * @param services
-     *        The {@link Services} object (for the {@link TermBuilder}).
+     * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return An elementary anonymizing heap update.
      */
     private static Term createElementaryAnonUpdate(LocationVariable heap, Term anonHeap, Term mod,

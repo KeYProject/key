@@ -15,17 +15,17 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
     private final LabeledParserRuleContext represents;
 
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> mods,
+    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
             LabeledParserRuleContext represents) {
-        super(mods);
+        super(modifiers);
         assert represents != null;
         this.represents = represents;
         setPosition(represents);
     }
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> mods,
+    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
             LabeledParserRuleContext represents, String name) {
-        this(mods, represents);
+        this(modifiers, represents);
         this.name = name;
     }
 
@@ -41,14 +41,16 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLRepresents r)) { return false; }
-        return mods.equals(r.mods) && represents.equals(r.represents);
+        if (!(o instanceof TextualJMLRepresents r)) {
+            return false;
+        }
+        return modifiers.equals(r.modifiers) && represents.equals(r.represents);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + represents.hashCode();
+        return modifiers.hashCode() + represents.hashCode();
     }
 
     public String getName() {

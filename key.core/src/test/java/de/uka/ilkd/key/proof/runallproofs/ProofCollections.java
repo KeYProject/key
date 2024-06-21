@@ -390,8 +390,8 @@ public class ProofCollections {
         g.provable("heap/simple/locsets.key");
         g.provable("heap/simple/loop1.key");
         g.provable("heap/simple/loop2.key");
-        g.provable("heap/simple/modifies_datagroup.key");
-        g.provable("heap/simple/modifies.key");
+        g.provable("heap/simple/modifiable_datagroup.key");
+        g.provable("heap/simple/modifiable.key");
         g.provable("heap/simple/object_creation.key");
         g.provable("heap/simple/operation_contracts.key");
         g.provable("heap/simple/select_store.key");

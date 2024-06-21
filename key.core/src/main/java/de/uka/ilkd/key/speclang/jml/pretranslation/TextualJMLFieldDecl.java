@@ -15,9 +15,9 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     private final JmlParser.Field_declarationContext decl;
 
 
-    public TextualJMLFieldDecl(ImmutableList<JMLModifier> mods,
+    public TextualJMLFieldDecl(ImmutableList<JMLModifier> modifiers,
             JmlParser.Field_declarationContext decl) {
-        super(mods);
+        super(modifiers);
         assert decl != null;
         this.decl = decl;
         setPosition(decl);
@@ -37,13 +37,15 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLFieldDecl fd)) { return false; }
-        return mods.equals(fd.mods) && decl.equals(fd.decl);
+        if (!(o instanceof TextualJMLFieldDecl fd)) {
+            return false;
+        }
+        return modifiers.equals(fd.modifiers) && decl.equals(fd.decl);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + decl.hashCode();
+        return modifiers.hashCode() + decl.hashCode();
     }
 }

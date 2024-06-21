@@ -265,7 +265,7 @@ int _old11(int);
          (rule "eliminate_variable_declaration" (formula "8") (term "18"))
          (rule "assignment_normalassign" (formula "8") (term "18"))
          (builtin "Update Simplification" (formula "8"))
-         (rule "while_inv_box" (formula "8") (inst "#modifies={i,b[0..b.length - 1]}") (inst "#v1=b_1") (inst "inv=  \\<{
+         (rule "while_inv_box" (formula "8") (inst "#modifiable={i,b[0..b.length - 1]}") (inst "#v1=b_1") (inst "inv=  \\<{
       int j;
     }\\> \\forall int j_11; 
           {j:=j_11}

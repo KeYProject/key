@@ -84,10 +84,16 @@ public final class RepresentsAxiom extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || o.getClass() != getClass()) { return false; }
+        if (o == null || o.getClass() != getClass()) {
+            return false;
+        }
         RepresentsAxiom other = (RepresentsAxiom) o;
-        if (!name.equals(other.name)) { return false; }
-        if (target != other.target) { return false; }
+        if (!name.equals(other.name)) {
+            return false;
+        }
+        if (target != other.target) {
+            return false;
+        }
         return kjt.equals(other.kjt);
     }
 
@@ -110,7 +116,9 @@ public final class RepresentsAxiom extends ClassAxiom {
         final Map<ProgramVariable, AbstractSortedOperator> map =
             new LinkedHashMap<>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
-        if (selfVar != null) { map.put(originalSelfVar, selfVar); }
+        if (selfVar != null) {
+            map.put(originalSelfVar, selfVar);
+        }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalRep);
     }
@@ -140,8 +148,10 @@ public final class RepresentsAxiom extends ClassAxiom {
             final Services services) {
         List<LocationVariable> heaps = new ArrayList<>();
         int hc = 0;
-        for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
-            if (hc >= target.getHeapCount(services)) { break; }
+        for (LocationVariable h : HeapContext.getModifiableHeaps(services, false)) {
+            if (hc >= target.getHeapCount(services)) {
+                break;
+            }
             heaps.add(h);
         }
         LocationVariable self = (!target.isStatic() ? originalSelfVar : null);
@@ -163,7 +173,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                 // I need a little bit help, why this is triggerd for my JML thing.
                 throw new IllegalStateException(
                     "Only functional represents for model methods is currently supported,"
-                            + "this should not have occured.");
+                        + "this should not have occured.");
             }
             Taclet tacletWithShowSatisfiability =
                 tg.generateRelationalRepresentsTaclet(tacletName, originalRep, kjt, target, heaps,
@@ -209,10 +219,8 @@ public final class RepresentsAxiom extends ClassAxiom {
      * package-privacy is implemented).
      * </p>
      *
-     * @param ax
-     *        some represents clause.
-     * @param tb
-     *        a term builder.
+     * @param ax some represents clause.
+     * @param tb a term builder.
      * @return a conjunction of this clause and {@code ax}.
      */
     public RepresentsAxiom conjoin(RepresentsAxiom ax, TermBuilder tb) {

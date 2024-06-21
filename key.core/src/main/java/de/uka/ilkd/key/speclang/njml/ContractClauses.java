@@ -28,6 +28,10 @@ class ContractClauses {
     static final Clauses<Label, Term> BREAKS = new Clauses<>();
     static final Clauses<Label, Term> CONTINUES = new Clauses<>();
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     static final Clauses<LocationVariable, Term> ASSIGNABLE = new Clauses<>();
     static final Clauses<LocationVariable, Term> ACCESSIBLE = new Clauses<>();
     static final Clauses<LocationVariable, Term> ENSURES = new Clauses<>();

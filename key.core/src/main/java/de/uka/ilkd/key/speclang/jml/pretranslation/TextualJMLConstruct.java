@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -26,7 +27,7 @@ import org.jspecify.annotations.NonNull;
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> mods;
-    private Location location = Location.UNDEFINED;
+    private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
     /**
@@ -34,13 +35,13 @@ public abstract class TextualJMLConstruct {
      */
     protected String name;
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> mods) {
-        assert mods != null;
-        this.mods = mods;
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
+        assert specModifiers != null;
+        this.modifiers = specModifiers;
     }
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> mods, String name) {
-        this(mods);
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+        this(specModifiers);
         this.name = name;
     }
 
@@ -53,16 +54,15 @@ public abstract class TextualJMLConstruct {
     }
 
     /**
-     * @param loopContract
-     *        boolean to identify contract as loop contract
+     * @param loopContract boolean to identify contract as loop contract
      * @see #isLoopContract()
      */
     public final void setLoopContract(boolean loopContract) {
         this.loopContract = loopContract;
     }
 
-    public final ImmutableList<JMLModifier> getMods() {
-        return mods;
+    public final ImmutableList<JMLModifier> getModifiers() {
+        return modifiers;
     }
 
     /**
@@ -79,11 +79,12 @@ public abstract class TextualJMLConstruct {
      * approximate position can still be changed while it is undefined. Also set source file name if
      * known.
      *
-     * @param ps
-     *        set position of the construct
+     * @param ps set position of the construct
      */
     protected void setPosition(PositionedString ps) {
-        if (location == null) { location = ps.location; }
+        if (location == null) {
+            location = ps.location;
+        }
     }
 
     protected void setPosition(ParserRuleContext ps) {

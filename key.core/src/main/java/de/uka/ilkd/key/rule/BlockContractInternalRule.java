@@ -75,22 +75,17 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      */
     private Instantiation lastInstantiation;
 
-    private BlockContractInternalRule() {}
+    private BlockContractInternalRule() {
+    }
 
     /**
      *
-     * @param contract
-     *        the contract being applied.
-     * @param self
-     *        the self term.
-     * @param heaps
-     *        the heaps.
-     * @param localInVariables
-     *        all free program variables in the block.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder.
-     * @param services
-     *        services.
+     * @param contract the contract being applied.
+     * @param self the self term.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param services services.
      * @return the preconditions.
      */
     private static Term[] createPreconditions(final BlockContract contract, final Term self,
@@ -111,12 +106,9 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     /**
      *
-     * @param localOutVariables
-     *        all free program variables modified by the block.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
      * @return the postconditions.
      */
     private static Term[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
@@ -135,54 +127,38 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     /**
      *
-     * @param contextUpdate
-     *        the context update.
-     * @param heaps
-     *        the heaps.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param variables
-     *        the variables.
-     * @param modifiesClauses
-     *        the modified clauses.
-     * @param services
-     *        services.
+     * @param contextUpdate the context update.
+     * @param heaps the heaps.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param variables the variables.
+     * @param modifiableClauses the modified clauses.
+     * @param services services.
      * @return the updates.
      */
     private static Term[] createUpdates(final Term contextUpdate,
             final List<LocationVariable> heaps,
             final Map<LocationVariable, JFunction> anonymisationHeaps,
             final BlockContract.Variables variables,
-            final Map<LocationVariable, Term> modifiesClauses, final Services services) {
+            final Map<LocationVariable, Term> modifiableClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
-            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
     /**
      *
-     * @param goal
-     *        the current goal.
-     * @param contract
-     *        the contract being applied.
-     * @param heaps
-     *        the heaps.
-     * @param localInVariables
-     *        all free program variables in the block.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param contextUpdate
-     *        the context update.
-     * @param remembranceUpdate
-     *        the remembrance update.
-     * @param localOutVariables
-     *        all free program variables modified by the block.
-     * @param configurator
-     *        a configurator.
-     * @param services
-     *        services.
+     * @param goal the current goal.
+     * @param contract the contract being applied.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param contextUpdate the context update.
+     * @param remembranceUpdate the remembrance update.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param configurator a configurator.
+     * @param services services.
      * @return a list containing the new goals.
      */
     private static ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
@@ -269,18 +245,18 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final Term[] preconditions = createPreconditions(contract, instantiation.self(), heaps,
             localInVariables, conditionsAndClausesBuilder, services);
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
-        final Map<LocationVariable, Term> modifiesClauses =
-            conditionsAndClausesBuilder.buildModifiesClauses();
-        final Map<LocationVariable, Term> freeModifiesClauses =
-            conditionsAndClausesBuilder.buildFreeModifiesClauses();
+        final Map<LocationVariable, Term> modifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
+        final Map<LocationVariable, Term> freeModifiableClauses =
+            conditionsAndClausesBuilder.buildFreeModifiableClauses();
         final Term frameCondition =
             conditionsAndClausesBuilder.buildFrameCondition(
-                modifiesClauses, freeModifiesClauses);
+                modifiableClauses, freeModifiableClauses);
         final Term[] assumptions =
             createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
-            variables, modifiesClauses, services);
+            variables, modifiableClauses, services);
 
         final GoalsConfigurator configurator =
             new GoalsConfigurator(application, new TermLabelState(), instantiation,
@@ -302,12 +278,18 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
-        if (occursNotAtTopLevelInSuccedent(occurrence)) { return false; }
+        if (occursNotAtTopLevelInSuccedent(occurrence)) {
+            return false;
+        }
         // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) { return false; }
+        if (Transformer.inTransformer(occurrence)) {
+            return false;
+        }
         final Instantiation instantiation =
             instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
-        if (instantiation == null) { return false; }
+        if (instantiation == null) {
+            return false;
+        }
         final ImmutableSet<BlockContract> contracts =
             getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
@@ -319,40 +301,23 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     /**
      * Sets up the validity goal as the first goal in the list.
      *
-     * @param result
-     *        the new goals.
-     * @param isInfFlow
-     *        whether or not this is an information flow proof.
-     * @param contract
-     *        the block contract being applied.
-     * @param application
-     *        the rule application.
-     * @param instantiation
-     *        the instantiation.
-     * @param heaps
-     *        the heaps.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param localInVariables
-     *        all free program variables in the block.
-     * @param localOutVariables
-     *        all free program variables modified by the block.
-     * @param variables
-     *        the variables.
-     * @param preconditions
-     *        the preconditions.
-     * @param assumptions
-     *        the postconditions.
-     * @param frameCondition
-     *        the framing condition.
-     * @param updates
-     *        the updates.
-     * @param configurator
-     *        a Configurator.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder
-     * @param services
-     *        services.
+     * @param result the new goals.
+     * @param isInfFlow whether or not this is an information flow proof.
+     * @param contract the block contract being applied.
+     * @param application the rule application.
+     * @param instantiation the instantiation.
+     * @param heaps the heaps.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param variables the variables.
+     * @param preconditions the preconditions.
+     * @param assumptions the postconditions.
+     * @param frameCondition the framing condition.
+     * @param updates the updates.
+     * @param configurator a Configurator.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
+     * @param services services.
      */
     private void setUpValidityGoal(final ImmutableList<Goal> result, final boolean isInfFlow,
             final BlockContract contract, final BlockContractInternalBuiltInRuleApp application,
@@ -380,7 +345,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             validityGoal.clearAndDetachRuleAppIndex();
             final TermBuilder tb = services.getTermBuilder();
 
-            if (contract.hasModifiesClause(heaps.get(0)) && contract.hasInfFlowSpecs()) {
+            if (contract.hasModifiableClause(heaps.get(0)) && contract.hasInfFlowSpecs()) {
                 // set up information flow validity goal
                 InfFlowValidityData infFlowValidityData = setUpInfFlowValidityGoal(validityGoal,
                     contract, anonymisationHeaps, services, variables, exceptionParameter, heaps,

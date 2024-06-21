@@ -78,50 +78,39 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      */
     private Instantiation lastInstantiation;
 
-    private LoopContractExternalRule() {}
+    private LoopContractExternalRule() {
+    }
 
     /**
      *
-     * @param contextUpdate
-     *        the context update.
-     * @param heaps
-     *        the heaps.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param variables
-     *        the variables.
-     * @param modifiesClauses
-     *        the modifies clauses.
-     * @param services
-     *        services.
+     * @param contextUpdate the context update.
+     * @param heaps the heaps.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param variables the variables.
+     * @param modifiableClauses the modifiable clauses.
+     * @param services services.
      * @return the updates for the usage branch.
      */
     private static Term[] createUpdates(final Term contextUpdate,
             final List<LocationVariable> heaps,
             final Map<LocationVariable, JFunction> anonymisationHeaps,
             final LoopContract.Variables variables,
-            final Map<LocationVariable, Term> modifiesClauses, final Services services) {
+            final Map<LocationVariable, Term> modifiableClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
-            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
     /**
      *
-     * @param selfTerm
-     *        the self term.
-     * @param contract
-     *        the loop contract being applied.
-     * @param heaps
-     *        the heaps.
-     * @param localInVariables
-     *        all free program variables in the block.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder.
-     * @param services
-     *        services.
+     * @param selfTerm the self term.
+     * @param contract the loop contract being applied.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param services services.
      * @return the preconditions.
      */
     private static Term[] createPreconditions(final Term selfTerm, final LoopContract contract,
@@ -142,12 +131,9 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     /**
      *
-     * @param localOutVariables
-     *        all free program variables modified by the block.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
      * @return preconditions for the usage branch.
      */
     private static Term[] createUsageAssumptions(
@@ -207,13 +193,17 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             final Instantiation instantiation =
                 instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
 
-            if (instantiation == null) { return false; }
+            if (instantiation == null) {
+                return false;
+            }
 
             final ImmutableSet<LoopContract> contracts =
                 getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
             for (LoopContract contract : contracts) {
-                if (contract.getHead() == null && !contract.isInternalOnly()) { return true; }
+                if (contract.getHead() == null && !contract.isInternalOnly()) {
+                    return true;
+                }
             }
             return false;
         }
@@ -248,8 +238,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
             new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
-        final Map<LocationVariable, Term> modifiesClauses =
-            conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> modifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
 
         final Term[] preconditions = createPreconditions(instantiation.self(), contract, heaps,
             localInVariables, conditionsAndClausesBuilder, services);
@@ -257,7 +247,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
-            variables, modifiesClauses, services);
+            variables, modifiableClauses, services);
 
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator =
@@ -273,7 +263,9 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
                 .getInitConfig().getJustifInfo().getJustification(this);
 
-        for (Contract c : contract.getFunctionalContracts()) { cjust.add(application, new RuleJustificationBySpec(c)); }
+        for (Contract c : contract.getFunctionalContracts()) {
+            cjust.add(application, new RuleJustificationBySpec(c));
+        }
 
         return result;
     }

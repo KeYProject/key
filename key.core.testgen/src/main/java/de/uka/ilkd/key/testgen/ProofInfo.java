@@ -85,9 +85,9 @@ public class ProofInfo {
         return services.getTermBuilder().ff();
     }
 
-    public Term getAssignable() {
+    public Term getModifiable() {
         Contract c = getContract();
-        return c.getAssignable(services.getTypeConverter().getHeapLDT().getHeap());
+        return c.getModifiable(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     public String getCode() {

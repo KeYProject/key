@@ -45,22 +45,17 @@ public interface LoopContract extends AuxiliaryContract {
 
     /**
      *
-     * @param heap
-     *        the heap to use.
-     * @param self
-     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
-     * @param services
-     *        services.
+     * @param heap the heap to use.
+     * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
      * @return this loop contract's decreases clause on the specified heap.
      */
     Term getDecreases(Term heap, Term self, Services services);
 
     /**
      *
-     * @param variables
-     *        the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services
-     *        services.
+     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
      * @return this loop contract's decreases clause.
      */
     Term getDecreases(Variables variables, Services services);
@@ -112,63 +107,45 @@ public interface LoopContract extends AuxiliaryContract {
 
     /**
      *
-     * @param newBlock
-     *        the new block.
-     * @param newPreconditions
-     *        the new preconditions.
-     * @param newPostconditions
-     *        the new postconditions.
-     * @param newModifiesClauses
-     *        the new modifies clauses.
-     * @param newFreeModifiesClauses
-     *        the new free modifies clauses.
-     * @param newinfFlowSpecs
-     *        the new information flow specifications.
-     * @param newVariables
-     *        the new variables.
-     * @param newMeasuredBy
-     *        the new measured-by clause.
-     * @param newDecreases
-     *        the new decreases clause.
+     * @param newBlock the new block.
+     * @param newPreconditions the new preconditions.
+     * @param newPostconditions the new postconditions.
+     * @param newModifiableClauses the new modifiable clauses.
+     * @param newFreeModifiableClauses the new free modifiable clauses.
+     * @param newinfFlowSpecs the new information flow specifications.
+     * @param newVariables the new variables.
+     * @param newMeasuredBy the new measured-by clause.
+     * @param newDecreases the new decreases clause.
      * @return a new loop contract with the specified attributes.
      */
     LoopContract update(StatementBlock newBlock, Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newFreePreconditions,
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newFreePostconditions,
-            Map<LocationVariable, Term> newModifiesClauses,
-            Map<LocationVariable, Term> newFreeModifiesClauses,
+            Map<LocationVariable, Term> newModifiableClauses,
+            Map<LocationVariable, Term> newFreeModifiableClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
 
     /**
      *
-     * @param newLoop
-     *        the new loop.
-     * @param newPreconditions
-     *        the new preconditions.
-     * @param newPostconditions
-     *        the new postconditions.
-     * @param newModifiesClauses
-     *        the new modifies clauses.
-     * @param newFreeModifiesClauses
-     *        the new free modifies clauses.
-     * @param newinfFlowSpecs
-     *        the new information flow specifications.
-     * @param newVariables
-     *        the new variables.
-     * @param newMeasuredBy
-     *        the new measured-by clause.
-     * @param newDecreases
-     *        the new decreases clause.
+     * @param newLoop the new loop.
+     * @param newPreconditions the new preconditions.
+     * @param newPostconditions the new postconditions.
+     * @param newModifiableClauses the new modifiable clauses.
+     * @param newFreeModifiableClauses the new free modifiable clauses.
+     * @param newinfFlowSpecs the new information flow specifications.
+     * @param newVariables the new variables.
+     * @param newMeasuredBy the new measured-by clause.
+     * @param newDecreases the new decreases clause.
      * @return a new loop contract with the specified attributes.
      */
     LoopContract update(LoopStatement newLoop, Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newFreePreconditions,
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newFreePostconditions,
-            Map<LocationVariable, Term> newModifiesClauses,
-            Map<LocationVariable, Term> newFreeModifiesClauses,
+            Map<LocationVariable, Term> newModifiableClauses,
+            Map<LocationVariable, Term> newFreeModifiableClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
 
@@ -189,18 +166,15 @@ public interface LoopContract extends AuxiliaryContract {
     ProgramVariable getValuesVariable();
 
     /**
-     * @param newKJT
-     *        the type containing the new target method.
-     * @param newPM
-     *        the new target method.
+     * @param newKJT the type containing the new target method.
+     * @param newPM the new target method.
      * @return a new loop contract equal to this one except that it belongs to a different target.
      */
     @Override
     LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
-     * @param newBlock
-     *        the new block.
+     * @param newBlock the new block.
      * @return a new loop contract equal to this one except that it belongs to a different block.
      */
     @Override
@@ -210,8 +184,7 @@ public interface LoopContract extends AuxiliaryContract {
     LoopContract map(UnaryOperator<Term> op, Services services);
 
     /**
-     * @param newLoop
-     *        the new loop.
+     * @param newLoop the new loop.
      * @return a new loop contract equal to this one except that it belongs to a different loop.
      */
     LoopContract setLoop(LoopStatement newLoop);
@@ -220,10 +193,8 @@ public interface LoopContract extends AuxiliaryContract {
      * Replaces {@code \index} and {@code \values} with the proper variables in all terms of this
      * contract.
      *
-     * @param newBlock
-     *        a new block.
-     * @param services
-     *        services.
+     * @param newBlock a new block.
+     * @param services services.
      * @return a new loop contract equal to this one except that it belongs to the new block, and
      *         {@code \index} and {@code \values} are replaced by proper variables in all terms.
      */

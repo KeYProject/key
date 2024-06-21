@@ -316,7 +316,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
         var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
-            HeapContext.getModHeaps(services, m.transaction()), services);
+            HeapContext.getModifiableHeaps(services, m.transaction()), services);
     }
 
     public boolean variantAvailable() {
