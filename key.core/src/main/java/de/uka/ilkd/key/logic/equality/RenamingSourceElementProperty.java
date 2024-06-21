@@ -40,20 +40,25 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     /**
      * Checks if {@code se2} is a source element syntactically equal to {@code se1} modulo renaming.
+     * <p>
+     * When this method is supplied with a {@link NameAbstractionTable}, it will use this table to
+     * compare the abstract names of the source elements. If no {@link NameAbstractionTable} is
+     * supplied, a new one will be created.
      *
      * @param se1 the first element of the equality check
      * @param se2 the second element of the equality check
-     * @param v should be a single {@link NameAbstractionTable} for this equality check
+     * @param v can be a single {@link NameAbstractionTable} for this equality check
      * @return {@code true} iff {@code se2} is a source element syntactically equal to {@code se1}
      *         modulo renaming
      * @param <V> is supposed to be {@link NameAbstractionTable} for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(SourceElement se1, SourceElement se2, V... v) {
-        // For this equality check, v must be a single NameAbstractionTable
-        if (v.length != 1 || !(v[0] instanceof NameAbstractionTable nat)) {
-            throw new IllegalArgumentException(
-                "Expected a single NameAbstractionTable as argument.");
+        NameAbstractionTable nat;
+        if (v.length > 0 && (v[0] instanceof NameAbstractionTable n)) {
+            nat = n;
+        } else {
+            nat = new NameAbstractionTable();
         }
 
         JavaASTTreeWalker tw1 = new JavaASTTreeWalker(se1);
