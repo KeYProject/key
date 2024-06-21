@@ -43,7 +43,7 @@ final class SimplifiedLinkedList {
         Node node = getNext(i-1);
         Node node2 = getNext(i);
         node.next = node2.next;
-        //@ set nodeseq = (\seq_concat(\seq_sub(nodeseq,0,i), \seq_sub(nodeseq,i+1,\seq_length(nodeseq))));
+        //@ set nodeseq = (\seq_concat(\seq_sub(nodeseq,0,i), \seq_sub(nodeseq,i+1,nodeseq.length)));
         size --;
     }
 }

@@ -23,6 +23,9 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+
 /**
  * Command that applies a calculus rule All parameters are passed as strings and converted by the
  * command. The parameters are:
@@ -58,8 +61,20 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         RuleApp theApp = makeRuleApp(args, state);
         Goal g = state.getFirstOpenAutomaticGoal();
 
-        if (theApp instanceof TacletApp) {
-            RuleApp completeApp = ((TacletApp) theApp).tryToInstantiate(g.proof().getServices());
+        if (theApp instanceof TacletApp tacletApp) {
+
+            if (!tacletApp.ifInstsComplete()) {
+                ImmutableList<TacletApp> ifSeqCandidates =
+                    tacletApp.findIfFormulaInstantiations(g.sequent(), g.proof().getServices());
+
+                if (ifSeqCandidates.size() == 1) {
+                    theApp = ifSeqCandidates.head();
+                    assert theApp != null;
+                    tacletApp = (TacletApp) theApp;
+                }
+            }
+
+            RuleApp completeApp = tacletApp.tryToInstantiate(g.proof().getServices());
             theApp = completeApp == null ? theApp : completeApp;
         }
         assert theApp != null;
@@ -315,7 +330,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
             throws ScriptException {
         final boolean satisfiesFormulaParameter =
-            p.formula != null && sf.formula().equalsModRenaming(p.formula);
+            p.formula != null && sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY);
 
         final boolean satisfiesMatchesParameter = p.matches != null
                 && formatTermString(LogicPrinter.quickPrintTerm(sf.formula(), services))
@@ -345,7 +360,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 boolean add =
-                    p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
+                    p.on == null || pta.posInOccurrence().subTerm()
+                            .equalsModProperty(p.on, RENAMING_PROPERTY);
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
@@ -354,7 +370,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
-                    add &= userInst == null || userInst.equalsModIrrelevantTermLabels(ptaInst);
+                    add &= userInst == null
+                            || userInst.equalsModProperty(ptaInst, IRRELEVANT_TERM_LABELS_PROPERTY);
                 }
 
                 if (add) {

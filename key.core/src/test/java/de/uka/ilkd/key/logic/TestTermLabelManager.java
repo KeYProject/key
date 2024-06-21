@@ -33,6 +33,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -867,9 +868,9 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+        public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
                 throws RuleAbortException {
-            return null;
+            throw new RuleAbortException("no implementation");
         }
 
         @Override

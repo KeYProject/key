@@ -26,6 +26,9 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
+
 /**
  * This class wraps an {@link ImmutableMap} from {@link SchemaVariable} to
  * {@link InstantiationEntry}
@@ -126,11 +129,6 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
 
-    public SVInstantiations add(ModalOperatorSV sv, Operator op, Services services) {
-        return add(sv, new OperatorInstantiation(op), services);
-    }
-
-
     public SVInstantiations addInteresting(SchemaVariable sv, Term subst, Services services) {
         return addInteresting(sv, new TermInstantiation(sv, subst), services);
     }
@@ -218,15 +216,17 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
             boolean p_forceRebuild, Services services) {
-        Boolean b = getGenericSortInstantiations().checkSorts(p_sv, p_entry);
+        if (p_sv instanceof OperatorSV asv) {
+            Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
-        if (b == null) {
-            return rebuildSorts(services);
-        } else if (!b) {
-            throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
-        }
-        if (p_forceRebuild) {
-            return rebuildSorts(services);
+            if (b == null) {
+                return rebuildSorts(services);
+            } else if (!b) {
+                throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
+            }
+            if (p_forceRebuild) {
+                return rebuildSorts(services);
+            }
         }
         return this;
     }
@@ -549,7 +549,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
-                if (!instAsTerm.equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+                if (!instAsTerm.equalsModProperty(cmp.getInstantiation(e.key()),
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
@@ -579,7 +580,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
-                if (!instAsTerm.equalsModProofIrrelevancy(cmp.getInstantiation(e.key()))) {
+                if (!instAsTerm.equalsModProperty(
+                    cmp.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY)) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {

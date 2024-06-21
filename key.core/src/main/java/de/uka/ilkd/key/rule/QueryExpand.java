@@ -59,10 +59,8 @@ public class QueryExpand implements BuiltInRule {
      */
     private final WeakHashMap<Term, Long> timeOfTerm = new WeakHashMap<>(DEFAULT_MAP_SIZE);
 
-
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 
         final PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term query = pio.subTerm();

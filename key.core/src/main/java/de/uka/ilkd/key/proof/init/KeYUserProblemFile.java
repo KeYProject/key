@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -150,7 +151,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
     @Override
-    public String getProofObligation() {
+    public Configuration getProofObligation() {
         return getProblemFinder().getProofObligation();
     }
 

@@ -11,6 +11,7 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -107,7 +108,7 @@ public final class GenericSortInstantiations {
      *         sorts are definitely incorrect, null if the sorts could (perhaps) be made correct by
      *         choosing the right generic sort instantiations
      */
-    public Boolean checkSorts(SchemaVariable sv, InstantiationEntry<?> p_entry) {
+    public Boolean checkSorts(OperatorSV sv, InstantiationEntry<?> p_entry) {
         if (!(p_entry instanceof TermInstantiation) || sv instanceof ProgramSV) {
             return Boolean.TRUE;
         }
@@ -179,7 +180,7 @@ public final class GenericSortInstantiations {
      *         currently otherwise
      * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(SchemaVariable p_sv, TermServices services) {
+    public Sort getRealSort(OperatorSV p_sv, TermServices services) {
         return getRealSort(p_sv.sort(), services);
     }
 

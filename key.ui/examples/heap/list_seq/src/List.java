@@ -25,7 +25,17 @@ public interface List {
       @   signals_only IndexOutOfBoundsException;
       @*/
     public /*@pure@*/ Object get(int index);
-    
+
+    /*@ public normal_behaviour
+      @   requires 0 <= index && index < seq.length; 
+      @   ensures seq == \seq_upd(\old(seq), index, o);
+      @   assignable footprint;
+      @
+      @ also public exceptional_behaviour
+      @   requires index < 0 || seq.length <= index;
+      @   signals_only IndexOutOfBoundsException;
+      @*/
+    public void set(int index, Object o);        
     
     /*@ public normal_behaviour
       @   accessible footprint;

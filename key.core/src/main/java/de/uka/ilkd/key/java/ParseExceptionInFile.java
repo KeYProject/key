@@ -38,18 +38,17 @@ public class ParseExceptionInFile extends ParseException implements HasLocation 
         return filename;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         // This kind of exception has a filename but no line/col information
         // Retrieve the latter from the cause. location remains null if
         // no line/col is available in cause.
         if (getCause() != null) {
             var location = ExceptionTools.getLocation(getCause());
-            if (location.isEmpty()) {
+            if (location == null) {
                 return null;
             }
-            return Location.fromFileName(getFilename(), location.get().getPosition());
+            return Location.fromFileName(getFilename(), location.getPosition());
         }
         return null;
     }

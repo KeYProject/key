@@ -139,9 +139,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 && !(kind.transaction());
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
         // Initial assertions
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;

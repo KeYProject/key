@@ -46,12 +46,12 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
         if (!(o instanceof TextualJMLInitially ci)) {
             return false;
         }
-        return mods.equals(ci.mods) && inv.equals(ci.inv);
+        return modifiers.equals(ci.modifiers) && inv.equals(ci.inv);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + inv.hashCode();
+        return modifiers.hashCode() + inv.hashCode();
     }
 }

@@ -39,7 +39,7 @@ problem
 :
   ( PROBLEM LBRACE ( t=termorseq ) RBRACE
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
-  | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
+  | PROOFOBLIGATION  (proofObligation=cvalue)? SEMI?
   )
   proofScript?
 ;
@@ -804,7 +804,7 @@ one_contract
 :
    contractName = simple_ident LBRACE
    (prog_var_decls)?
-   fma=term MODIFIES modifiesClause=term
+   fma=term MODIFIABLE modifiableClause=term
    RBRACE SEMI
 ;
 

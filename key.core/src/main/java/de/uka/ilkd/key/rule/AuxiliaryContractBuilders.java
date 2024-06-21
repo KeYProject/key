@@ -47,6 +47,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 /**
  * This contains various builders used in building formulae and terms for block and loop contracts.
  *
@@ -348,7 +350,7 @@ public final class AuxiliaryContractBuilders {
                 // In an existing PO, the outer remembrance vars already exist and refer to the
                 // current method's prestate.
                 return new BlockContract.Variables(
-                    self != null ? self.op(ProgramVariable.class) : null,
+                    self != null ? self.op(LocationVariable.class) : null,
                     createAndRegisterFlags(placeholderVariables.breakFlags),
                     createAndRegisterFlags(placeholderVariables.continueFlags),
                     createAndRegisterVariable(placeholderVariables.returnFlag),
@@ -372,7 +374,7 @@ public final class AuxiliaryContractBuilders {
                     outerRemembranceVariables);
 
                 return new BlockContract.Variables(
-                    self != null ? self.op(ProgramVariable.class) : null,
+                    self != null ? self.op(LocationVariable.class) : null,
                     createAndRegisterFlags(placeholderVariables.breakFlags),
                     createAndRegisterFlags(placeholderVariables.continueFlags),
                     createAndRegisterVariable(placeholderVariables.returnFlag),
@@ -433,10 +435,10 @@ public final class AuxiliaryContractBuilders {
          * @param placeholderFlags the placeholder flags.
          * @return newly created and registered flags with the same names.
          */
-        private Map<Label, ProgramVariable> createAndRegisterFlags(
-                final Map<Label, ProgramVariable> placeholderFlags) {
-            Map<Label, ProgramVariable> result = new LinkedHashMap<>();
-            for (Map.Entry<Label, ProgramVariable> flag : placeholderFlags.entrySet()) {
+        private Map<Label, LocationVariable> createAndRegisterFlags(
+                final Map<Label, LocationVariable> placeholderFlags) {
+            Map<Label, LocationVariable> result = new LinkedHashMap<>();
+            for (Map.Entry<Label, LocationVariable> flag : placeholderFlags.entrySet()) {
                 result.put(flag.getKey(), createAndRegisterVariable(flag.getValue()));
             }
             return result;
@@ -591,68 +593,69 @@ public final class AuxiliaryContractBuilders {
         /**
          *
          * @param anonymisationHeaps anonymization heaps.
-         * @param modifiesClauses modifies clauses for the specified heaps.
-         * @return an anonymization update for the specified modifies clauses.
+         * @param modifiableClauses modifiable clauses for the specified heaps.
+         * @return an anonymization update for the specified modifiable clauses.
          */
         public Term buildAnonOutUpdate(
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses) {
+                final Map<LocationVariable, Term> modifiableClauses) {
             return buildAnonOutUpdate(variables.remembranceLocalVariables.keySet(),
-                anonymisationHeaps, modifiesClauses, ANON_OUT_PREFIX);
+                anonymisationHeaps, modifiableClauses, ANON_OUT_PREFIX);
         }
 
         /**
          *
          * @param el a program element
          * @param anonymisationHeaps anonymization heaps.
-         * @param modifiesClauses modifies clauses for the specified heaps.
-         * @return an anonymization update for the specified modifies clauses and for every modified
-         *         variable that occurs in the specified program element.
+         * @param modifiableClauses modifiable clauses for the specified heaps.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         modified variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses) {
-            return buildAnonOutUpdate(el, anonymisationHeaps, modifiesClauses, ANON_OUT_PREFIX);
+                final Map<LocationVariable, Term> modifiableClauses) {
+            return buildAnonOutUpdate(el, anonymisationHeaps, modifiableClauses, ANON_OUT_PREFIX);
         }
 
         /**
          *
          * @param el a program element
          * @param anonymisationHeaps anonymization heaps.
-         * @param modifiesClauses modifies clauses for the specified heaps.
+         * @param modifiableClauses modifiable clauses for the specified heaps.
          * @param prefix a prefix for the name of the anon functions.
-         * @return an anonymization update for the specified modifies clauses and for every modified
-         *         variable that occurs in the specified program element.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         modified variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses, final String prefix) {
+                final Map<LocationVariable, Term> modifiableClauses, final String prefix) {
             return buildAnonOutUpdate(
                 MiscTools.getLocalOuts(el, services).stream()
                         .filter(LocationVariable.class::isInstance)
                         .map(LocationVariable.class::cast).collect(Collectors.toSet()),
-                anonymisationHeaps, modifiesClauses, prefix);
+                anonymisationHeaps, modifiableClauses, prefix);
         }
 
         /**
          *
          * @param vars a set of variables
          * @param anonymisationHeaps anonymization heaps.
-         * @param modifiesClauses modifies clauses for the specified heaps.
+         * @param modifiableClauses modifiable clauses for the specified heaps.
          * @param prefix a prefix for the name of the anon functions.
-         * @return an anonymization update for the specified modifies clauses and for every variable
-         *         in the specified set.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         variable in the specified set.
          */
         public Term buildAnonOutUpdate(final Set<LocationVariable> vars,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses, final String prefix) {
+                final Map<LocationVariable, Term> modifiableClauses, final String prefix) {
             Term result = buildLocalVariablesAnonUpdate(vars, prefix);
             for (Map.Entry<LocationVariable, JFunction> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
-                final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equalsModIrrelevantTermLabels(strictlyNothing())) {
-                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
+                final Term modifiableClause = modifiableClauses.get(anonymisationHeap.getKey());
+                if (!modifiableClause.equalsModProperty(strictlyNothing(),
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiableClause,
                         services.getTermBuilder().label(
                             services.getTermBuilder().func(anonymisationHeap.getValue()),
                             ParameterlessTermLabel.ANON_HEAP_LABEL));
@@ -811,7 +814,7 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that all of those variables have valid values.
          */
         public Term buildReachableInCondition(
-                final ImmutableSet<ProgramVariable> localInVariables) {
+                final ImmutableSet<LocationVariable> localInVariables) {
             return buildReachableCondition(localInVariables);
         }
 
@@ -821,7 +824,7 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that all of those variables have valid values.
          */
         public Term buildReachableOutCondition(
-                final ImmutableSet<ProgramVariable> localOutVariables) {
+                final ImmutableSet<LocationVariable> localOutVariables) {
             final Term reachableResult =
                 (variables.result != null) ? reachableValue(variables.result)
                         : services.getTermBuilder().tt();
@@ -834,9 +837,9 @@ public final class AuxiliaryContractBuilders {
          * @param variables a set of variables.
          * @return the condition that all of those variables have valid values.
          */
-        public Term buildReachableCondition(final ImmutableSet<ProgramVariable> variables) {
+        public Term buildReachableCondition(final ImmutableSet<LocationVariable> variables) {
             Term result = tt();
-            for (ProgramVariable variable : variables) {
+            for (LocationVariable variable : variables) {
                 result = and(result, reachableValue(variable));
             }
             return result;
@@ -844,25 +847,26 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @return the contract's modifies clauses.
+         * @return the contract's modifiable clauses.
          */
-        public Map<LocationVariable, Term> buildModifiesClauses() {
+        public Map<LocationVariable, Term> buildModifiableClauses() {
             Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
-                result.put(heap, contract.getModifiesClause(heap, var(heap), terms.self, services));
+                result.put(heap,
+                    contract.getModifiableClause(heap, var(heap), terms.self, services));
             }
             return result;
         }
 
         /**
          *
-         * @return the contract's free modifies clauses.
+         * @return the contract's free modifiable clauses.
          */
-        public Map<LocationVariable, Term> buildFreeModifiesClauses() {
+        public Map<LocationVariable, Term> buildFreeModifiableClauses() {
             Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
                 result.put(heap,
-                    contract.getFreeModifiesClause(heap, var(heap), terms.self, services));
+                    contract.getFreeModifiableClause(heap, var(heap), terms.self, services));
             }
             return result;
         }
@@ -918,35 +922,35 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param modifiesClauses the contract's modifies clauses
-         * @param freeModifiesClauses the contract's free modifies clauses
+         * @param modifiableClauses the contract's modifiable clauses
+         * @param freeModifiableClauses the contract's free modifiable clauses
          * @return the contract's framing condition.
          */
         public Term buildFrameCondition(
-                final Map<LocationVariable, Term> modifiesClauses,
-                final Map<LocationVariable, Term> freeModifiesClauses) {
+                final Map<LocationVariable, Term> modifiableClauses,
+                final Map<LocationVariable, Term> freeModifiableClauses) {
             Term result = tt();
             Map<LocationVariable, Map<Term, Term>> remembranceVariables =
                 constructRemembranceVariables();
             for (LocationVariable heap : heaps) {
-                final Term modifiesClause = modifiesClauses.get(heap);
-                final Term freeModifiesClause = freeModifiesClauses.get(heap);
+                final Term modifiableClause = modifiableClauses.get(heap);
+                final Term freeModifiableClause = freeModifiableClauses.get(heap);
                 final Term frameCondition;
-                if (!contract.hasModifiesClause(heap)) {
-                    if (!contract.hasFreeModifiesClause(heap)) {
+                if (!contract.hasModifiableClause(heap)) {
+                    if (!contract.hasFreeModifiableClause(heap)) {
                         frameCondition = frameStrictlyEmpty(
                             var(heap), remembranceVariables.get(heap));
                     } else {
                         frameCondition =
-                            frame(var(heap), remembranceVariables.get(heap), freeModifiesClause);
+                            frame(var(heap), remembranceVariables.get(heap), freeModifiableClause);
                     }
                 } else {
-                    if (!contract.hasFreeModifiesClause(heap)) {
+                    if (!contract.hasFreeModifiableClause(heap)) {
                         frameCondition = frame(
-                            var(heap), remembranceVariables.get(heap), modifiesClause);
+                            var(heap), remembranceVariables.get(heap), modifiableClause);
                     } else {
                         frameCondition = frame(var(heap), remembranceVariables.get(heap),
-                            union(modifiesClause, freeModifiesClause));
+                            union(modifiableClause, freeModifiableClause));
                     }
                 }
                 result = and(result, frameCondition);
@@ -1071,9 +1075,9 @@ public final class AuxiliaryContractBuilders {
          * @param flags a collection of boolean variables.
          * @return the condition that all flags are {@code false}.
          */
-        private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags) {
+        private List<Term> buildFlagsNotSetConditions(final Collection<LocationVariable> flags) {
             final List<Term> result = new LinkedList<>();
-            for (ProgramVariable flag : flags) {
+            for (LocationVariable flag : flags) {
                 result.add(buildFlagNotSetCondition(flag));
             }
             return result;
@@ -1084,7 +1088,7 @@ public final class AuxiliaryContractBuilders {
          * @param flag a boolean variable.
          * @return the condition that the flag is {@code false}.
          */
-        private Term buildFlagNotSetCondition(final ProgramVariable flag) {
+        private Term buildFlagNotSetCondition(final LocationVariable flag) {
             return equals(var(flag), FALSE());
         }
     }
@@ -1180,17 +1184,17 @@ public final class AuxiliaryContractBuilders {
          * @param services services.
          * @return additional program variables necessary for loop contract rules.
          */
-        private static ProgramVariable[] createLoopVariables(final Services services) {
-            ProgramVariable conditionVariable = AbstractAuxiliaryContractRule.createLocalVariable(
+        private static LocationVariable[] createLoopVariables(final Services services) {
+            LocationVariable conditionVariable = AbstractAuxiliaryContractRule.createLocalVariable(
                 "cond", services.getJavaInfo().getKeYJavaType("boolean"), services);
 
-            ProgramVariable brokeLoopVariable = AbstractAuxiliaryContractRule.createLocalVariable(
+            LocationVariable brokeLoopVariable = AbstractAuxiliaryContractRule.createLocalVariable(
                 "brokeLoop", services.getJavaInfo().getKeYJavaType("boolean"), services);
 
-            ProgramVariable continuedLoopVariable =
+            LocationVariable continuedLoopVariable =
                 AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
                     services.getJavaInfo().getKeYJavaType("boolean"), services);
-            final ProgramVariable[] loopVariables = new ProgramVariable[] { conditionVariable,
+            final LocationVariable[] loopVariables = new LocationVariable[] { conditionVariable,
                 brokeLoopVariable, continuedLoopVariable };
             return loopVariables;
         }
@@ -1343,7 +1347,7 @@ public final class AuxiliaryContractBuilders {
          */
         public Term setUpWdGoal(final Goal goal, final BlockContract contract, final Term update,
                 final Term anonUpdate, final LocationVariable heap, final JFunction anonHeap,
-                final ImmutableSet<ProgramVariable> localIns) {
+                final ImmutableSet<LocationVariable> localIns) {
             // FIXME: Handling of \old-references needs to be investigated,
             // however only completeness is lost, soundness is guaranteed
             final BlockWellDefinedness bwd =
@@ -1427,7 +1431,7 @@ public final class AuxiliaryContractBuilders {
          * @param remember the remembrance update for the current loop iteration.
          * @param rememberNext the remembrance update for the next loop iteration.
          * @param anonOutHeaps the heaps used in the anonOut update.
-         * @param modifiesClauses the modified clauses.
+         * @param modifiableClauses the modified clauses.
          * @param assumptions the assumptions.
          * @param decreasesCheck the decreases check.
          * @param postconditions the current loop iteration's postconditions.
@@ -1440,16 +1444,16 @@ public final class AuxiliaryContractBuilders {
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
                 final Term context, final Term remember, final Term rememberNext,
                 final Map<LocationVariable, JFunction> anonOutHeaps,
-                final Map<LocationVariable, Term> modifiesClauses,
-                final Map<LocationVariable, Term> freeModifiesClauses,
+                final Map<LocationVariable, Term> modifiableClauses,
+                final Map<LocationVariable, Term> freeModifiableClauses,
                 final Term[] assumptions,
                 final Term decreasesCheck, final Term[] postconditions,
-                final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
+                final Term[] postconditionsNext, final LocationVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms, final AuxiliaryContract.Variables nextVars) {
             final TermBuilder tb = services.getTermBuilder();
             final Modality modality = instantiation.modality();
 
-            final ProgramVariable[] loopVariables = createLoopVariables(services);
+            final LocationVariable[] loopVariables = createLoopVariables(services);
             OuterBreakContinueAndReturnCollector collector =
                 new OuterBreakContinueAndReturnCollector(contract.getBody(), new LinkedList<>(),
                     services);
@@ -1459,7 +1463,7 @@ public final class AuxiliaryContractBuilders {
             collector.collect();
 
             boolean bodyBreakFound = false;
-            Map<Label, ProgramVariable> breakFlags = new LinkedHashMap<>(variables.breakFlags);
+            Map<Label, LocationVariable> breakFlags = new LinkedHashMap<>(variables.breakFlags);
             for (Break br : bodyBreaks) {
                 Label label = br.getLabel();
                 if (label == null || contract.getLoopLabels().contains(label)) {
@@ -1467,13 +1471,13 @@ public final class AuxiliaryContractBuilders {
                     bodyBreakFound = true;
                 }
             }
-            Map<Label, ProgramVariable> continueFlags =
+            Map<Label, LocationVariable> continueFlags =
                 collectContinueFlags(contract, loopVariables[2], bodyContinues);
             final JavaBlock[] javaBlocks = createJavaBlocks(contract, loopVariables[0],
                 exceptionParameter, breakFlags, continueFlags);
 
             Term anonOut = new UpdatesBuilder(variables, services)
-                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
+                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiableClauses);
 
             Map<LocationVariable, JFunction> anonOutHeaps2 = new HashMap<>();
             for (LocationVariable heap : anonOutHeaps.keySet()) {
@@ -1485,7 +1489,7 @@ public final class AuxiliaryContractBuilders {
                 anonOutHeaps2.put(heap, anonymisationFunction);
             }
             Term anonOut2 = new UpdatesBuilder(variables, services).buildAnonOutUpdate(
-                contract.getLoop(), anonOutHeaps2, modifiesClauses, "init_" + ANON_OUT_PREFIX);
+                contract.getLoop(), anonOutHeaps2, modifiableClauses, "init_" + ANON_OUT_PREFIX);
 
             final Term[] posts = createPosts(goal, postconditions, postconditionsNext, terms, tb);
 
@@ -1576,8 +1580,9 @@ public final class AuxiliaryContractBuilders {
          * @return Java blocks for every program fragment.
          */
         private JavaBlock[] createJavaBlocks(final LoopContract contract,
-                ProgramVariable conditionVariable, final ProgramVariable exceptionParameter,
-                Map<Label, ProgramVariable> breakFlags, Map<Label, ProgramVariable> continueFlags) {
+                LocationVariable conditionVariable, final LocationVariable exceptionParameter,
+                Map<Label, LocationVariable> breakFlags,
+                Map<Label, LocationVariable> continueFlags) {
             AuxiliaryContract.Variables bodyVariables = new Variables(variables.self, breakFlags,
                 continueFlags, variables.returnFlag, variables.result, variables.exception,
                 variables.remembranceHeaps, variables.remembranceLocalVariables,
@@ -1640,11 +1645,11 @@ public final class AuxiliaryContractBuilders {
 
         private StatementBlock constructAbruptTerminationIfCascade() {
             List<If> ifCascade = new ArrayList<>();
-            for (Map.Entry<Label, ProgramVariable> flag : variables.breakFlags.entrySet()) {
+            for (Map.Entry<Label, LocationVariable> flag : variables.breakFlags.entrySet()) {
                 ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
                     KeYJavaASTFactory.breakStatement(flag.getKey())));
             }
-            for (Map.Entry<Label, ProgramVariable> flag : variables.continueFlags.entrySet()) {
+            for (Map.Entry<Label, LocationVariable> flag : variables.continueFlags.entrySet()) {
                 ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
                     KeYJavaASTFactory.continueStatement(flag.getKey())));
             }
@@ -1678,9 +1683,9 @@ public final class AuxiliaryContractBuilders {
             return JavaBlock.createJavaBlock(finishedBlock);
         }
 
-        private Map<Label, ProgramVariable> collectContinueFlags(final LoopContract contract,
-                ProgramVariable continuedLoopVariable, List<Continue> bodyContinues) {
-            Map<Label, ProgramVariable> continueFlags =
+        private Map<Label, LocationVariable> collectContinueFlags(final LoopContract contract,
+                LocationVariable continuedLoopVariable, List<Continue> bodyContinues) {
+            Map<Label, LocationVariable> continueFlags =
                 new LinkedHashMap<>(variables.continueFlags);
             continueFlags.remove(null);
             for (Continue cont : bodyContinues) {

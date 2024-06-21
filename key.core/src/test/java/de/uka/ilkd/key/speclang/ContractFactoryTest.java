@@ -73,7 +73,7 @@ public class ContractFactoryTest {
      * @throws SLTranslationException is not thrown if the test succeeds
      */
     @Test
-    public void testCombineEqualAssignable() throws SLTranslationException {
+    public void testCombineEqualModifiable() throws SLTranslationException {
         String contract = """
                 /*@ normal_behavior
                 @  requires a != 5;
@@ -88,7 +88,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+        Term woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("empty", woLabels.toString());
     }
 
@@ -99,7 +99,7 @@ public class ContractFactoryTest {
      * @throws SLTranslationException is not thrown if test succeeds
      */
     @Test
-    public void testCombineEmptyAssignable() throws SLTranslationException {
+    public void testCombineEmptyModifiable() throws SLTranslationException {
         String contract = """
                 /*@ normal_behavior
                 @  requires a != 5;
@@ -114,7 +114,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+        Term woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("empty<<impl>>", woLabels.toString());
     }
 
@@ -125,7 +125,7 @@ public class ContractFactoryTest {
      * @throws SLTranslationException is not thrown if test succeeds
      */
     @Test
-    public void testCombineDifferentAssignable() throws SLTranslationException {
+    public void testCombineDifferentModifiable() throws SLTranslationException {
         String contract = """
                 /*@ normal_behavior
                 @  requires a != 5;
@@ -140,7 +140,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModWOLabels(contract);
+        Term woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
             + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
             + "allLocs))", woLabels.toString());
@@ -148,14 +148,15 @@ public class ContractFactoryTest {
 
     /**
      * Helper for the tests: Parses the given contracts (must always be two), combines them and
-     * returns the modifies term of the resulting combined contract (with origin labels removed).
+     * returns the modifiable term of the resulting combined contract (with origin labels removed).
      *
      * @param contractStr the string containing the contracts for method m
-     * @return the combined modifies term of the contracts in the input string, without origin
+     * @return the combined modifiable term of the contracts in the input string, without origin
      *         labels
      * @throws SLTranslationException should not be thrown
      */
-    private Term calculateCombinedModWOLabels(String contractStr) throws SLTranslationException {
+    private Term calculateCombinedModifiableWOLabels(String contractStr)
+            throws SLTranslationException {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         ImmutableList<TextualJMLConstruct> constructs = preParser.parseClassLevel(contractStr);
 
@@ -183,7 +184,7 @@ public class ContractFactoryTest {
         FunctionalOperationContract singleContract = cf.union(cs);
 
         // remove origin labels
-        Term combinedMod = singleContract.getMod();
-        return TermLabelManager.removeIrrelevantLabels(combinedMod, services);
+        Term combinedModifiable = singleContract.getModifiable();
+        return TermLabelManager.removeIrrelevantLabels(combinedModifiable, services);
     }
 }

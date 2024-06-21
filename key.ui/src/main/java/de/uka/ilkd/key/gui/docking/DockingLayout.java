@@ -130,9 +130,8 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         DockingHelper.restoreMissingPanels(window);
     }
 
-    @NonNull
     @Override
-    public List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         List<Action> actions = new ArrayList<>();
         int keypos = 0;
         for (String layout : LAYOUT_NAMES) {

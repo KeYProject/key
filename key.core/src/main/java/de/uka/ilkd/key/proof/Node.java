@@ -47,7 +47,7 @@ public class Node implements Iterable<Node> {
     private final Proof proof;
 
     /** The parent node. **/
-    private Node parent = null;
+    private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
      */
@@ -104,8 +104,7 @@ public class Node implements Iterable<Node> {
 
     private String cachedName = null;
 
-    @Nullable
-    private Lookup userData = null;
+    private @Nullable Lookup userData = null;
 
 
     /**
@@ -226,10 +225,10 @@ public class Node implements Iterable<Node> {
 
     /**
      * Returns the set of created program variables known in this node.
-     *
+     * <p>
      * In the resulting list, the newest additions come first.
      *
-     * @returns a non-null immutable list of program variables.
+     * @return a non-null immutable list of program variables.
      */
     public ImmutableList<IProgramVariable> getLocalProgVars() {
         return localProgVars;
@@ -270,7 +269,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
-    public Node parent() {
+    public @Nullable Node parent() {
         return parent;
     }
 

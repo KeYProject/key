@@ -11,8 +11,6 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 
-
-
 /**
  * A JML class invariant declaration in textual form.
  */
@@ -29,9 +27,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         this.free = free;
     }
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> mods,
+    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers,
             JmlParser.Class_invariantContext inv, boolean free) {
-        this(mods, inv, null, free);
+        this(modifiers, inv, null, free);
     }
 
     /**
@@ -62,13 +60,17 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         if (!(o instanceof TextualJMLClassInv ci)) {
             return false;
         }
-        return mods.equals(ci.mods) && inv.equals(ci.inv);
+        return modifiers.equals(ci.modifiers) && inv.equals(ci.inv);
     }
 
 
     @Override
     public int hashCode() {
-        return Objects.hash(mods, inv);
+        return Objects.hash(modifiers, inv);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean isFree() {

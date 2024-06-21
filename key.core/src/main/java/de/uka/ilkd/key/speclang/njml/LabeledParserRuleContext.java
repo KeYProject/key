@@ -15,8 +15,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
