@@ -212,37 +212,37 @@ public class JMLSpecFactory {
 
         if (useSoundDefault) {
             return cf.func(
-                generateName(method, Behavior.BEHAVIOR, null),
-                method,
-                false,
-                Map.of(heap, tb.tt()),
-                Map.of(heap, tb.tt()),
-                null,
-                Map.of(heap, tb.tt()),
-                Map.of(heap, tb.tt()),
-                Map.of(),
-                Map.of(heap, tb.allLocs()),
-                Map.of(heap, tb.allLocs()),
-                Map.of(heap, tb.allLocs()),
-                Map.of(heap, true),
-                Map.of(heap, true),
+                generateName(method, Behavior.BEHAVIOR, null), // base name
+                method, // program method
+                false, // terminates
+                Map.of(heap, tb.tt()), // pre
+                Map.of(heap, tb.tt()), // freePre
+                null, // measuredBy
+                Map.of(heap, tb.tt()), // post
+                Map.of(heap, tb.tt()), // freePost
+                Map.of(), // axioms
+                Map.of(heap, tb.allLocs()), // mod
+                Map.of(heap, tb.allLocs()), // freeMod
+                Map.of(heap, tb.allLocs()), // accessible
+                Map.of(heap, true), // has mod
+                Map.of(heap, true), // has free mod
                 progVarCollection);
         } else {
             return cf.func(
-                generateName(method, Behavior.NORMAL_BEHAVIOR, null),
-                method,
-                true,
-                Map.of(heap, tb.tt()),
-                Map.of(heap, tb.tt()),
-                null,
-                Map.of(heap, excNull),
-                Map.of(heap, tb.tt()),
-                Map.of(),
-                Map.of(heap, tb.empty()),
-                Map.of(heap, tb.empty()),
-                Map.of(heap, tb.empty()),
-                Map.of(heap, false),
-                Map.of(heap, false),
+                generateName(method, Behavior.NORMAL_BEHAVIOR, null), // base name
+                method, // program method
+                true, // terminates
+                Map.of(heap, tb.tt()), // pre
+                Map.of(heap, tb.tt()), // freePre
+                null, // measuredBy
+                Map.of(heap, excNull), // post
+                Map.of(heap, tb.tt()), // freePost
+                Map.of(), // axioms
+                Map.of(heap, tb.empty()), // mod
+                Map.of(heap, tb.empty()), // freeMod
+                Map.of(heap, tb.empty()), // accessible
+                Map.of(heap, false), // has mod
+                Map.of(heap, false), // has free mod
                 progVarCollection);
         }
     }
