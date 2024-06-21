@@ -27,4 +27,8 @@ public class RustyBlock implements Program {
     public int getChildCount() {
         return 1;
     }
+
+    public boolean isEmpty() {
+        return false;
+    }
 }

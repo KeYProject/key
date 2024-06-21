@@ -2,6 +2,7 @@ package org.key_project.rusty.logic;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
@@ -41,6 +42,7 @@ class TermImpl implements Term {
             * A cached value for computing the term's rigidness.
             */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
+    private ThreeValuedTruth containsCodeBlockRecursive = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
 
     /**
@@ -206,5 +208,37 @@ class TermImpl implements Term {
             }
         }
         visitor.subtreeLeft(this);
+    }
+
+    /**
+     * Checks whether the Term is valid on the top level. If this is the case this method returns
+     * the Term unmodified. Otherwise, a TermCreationException is thrown.
+     */
+    public Term checked() {
+        op.validTopLevelException(this);
+        return this;
+        /*
+         * if (op.validTopLevel(this)) { return this; } else { throw new TermCreationException(op,
+         * this); }
+         */
+    }
+
+    public boolean containsCodeBlockRecursive() {
+        if (containsCodeBlockRecursive == ThreeValuedTruth.UNKNOWN) {
+            ThreeValuedTruth result = ThreeValuedTruth.FALSE;
+            if (op instanceof Modality mod && !((RustyBlock) mod.program()).isEmpty()) {
+                result = ThreeValuedTruth.TRUE;
+            } else {
+                for (int i = 0, arity = subs.size(); i < arity; i++) {
+                    var sub = (TermImpl) subs.get(i);
+                    if (sub.containsCodeBlockRecursive()) {
+                        result = ThreeValuedTruth.TRUE;
+                        break;
+                    }
+                }
+            }
+            this.containsCodeBlockRecursive = result;
+        }
+        return containsCodeBlockRecursive == ThreeValuedTruth.TRUE;
     }
 }

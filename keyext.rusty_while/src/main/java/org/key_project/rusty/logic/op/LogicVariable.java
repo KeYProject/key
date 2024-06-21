@@ -18,16 +18,23 @@ import java.util.Objects;
 
 /**
  * The objects of this class represent logical variables, used e.g. for quantification.
+ * It uses De Brujin indices instead of names.
  */
 public final class LogicVariable extends AbstractSortedOperator
         implements QuantifiableVariable, ParsableVariable, EqualsModProofIrrelevancy {
 
-    public LogicVariable(Name name, Sort sort) {
-        super(name, sort, Modifier.RIGID);
+    private final int index ;
+
+    public LogicVariable(int index, Sort sort) {
+        super(new Name("@"+index), sort, Modifier.RIGID);
         assert sort != RustyDLTheory.FORMULA;
         assert sort != RustyDLTheory.UPDATE;
+        this.index = index;
     }
 
+    public int getIndex() {
+        return index;
+    }
 
     @Override
     public String toString() {
@@ -39,11 +46,12 @@ public final class LogicVariable extends AbstractSortedOperator
         if (!(obj instanceof LogicVariable that)) {
             return false;
         }
-        return name().equals(that.name()) && sort().equals(that.sort());
+        return index == that.index;
     }
 
     @Override
     public int hashCodeModProofIrrelevancy() {
+        // TODO
         return Objects.hash(name(), sort());
     }
 
