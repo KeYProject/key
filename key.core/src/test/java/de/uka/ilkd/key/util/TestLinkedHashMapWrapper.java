@@ -296,8 +296,8 @@ public class TestLinkedHashMapWrapper {
         assertFalse(wrappedMap3.containsValue(1),
             "Map should not contain value 1 as it should be overwritten by 3");
 
-        Iterator<Pair<Term, Integer>> it = wrappedMap3.iterator();
-        it.forEachRemaining(pair -> {
+        Iterator<Pair<Term, Integer>> it1 = wrappedMap3.iterator();
+        it1.forEachRemaining(pair -> {
             if (pair.first.equals(tb.tt())) {
                 assertEquals(3, pair.second, "Value for tt should be 3");
             } else if (pair.first.equals(tb.ff())) {
@@ -306,5 +306,12 @@ public class TestLinkedHashMapWrapper {
                 fail("Unexpected key in map");
             }
         });
+
+        Iterator<Pair<Term, Integer>> it2 = wrappedMap2.iterator();
+        assertTrue(it2.hasNext(), "Iterator should have next element");
+        it2.next();
+        assertTrue(it2.hasNext(), "Iterator should have next element");
+        it2.next();
+        assertFalse(it2.hasNext(), "Iterator should not have next element");
     }
 }
