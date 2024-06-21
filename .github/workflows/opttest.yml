@@ -25,7 +25,7 @@ jobs:
           cache: 'gradle'
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v3.3.2
         with:
           arguments: --continue ${{ matrix.tests }}
 

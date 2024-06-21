@@ -254,8 +254,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
-            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free")
-                    || ctx.MODIFIES() != null && ctx.MODIFIES().getText().endsWith("_free");
+            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
@@ -265,6 +264,28 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             if (methodContract != null) {
                 methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2);
             }
+            if (loopContract != null) {
+                loopContract.addClause(
+                    isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
+                            : TextualJMLLoopSpec.ClauseHd.ASSIGNABLE,
+                    heap, ctx2);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        final boolean isFree =
+            (ctx.LOOP_ASSIGNABLE() != null && ctx.LOOP_ASSIGNABLE().getText().endsWith("_free"))
+                    || (ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free"));
+        final LabeledParserRuleContext ctx2 =
+            LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
+                    ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
+                    : OriginTermLabel.SpecType.ASSIGNABLE,
+                attachOriginLabel);
+        for (Name heap : heaps) {
             if (loopContract != null) {
                 loopContract.addClause(
                     isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE

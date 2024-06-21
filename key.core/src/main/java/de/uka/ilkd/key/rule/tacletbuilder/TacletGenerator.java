@@ -646,7 +646,7 @@ public class TacletGenerator {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
         Map<Term, Term> replace = new LinkedHashMap<>();
         int i = 0;
-        for (ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (ProgramVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
         }
         final OpReplacer replacer = new OpReplacer(replace, services.getTermFactory());

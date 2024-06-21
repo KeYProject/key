@@ -349,9 +349,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             new LinkedHashMap<>();
         final Map<LocationVariable, Term> newFreePostconditions =
             new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newModifiesClauses =
+        final Map<LocationVariable, Term> newModifiableClauses =
             new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreeModifiesClauses =
+        final Map<LocationVariable, Term> newFreeModifiableClauses =
             new LinkedHashMap<LocationVariable, Term>();
         boolean changed = blockChanged;
 
@@ -360,29 +360,29 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final Term oldFreePrecondition = oldContract.getFreePrecondition(heap, services);
             final Term oldPostcondition = oldContract.getPostcondition(heap, services);
             final Term oldFreePostcondition = oldContract.getFreePostcondition(heap, services);
-            final Term oldModifies = oldContract.getModifiesClause(heap, services);
-            final Term oldFreeModifies = oldContract.getFreeModifiesClause(heap, services);
+            final Term oldModifiable = oldContract.getModifiableClause(heap, services);
+            final Term oldFreeModifiable = oldContract.getFreeModifiableClause(heap, services);
 
             final Term newPrecondition = replaceVariablesInTerm(oldPrecondition);
             final Term newFreePrecondition = replaceVariablesInTerm(oldFreePrecondition);
             final Term newPostcondition = replaceVariablesInTerm(oldPostcondition);
             final Term newFreePostcondition = replaceVariablesInTerm(oldFreePostcondition);
-            final Term newModifies = replaceVariablesInTerm(oldModifies);
-            final Term newFreeModifies = replaceVariablesInTerm(oldFreeModifies);
+            final Term newModifiable = replaceVariablesInTerm(oldModifiable);
+            final Term newFreeModifiable = replaceVariablesInTerm(oldFreeModifiable);
 
             newPreconditions.put(heap, newPrecondition);
             newFreePreconditions.put(heap, newFreePrecondition);
             newPostconditions.put(heap, newPostcondition);
             newFreePostconditions.put(heap, newFreePostcondition);
-            newModifiesClauses.put(heap, newModifies);
-            newFreeModifiesClauses.put(heap, newFreeModifies);
+            newModifiableClauses.put(heap, newModifiable);
+            newFreeModifiableClauses.put(heap, newFreeModifiable);
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newFreePrecondition != oldFreePrecondition)
                     || (newPostcondition != oldPostcondition)
                     || (newFreePostcondition != oldFreePostcondition)
-                    || (newModifies != oldModifies)
-                    || (newFreeModifies != oldFreeModifies));
+                    || (newModifiable != oldModifiable)
+                    || (newFreeModifiable != oldFreeModifiable));
         }
         final ImmutableList<InfFlowSpec> newInfFlowSpecs =
             replaceVariablesInTermListTriples(oldContract.getInfFlowSpecs());
@@ -392,8 +392,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         return changed
                 ? oldContract.update(newBlock, newPreconditions, newFreePreconditions,
-                    newPostconditions, newFreePostconditions, newModifiesClauses,
-                    newFreeModifiesClauses, newInfFlowSpecs, newVariables,
+                    newPostconditions, newFreePostconditions, newModifiableClauses,
+                    newFreeModifiableClauses, newInfFlowSpecs, newVariables,
                     replacer.replace(oldContract.getMby()))
                 : oldContract;
     }
@@ -406,8 +406,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final Map<LocationVariable, Term> newFreePreconditions = new LinkedHashMap<>();
         final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<>();
         final Map<LocationVariable, Term> newFreePostconditions = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreeModifiesClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newModifiableClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newFreeModifiableClauses = new LinkedHashMap<>();
         boolean changed = blockChanged;
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -415,29 +415,29 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final Term oldFreePrecondition = oldContract.getFreePrecondition(heap, services);
             final Term oldPostcondition = oldContract.getPostcondition(heap, services);
             final Term oldFreePostcondition = oldContract.getFreePostcondition(heap, services);
-            final Term oldModifies = oldContract.getModifiesClause(heap, services);
-            final Term oldFreeModifies = oldContract.getFreeModifiesClause(heap, services);
+            final Term oldModifiable = oldContract.getModifiableClause(heap, services);
+            final Term oldFreeModifiable = oldContract.getFreeModifiableClause(heap, services);
 
             final Term newPrecondition = replaceVariablesInTerm(oldPrecondition);
             final Term newFreePrecondition = replaceVariablesInTerm(oldFreePrecondition);
             final Term newPostcondition = replaceVariablesInTerm(oldPostcondition);
             final Term newFreePostcondition = replaceVariablesInTerm(oldFreePostcondition);
-            final Term newModifies = replaceVariablesInTerm(oldModifies);
-            final Term newFreeModifies = replaceVariablesInTerm(oldFreeModifies);
+            final Term newModifiable = replaceVariablesInTerm(oldModifiable);
+            final Term newFreeModifiable = replaceVariablesInTerm(oldFreeModifiable);
 
             newPreconditions.put(heap, newPrecondition);
             newFreePreconditions.put(heap, newFreePrecondition);
             newPostconditions.put(heap, newPostcondition);
             newFreePostconditions.put(heap, newFreePostcondition);
-            newModifiesClauses.put(heap, newModifies);
-            newFreeModifiesClauses.put(heap, newFreeModifies);
+            newModifiableClauses.put(heap, newModifiable);
+            newFreeModifiableClauses.put(heap, newFreeModifiable);
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newFreePrecondition != oldFreePrecondition)
                     || (newPostcondition != oldPostcondition)
                     || (newFreePostcondition != oldFreePostcondition)
-                    || (newModifies != oldModifies)
-                    || (newFreeModifies != oldFreeModifies));
+                    || (newModifiable != oldModifiable)
+                    || (newFreeModifiable != oldFreeModifiable));
         }
         final ImmutableList<InfFlowSpec> newInfFlowSpecs =
             replaceVariablesInTermListTriples(oldContract.getInfFlowSpecs());
@@ -449,14 +449,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return oldContract;
         } else if (newStatement instanceof StatementBlock) {
             return oldContract.update((StatementBlock) newStatement, newPreconditions,
-                newFreePreconditions, newPostconditions, newFreePostconditions, newModifiesClauses,
-                newFreeModifiesClauses, newInfFlowSpecs, newVariables,
+                newFreePreconditions, newPostconditions, newFreePostconditions,
+                newModifiableClauses,
+                newFreeModifiableClauses, newInfFlowSpecs, newVariables,
                 replacer.replace(oldContract.getMby()),
                 replacer.replace(oldContract.getDecreases()));
         } else {
             return oldContract.update((LoopStatement) newStatement, newPreconditions,
-                newFreePreconditions, newPostconditions, newFreePostconditions, newModifiesClauses,
-                newFreeModifiesClauses, newInfFlowSpecs, newVariables,
+                newFreePreconditions, newPostconditions, newFreePostconditions,
+                newModifiableClauses,
+                newFreeModifiableClauses, newInfFlowSpecs, newVariables,
                 replacer.replace(oldContract.getMby()),
                 replacer.replace(oldContract.getDecreases()));
         }
@@ -546,11 +548,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             final Term m =
-                replaceVariablesInTerm(inv.getModifies(heap, selfTerm, atPres, services));
+                replaceVariablesInTerm(inv.getModifiable(heap, selfTerm, atPres, services));
             newMods.put(heap, m);
 
             final Term mf = replaceVariablesInTerm(
-                inv.getFreeModifies(heap, selfTerm, atPres, services));
+                inv.getFreeModifiable(heap, selfTerm, atPres, services));
             newFreeMods.put(heap, mf);
 
             final ImmutableList<InfFlowSpec> infFlowSpecs = replaceVariablesInTermListTriples(
