@@ -1,0 +1,3 @@
+[submodule "keyext.llmsynth/jmlparser"]
+	path = keyext.llmsynth/jmlparser
+	url = git@github.com:samysweb/jmlparser.git
