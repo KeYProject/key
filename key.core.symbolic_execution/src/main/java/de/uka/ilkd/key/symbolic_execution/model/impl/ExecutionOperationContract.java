@@ -101,7 +101,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             exceptionTerm = search.getExceptionEquality().sub(0);
             // Rename variables in contract to the current one
             List<LocationVariable> heapContext =
-                HeapContext.getModHeaps(services, inst.transaction);
+                HeapContext.getModifiableHeaps(services, inst.transaction);
             Map<LocationVariable, LocationVariable> atPreVars =
                 UseOperationContractRule.computeAtPreVars(heapContext, services, inst);
             Map<LocationVariable, Term> atPres = HeapContext.getAtPres(atPreVars, services);

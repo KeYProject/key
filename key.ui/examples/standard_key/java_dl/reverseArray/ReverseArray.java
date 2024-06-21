@@ -1,12 +1,12 @@
 
 public class ReverseArray {
 
-    public int[] a;     
-   
+    public int[] a;
+
     public ReverseArray() {
     }
-    
-    
+
+
     /*@ public normal_behavior
       @ requires a!=null && a.length>=0;
       @ ensures (\forall int j; j>=0 && j<a.length; a[j]==\old(a[a.length-(j+1)]));
@@ -16,13 +16,13 @@ public class ReverseArray {
 	int i = 0;
 
         final int length = (a.length/2) ;
-	/*@ 
+	/*@
 	  @ loop_invariant
 	  @   (\forall int j; j>=0 && j<i; \old(a[a.length-(j+1)])==a[j] && \old(a[j])==a[a.length-(j+1)])
 	  @   && (\forall int j; j>=i && j<length; \old(a[a.length-(j+1)])==a[a.length-(j+1)] && \old(a[j])==a[j])
 	  @   && (a.length % 2 != 0 ==> \old(a[a.length/2])==a[length])
 	  @   && i>=0 && i<=length;
-	  @ modifies a[*];
+	  @ assignable a[*];
 	  @*/
 	while (i<length) {
 	    int tmp = a[i];
@@ -43,12 +43,12 @@ public class ReverseArray {
     public int[] reverse2(int[] p_a) {
         int[] b = new int[p_a.length];
 	int i = 0;
-	/*@ 
+	/*@
 	    @ loop_invariant (\forall int j; j>=0 && j<i; b[j]==p_a[p_a.length-(j+1)]) && i>=0 && i<=p_a.length;
-	      @ modifies b[*];
+	      @ assignable b[*];
 	      @*/
-	while (i<p_a.length) {      
-	    b[i] = p_a[p_a.length-(i+1)];      
+	while (i<p_a.length) {
+	    b[i] = p_a[p_a.length-(i+1)];
 	    i++;
 	}
 	return b;
@@ -64,7 +64,7 @@ public class ReverseArray {
 	for (int i = 0; i<ra.a.length; i++) {
 	    System.out.println(ra.a[i]);
 	}
-     
+
     }
 
 }
