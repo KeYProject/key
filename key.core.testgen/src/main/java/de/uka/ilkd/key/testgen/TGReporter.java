@@ -7,6 +7,8 @@ import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 
 /**
+ * Reporter for test case generation.
+ *
  * @author Alexander Weigl
  * @version 1 (24.05.24)
  */

@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.util.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -32,8 +30,6 @@ import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-
-import org.jspecify.annotations.Nullable;
 
 import org.key_project.logic.Choice;
 import org.key_project.logic.Term;
@@ -75,7 +71,8 @@ public abstract class AbstractTestGenerator {
         this.originalProof = originalProof;
     }
 
-    public void generateTestCases(final StopRequest stopRequest, final TGReporter log) {
+    public void generateTestCases(final StopRequest stopRequest, final TGReporter log)
+            throws InterruptedException {
         TestGenerationSettings settings = TestGenerationSettings.getInstance();
 
         if (!SolverTypes.Z3_CE_SOLVER.isInstalled(true)) {
@@ -98,6 +95,8 @@ public abstract class AbstractTestGenerator {
                 TestGenMacro macro = new TestGenMacro();
                 macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
                 log.writeln("Finished symbolic execution.");
+            } catch (InterruptedException e) {
+                throw e;
             } catch (Exception ex) {
                 log.reportException(ex);
             }
@@ -105,7 +104,7 @@ public abstract class AbstractTestGenerator {
 
         log.writeln("Extracting test data constraints (path conditions).");
         proofs =
-                createProofsForTesting(settings.removeDuplicates(), !settings.includePostCondition());
+            createProofsForTesting(settings.removeDuplicates(), !settings.includePostCondition());
         if (stopRequest != null && stopRequest.shouldStop()) {
             return;
         }
@@ -138,6 +137,7 @@ public abstract class AbstractTestGenerator {
                     LOGGER.debug("Semantics blasting interrupted");
                     log.writeln("\n Warning: semantics blasting was interrupted. "
                         + "A test case will not be generated.");
+                    throw e;
                 } catch (final Exception e) {
                     log.writeln(e.getLocalizedMessage());
                     LOGGER.warn("", e);
@@ -167,7 +167,7 @@ public abstract class AbstractTestGenerator {
         launcher.addListener(new SolverLauncherListener() {
             @Override
             public void launcherStopped(SolverLauncher launcher,
-                                        Collection<SMTSolver> finishedSolvers) {
+                    Collection<SMTSolver> finishedSolvers) {
                 handleLauncherStopped(launcher, finishedSolvers, log);
             }
 
@@ -237,7 +237,7 @@ public abstract class AbstractTestGenerator {
                         removePostCondition);
                 } else {
                     p = createProofForTestingNoDuplicate(oldGoalIter.next(), null,
-                            removePostCondition);
+                        removePostCondition);
                 }
                 if (p != null) {
                     res.add(p);
@@ -278,7 +278,7 @@ public abstract class AbstractTestGenerator {
      * @throws ProofInputException exception for proof input
      */
     private Proof createProofForTestingNoDuplicate(Node node, List<Proof> otherProofs,
-                                                   boolean removePostCondition) throws ProofInputException {
+            boolean removePostCondition) throws ProofInputException {
         final Proof oldProof = node.proof();
         final Sequent oldSequent = node.sequent();
         Sequent newSequent = JavaDLSequentKit.getInstance().getEmptySequent();
@@ -365,13 +365,10 @@ public abstract class AbstractTestGenerator {
 
     protected void generateFiles(Collection<SMTSolver> problemSolvers,
             TGReporter log, Proof originalProof) throws IOException {
-        final TestCaseGenerator tg = new TestCaseGenerator(originalProof, new TestGenerationSettings(), log);
+        final TestCaseGenerator tg =
+            new TestCaseGenerator(originalProof, new TestGenerationSettings(), log);
         tg.generateJUnitTestSuite(problemSolvers);
-        if (tg.isJunit()) {
-            log.writeln("Compile the generated files using a Java compiler.");
-        } else {
-            log.writeln("Compile and run the file with openjml!");
-        }
+        log.writeln("Compile the generated files using a Java compiler.");
     }
 
     /**

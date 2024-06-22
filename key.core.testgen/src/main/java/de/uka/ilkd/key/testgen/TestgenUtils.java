@@ -3,39 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
-import java.util.Objects;
+
+import java.util.List;
 
 import de.uka.ilkd.key.smt.model.Model;
+
+import com.squareup.javapoet.TypeName;
 import org.jspecify.annotations.Nullable;
 
+import static com.squareup.javapoet.TypeName.*;
+
 public class TestgenUtils {
-    interface AssignmentCreator {
-        String assign(String type, Object left, String right);
-    }
-
-    public String createAssignment(boolean rfl, String type, Object left, String right) {
-        if (rfl) {
-            return createAssignmentWithRfl(type, left, right);
-        } else {
-            return createAssignmentWithoutRfl(type, left, right);
-        }
-    }
-
-    public static String createAssignmentWithRfl(String type, Object left, String right) {
-        if (left instanceof RefEx leftEx) {
-            return "%s.%s%s(%s.class, %s, \"%s\", %s)".formatted(
-                    ReflectionClassCreator.NAME_OF_CLASS,
-                    ReflectionClassCreator.SET_PREFIX,
-                    ReflectionClassCreator.cleanTypeName(leftEx.fieldType()),
-                    leftEx.rcObjType(), leftEx.rcObj(), leftEx.field(), right);
-        } else {
-            return createAssignmentWithoutRfl(type, left, right);
-        }
-    }
-
-    public static String createAssignmentWithoutRfl(String type, Object left, String right) {
-        return "%s %s = %s".formatted(type, left, right);
-    }
+    // setter and getter methods will be created for these types.
+    public static final List<TypeName> PRIMITIVE_TYPES =
+        List.of(BYTE, INT, LONG, CHAR, BOOLEAN, FLOAT, SHORT, DOUBLE);
 
     public static boolean isNumericType(String type) {
         return type.equals("byte") || type.equals("short") || type.equals("int")
@@ -46,6 +27,9 @@ public class TestgenUtils {
         return isNumericType(type) || type.equals("boolean") || type.equals("char");
     }
 
+    public static boolean isPrimitiveType(TypeName type) {
+        return PRIMITIVE_TYPES.contains(type);
+    }
 
     public static String translateValueExpression(String val) {
         if (val.contains("/")) {

@@ -18,7 +18,6 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
@@ -29,6 +28,8 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
@@ -84,7 +85,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-                                                     PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.

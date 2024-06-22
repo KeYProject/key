@@ -17,8 +17,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -147,9 +145,6 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
      */
     public static class NoMainWindowCounterExampleGenerator
             extends AbstractSideProofCounterExampleGenerator {
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
                 Proof proof) {

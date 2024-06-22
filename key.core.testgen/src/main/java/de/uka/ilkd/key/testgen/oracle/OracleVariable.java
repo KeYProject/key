@@ -7,6 +7,7 @@ import org.key_project.logic.sort.Sort;
 
 public record OracleVariable(String name, Sort sort) implements OracleTerm {
     public String toString() {
-        return name;}
+        return name;
+    }
 
 }

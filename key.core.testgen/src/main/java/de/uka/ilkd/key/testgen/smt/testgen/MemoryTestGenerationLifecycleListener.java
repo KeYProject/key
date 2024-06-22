@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.smt.testgen;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.testgen.Constants.NEW_LINE;
 
 /**
@@ -20,7 +22,7 @@ public class MemoryTestGenerationLifecycleListener implements TestGenerationLife
      * {@inheritDoc}
      */
     @Override
-    public void writeln(@Nullable String message) {
+    public void writeln(Object sender, @Nullable String message) {
         sb.append(message);
         sb.append(NEW_LINE);
     }

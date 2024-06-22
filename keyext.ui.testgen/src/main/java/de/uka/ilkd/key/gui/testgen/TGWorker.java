@@ -46,7 +46,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
     }
 
     @Override
-    public Void doInBackground() {
+    public Void doInBackground() throws InterruptedException {
         testGenerator.generateTestCases(this, tgInfoDialog.getLogger());
         return null;
     }

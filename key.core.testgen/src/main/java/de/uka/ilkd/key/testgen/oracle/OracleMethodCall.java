@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 public record OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args,
-                               @Nullable OracleTerm caller)
+        @Nullable OracleTerm caller)
         implements OracleTerm {
     public OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args) {
         this(method, args, null);

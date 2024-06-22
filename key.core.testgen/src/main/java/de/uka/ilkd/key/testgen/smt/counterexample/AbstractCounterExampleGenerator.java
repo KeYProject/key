@@ -64,7 +64,7 @@ public abstract class AbstractCounterExampleGenerator {
      * @throws ProofInputException Occurred Exception.
      */
     public void searchCounterExample(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent)
-            throws ProofInputException {
+            throws ProofInputException, InterruptedException {
         if (!isSolverAvailable()) {
             throw new IllegalStateException(
                 "Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
@@ -76,12 +76,10 @@ public abstract class AbstractCounterExampleGenerator {
         final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
         ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
         try {
-            synchronized (macro) { // TODO: Useless? No other thread has access to macro wait for
-                                   // macro to terminate
-                info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
-            }
+            info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
         } catch (InterruptedException e) {
             LOGGER.debug("Semantics blasting interrupted");
+            throw e;
         } finally {
             semanticsBlastingCompleted(ui);
             ptl.taskFinished(info);

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.testgen.macros;
 import java.util.Set;
 
 import de.uka.ilkd.key.macros.AbstractBlastingMacro;
+
 import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.rules.Rule;
 
@@ -15,10 +16,10 @@ import org.jspecify.annotations.Nullable;
  * @author mihai
  */
 public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
-    private final Set<String> EMPTY_RULES = Set.of(
+    private static final Set<String> EMPTY_RULES = Set.of(
         "equalityToElementOf", "equalityToSelect", "equalityToSeqGetAndSeqLen");
 
-    private final Set<String> SEMANTIC_RULES = Set.of(
+    private static final Set<String> SEMANTIC_RULES = Set.of(
         "selectOfStore",
         "selectOfCreate",
         "selectOfAnon",
@@ -126,8 +127,9 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
     private record NameRuleFilter(Set<String> rules) implements RuleFilter {
 
-    @Override
-    public boolean filter(Rule rule) {
-        return rules.contains(rule.name().toString());
+        @Override
+        public boolean filter(Rule rule) {
+            return rules.contains(rule.name().toString());
+        }
     }
-}}
+}
