@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.sort.Sort;
+
+import static de.uka.ilkd.key.ldt.JavaDLTheory.FORMULA;
 
 public record OracleConstant(String value, Sort sort) implements OracleTerm {
-    public static final OracleConstant TRUE = new OracleConstant("true", Sort.FORMULA);
-    public static final OracleConstant FALSE = new OracleConstant("false", Sort.FORMULA);
+    public static final OracleConstant TRUE = new OracleConstant("true", FORMULA);
+    public static final OracleConstant FALSE = new OracleConstant("false", FORMULA);
 
     public String toString() {
         return value;

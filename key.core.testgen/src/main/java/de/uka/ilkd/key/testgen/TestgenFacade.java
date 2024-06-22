@@ -24,11 +24,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
-import org.jspecify.annotations.Nullable;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 
 public record TestgenFacade(TestGenerationSettings settings) {
     public static Callable<Boolean> generateTestcasesTask(KeYEnvironment<?> env, Proof proof,
