@@ -21,7 +21,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  * The abstract class StrategyProofMacro can be used to define proof macros which use their own
