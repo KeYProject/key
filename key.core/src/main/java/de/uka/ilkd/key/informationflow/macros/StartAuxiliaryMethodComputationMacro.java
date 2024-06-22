@@ -22,8 +22,6 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
-
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**

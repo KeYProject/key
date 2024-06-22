@@ -13,7 +13,6 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros which apply the

@@ -11,7 +11,6 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
-import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.testgen.Constants.TAB;
 

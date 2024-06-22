@@ -17,7 +17,6 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left untouched.

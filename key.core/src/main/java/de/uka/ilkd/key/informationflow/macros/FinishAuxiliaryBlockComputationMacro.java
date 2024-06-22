@@ -24,7 +24,6 @@ import de.uka.ilkd.key.speclang.BlockContract;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  *

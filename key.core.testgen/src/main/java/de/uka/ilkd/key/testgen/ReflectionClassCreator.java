@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import javax.lang.model.element.Modifier;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 
 import com.squareup.javapoet.*;
 
@@ -77,8 +77,8 @@ public class ReflectionClassCreator {
      */
     private HashSet<String> sortsToString() {
         final HashSet<String> result = new HashSet<>();
-        for (final Sort var : usedObjectSorts) {
-            String sort = var.toString();
+        for (final Sort s : usedObjectSorts) {
+            String sort = s.toString();
             // We only want Object-Types
             if (!" jbyte jint jlong jfloat jdouble jboolean jchar ".contains(" " + sort + " ")) {
                 if (" jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] "
@@ -191,8 +191,6 @@ public class ReflectionClassCreator {
      * All calls to create objects for the given sorts
      */
     private void instances(final HashSet<String> sorts, TypeSpec.Builder clazz) {
-        // r.append(NEW_LINE).append(" // ---The methods for object creation---").append(NEW_LINE)
-        // .append(NEW_LINE);
         for (final String sort : sorts) {
             clazz.addMethod(newRef(sort));
         }

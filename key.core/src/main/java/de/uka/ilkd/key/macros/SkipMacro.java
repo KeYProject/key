@@ -11,7 +11,6 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  * This macro does nothing and is not applicable. It can be used to create compound macros, e.g. as

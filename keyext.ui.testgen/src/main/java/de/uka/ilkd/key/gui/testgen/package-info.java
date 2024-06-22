@@ -8,5 +8,3 @@
  * @version 1 (9/16/20)
  */
 package de.uka.ilkd.key.gui.testgen;
-
-import org.jspecify.annotations.NullMarked;

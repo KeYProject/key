@@ -23,7 +23,6 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  *

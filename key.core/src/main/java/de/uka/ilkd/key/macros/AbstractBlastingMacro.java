@@ -45,7 +45,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
