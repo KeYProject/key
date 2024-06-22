@@ -5,28 +5,27 @@ package de.uka.ilkd.key.testgen;
 
 import org.key_project.util.java.StringUtil;
 
-public interface Constants {
-
+public class Constants {
     /**
      * Constant for the line break which is used by the operating system.
      * <p>
      * <b>Do not use {@code \n}!</b>
      */
-    String NEW_LINE = StringUtil.NEW_LINE;
-    String NULLABLE = "/*@ nullable */";
-    String ALL_OBJECTS = "allObjects";
-    String ALL_INTS = "allInts";
-    String ALL_BOOLS = "allBools";
-    String ALL_HEAPS = "allHeaps";
-    String ALL_FIELDS = "allFields";
-    String ALL_SEQ = "allSeq";
-    String ALL_LOCSETS = "allLocSets";
+    public static final String NEW_LINE = StringUtil.NEW_LINE;
+    public static final String NULLABLE = "/*@ nullable */";
 
-    String OBJENESIS_NAME = "objenesis-2.2.jar";
+    public static final String ALL_OBJECTS = "allObjects";
+    public static final String ALL_INTS = "allInts";
+    public static final String ALL_BOOLS = "allBools";
+    public static final String ALL_HEAPS = "allHeaps";
+    public static final String ALL_FIELDS = "allFields";
+    public static final String ALL_SEQ = "allSeq";
+    public static final String ALL_LOCSETS = "allLocSets";
+    public static final String OBJENESIS_NAME = "objenesis-2.2.jar";
+    public static final String OLD_MAP = "old";
+    public static final String TAB = "   ";
+    public static final String DUMMY_POSTFIX = "DummyImpl";
 
-    String OLDMap = "old";
-
-    String TAB = "   ";
-
-    String DUMMY_POSTFIX = "DummyImpl";
+    private Constants() {
+    }
 }

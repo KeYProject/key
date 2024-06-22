@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
-public sealed
-interface OracleTerm
-permits OracleBinTerm, OracleConstant, OracleMethodCall, OracleType, OracleUnaryTerm, OracleVariable
-{
+public sealed interface OracleTerm
+        permits OracleBinTerm, OracleConstant, OracleMethodCall, OracleType, OracleUnaryTerm,
+        OracleVariable {
 }

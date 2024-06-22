@@ -5,11 +5,12 @@ package de.uka.ilkd.key.testgen;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import javax.lang.model.element.Modifier;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-
 import com.squareup.javapoet.*;
+
+import static com.squareup.javapoet.TypeName.*;
 
 /**
  * Creates the RFL.java file, that provides setter and getter methods using the reflection API as
@@ -20,26 +21,18 @@ import com.squareup.javapoet.*;
  * @author weigl -- rewrite for javapoet
  */
 public class ReflectionClassCreator {
-
     public static final String NAME_OF_CLASS = "RFL";
-
     public static final String ARRAY = "_ARRAY_";
     public static final String SET_PREFIX = "_set_";
     public static final String GET_PREFIX = "_get_";
 
-    // setter and getter methods will be created for these types.
-    private static final String[] PRIMITIVE_TYPES =
-        { "int", "long", "byte", "char", "boolean", "float", "double" };
-
     // Default values for primitive types
-    private static final String[] PRIM_TYP_DEF_VAL = { "0", "0", "0", "' '", "false", "0", "0" };
+    private static final String[] PRIM_TYP_DEF_VAL = { "0", "0", "0", "0", "false", "0", "0" };
 
-    private final HashSet<Sort> usedObjectSorts;
-    private final HashSet<String> usedObjectSortsStrings;
+    private final HashSet<TypeName> usedObjectSortsStrings;
 
 
     public ReflectionClassCreator() {
-        usedObjectSorts = new HashSet<>();
         usedObjectSortsStrings = new HashSet<>();
     }
 
@@ -48,7 +41,7 @@ public class ReflectionClassCreator {
      * as well as object creation functions based on the objenesis library.
      */
     public TypeSpec createClass(boolean staticClass) {
-        final HashSet<String> sorts = sortsToString();
+        var sorts = sortsToString();
         var clazz = classDecl(staticClass);
         ghostMapDecls(clazz);
         staticInitializer(true, clazz);
@@ -61,46 +54,32 @@ public class ReflectionClassCreator {
     /**
      * Constructors, setter-, getter-methods will be created for the added sorts.
      */
-    public void addSort(Sort s) {
-        usedObjectSorts.add(s);
-    }
-
-    /**
-     * Constructors, setter-, getter-methods will be created for the added sorts.
-     */
-    public void addSort(String s) {
+    public void addSort(TypeName s) {
         usedObjectSortsStrings.add(s);
     }
 
     /**
      * @return String representations for all non primitive types
      */
-    private HashSet<String> sortsToString() {
-        final HashSet<String> result = new HashSet<>();
-        for (final Sort var : usedObjectSorts) {
-            String sort = var.toString();
-            // We only want Object-Types
-            if (!" jbyte jint jlong jfloat jdouble jboolean jchar ".contains(" " + sort + " ")) {
-                if (" jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] "
-                        .contains(" " + sort + " ")) {
-                    sort = sort.substring(1);
-                }
-                if (!isPrimitiveType(sort)) {
-                    result.add(sort);
-                }
+    private Set<TypeName> sortsToString() {
+        final Set<TypeName> result = new HashSet<>();
+
+        for (TypeName sort : usedObjectSortsStrings) {
+            if (sort instanceof ArrayTypeName a) {
+                sort = a.componentType;
             }
-        }
-        for (String sort : usedObjectSortsStrings) {
-            // We only want Object-Types
-            if (!" jbyte jint jlong jfloat jdouble jboolean jchar ".contains(" " + sort + " ")) {
-                if (" jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] "
-                        .contains(" " + sort + " ")) {
-                    sort = sort.substring(1);
-                }
-                if (!isPrimitiveType(sort)) {
-                    result.add(sort);
-                }
+
+            if (sort instanceof ParameterizedTypeName p) {
+                sort = p.rawType;
             }
+
+            if (sort instanceof TypeVariableName
+                    || sort instanceof WildcardTypeName
+                    || TestgenUtils.PRIMITIVE_TYPES.contains(sort)
+                    || sort == VOID) {
+                continue;
+            }
+            result.add(sort);
         }
         return result;
     }
@@ -190,10 +169,8 @@ public class ReflectionClassCreator {
     /**
      * All calls to create objects for the given sorts
      */
-    private void instances(final HashSet<String> sorts, TypeSpec.Builder clazz) {
-        // r.append(NEW_LINE).append(" // ---The methods for object creation---").append(NEW_LINE)
-        // .append(NEW_LINE);
-        for (final String sort : sorts) {
+    private void instances(final Set<TypeName> sorts, TypeSpec.Builder clazz) {
+        for (final TypeName sort : sorts) {
             clazz.addMethod(newRef(sort));
         }
     }
@@ -201,9 +178,9 @@ public class ReflectionClassCreator {
     /**
      * @return The call to create an object of given type
      */
-    private MethodSpec newRef(final String sort) {
-        if (sort.indexOf('[') != -1) {
-            return newArrayField(sort);
+    private MethodSpec newRef(final TypeName sort) {
+        if (sort instanceof ArrayTypeName a) {
+            return newArrayField(a);
         } else {
             return newInstance(sort);
         }
@@ -215,35 +192,30 @@ public class ReflectionClassCreator {
      * method names. This method is also used in Assignment.toString(boolean rfl) to generate the
      * correct method names.
      */
-    public static String cleanTypeName(String s) {
-        // WARNING: Make sure this fixed string begins with a SPACE and also
-        // ends with a SPACE.
-        if (" jbyte jint jlong jfloat jdouble jboolean jchar jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] "
-                .contains(" " + s + " ")) {
-            s = s.substring(1);
+    public static String cleanTypeName(TypeName s) {
+        if (s instanceof ArrayTypeName a) {
+            return cleanTypeName(a.componentType) + ARRAY;
         }
-        while (s.contains(".")) {
-            s = s.substring(0, s.indexOf('.')) + "_" + s.substring(s.indexOf('.') + 1);
+
+        if (s instanceof ParameterizedTypeName p) {
+            return cleanTypeName(p.rawType);
         }
-        while (s.contains("[]")) {
-            s = s.substring(0, s.indexOf("[]")) + ARRAY + s.substring(s.indexOf("[]") + 2);
-        }
-        return s;
+
+        return s.toString().replace('.', '_');
     }
 
     /**
      * @param sort
      * @return The call to create an object of given type
      */
-    private MethodSpec newInstance(final String sort) {
+    private MethodSpec newInstance(final TypeName sort) {
         String methodName = cleanTypeName(sort);
-        ClassName returnType = ClassName.get("", sort);
         return MethodSpec.methodBuilder(methodName)
-                .returns(returnType)
+                .returns(sort)
                 .addException(RuntimeException.class)
                 .addStatement("try{ return ($N) newInstance($N.class); } " +
                     "catch (java.lang.Throwable e) { throw new java.lang.RuntimeException(e); }",
-                    returnType)
+                    sort)
                 .build();
     }
 
@@ -251,51 +223,48 @@ public class ReflectionClassCreator {
      * @param sort
      * @return The call to create an Array of given type
      */
-    private MethodSpec newArrayField(final String sort) {
+    private MethodSpec newArrayField(final ArrayTypeName sort) {
         String typeName = cleanTypeName(sort);
-        String substring = sort.substring(0, sort.length() - 2);
         return MethodSpec.methodBuilder("new" + typeName)
-                .addStatement("return new $N[dim];", substring)
+                .returns(sort)
+                .addStatement("return new $N[dim];", sort.componentType)
                 .build();
     }
 
-    private boolean isPrimitiveType(String sort) {
-        for (String s : PRIMITIVE_TYPES) {
-            if (s.equals(sort)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isPrimitiveType(TypeName sort) {
+        return TestgenUtils.PRIMITIVE_TYPES.contains(sort);
     }
 
-    private void getterAndSetter(final HashSet<String> sorts, TypeSpec.Builder clazz) {
+    private void getterAndSetter(final Set<TypeName> sorts, TypeSpec.Builder clazz) {
         for (int i = 0; i < 7; i++) {
-            clazz.addMethod(declareSetter(PRIMITIVE_TYPES[i], true));
-            clazz.addMethod(declareGetter(PRIMITIVE_TYPES[i], PRIM_TYP_DEF_VAL[i], true));
+            clazz.addMethod(declareSetter(TestgenUtils.PRIMITIVE_TYPES.get(i), true));
+            clazz.addMethod(
+                declareGetter(TestgenUtils.PRIMITIVE_TYPES.get(i), PRIM_TYP_DEF_VAL[i], true));
         }
-        for (final String sort : sorts) {
+        for (final var sort : sorts) {
             clazz.addMethod(declareSetter(sort, false));
             clazz.addMethod(declareGetter(sort, "null", false));
         }
     }
 
-    private MethodSpec declareSetter(final String sort, final boolean prim) {
-
-        var retType = ClassName.get("", sort);
+    private MethodSpec declareSetter(final TypeName sort, final boolean prim) {
+        var retType = sort;
         var ms = MethodSpec.methodBuilder(SET_PREFIX + cleanTypeName(sort))
                 .addParameter(Class.class, "c")
-                .addParameter(TypeName.OBJECT, "obj")
+                .addParameter(OBJECT, "obj")
                 .addParameter(String.class, "attr")
                 .addParameter(retType, "val")
                 .beginControlFlow("try")
                 .addStatement("$T f = c.getDeclaredField(attr);", java.lang.reflect.Field.class)
                 .addStatement("f.setAccessible(true);");
 
-        if (prim)
-            ms.addStatement("f.set" + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)
-                + "(obj, val);");
-        else
+        if (prim) {
+            var camelCase =
+                Character.toUpperCase(sort.toString().charAt(0)) + sort.toString().substring(1);
+            ms.addStatement("f.set" + camelCase + "(obj, val);");
+        } else {
             ms.addStatement("f.set(obj, val);");
+        }
 
         ms.nextControlFlow("catch(NoSuchFieldException e)")
                 .beginControlFlow("if(ghostMapActive)")
@@ -310,36 +279,27 @@ public class ReflectionClassCreator {
         return ms.build();
     }
 
-    private String primToWrapClass(String sort) {
-        if (sort.equals("int")) {
-            return "Integer";
-        } else if (sort.equals("char")) {
-            return "Character";
-        } else {
-            return Character.toUpperCase(sort.charAt(0)) + sort.substring(1);
-        }
-    }
 
-    private MethodSpec declareGetter(final String sort, final String def, final boolean prim) {
-        var retType = ClassName.get("", sort);
+    private MethodSpec declareGetter(final TypeName sort, final String def, final boolean prim) {
         var ms = MethodSpec.methodBuilder(GET_PREFIX + cleanTypeName(sort))
-                .returns(retType)
+                .returns(sort)
                 .addParameter(Class.class, "c")
-                .addParameter(TypeName.OBJECT, "obj")
+                .addParameter(OBJECT, "obj")
                 .addParameter(String.class, "attr")
                 .addStatement("rest = $L;", def)
                 .beginControlFlow("try")
                 .addStatement("$T f = c.getDeclaredField(attr);", java.lang.reflect.Field.class)
                 .addStatement("f.setAccessible(true);");
 
-        if (prim)
-            ms.addStatement("return f.get" + Character.toUpperCase(sort.charAt(0))
-                + sort.substring(1) + "(obj);");
-        else
-            ms.addStatement("return ($N) f.get(obj);", retType);
+        if (prim) {
+            var camelCase =
+                Character.toUpperCase(sort.toString().charAt(0)) + sort.toString().substring(1);
+            ms.addStatement("return f.get" + camelCase + "(obj);");
+        } else {
+            ms.addStatement("return ($N) f.get(obj);", sort);
+        }
 
         ms.nextControlFlow("catch($N e)", NoSuchFieldException.class);
-        ms.addStatement(prim ? primToWrapClass(sort) : sort);
         ms.addStatement("ghostModelFields.get(getHash(c,obj,attr));");
         ms.nextControlFlow("catch(Exception e)");
         ms.addStatement("throw new RuntimeException(e);");

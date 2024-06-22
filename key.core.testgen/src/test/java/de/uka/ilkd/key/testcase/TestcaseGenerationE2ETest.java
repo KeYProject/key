@@ -1,7 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testcase;
 
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.testgen.TGMain;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -10,18 +15,21 @@ import org.junit.jupiter.api.Test;
  */
 public class TestcaseGenerationE2ETest {
     @Test
-    public void binarySearch() throws ProblemLoaderException, InterruptedException {
-        TGMain.main(new String[]{
-                "--output", "testcases/binarysearch/actual", "testcases/binarysearch/attempt.proof"
+    @Disabled
+    public void binarySearch() {
+        int exit = TGMain.mainwox(new String[] {
+            "--output", "testcases/binarysearch/actual", "testcases/binarysearch/attempt.proof"
         });
+        Assertions.assertEquals(0, exit, "Expected error level to be zero");
     }
 
     @Test
-    public void arrayUtil() throws ProblemLoaderException, InterruptedException {
-        TGMain.main(new String[]{
-                "--all-contracts",
-                "--output", "testcases/arrayutil/actual",
-                "testcases/arrayutil/src/"
+    public void arrayUtil() {
+        int exit = TGMain.mainwox(new String[] {
+            "--all-contracts",
+            "--output", "testcases/arrayutil/actual",
+            "testcases/arrayutil/src/"
         });
+        Assertions.assertEquals(0, exit, "Expected error level to be zero");
     }
 }

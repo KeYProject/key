@@ -8,9 +8,9 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
@@ -27,11 +27,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
-
-import org.key_project.logic.sort.Sort;
-
-import org.jspecify.annotations.Nullable;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +42,8 @@ public record ProofInfo(Proof proof, Services services) {
     public IProgramMethod getMUT() {
         SpecificationRepository spec = services.getSpecificationRepository();
         IObserverFunction f = spec.getTargetOfProof(proof);
-        if (f instanceof IProgramMethod) {
-            return (IProgramMethod) f;
+        if (f instanceof IProgramMethod pm) {
+            return pm;
         } else {
             return null;
         }
@@ -57,16 +52,18 @@ public record ProofInfo(Proof proof, Services services) {
     @Nullable
     public String getMUTCall() {
         var m = getMUT();
-        if (m == null) return null;
+        if (m == null)
+            return null;
 
         var name = m.getFullName();
-        if (name == null) return null;
+        if (name == null)
+            return null;
 
         StringBuilder params = new StringBuilder();
         for (ParameterDeclaration p : m.getParameters()) {
             for (VariableSpecification v : p.getVariables()) {
-                IProgramVariable var = v.getProgramVariable();
-                params.append(",").append(var.name());
+                IProgramVariable pvar = v.getProgramVariable();
+                params.append(",").append(pvar.name());
             }
         }
         if (!params.isEmpty()) {
@@ -98,7 +95,7 @@ public record ProofInfo(Proof proof, Services services) {
 
     @Nullable
     public KeYJavaType getReturnType() {
-        var mut =  getMUT();
+        var mut = getMUT();
         return mut != null ? mut.getType() : null;
     }
 
@@ -123,9 +120,8 @@ public record ProofInfo(Proof proof, Services services) {
         Contract c = getContract();
         if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
-            JTerm post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
-                    orig.params, orig.atPres, services);
-            return post;
+            return t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
+                orig.params, orig.atPres, services);
         }
         // no pre <==> false
         return services.getTermBuilder().ff();
@@ -215,7 +211,7 @@ public record ProofInfo(Proof proof, Services services) {
                 return "";
             }
             return "   \n" + up.lhs().sort() + " " + up.lhs().toString() + " = " + update.sub(0)
-                    + ";";
+                + ";";
         }
         StringBuilder result = new StringBuilder();
         for (JTerm sub : update.subs()) {
