@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.io.File;
 import java.util.Locale;
+import java.util.Objects;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -95,8 +96,6 @@ public final class KeYFileChooser extends JFileChooser {
 
     private static KeYFileChooser INSTANCE;
 
-    private static final long serialVersionUID = -7598570660247063980L;
-
     /** indicates whether the dialog is used for saving or loading */
     private boolean saveDialog;
 
@@ -150,11 +149,7 @@ public final class KeYFileChooser extends JFileChooser {
 
     @Override
     public void setDialogTitle(String title) {
-        if (title != null) {
-            super.setDialogTitle(title);
-        } else {
-            super.setDialogTitle("Select file to load");
-        }
+        super.setDialogTitle(Objects.requireNonNullElse(title, "Select file to load"));
     }
 
     private void setSaveDialog(boolean b) {
