@@ -15,10 +15,10 @@ import org.jspecify.annotations.Nullable;
  * @author mihai
  */
 public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
-    private final Set<String> EMPTY_RULES = Set.of(
+    private static final Set<String> EMPTY_RULES = Set.of(
         "equalityToElementOf", "equalityToSelect", "equalityToSeqGetAndSeqLen");
 
-    private final Set<String> SEMANTIC_RULES = Set.of(
+    private static final Set<String> SEMANTIC_RULES = Set.of(
         "selectOfStore",
         "selectOfCreate",
         "selectOfAnon",
