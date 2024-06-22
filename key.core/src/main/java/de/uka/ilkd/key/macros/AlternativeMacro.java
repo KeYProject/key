@@ -15,7 +15,6 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  * The abstract class AlternativeMacro can be used to create compound macros which apply the first
