@@ -29,6 +29,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
