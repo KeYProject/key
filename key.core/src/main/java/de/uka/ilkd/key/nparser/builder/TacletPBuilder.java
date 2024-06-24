@@ -685,8 +685,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         String value = ctx.option().value.getText();
         String choiceStr = category + ":" + value;
         /*
-         * Make sure that the choice (category and value!) is known to KeY. This prevents from
-         * accidentally deactivating (parts of) taclets due to non-existing choices (see
+         * Make sure that the choice (category and value!) is known to KeY, i.e. that it is declared
+         * in the file `optionsDeclarations.key`. This prevents from accidentally deactivating
+         * (parts of) taclets due to non-existing choices (see
          * https://github.com/KeYProject/key/issues/3352).
          */
         if (choices().lookup(choiceStr) == null) {
