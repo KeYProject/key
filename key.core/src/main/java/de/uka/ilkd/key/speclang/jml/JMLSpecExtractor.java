@@ -740,4 +740,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     public ImmutableList<PositionedString> getWarnings() {
         return warnings.append(JMLTransformer.getWarningsOfLastInstance());
     }
+
+    @Override
+    public Contract createDefaultContract(IProgramMethod method, boolean useSoundDefault) {
+        return jsf.createDefaultContract(method, useSoundDefault);
+    }
 }
