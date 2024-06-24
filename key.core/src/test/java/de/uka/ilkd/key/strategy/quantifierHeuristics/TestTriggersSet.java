@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.BeforeEach;
