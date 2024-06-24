@@ -11,7 +11,6 @@ import java.util.function.Function;
 
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
@@ -134,8 +133,8 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     private boolean contains(Semisequent semiseq, Term formula) {
-        for (SequentFormula sf : semiseq.asList()) {
-            if (sf.formula().equalsModProperty(formula, RENAMING_PROPERTY)) {
+        for (Term sf : semiseq.asList()) {
+            if (sf.equalsModProperty(formula, RENAMING_PROPERTY)) {
                 return true;
             }
         }

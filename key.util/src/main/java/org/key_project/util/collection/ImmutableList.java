@@ -37,7 +37,7 @@ public interface ImmutableList<T extends @Nullable Object>
      * @param list a List.
      * @return an ImmutableList containing the same elements as the specified list.
      */
-    static <T extends @Nullable Object> ImmutableList<T> fromList(Collection<T> list) {
+    static <T extends @Nullable Object> ImmutableList<T> fromList(Iterable<T> list) {
         ImmutableList<T> result = ImmutableSLList.nil();
 
         for (T el : list) {

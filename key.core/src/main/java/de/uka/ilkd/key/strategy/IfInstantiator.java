@@ -6,10 +6,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
@@ -94,21 +91,21 @@ public class IfInstantiator {
      * @return a list of potential if-formula instantiations (analogously to
      *         <code>IfFormulaInstSeq.createList</code>)
      */
-    private ImmutableArray<IfFormulaInstantiation> getSequentFormulas(boolean p_antec,
+    private ImmutableArray<IfFormulaInstantiation> getTerms(boolean p_antec,
             boolean p_all) {
         if (p_all) {
-            return getAllSequentFormulas(p_antec);
+            return getAllTerms(p_antec);
         }
 
         final ImmutableArray<IfFormulaInstantiation> cache =
-            getNewSequentFormulasFromCache(p_antec);
+            getNewTermsFromCache(p_antec);
         if (cache != null) {
             return cache;
         }
 
         final ImmutableArray<IfFormulaInstantiation> newFormulas = selectNewFormulas(p_antec);
 
-        addNewSequentFormulasToCache(newFormulas, p_antec);
+        addNewTermsToCache(newFormulas, p_antec);
 
         return newFormulas;
     }
@@ -120,12 +117,12 @@ public class IfInstantiator {
      *         <code>true</code>
      */
     private ImmutableArray<IfFormulaInstantiation> selectNewFormulas(boolean p_antec) {
-        final ImmutableArray<IfFormulaInstantiation> allSequentFormulas =
-            getAllSequentFormulas(p_antec);
-        final IfFormulaInstantiation[] res = new IfFormulaInstantiation[allSequentFormulas.size()];
+        final ImmutableArray<IfFormulaInstantiation> allTerms =
+            getAllTerms(p_antec);
+        final IfFormulaInstantiation[] res = new IfFormulaInstantiation[allTerms.size()];
 
         int i = 0;
-        for (final IfFormulaInstantiation ifInstantiation : allSequentFormulas) {
+        for (final IfFormulaInstantiation ifInstantiation : allTerms) {
             if (isNewFormulaDirect((IfFormulaInstSeq) ifInstantiation)) {
                 res[i] = ifInstantiation;
                 ++i;
@@ -142,7 +139,7 @@ public class IfInstantiator {
     private boolean isNewFormula(IfFormulaInstSeq p_ifInstantiation) {
         final boolean antec = p_ifInstantiation.inAntec();
 
-        final ImmutableArray<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
+        final ImmutableArray<IfFormulaInstantiation> cache = getNewTermsFromCache(antec);
 
         if (cache != null) {
             return cache.contains(p_ifInstantiation);
@@ -159,7 +156,7 @@ public class IfInstantiator {
     private boolean isNewFormulaDirect(IfFormulaInstSeq p_ifInstantiation) {
         final boolean antec = p_ifInstantiation.inAntec();
 
-        final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula();
+        final Term cfma = p_ifInstantiation.getConstrainedFormula();
         final PosInOccurrence pio = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
         final FormulaTagManager tagManager = goal.getFormulaTagManager();
@@ -173,17 +170,17 @@ public class IfInstantiator {
         return tacletAppContainer.getAge() < formulaAge;
     }
 
-    private ImmutableArray<IfFormulaInstantiation> getNewSequentFormulasFromCache(boolean p_antec) {
+    private ImmutableArray<IfFormulaInstantiation> getNewTermsFromCache(boolean p_antec) {
         return ifInstCache.get(p_antec, tacletAppContainer.getAge());
     }
 
-    private void addNewSequentFormulasToCache(ImmutableArray<IfFormulaInstantiation> p_list,
+    private void addNewTermsToCache(ImmutableArray<IfFormulaInstantiation> p_list,
             boolean p_antec) {
         ifInstCache.put(p_antec, tacletAppContainer.getAge(), p_list);
     }
 
 
-    private ImmutableArray<IfFormulaInstantiation> getAllSequentFormulas(boolean p_antec) {
+    private ImmutableArray<IfFormulaInstantiation> getAllTerms(boolean p_antec) {
         return p_antec ? allAntecFormulas : allSuccFormulas;
     }
 
@@ -197,8 +194,8 @@ public class IfInstantiator {
      * @param p_alreadyMatchedNewFor at least one new formula has already been matched, i.e. a
      *        formula that has been modified recently
      */
-    private void findIfFormulaInstantiationsHelp(ImmutableList<SequentFormula> p_ifSeqTail,
-            ImmutableList<SequentFormula> p_ifSeqTail2nd,
+    private void findIfFormulaInstantiationsHelp(ImmutableList<Term> p_ifSeqTail,
+            ImmutableList<Term> p_ifSeqTail2nd,
             ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
             MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
 
@@ -219,9 +216,9 @@ public class IfInstantiator {
         final boolean lastIfFormula =
             p_ifSeqTail.size() == 1 && (p_ifSeqTail2nd == null || p_ifSeqTail2nd.isEmpty());
         final ImmutableArray<IfFormulaInstantiation> formulas =
-            getSequentFormulas(antec, !lastIfFormula || p_alreadyMatchedNewFor);
+            getTerms(antec, !lastIfFormula || p_alreadyMatchedNewFor);
         final IfMatchResult mr = getTaclet().getMatcher().matchIf(formulas,
-            p_ifSeqTail.head().formula(), p_matchCond, getServices());
+            p_ifSeqTail.head(), p_matchCond, getServices());
 
         // For each matching formula call the method again to match
         // the remaining terms

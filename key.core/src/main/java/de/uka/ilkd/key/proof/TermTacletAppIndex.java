@@ -91,9 +91,9 @@ public class TermTacletAppIndex {
 
 
     /**
-     * collects all AntecedentTaclet instantiations for the given heuristics and SequentFormula
+     * collects all AntecedentTaclet instantiations for the given heuristics and Term
      *
-     * @param pos the PosInOccurrence of the SequentFormula the taclets have to be connected to (pos
+     * @param pos the PosInOccurrence of the Term the taclets have to be connected to (pos
      *        must point to the top level formula, i.e. <tt>pos.isTopLevel()</tt> must be true)
      * @param services the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
@@ -105,9 +105,9 @@ public class TermTacletAppIndex {
     }
 
     /**
-     * collects all SuccedentTaclet instantiations for the given heuristics and SequentFormula
+     * collects all SuccedentTaclet instantiations for the given heuristics and Term
      *
-     * @param pos the PosInOccurrence of the SequentFormula the taclets have to be connected to (pos
+     * @param pos the PosInOccurrence of the Term the taclets have to be connected to (pos
      *        must point to the top level formula, i.e. <tt>pos.isTopLevel()</tt> must be true)
      * @param services the Services object encapsulating information about the java datastructures
      *        like (static)types etc.

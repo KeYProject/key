@@ -10,7 +10,6 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -39,7 +38,7 @@ import org.jspecify.annotations.NonNull;
  * A {@link BuiltInRule} which evaluates a modality in a side proof.
  * </p>
  * <p>
- * This rule is applicable on top level terms ({@link SequentFormula}) of the form.
+ * This rule is applicable on top level terms ({@link Term}) of the form.
  * <ul>
  * <li>{@code {...}\[...\](<something> = <var>)} or</li>
  * <li>{@code {...}\<...\>(<something> = <var>)} or</li>
@@ -49,8 +48,8 @@ import org.jspecify.annotations.NonNull;
  * The leading updates are optional and any {@link Modality} is supported.
  * </p>
  * <p>
- * The original {@link SequentFormula} which contains the equality is always removed in the
- * following {@link Goal}. For each possible result value is a {@link SequentFormula} added to the
+ * The original {@link Term} which contains the equality is always removed in the
+ * following {@link Goal}. For each possible result value is a {@link Term} added to the
  * {@link Sequent} of the form:
  * <ul>
  * <li>Antecedent: {@code <resultCondition> -> <something> = <result>} or</li>
@@ -169,7 +168,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true);
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
-                    .computeGeneralSequentToProve(goal.sequent(), pio.sequentFormula());
+                    .computeGeneralSequentToProve(goal.sequent(), pio.sequentLevelFormula());
             JFunction newPredicate = createResultFunction(sideProofServices, varTerm.sort());
             final TermBuilder tb = sideProofServices.getTermBuilder();
             Term newTerm = tb.func(newPredicate, varTerm);
@@ -178,7 +177,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                 modalityTerm.getLabels());
             Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
             sequentToProve = sequentToProve
-                    .addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false)
+                    .addFormula(newModalityWithUpdatesTerm, false, false)
                     .sequent();
             // Compute results and their conditions
             List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
@@ -207,12 +206,12 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                 }
                 Term newImplication = tb.imp(newCondition, modalityTerm.sub(0).sub(1));
                 Term newImplicationWithUpdates = tb.applySequential(updates, newImplication);
-                resultGoal.addFormula(new SequentFormula(newImplicationWithUpdates),
+                resultGoal.addFormula(newImplicationWithUpdates,
                     pio.isInAntec(), false);
             } else {
                 // Add result directly as new top level formula
                 for (Term result : resultTerms) {
-                    resultGoal.addFormula(new SequentFormula(result), pio.isInAntec(), false);
+                    resultGoal.addFormula(result, pio.isInAntec(), false);
                 }
             }
             return goals;

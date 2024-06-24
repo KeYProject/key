@@ -1355,7 +1355,7 @@ public final class AuxiliaryContractBuilders {
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
-            final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
+            final Term wdBlock = bwd.generateSequent(variables.self, variables.exception,
                 variables.result, heap, heapAtPre, anon, localIns, update, anonUpdate, services);
 
             if (goal != null) {
@@ -1363,7 +1363,7 @@ public final class AuxiliaryContractBuilders {
                 goal.changeFormula(wdBlock, occurrence);
             }
 
-            return wdBlock.formula();
+            return wdBlock;
         }
 
         /**
@@ -1394,8 +1394,9 @@ public final class AuxiliaryContractBuilders {
 
             Term term;
             if (goal != null) {
+                Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
                 goal.addFormula(
-                    new SequentFormula(tb.applySequential(updates, tb.and(assumptions))), true,
+                    uAssumptions, true,
                     false);
 
                 ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(
@@ -1408,7 +1409,7 @@ public final class AuxiliaryContractBuilders {
                 term = tb.applySequential(updates,
                     tb.prog(instantiation.modality().kind(), newJavaBlock, newPost, labels));
 
-                goal.changeFormula(new SequentFormula(term), occurrence);
+                goal.changeFormula(term, occurrence);
                 TermLabelManager.refactorGoal(termLabelState, services, occurrence,
                     application.rule(), goal, null, null);
                 addInfFlow(goal);
@@ -1512,7 +1513,7 @@ public final class AuxiliaryContractBuilders {
             if (goal != null) {
                 goal.setBranchLabel("Validity");
                 addInfFlow(goal);
-                goal.changeFormula(new SequentFormula(term), occurrence);
+                goal.changeFormula(term, occurrence);
             }
             return term;
         }
@@ -1532,7 +1533,7 @@ public final class AuxiliaryContractBuilders {
             fullPrecondition =
                 TermLabelManager.refactorTerm(termLabelState, services, null, fullPrecondition,
                     rule, goal, BlockContractInternalRule.FULL_PRECONDITION_TERM_HINT, null);
-            goal.changeFormula(new SequentFormula(fullPrecondition), occurrence);
+            goal.changeFormula(fullPrecondition, occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(),
                 goal, null, null);
         }
@@ -1549,9 +1550,10 @@ public final class AuxiliaryContractBuilders {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Usage");
             Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
-            goal.addFormula(new SequentFormula(uAssumptions), true, false);
+            goal.addFormula(uAssumptions, true, false);
+            Term uAssumptions1 = tb.applySequential(updates, buildUsageFormula(goal));
             goal.changeFormula(
-                new SequentFormula(tb.applySequential(updates, buildUsageFormula(goal))),
+                uAssumptions1,
                 occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(),
                 goal, null, null);

@@ -236,8 +236,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
     private static Term getTermBelowQuantifier(Taclet taclet, SchemaVariable varSV) {
-        for (SequentFormula sequentFormula : taclet.ifSequent()) {
-            Term result = getTermBelowQuantifier(varSV, sequentFormula.formula());
+        for (Term assumesFml : taclet.ifSequent()) {
+            Term result = getTermBelowQuantifier(varSV, assumesFml);
             if (result != null) {
                 return result;
             }
@@ -895,7 +895,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return a list of tacletapps with the found if formula instantiations
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-            ImmutableList<SequentFormula> ruleSuccTail, ImmutableList<SequentFormula> ruleAntecTail,
+            ImmutableList<Term> ruleSuccTail, ImmutableList<Term> ruleAntecTail,
             ImmutableArray<IfFormulaInstantiation> instSucc,
             ImmutableArray<IfFormulaInstantiation> instAntec,
             ImmutableList<IfFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
@@ -918,8 +918,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         }
 
         // Match the current formula
-        IfMatchResult mr = taclet().getMatcher().matchIf(instSucc, ruleSuccTail.head().formula(),
-            matchCond, services);
+        Term fml = ruleSuccTail.head();
+        IfMatchResult mr = taclet().getMatcher().matchIf(instSucc, fml, matchCond, services);
 
         // For each matching formula call the method again to match
         // the remaining terms
@@ -935,10 +935,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         return res;
     }
 
-    private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
-        ImmutableList<SequentFormula> res = ImmutableSLList.nil();
+    private ImmutableList<Term> createSemisequentList(Semisequent p_ss) {
+        ImmutableList<Term> res = ImmutableSLList.nil();
 
-        for (SequentFormula p_s : p_ss) {
+        for (Term p_s : p_ss) {
             res = res.prepend(p_s);
         }
 

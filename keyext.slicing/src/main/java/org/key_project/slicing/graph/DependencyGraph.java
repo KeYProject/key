@@ -350,7 +350,7 @@ public class DependencyGraph {
         }
         while (true) {
             TrackedFormula formula =
-                new TrackedFormula(pio.sequentFormula(), locationGuess, pio.isInAntec(),
+                new TrackedFormula(pio.sequentLevelFormula(), locationGuess, pio.isInAntec(),
                     proof.getServices());
             if (containsNode(formula)) {
                 return formula;

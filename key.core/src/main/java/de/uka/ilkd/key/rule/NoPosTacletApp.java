@@ -282,7 +282,7 @@ public class NoPosTacletApp extends TacletApp {
 
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula and a position in the
+     * returns the PositionInOccurrence (representing a Term and a position in the
      * corresponding formula)
      *
      * @return the PosInOccurrence

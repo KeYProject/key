@@ -5,11 +5,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,11 +52,11 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
 
         Taclet hideLeft =
             state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
-        for (SequentFormula s : args.sequent.antecedent()) {
+        for (Term s : args.sequent.antecedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
-            SequentFormula s2 = find(s, goal.sequent().antecedent());
+            Term s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
+            app = app.addCheckedInstantiation(sv, s2, service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
                 service);
             goal.apply(app);
@@ -68,20 +64,20 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
 
         Taclet hideRight =
             state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_RIGHT);
-        for (SequentFormula s : args.sequent.succedent()) {
+        for (Term s : args.sequent.succedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
-            SequentFormula s2 = find(s, goal.sequent().succedent());
+            Term s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
+            app = app.addCheckedInstantiation(sv, s2, service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
                 service);
             goal.apply(app);
         }
     }
 
-    private SequentFormula find(SequentFormula sf, Semisequent semiseq) throws ScriptException {
-        for (SequentFormula s : semiseq) {
-            if (s.formula().equalsModProperty(sf.formula(), TERM_LABELS_PROPERTY)) {
+    private Term find(Term sf, Semisequent semiseq) throws ScriptException {
+        for (Term s : semiseq) {
+            if (s.equalsModProperty(sf, TERM_LABELS_PROPERTY)) {
                 return s;
             }
         }

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.label;
 
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -20,6 +19,8 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.TerminalSyntaxElement;
 
 // spotless:off     // this protects the JavaDoc from automatic reformatting
 /**
@@ -34,8 +35,8 @@ import org.key_project.logic.Named;
  * without parameters class {@link ParameterlessTermLabel} can be used.
  * </p>
  * <p>
- * A term label can have parameters accessible via {@link #getChild(int)} and
- * {@link #getChildCount()}. Such parameters can be any {@link Object}. But keep in mind that it is
+ * A term label can have parameters accessible via {@link #getTLChild(int)} and
+ * {@link #getTLChildCount()}. Such parameters can be any {@link Object}. But keep in mind that it is
  * required to parse {@link String}s into {@link Term}s, e.g. if it is used in a Taclet definition
  * or if a cut rule is applied. For convenience parameters are always printed as {@link String}s
  * and have to be parsed individually into the required {@link Object} instances via a
@@ -55,14 +56,14 @@ import org.key_project.logic.Named;
  * </p>
  * <p>
  * Antecedent and succedent of a {@link Sequent} are sets. The equality check if a
- * {@link SequentFormula} is already contained ignores {@link TermLabel}s. To ensure that
+ * {@link Term} is already contained ignores {@link TermLabel}s. To ensure that
  * {@link TermLabel}s are not lost,
  * {@link TermLabelManager#mergeLabels(de.uka.ilkd.key.java.Services,
  *         de.uka.ilkd.key.logic.SequentChangeInfo)}
- * merges the labels of the existing {@link SequentFormula} with those of the rejected
- * {@link SequentFormula}. How this is done in detail is implemented by a {@link TermLabelMerger}.
+ * merges the labels of the existing {@link Term} with those of the rejected
+ * {@link Term}. How this is done in detail is implemented by a {@link TermLabelMerger}.
  * If no {@link TermLabelMerger} is available, the {@link TermLabel} of the rejected
- * {@link SequentFormula} are lost.
+ * {@link Term} are lost.
  * </p>
  * <p>
  * To implement a new {@link TermLabel} follow the following steps:
@@ -124,7 +125,7 @@ import org.key_project.logic.Named;
  *              which works on {@link RefactoringScope#SEQUENT} to freely add or remove
  *              {@link TermLabel}s on any {@link Term} of the {@link Sequent}.</li>
  *          <li>Implement a {@link TermLabelMerger} to ensure that {@link TermLabel}s are maintained
- *              in case of rejected {@link SequentFormula}s.</li>
+ *              in case of rejected {@link Term}s.</li>
  *       </ul>
  *    </li>
  *    <li>
@@ -150,7 +151,7 @@ import org.key_project.logic.Named;
  * @see TermLabelManager
  */
 // spotless:on
-public interface TermLabel extends Named {
+public interface TermLabel extends Named, SyntaxElement, /* TODO: Remove */ TerminalSyntaxElement {
 
     /**
      * Retrieves the i-th parameter object of this term label.
@@ -161,16 +162,16 @@ public interface TermLabel extends Named {
      * @param i the number of the parameter to retrieve ( {@code 0 <= i < getChildCount()})
      * @return the selected parameter
      * @throws IndexOutOfBoundsException if the given parameter number <tt>i</tt> is negative or
-     *         greater-or-equal the number of parameters returned by {@link #getChildCount()}
+     *         greater-or-equal the number of parameters returned by {@link #getTLChildCount()}
      */
-    Object getChild(int i);
+    Object getTLChild(int i);
 
     /**
      * Gets the number of parameters of this term label.
      *
      * @return the number of parameters (a non-negative number)
      */
-    int getChildCount();
+    int getTLChildCount();
 
     /**
      * Returns {@code true} iff this label is used in any way during the proof. E.g.,

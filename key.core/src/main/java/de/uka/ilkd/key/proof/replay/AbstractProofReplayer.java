@@ -14,8 +14,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -304,10 +304,10 @@ public abstract class AbstractProofReplayer {
             if (oldFormulaPioSpec.second) {
                 ifFormulaList = ifFormulaList.append(
                     new IfFormulaInstSeq(currGoal.sequent(), oldFormulaPio.isInAntec(),
-                        newPio.sequentFormula()));
+                        newPio.sequentLevelFormula()));
             } else {
                 ifFormulaList = ifFormulaList.append(
-                    new IfFormulaInstDirect(newPio.sequentFormula()));
+                    new IfFormulaInstDirect(newPio.sequentLevelFormula()));
             }
         }
 
@@ -333,11 +333,12 @@ public abstract class AbstractProofReplayer {
      * @return the formula in the sequent, or null if not found
      */
     private PosInOccurrence findInNewSequent(PosInOccurrence oldPos, Sequent newSequent) {
-        SequentFormula oldFormula = oldPos.sequentFormula();
+        Term oldFormula = oldPos.sequentLevelFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();
-        for (SequentFormula newFormula : semiSeq.asList()) {
-            if (newFormula.equalsModProofIrrelevancy(oldFormula)) {
+        for (Term newFormula : semiSeq.asList()) {
+            if (newFormula.equalsModProperty(oldFormula,
+                ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY)) {
                 return oldPos.replaceConstrainedFormula(newFormula);
             }
         }

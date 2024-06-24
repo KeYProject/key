@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -283,19 +282,19 @@ public abstract class AbstractTestGenerator {
         final Sequent oldSequent = node.sequent();
         Sequent newSequent =
             Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
-        Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
+        Iterator<Term> it = oldSequent.antecedent().iterator();
         while (it.hasNext()) {
-            final SequentFormula sf = it.next();
+            final Term sf = it.next();
             // Allow updates modailities in the antecedent
-            if (hasModalities(sf.formula(), false)) {
+            if (hasModalities(sf, false)) {
                 continue;
             }
             newSequent = newSequent.addFormula(sf, true, false).sequent();
         }
         it = oldSequent.succedent().iterator();
         while (it.hasNext()) {
-            final SequentFormula sf = it.next();
-            if (hasModalities(sf.formula(), removePostCondition)) {
+            final Term sf = it.next();
+            if (hasModalities(sf, removePostCondition)) {
                 continue;
             }
             newSequent = newSequent.addFormula(sf, false, false).sequent();

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.pp;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 import org.key_project.util.collection.ImmutableList;
@@ -83,7 +83,7 @@ public abstract class SequentPrintFilter {
      */
     protected void filterIdentity() {
         antec = ImmutableSLList.nil();
-        Iterator<SequentFormula> it = originalSequent.antecedent().iterator();
+        Iterator<Term> it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             antec = antec.append(new IdentityFilterEntry(it.next()));
         }

@@ -105,10 +105,10 @@ public class ProofExplorationService {
     public @NonNull Node soundAddition(@NonNull Goal g, @NonNull Term t, boolean antecedent) {
         Taclet cut =
             g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
-        Semisequent semisequent = new Semisequent(new SequentFormula(t));
+        Semisequent semisequent = new Semisequent(t);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), services, true);
+        app = app.addCheckedInstantiation(sv, semisequent.getFirst(), services, true);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
         if (antecedent) {
             explorationNodeData.setExplorationAction("Added " + t + " ==>");
@@ -186,11 +186,10 @@ public class ProofExplorationService {
     private TacletApp soundChange(@NonNull PosInOccurrence pio, @NonNull Term term,
             @NonNull Term newTerm) {
         Taclet cut = getCutTaclet();
-        Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
+        Semisequent semisequent = new Semisequent(newTerm);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), services, true);
-        return app;
+        return app.addCheckedInstantiation(sv, semisequent.getFirst(), services, true);
     }
 
     public void soundHide(Goal g, PosInOccurrence pio, Term term) {

@@ -11,7 +11,6 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
@@ -145,9 +144,9 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
 
         final List<CofactorPolynomial> res = new ArrayList<>();
 
-        for (final SequentFormula cfm : goal.sequent().antecedent()) {
+        for (final Term cfm : goal.sequent().antecedent()) {
 
-            final Term t = cfm.formula();
+            final Term t = cfm;
             if (t.op() != Equality.EQUALS || t.sub(0).sort() != numbers.targetSort()
                     || t.sub(1).sort() != numbers.targetSort()) {
                 continue;

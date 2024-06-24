@@ -309,7 +309,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         Sequent sequent = getRoot().sequent();
         assert sequent.antecedent().isEmpty();
         assert sequent.succedent().size() == 1;
-        Term sf = sequent.succedent().get(0).formula();
+        final Term sf = sequent.succedent().get(0);
         assert sf.op() == Junctor.IMP;
         Term modality = sf.sub(1);
         return TermBuilder.goBelowUpdates2(modality).first;
@@ -680,9 +680,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     protected Set<Term> collectObjectsFromSequent(Sequent sequent, Set<Term> objectsToIgnore)
             throws ProofInputException {
         Set<Term> result = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
+        for (Term sf : sequent) {
             if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
-                result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
+                result.addAll(collectSymbolicObjectsFromTerm(sf, objectsToIgnore));
             }
         }
         return result;

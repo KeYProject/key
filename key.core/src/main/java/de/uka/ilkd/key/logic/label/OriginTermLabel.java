@@ -57,7 +57,7 @@ public class OriginTermLabel implements TermLabel {
     public final static Name NAME = new Name("origin");
 
     /**
-     * @see #getChildCount()
+     * @see #getTLChildCount()
      */
     public final static int CHILD_COUNT = 2;
     public static final Sort[] EMPTY_SORTS = new Sort[0];
@@ -251,9 +251,9 @@ public class OriginTermLabel implements TermLabel {
         SequentChangeInfo changes = null;
 
         for (int i = 1; i <= seq.size(); ++i) {
-            SequentFormula oldFormula = seq.getFormulabyNr(i);
-            SequentFormula newFormula = new SequentFormula(
-                OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
+            Term oldFormula = seq.getFormulabyNr(i);
+            Term uAssumptions = OriginTermLabel.removeOriginLabels(oldFormula, services);
+            Term newFormula = uAssumptions;
             SequentChangeInfo change = seq.changeFormula(newFormula,
                 PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel()));
 
@@ -450,7 +450,7 @@ public class OriginTermLabel implements TermLabel {
     }
 
     @Override
-    public Object getChild(int i) {
+    public Object getTLChild(int i) {
         if (i == 0) {
             return origin;
         } else if (i == 1) {
@@ -461,7 +461,7 @@ public class OriginTermLabel implements TermLabel {
     }
 
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         return CHILD_COUNT;
     }
 

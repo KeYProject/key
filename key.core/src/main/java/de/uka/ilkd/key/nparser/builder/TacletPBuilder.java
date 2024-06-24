@@ -151,7 +151,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             }
             TacletBuilder<?> b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
             currentTBuilder.push(b);
-            SequentFormula sform = new SequentFormula(form);
+            Term sform = form;
             Semisequent semi = new Semisequent(sform);
             Sequent addSeq = Sequent.createAnteSequent(semi);
             ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
@@ -322,8 +322,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         var res = schemaVariables[argIndex];
 
         tacletBuilder.setFind(tb.func(function, tb.var(x)));
+        Term uAssumptions = tb.equals(tb.var(x), tb.func(consFn, args));
         tacletBuilder.setIfSequent(Sequent.createAnteSequent(
-            new Semisequent(new SequentFormula(tb.equals(tb.var(x), tb.func(consFn, args))))));
+            new Semisequent(uAssumptions)));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(tb.var(res)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
 
@@ -350,7 +351,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         var use = tb.all(qvar, tb.var(phi));
         var useCase = new TacletGoalTemplate(
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(use))),
+            Sequent.createAnteSequent(new Semisequent(use)),
             ImmutableSLList.nil());
         useCase.setName("Use case of " + ctx.name.getText());
         cases.add(useCase);
@@ -364,7 +365,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             VariableSV qvar, Term var, Sort sort) {
         var constr = createQuantifiedFormula(it, qvar, var, sort);
         var goal = new TacletGoalTemplate(
-            Sequent.createSuccSequent(new Semisequent(new SequentFormula(constr))),
+            Sequent.createSuccSequent(new Semisequent(constr)),
             ImmutableSLList.nil());
         goal.setName(it.getText());
         return goal;
@@ -393,7 +394,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var axiom = tb.equals(find, tb.and(cases));
 
         var goal = new TacletGoalTemplate(
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(axiom))),
+            Sequent.createAnteSequent(new Semisequent(axiom)),
             ImmutableSLList.nil());
         tacletBuilder.addTacletGoalTemplate(goal);
 
@@ -474,8 +475,9 @@ public class TacletPBuilder extends ExpressionBuilder {
             for (int i = 0; i < args.length; i++) {
                 args[i] = variables.get(context.argName.get(i).getText());
             }
+            Term uAssumptions = tb.equals(tb.var(phi), tb.func(func, args));
             Semisequent antec =
-                new Semisequent(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args))));
+                new Semisequent(uAssumptions);
             Sequent addedSeq = Sequent.createAnteSequent(antec);
             TacletGoalTemplate goal = new TacletGoalTemplate(addedSeq, ImmutableSLList.nil());
             goal.setName("#var = " + context.name.getText());
@@ -757,14 +759,14 @@ public class TacletPBuilder extends ExpressionBuilder {
             if (findSeq.isEmpty()) {
                 return new NoFindTacletBuilder();
             } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().isEmpty()) {
-                Term findFma = findSeq.antecedent().get(0).formula();
+                Term findFma = findSeq.antecedent().get(0);
                 AntecTacletBuilder b = new AntecTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
                     (applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) == 0);
                 return b;
             } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
-                Term findFma = findSeq.succedent().get(0).formula();
+                Term findFma = findSeq.succedent().get(0);
                 SuccTacletBuilder b = new SuccTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(

@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -64,26 +63,26 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
     }
 
 
-    private SequentFormula applyReplacewithHelper(Goal goal, TermLabelState termLabelState,
+    private Term applyReplacewithHelper(Goal goal, TermLabelState termLabelState,
             RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind, Services services,
             MatchConditions matchCond, RuleApp ruleApp) {
-        final Term term = posOfFind.sequentFormula().formula();
+        final Term term = posOfFind.sequentLevelFormula();
         final IntIterator it = posOfFind.posInTerm().iterator();
         final Term rwTemplate = gt.replaceWith();
 
         Term formula = replace(term, rwTemplate, termLabelState, new TacletLabelHint(rwTemplate),
             posOfFind, it, matchCond, term.sort(), goal, services, ruleApp);
-        formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula,
+        formula = TermLabelManager.refactorTerm(termLabelState, services, formula,
             posOfFind, taclet, goal, null, rwTemplate);
         if (term == formula) {
-            return posOfFind.sequentFormula();
+            return posOfFind.sequentLevelFormula();
         } else {
-            return new SequentFormula(formula);
+            return formula;
         }
     }
 
 
-    public SequentFormula getRewriteResult(Goal goal, TermLabelState termLabelState,
+    public Term getRewriteResult(Goal goal, TermLabelState termLabelState,
             Services services, TacletApp app) {
         assert taclet.goalTemplates().size() == 1;
         assert taclet.goalTemplates().head().sequent().isEmpty();
@@ -104,19 +103,19 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             SequentChangeInfo currentSequent, PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services) {
         if (gt instanceof RewriteTacletGoalTemplate) {
-            final SequentFormula cf = applyReplacewithHelper(goal, termLabelState,
+            final Term cf = applyReplacewithHelper(goal, termLabelState,
                 (RewriteTacletGoalTemplate) gt, posOfFind, services, matchCond, ruleApp);
             currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
         } else {
             // Then there was no replacewith...
             // This is strange in a RewriteTaclet, but who knows...
             // However, term label refactorings have to be performed.
-            final Term oldFormula = posOfFind.sequentFormula().formula();
-            final Term newFormula = TermLabelManager.refactorSequentFormula(termLabelState,
+            final Term oldFormula = posOfFind.sequentLevelFormula();
+            final Term newFormula = TermLabelManager.refactorTerm(termLabelState,
                 services, oldFormula, posOfFind, taclet, goal, null, null);
             if (oldFormula != newFormula) {
                 currentSequent.combine(currentSequent.sequent()
-                        .changeFormula(new SequentFormula(newFormula), posOfFind));
+                        .changeFormula(newFormula, posOfFind));
             }
         }
     }

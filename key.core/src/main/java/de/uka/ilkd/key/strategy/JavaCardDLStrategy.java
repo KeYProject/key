@@ -1919,9 +1919,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "apply_select_eq",
             add(isInstantiated("s"), isInstantiated("t1"),
+                NoSelfApplicationFeature.INSTANCE,
                 or(applyTF("s", rec(any(), SimplifiedSelectTermFeature.create(heapLDT))),
-                    add(NoSelfApplicationFeature.INSTANCE,
-                        applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE)))));
+                    add(applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE)))));
         bindRuleSet(d, "apply_auxiliary_eq",
             add(NoSelfApplicationFeature.INSTANCE, isInstantiated("s"),
                 applyTF("s",

@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -744,7 +745,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     private static String getSignatureText(IProgramMethod pm, Operator originalResultVar,
-            Operator originalSelfVar, ImmutableList<? extends SVSubstitute> originalParamVars,
+            Operator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
             LocationVariable originalExcVar, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
         final StringBuilder sig = new StringBuilder();
@@ -761,7 +762,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
         sig.append(pm.getName());
         sig.append("(");
-        for (SVSubstitute subst : originalParamVars) {
+        for (SyntaxElement subst : originalParamVars) {
             if (subst instanceof Named named) {
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof Term) {
@@ -868,7 +869,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private static String getText(IProgramMethod pm, Operator originalResultVar,
-            Operator originalSelfVar, ImmutableList<? extends SVSubstitute> originalParamVars,
+            Operator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
             LocationVariable originalExcVar, boolean hasMby, Term originalMby,
             Map<LocationVariable, Term> originalModifiables,
             Map<LocationVariable, Boolean> hasRealModifiable, Term globalDefs,
@@ -1300,7 +1301,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
@@ -1328,7 +1329,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         map.put(tb.var(heap), heapTerm);
         if (originalSelfVar != null) {
             map.put(tb.var(originalSelfVar), selfTerm);

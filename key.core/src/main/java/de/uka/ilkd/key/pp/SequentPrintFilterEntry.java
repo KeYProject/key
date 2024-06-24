@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 
 
 /**
@@ -15,11 +15,11 @@ public interface SequentPrintFilterEntry {
     /**
      * Formula to display
      */
-    SequentFormula getFilteredFormula();
+    Term getFilteredFormula();
 
     /**
      * Original formula from sequent
      */
-    SequentFormula getOriginalFormula();
+    Term getOriginalFormula();
 
 }

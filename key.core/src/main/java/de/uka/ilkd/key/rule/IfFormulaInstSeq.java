@@ -4,11 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -25,9 +21,9 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      */
     private final Sequent seq;
     private final boolean antec; // formula is in antecedent?
-    private final SequentFormula cf;
+    private final Term cf;
 
-    public IfFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf) {
+    public IfFormulaInstSeq(Sequent p_seq, boolean antec, Term p_cf) {
         seq = p_seq;
         this.antec = antec;
         cf = p_cf;
@@ -43,7 +39,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      * @return the cf this is pointing to
      */
     @Override
-    public SequentFormula getConstrainedFormula() {
+    public Term getConstrainedFormula() {
         return cf;
     }
 
@@ -93,7 +89,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     @Override
     public String toString(Services services) {
-        return OutputStreamProofSaver.printAnything(cf.formula(), services);
+        return OutputStreamProofSaver.printAnything(cf, services);
     }
 
     @Override

@@ -236,8 +236,8 @@ public class MergeRuleUtils {
             Services services) {
         HashSet<LocationVariable> result = new HashSet<>();
 
-        for (SequentFormula f : sequent) {
-            result.addAll(getLocationVariablesHashSet(f.formula(), services));
+        for (Term f : sequent) {
+            result.addAll(getLocationVariablesHashSet(f, services));
         }
 
         return result;
@@ -800,7 +800,7 @@ public class MergeRuleUtils {
     public static void clearSemisequent(Goal goal, boolean antec) {
         final Semisequent semiseq =
             antec ? goal.sequent().antecedent() : goal.sequent().succedent();
-        for (final SequentFormula f : semiseq) {
+        for (final Term f : semiseq) {
             final PosInOccurrence gPio = new PosInOccurrence(f, PosInTerm.getTopLevel(), antec);
             goal.removeFormula(gPio);
         }
@@ -1055,15 +1055,16 @@ public class MergeRuleUtils {
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
             PosInOccurrence pio, Services services) {
 
-        ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
+        ImmutableList<Term> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent().asList());
 
         Term selected = pio.subTerm();
 
-        for (SequentFormula sf : node.sequent().succedent()) {
-            if (!sf.formula().equals(selected)) {
+        for (Term sf : node.sequent().succedent()) {
+            if (!sf.equals(selected)) {
+                Term uAssumptions = services.getTermBuilder().not(sf);
                 pathConditionSet = pathConditionSet
-                        .prepend(new SequentFormula(services.getTermBuilder().not(sf.formula())));
+                        .prepend(uAssumptions);
             }
         }
 
@@ -1373,14 +1374,14 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return And-formula connecting the given terms.
      */
-    private static Term joinListToAndTerm(ImmutableList<SequentFormula> formulae,
+    private static Term joinListToAndTerm(ImmutableList<Term> formulae,
             Services services) {
         if (formulae.size() == 0) {
             return services.getTermBuilder().tt();
         } else if (formulae.size() == 1) {
-            return formulae.head().formula();
+            return formulae.head();
         } else {
-            return services.getTermBuilder().and(formulae.head().formula(),
+            return services.getTermBuilder().and(formulae.head(),
                 joinListToAndTerm(formulae.tail(), services));
         }
     }
@@ -1471,7 +1472,7 @@ public class MergeRuleUtils {
             String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(Sequent.createSequent(
             // Sequent to prove
-            Semisequent.EMPTY_SEMISEQUENT, new Semisequent(new SequentFormula(toProve))), services,
+            Semisequent.EMPTY_SEMISEQUENT, new Semisequent(toProve)), services,
             doSplit, sideProofName, timeout);
     }
 
@@ -1620,12 +1621,12 @@ public class MergeRuleUtils {
         ImmutableList<Term> succedentForms = ImmutableSLList.nil();
 
         // Shift antecedent formulae to the succedent by negation
-        for (SequentFormula sf : sequent.antecedent().asList()) {
-            negAntecedentForms = negAntecedentForms.prepend(tb.not(sf.formula()));
+        for (Term sf : sequent.antecedent().asList()) {
+            negAntecedentForms = negAntecedentForms.prepend(tb.not(sf));
         }
 
-        for (SequentFormula sf : sequent.succedent().asList()) {
-            succedentForms = succedentForms.prepend(sf.formula());
+        for (Term sf : sequent.succedent().asList()) {
+            succedentForms = succedentForms.prepend(sf);
         }
 
         return tb.or(negAntecedentForms.prepend(succedentForms));

@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation;
 
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
@@ -19,8 +16,8 @@ public abstract class TacletVisitor implements DefaultVisitor {
     private String failureDescription = null;
 
     private void visit(Semisequent semiseq) {
-        for (SequentFormula aSemiseq : semiseq) {
-            aSemiseq.formula().execPostOrder(this);
+        for (Term aSemiseq : semiseq) {
+            aSemiseq.execPostOrder(this);
         }
     }
 

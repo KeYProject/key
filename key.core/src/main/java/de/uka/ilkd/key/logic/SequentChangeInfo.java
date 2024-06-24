@@ -148,7 +148,7 @@ public class SequentChangeInfo {
      *        antecedent; false means succedent)
      * @return list of formulas added to the selected semisequent
      */
-    public ImmutableList<SequentFormula> addedFormulas(boolean antec) {
+    public ImmutableList<Term> addedFormulas(boolean antec) {
         return antec
                 ? (antecedent != null ? antecedent.addedFormulas() : ImmutableSLList.nil())
                 : (succedent != null ? succedent.addedFormulas() : ImmutableSLList.nil());
@@ -160,9 +160,9 @@ public class SequentChangeInfo {
      *
      * @return list of formulas added to sequent
      */
-    public ImmutableList<SequentFormula> addedFormulas() {
-        final ImmutableList<SequentFormula> addedFormulasAntec = addedFormulas(true);
-        final ImmutableList<SequentFormula> addedFormulasSucc = addedFormulas(false);
+    public ImmutableList<Term> addedFormulas() {
+        final ImmutableList<Term> addedFormulasAntec = addedFormulas(true);
+        final ImmutableList<Term> addedFormulasSucc = addedFormulas(false);
 
         return concatenateHelper(addedFormulasAntec, addedFormulasSucc);
 
@@ -177,7 +177,7 @@ public class SequentChangeInfo {
      *        antecedent; false means succedent)
      * @return list of formulas removed from the selected semisequent
      */
-    public ImmutableList<SequentFormula> removedFormulas(boolean antec) {
+    public ImmutableList<Term> removedFormulas(boolean antec) {
         return antec
                 ? (antecedent != null ? antecedent.removedFormulas() : ImmutableSLList.nil())
                 : (succedent != null ? succedent.removedFormulas() : ImmutableSLList.nil());
@@ -189,9 +189,9 @@ public class SequentChangeInfo {
      *
      * @return list of formulas removed from the sequent
      */
-    public ImmutableList<SequentFormula> removedFormulas() {
-        final ImmutableList<SequentFormula> removedFormulasAntec = removedFormulas(true);
-        final ImmutableList<SequentFormula> removedFormulasSucc = removedFormulas(false);
+    public ImmutableList<Term> removedFormulas() {
+        final ImmutableList<Term> removedFormulasAntec = removedFormulas(true);
+        final ImmutableList<Term> removedFormulasSucc = removedFormulas(false);
 
         return concatenateHelper(removedFormulasAntec, removedFormulasSucc);
     }
@@ -231,7 +231,7 @@ public class SequentChangeInfo {
      *        antecedent; false means succedent)
      * @return list of formulas rejected when trying to add to the selected semisequent
      */
-    public ImmutableList<SequentFormula> rejectedFormulas(boolean antec) {
+    public ImmutableList<Term> rejectedFormulas(boolean antec) {
         return antec
                 ? (antecedent != null ? antecedent.rejectedFormulas() : ImmutableSLList.nil())
                 : (succedent != null ? succedent.rejectedFormulas() : ImmutableSLList.nil());
@@ -242,9 +242,9 @@ public class SequentChangeInfo {
      *
      * @return list of rejected formulas
      */
-    public ImmutableList<SequentFormula> rejectedFormulas() {
-        final ImmutableList<SequentFormula> rejectedFormulasAntec = rejectedFormulas(true);
-        final ImmutableList<SequentFormula> rejectedFormulasSucc = rejectedFormulas(false);
+    public ImmutableList<Term> rejectedFormulas() {
+        final ImmutableList<Term> rejectedFormulasAntec = rejectedFormulas(true);
+        final ImmutableList<Term> rejectedFormulasSucc = rejectedFormulas(false);
 
         return concatenateHelper(rejectedFormulasAntec, rejectedFormulasSucc);
     }

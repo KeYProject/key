@@ -9,7 +9,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
@@ -41,7 +40,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         }
 
         @Override
-        public SequentFormula getConstrainedFormula() {
+        public Term getConstrainedFormula() {
             return null;
         }
     };
@@ -127,7 +126,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
                 new NodeOrigin(SpecType.USER_INTERACTION,
                     app.rule().displayName(), goal.node().serialNr()));
 
-            return new IfFormulaInstDirect(new SequentFormula(term));
+            return new IfFormulaInstDirect(term);
         } catch (RecognitionException e) {
             throw new SVInstantiationParserException(manualInput,
                 Position.fromOneZeroBased(pos, e.charPositionInLine),

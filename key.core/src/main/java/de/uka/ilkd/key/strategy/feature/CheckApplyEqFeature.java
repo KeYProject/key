@@ -39,7 +39,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     private boolean isNotSelfApplication(PosInOccurrence pos, IfFormulaInstantiation ifInst) {
         if (!(ifInst instanceof IfFormulaInstSeq)
-                || ifInst.getConstrainedFormula() != pos.sequentFormula()
+                || ifInst.getConstrainedFormula() != pos.sequentLevelFormula()
                 || ((IfFormulaInstSeq) ifInst).inAntec() != pos.isInAntec()) {
             return true;
         }

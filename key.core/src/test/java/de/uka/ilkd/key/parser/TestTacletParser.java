@@ -95,8 +95,8 @@ public class TestTacletParser {
         return parseTerm(s);
     }
 
-    public SequentFormula cf(String s) {
-        return new SequentFormula(parseFma(s));
+    public Term cf(String s) {
+        return parseFma(s);
     }
 
     public Semisequent sseq(String s) {

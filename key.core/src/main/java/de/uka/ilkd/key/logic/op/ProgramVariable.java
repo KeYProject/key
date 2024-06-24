@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -255,5 +256,16 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         } else {
             return null;
         }
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException(
+            "Program variable " + name() + " does not have children");
     }
 }

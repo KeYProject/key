@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -55,7 +56,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula and a position in the
+     * returns the PositionInOccurrence (representing a Term and a position in the
      * corresponding formula) of this rule application
      */
     @Override
@@ -171,7 +172,8 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     @Override
     public int hashCodeModProofIrrelevancy() {
         return Objects.hash(rule(), getHeapContext(),
-            posInOccurrence().sequentFormula().hashCodeModProofIrrelevancy(),
+            ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY
+                    .hashCodeModThisProperty(posInOccurrence().sequentLevelFormula()),
             posInOccurrence().posInTerm());
     }
 

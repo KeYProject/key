@@ -113,7 +113,7 @@ public final class SetStatementRule implements BuiltInRule {
         Term newTerm = tb.apply(update, tb.apply(newUpdate, term));
 
         ImmutableList<Goal> result = goal.split(1);
-        result.head().changeFormula(new SequentFormula(newTerm), occurrence);
+        result.head().changeFormula(newTerm, occurrence);
         return result;
     }
 

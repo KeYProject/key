@@ -12,7 +12,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -156,12 +155,12 @@ public class TriggeredInstantiations implements TermGenerator {
             final IntegerLDT integerLDT, Semisequent antecedent, boolean inAntecedent,
             TermServices services) {
 
-        for (SequentFormula sf : antecedent) {
-            collectTerms(sf.formula(), terms, integerLDT);
-            if (sf.formula().op() instanceof JFunction
-                    || sf.formula().op() == Equality.EQUALS) {
+        for (Term sf : antecedent) {
+            collectTerms(sf, terms, integerLDT);
+            if (sf.op() instanceof JFunction
+                    || sf.op() == Equality.EQUALS) {
                 axioms.add(
-                    inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
+                    inAntecedent ? sf : services.getTermBuilder().not(sf));
             }
         }
     }

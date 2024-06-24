@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.util.collection.ImmutableList;
@@ -55,7 +55,7 @@ public class NodeReplacement {
     }
 
     private void addNodeChange(SequentChangeInfo p_sci) {
-        Iterator<SequentFormula> it;
+        Iterator<Term> it;
         Iterator<FormulaChangeInfo> it2;
 
         // ---
@@ -72,13 +72,13 @@ public class NodeReplacement {
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(true).iterator();
         while (it2.hasNext()) {
-            addRemovedChange(it2.next().positionOfModification().sequentFormula(), true);
+            addRemovedChange(it2.next().positionOfModification().sequentLevelFormula(), true);
         }
 
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(false).iterator();
         while (it2.hasNext()) {
-            addRemovedChange(it2.next().positionOfModification().sequentFormula(), false);
+            addRemovedChange(it2.next().positionOfModification().sequentLevelFormula(), false);
         }
 
         it = p_sci.addedFormulas(true).iterator();
@@ -119,7 +119,7 @@ public class NodeReplacement {
 
     }
 
-    private void addAddedChange(SequentFormula p_cf, boolean p_inAntec) {
+    private void addAddedChange(Term p_cf, boolean p_inAntec) {
         Sequent oldS = parent.sequent();
         Semisequent oldSS = (p_inAntec ? oldS.antecedent() : oldS.succedent());
         Sequent newS = node.sequent();
@@ -140,7 +140,7 @@ public class NodeReplacement {
      * @param p_cf
      * @param p_inAntec
      */
-    private void addAddedRedundantChange(SequentFormula p_cf, boolean p_inAntec) {
+    private void addAddedRedundantChange(Term p_cf, boolean p_inAntec) {
 
         final PosInOccurrence pio = new PosInOccurrence(p_cf, PosInTerm.getTopLevel(), p_inAntec);
         addNodeChange(new NodeRedundantAddChange(pio));
@@ -149,7 +149,7 @@ public class NodeReplacement {
 
 
 
-    private void addRemovedChange(SequentFormula p_cf, boolean p_inAntec) {
+    private void addRemovedChange(Term p_cf, boolean p_inAntec) {
         Sequent oldS = parent.sequent();
         Semisequent oldSS = (p_inAntec ? oldS.antecedent() : oldS.succedent());
 
@@ -165,7 +165,7 @@ public class NodeReplacement {
         changes = changes.prepend(p_nc);
     }
 
-    private void removeNodeChanges(SequentFormula p_cf, boolean p_inAntec) {
+    private void removeNodeChanges(Term p_cf, boolean p_inAntec) {
         Iterator<NodeChange> it = changes.iterator();
         changes = ImmutableSLList.nil();
         NodeChange oldNC;
@@ -176,7 +176,7 @@ public class NodeReplacement {
 
             if (oldNC instanceof NodeChangeARFormula) {
                 oldPio = oldNC.getPos();
-                if (oldPio.isInAntec() == p_inAntec && oldPio.sequentFormula().equals(p_cf)) {
+                if (oldPio.isInAntec() == p_inAntec && oldPio.sequentLevelFormula().equals(p_cf)) {
                     continue;
                 }
             }

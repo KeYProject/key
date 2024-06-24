@@ -959,7 +959,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     var ossParentNode = ((GUIProofTreeNode) ossNode.getParent());
                     var newSequent = ossParentNode.getNode().sequent();
                     var modifiedSequent = newSequent
-                            .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
+                            .replaceFormula(ossNode.getFormulaNr(), pio.sequentLevelFormula())
+                            .sequent();
                     mediator.getSelectionModel().setSelectedSequentAndRuleApp(
                         ossParentNode.getNode(), modifiedSequent, ossNode.getRuleApp());
                 } else {

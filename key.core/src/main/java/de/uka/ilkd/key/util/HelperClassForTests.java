@@ -95,7 +95,7 @@ public class HelperClassForTests {
     }
 
     public Term extractProblemTerm(Proof p) {
-        return p.root().sequent().succedent().iterator().next().formula();
+        return p.root().sequent().succedent().iterator().next();
     }
 
     /**

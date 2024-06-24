@@ -69,8 +69,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                         originalLabelIds.add(mostImportantLabel.getId());
                     }
                 }
-                if (tacletHint.getSequentFormula() != null) {
-                    if (!TruthValueTracingUtil.isPredicate(tacletHint.getSequentFormula())) {
+                if (tacletHint.getTerm() != null) {
+                    if (!TruthValueTracingUtil.isPredicate(tacletHint.getTerm())) {
                         newLabelIdRequired = true;
                     }
                 } else if (tacletHint.getTerm() != null) {
@@ -164,10 +164,6 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * @return {@code true} is top level, {@code false} is not top level.
      */
     protected boolean isTopLevel(TacletLabelHint tacletHint, Term tacletTerm) {
-        if (TacletOperation.REPLACE_TERM.equals(tacletHint.getTacletOperation())) {
-            return tacletHint.getTerm() == tacletTerm;
-        } else {
-            return tacletHint.getSequentFormula().formula() == tacletTerm;
-        }
+        return tacletHint.getTerm() == tacletTerm;
     }
 }

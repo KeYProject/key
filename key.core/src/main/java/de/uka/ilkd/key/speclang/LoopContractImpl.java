@@ -41,13 +41,13 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -331,7 +331,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
      */
     private static OpReplacer createOpReplacer(final ProgramVariable index,
             final ProgramVariable values, Services services) {
-        final Map<SVSubstitute, SVSubstitute> replacementMap = new HashMap<>();
+        final Map<SyntaxElement, SyntaxElement> replacementMap = new HashMap<>();
         if (index != null) {
             replacementMap.put(services.getTermBuilder().index(),
                 services.getTermBuilder().var(index));

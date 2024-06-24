@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.LabelCollection;
@@ -161,7 +160,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
         APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE,
 
         /**
-         * Refactor the {@link SequentFormula} on which the rule is applied.
+         * Refactor the {@link Term} on which the rule is applied.
          */
         APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS,
 

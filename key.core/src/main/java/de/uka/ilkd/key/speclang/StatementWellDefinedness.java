@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -54,7 +53,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return
      */
-    abstract SequentFormula generateSequent(SequentTerms seqTerms, TermServices services);
+    abstract Term generateSequent(SequentTerms seqTerms, TermServices services);
 
     public abstract SpecificationElement getStatement();
 
@@ -121,7 +120,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(LocationVariable self, LocationVariable exception,
+    public Term generateSequent(LocationVariable self, LocationVariable exception,
             LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
             Term anonHeap,
             ImmutableSet<LocationVariable> ps, Term leadingUpdate, Term localAnonUpdate,
@@ -153,7 +152,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(LocationVariable self, LocationVariable heap,
+    public Term generateSequent(LocationVariable self, LocationVariable heap,
             Term anonHeap, ImmutableSet<LocationVariable> ps, Term leadingUpdate,
             Term localAnonUpdate, Services services) {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,

@@ -87,13 +87,13 @@ public class BuiltInRuleAppIndex {
         final Node node = goal.node();
         final Sequent seq = node.sequent();
 
-        for (final SequentFormula sf : (antec ? seq.antecedent() : seq.succedent())) {
+        for (final Term sf : (antec ? seq.antecedent() : seq.succedent())) {
             scanSimplificationRule(rules, goal, antec, sf, listener);
         }
     }
 
     private void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal, boolean antec,
-            SequentFormula cfma, NewRuleListener listener) {
+            Term cfma, NewRuleListener listener) {
         final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
         ImmutableList<BuiltInRule> subrules = ImmutableSLList.nil();
         while (!rules.isEmpty()) {
@@ -145,9 +145,9 @@ public class BuiltInRuleAppIndex {
 
     private void scanAddedFormulas(Goal goal, boolean antec, SequentChangeInfo sci,
             NewRuleListener listener) {
-        ImmutableList<SequentFormula> cfmas = sci.addedFormulas(antec);
+        ImmutableList<Term> cfmas = sci.addedFormulas(antec);
         while (!cfmas.isEmpty()) {
-            final SequentFormula cfma = cfmas.head();
+            final Term cfma = cfmas.head();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             cfmas = cfmas.tail();
         }
@@ -160,7 +160,7 @@ public class BuiltInRuleAppIndex {
 
         while (!fcis.isEmpty()) {
             final FormulaChangeInfo fci = fcis.head();
-            final SequentFormula cfma = fci.newFormula();
+            final Term cfma = fci.newFormula();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             fcis = fcis.tail();
         }

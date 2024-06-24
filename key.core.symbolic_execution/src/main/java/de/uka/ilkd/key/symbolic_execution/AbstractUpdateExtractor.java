@@ -152,8 +152,8 @@ public abstract class AbstractUpdateExtractor {
             // Add initial updates which are used as backup of the heap and method arguments. They
             // are not part of the source code and should be ignored.
             Sequent sequent = getRoot().sequent();
-            for (SequentFormula sf : sequent.succedent()) {
-                Term term = sf.formula();
+            for (Term sf : sequent.succedent()) {
+                Term term = sf;
                 if (Junctor.IMP.equals(term.op())) {
                     fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
                 }
@@ -434,9 +434,9 @@ public abstract class AbstractUpdateExtractor {
     protected Set<ExtractLocationParameter> extractLocationsFromSequent(Sequent sequent,
             Set<Term> objectsToIgnore) throws ProofInputException {
         Set<ExtractLocationParameter> result = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
+        for (Term sf : sequent) {
             result.addAll(extractLocationsFromTerm(
-                OriginTermLabel.removeOriginLabels(sf.formula(), getServices()), objectsToIgnore));
+                OriginTermLabel.removeOriginLabels(sf, getServices()), objectsToIgnore));
         }
         return result;
     }

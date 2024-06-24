@@ -109,19 +109,21 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         index.autoModeStopped();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
-        for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) {
-                continue;
+        for (Term sf : g.node().sequent().antecedent()) {
+            if (p.formula != null) {
+                if (!sf.equalsModProperty(p.formula, RENAMING_PROPERTY)) {
+                    continue;
+                }
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
-        for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) {
-                continue;
+        for (Term sf : g.node().sequent().succedent()) {
+            if (p.formula != null) {
+                if (!sf.equalsModProperty(p.formula, RENAMING_PROPERTY)) {
+                    continue;
+                }
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
@@ -149,8 +151,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         Node n = goal.node();
         Sequent seq = n.sequent();
         int occ = params.occ;
-        for (SequentFormula form : seq.antecedent().asList()) {
-            Term term = form.formula();
+        for (Term form : seq.antecedent().asList()) {
+            Term term = form;
             Term stripped = stripUpdates(term);
             if (stripped.op() == Quantifier.ALL) {
                 String varName = stripped.boundVars().get(0).name().toString();
@@ -164,8 +166,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             }
         }
 
-        for (SequentFormula form : seq.succedent().asList()) {
-            Term term = form.formula();
+        for (Term form : seq.succedent().asList()) {
+            Term term = form;
             Term stripped = stripUpdates(term);
             if (stripped.op() == Quantifier.EX) {
                 String varName = stripped.boundVars().get(0).name().toString();

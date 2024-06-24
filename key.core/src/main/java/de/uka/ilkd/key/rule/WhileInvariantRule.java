@@ -34,7 +34,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -414,7 +413,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term infFlowAssumptions = tb.apply(infData.updates.first, tb.and(beforeAssumptions,
             tb.apply(infData.updates.second, tb.and(afterAssumptions, infData.applPredTerm))));
 
-        goal.addFormula(new SequentFormula(infFlowAssumptions), true, false);
+        goal.addFormula(infFlowAssumptions, true, false);
         goal.addTaclet(infData.infFlowApp, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         final InfFlowProof proof = (InfFlowProof) goal.proof();
         proof.addIFSymbol(infData.applPredTerm);
@@ -464,7 +463,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term finalTerm =
             tb.imp(tb.label(selfComposedExec, ParameterlessTermLabel.SELF_COMPOSITION_LABEL), post);
         ((InfFlowProof) infFlowGoal.proof()).addLabeledIFSymbol(selfComposedExec);
-        infFlowGoal.addFormula(new SequentFormula(finalTerm), false, true);
+        infFlowGoal.addFormula(finalTerm, false, true);
 
         return infFlowData;
     }
@@ -545,13 +544,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
+    private Term initFormula(TermLabelState termLabelState, Instantiation inst,
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
             initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
-        return new SequentFormula(sfTerm);
+        return sfTerm;
     }
 
     private Term useCaseFormula(TermLabelState termLabelState, Services services, RuleApp ruleApp,
@@ -614,15 +613,16 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term[] uBeforeLoopDefAnonVariant, final Term uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
         bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
-        bodyGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
+        bodyGoal.addFormula(wellFormedAnon, true, false);
 
-        bodyGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+        bodyGoal.addFormula(uAnonInv, true, false);
 
         Term guardTrueBody = bodyTerm(termLabelState, services, ruleApp, applicationSequent, inst,
             invTerm, frameCondition, variantPO, bodyGoal, guardJb, guardTrueTerm);
 
+        Term uAssumptions = tb.applySequential(uBeforeLoopDefAnonVariant, guardTrueBody);
         bodyGoal.changeFormula(
-            new SequentFormula(tb.applySequential(uBeforeLoopDefAnonVariant, guardTrueBody)),
+            uAssumptions,
             ruleApp.posInOccurrence());
     }
 
@@ -632,13 +632,14 @@ public final class WhileInvariantRule implements BuiltInRule {
             final JavaBlock guardJb, final Term guardFalseTerm, final Term[] uAnon,
             final Term uAnonInv) {
         useGoal.setBranchLabel("Use Case");
-        useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
-        useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+        useGoal.addFormula(wellFormedAnon, true, false);
+        useGoal.addFormula(uAnonInv, true, false);
         final TermBuilder tb = services.getTermBuilder();
 
         Term guardFalseRestPsi = useCaseFormula(termLabelState, services, ruleApp, inst, useGoal,
             guardJb, guardFalseTerm);
-        useGoal.changeFormula(new SequentFormula(tb.applySequential(uAnon, guardFalseRestPsi)),
+        Term uAssumptions = tb.applySequential(uAnon, guardFalseRestPsi);
+        useGoal.changeFormula(uAssumptions,
             ruleApp.posInOccurrence());
     }
 
@@ -696,7 +697,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             self = null;
         }
         services.getSpecificationRepository().addWdStatement(lwd);
-        final SequentFormula wdInv =
+        final Term wdInv =
             lwd.generateSequent(self, heap, anonHeap, localIns, update, localAnonUpdate, services);
         goal.changeFormula(wdInv, pio);
     }

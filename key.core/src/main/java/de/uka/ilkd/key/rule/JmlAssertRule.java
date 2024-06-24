@@ -158,7 +158,8 @@ public final class JmlAssertRule implements BuiltInRule {
     private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update,
             Term condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
-        goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
+        Term uAssumptions = tb.apply(update, condition);
+        goal.changeFormula(uAssumptions, occurrence);
     }
 
     private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence, Term update, Term target,
@@ -169,7 +170,7 @@ public final class JmlAssertRule implements BuiltInRule {
             tb.imp(condition,
                 tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), null)));
 
-        goal.changeFormula(new SequentFormula(newTerm), occurrence);
+        goal.changeFormula(newTerm, occurrence);
     }
 
     @Override

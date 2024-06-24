@@ -5,7 +5,7 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -44,7 +44,7 @@ public class PositionTable {
     private final int rows;
 
     /**
-     * creates a new PositionTable with the number of subterms (or number of SequentFormula in a
+     * creates a new PositionTable with the number of subterms (or number of Term in a
      * Semisequent, or the number of Semisequents in a Sequent, etc.)
      *
      * @param rows the number of direct sub-elements in the term whose position information is
@@ -243,7 +243,7 @@ public class PositionTable {
 
         // This can raise a NPE sporadically. (MU 19)
         // This raises an NPE repeatably (JS/MU 21) #1650
-        SequentFormula cfma = filterEntry.getOriginalFormula();
+        Term cfma = filterEntry.getOriginalFormula();
 
         PosInOccurrence currentPos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(),
             filter.getOriginalSequent().antecedent().contains(cfma));

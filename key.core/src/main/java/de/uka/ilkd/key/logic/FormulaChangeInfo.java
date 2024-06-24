@@ -10,10 +10,10 @@ package de.uka.ilkd.key.logic;
  * @param newFormula             modified formula
  * @see SequentChangeInfo
  */
-public record FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
+public record FormulaChangeInfo(PosInOccurrence positionOfModification, Term newFormula) {
 
-    public SequentFormula getOriginalFormula() {
-        return positionOfModification().sequentFormula();
+    public Term getOriginalFormula() {
+        return positionOfModification().sequentLevelFormula();
     }
 
     /**

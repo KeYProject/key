@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 
@@ -17,16 +17,16 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     /**
      * Simply the formula
      */
-    private final SequentFormula cf;
+    private final Term cf;
 
-    public IfFormulaInstDirect(SequentFormula p_cf) {
+    public IfFormulaInstDirect(Term p_cf) {
         cf = p_cf;
     }
 
     /**
      * @return the cf this is pointing to
      */
-    public SequentFormula getConstrainedFormula() {
+    public Term getConstrainedFormula() {
         return cf;
     }
 
@@ -48,6 +48,6 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     }
 
     public String toString(Services services) {
-        return ProofSaver.printAnything(cf.formula(), services);
+        return ProofSaver.printAnything(cf, services);
     }
 }

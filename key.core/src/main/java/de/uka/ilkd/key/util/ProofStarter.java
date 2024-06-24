@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -63,7 +62,7 @@ public class ProofStarter {
 
         public UserProvidedInput(Term formula, ProofEnvironment env) {
             this(Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                    .insertFirst(new SequentFormula(formula)).semisequent()),
+                    .insertFirst(formula).semisequent()),
                 env);
         }
 

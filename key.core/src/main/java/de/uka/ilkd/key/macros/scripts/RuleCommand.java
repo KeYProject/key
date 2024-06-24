@@ -266,7 +266,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         final BuiltInRuleAppIndex index = g.ruleAppIndex().builtInRuleAppIndex();
 
         ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
-        for (SequentFormula sf : g.node().sequent().antecedent()) {
+        for (Term sf : g.node().sequent().antecedent()) {
             if (!isFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
@@ -275,7 +275,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 index.getBuiltInRule(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
         }
 
-        for (SequentFormula sf : g.node().sequent().succedent()) {
+        for (Term sf : g.node().sequent().succedent()) {
             if (!isFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
@@ -297,7 +297,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         index.autoModeStopped();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
-        for (SequentFormula sf : g.node().sequent().antecedent()) {
+        for (Term sf : g.node().sequent().antecedent()) {
             if (!isFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
@@ -306,7 +306,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
-        for (SequentFormula sf : g.node().sequent().succedent()) {
+        for (Term sf : g.node().sequent().succedent()) {
             if (!isFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
@@ -319,21 +319,21 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     /**
-     * Returns true iff the given {@link SequentFormula} either matches the
+     * Returns true iff the given {@link Term} either matches the
      * {@link Parameters#formula} parameter or its String representation matches the
      * {@link Parameters#matches} regex. If both parameters are not supplied, always returns true.
      *
      * @param p The {@link Parameters} object.
-     * @param sf The {@link SequentFormula} to check.
+     * @param sf The {@link Term} to check.
      * @return true if <code>sf</code> matches.
      */
-    private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
+    private boolean isFormulaSearchedFor(Parameters p, Term sf, Services services)
             throws ScriptException {
         final boolean satisfiesFormulaParameter =
-            p.formula != null && sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY);
+            p.formula != null && sf.equalsModProperty(p.formula, RENAMING_PROPERTY);
 
         final boolean satisfiesMatchesParameter = p.matches != null
-                && formatTermString(LogicPrinter.quickPrintTerm(sf.formula(), services))
+                && formatTermString(LogicPrinter.quickPrintTerm(sf, services))
                         .matches(".*" + p.matches + ".*");
 
         return (p.formula == null && p.matches == null) || satisfiesFormulaParameter

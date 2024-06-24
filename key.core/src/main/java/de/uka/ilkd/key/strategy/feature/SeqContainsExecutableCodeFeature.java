@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
@@ -36,10 +36,10 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
                     goal.proof().getServices());
     }
 
-    private boolean containsExec(Iterator<SequentFormula> it, MutableState mState,
+    private boolean containsExec(Iterator<Term> it, MutableState mState,
             Services services) {
         while (it.hasNext()) {
-            if (tf.compute(it.next().formula(), mState, services)
+            if (tf.compute(it.next(), mState, services)
                     .equals(BinaryTermFeature.ZERO_COST)) {
                 return true;
             }

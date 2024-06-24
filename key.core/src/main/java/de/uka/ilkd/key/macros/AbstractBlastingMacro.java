@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.SortCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -68,14 +67,14 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         SortCollector sortCollector = new SortCollector();
 
-        for (SequentFormula sf : goal.sequent()) {
-            sf.formula().execPreOrder(sortCollector);
+        for (Term sf : goal.sequent()) {
+            sf.execPreOrder(sortCollector);
         }
 
         Set<Sort> sorts = sortCollector.getSorts();
         sorts.remove(nullSort);
-        List<SequentFormula> formulae = createFormulae(goal.proof().getServices(), sorts);
-        for (SequentFormula sf : formulae) {
+        List<Term> formulae = createFormulae(goal.proof().getServices(), sorts);
+        for (Term sf : formulae) {
             Sequent s = goal.sequent();
             Semisequent antecedent = s.antecedent();
             if (!antecedent.containsEqual(sf)) {
@@ -98,8 +97,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return false;
     }
 
-    private List<SequentFormula> createFormulae(Services services, Set<Sort> sorts) {
-        List<SequentFormula> result = new LinkedList<>();
+    private List<Term> createFormulae(Services services, Set<Sort> sorts) {
+        List<Term> result = new LinkedList<>();
 
         JavaInfo info = services.getJavaInfo();
         SpecificationRepository spec = services.getSpecificationRepository();
@@ -132,7 +131,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return result;
     }
 
-    private static void addFormulas(List<SequentFormula> result, KeYJavaType kjt, ClassAxiom c,
+    private static void addFormulas(List<Term> result, KeYJavaType kjt, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
@@ -162,10 +161,10 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                     exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                     instanceImpl = tb.all(h, tb.all(o, instanceImpl));
 
-                    result.add(new SequentFormula(exactInstanceEquiv));
+                    result.add(exactInstanceEquiv);
 
                     if (!right.equals(tb.tt())) {
-                        result.add(new SequentFormula(instanceImpl));
+                        result.add(instanceImpl);
                     }
                 } else if (right.op().name().equals(inv.op().name())) {
 
@@ -176,21 +175,17 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                     exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                     instanceImpl = tb.all(h, tb.all(o, instanceImpl));
 
-                    result.add(new SequentFormula(exactInstanceEquiv));
+                    result.add(exactInstanceEquiv);
 
                     if (!left.equals(tb.tt())) {
-                        result.add(new SequentFormula(instanceImpl));
+                        result.add(instanceImpl);
                     }
 
                 } else {
-                    Term f = t;
-                    f = tb.all(h, tb.all(o, f));
-                    result.add(new SequentFormula(f));
+                    result.add(tb.all(h, tb.all(o, t)));
                 }
             } else {
-                Term f = t;
-                f = tb.all(h, tb.all(o, f));
-                result.add(new SequentFormula(f));
+                result.add(tb.all(h, tb.all(o, t)));
             }
         } catch (Exception e) {
         }

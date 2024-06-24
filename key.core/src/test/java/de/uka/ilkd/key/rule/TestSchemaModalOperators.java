@@ -47,7 +47,8 @@ public class TestSchemaModalOperators {
         if ("".equals(t)) {
             return Semisequent.EMPTY_SEMISEQUENT;
         }
-        SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
+        Term uAssumptions = TacletForTests.parseTerm(t);
+        Term cf0 = uAssumptions;
         return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
     }
 
@@ -94,8 +95,8 @@ public class TestSchemaModalOperators {
          * consMV_f_c_X = Constraint.BOTTOM.unify(t_mv, t_f_c_X); consMV_f_X_c =
          * Constraint.BOTTOM.unify(t_mv, t_f_X_c);
          *
-         * SequentFormula cf1 = new SequentFormula(TacletForTests.parseTerm("A & B"), consMV_f_c_X);
-         * SequentFormula cf2 = new SequentFormula(TacletForTests.parseTerm("!(A | B)"),
+         * Term cf1 = Term.create(TacletForTests.parseTerm("A & B"), consMV_f_c_X);
+         * Term cf2 = Term.create(TacletForTests.parseTerm("!(A | B)"),
          * consMV_f_X_c);
          *
          * Sequent seq = Sequent.createSequent
@@ -152,10 +153,9 @@ public class TestSchemaModalOperators {
         assertSame(Modality.JavaModalityKind.DIA, mc.getInstantiations().getInstantiation(osv));
 
         PosInOccurrence pos =
-            new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(goal, PosInTerm.getTopLevel(), true);
         PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
-        Term instReplace =
-            t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
+        Term instReplace = t.getRewriteResult(null, new TermLabelState(), services, tacletApp);
         assertNotNull(instReplace);
         assertSame(Modality.JavaModalityKind.DIA, ((Modality) instReplace.op()).kind());
     }

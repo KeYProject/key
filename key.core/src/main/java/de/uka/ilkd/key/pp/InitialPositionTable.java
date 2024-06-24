@@ -5,7 +5,7 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableSLList;
 /**
  * An InitialPositionTable is a PositionTable that describes the beginning of the element/subelement
  * relationship. Thus, an InitialPositionTable describes the information on where the
- * {@link SequentFormula}e of a sequent are located. It is the root of the tree of PositionTables
+ * {@link Term}e of a sequent are located. It is the root of the tree of PositionTables
  * and may be asked for a PosInSequent for a given index position and a given Sequent.
  *
  * <p>
@@ -80,7 +80,7 @@ public class InitialPositionTable extends PositionTable {
 
     /**
      * Returns the path for a given PosInOccurrence. This is built up from the initial 0, the number
-     * of the SequentFormula in the sequent, the position in the constrained formula, and possibly
+     * of the Term in the sequent, the position in the constrained formula, and possibly
      * inside a Metavariable instantiation.
      *
      * @param pio the given PosInOccurrence
@@ -90,7 +90,7 @@ public class InitialPositionTable extends PositionTable {
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio, SequentPrintFilter filter) {
         ImmutableList<Integer> p = ImmutableSLList.nil();
         p = prependPathInFormula(p, pio);
-        int index = indexOfCfma(pio.sequentFormula(), filter);
+        int index = indexOfCfma(pio.sequentLevelFormula(), filter);
         if (index == -1) {
             return null;
         }
@@ -116,7 +116,7 @@ public class InitialPositionTable extends PositionTable {
      * @param filter the current filter
      * @return the index of the given formula in the sequent as printed
      */
-    private int indexOfCfma(SequentFormula cfma, SequentPrintFilter filter) {
+    private int indexOfCfma(Term cfma, SequentPrintFilter filter) {
         ImmutableList<SequentPrintFilterEntry> list =
             filter.getFilteredAntec().append(filter.getFilteredSucc());
         int k;

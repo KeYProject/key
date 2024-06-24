@@ -102,7 +102,7 @@ public class FormulaTagManager {
     }
 
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        for (SequentFormula constrainedFormula : sci.addedFormulas(p_antec)) {
+        for (Term constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence pio =
                 new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
@@ -110,7 +110,7 @@ public class FormulaTagManager {
     }
 
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        for (SequentFormula constrainedFormula : sci.removedFormulas(p_antec)) {
+        for (Term constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio =
                 new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             removeTag(pio);
@@ -148,7 +148,7 @@ public class FormulaTagManager {
         final Sequent seq = p_goal.sequent();
         final Semisequent ss = p_antec ? seq.antecedent() : seq.succedent();
 
-        for (SequentFormula s : ss) {
+        for (Term s : ss) {
             final PosInOccurrence pio = new PosInOccurrence(s, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }

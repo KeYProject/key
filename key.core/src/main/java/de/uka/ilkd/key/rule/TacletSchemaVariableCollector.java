@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -159,8 +158,8 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (SequentFormula aSemiseq : semiseq) {
-            aSemiseq.formula().execPostOrder(this);
+        for (Term aSemiseq : semiseq) {
+            aSemiseq.execPostOrder(this);
         }
     }
 

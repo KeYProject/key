@@ -69,7 +69,7 @@ public abstract class AbstractSlicer {
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         // Solve this reference
         PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
-        Term topLevel = pio.sequentFormula().formula();
+        Term topLevel = pio.sequentLevelFormula();
         Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
         Services services = seedNode.proof().getServices();
         ExecutionContext ec =
@@ -209,7 +209,7 @@ public abstract class AbstractSlicer {
      */
     protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
         PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-        Term topLevel = pio.sequentFormula().formula();
+        Term topLevel = pio.sequentLevelFormula();
         Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(topLevel);
         Term modalityTerm = pair.second;
         SymbolicExecutionTermLabel label =
@@ -283,14 +283,14 @@ public abstract class AbstractSlicer {
      */
     protected void analyzeSequent(Services services, Sequent sequent,
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
-        for (SequentFormula sf : sequent.antecedent()) {
-            Term term = sf.formula();
+        for (Term sf : sequent.antecedent()) {
+            Term term = sf;
             if (Equality.EQUALS == term.op()) {
                 analyzeEquality(services, term, aliases, thisReference);
             }
         }
-        for (SequentFormula sf : sequent.succedent()) {
-            Term term = sf.formula();
+        for (Term sf : sequent.succedent()) {
+            Term term = sf;
             if (Junctor.NOT == term.op()) {
                 Term negatedTerm = term.sub(0);
                 if (Equality.EQUALS == negatedTerm.op()) {

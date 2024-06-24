@@ -45,9 +45,9 @@ public class TestVariableNamer {
     private final LocationVariable x_2 = constructProgramVariable("x_2");
     private final LocationVariable var_1 = constructProgramVariable("var_1");
     private final LocationVariable var_2 = constructProgramVariable("var_2");
-    private final SequentFormula formulaWithX = constructFormula(x);
-    private final SequentFormula formulaWithX_1 = constructFormula(x_1);
-    private final SequentFormula formulaWithVar_1 = constructFormula(var_1);
+    private final Term formulaWithX = constructFormula(x);
+    private final Term formulaWithX_1 = constructFormula(x_1);
+    private final Term formulaWithVar_1 = constructFormula(var_1);
     private final SchemaVariable variableSV = SchemaVariableFactory
             .createProgramSV(new ProgramElementName("sv"), ProgramSVSort.VARIABLE, false);
 
@@ -63,23 +63,23 @@ public class TestVariableNamer {
         return constructProgramVariable(pen);
     }
 
-    private SequentFormula constructFormula(ProgramVariable containedVar) {
+    private Term constructFormula(ProgramVariable containedVar) {
         Statement statement = new PostIncrement(containedVar);
         StatementBlock statementBlock = new StatementBlock(statement);
         JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
         Term term = services.getTermBuilder().dia(javaBlock, services.getTermBuilder().tt());
 
-        return new SequentFormula(term);
+        return term;
     }
 
 
-    private PosInOccurrence constructPIO(SequentFormula formula) {
+    private PosInOccurrence constructPIO(Term formula) {
         return new PosInOccurrence(formula, PosInTerm.getTopLevel(), true);
     }
 
 
-    private Goal constructGoal(SequentFormula containedFormula) {
+    private Goal constructGoal(Term containedFormula) {
         Semisequent empty = Semisequent.EMPTY_SEMISEQUENT;
         Semisequent ante = empty.insert(0, containedFormula).semisequent();
 
@@ -148,7 +148,7 @@ public class TestVariableNamer {
         assertNotEquals("x", name.getProgramName());
 
         LocationVariable v = constructProgramVariable(name);
-        SequentFormula formula = constructFormula(v);
+        Term formula = constructFormula(v);
         Goal goal = constructGoal(formula);
         PosInOccurrence pio = constructPIO(formula);
         v = vn.rename(v, goal, pio);

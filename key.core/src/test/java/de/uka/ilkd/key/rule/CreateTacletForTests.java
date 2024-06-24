@@ -247,13 +247,13 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         Term t_test1 = null;
         try {
             t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
-                    .get(0).formula();
+                    .get(0);
         } catch (Exception e) {
             LOGGER.error("Parser Error or Input Error", e);
             fail("Parser Error");
         }
-        SequentFormula cf = new SequentFormula(t_test1);
-        SequentFormula cf2 = new SequentFormula(t_test1);
+        Term cf = t_test1;
+        Term cf2 = t_test1;
         seq_test1 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
             Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent());
         seq_test2 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent(),
@@ -288,13 +288,13 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
         // => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
         seq_testNat = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(tnat)).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, tnat).semisequent());
 
 
         z = new LogicVariable(new Name("z"), sort1);
         Term t_z = tf.createTerm(z);
         Term t_allzpz = services.getTermBuilder().all(z, tf.createTerm(func_p, t_z));
-        SequentFormula cf3 = new SequentFormula(t_allzpz);
+        Term cf3 = t_allzpz;
         seq_testAll = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
             Semisequent.EMPTY_SEMISEQUENT.insert(0, cf3).semisequent());
 

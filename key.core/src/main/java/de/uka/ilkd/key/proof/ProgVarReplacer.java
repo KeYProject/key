@@ -144,9 +144,8 @@ public final class ProgVarReplacer {
                     result = result.replace(sv, newA, services);
                 }
             } else if (ie instanceof TermInstantiation) {
-                Term t = (Term) inst;
-                Term newT = replace(t);
-                if (newT != t) {
+                Term newT = replace((Term) inst);
+                if (newT != inst) {
                     result = result.replace(sv, newT, services);
                 }
             } else {
@@ -183,11 +182,11 @@ public final class ProgVarReplacer {
         SemisequentChangeInfo result = new SemisequentChangeInfo();
         result.setFormulaList(s.asList());
 
-        final Iterator<SequentFormula> it = s.iterator();
+        final Iterator<Term> it = s.iterator();
 
         for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {
-            final SequentFormula oldcf = it.next();
-            final SequentFormula newcf = replace(oldcf);
+            final Term oldcf = it.next();
+            final Term newcf = replace(oldcf);
 
             if (newcf != oldcf) {
                 result.combine(result.semisequent().replace(formulaNumber, newcf));
@@ -197,22 +196,6 @@ public final class ProgVarReplacer {
         return result;
     }
 
-
-    /**
-     * replaces in a constrained formula
-     */
-    public SequentFormula replace(SequentFormula cf) {
-        SequentFormula result = cf;
-
-        final Term newFormula = replace(cf.formula());
-
-        if (newFormula != cf.formula()) {
-            result = new SequentFormula(newFormula);
-        }
-        return result;
-    }
-
-
     private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         ProgramVariable o = map.get(pv);
@@ -221,7 +204,6 @@ public final class ProgVarReplacer {
         }
         return t;
     }
-
 
     private Term standardReplace(Term t) {
         Term result = t;
