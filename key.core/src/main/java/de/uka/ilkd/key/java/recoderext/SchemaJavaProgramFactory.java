@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.Namespace;
+import org.key_project.logic.Namespace;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;

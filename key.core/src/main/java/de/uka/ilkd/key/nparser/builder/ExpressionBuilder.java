@@ -34,6 +34,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;

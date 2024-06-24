@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SortException;
 
+import org.key_project.logic.Namespace;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
