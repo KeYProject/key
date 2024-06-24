@@ -1,0 +1,53 @@
+\profile "Java Profile";
+
+\settings // Proof-Settings-Config-File
+{ 
+    "Choice" : { 
+        "JavaCard" : "JavaCard:off",
+        "Strings" : "Strings:on",
+        "assertions" : "assertions:safe",
+        "bigint" : "bigint:on",
+        "floatRules" : "floatRules:strictfpOnly",
+        "initialisation" : "initialisation:disableStaticInitialisation",
+        "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
+        "integerSimplificationRules" : "integerSimplificationRules:full",
+        "javaLoopTreatment" : "javaLoopTreatment:efficient",
+        "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
+        "methodExpansion" : "methodExpansion:modularOnly",
+        "modelFields" : "modelFields:treatAsAxiom",
+        "moreSeqRules" : "moreSeqRules:on",
+        "permissions" : "permissions:off",
+        "programRules" : "programRules:Java",
+        "reach" : "reach:on",
+        "runtimeExceptions" : "runtimeExceptions:ban",
+        "sequences" : "sequences:on",
+        "wdChecks" : "wdChecks:off",
+        "wdOperator" : "wdOperator:L"
+     }
+ } 
+
+\proofObligation // Proof-Obligation settings
+{ 
+    "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+    "name" : "seqSwapPreservesSeqPermEQ"
+ }
+
+\proof {
+(keyLog "0" (keyUser "wolfram" ) (keyVersion "c8b5d84c8b26505e96801636fd7dcce6a7f28f5e"))
+
+(autoModeTime "271")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1") (newnames "f_x,f_s,f_y,f_EQ"))
+(rule "orRight" (formula "2"))
+(rule "andLeft" (formula "1"))
+(rule "notRight" (formula "4"))
+(rule "andLeft" (formula "2"))
+(rule "andLeft" (formula "2"))
+(rule "applyEqReverse" (formula "6") (term "1") (ifseqformula "1") (userinteraction))
+(rule "seqSwapPreservesSeqPerm" (formula "6") (userinteraction))
+(rule "replace_known_left" (formula "6") (term "1") (ifseqformula "5"))
+ (builtin "One Step Simplification" (formula "6") (ifInst ""  (formula "2")) (ifInst ""  (formula "3")) (ifInst ""  (formula "4")))
+(rule "closeTrue" (formula "6"))
+)
+}
