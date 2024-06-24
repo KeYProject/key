@@ -5400,7 +5400,7 @@ Choices: sequences:on}
 defOfSeqUpd {
 \find(seqUpd(seq,idx,value))
 \varcond(\notFreeIn(uSub (variable), seq (Seq term)), \notFreeIn(uSub (variable), value (any term)), \notFreeIn(uSub (variable), idx (int term)))
-\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,any::seqGet(seq,uSub)))) 
+\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,any::seqGet(seq,uSub))))
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9697,7 +9697,7 @@ Choices: sequences:on}
 == getOfSeqUpd (getOfSeqUpd) =========================================
 getOfSeqUpd {
 \find(alpha::seqGet(seqUpd(seq,idx,value),jdx))
-\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),alpha::cast(value),alpha::seqGet(seq,jdx))) 
+\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),alpha::cast(value),alpha::seqGet(seq,jdx)))
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -12135,7 +12135,7 @@ Choices: sequences:on}
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
 lenOfSeqUpd {
 \find(seqLen(seqUpd(seq,idx,value)))
-\replacewith(seqLen(seq)) 
+\replacewith(seqLen(seq))
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16555,7 +16555,7 @@ Choices: true}
 == ssubsortDirect (ssubsortDirect) =========================================
 ssubsortDirect {
 \find(ssubsort(alphSub::ssort,alph::ssort))
-\replacewith(true) 
+\replacewith(true)
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -16563,14 +16563,14 @@ Choices: true}
 ssubsortSup {
 \find(ssubsort(alph::ssort,alphSub::ssort))
 \varcond(\not\same(alphSub, alph))
-\replacewith(false) 
+\replacewith(false)
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == ssubsortTop (ssubsortTop) =========================================
 ssubsortTop {
 \find(ssubsort(s,anySORT))
-\replacewith(true) 
+\replacewith(true)
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -17071,8 +17071,8 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == subsortTrans (subsortTrans) =========================================
 subsortTrans {
-\assumes ([ssubsort(s1,s2),ssubsort(s2,s3)]==>[]) 
-\add [ssubsort(s1,s3)]==>[] 
+\assumes ([ssubsort(s1,s2),ssubsort(s2,s3)]==>[])
+\add [ssubsort(s1,s3)]==>[]
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
