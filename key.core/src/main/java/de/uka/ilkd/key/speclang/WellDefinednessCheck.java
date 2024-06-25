@@ -669,11 +669,10 @@ public abstract class WellDefinednessCheck implements Contract {
         assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
         assert find1.sub(0).arity() == find2.sub(0).arity();
 
-        Map<ProgramVariable, ProgramVariable> map =
-            new LinkedHashMap<>();
+        Map<Operator, Operator> map = new LinkedHashMap<>();
         int i = 0;
         for (Term sub : find1.sub(0).subs()) {
-            map.put((ProgramVariable) find2.sub(0).sub(i).op(), (ProgramVariable) sub.op());
+            map.put(find2.sub(0).sub(i).op(), sub.op());
             i++;
         }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory());

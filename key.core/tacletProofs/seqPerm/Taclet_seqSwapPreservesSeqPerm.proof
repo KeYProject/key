@@ -1,8 +1,8 @@
 \profile "Java Profile";
 
 \settings // Proof-Settings-Config-File
-{ 
-    "Choice" : { 
+{
+    "Choice" : {
         "JavaCard" : "JavaCard:off",
         "Strings" : "Strings:on",
         "assertions" : "assertions:safe",
@@ -24,10 +24,10 @@
         "wdChecks" : "wdChecks:off",
         "wdOperator" : "wdOperator:L"
      }
- } 
+ }
 
 \proofObligation // Proof-Obligation settings
-{ 
+{
     "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
     "name" : "seqSwapPreservesSeqPerm"
  }
