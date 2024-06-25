@@ -125,6 +125,11 @@ public class TestTacletEquality {
         }
     }
 
+    // @Test
+    public void createOracle() {
+        createNewOracle();
+    }
+
     @ParameterizedTest
     @MethodSource("createCases")
     public void testEquality(String name, String expected) {

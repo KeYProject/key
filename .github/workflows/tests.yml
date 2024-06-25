@@ -37,10 +37,10 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
 
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3.3.2
-        with:
-          arguments: --continue -DjacocoEnabled=true -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.3.2
+      - name: Test with Gradle
+        run: ./gradlew --continue -DjacocoEnabled=true -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -86,11 +86,10 @@ jobs:
         run: .github/dlsmt.sh
         shell: bash
 
-
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.3.2
       - name: "Running tests: ${{ matrix.test }}"
-        uses: gradle/gradle-build-action@v3.3.2
-        with:
-          arguments: --continue ${{ matrix.test }}
+        run: ./gradlew --continue ${{ matrix.test }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
