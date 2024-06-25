@@ -28,12 +28,12 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     /**
      * The fall-back namespace for symbols not present in this Namespace.
      */
-    private Namespace<E> parent;
+    private @Nullable Namespace<E> parent;
 
     /**
      * The map that maps a name to a symbols of that name if it is defined in this Namespace.
      */
-    private Map<Name, E> symbols;
+    private @Nullable Map<Name, E> symbols;
 
     /**
      * A namespace can be made immutable, this is called "sealing". This flag indicates whether this
@@ -138,7 +138,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         }
     }
 
-    protected E lookupLocally(Name name) {
+    protected @Nullable E lookupLocally(Name name) {
         if (symbols != null) {
             return symbols.get(name);
         } else {
@@ -169,7 +169,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * @return Object with name "name" or null if no such an object has been found
      */
     public @Nullable E lookup(Name name) {
-        E symbol = lookupLocally(name);
+        @Nullable E symbol = lookupLocally(name);
         if (symbol != null) {
             return symbol;
         }
@@ -182,7 +182,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     /** Convenience method to look up. */
-    public E lookup(String name) {
+    public @Nullable E lookup(String name) {
         return lookup(new Name(name));
     }
 
@@ -215,7 +215,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * returns the fall-back Namespace of this Namespace, i.e. the one where symbols are looked up
      * that are not found in this one.
      */
-    public Namespace<E> parent() {
+    public @Nullable Namespace<E> parent() {
         return parent;
     }
 
