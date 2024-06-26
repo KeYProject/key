@@ -11,10 +11,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 import de.uka.ilkd.key.util.LinkedHashMap;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * A map to be used in an {@link OpReplacer}. It maps operators that should be replaced to their
@@ -25,7 +26,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  * @param <S> the type of the elements to replace.
  * @param <T> the type of the replacements.
  */
-public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
+public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
 
     /**
      * Creates a new replacement map.
@@ -36,7 +37,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param proof the currently loaded proof, or {@code null} if no proof is loaded.
      * @return a new replacement map.
      */
-    static <S extends SVSubstitute, T> ReplacementMap<S, T> create(TermFactory tf,
+    static <S extends SyntaxElement, T> ReplacementMap<S, T> create(TermFactory tf,
             Proof proof) {
         var noIrrelevantTermLabelsMap = proof == null
                 ? ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings().getUseOriginLabels()
@@ -58,7 +59,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param initialMappings a map whose mapping should be added to the new replacement map.
      * @return a new replacement map.
      */
-    static <S extends SVSubstitute, T> ReplacementMap<S, T> create(TermFactory tf,
+    static <S extends SyntaxElement, T> ReplacementMap<S, T> create(TermFactory tf,
             Proof proof, Map<S, T> initialMappings) {
         ReplacementMap<S, T> result = create(tf, proof);
         result.putAll(initialMappings);
@@ -77,7 +78,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param <S> the type of the operators to replace.
      * @param <T> the type of the replacements.
      */
-    class DefaultReplacementMap<S extends SVSubstitute, T> extends LinkedHashMap<S, T>
+    class DefaultReplacementMap<S extends SyntaxElement, T> extends LinkedHashMap<S, T>
             implements ReplacementMap<S, T> {
         private static final long serialVersionUID = 6223486569442129676L;
     }
@@ -98,7 +99,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      *
      * @see OriginTermLabel
      */
-    class NoIrrelevantLabelsReplacementMap<S extends SVSubstitute, T>
+    class NoIrrelevantLabelsReplacementMap<S extends SyntaxElement, T>
             implements ReplacementMap<S, T> {
 
         /**

@@ -7,13 +7,14 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 
 /**
  * A schema variable that is used as placeholder for terms.
  */
-public final class TermSV extends OperatorSV {
+public final class TermSV extends OperatorSV implements TerminalSyntaxElement {
 
     /**
      * @param name the name of the schema variable
