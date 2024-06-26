@@ -7,8 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.macros.ProofMacro;
+
+import org.key_project.logic.op.Function;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
