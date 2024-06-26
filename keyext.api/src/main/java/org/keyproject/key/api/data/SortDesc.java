@@ -5,7 +5,7 @@ package org.keyproject.key.api.data;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 
 /**
  * @author Alexander Weigl
