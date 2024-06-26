@@ -6,17 +6,15 @@ package de.uka.ilkd.key.gui.docking;
 import java.util.function.Supplier;
 import javax.swing.*;
 
-import bibliothek.gui.Dockable;
-import bibliothek.gui.dock.action.ActionType;
-import bibliothek.gui.dock.action.DockActionSource;
-import bibliothek.gui.dock.action.MenuDockAction;
-import bibliothek.gui.dock.action.actions.SimpleDockAction;
-import bibliothek.gui.dock.action.view.ActionViewConverter;
-import bibliothek.gui.dock.action.view.ViewTarget;
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CMenu;
-import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
-import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
+import org.key_project.dockingframes.common.common.action.*;
+import org.key_project.dockingframes.common.common.action.core.CommonDecoratableDockAction;
+import org.key_project.dockingframes.common.common.intern.action.CDecorateableAction;
+import org.key_project.dockingframes.core.gui.Dockable;
+import org.key_project.dockingframes.core.gui.dock.action.*;
+import org.key_project.dockingframes.core.gui.dock.action.actions.*;
+import org.key_project.dockingframes.core.gui.dock.action.view.ActionViewConverter;
+import org.key_project.dockingframes.core.gui.dock.action.view.ViewTarget;
+
 
 /**
  * CMenu that gets (re-)generated when the action gets fired using the provided supplier.
