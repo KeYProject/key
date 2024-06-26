@@ -38,18 +38,19 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      */
     private final boolean throwDirect;
 
+    @Nullable
     private final Logger logger;
 
-    public SyntaxErrorReporter(Logger logger, boolean throwDirect) {
+    public SyntaxErrorReporter(@Nullable Logger logger, boolean throwDirect) {
         this.logger = logger;
         this.throwDirect = throwDirect;
     }
 
-    public SyntaxErrorReporter(Class<?> loggerCategory) {
+    public SyntaxErrorReporter(@Nullable Class<?> loggerCategory) {
         this(loggerCategory, false);
     }
 
-    public SyntaxErrorReporter(Class<?> loggerCategory, boolean throwDirect) {
+    public SyntaxErrorReporter(@Nullable Class<?> loggerCategory, boolean throwDirect) {
         this(loggerCategory != null ? LoggerFactory.getLogger(loggerCategory) : null, throwDirect);
     }
 

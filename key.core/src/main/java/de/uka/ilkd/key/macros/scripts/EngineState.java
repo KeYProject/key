@@ -27,6 +27,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -35,14 +36,11 @@ import org.jspecify.annotations.NonNull;
 public class EngineState {
     private final Proof proof;
     private final AbbrevMap abbrevMap = new AbbrevMap();
-    /**
-     * nullable
-     */
-    private Consumer<ProofScriptEngine.Message> observer;
+    private @Nullable Consumer<ProofScriptEngine.Message> observer;
     private File baseFileName = new File(".");
     private final ValueInjector valueInjector = ValueInjector.createDefault();
-    private Goal goal;
-    private Node lastSetGoalNode;
+    private @Nullable Goal goal;
+    private @Nullable Node lastSetGoalNode;
 
     /**
      * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
@@ -63,7 +61,7 @@ public class EngineState {
         valueInjector.addConverter(Sort.class, this::toSort);
     }
 
-    protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
+    protected static @Nullable Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
             if (goal.node() == node) {
                 return goal;
@@ -72,9 +70,9 @@ public class EngineState {
         return null;
     }
 
-    public void setGoal(Goal g) {
+    public void setGoal(@Nullable Goal g) {
         goal = g;
-        lastSetGoalNode = Optional.ofNullable(g).map(Goal::node).orElse(null);
+        lastSetGoalNode = g != null ? g.node() : null;
     }
 
     public Proof getProof() {
@@ -91,7 +89,7 @@ public class EngineState {
      * @throws ScriptException If there is no such {@link Goal}, or something else goes wrong.
      */
     @SuppressWarnings("unused")
-    public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
+    public @Nullable Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }
@@ -127,14 +125,13 @@ public class EngineState {
      *
      * @throws ScriptException If there is no such {@link Goal}.
      */
-    public Goal getFirstOpenAutomaticGoal() throws ScriptException {
+    public @Nullable Goal getFirstOpenAutomaticGoal() throws ScriptException {
         return getFirstOpenGoal(true);
     }
 
-    private static Node goUpUntilOpen(final Node start) {
+    private static @Nullable Node goUpUntilOpen(@Nullable Node start) {
         Node currNode = start;
-
-        while (currNode.isClosed()) {
+        while (currNode != null && currNode.isClosed()) {
             /*
              * There should always be a non-closed parent since we check whether the proof is closed
              * at the beginning.
@@ -145,7 +142,7 @@ public class EngineState {
         return currNode;
     }
 
-    private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
+    private @Nullable Goal findGoalFromRoot(@Nullable final Node rootNode, boolean checkAutomatic) {
         final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
@@ -190,7 +187,7 @@ public class EngineState {
     }
 
 
-    public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
+    public Term toTerm(String string, @Nullable Sort sort) throws ParserException, ScriptException {
         final var io = getKeyIO();
         var term = io.parseExpression(string);
         if (sort == null || term.sort().equals(sort))
@@ -231,11 +228,11 @@ public class EngineState {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 
-    public Consumer<ProofScriptEngine.Message> getObserver() {
+    public @Nullable Consumer<ProofScriptEngine.Message> getObserver() {
         return observer;
     }
 
-    public void setObserver(Consumer<ProofScriptEngine.Message> observer) {
+    public void setObserver(@Nullable Consumer<ProofScriptEngine.Message> observer) {
         this.observer = observer;
     }
 

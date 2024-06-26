@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -25,7 +26,7 @@ public class SkipMacro extends AbstractProofMacro {
     }
 
     @Override
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 

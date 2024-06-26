@@ -9,6 +9,7 @@ import java.util.Iterator;
 /**
  * This interface has to be implemented by a Class providing a persistent Map.
  */
+@SuppressWarnings({"nullness", "type.argument.type.incompatible"})
 public interface ImmutableMap<S, T>
         extends Iterable<ImmutableMapEntry<S, T>> {
 
@@ -21,19 +22,29 @@ public interface ImmutableMap<S, T>
      */
     ImmutableMap<S, T> put(S key, T value);
 
-    /** @return value of type <T> that is mapped by key of type<S> */
+    /**
+     * @return value of type <T> that is mapped by key of type<S>
+     */
     T get(S key);
 
-    /** @return number of entries as int */
+    /**
+     * @return number of entries as int
+     */
     int size();
 
-    /** @return true iff the map is empty */
+    /**
+     * @return true iff the map is empty
+     */
     boolean isEmpty();
 
-    /** @return true iff the map includes key */
+    /**
+     * @return true iff the map includes key
+     */
     boolean containsKey(S key);
 
-    /** @return true iff the map includes value */
+    /**
+     * @return true iff the map includes value
+     */
     boolean containsValue(T value);
 
     /**
@@ -50,13 +61,19 @@ public interface ImmutableMap<S, T>
      */
     ImmutableMap<S, T> removeAll(T value);
 
-    /** @return iterator about all keys */
+    /**
+     * @return iterator about all keys
+     */
     Iterator<S> keyIterator();
 
-    /** @return iterator about all values */
+    /**
+     * @return iterator about all values
+     */
     Iterator<T> valueIterator();
 
-    /** @return iterator for entries */
+    /**
+     * @return iterator for entries
+     */
     Iterator<ImmutableMapEntry<S, T>> iterator();
 
 

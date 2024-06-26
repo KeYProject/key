@@ -55,6 +55,7 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
         return "javascript";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public String script;

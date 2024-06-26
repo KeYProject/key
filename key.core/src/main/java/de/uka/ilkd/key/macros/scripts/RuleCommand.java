@@ -7,7 +7,10 @@ import java.util.*;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
@@ -22,6 +25,8 @@ import de.uka.ilkd.key.rule.*;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
@@ -128,9 +133,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
     }
 
-    private TacletApp instantiateTacletApp(final Parameters p, final EngineState state,
+    private @Nullable TacletApp instantiateTacletApp(final Parameters p, final EngineState state,
             final Proof proof, final TacletApp theApp) throws ScriptException {
-        TacletApp result = theApp;
+        TacletApp result;
 
         Services services = proof.getServices();
         ImmutableList<TacletApp> assumesCandidates = theApp
@@ -204,8 +209,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     private TacletApp makeNoFindTacletApp(Taclet taclet) {
-        TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclet);
-        return app;
+        return NoPosTacletApp.createNoPosTacletApp(taclet);
     }
 
     private IBuiltInRuleApp builtInRuleApp(Parameters p, EngineState state, BuiltInRule rule)
@@ -260,8 +264,6 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private ImmutableList<IBuiltInRuleApp> findBuiltInRuleApps(Parameters p, EngineState state)
             throws ScriptException {
         final Services services = state.getProof().getServices();
-        assert services != null;
-
         final Goal g = state.getFirstOpenAutomaticGoal();
         final BuiltInRuleAppIndex index = g.ruleAppIndex().builtInRuleAppIndex();
 
@@ -290,7 +292,6 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private ImmutableList<TacletApp> findAllTacletApps(Parameters p, EngineState state)
             throws ScriptException {
         Services services = state.getProof().getServices();
-        assert services != null;
         TacletFilter filter = new TacletNameFilter(p.rulename);
         Goal g = state.getFirstOpenAutomaticGoal();
         RuleAppIndex index = g.ruleAppIndex();
@@ -327,8 +328,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      * @param sf The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
-    private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
-            throws ScriptException {
+    private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services) {
         final boolean satisfiesFormulaParameter =
             p.formula != null && sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY);
 
@@ -382,21 +382,25 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return matchingApps;
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option(value = "#2")
         public String rulename;
         @Option(value = "on", required = false)
+        @Nullable
         public Term on;
         @Option(value = "formula", required = false)
+        @Nullable
         public Term formula;
         @Option(value = "occ", required = false)
+        @Nullable
         public int occ = -1;
         /**
          * Represents a part of a formula (may use Java regular expressions as long as supported by
          * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
         @Option(value = "matches", required = false)
-        public String matches = null;
+        public @Nullable String matches = null;
         @Varargs(as = Term.class, prefix = "inst_")
         public Map<String, Term> instantiations = new HashMap<>();
     }

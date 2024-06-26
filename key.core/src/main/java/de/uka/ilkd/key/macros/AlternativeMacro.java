@@ -28,7 +28,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      *
      * This array is created on demand using {@link #createProofMacroArray()}.
      */
-    private ProofMacro[] proofMacros = null;
+    private ProofMacro[] proofMacros = new ProofMacro[0];
 
     /**
      * Creates the proof macro array.

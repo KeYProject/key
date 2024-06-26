@@ -4,3 +4,20 @@ dependencies {
     implementation project(":key.core")
     implementation project(":key.ui")
 }
+
+
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.logic",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
