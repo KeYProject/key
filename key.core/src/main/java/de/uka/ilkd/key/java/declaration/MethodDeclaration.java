@@ -163,7 +163,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
 
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
 
