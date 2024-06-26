@@ -18,15 +18,16 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
-import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.testgen.smt.counterexample.AbstractCounterExampleGenerator;
+import de.uka.ilkd.key.testgen.smt.counterexample.AbstractSideProofCounterExampleGenerator;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         setName(NAME);
         setTooltip(TOOLTIP);
         Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
-        putValue(SMALL_ICON, icon);
+        setSmallIcon(icon);
         setMenuPath("Proof");
         init();
         lookupAcceleratorKey();
@@ -57,7 +58,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
      * <b>This class provides only the user interface and no counter example generation logic which
      * is implemented by the {@link AbstractCounterExampleGenerator}</b>.
      */
-    public void init() {
+    public void init(@UnknownInitialization CounterExampleAction this) {
         ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
                 .addPropertyChangeListener(this);
         checkZ3CE();

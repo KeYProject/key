@@ -11,6 +11,8 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This macro does nothing and is not applicable. It can be used to create compound macros, e.g. as
  * an alternative macro for {@link DoWhileFinallyMacro}.
@@ -41,7 +43,8 @@ public class SkipMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         // do nothing
         return new ProofMacroFinishedInfo(this, goals);

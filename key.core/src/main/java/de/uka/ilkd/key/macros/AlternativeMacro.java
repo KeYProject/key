@@ -15,6 +15,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class AlternativeMacro can be used to create compound macros which apply the first
  * applicable macro (similar to a shortcut disjunction) and then it returns.
@@ -68,7 +70,8 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {
