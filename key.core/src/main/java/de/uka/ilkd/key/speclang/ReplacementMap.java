@@ -13,7 +13,8 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * A map from some type to the same type.
@@ -22,7 +23,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  *
  * @author lanzinger
  */
-public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
+public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
         extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
 
     /**

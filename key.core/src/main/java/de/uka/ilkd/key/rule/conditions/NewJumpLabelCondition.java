@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 /**
@@ -41,11 +41,11 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond, Services services) {
         if (var != labelSV && matchCond.getInstantiations().isInstantiated(labelSV)) {
             var = labelSV;
-            instCandidate = (SVSubstitute) matchCond.getInstantiations().getInstantiation(labelSV);
+            instCandidate = (SyntaxElement) matchCond.getInstantiations().getInstantiation(labelSV);
         }
 
         if (var == labelSV) {

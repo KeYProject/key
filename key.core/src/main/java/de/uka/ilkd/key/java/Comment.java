@@ -5,6 +5,8 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.logic.SyntaxElement;
+
 /**
  * Comment element of Java source code.
  */
@@ -70,5 +72,15 @@ public class Comment extends JavaSourceElement {
             return false;
         }
         return (getText().equals(cmp.getText()));
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Comment has no children");
     }
 }

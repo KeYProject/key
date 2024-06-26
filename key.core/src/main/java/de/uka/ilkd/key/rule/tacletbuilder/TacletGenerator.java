@@ -166,6 +166,8 @@ public class TacletGenerator {
             new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.nil(), findTerm);
 
         // choices, rule set
+        // Be careful that the choices used here is actually declared (see optionsDeclarations.key),
+        // otherwise the taclet will be unusable!
         var choice = ChoiceExpr.variable("modelFields",
             satisfiabilityGuard ? "showSatisfiability" : "treatAsAxiom");
         final RuleSet ruleSet = new RuleSet(

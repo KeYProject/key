@@ -50,7 +50,7 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public Object getChild(int i) {
+    public Object getTLChild(int i) {
         if (i == 0) {
             return id();
         }
@@ -61,7 +61,7 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         return 1;
     }
 
