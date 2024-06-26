@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import org.key_project.logic.TerminalSyntaxElement;
+
 /**
  * Terminal program element. taken from COMPOST and changed to achieve an immutable structure
  */
 
-public interface TerminalProgramElement extends ProgramElement {
+public interface TerminalProgramElement extends ProgramElement, TerminalSyntaxElement {
+
 }

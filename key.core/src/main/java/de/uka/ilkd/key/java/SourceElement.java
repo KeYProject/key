@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.logic.SyntaxElement;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.Property;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 /**
  * A source element is a piece of syntax. It does not necessarily have a semantics, at least none
@@ -14,7 +15,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  * to achieve an immutable structure
  */
 
-public interface SourceElement extends SVSubstitute, EqualsModProperty<SourceElement> {
+public interface SourceElement extends SyntaxElement, EqualsModProperty<SourceElement> {
 
 
     /**

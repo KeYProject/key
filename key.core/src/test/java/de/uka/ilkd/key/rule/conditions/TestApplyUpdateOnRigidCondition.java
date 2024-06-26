@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.Test;
@@ -229,7 +230,7 @@ public class TestApplyUpdateOnRigidCondition {
      * @param tOrPhi the {@link SchemaVariable} that is instantiated with the term or formula in
      *        <code>term</code>
      * @param result the {@link SchemaVariable} that is instantiated with the result of a
-     *        {@link ApplyUpdateOnRigidCondition#check(SchemaVariable, SVSubstitute, MatchConditions, Services)}
+     *        {@link ApplyUpdateOnRigidCondition#check(SchemaVariable, SyntaxElement, MatchConditions, Services)}
      *        call
      *
      * @return the original formula or term if the update cannot be applied; else, the updated
