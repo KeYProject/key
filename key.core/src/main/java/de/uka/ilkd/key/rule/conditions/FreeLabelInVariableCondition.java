@@ -7,10 +7,11 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.FreeLabelFinder;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
 
 
 public final class FreeLabelInVariableCondition extends VariableConditionAdapter {
@@ -29,7 +30,7 @@ public final class FreeLabelInVariableCondition extends VariableConditionAdapter
 
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
         Label prgLabel = null;
         ProgramElement program = null;

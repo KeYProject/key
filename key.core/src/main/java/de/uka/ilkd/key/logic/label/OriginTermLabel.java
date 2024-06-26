@@ -57,7 +57,7 @@ public class OriginTermLabel implements TermLabel {
     public final static Name NAME = new Name("origin");
 
     /**
-     * @see #getChildCount()
+     * @see #getTLChildCount()
      */
     public final static int CHILD_COUNT = 2;
     public static final Sort[] EMPTY_SORTS = new Sort[0];
@@ -450,7 +450,7 @@ public class OriginTermLabel implements TermLabel {
     }
 
     @Override
-    public Object getChild(int i) {
+    public Object getTLChild(int i) {
         if (i == 0) {
             return origin;
         } else if (i == 1) {
@@ -461,7 +461,7 @@ public class OriginTermLabel implements TermLabel {
     }
 
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         return CHILD_COUNT;
     }
 
@@ -785,12 +785,16 @@ public class OriginTermLabel implements TermLabel {
         ASSERT("assert"),
 
         /**
-         * assignable
+         * assignable.
+         * The name 'assignable' is kept here for legacy reasons.
+         * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
          */
         ASSIGNABLE("assignable"),
 
         /**
          * assignable_free
+         * The name 'assignable' is kept here for legacy reasons.
+         * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
          */
         ASSIGNABLE_FREE("assignable_free"),
 

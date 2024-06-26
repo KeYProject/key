@@ -87,7 +87,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      * @param heaps the heaps.
      * @param anonymisationHeaps the anonymization heaps.
      * @param variables the variables.
-     * @param modifiesClauses the modifies clauses.
+     * @param modifiableClauses the modifiable clauses.
      * @param services services.
      * @return the updates for the usage branch.
      */
@@ -95,11 +95,11 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             final List<LocationVariable> heaps,
             final Map<LocationVariable, JFunction> anonymisationHeaps,
             final LoopContract.Variables variables,
-            final Map<LocationVariable, Term> modifiesClauses, final Services services) {
+            final Map<LocationVariable, Term> modifiableClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
-            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
@@ -238,8 +238,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
             new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
-        final Map<LocationVariable, Term> modifiesClauses =
-            conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> modifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
 
         final Term[] preconditions = createPreconditions(instantiation.self(), contract, heaps,
             localInVariables, conditionsAndClausesBuilder, services);
@@ -247,7 +247,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
-            variables, modifiesClauses, services);
+            variables, modifiableClauses, services);
 
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator =

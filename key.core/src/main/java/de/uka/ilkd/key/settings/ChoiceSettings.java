@@ -35,7 +35,6 @@ public class ChoiceSettings extends AbstractSettings {
 
     private static final String PROP_CHOICE_DEFAULT = "category2Default";
     private static final String PROP_CHOICE_CATEGORIES = "category2Choices";
-    private HashMap<String, String> category2Default;
 
 
     /**
@@ -43,6 +42,7 @@ public class ChoiceSettings extends AbstractSettings {
      * category).
      */
     private Map<String, Set<String>> category2Choices = new LinkedHashMap<>();
+    private Map<String, String> category2Default;
 
 
     public ChoiceSettings() {

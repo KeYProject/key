@@ -7,7 +7,7 @@ public class BranchingLoop {
 	public void doIt(int n){
 		int i=0;
 		int oldN = n;
-		//@ loop_invariant (i+4) / (1+n-oldN) ==  4; modifies i,n;
+		//@ loop_invariant (i+4) / (1+n-oldN) ==  4; assignable i,n;
 		while(i < n*2){
 			n+=2;
 			if(i >= 64){
@@ -16,7 +16,7 @@ public class BranchingLoop {
 			i+=8;
 		}
 	}
-	
+
 	public void foo(int n){
 		//dummy
 	}

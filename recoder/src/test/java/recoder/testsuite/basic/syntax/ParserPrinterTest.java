@@ -6,7 +6,8 @@ package recoder.testsuite.basic.syntax;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.convenience.Format;
@@ -14,8 +15,6 @@ import recoder.io.SourceFileRepository;
 import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import static org.junit.Assert.fail;
 
 public class ParserPrinterTest {
     @Test
@@ -27,11 +26,12 @@ public class ParserPrinterTest {
             String buffer1 = cu.toSource();
             CompilationUnit cv = pf.parseCompilationUnit(buffer1);
             if (!ProgramElement.STRUCTURAL_EQUALITY.equals(cu, cv)) {
-                fail("Printed tree of " + Format.toString("%u", cu) + " has changed its structure");
+                Assertions.fail(
+                    "Printed tree of " + Format.toString("%u", cu) + " has changed its structure");
             }
             String buffer2 = cv.toSource();
             if (!buffer1.equals(buffer2)) {
-                fail(Format.toString("Reprint of parsed %u differs", cu));
+                Assertions.fail(Format.toString("Reprint of parsed %u differs", cu));
             }
         }
     }

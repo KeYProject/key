@@ -40,7 +40,7 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable) 
      * {@inheritDoc}
      */
     @Override
-    public ProgramVariable getChild(int i) {
+    public ProgramVariable getTLChild(int i) {
         if (i == 0) {
             return exceptionVariable();
         }
@@ -51,7 +51,7 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable) 
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         return 1;
     }
 
