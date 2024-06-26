@@ -16,13 +16,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * Extracts the loop invariants for a loop term (for all applicable heap contexts).
@@ -42,7 +43,7 @@ public class LoopInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();

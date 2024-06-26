@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Dec 18 12:41:03 CET 2023
+# Date: Fri Jun 21 16:10:16 CEST 2024
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -5396,6 +5396,14 @@ defOfSeqSub {
 
 Choices: sequences:on}
 -----------------------------------------------------
+== defOfSeqUpd (defOfSeqUpd) =========================================
+defOfSeqUpd {
+\find(seqUpd(seq,idx,value))
+\varcond(\notFreeIn(uSub (variable), seq (Seq term)), \notFreeIn(uSub (variable), value (any term)), \notFreeIn(uSub (variable), idx (int term)))
+\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,any::seqGet(seq,uSub))))
+
+Choices: sequences:on}
+-----------------------------------------------------
 == defSeq2Map (defSeq2Map) =========================================
 defSeq2Map {
 \find(seq2map(s))
@@ -9233,28 +9241,28 @@ expandInByte {
 \find(inByte(i))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == expandInChar (expandInChar) =========================================
 expandInChar {
 \find(inChar(i))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == expandInInt (expandInInt) =========================================
 expandInInt {
 \find(inInt(i))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == expandInLong (expandInLong) =========================================
 expandInLong {
 \find(inLong(i))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == expandInRangeByte (expandInRangeByte) =========================================
 expandInRangeByte {
@@ -9296,7 +9304,7 @@ expandInShort {
 \find(inShort(i))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == expand_addJint (expand_addJint) =========================================
 expand_addJint {
@@ -9684,6 +9692,13 @@ getOfSeqSubEQ {
 \find(alpha::seqGet(EQ,idx))
 \sameUpdateLevel\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),alpha::seqGet(seq,add(idx,from)),alpha::cast(seqGetOutside))) 
 \heuristics(simplify_enlarging, no_self_application)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfSeqUpd (getOfSeqUpd) =========================================
+getOfSeqUpd {
+\find(alpha::seqGet(seqUpd(seq,idx,value),jdx))
+\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),alpha::cast(value),alpha::seqGet(seq,jdx)))
+\heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == greater (greater) =========================================
@@ -12115,6 +12130,13 @@ lenOfSeqSubEQ {
 \find(seqLen(EQ))
 \sameUpdateLevel\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
 \heuristics(find_term_not_in_assumes, simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfSeqUpd (lenOfSeqUpd) =========================================
+lenOfSeqUpd {
+\find(seqLen(seqUpd(seq,idx,value)))
+\replacewith(seqLen(seq))
+\heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lengthReplace (lengthReplace) =========================================
@@ -16530,6 +16552,28 @@ square_nonneg {
 \heuristics(simplify_int)
 Choices: true}
 -----------------------------------------------------
+== ssubsortDirect (ssubsortDirect) =========================================
+ssubsortDirect {
+\find(ssubsort(alphSub::ssort,alph::ssort))
+\replacewith(true)
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== ssubsortSup (ssubsortSup) =========================================
+ssubsortSup {
+\find(ssubsort(alph::ssort,alphSub::ssort))
+\varcond(\not\same(alphSub, alph))
+\replacewith(false)
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== ssubsortTop (ssubsortTop) =========================================
+ssubsortTop {
+\find(ssubsort(s,anySORT))
+\replacewith(true)
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
 == startsWith (startsWith) =========================================
 startsWith {
 \find(clStartsWith(sourceStr,searchStr))
@@ -17024,6 +17068,13 @@ subsetWithSetMinusLeftEQ {
 \sameUpdateLevel\replacewith(subset(s,union(s2,s3))) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
+-----------------------------------------------------
+== subsortTrans (subsortTrans) =========================================
+subsortTrans {
+\assumes ([ssubsort(s1,s2),ssubsort(s2,s3)]==>[])
+\add [ssubsort(s1,s3)]==>[]
+\heuristics(simplify_enlarging)
+Choices: true}
 -----------------------------------------------------
 == subst_to_eq (subst_to_eq) =========================================
 subst_to_eq {

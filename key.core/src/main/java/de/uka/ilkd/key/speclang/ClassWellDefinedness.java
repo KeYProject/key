@@ -29,10 +29,10 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     private final ClassInvariant inv;
 
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term assignable,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
             Term accessible, Condition ensures, Term mby, Term rep, ClassInvariant inv,
             TermBuilder tb) {
-        super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
+        super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.inv = inv;
     }
@@ -44,7 +44,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         assert inv != null;
         this.inv = inv;
         setRequires(inv.getOriginalInv());
-        setAssignable(TB.strictlyNothing(), services);
+        setModifiable(TB.strictlyNothing(), services);
         setEnsures(inv.getOriginalInv());
         setAccessible(accessible);
         setMby(mby);
@@ -53,7 +53,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     @Override
     public ClassWellDefinedness map(UnaryOperator<Term> op, Services services) {
         return new ClassWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
-            getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
+            getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
             op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
             op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
     }
@@ -136,14 +136,14 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     @Override
     public ClassWellDefinedness setID(int newId) {
         return new ClassWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
-            getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getOrigVars(), getRequires(), getModifiable(), getAccessible(), getEnsures(), getMby(),
             getRepresents(), getInvariant(), TB);
     }
 
     @Override
     public ClassWellDefinedness setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new ClassWellDefinedness(getName(), id(), type(), newPM, getHeap(), getOrigVars(),
-            getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRequires(), getModifiable(), getAccessible(), getEnsures(), getMby(),
             getRepresents(), getInvariant().setKJT(newKJT), TB);
     }
 

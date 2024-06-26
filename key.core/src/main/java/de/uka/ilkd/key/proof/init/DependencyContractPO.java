@@ -144,7 +144,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             new LinkedHashMap<>();
         List<LocationVariable> heaps = new LinkedList<>();
         int hc = 0;
-        for (LocationVariable h : HeapContext.getModHeaps(proofServices, false)) {
+        for (LocationVariable h : HeapContext.getModifiableHeaps(proofServices, false)) {
             if (hc >= heapCount) {
                 break;
             }

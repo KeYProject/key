@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -239,8 +239,8 @@ public class VMTacletMatcher implements TacletMatcher {
             while (result != null && svIterator.hasNext()) {
                 final SchemaVariable sv = svIterator.next();
                 final Object o = result.getInstantiations().getInstantiation(sv);
-                if (o instanceof SVSubstitute) {
-                    result = checkVariableConditions(sv, (SVSubstitute) o, result, services);
+                if (o instanceof SyntaxElement) {
+                    result = checkVariableConditions(sv, (SyntaxElement) o, result, services);
                 }
             }
         }
@@ -279,7 +279,7 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final MatchConditions checkVariableConditions(SchemaVariable var,
-            SVSubstitute instantiationCandidate, MatchConditions matchCond, Services services) {
+            SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services) {
         if (matchCond != null) {
             if (instantiationCandidate instanceof Term term) {
                 if (!(term.op() instanceof QuantifiableVariable)) {

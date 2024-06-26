@@ -247,7 +247,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     /**
      * @return (assumption, anon update, anon heap)
      */
-    private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
+    private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term modifiable,
             LoopSpecification inv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -265,10 +265,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // check for strictly pure loops
         final Term anonUpdate;
-        if (tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+        if (tb.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             anonUpdate = tb.skip();
         } else {
-            anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
+            anonUpdate = tb.anonUpd(heap, modifiable, anonHeapTerm);
         }
 
         return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(), anonHeapTerm);
@@ -559,15 +559,15 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         JavaBlock useJavaBlock =
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-        var mod = (Modality) inst.progPost.op();
+        var modality = (Modality) inst.progPost.op();
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
             "UseModality", null,
-            tb.tf().createTerm(Modality.getModality(mod.kind(), useJavaBlock),
+            tb.tf().createTerm(Modality.getModality(modality.kind(), useJavaBlock),
                 new ImmutableArray<>(inst.progPost.sub(0)),
                 null, inst.progPost.getLabels()));
         Term restPsi =
-            tb.prog(mod.kind(), useJavaBlock, inst.progPost.sub(0),
+            tb.prog(modality.kind(), useJavaBlock, inst.progPost.sub(0),
                 instantiateLabels);
         Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
         return guardFalseRestPsi;
@@ -721,11 +721,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term invTerm = conjunctInv(services, inst, atPres, heapContext);
         final Term invFreeTerm = conjunctFreeInv(services, inst, atPres, heapContext);
 
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> freeMods = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> modifiables = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> freeModifiables = new LinkedHashMap<>();
         for (LocationVariable heap : heapContext) {
-            mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services));
-            freeMods.put(heap, inst.inv.getFreeModifies(heap, inst.selfTerm, atPres, services));
+            modifiables.put(heap, inst.inv.getModifiable(heap, inst.selfTerm, atPres, services));
+            freeModifiables.put(heap,
+                inst.inv.getFreeModifiable(heap, inst.selfTerm, atPres, services));
         }
 
         final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
@@ -809,7 +810,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term anonHeap = null;
         ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
         for (LocationVariable heap : heapContext) {
-            final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap), inst.inv, services);
+            final AnonUpdateData tAnon =
+                createAnonUpdate(heap, modifiables.get(heap), inst.inv, services);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if (anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;
@@ -824,25 +826,27 @@ public final class WhileInvariantRule implements BuiltInRule {
             if (anonHeap == null) {
                 anonHeap = tAnon.anonHeap;
             }
-            final Term mod = mods.get(heap);
-            final Term freeMod = freeMods.get(heap);
+            final Term modifiable = modifiables.get(heap);
+            final Term freeModifiable = freeModifiables.get(heap);
             final Term strictlyNothing = tb.strictlyNothing();
             final Term currentFrame;
             if (strictlyNothing.equalsModProperty(
-                mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 if (strictlyNothing.equalsModProperty(
-                    freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    freeModifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
                 } else {
-                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeMod);
+                    currentFrame =
+                        tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
                 }
             } else {
                 if (strictlyNothing.equalsModProperty(
-                    freeMod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), mod);
+                    freeModifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), modifiable);
                 } else {
                     currentFrame = tb.frame(
-                        tb.var(heap), heapToBeforeLoop.get(heap), tb.union(mod, freeMod));
+                        tb.var(heap), heapToBeforeLoop.get(heap),
+                        tb.union(modifiable, freeModifiable));
                 }
             }
             if (frameCondition == null) {
@@ -887,7 +891,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // "Body Preserves Invariant":
         // \replacewith (==> #atPreEqs(anon1)
-        // -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1,
+        // -> #introNewAnonUpdate(#modifiable, #locDepFunc(anon1,
         // \[{.. while (#e) #s ...}\]post) & inv ->
         // (\[{ method-frame(#ex){#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
         // #whileInvRule(\[{.. while (#e) #s ...}\]post,
@@ -913,7 +917,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             localAnonUpdate, localIns, ruleApp.posInOccurrence(), services);
 
         // "Use Case":
-        // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
+        // \replacewith (==> #introNewAnonUpdate(#modifiable, inv ->
         // (\[{ method-frame(#ex){#typeof(#e) #v1 = #e;} }\]
         // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
         prepareUseCaseBranch(termLabelState, services, ruleApp, inst, wellFormedAnon, useGoal,

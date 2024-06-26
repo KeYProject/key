@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.speclang.PositionedString;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 public class EmptyEnvInput extends AbstractEnvInput {
@@ -21,8 +22,7 @@ public class EmptyEnvInput extends AbstractEnvInput {
 
     @Override
     public ImmutableSet<PositionedString> read() throws ProofInputException {
-        // nothing to to do
-        return null;
+        return DefaultImmutableSet.nil();
     }
 
     @Override

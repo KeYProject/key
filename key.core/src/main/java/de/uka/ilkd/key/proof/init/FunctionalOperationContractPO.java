@@ -196,11 +196,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+    protected Term getPre(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
-        final Term freePre = contract.getFreePre(modHeaps, selfVar, paramVars, atPreVars, services);
-        final Term pre = contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
+        final Term freePre =
+            contract.getFreePre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
+        final Term pre = contract.getPre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
         return freePre != null ? services.getTermBuilder().and(pre, freePre) : pre;
     }
 
@@ -208,11 +209,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+    protected Term getPost(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
-        return contract.getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
+        return contract.getPost(modifiableHeaps, selfVar, paramVars, resultVar, exceptionVar,
+            atPreVars,
             services);
     }
 
@@ -226,27 +228,27 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-            Services services) {
+    protected Term buildFrameClause(List<LocationVariable> modifiableHeaps,
+            Map<Term, Term> heapToAtPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         Term frameTerm = null;
-        for (LocationVariable heap : modHeaps) {
+        for (LocationVariable heap : modifiableHeaps) {
             final Term ft;
-            if (!getContract().hasModifiesClause(heap)) {
-                if (!getContract().hasFreeModifiesClause(heap)) {
+            if (!getContract().hasModifiable(heap)) {
+                if (!getContract().hasFreeModifiable(heap)) {
                     ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
                 } else {
                     ft = tb.frame(tb.var(heap), heapToAtPre,
-                        getContract().getFreeMod(heap, selfVar, paramVars, services));
+                        getContract().getFreeModifiable(heap, selfVar, paramVars, services));
                 }
             } else {
-                if (!getContract().hasFreeModifiesClause(heap)) {
+                if (!getContract().hasFreeModifiable(heap)) {
                     ft = tb.frame(tb.var(heap), heapToAtPre,
-                        getContract().getMod(heap, selfVar, paramVars, services));
+                        getContract().getModifiable(heap, selfVar, paramVars, services));
                 } else {
                     ft = tb.frame(tb.var(heap), heapToAtPre, tb.union(
-                        getContract().getMod(heap, selfVar, paramVars, services),
-                        getContract().getFreeMod(heap, selfVar, paramVars, services)));
+                        getContract().getModifiable(heap, selfVar, paramVars, services),
+                        getContract().getFreeModifiable(heap, selfVar, paramVars, services)));
                 }
             }
 

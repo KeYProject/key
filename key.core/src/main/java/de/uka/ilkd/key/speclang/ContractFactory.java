@@ -98,8 +98,9 @@ public class ContractFactory {
         return new FunctionalOperationContractImpl(foci.baseName, foci.name, foci.kjt, foci.pm,
             foci.specifiedIn, foci.modalityKind, foci.originalPres, foci.originalFreePres,
             foci.originalMby, newPosts, foci.originalFreePosts, foci.originalAxioms,
-            foci.originalMods, foci.originalFreeMods, foci.originalDeps, foci.hasRealModifiesClause,
-            foci.hasRealFreeModifiesClause, foci.originalSelfVar, foci.originalParamVars,
+            foci.originalModifiables, foci.originalFreeModifiables, foci.originalDeps,
+            foci.hasRealModifiable,
+            foci.hasRealFreeModifiable, foci.originalSelfVar, foci.originalParamVars,
             foci.originalResultVar, foci.originalExcVar, foci.originalAtPreVars, foci.globalDefs,
             foci.id, foci.toBeSaved, foci.transaction, services);
     }
@@ -148,12 +149,14 @@ public class ContractFactory {
         // create new contract
         return new FunctionalOperationContractImpl(foci.baseName, foci.name, foci.kjt, foci.pm,
             foci.specifiedIn, foci.modalityKind, newPres, foci.originalFreePres, foci.originalMby,
-            foci.originalPosts, foci.originalFreePosts, foci.originalAxioms, foci.originalMods,
-            foci.originalFreeMods, foci.originalDeps, foci.hasRealModifiesClause,
-            foci.hasRealFreeModifiesClause, foci.originalSelfVar, foci.originalParamVars,
+            foci.originalPosts, foci.originalFreePosts, foci.originalAxioms,
+            foci.originalModifiables,
+            foci.originalFreeModifiables, foci.originalDeps, foci.hasRealModifiable,
+            foci.hasRealFreeModifiable, foci.originalSelfVar, foci.originalParamVars,
             foci.originalResultVar, foci.originalExcVar, foci.originalAtPreVars, foci.globalDefs,
             foci.id, foci.toBeSaved,
-            foci.originalMods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
+            foci.originalModifiables
+                    .get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
             services);
     }
 
@@ -171,8 +174,8 @@ public class ContractFactory {
         return new FunctionalOperationContractImpl(foci.baseName, foci.name, foci.kjt, foci.pm,
             foci.specifiedIn, foci.modalityKind, foci.originalPres, foci.originalFreePres,
             foci.originalMby, foci.originalPosts, foci.originalFreePosts, foci.originalAxioms,
-            foci.originalMods, foci.originalFreeMods, foci.originalDeps,
-            foci.hasRealModifiesClause, foci.hasRealFreeModifiesClause, foci.originalSelfVar,
+            foci.originalModifiables, foci.originalFreeModifiables, foci.originalDeps,
+            foci.hasRealModifiable, foci.hasRealFreeModifiable, foci.originalSelfVar,
             foci.originalParamVars, foci.originalResultVar, foci.originalExcVar,
             foci.originalAtPreVars, globalDefs, foci.id, foci.toBeSaved, foci.transaction,
             services);
@@ -196,7 +199,7 @@ public class ContractFactory {
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
         Map<LocationVariable, Term> accessibles = new LinkedHashMap<>();
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (final LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (heap == targetHeap) {
                 accessibles.put(heap, dep.second);
             } else {
@@ -222,7 +225,7 @@ public class ContractFactory {
     public InformationFlowContract createInformationFlowContract(KeYJavaType forClass,
             IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
             Term requires,
-            Term requiresFree, Term measuredBy, Term modifies, boolean hasMod,
+            Term requiresFree, Term measuredBy, Term modifiable, boolean hasModifiable,
             ProgramVariableCollection progVars, Term accessible,
             ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -232,7 +235,8 @@ public class ContractFactory {
         final Term result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
         final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
         return new InformationFlowContractImpl(INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm,
-            specifiedIn, modalityKind, requires, requiresFree, measuredBy, modifies, hasMod, self,
+            specifiedIn, modalityKind, requires, requiresFree, measuredBy, modifiable,
+            hasModifiable, self,
             params, result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
     }
 
@@ -292,11 +296,11 @@ public class ContractFactory {
      * @param posts the postcondition of the contract
      * @param freePosts the free/unchecked postcondition of the contract
      * @param axioms the class axioms of the method
-     * @param mods the modifies clause of the contract
-     * @param freeMods the free modifies clause of the contract
+     * @param modifiables the modifiable clause of the contract
+     * @param freeModifiables the free modifiable clause of the contract
      * @param accs the dependency clause of the contract
-     * @param hasMod whether the contract has a modifies set
-     * @param hasFreeMod whether the contract has a free modifies set
+     * @param hasModifiable whether the contract has a modifiable set
+     * @param hasFreeModifiable whether the contract has a free modifiable set
      * @param selfVar the self variable
      * @param paramVars the parameter variables
      * @param resultVar the exception variable
@@ -309,19 +313,23 @@ public class ContractFactory {
             Modality.JavaModalityKind modalityKind, Map<LocationVariable, Term> pres,
             Map<LocationVariable, Term> freePres, Term mby, Map<LocationVariable, Term> posts,
             Map<LocationVariable, Term> freePosts, Map<LocationVariable, Term> axioms,
-            Map<LocationVariable, Term> mods, Map<LocationVariable, Term> freeMods,
+            Map<LocationVariable, Term> modifiables, Map<LocationVariable, Term> freeModifiables,
             Map<LocationVariable, Term> accs,
-            Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
+            Map<LocationVariable, Boolean> hasModifiable,
+            Map<LocationVariable, Boolean> hasFreeModifiable,
             LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, pm.getContainerType(),
-            modalityKind, pres, freePres, mby, posts, freePosts, axioms, mods, freeMods, accs,
-            hasMod,
-            hasFreeMod, selfVar, paramVars, resultVar, excVar, atPreVars, null, Contract.INVALID_ID,
+            modalityKind, pres, freePres, mby, posts, freePosts, axioms, modifiables,
+            freeModifiables, accs,
+            hasModifiable,
+            hasFreeModifiable, selfVar, paramVars, resultVar, excVar, atPreVars, null,
+            Contract.INVALID_ID,
             toBeSaved,
-            mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null, services);
+            modifiables.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
+            services);
     }
 
     /**
@@ -336,26 +344,28 @@ public class ContractFactory {
      * @param posts the postcondition of the contract
      * @param freePosts the free/unchecked postcondition of the contract
      * @param axioms the class axioms of the method
-     * @param mods the modifies clause of the contract
-     * @param freeMods the free modifies clause of the contract
+     * @param modifiables the modifiable clause of the contract
+     * @param freeModifiables the free modifiable clause of the contract
      * @param accessibles the dependency clause of the contract
-     * @param hasMod whether the contract has a modifies set
-     * @param hasFreeMod whether the contract has a modifies set
+     * @param hasModifiable whether the contract has a modifiable set
+     * @param hasFreeModifiable whether the contract has a modifiable set
      * @param pv a collection of the program variables
      * @return the resulting functional operation contract
      */
     public FunctionalOperationContract func(String baseName, IProgramMethod pm, boolean terminates,
             Map<LocationVariable, Term> pres, Map<LocationVariable, Term> freePres, Term mby,
             Map<LocationVariable, Term> posts, Map<LocationVariable, Term> freePosts,
-            Map<LocationVariable, Term> axioms, Map<LocationVariable, Term> mods,
-            Map<LocationVariable, Term> freeMods, Map<LocationVariable, Term> accessibles,
-            Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
+            Map<LocationVariable, Term> axioms, Map<LocationVariable, Term> modifiables,
+            Map<LocationVariable, Term> freeModifiables, Map<LocationVariable, Term> accessibles,
+            Map<LocationVariable, Boolean> hasModifiable,
+            Map<LocationVariable, Boolean> hasFreeModifiable,
             ProgramVariableCollection pv) {
         return func(baseName, pm,
             terminates ? Modality.JavaModalityKind.DIA : Modality.JavaModalityKind.BOX, pres,
             freePres, mby,
-            posts, freePosts, axioms, mods, freeMods, accessibles, hasMod, hasFreeMod, pv, false,
-            mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+            posts, freePosts, axioms, modifiables, freeModifiables, accessibles, hasModifiable,
+            hasFreeModifiable, pv, false,
+            modifiables.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
 
     /**
@@ -370,11 +380,11 @@ public class ContractFactory {
      * @param posts the postcondition of the contract
      * @param freePosts the free/unchecked postcondition of the contract
      * @param axioms the class axioms of the method
-     * @param mods the modifies clause of the contract
-     * @param freeMods the free modifies clause of the contract
+     * @param modifiables the modifiable clause of the contract
+     * @param freeModifiables the free modifiable clause of the contract
      * @param accessibles the dependency clause of the contract
-     * @param hasMod whether the contract has a modifies set
-     * @param hasFreeMod whether the contract has a modifies set
+     * @param hasModifiable whether the contract has a modifiable set
+     * @param hasFreeModifiable whether the contract has a modifiable set
      * @param progVars the program variables
      * @param toBeSaved TODO
      * @param transaction TODO
@@ -384,14 +394,16 @@ public class ContractFactory {
             Modality.JavaModalityKind modalityKind,
             Map<LocationVariable, Term> pres, Map<LocationVariable, Term> freePres, Term mby,
             Map<LocationVariable, Term> posts, Map<LocationVariable, Term> freePosts,
-            Map<LocationVariable, Term> axioms, Map<LocationVariable, Term> mods,
-            Map<LocationVariable, Term> freeMods, Map<LocationVariable, Term> accessibles,
-            Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
+            Map<LocationVariable, Term> axioms, Map<LocationVariable, Term> modifiables,
+            Map<LocationVariable, Term> freeModifiables, Map<LocationVariable, Term> accessibles,
+            Map<LocationVariable, Boolean> hasModifiable,
+            Map<LocationVariable, Boolean> hasFreeModifiable,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
             pm.getContainerType(), modalityKind, pres, freePres, mby, posts, freePosts, axioms,
-            mods,
-            freeMods, accessibles, hasMod, hasFreeMod, progVars.selfVar, progVars.paramVars,
+            modifiables,
+            freeModifiables, accessibles, hasModifiable, hasFreeModifiable, progVars.selfVar,
+            progVars.paramVars,
             progVars.resultVar, progVars.excVar, progVars.atPreVars, null, Contract.INVALID_ID,
             toBeSaved, transaction, services);
     }
@@ -437,37 +449,41 @@ public class ContractFactory {
         return mby;
     }
 
-    private static void combineModifies(FunctionalOperationContractImpl t,
-            Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Term> mods,
-            Map<LocationVariable, Term> uniformMod, FunctionalOperationContract other,
+    private static void combineModifiable(FunctionalOperationContractImpl t,
+            Map<LocationVariable, Boolean> hasModifiable, Map<LocationVariable, Term> modifiables,
+            Map<LocationVariable, Term> uniformModifiable, FunctionalOperationContract other,
             LocationVariable h, Term otherPre, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        if (hasMod.get(h) || t.hasModifiesClause(h) || other.hasModifiesClause(h)) {
-            hasMod.put(h, true);
-            Term m1 = mods.get(h);
-            Term m2 = other.getMod(h, t.originalSelfVar, t.originalParamVars, services);
-            if (m1 != null || m2 != null) {
-                Term nm;
-                if (m1 == null) {
-                    nm = m2;
-                } else if (m2 == null) {
-                    nm = m1;
+        if (hasModifiable.get(h) || t.hasModifiable(h) || other.hasModifiable(h)) {
+            hasModifiable.put(h, true);
+            Term modifiable1 = modifiables.get(h);
+            Term modifiable2 =
+                other.getModifiable(h, t.originalSelfVar, t.originalParamVars, services);
+            if (modifiable1 != null || modifiable2 != null) {
+                Term intersectedModifiable;
+                if (modifiable1 == null) {
+                    intersectedModifiable = modifiable2;
+                } else if (modifiable2 == null) {
+                    intersectedModifiable = modifiable1;
                 } else {
-                    nm = tb.intersect(m1, tb.ife(otherPre, m2, tb.allLocs()));
+                    intersectedModifiable =
+                        tb.intersect(modifiable1, tb.ife(otherPre, modifiable2, tb.allLocs()));
 
-                    // check if the other mod is the same as the one in the uniform store.
+                    // check if the other modifiable is the same as the one in the uniform store.
                     // To obtain meaningful results, check for equality ignoring all term labels!
-                    if (uniformMod.containsKey(h)) {
-                        if (!uniformMod.get(h).equalsModProperty(m2, TERM_LABELS_PROPERTY)) {
-                            uniformMod.remove(h);
+                    if (uniformModifiable.containsKey(h)) {
+                        if (!uniformModifiable.get(h).equalsModProperty(modifiable2,
+                            TERM_LABELS_PROPERTY)) {
+                            uniformModifiable.remove(h);
                         } else {
-                            // merge term labels (in particular origin labels) of both modifies
+                            // merge term labels (in particular origin labels) of both modifiable
                             // terms
-                            uniformMod.put(h, mergeTermLabels(uniformMod.get(h), m2, tb));
+                            uniformModifiable.put(h,
+                                mergeTermLabels(uniformModifiable.get(h), modifiable2, tb));
                         }
                     }
                 }
-                mods.put(h, nm);
+                modifiables.put(h, intersectedModifiable);
             }
         }
     }
@@ -477,10 +493,11 @@ public class ContractFactory {
      * input terms. An exception of this are origin labels: These are combined into a single one
      * containing both origins.
      */
-    private static Term mergeTermLabels(Term uniformMod, Term otherMod, TermBuilder tb) {
-        List<TermLabel> labels = uniformMod.getLabels().toList();
+    private static Term mergeTermLabels(Term uniformModifiable, Term otherModifiable,
+            TermBuilder tb) {
+        List<TermLabel> labels = uniformModifiable.getLabels().toList();
         List<TermLabel> newLabels = new ArrayList<>(labels);
-        for (TermLabel ol : otherMod.getLabels()) {
+        for (TermLabel ol : otherModifiable.getLabels()) {
             if (!labels.contains(ol)) {
                 // origin labels need to be handled specially to correctly merge their origins
                 if (ol instanceof OriginTermLabel) {
@@ -499,7 +516,7 @@ public class ContractFactory {
                             break;
                         }
                     }
-                    // if uniformMod has no origin, use other origin
+                    // if uniformModifiable has no origin, use other origin
                     if (uol == null) {
                         newLabels.add(ol);
                     }
@@ -509,8 +526,8 @@ public class ContractFactory {
                 }
             }
         }
-        // update (overwrite) the labels of the uniform mod with the found ones
-        return tb.label(uniformMod, new ImmutableArray<>(newLabels));
+        // update (overwrite) the labels of the uniform modifiable with the found ones
+        return tb.label(uniformModifiable, new ImmutableArray<>(newLabels));
     }
 
     private static Map<LocationVariable, Term> joinDependencies(FunctionalOperationContractImpl t,
@@ -563,13 +580,13 @@ public class ContractFactory {
      * @param others the other passed contracts
      * @param pres the first contract's precondition
      * @param mby the first contract's measuredBy term
-     * @param hasMod whether the first contract has a modifies clause
-     * @param hasFreeMod whether the first contract has a free modifies clause
+     * @param hasModifiable whether the first contract has a modifiable clause
+     * @param hasFreeModifiable whether the first contract has a free modifiable clause
      * @param posts the first contract's postcondition
      * @param freePosts the first contract's free postconditions
      * @param axioms the first contract's axioms
-     * @param mods the first contract's modifies clause
-     * @param freeMods the first contract's free modifies clause
+     * @param modifiables the first contract's modifiable clause
+     * @param freeModifiables the first contract's free modifiable clause
      * @param deps the first contract's dependency clause
      * @param modalityKind the first contract's modality
      * @return the joined contract
@@ -577,15 +594,15 @@ public class ContractFactory {
     private FunctionalOperationContract joinWithOtherContracts(final String name,
             FunctionalOperationContractImpl t, FunctionalOperationContract[] others,
             Map<LocationVariable, Term> pres, Term mby,
-            Map<LocationVariable, Boolean> hasMod,
-            Map<LocationVariable, Boolean> hasFreeMod,
-            Map<LocationVariable, Term> uniformMod,
-            Map<LocationVariable, Term> uniformFreeMod,
+            Map<LocationVariable, Boolean> hasModifiable,
+            Map<LocationVariable, Boolean> hasFreeModifiable,
+            Map<LocationVariable, Term> uniformModifiable,
+            Map<LocationVariable, Term> uniformFreeModifiable,
             Map<LocationVariable, Term> posts,
             Map<LocationVariable, Term> freePosts,
             Map<LocationVariable, Term> axioms,
-            Map<LocationVariable, Term> mods,
-            Map<LocationVariable, Term> freeMods,
+            Map<LocationVariable, Term> modifiables,
+            Map<LocationVariable, Term> freeModifiables,
             Map<LocationVariable, Term> deps, Modality.JavaModalityKind modalityKind) {
         for (FunctionalOperationContract other : others) {
             modalityKind = combineModalityKinds(modalityKind, other.getModalityKind());
@@ -603,9 +620,11 @@ public class ContractFactory {
                     t.originalParamVars, t.originalResultVar, t.originalAtPreVars, services);
                 mby = combineMeasuredBy(mby, otherMby, h, otherPre, services);
 
-                // the modifies clause must be computed before the preconditions
-                combineModifies(t, hasMod, mods, uniformMod, other, h, otherPre, services);
-                combineModifies(t, hasFreeMod, freeMods, uniformFreeMod, other, h, otherPre,
+                // the modifiable clause must be computed before the preconditions
+                combineModifiable(t, hasModifiable, modifiables, uniformModifiable, other, h,
+                    otherPre, services);
+                combineModifiable(t, hasFreeModifiable, freeModifiables, uniformFreeModifiable,
+                    other, h, otherPre,
                     services);
 
                 if (otherPre != null) {
@@ -630,16 +649,17 @@ public class ContractFactory {
         }
 
         /*
-         * If there is a uniform mod clause (i.e., the same for all joined contracts), then use that
+         * If there is a uniform modifiable clause (i.e., the same for all joined contracts), then
+         * use that
          * instead of the disjunction of if-then-else expressions. (Related to an older fix by
          * Daniel Grahl for MT-1557.)
          */
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            if (uniformMod.containsKey(h)) {
-                mods.put(h, uniformMod.get(h));
+            if (uniformModifiable.containsKey(h)) {
+                modifiables.put(h, uniformModifiable.get(h));
             }
-            if (uniformFreeMod.containsKey(h)) {
-                freeMods.put(h, uniformFreeMod.get(h));
+            if (uniformFreeModifiable.containsKey(h)) {
+                freeModifiables.put(h, uniformFreeModifiable.get(h));
             }
         }
 
@@ -650,7 +670,8 @@ public class ContractFactory {
          */
         return new FunctionalOperationContractImpl(INVALID_ID, name, t.kjt, t.pm, t.specifiedIn,
             modalityKind, pres, new LinkedHashMap<>(), // (*)
-            mby, posts, freePosts, axioms, mods, freeMods, deps, hasMod, hasFreeMod,
+            mby, posts, freePosts, axioms, modifiables, freeModifiables, deps, hasModifiable,
+            hasFreeModifiable,
             t.originalSelfVar, t.originalParamVars, t.originalResultVar, t.originalExcVar,
             t.originalAtPreVars, t.globalDefs, Contract.INVALID_ID, t.toBeSaved, t.transaction,
             services);
@@ -670,14 +691,15 @@ public class ContractFactory {
             FunctionalOperationContract[] others) {
         // MU: Bugfix #1489
         // Do not modify the data stores in t but make new copies
-        Map<LocationVariable, Term> mods = new LinkedHashMap<>(t.originalMods);
-        Map<LocationVariable, Term> freeMods = new LinkedHashMap<>(t.originalFreeMods);
+        Map<LocationVariable, Term> modifiables = new LinkedHashMap<>(t.originalModifiables);
+        Map<LocationVariable, Term> freeModifiables =
+            new LinkedHashMap<>(t.originalFreeModifiables);
         Map<LocationVariable, Term> deps = new LinkedHashMap<>(t.originalDeps);
 
         // keep this to check if every contract has the same mod
         // then no if-then-else cascades are needed.
-        Map<LocationVariable, Term> uniformMod = new LinkedHashMap<>();
-        Map<LocationVariable, Term> uniformFreeMod = new LinkedHashMap<>();
+        Map<LocationVariable, Term> uniformModifiable = new LinkedHashMap<>();
+        Map<LocationVariable, Term> uniformFreeModifiable = new LinkedHashMap<>();
 
         // collect information
         Map<LocationVariable, Term> pres = new LinkedHashMap<>(t.originalPres.size());
@@ -685,13 +707,13 @@ public class ContractFactory {
             pres.put(h, t.originalPres.get(h));
         }
         Term mby = t.originalMby;
-        Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
-        Map<LocationVariable, Boolean> hasFreeMod = new LinkedHashMap<>();
+        Map<LocationVariable, Boolean> hasModifiable = new LinkedHashMap<>();
+        Map<LocationVariable, Boolean> hasFreeModifiable = new LinkedHashMap<>();
         Map<LocationVariable, Term> posts = new LinkedHashMap<>(t.originalPosts.size());
         Map<LocationVariable, Term> freePosts = new LinkedHashMap<>(t.originalFreePosts.size());
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            hasMod.put(h, false);
-            hasFreeMod.put(h, false);
+            hasModifiable.put(h, false);
+            hasFreeModifiable.put(h, false);
             Term oriPost = t.originalPosts.get(h);
             Term oriFreePost = t.originalFreePosts.get(h);
             if (oriPost != null) {
@@ -701,15 +723,16 @@ public class ContractFactory {
                 freePosts.put(h,
                     tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars), oriFreePost));
             }
-            Term origMod = t.originalMods.get(h);
-            if (origMod != null) {
-                mods.put(h, tb.ife(t.originalPres.get(h), origMod, tb.allLocs()));
-                uniformMod.put(h, origMod);
+            Term origModifiable = t.originalModifiables.get(h);
+            if (origModifiable != null) {
+                modifiables.put(h, tb.ife(t.originalPres.get(h), origModifiable, tb.allLocs()));
+                uniformModifiable.put(h, origModifiable);
             }
-            Term origFreeMod = t.originalFreeMods.get(h);
-            if (origFreeMod != null) {
-                freeMods.put(h, tb.ife(t.originalPres.get(h), origFreeMod, tb.allLocs()));
-                uniformFreeMod.put(h, origFreeMod);
+            Term origFreeModifiable = t.originalFreeModifiables.get(h);
+            if (origFreeModifiable != null) {
+                freeModifiables.put(h,
+                    tb.ife(t.originalPres.get(h), origFreeModifiable, tb.allLocs()));
+                uniformFreeModifiable.put(h, origFreeModifiable);
             }
         }
 
@@ -723,10 +746,10 @@ public class ContractFactory {
                 }
             }
         }
-        Modality.JavaModalityKind moda = t.modalityKind;
+        Modality.JavaModalityKind modality = t.modalityKind;
         return joinWithOtherContracts(name, t, others, pres, mby,
-            hasMod, hasFreeMod, uniformMod, uniformFreeMod,
-            posts, freePosts, axioms, mods, freeMods, deps, moda);
+            hasModifiable, hasFreeModifiable, uniformModifiable, uniformFreeModifiable,
+            posts, freePosts, axioms, modifiables, freeModifiables, deps, modality);
 
     }
 

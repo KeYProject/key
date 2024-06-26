@@ -461,7 +461,7 @@ public class TestCaseGenerator {
         oracleMethods.addAll(oracleGenerator.getOracleMethods());
 
         LOGGER.debug("Modifier Set: {}",
-            oracleGenerator.getOracleLocationSet(info.getAssignable()));
+            oracleGenerator.getOracleLocationSet(info.getModifiable()));
 
         return "assertTrue(" + oracleCall + ");";
     }

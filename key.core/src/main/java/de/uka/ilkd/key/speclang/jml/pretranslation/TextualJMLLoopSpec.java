@@ -24,13 +24,15 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     /**
      * Heap-dependent clauses
+     * Note that the name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
     public enum ClauseHd {
         INFORMATION_FLOW, ASSIGNABLE, ASSIGNABLE_FREE, INVARIANT, INVARIANT_FREE
     }
 
-    public TextualJMLLoopSpec(ImmutableList<JMLModifier> mods) {
-        super(mods);
+    public TextualJMLLoopSpec(ImmutableList<JMLModifier> modifiers) {
+        super(modifiers);
     }
 
     /*
@@ -67,26 +69,50 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return ImmutableList.fromList(seq);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ClauseHd.ASSIGNABLE);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
         return getMap(ClauseHd.ASSIGNABLE);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesInit() {
         return getMapInit(ClauseHd.ASSIGNABLE);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignableFree() {
         return getList(ClauseHd.ASSIGNABLE_FREE);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFree() {
         return getMap(ClauseHd.ASSIGNABLE_FREE);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFreeInit() {
         return getMapInit(ClauseHd.ASSIGNABLE_FREE);
     }
@@ -156,7 +182,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * (Name heap : HeapLDT.VALID_HEAP_NAMES) { it = freeInvariants.get(heap.toString()).iterator();
      * while (it.hasNext()) { sb.append("free invariant<" + heap + ">: " + it.next() + "\n"); } }
      * for (Name heap : HeapLDT.VALID_HEAP_NAMES) { it =
-     * assignables.get(heap.toString()).iterator(); while (it.hasNext()) { sb.append("assignable<" +
+     * modifiables.get(heap.toString()).iterator(); while (it.hasNext()) { sb.append("modifiable<" +
      * heap + ">: " + it.next() + "\n"); } } for (Name heap : HeapLDT.VALID_HEAP_NAMES) { it =
      * infFlowSpecs.iterator(); while (it.hasNext()) { sb.append("determines<" + heap + ">: " +
      * it.next() + "\n"); } } if (variant != null) { sb.append("decreases: " + variant); }

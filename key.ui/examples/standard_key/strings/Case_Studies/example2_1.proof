@@ -312,7 +312,7 @@
                                     (rule "variableDeclaration" (formula "17") (term "4") (newnames "i_3"))
                                     (rule "assignment" (formula "17") (term "4"))
                                     (builtin "Update Simplification" (formula "17"))
-                                    (rule "whileInvDiamondDec2" (formula "17") (newnames "i_3_0,d_2_0,i_3_1,d_2_1,anon_0,j_17") (inst "#v1=b") (inst "#v2=j") (inst "#modifies={i_3,d_2}") (inst "inv=d_2 >= 0") (inst "variant=m_2 - i_3") (userinteraction))
+                                    (rule "whileInvDiamondDec2" (formula "17") (newnames "i_3_0,d_2_0,i_3_1,d_2_1,anon_0,j_17") (inst "#v1=b") (inst "#v2=j") (inst "#modifiable={i_3,d_2}") (inst "inv=d_2 >= 0") (inst "variant=m_2 - i_3") (userinteraction))
                                     (branch " Invariant Initially Valid"
                                        (builtin "Update Simplification" (formula "17"))
                                        (rule "lengthGEq0" (inst "l=content(t_1)") (userinteraction))
@@ -1433,7 +1433,7 @@
    -> \\forall int k; 
         (   k >= 0 & k <  i_2
          ->   charAt(k, content(t_1))
-            = charAt(k, content(s_1))))") (inst "#modifies={i_2,d_2}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+            = charAt(k, content(s_1))))") (inst "#modifiable={i_2,d_2}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                  (branch " Invariant Initially Valid"
                                     (builtin "Update Simplification" (formula "16"))
                                     (rule "castDelInt" (formula "16") (term "1,1,0,0,1,1,0"))
@@ -2832,7 +2832,7 @@
                                  (rule "concrete_and_2" (formula "15"))
                                  (rule "false_right" (formula "15"))
                                  (rule "lengthGEq0" (newnames "L_1"))
-                                 (rule "whileInvDiamondDec2" (formula "16") (newnames "i_2_2,d_2_4,i_2_3,d_2_5,anon_2,j_55") (inst "variant=m_2 - i_2") (inst "inv=d_2 >= 0") (inst "#modifies={i_2,d_2}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                                 (rule "whileInvDiamondDec2" (formula "16") (newnames "i_2_2,d_2_4,i_2_3,d_2_5,anon_2,j_55") (inst "variant=m_2 - i_2") (inst "inv=d_2 >= 0") (inst "#modifiable={i_2,d_2}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                  (branch " Invariant Initially Valid"
                                     (builtin "Update Simplification" (formula "16"))
                                     (rule "lengthGEq0" (inst "l=content(s_1)") (userinteraction))
@@ -4080,7 +4080,7 @@
                            (rule "variableDeclaration" (formula "17") (term "4") (newnames "i"))
                            (rule "assignment" (formula "17") (term "4"))
                            (builtin "Update Simplification" (formula "17"))
-                           (rule "whileInvDiamondDec2" (formula "17") (newnames "i_0,d_0,i_1,d_1,anon_3,j_7") (inst "variant=m - i") (inst "inv=d = 0") (inst "#modifies={i,d}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                           (rule "whileInvDiamondDec2" (formula "17") (newnames "i_0,d_0,i_1,d_1,anon_3,j_7") (inst "variant=m - i") (inst "inv=d = 0") (inst "#modifiable={i,d}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                            (branch " Invariant Initially Valid"
                               (builtin "Update Simplification" (formula "17"))
                               (rule "lengthGEq0" (inst "l=content(s_1)") (userinteraction))

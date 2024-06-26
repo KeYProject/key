@@ -166,6 +166,8 @@ public class TacletGenerator {
             new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.nil(), findTerm);
 
         // choices, rule set
+        // Be careful that the choices used here is actually declared (see optionsDeclarations.key),
+        // otherwise the taclet will be unusable!
         var choice = ChoiceExpr.variable("modelFields",
             satisfiabilityGuard ? "showSatisfiability" : "treatAsAxiom");
         final RuleSet ruleSet = new RuleSet(
@@ -646,7 +648,7 @@ public class TacletGenerator {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
         Map<Term, Term> replace = new LinkedHashMap<>();
         int i = 0;
-        for (ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (ProgramVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
         }
         final OpReplacer replacer = new OpReplacer(replace, services.getTermFactory());

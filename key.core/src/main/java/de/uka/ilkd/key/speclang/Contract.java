@@ -149,7 +149,7 @@ public interface Contract extends SpecificationElement {
 
     Term getRequires(LocationVariable heap);
 
-    Term getAssignable(LocationVariable heap);
+    Term getModifiable(LocationVariable heap);
 
     Term getAccessible(LocationVariable heap);
 

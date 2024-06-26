@@ -27,8 +27,8 @@ public interface BasicPOSnippetFactory {
         // postcondition of the contract
         CONTRACT_POST(BasicPostconditionSnippet.class),
 
-        // modifies of the contract
-        CONTRACT_MOD(BasicModifiesSnippet.class),
+        // modifiable of the contract
+        CONTRACT_MODIFIABLE(BasicModifiableSnippet.class),
 
         // dependencies of the contract
         CONTRACT_DEP(BasicDependsSnippet.class),

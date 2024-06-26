@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
@@ -84,5 +85,15 @@ public final class IfThenElse extends AbstractOperator implements Operator {
                 && s1 != JavaDLTheory.UPDATE && s2 != JavaDLTheory.UPDATE)) {
             throw new TermCreationException(this, term);
         }
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException(name() + " has no children");
     }
 }

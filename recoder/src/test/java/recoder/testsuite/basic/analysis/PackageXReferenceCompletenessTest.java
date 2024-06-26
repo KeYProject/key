@@ -6,8 +6,8 @@ package recoder.testsuite.basic.analysis;
 
 import java.util.List;
 
-import junit.framework.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import recoder.abstraction.Type;
 import recoder.java.reference.TypeReference;
 import recoder.service.CrossReferenceSourceInfo;
@@ -27,7 +27,7 @@ public class PackageXReferenceCompletenessTest extends XReferenceCompletenessTes
             for (TypeReference r : list) {
                 Type y = xrsi.getType(r);
                 if (x != y) {
-                    Assert.fail(makeResolutionError(r, x, y));
+                    Assertions.fail(makeResolutionError(r, x, y));
                 }
             }
         }

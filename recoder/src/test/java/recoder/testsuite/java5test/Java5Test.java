@@ -11,8 +11,8 @@ import java.io.Writer;
 import java.util.EventObject;
 import java.util.List;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.abstraction.*;
@@ -39,7 +39,7 @@ import recoder.service.*;
 import recoder.service.ConstantEvaluator.EvaluationResult;
 import recoder.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*
  * Created on 11.03.2005
@@ -50,7 +50,7 @@ import static org.junit.Assert.*;
 /**
  * @author gutzmann
  */
-@Ignore
+@Disabled
 public class Java5Test {
     final static Order UNIT_NAME_ORDER = new Order.CustomLexicalOrder() {
         protected String toString(Object x) {
@@ -260,13 +260,13 @@ public class Java5Test {
             public void modelUpdating(EventObject event) { /* ignore */ }
 
             public void modelUpdated(EventObject event) {
-                assertEquals("Not enough errors", 10, errNum);
+                assertEquals(10, errNum, "Not enough errors");
             }
 
             public void reportError(Exception e) throws RuntimeException {
                 switch (errNum++) {
                 case 0:
-                    assertTrue(e instanceof AmbiguousStaticFieldImportException);
+                    assertInstanceOf(AmbiguousStaticFieldImportException.class, e);
                     break;
                 case 1:
                 case 2:
@@ -277,7 +277,7 @@ public class Java5Test {
                 case 7:
                 case 8:
                 case 9:
-                    assertTrue(e instanceof UnresolvedReferenceException);
+                    assertInstanceOf(UnresolvedReferenceException.class, e);
                     break;
                 default:
                     System.err.println("failing:\n" + "    " + e.getMessage());
@@ -301,8 +301,7 @@ public class Java5Test {
     }
 
     private String getAnnotationName(AnnotationUse au) {
-        if (au instanceof AnnotationUseInfo) {
-            AnnotationUseInfo aus = (AnnotationUseInfo) au;
+        if (au instanceof AnnotationUseInfo aus) {
             return dsfr.getServiceConfiguration().getByteCodeInfo().getAnnotationType(aus)
                     .getFullName();
         } else {

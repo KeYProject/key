@@ -70,11 +70,11 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
         Term fma = accept(ctx.fma);
-        Term modifiesClause = accept(ctx.modifiesClause);
+        Term modifiableClause = accept(ctx.modifiableClause);
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             FunctionalOperationContract dlOperationContract =
-                dsf.createDLOperationContract(contractName, fma, modifiesClause);
+                dsf.createDLOperationContract(contractName, fma, modifiableClause);
             contracts.add(dlOperationContract);
         } catch (ProofInputException e) {
             semanticError(ctx, e.getMessage());

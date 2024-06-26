@@ -11,4 +11,6 @@ this
 1.f < 2.f < 3.f
 1.f + 2.f
 1. + 2
-1f + 2d
+1.f + 2.d
+\seq()
+\locset()

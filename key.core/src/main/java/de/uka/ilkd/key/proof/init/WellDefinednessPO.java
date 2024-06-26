@@ -39,7 +39,7 @@ import org.key_project.util.collection.ImmutableSet;
  * WD(<generalAssumptions> && <preconditions>) &
  * (<generalAssumptions> & <preconditions>
  *    -> WD(<otherClauses>) &
- *       {anon^assignable}WD(<postconditions>)
+ *       {anon^modifiable}WD(<postconditions>)
  * }
  * </pre>
  * </p>
@@ -237,18 +237,19 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final TermAndFunc preCond =
             check.getPre(po.pre(), vars.self, vars.heap, vars.params, proofServices);
         final Term wdPre = tb.wd(preCond.term());
-        final Term wdMod = tb.wd(po.mod());
+        final Term wdModifiable = tb.wd(po.modifiable());
         final Term wdRest = tb.and(tb.wd(po.rest()));
         register(preCond.func(), proofServices);
         mbyAtPre = preCond.func() != null ? check.replace(tb.func(preCond.func()), vars) : null;
         final Term post = check.getPost(po.post(), vars.result, proofServices);
         final Term pre = preCond.term();
         final Term updates =
-            check.getUpdates(po.mod(), vars.heap, vars.heapAtPre, vars.anonHeap, proofServices);
+            check.getUpdates(po.modifiable(), vars.heap, vars.heapAtPre, vars.anonHeap,
+                proofServices);
         final Term wfAnon = tb.wellFormed(vars.anonHeap);
         final Term uPost =
             check instanceof ClassWellDefinedness ? tb.tt() : tb.apply(updates, tb.wd(post));
-        final Term imp = tb.imp(tb.and(pre, wfAnon), tb.and(wdMod, wdRest, uPost));
+        final Term imp = tb.imp(tb.and(pre, wfAnon), tb.and(wdModifiable, wdRest, uPost));
         final Term poTerms = tb.and(wdPre, imp);
         assignPOTerms(poTerms);
         // add axioms

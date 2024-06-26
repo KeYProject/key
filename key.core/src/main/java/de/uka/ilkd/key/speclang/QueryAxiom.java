@@ -152,7 +152,7 @@ public final class QueryAxiom extends ClassAxiom {
         // program variables
         Term update = null;
         int hc = 0;
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (hc >= target.getHeapCount(services)) {
                 break;
             }

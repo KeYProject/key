@@ -107,7 +107,7 @@ public class NJmlTranslatorTests {
         assertEquals(1, result.size());
         TextualJMLConstruct jml = result.head();
         assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
-            jml.getMods());
+            jml.getModifiers());
     }
 
     @Test
@@ -125,10 +125,10 @@ public class NJmlTranslatorTests {
         assertEquals(2, result.size());
         TextualJMLConstruct jml = result.head();
         assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
-            jml.getMods());
+            jml.getModifiers());
         jml = result.tail().head();
         assertEquals(ImmutableList.of(JMLModifier.PRIVATE, JMLModifier.STATIC),
-            jml.getMods());
+            jml.getModifiers());
     }
 
     @Test
@@ -147,9 +147,9 @@ public class NJmlTranslatorTests {
         assertEquals(2, result.size());
         TextualJMLConstruct jml = result.head();
         assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
-            jml.getMods());
+            jml.getModifiers());
         jml = result.tail().head();
         assertEquals(ImmutableList.of(JMLModifier.PRIVATE, JMLModifier.STATIC),
-            jml.getMods());
+            jml.getModifiers());
     }
 }

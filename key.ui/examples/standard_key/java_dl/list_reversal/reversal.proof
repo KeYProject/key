@@ -195,7 +195,7 @@
         -> nodes(i).next@(list) = nodes(i + 1))
    & \\forall int i; 
        (   i >= j & i <  len
-        -> nodes(i).prev@(list) = nodes(i - 1)))") (inst "#modifies={*}") (inst "#v1=b") (inst "#v2=j") (userinteraction "y"))
+        -> nodes(i).prev@(list) = nodes(i - 1)))") (inst "#modifiable={*}") (inst "#v1=b") (inst "#v2=j") (userinteraction "y"))
    (branch " Invariant Initially Valid"
       (builtin "Update Simplification" (formula "7"))
       (rule "inEqSimp_ltToLeq" (formula "7") (term "1,0,0,1,0,0,0,0,0") (userinteraction "n"))

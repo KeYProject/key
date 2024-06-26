@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 
@@ -72,7 +72,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute subst, SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
             Services services) {
 
         if (!fst.isComplete(var, subst, svInst, services)

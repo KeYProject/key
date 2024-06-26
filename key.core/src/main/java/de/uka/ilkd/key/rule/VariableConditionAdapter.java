@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
 
 
 /**
@@ -24,13 +25,13 @@ public abstract class VariableConditionAdapter implements VariableCondition {
      * @param services the program information object
      * @return true iff condition is fulfilled
      */
-    public abstract boolean check(SchemaVariable var, SVSubstitute instCandidate,
+    public abstract boolean check(SchemaVariable var, SyntaxElement instCandidate,
             SVInstantiations instMap, Services services);
 
 
 
     @Override
-    public final MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
+    public final MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions mc, Services services) {
         return check(var, instCandidate, mc.getInstantiations(), services) ? mc : null;
     }

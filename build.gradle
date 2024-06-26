@@ -24,7 +24,7 @@ plugins {
     id "com.diffplug.spotless" version "6.25.0"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.28"
+    id "org.checkerframework" version "0.6.39"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -75,15 +75,15 @@ subprojects {
 
     dependencies {
         implementation("org.slf4j:slf4j-api:2.0.13")
-        implementation("org.slf4j:slf4j-api:2.0.12")
-        testImplementation("ch.qos.logback:logback-classic:1.4.8")
+        implementation("org.slf4j:slf4j-api:2.0.13")
+        testImplementation("ch.qos.logback:logback-classic:1.5.6")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
         compileOnly("org.jspecify:jspecify:0.3.0")
         testCompileOnly("org.jspecify:jspecify:0.3.0")
-        def eisop_version = "3.42.0-eisop2"
+        def eisop_version = "3.42.0-eisop3"
         compileOnly "io.github.eisop:checker-qual:$eisop_version"
         compileOnly "io.github.eisop:checker-util:$eisop_version"
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
@@ -94,8 +94,6 @@ subprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.2'
         testImplementation project(':key.util')
 
-        testCompileOnly 'junit:junit:4.13.2'
-        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.10.2'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     }
 

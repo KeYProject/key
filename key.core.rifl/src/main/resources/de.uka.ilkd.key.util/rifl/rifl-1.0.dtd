@@ -8,9 +8,9 @@
 <!ELEMENT flow EMPTY>
 <!ATTLIST flow from IDREF #REQUIRED to IDREF #REQUIRED>
 
-<!ELEMENT interfacespec (assignable)*>
-<!ELEMENT assignable (category | source | sink)>
-<!ATTLIST assignable handle ID #REQUIRED>
+<!ELEMENT interfacespec (modifiable)*>
+<!ELEMENT modifiable (category | source | sink)>
+<!ATTLIST modifiable handle ID #REQUIRED>
 <!ELEMENT category (category | source | sink)*>
 <!ATTLIST category name ID #REQUIRED>
 

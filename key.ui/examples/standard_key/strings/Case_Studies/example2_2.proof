@@ -531,7 +531,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i_1,d}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i_1,d}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                    (branch " Invariant Initially Valid"
                                                       (builtin "Update Simplification" (formula "22"))
                                                       (rule "lengthGEq0" (inst "l=content(s_0)") (userinteraction))
@@ -1075,7 +1075,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i_2,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i_2,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                                         (branch " Invariant Initially Valid"
                                                                            (builtin "Update Simplification" (formula "33"))
                                                                            (rule "castDelInt" (formula "33") (term "0,0"))
@@ -3004,7 +3004,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i_2,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i_2,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                                      (branch " Invariant Initially Valid"
                                                                         (builtin "Update Simplification" (formula "29"))
                                                                         (rule "castDelInt" (formula "29") (term "0,0"))
@@ -4527,7 +4527,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i,d}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i,d}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                       (branch " Invariant Initially Valid"
                                                          (builtin "Update Simplification" (formula "22"))
                                                          (rule "castDelInt" (formula "22") (term "0,0"))
@@ -5021,7 +5021,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i_4,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i_4,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                                            (branch " Invariant Initially Valid"
                                                                               (builtin "Update Simplification" (formula "33"))
                                                                               (rule "castDelInt" (formula "33") (term "0,0"))
@@ -6806,7 +6806,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i_4,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i_4,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                                         (branch " Invariant Initially Valid"
                                                                            (builtin "Update Simplification" (formula "29"))
                                                                            (rule "castDelInt" (formula "29") (term "0,0"))
@@ -8072,7 +8072,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i,d}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i,d}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                 (branch " Invariant Initially Valid"
                                                    (builtin "Update Simplification" (formula "20"))
                                                    (rule "castDelInt" (formula "20") (term "0,0"))
@@ -8261,7 +8261,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i_3,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i_3,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                          (branch " Invariant Initially Valid"
                                                             (builtin "Update Simplification" (formula "25"))
                                                             (rule "castDelInt" (formula "25") (term "0,0"))
@@ -10869,7 +10869,7 @@
          \\then (  charAt(k, content(t_0))
                 - charAt(k, content(s_0)))
          \\else (  charAt(k, content(s_0))
-                - charAt(k, content(t_0)))))") (inst "#modifies={i_3,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
+                - charAt(k, content(t_0)))))") (inst "#modifiable={i_3,d_1}") (inst "#v2=j") (inst "#v1=b") (userinteraction))
                                                                   (branch " Invariant Initially Valid"
                                                                      (builtin "Update Simplification" (formula "27"))
                                                                      (rule "castDelInt" (formula "27") (term "0,0"))

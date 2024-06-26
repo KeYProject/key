@@ -89,10 +89,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     }
 
     /**
-     * Tests example: /set/truthValueExceptinalAssignableNothingTest
+     * Tests example: /set/truthValueExceptionalModifiableNothingTest
      */
     @Test
-    public void testExceptinalAssignableNothingTest_OSS() throws Exception {
+    public void testExceptionalModifiableNothingTest_OSS() throws Exception {
         // Create expected results
         ExpectedBranchResult goal374 =
             new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
@@ -138,16 +138,16 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             new ExpectedTruthValueEvaluationResult(goal374, goal407, goal444, goal475, goal476);
         // Perform test
         doTruthValueEvaluationTest(
-            "/set/truthValueExceptinalAssignableNothingTest/test/ExceptinalAssignableNothingTest_OSS.proof",
-            "/set/truthValueExceptinalAssignableNothingTest/oracle/ExceptinalAssignableNothingTest.xml",
+            "/set/truthValueExceptionalModifiableNothingTest/test/ExceptionalModifiableNothingTest_OSS.proof",
+            "/set/truthValueExceptionalModifiableNothingTest/oracle/ExceptionalModifiableNothingTest.xml",
             false, false, false, exceptionResult);
     }
 
     /**
-     * Tests example: /set/truthValueExceptinalAssignableNothingTest
+     * Tests example: /set/truthValueExceptionalModifiableNothingTest
      */
     @Test
-    public void testExceptinalAssignableNothingTest() throws Exception {
+    public void testExceptionalModifiableNothingTest() throws Exception {
         // Create expected results
         ExpectedBranchResult goal374 =
             new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
@@ -193,8 +193,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             new ExpectedTruthValueEvaluationResult(goal374, goal407, goal444, goal475, goal476);
         // Perform test
         doTruthValueEvaluationTest(
-            "/set/truthValueExceptinalAssignableNothingTest/test/ExceptinalAssignableNothingTest.proof",
-            "/set/truthValueExceptinalAssignableNothingTest/oracle/ExceptinalAssignableNothingTest.xml",
+            "/set/truthValueExceptionalModifiableNothingTest/test/ExceptionalModifiableNothingTest.proof",
+            "/set/truthValueExceptionalModifiableNothingTest/oracle/ExceptionalModifiableNothingTest.xml",
             false, false, false, exceptionResult);
     }
 
@@ -310,11 +310,11 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     }
 
     /**
-     * Tests example: /set/truthValueAssignableAndLoop
+     * Tests example: /set/truthValueModifiableAndLoop
      */
     @Test
     @Disabled
-    public void IGNORE_testAssignableAndLoop() throws Exception {
+    public void IGNORE_testModifiableAndLoop() throws Exception {
         // Create expected results
         ExpectedBranchResult goal430 =
             new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
@@ -370,8 +370,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
         ExpectedTruthValueEvaluationResult result5 =
             new ExpectedTruthValueEvaluationResult(goal1113, goal1134, goal1137);
         // Perform test
-        doTruthValueEvaluationTest("/set/truthValueAssignableAndLoop/test/MagicProofNoOSS.proof",
-            "/set/truthValueAssignableAndLoop/oracle/MagicProofNoOSS.xml", true, true, false,
+        doTruthValueEvaluationTest("/set/truthValueModifiableAndLoop/test/MagicProofNoOSS.proof",
+            "/set/truthValueModifiableAndLoop/oracle/MagicProofNoOSS.xml", true, true, false,
             resultExceptionBranch, resultInvInitial, resultPrecondition, resultLoopEnd, result5);
     }
 

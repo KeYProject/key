@@ -68,7 +68,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
             return this; // incomplete app;
         }
         var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
-        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), m.transaction());
+        heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), m.transaction());
         return setContract(contracts.iterator().next());
     }
 
@@ -83,7 +83,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
                     .computeInstantiation(posInOccurrence().subTerm(), services),
                 services);
         var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
-        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), m.transaction());
+        heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), m.transaction());
         final FunctionalOperationContract combinedContract =
             services.getSpecificationRepository().combineOperationContracts(contracts);
         return setContract(combinedContract);

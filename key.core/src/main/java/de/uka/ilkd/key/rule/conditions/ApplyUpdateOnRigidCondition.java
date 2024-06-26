@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -198,7 +199,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);

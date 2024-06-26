@@ -19,6 +19,7 @@ import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
@@ -95,7 +96,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
             return services.getTermBuilder().tf().createTerm(binFunc, superterm, index);
         }
 
-        private static class SuperTermGeneratedOp implements SortedOperator, Operator {
+        private static class SuperTermGeneratedOp
+                implements SortedOperator, Operator, TerminalSyntaxElement {
             private final Name NAME;
             private final IntegerLDT numbers;
 

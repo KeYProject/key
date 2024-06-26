@@ -134,7 +134,7 @@ public class FormulaTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public Object getChild(int i) {
+    public Object getTLChild(int i) {
         return switch (i) {
         case 0 -> getId();
         case 1 -> beforeIds;
@@ -146,7 +146,7 @@ public class FormulaTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         if (beforeIds != null) {
             return 2;
         } else {

@@ -8,4 +8,22 @@ package org.key_project.logic;
  * AST nodes.
  */
 public interface SyntaxElement {
+    /**
+     * Get the {@code n}-th child of this syntax element.
+     *
+     * @param n index of the child.
+     * @return the {@code n}-th child of this syntax element.
+     * @throws IndexOutOfBoundsException if there is no {@code n}-th child.
+     */
+    SyntaxElement getChild(int n);
+
+    /**
+     *
+     * @return the number of children of this syntax element.
+     */
+    int getChildCount();
+
+    default SyntaxElementCursor getCursor() {
+        return new SyntaxElementCursor(this);
+    }
 }

@@ -859,7 +859,7 @@ public final class SourceView extends JComponent {
             node = node.parent();
         }
         // if no label was found we have to prove the postcondition
-        return "Show Postcondition/Assignable";
+        return "Show Postcondition/Modifiable";
     }
 
     /**

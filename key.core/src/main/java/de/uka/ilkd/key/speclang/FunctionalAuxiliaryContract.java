@@ -242,8 +242,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
-        return contract.getAssignable(heap);
+    public Term getModifiable(LocationVariable heap) {
+        return contract.getModifiable(heap);
     }
 
     @Override
@@ -320,10 +320,10 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      *
      * @param heap the heap to use.
      * @return <code>true</code> iff this contract is strictly pure.
-     * @see AuxiliaryContract#hasModifiesClause(LocationVariable)
+     * @see AuxiliaryContract#hasModifiableClause(LocationVariable)
      */
-    public boolean hasModifiesClause(LocationVariable heap) {
-        return contract.hasModifiesClause(heap);
+    public boolean hasModifiableClause(LocationVariable heap) {
+        return contract.hasModifiableClause(heap);
     }
 
     protected void setAuxiliaryContract(T contract) {

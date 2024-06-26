@@ -17,11 +17,11 @@ import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -111,7 +111,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute subst, SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
             Services services) {
         Map<String, String> tacletOptions =
             services.getProof().getSettings().getChoiceSettings().getDefaultChoices();

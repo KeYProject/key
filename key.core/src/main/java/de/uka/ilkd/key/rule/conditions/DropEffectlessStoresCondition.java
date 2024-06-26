@@ -7,13 +7,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -68,7 +68,8 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term hInst = (Term) svInst.getInstantiation(h);
