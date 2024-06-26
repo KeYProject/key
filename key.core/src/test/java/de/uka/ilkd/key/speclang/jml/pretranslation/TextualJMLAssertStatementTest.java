@@ -33,6 +33,6 @@ public class TextualJMLAssertStatementTest {
         assertEquals(1, constructs.size());
         assertInstanceOf(TextualJMLAssertStatement.class, constructs.head());
         var jmlAssert = (TextualJMLAssertStatement) constructs.head();
-        assertEquals(text, jmlAssert.getContext().getText());
+        assertEquals(text, jmlAssert.getExpression().first.getText());
     }
 }

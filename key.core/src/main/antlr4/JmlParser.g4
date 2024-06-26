@@ -180,7 +180,7 @@ in_group_clause: IN expression;
 maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
-set_statement: SET entity_name? expression EQUAL_SINGLE expression SEMI_TOPLEVEL;
+set_statement: SET entity_name? assignee=expression EQUAL_SINGLE value=expression SEMI_TOPLEVEL;
 merge_point_statement:
   MERGE_POINT
   (MERGE_PROC (proc=STRING_LITERAL))?
@@ -204,7 +204,6 @@ variant_function: DECREASING entity_name? expression (COMMA expression)* SEMI_TO
  * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
  */
 loop_assignable_clause: (LOOP_ASSIGNABLE | ASSIGNABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
-variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
 assume_statement: ASSUME entity_name? expression SEMI_TOPLEVEL;

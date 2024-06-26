@@ -69,10 +69,6 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         return Objects.hash(modifiers, inv);
     }
 
-    public String getName() {
-        return name;
-    }
-
     public boolean isFree() {
         return free;
     }

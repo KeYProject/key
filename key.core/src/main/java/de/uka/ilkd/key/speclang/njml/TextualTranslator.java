@@ -5,7 +5,6 @@ package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 
 import org.key_project.logic.Name;
@@ -281,10 +280,13 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             (ctx.LOOP_ASSIGNABLE() != null && ctx.LOOP_ASSIGNABLE().getText().endsWith("_free"))
                     || (ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free"));
         final LabeledParserRuleContext ctx2 =
-            LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
-                    ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
-                    : OriginTermLabel.SpecType.ASSIGNABLE,
-                attachOriginLabel);
+            LabeledParserRuleContext.createLabeledParserRuleContext(
+                ctx,
+                isFree
+                        ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
+                        : OriginTermLabel.SpecType.ASSIGNABLE,
+                attachOriginLabel,
+                null);
         for (Name heap : heaps) {
             if (loopContract != null) {
                 loopContract.addClause(

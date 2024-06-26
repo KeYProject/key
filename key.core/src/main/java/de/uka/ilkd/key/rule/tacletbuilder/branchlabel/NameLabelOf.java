@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -15,6 +14,8 @@ import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.logic.Name;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class NameLabelOf implements BranchNamingFunction {
             var name = term.getLabel(SpecNameLabel.NAME);
 
             if (name != null) {
-                return ((SpecNameLabel) name).getLabel();
+                return ((SpecNameLabel) name).label();
                 // return LogicPrinter.quickPrintTerm(term, services);
             }
 

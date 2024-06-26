@@ -25,7 +25,6 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.rule.tacletbuilder.branchlabel.BranchNamingFunction;
 import de.uka.ilkd.key.rule.tacletbuilder.branchlabel.BranchNamingFunctions;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
@@ -191,7 +190,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
             applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
         }
-        @Nullable
+
         Object find = accept(ctx.find);
         TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
         currentTBuilder.push(b);

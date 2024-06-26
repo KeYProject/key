@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -46,7 +47,7 @@ public class LabeledParserRuleContext {
                 : new LabeledParserRuleContext(ctx);
     }
 
-    public LabeledParserRuleContext(@NonNull ParserRuleContext first, List<TermLabel> labels) {
+    public LabeledParserRuleContext(ParserRuleContext first, @Nullable List<TermLabel> labels) {
         this.first = first;
         if (labels != null) {
             this.second = Collections.unmodifiableList(labels);

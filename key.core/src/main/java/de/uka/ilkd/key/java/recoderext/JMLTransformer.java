@@ -12,6 +12,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -430,7 +431,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
         StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
         int childIndex = astParent.getIndexOfChild(originalComments[0].getParent());
 
-        var ctx = stat.getContext();
+        var c = stat.getExpression();
+        var ctx = new KeyAst.Expression((JmlParser.ExpressionContext) c.first);
 
         de.uka.ilkd.key.java.Position pos = ctx.getStartLocation().getPosition();
         final Kind kind = stat.getKind();

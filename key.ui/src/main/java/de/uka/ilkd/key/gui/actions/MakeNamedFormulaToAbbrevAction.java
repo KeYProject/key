@@ -64,10 +64,10 @@ public class MakeNamedFormulaToAbbrevAction extends MainWindowAction {
         var l = (SpecNameLabel) t.getLabel(SpecNameLabel.NAME);
         if (l != null) {
             try {
-                getMediator().getNotationInfo().getAbbrevMap().put(t, l.getLabel(), true);
-                LOGGER.info("Activate abbreviation @{} with {}", l.getLabel(), t);
+                getMediator().getNotationInfo().getAbbrevMap().put(t, l.label(), true);
+                LOGGER.info("Activate abbreviation @{} with {}", l.label(), t);
             } catch (AbbrevException e) {
-                LOGGER.error("Could not activate abbreviation @{} with {}", l.getLabel(), t);
+                LOGGER.error("Could not activate abbreviation @{} with {}", l.label(), t);
             }
         }
 
