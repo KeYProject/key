@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
@@ -72,4 +73,15 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
     // Term res = cfSubst.apply(term.sub(1));
     // return res;
     // }
+
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("SubstOp " + name() + " has no children");
+    }
 }

@@ -6,12 +6,14 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 /**
  * Schema variable that is instantiated with logical variables.
  */
-public final class VariableSV extends OperatorSV implements QuantifiableVariable {
+public final class VariableSV extends OperatorSV
+        implements QuantifiableVariable, TerminalSyntaxElement {
 
     /**
      * Creates a new SchemaVariable that is used as placeholder for bound(quantified) variables.
@@ -34,4 +36,6 @@ public final class VariableSV extends OperatorSV implements QuantifiableVariable
         l.print("\\schemaVar \\variables ").print(sort().name().toString()).print(" ")
                 .print(name().toString());
     }
+
+
 }
