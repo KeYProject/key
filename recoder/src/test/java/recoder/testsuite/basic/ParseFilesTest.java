@@ -6,7 +6,7 @@ package recoder.testsuite.basic;
 
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import recoder.ParserException;
 import recoder.io.DefaultProjectFileIO;
 

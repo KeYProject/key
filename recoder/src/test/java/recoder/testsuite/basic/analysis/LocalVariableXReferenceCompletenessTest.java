@@ -6,8 +6,8 @@ package recoder.testsuite.basic.analysis;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import recoder.abstraction.Field;
 import recoder.abstraction.Variable;
 import recoder.convenience.TreeWalker;
@@ -34,7 +34,7 @@ public class LocalVariableXReferenceCompletenessTest extends XReferenceCompleten
                     for (VariableReference r : list) {
                         Variable y = xrsi.getVariable(r);
                         if (x != y) {
-                            Assert.fail(makeResolutionError(r, x, y));
+                            Assertions.fail(makeResolutionError(r, x, y));
                         }
                     }
                 }

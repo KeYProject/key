@@ -94,7 +94,7 @@ SKOLEMFORMULA : '\\skolemFormula';
 TERMLABEL : '\\termlabel';
 
 // used in contracts
-MODIFIES : '\\modifies';
+MODIFIABLE : '\\modifiable';
 
 // Keywords used in program variable declarations
 PROGRAMVARIABLES : '\\programVariables';

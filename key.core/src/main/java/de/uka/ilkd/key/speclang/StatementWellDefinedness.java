@@ -40,9 +40,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term assignable,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
             Term accessible, Condition ensures, Term mby, Term rep, TermBuilder tb) {
-        super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
+        super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
     }
 
@@ -100,10 +100,10 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term post = getPost(po.post(), vars.result, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest());
         final Term updates = TB.parallel(localAnon,
-            getUpdates(po.mod(), vars.heap, vars.heap, vars.anonHeap, services));
+            getUpdates(po.modifiable(), vars.heap, vars.heap, vars.anonHeap, services));
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
-        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod(), po.rest(), uPost,
-            services);
+        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.modifiable(), po.rest(),
+            uPost, services);
     }
 
     /**
@@ -187,7 +187,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * A data structure to pass the needed terms for the well-definedness sequent of a jml
      * statement, including the context update, pre-condition for the statement, well-formedness
      * condition for the anonymous heap, well-definedness term for the statement's
-     * assignable-clause, well-definedness term for other clauses in the statement and the
+     * modifiable-clause, well-definedness term for other clauses in the statement and the
      * well-definedness term for the statement's post-condition with the according updates (heap of
      * pre-state becomes current heap and the current heap gets anonymised) applied to it.
      *
@@ -197,16 +197,16 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term context;
         final Term pre;
         final Term wfAnon;
-        final Term wdMod;
+        final Term wdModifiable;
         final Term wdRest;
         final Term anonWdPost;
 
-        private SequentTerms(Term context, Term pre, Term anonHeap, Term mod,
+        private SequentTerms(Term context, Term pre, Term anonHeap, Term modifiable,
                 ImmutableList<Term> rest, Term anonWdPost, TermServices services) {
             this.context = context;
             this.pre = pre;
             this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();
-            this.wdMod = TB.wd(mod);
+            this.wdModifiable = TB.wd(modifiable);
             this.wdRest = TB.and(TB.wd(rest));
             this.anonWdPost = anonWdPost;
         }

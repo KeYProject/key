@@ -131,7 +131,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param heap the heap to use.
      * @return whether this contract is strictly pure.
      */
-    boolean hasModifiesClause(LocationVariable heap);
+    boolean hasModifiableClause(LocationVariable heap);
 
     /**
      * Returns <code>true</code> iff the method (according to the free part of the contract)
@@ -141,7 +141,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      *        the heap to use.
      * @return whether this contract is strictly pure.
      */
-    boolean hasFreeModifiesClause(LocationVariable heap);
+    boolean hasFreeModifiableClause(LocationVariable heap);
 
     /**
      *
@@ -322,9 +322,9 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param heap the heap to use.
      * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
      * @param services services.
-     * @return this contract's modifies clause on the specified heap.
+     * @return this contract's modifiable clause on the specified heap.
      */
-    Term getModifiesClause(LocationVariable heap, LocationVariable self, Services services);
+    Term getModifiableClause(LocationVariable heap, LocationVariable self, Services services);
 
     /**
      *
@@ -332,9 +332,9 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param heap the heap to use.
      * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
      * @param services services.
-     * @return this contract's modifies clause on the specified heap.
+     * @return this contract's modifiable clause on the specified heap.
      */
-    Term getModifiesClause(LocationVariable heapVariable, Term heap, Term self,
+    Term getModifiableClause(LocationVariable heapVariable, Term heap, Term self,
             Services services);
 
     /**
@@ -342,17 +342,17 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param heap the heap to use.
      * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
      * @param services services.
-     * @return this contract's modifies clause on the specified heap.
+     * @return this contract's modifiable clause on the specified heap.
      */
-    Term getModifiesClause(LocationVariable heap, Variables variables, Services services);
+    Term getModifiableClause(LocationVariable heap, Variables variables, Services services);
 
     /**
      *
      * @param heap the heap to use.
      * @param services services.
-     * @return this contract's modifies clause on the specified heap.
+     * @return this contract's modifiable clause on the specified heap.
      */
-    Term getModifiesClause(LocationVariable heap, Services services);
+    Term getModifiableClause(LocationVariable heap, Services services);
 
     /**
      *
@@ -362,9 +362,9 @@ public interface AuxiliaryContract extends SpecificationElement {
      *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
      * @param services
      *        services.
-     * @return this contract's free modifies clause on the specified heap.
+     * @return this contract's free modifiable clause on the specified heap.
      */
-    Term getFreeModifiesClause(LocationVariable heap, LocationVariable self, Services services);
+    Term getFreeModifiableClause(LocationVariable heap, LocationVariable self, Services services);
 
     /**
      *
@@ -376,9 +376,9 @@ public interface AuxiliaryContract extends SpecificationElement {
      *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
      * @param services
      *        services.
-     * @return this contract's free modifies clause on the specified heap.
+     * @return this contract's free modifiable clause on the specified heap.
      */
-    Term getFreeModifiesClause(LocationVariable heapVariable, Term heap, Term self,
+    Term getFreeModifiableClause(LocationVariable heapVariable, Term heap, Term self,
             Services services);
 
     /**
@@ -389,9 +389,9 @@ public interface AuxiliaryContract extends SpecificationElement {
      *        the variables to use instead of {@link #getPlaceholderVariables()}.
      * @param services
      *        services.
-     * @return this contract's free modifies clause on the specified heap.
+     * @return this contract's free modifiable clause on the specified heap.
      */
-    Term getFreeModifiesClause(LocationVariable heap, Variables variables, Services services);
+    Term getFreeModifiableClause(LocationVariable heap, Variables variables, Services services);
 
     /**
      *
@@ -399,9 +399,9 @@ public interface AuxiliaryContract extends SpecificationElement {
      *        the heap to use.
      * @param services
      *        services.
-     * @return this contract's free modifies clause on the specified heap.
+     * @return this contract's free modifiable clause on the specified heap.
      */
-    Term getFreeModifiesClause(LocationVariable heap, Services services);
+    Term getFreeModifiableClause(LocationVariable heap, Services services);
 
 
     /**
@@ -435,9 +435,9 @@ public interface AuxiliaryContract extends SpecificationElement {
     /**
      *
      * @param heap the heap to use.
-     * @return this contract's assignable term on the specified heap.
+     * @return this contract's modifiable term on the specified heap.
      */
-    Term getAssignable(LocationVariable heap);
+    Term getModifiable(LocationVariable heap);
 
     /**
      * Accepts a visitor.
@@ -563,9 +563,9 @@ public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      * @param services services.
-     * @return the original modifies clause of the contract.
+     * @return the original modifiable clause of the contract.
      */
-    Term getMod(Services services);
+    Term getModifiable(Services services);
 
     /**
      * @return the original information flow specification clause of the contract.
@@ -655,7 +655,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         public final Map<LocationVariable, LocationVariable> remembranceHeaps;
 
         /**
-         * A map from every variable {@code var} that is assignable inside the block to
+         * A map from every variable {@code var} that is modifiable inside the block to
          * {@code var_Before_BLOCK}.
          */
         public final Map<LocationVariable, LocationVariable> remembranceLocalVariables;
@@ -693,7 +693,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param exception exception variable to set when the block terminates by an uncaught
          *        {@code throw} statement.
          * @param remembranceHeaps a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
-         * @param remembranceLocalVariables a map from every variable {@code var} that is assignable
+         * @param remembranceLocalVariables a map from every variable {@code var} that is modifiable
          *        inside the block to {@code var_Before_BLOCK}.
          * @param outerRemembranceHeaps a map from every heap {@code heap} that is accessible inside
          *        the block to {@code heap_Before_METHOD}.
@@ -1302,7 +1302,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param exception exception variable to set when the block terminates by an uncaught
          *        {@code throw} statement.
          * @param remembranceHeaps a map from every heap {@code heap} to {@code heap_Before_BLOCK}.
-         * @param remembranceLocalVariables a map from every variable {@code var} that is assignable
+         * @param remembranceLocalVariables a map from every variable {@code var} that is modifiable
          *        inside the block to {@code var_Before_BLOCK}.
          * @param outerRemembranceHeaps a map from every heap {@code heap} that is accessible inside
          *        the block to {@code heap_Before_METHOD}.

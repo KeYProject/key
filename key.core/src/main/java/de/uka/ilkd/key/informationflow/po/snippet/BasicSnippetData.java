@@ -90,7 +90,7 @@ class BasicSnippetData {
          */
         FREE_PRECONDITION(Term.class), POSTCONDITION(Term.class),
         LOOP_INVARIANT(LoopSpecification.class), LOOP_INVARIANT_TERM(Term.class),
-        MODIFIES(Term.class), DEPENDENS(Term.class), MEASURED_BY(Term.class),
+        MODIFIABLE(Term.class), DEPENDENS(Term.class), MEASURED_BY(Term.class),
         MODALITY(Modality.JavaModalityKind.class), INF_FLOW_SPECS(ImmutableList.class),
         /**
          * Self term of the transformed block contract
@@ -125,7 +125,7 @@ class BasicSnippetData {
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
         contractContents.put(Key.PRECONDITION, contract.getPre());
         contractContents.put(Key.POSTCONDITION, contract.getPost());
-        contractContents.put(Key.MODIFIES, contract.getMod());
+        contractContents.put(Key.MODIFIABLE, contract.getModifiable());
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModalityKind());
 
@@ -145,22 +145,22 @@ class BasicSnippetData {
         contractContents.put(Key.EXECUTION_CONTEXT, context);
         contractContents.put(Key.LOOP_INVARIANT, invariant);
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
-        contractContents.put(Key.MODIFIES, invariant.getModifies());
+        contractContents.put(Key.MODIFIABLE, invariant.getModifiable());
         contractContents.put(Key.MODALITY, Modality.JavaModalityKind.BOX);
         contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
 
         // add guard term to information flow specs (necessary for soundness)
         // and add the modified specs to the table
         ImmutableList<InfFlowSpec> infFlowSpecs = invariant.getInfFlowSpecs(services);
-        ImmutableList<InfFlowSpec> modifedSpecs = ImmutableSLList.nil();
+        ImmutableList<InfFlowSpec> modifiedSpecs = ImmutableSLList.nil();
         for (InfFlowSpec infFlowSpec : infFlowSpecs) {
             ImmutableList<Term> modifiedPreExps = infFlowSpec.preExpressions.append(guardTerm);
             ImmutableList<Term> modifiedPostExps = infFlowSpec.postExpressions.append(guardTerm);
             InfFlowSpec modifiedSpec =
                 new InfFlowSpec(modifiedPreExps, modifiedPostExps, infFlowSpec.newObjects);
-            modifedSpecs = modifedSpecs.append(modifiedSpec);
+            modifiedSpecs = modifiedSpecs.append(modifiedSpec);
         }
-        contractContents.put(Key.INF_FLOW_SPECS, modifedSpecs);
+        contractContents.put(Key.INF_FLOW_SPECS, modifiedSpecs);
 
         final Term heap = tb.getBaseHeap();
         final ImmutableSet<LocationVariable> localInVariables =
@@ -187,7 +187,7 @@ class BasicSnippetData {
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
         contractContents.put(Key.PRECONDITION, contract.getPre());
         contractContents.put(Key.FREE_PRECONDITION, contract.getFreePre());
-        contractContents.put(Key.MODIFIES, contract.getMod());
+        contractContents.put(Key.MODIFIABLE, contract.getModifiable());
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModalityKind());
@@ -211,7 +211,7 @@ class BasicSnippetData {
         contractContents.put(Key.BLOCK_SELF, contract.getInstantiationSelfTerm(services));
         contractContents.put(Key.PRECONDITION, contract.getPre(services));
         contractContents.put(Key.POSTCONDITION, contract.getPost(services));
-        contractContents.put(Key.MODIFIES, contract.getMod(services));
+        contractContents.put(Key.MODIFIABLE, contract.getModifiable(services));
         contractContents.put(Key.MODALITY, contract.getModalityKind());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
         List<Label> labels = contract.getLabels();

@@ -42,7 +42,7 @@ public class ReverseArray {
         int i = 0;
         /*@
           @ loop_invariant (\forall int j; j >= 0 && j < i; b[j] == p_a[p_a.length - (j+1)]) && i >= 0 && i <= p_a.length;
-          @ modifies b[*];
+          @ assignable b[*];
           @*/
         while (i < p_a.length) {
             b[i] = p_a[p_a.length - (i+1)];

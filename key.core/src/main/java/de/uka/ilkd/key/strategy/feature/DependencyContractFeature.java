@@ -42,7 +42,7 @@ public final class DependencyContractFeature extends BinaryFeature {
         // determine possible steps
 
         List<LocationVariable> heapContext = bapp.getHeapContext() != null ? bapp.getHeapContext()
-                : HeapContext.getModHeaps(goal.proof().getServices(), false);
+                : HeapContext.getModifiableHeaps(goal.proof().getServices(), false);
 
         final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(heapContext, pos,
             goal.sequent(), goal.proof().getServices());

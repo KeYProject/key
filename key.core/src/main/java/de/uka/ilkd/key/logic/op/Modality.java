@@ -125,7 +125,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
         return super.toString();
     }
 
-    public static class JavaModalityKind extends Kind implements SVSubstitute {
+    public static class JavaModalityKind extends Kind {
         private static final Map<String, JavaModalityKind> kinds = new HashMap<>();
         /**
          * The diamond operator of dynamic logic. A formula <alpha;>Phi can be read as after

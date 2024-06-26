@@ -28,7 +28,7 @@ public interface OperationContract extends Contract {
      *
      * @return whether this contract is strictly pure.
      */
-    boolean hasModifiesClause(LocationVariable heap);
+    boolean hasModifiable(LocationVariable heap);
 
     /**
      * Returns <code>true</code> iff the method (according to a free clause of the contract) does
@@ -36,57 +36,57 @@ public interface OperationContract extends Contract {
      *
      * @return whether this contract is freely strictly pure.
      */
-    boolean hasFreeModifiesClause(LocationVariable heap);
+    boolean hasFreeModifiable(LocationVariable heap);
 
     /**
-     * Returns the modifies clause of the contract.
+     * Returns the modifiable clause of the contract.
      *
      * @param heapVar the heap variable.
      * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
      * @param services the services object.
-     * @return the modifies clause.
+     * @return the modifiable clause.
      */
-    Term getMod(LocationVariable heapVar, LocationVariable selfVar,
+    Term getModifiable(LocationVariable heapVar, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
-     * Returns the modifies clause of the contract.
+     * Returns the modifiable clause of the contract.
      *
      * @param heapVar the heap variable
      * @param heapTerm the heap variable term.
      * @param selfTerm the self variable term.
      * @param paramTerms the list of parameter variable terms.
      * @param services the services object.
-     * @return the modifies clause.
+     * @return the modifiable clause.
      */
-    Term getMod(LocationVariable heapVar, Term heapTerm, Term selfTerm,
+    Term getModifiable(LocationVariable heapVar, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services);
 
     /**
-     * Returns the free modifies clause of the contract.
+     * Returns the free modifiable clause of the contract.
      *
      * @param heapVar the heap variable.
      * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
      * @param services the services object.
-     * @return the free modifies clause.
+     * @return the free modifiable clause.
      */
-    Term getFreeMod(LocationVariable heapVar, LocationVariable selfVar,
+    Term getFreeModifiable(LocationVariable heapVar, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Services services);
 
     /**
-     * Returns the free modifies clause of the contract.
+     * Returns the free modifiable clause of the contract.
      *
      * @param heapVar the heap variable
      * @param heapTerm the heap variable term.
      * @param selfTerm the self variable term.
      * @param paramTerms the list of parameter variable terms.
      * @param services the services object.
-     * @return the free modifies clause.
+     * @return the free modifiable clause.
      */
-    Term getFreeMod(LocationVariable heapVar, Term heapTerm,
+    Term getFreeModifiable(LocationVariable heapVar, Term heapTerm,
             Term selfTerm,
             ImmutableList<Term> paramTerms,
             Services services);

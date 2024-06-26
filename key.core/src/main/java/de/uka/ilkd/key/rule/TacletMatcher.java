@@ -6,8 +6,9 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import org.key_project.logic.SyntaxElement;
 
 public interface TacletMatcher {
 
@@ -69,7 +70,7 @@ public interface TacletMatcher {
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
     MatchConditions checkVariableConditions(SchemaVariable var,
-            SVSubstitute instantiationCandidate, MatchConditions matchCond, Services services);
+            SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services);
 
     /**
      * matches the given term against the taclet's find term if the taclet has no find term or the

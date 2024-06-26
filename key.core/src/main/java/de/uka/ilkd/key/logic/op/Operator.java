@@ -13,7 +13,7 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * etc. have to implement this interface.
  */
 public interface Operator
-        extends org.key_project.logic.op.Operator, SVSubstitute, EqualsModProofIrrelevancy {
+        extends org.key_project.logic.op.Operator, EqualsModProofIrrelevancy {
 
     /**
      * comparator to compare operators; for modalities only their kind is compared

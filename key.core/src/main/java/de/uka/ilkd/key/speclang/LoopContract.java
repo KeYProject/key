@@ -110,8 +110,8 @@ public interface LoopContract extends AuxiliaryContract {
      * @param newBlock the new block.
      * @param newPreconditions the new preconditions.
      * @param newPostconditions the new postconditions.
-     * @param newModifiesClauses the new modifies clauses.
-     * @param newFreeModifiesClauses the new free modifies clauses.
+     * @param newModifiableClauses the new modifiable clauses.
+     * @param newFreeModifiableClauses the new free modifiable clauses.
      * @param newinfFlowSpecs the new information flow specifications.
      * @param newVariables the new variables.
      * @param newMeasuredBy the new measured-by clause.
@@ -122,8 +122,8 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, Term> newFreePreconditions,
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newFreePostconditions,
-            Map<LocationVariable, Term> newModifiesClauses,
-            Map<LocationVariable, Term> newFreeModifiesClauses,
+            Map<LocationVariable, Term> newModifiableClauses,
+            Map<LocationVariable, Term> newFreeModifiableClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
 
@@ -132,8 +132,8 @@ public interface LoopContract extends AuxiliaryContract {
      * @param newLoop the new loop.
      * @param newPreconditions the new preconditions.
      * @param newPostconditions the new postconditions.
-     * @param newModifiesClauses the new modifies clauses.
-     * @param newFreeModifiesClauses the new free modifies clauses.
+     * @param newModifiableClauses the new modifiable clauses.
+     * @param newFreeModifiableClauses the new free modifiable clauses.
      * @param newinfFlowSpecs the new information flow specifications.
      * @param newVariables the new variables.
      * @param newMeasuredBy the new measured-by clause.
@@ -144,8 +144,8 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, Term> newFreePreconditions,
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newFreePostconditions,
-            Map<LocationVariable, Term> newModifiesClauses,
-            Map<LocationVariable, Term> newFreeModifiesClauses,
+            Map<LocationVariable, Term> newModifiableClauses,
+            Map<LocationVariable, Term> newFreeModifiableClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
 

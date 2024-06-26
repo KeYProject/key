@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -66,7 +67,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute subst, SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
             Services services) {
         final Term s1Inst = (Term) svInst.getInstantiation(var1);
         final Term s2Inst = (Term) svInst.getInstantiation(var2);

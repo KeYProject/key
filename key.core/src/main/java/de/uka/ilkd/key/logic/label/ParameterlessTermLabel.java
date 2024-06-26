@@ -139,7 +139,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * {@link IndexOutOfBoundsException}.
      */
     @Override
-    public Object getChild(int i) {
+    public Object getTLChild(int i) {
         throw new IndexOutOfBoundsException();
     }
 
@@ -150,7 +150,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * Simple term labels have no parameters. This always returns 0.
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         return 0;
     }
 

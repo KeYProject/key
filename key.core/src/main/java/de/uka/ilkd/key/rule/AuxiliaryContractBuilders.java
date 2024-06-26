@@ -593,69 +593,69 @@ public final class AuxiliaryContractBuilders {
         /**
          *
          * @param anonymisationHeaps anonymization heaps.
-         * @param modifiesClauses modifies clauses for the specified heaps.
-         * @return an anonymization update for the specified modifies clauses.
+         * @param modifiableClauses modifiable clauses for the specified heaps.
+         * @return an anonymization update for the specified modifiable clauses.
          */
         public Term buildAnonOutUpdate(
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses) {
+                final Map<LocationVariable, Term> modifiableClauses) {
             return buildAnonOutUpdate(variables.remembranceLocalVariables.keySet(),
-                anonymisationHeaps, modifiesClauses, ANON_OUT_PREFIX);
+                anonymisationHeaps, modifiableClauses, ANON_OUT_PREFIX);
         }
 
         /**
          *
          * @param el a program element
          * @param anonymisationHeaps anonymization heaps.
-         * @param modifiesClauses modifies clauses for the specified heaps.
-         * @return an anonymization update for the specified modifies clauses and for every modified
-         *         variable that occurs in the specified program element.
+         * @param modifiableClauses modifiable clauses for the specified heaps.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         modified variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses) {
-            return buildAnonOutUpdate(el, anonymisationHeaps, modifiesClauses, ANON_OUT_PREFIX);
+                final Map<LocationVariable, Term> modifiableClauses) {
+            return buildAnonOutUpdate(el, anonymisationHeaps, modifiableClauses, ANON_OUT_PREFIX);
         }
 
         /**
          *
          * @param el a program element
          * @param anonymisationHeaps anonymization heaps.
-         * @param modifiesClauses modifies clauses for the specified heaps.
+         * @param modifiableClauses modifiable clauses for the specified heaps.
          * @param prefix a prefix for the name of the anon functions.
-         * @return an anonymization update for the specified modifies clauses and for every modified
-         *         variable that occurs in the specified program element.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         modified variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses, final String prefix) {
+                final Map<LocationVariable, Term> modifiableClauses, final String prefix) {
             return buildAnonOutUpdate(
                 MiscTools.getLocalOuts(el, services).stream()
                         .filter(LocationVariable.class::isInstance)
                         .map(LocationVariable.class::cast).collect(Collectors.toSet()),
-                anonymisationHeaps, modifiesClauses, prefix);
+                anonymisationHeaps, modifiableClauses, prefix);
         }
 
         /**
          *
          * @param vars a set of variables
          * @param anonymisationHeaps anonymization heaps.
-         * @param modifiesClauses modifies clauses for the specified heaps.
+         * @param modifiableClauses modifiable clauses for the specified heaps.
          * @param prefix a prefix for the name of the anon functions.
-         * @return an anonymization update for the specified modifies clauses and for every variable
-         *         in the specified set.
+         * @return an anonymization update for the specified modifiable clauses and for every
+         *         variable in the specified set.
          */
         public Term buildAnonOutUpdate(final Set<LocationVariable> vars,
                 final Map<LocationVariable, JFunction> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses, final String prefix) {
+                final Map<LocationVariable, Term> modifiableClauses, final String prefix) {
             Term result = buildLocalVariablesAnonUpdate(vars, prefix);
             for (Map.Entry<LocationVariable, JFunction> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
-                final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equalsModProperty(strictlyNothing(),
+                final Term modifiableClause = modifiableClauses.get(anonymisationHeap.getKey());
+                if (!modifiableClause.equalsModProperty(strictlyNothing(),
                     IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiableClause,
                         services.getTermBuilder().label(
                             services.getTermBuilder().func(anonymisationHeap.getValue()),
                             ParameterlessTermLabel.ANON_HEAP_LABEL));
@@ -847,25 +847,26 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @return the contract's modifies clauses.
+         * @return the contract's modifiable clauses.
          */
-        public Map<LocationVariable, Term> buildModifiesClauses() {
+        public Map<LocationVariable, Term> buildModifiableClauses() {
             Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
-                result.put(heap, contract.getModifiesClause(heap, var(heap), terms.self, services));
+                result.put(heap,
+                    contract.getModifiableClause(heap, var(heap), terms.self, services));
             }
             return result;
         }
 
         /**
          *
-         * @return the contract's free modifies clauses.
+         * @return the contract's free modifiable clauses.
          */
-        public Map<LocationVariable, Term> buildFreeModifiesClauses() {
+        public Map<LocationVariable, Term> buildFreeModifiableClauses() {
             Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
                 result.put(heap,
-                    contract.getFreeModifiesClause(heap, var(heap), terms.self, services));
+                    contract.getFreeModifiableClause(heap, var(heap), terms.self, services));
             }
             return result;
         }
@@ -921,35 +922,35 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param modifiesClauses the contract's modifies clauses
-         * @param freeModifiesClauses the contract's free modifies clauses
+         * @param modifiableClauses the contract's modifiable clauses
+         * @param freeModifiableClauses the contract's free modifiable clauses
          * @return the contract's framing condition.
          */
         public Term buildFrameCondition(
-                final Map<LocationVariable, Term> modifiesClauses,
-                final Map<LocationVariable, Term> freeModifiesClauses) {
+                final Map<LocationVariable, Term> modifiableClauses,
+                final Map<LocationVariable, Term> freeModifiableClauses) {
             Term result = tt();
             Map<LocationVariable, Map<Term, Term>> remembranceVariables =
                 constructRemembranceVariables();
             for (LocationVariable heap : heaps) {
-                final Term modifiesClause = modifiesClauses.get(heap);
-                final Term freeModifiesClause = freeModifiesClauses.get(heap);
+                final Term modifiableClause = modifiableClauses.get(heap);
+                final Term freeModifiableClause = freeModifiableClauses.get(heap);
                 final Term frameCondition;
-                if (!contract.hasModifiesClause(heap)) {
-                    if (!contract.hasFreeModifiesClause(heap)) {
+                if (!contract.hasModifiableClause(heap)) {
+                    if (!contract.hasFreeModifiableClause(heap)) {
                         frameCondition = frameStrictlyEmpty(
                             var(heap), remembranceVariables.get(heap));
                     } else {
                         frameCondition =
-                            frame(var(heap), remembranceVariables.get(heap), freeModifiesClause);
+                            frame(var(heap), remembranceVariables.get(heap), freeModifiableClause);
                     }
                 } else {
-                    if (!contract.hasFreeModifiesClause(heap)) {
+                    if (!contract.hasFreeModifiableClause(heap)) {
                         frameCondition = frame(
-                            var(heap), remembranceVariables.get(heap), modifiesClause);
+                            var(heap), remembranceVariables.get(heap), modifiableClause);
                     } else {
                         frameCondition = frame(var(heap), remembranceVariables.get(heap),
-                            union(modifiesClause, freeModifiesClause));
+                            union(modifiableClause, freeModifiableClause));
                     }
                 }
                 result = and(result, frameCondition);
@@ -1430,7 +1431,7 @@ public final class AuxiliaryContractBuilders {
          * @param remember the remembrance update for the current loop iteration.
          * @param rememberNext the remembrance update for the next loop iteration.
          * @param anonOutHeaps the heaps used in the anonOut update.
-         * @param modifiesClauses the modified clauses.
+         * @param modifiableClauses the modified clauses.
          * @param assumptions the assumptions.
          * @param decreasesCheck the decreases check.
          * @param postconditions the current loop iteration's postconditions.
@@ -1443,8 +1444,8 @@ public final class AuxiliaryContractBuilders {
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
                 final Term context, final Term remember, final Term rememberNext,
                 final Map<LocationVariable, JFunction> anonOutHeaps,
-                final Map<LocationVariable, Term> modifiesClauses,
-                final Map<LocationVariable, Term> freeModifiesClauses,
+                final Map<LocationVariable, Term> modifiableClauses,
+                final Map<LocationVariable, Term> freeModifiableClauses,
                 final Term[] assumptions,
                 final Term decreasesCheck, final Term[] postconditions,
                 final Term[] postconditionsNext, final LocationVariable exceptionParameter,
@@ -1476,7 +1477,7 @@ public final class AuxiliaryContractBuilders {
                 exceptionParameter, breakFlags, continueFlags);
 
             Term anonOut = new UpdatesBuilder(variables, services)
-                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
+                    .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiableClauses);
 
             Map<LocationVariable, JFunction> anonOutHeaps2 = new HashMap<>();
             for (LocationVariable heap : anonOutHeaps.keySet()) {
@@ -1488,7 +1489,7 @@ public final class AuxiliaryContractBuilders {
                 anonOutHeaps2.put(heap, anonymisationFunction);
             }
             Term anonOut2 = new UpdatesBuilder(variables, services).buildAnonOutUpdate(
-                contract.getLoop(), anonOutHeaps2, modifiesClauses, "init_" + ANON_OUT_PREFIX);
+                contract.getLoop(), anonOutHeaps2, modifiableClauses, "init_" + ANON_OUT_PREFIX);
 
             final Term[] posts = createPosts(goal, postconditions, postconditionsNext, terms, tb);
 

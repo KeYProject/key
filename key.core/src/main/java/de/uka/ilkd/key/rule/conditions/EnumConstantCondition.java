@@ -9,10 +9,11 @@ import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
 
 
 /**
@@ -36,7 +37,7 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
 
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute subst, SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
             Services services) {
 
         if (var == reference) {

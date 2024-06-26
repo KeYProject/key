@@ -25,7 +25,7 @@ import org.key_project.logic.Name;
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
- * Creates the frame condition (aka "assignable clause") for the given loop. Also accepts the
+ * Creates the frame condition (aka "modifiable clause") for the given loop. Also accepts the
  * pre-state update and extracts the symbols from there. New symbols in the pre-state update (like
  * "heap_BeforeLOOP") are added to the namespaces. This is because the update is, for the loop scope
  * invariant taclet, created by a variable condition; new symbols created there are not
@@ -68,7 +68,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
     /**
      * Creates the frame condition.
      *
-     * @param loopSpec The {@link LoopSpecification}, for the modifies clause.
+     * @param loopSpec The {@link LoopSpecification}, for the modifiable clause.
      * @param isTransaction A flag set to true iff the current modality is a transaction modality.
      * @param heapToBeforeLoopMap The map from heap variables to a map from original to pre-state
      *        terms.
@@ -83,20 +83,21 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
         final List<LocationVariable> heapContext = //
-            HeapContext.getModHeaps(services, isTransaction);
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        heapContext.forEach(heap -> mods.put(heap,
-            loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
+            HeapContext.getModifiableHeaps(services, isTransaction);
+        final Map<LocationVariable, Term> modifiables = new LinkedHashMap<>();
+        heapContext.forEach(heap -> modifiables.put(heap,
+            loopSpec.getModifiable(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
 
         Term frameCondition = null;
         for (LocationVariable heap : heapContext) {
-            final Term mod = mods.get(heap);
+            final Term modifiable = modifiables.get(heap);
             final Term fc;
 
-            if (tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            if (tb.strictlyNothing().equalsModProperty(modifiable,
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoopMap.get(heap));
             } else {
-                fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), mod);
+                fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), modifiable);
             }
 
             frameCondition = frameCondition == null ? fc : tb.and(frameCondition, fc);

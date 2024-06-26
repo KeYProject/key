@@ -20,7 +20,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.key_project.util.helper.FindResources;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

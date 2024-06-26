@@ -179,7 +179,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
-            if (contract.hasModifiesClause(variable)) {
+            if (contract.hasModifiableClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
                 final JFunction anonymisationFunction =

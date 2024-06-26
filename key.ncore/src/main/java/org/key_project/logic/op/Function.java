@@ -4,6 +4,7 @@
 package org.key_project.logic.op;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -50,5 +51,15 @@ public abstract class Function extends org.key_project.logic.op.AbstractSortedOp
     @Override
     public final String toString() {
         return (name() + (whereToBind() == null ? "" : "{" + whereToBind() + "}"));
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Function " + name() + " has no children");
     }
 }

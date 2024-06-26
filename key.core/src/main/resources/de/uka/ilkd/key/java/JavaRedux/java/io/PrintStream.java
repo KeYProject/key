@@ -14,6 +14,7 @@ public class PrintStream extends java.io.FilterOutputStream {
     public void print(char[] s);
     public void print(java.lang.String s);
     public void print(java.lang.Object obj);
+    public void printf(java.lang.String s, Object... args);
     public void println();
     public void println(boolean x);
     public void println(char x);

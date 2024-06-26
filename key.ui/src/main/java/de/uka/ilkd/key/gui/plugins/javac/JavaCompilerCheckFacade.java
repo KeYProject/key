@@ -85,32 +85,34 @@ public class JavaCompilerCheckFacade {
         List<String> classes = new ArrayList<>();
 
         // gather configured bootstrap classpath and regular classpath
-        List<File> paths = new ArrayList<>();
+        List<String> options = new ArrayList<>();
         if (bootClassPath != null) {
-            paths.add(bootClassPath);
+            options.add("-Xbootclasspath");
+            options.add(bootClassPath.getAbsolutePath());
         }
         if (classPath != null && !classPath.isEmpty()) {
-            paths.addAll(classPath);
+            options.add("-classpath");
+            options.add(
+                classPath.stream().map(File::getAbsolutePath).collect(Collectors.joining(":")));
         }
-        paths.add(javaPath);
         ArrayList<Path> files = new ArrayList<>();
-        for (File path : paths) {
-            if (!path.isDirectory()) {
-                continue;
-            }
-            try (var s = Files.walk(path.toPath())) {
+        if (javaPath.isDirectory()) {
+            try (var s = Files.walk(javaPath.toPath())) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))
                         .forEachOrdered(files::add);
             } catch (IOException e) {
                 LOGGER.info("", e);
             }
+        } else {
+            files.add(javaPath.toPath());
         }
+
         Iterable<? extends JavaFileObject> compilationUnits =
             fileManager.getJavaFileObjects(files.toArray(new Path[0]));
 
         JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
-            new ArrayList<>(), classes, compilationUnits);
+            options, classes, compilationUnits);
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();

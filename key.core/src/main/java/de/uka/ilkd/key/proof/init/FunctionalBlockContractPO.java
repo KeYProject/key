@@ -131,7 +131,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         Map<LocationVariable, JFunction> anonOutHeaps =
             new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
-            if (contract.hasModifiesClause(heap)) {
+            if (contract.hasModifiableClause(heap)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
                 final JFunction anonymisationFunction =
@@ -168,14 +168,14 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      */
     private static Term[] createPostconditions(
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
-        final Map<LocationVariable, Term> modifiesClauses =
-            conditionsAndClausesBuilder.buildModifiesClauses();
-        final Map<LocationVariable, Term> freeModifiesClauses =
-            conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> modifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
+        final Map<LocationVariable, Term> freeModifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition =
             conditionsAndClausesBuilder.buildFrameCondition(
-                modifiesClauses, freeModifiesClauses);
+                modifiableClauses, freeModifiableClauses);
         return new Term[] { postcondition, frameCondition };
     }
 
@@ -185,7 +185,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param anonHeaps the heaps used in the anonIn update.
      * @param anonOutHeaps the heaps used in the anonOut update.
      * @param localInVariables the free local variables in the block.
-     * @param localOutVariables the free local variables modified by the block.
+     * @param localOutVariables the free local variables modifiable by the block.
      * @param exceptionParameter the exception variable.
      * @param assumptions the preconditions.
      * @param postconditions the postconditions.
@@ -223,7 +223,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param heaps the heaps.
      * @param anonOutHeaps the heaps used in the anonOut update.
      * @param localInVariables the free local variables in the block.
-     * @param localOutVariables the free local variables modified by the block.
+     * @param localOutVariables the free local variables modifiable by the block.
      * @param bc the contract being applied.
      * @param configurator a goal configurator
      * @param services services.
@@ -321,7 +321,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 false);
         }
 
-        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(block, services);
         final ImmutableSet<LocationVariable> localOutVariables =

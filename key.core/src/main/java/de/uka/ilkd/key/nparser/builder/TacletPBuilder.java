@@ -681,6 +681,18 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public ChoiceExpr visitOption_expr_prop(KeYParser.Option_expr_propContext ctx) {
+        String category = ctx.option().cat.getText();
+        String value = ctx.option().value.getText();
+        String choiceStr = category + ":" + value;
+        /*
+         * Make sure that the choice (category and value!) is known to KeY, i.e. that it is declared
+         * in the file `optionsDeclarations.key`. This prevents from accidentally deactivating
+         * (parts of) taclets due to non-existing choices (see
+         * https://github.com/KeYProject/key/issues/3352).
+         */
+        if (choices().lookup(choiceStr) == null) {
+            semanticError(ctx, "Could not find choice: %s", category + ":" + choiceStr);
+        }
         return ChoiceExpr.variable(ctx.option().cat.getText(), ctx.option().value.getText());
     }
 

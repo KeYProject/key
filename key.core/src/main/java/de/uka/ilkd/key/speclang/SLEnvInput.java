@@ -5,9 +5,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
@@ -16,6 +14,7 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -331,6 +330,21 @@ public final class SLEnvInput extends AbstractEnvInput {
                 final ImmutableSet<SpecificationElement> methodSpecs =
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
                 specRepos.addSpecs(methodSpecs);
+
+                Type declaringType = pm.getContainerType().getJavaType();
+
+                // Create default contracts for all methods except KeY default methods (like <init>)
+                // and Object methods.
+                if (methodSpecs.isEmpty()
+                        && (declaringType instanceof TypeDeclaration decl && decl.isLibraryClass())
+                        && !declaringType.getFullName().equals("java.lang.Object")
+                        && !pm.isImplicit()) {
+                    specRepos.addContract(specExtractor.createDefaultContract(pm,
+                        initConfig.getActivatedChoices().exists(
+                            choice -> choice.category().equals("soundDefaultContracts")
+                                    && choice.name().toString()
+                                            .equals("soundDefaultContracts:on"))));
+                }
 
                 addLoopInvariants(specExtractor, specRepos, kjt, pm);
                 addLoopContracts(specExtractor, specRepos, kjt, pm);
