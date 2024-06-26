@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.logic.SyntaxElement;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.Property;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * A source element is a piece of syntax. It does not necessarily have a semantics, at least none
