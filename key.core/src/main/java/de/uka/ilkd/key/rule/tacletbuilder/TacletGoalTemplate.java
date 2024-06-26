@@ -3,16 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.branchlabel.BranchNamingFunction;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new
@@ -30,7 +34,14 @@ public class TacletGoalTemplate {
     /** program variables added by this taclet to the namespace */
     private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
 
+    @Nullable
     private String name = null;
+
+    /**
+     *
+     */
+    @Nullable
+    private BranchNamingFunction namingFunction = null;
 
 
     /**
@@ -129,6 +140,24 @@ public class TacletGoalTemplate {
 
     public String name() {
         return name;
+    }
+
+    public void setBranchNamingFunction(@Nullable BranchNamingFunction fn) {
+        namingFunction = fn;
+    }
+
+    /**
+     * Returns the branch naming function for this goal. It is either given by directly, via the
+     * name of the goal or
+     * null.
+     */
+    @Nullable
+    public BranchNamingFunction getBranchNamingFunction() {
+        if (namingFunction != null)
+            return namingFunction;
+        if (name != null)
+            return (services, currentSequent, tacletApp, termLabelState) -> name;
+        return null;
     }
 
 

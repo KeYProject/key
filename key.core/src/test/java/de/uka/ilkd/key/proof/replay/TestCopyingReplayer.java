@@ -9,7 +9,7 @@ import java.util.HashSet;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.helper.FindResources;
 
@@ -26,7 +26,7 @@ class TestCopyingReplayer {
 
     @Test
     void testJavaProof() throws Exception {
-        GeneralSettings.noPruningClosed = false;
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(false);
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory,
@@ -51,7 +51,7 @@ class TestCopyingReplayer {
         Assertions.assertTrue(proof2.closed());
         Assertions.assertEquals(proof1.countNodes(), proof2.countNodes());
 
-        GeneralSettings.noPruningClosed = true;
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(true);
 
         env.dispose();
         env2.dispose();

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -244,6 +245,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     // region expression
+    @Override
+    public SLExpression visitPrimaryLbl(JmlParser.PrimaryLblContext ctx) {
+        SLExpression expr = accept(ctx.expression());
+        var label = ctx.ident().getText();
+        var term = tb.label(expr.getTerm(), new SpecNameLabel(label));
+        return new SLExpression(term);
+    }
 
     @Override
     public KeYJavaType visitBuiltintype(JmlParser.BuiltintypeContext ctx) {

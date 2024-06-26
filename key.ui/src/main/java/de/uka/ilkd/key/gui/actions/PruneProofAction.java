@@ -13,7 +13,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * This action is one part of the previous UndoLastStepAction: It prunes the proof tree below the
@@ -64,7 +64,8 @@ public final class PruneProofAction extends MainWindowAction {
                          * command line option "--no-pruning-closed" is set (saves memory)
                          */
                         if (!selNode.leaf() && (proof.getSubtreeGoals(selNode).size() > 0
-                                || (!GeneralSettings.noPruningClosed
+                                || (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                                        .isNoPruningClosed()
                                         && proof.getClosedSubtreeGoals(selNode).size() > 0))) {
 
                             enabled = true;

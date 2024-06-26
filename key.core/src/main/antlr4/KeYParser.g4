@@ -752,7 +752,7 @@ option_expr
 
 goalspec
 :
-  (name=string_value COLON)?
+  ((plainname=string_value) COLON)?
   ( rwObj=replacewith
     addSeq=add?
     addRList=addrules?
@@ -852,7 +852,7 @@ preferences
 
 proofScript
 :
-  PROOFSCRIPT ps = STRING_LITERAL
+  PROOFSCRIPT ps = STRING_LITERAL SEMI?
 ;
 
 // PROOF

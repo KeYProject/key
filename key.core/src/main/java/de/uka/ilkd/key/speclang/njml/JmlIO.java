@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Label;
@@ -10,6 +11,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.SpecNameLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -159,7 +163,6 @@ public class JmlIO {
     }
 
 
-
     /**
      * Parse and interpret the given string as an JML expression in the current context.
      */
@@ -206,12 +209,13 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr) {
         Term term = translateTerm(expr.first);
-        if (expr.second != null) {
-            return services.getTermBuilder().addLabel(term, expr.second);
-        } else {
-            return term;
+        final var termBuilder = services.getTermBuilder();
+        for (TermLabel label : expr.second) {
+            term = termBuilder.addLabel(term, label);
         }
+        return term;
     }
+
 
     /**
      * Interpret the given parse tree as an JML expression in the current context. Attach both given
@@ -219,12 +223,19 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
+
         OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
-        if (expr.second != null) {
-            return services.getTermBuilder().addLabel(term, expr.second);
+        term = services.getTermBuilder().addLabel(term, origin);
+
+        List<TermLabel> labels;
+        if (FeatureSettings
+                .isFeatureActivated(GeneralSettings.FEATURE_JML_ENTITY_NAMES_AS_TERMLABEL)) {
+            labels = expr.second;
         } else {
-            return services.getTermBuilder().addLabel(term, origin);
+            labels = expr.second.stream().filter(it -> !(it instanceof SpecNameLabel)).toList();
         }
+        term = services.getTermBuilder().addLabel(term, new ImmutableArray<>(labels));
+        return term;
     }
 
 
@@ -249,7 +260,7 @@ public class JmlIO {
     public Term translateTermAsFormula(final LabeledParserRuleContext condition) {
         Term term = services.getTermBuilder().convertToFormula(translateTerm(condition.first));
         if (condition.second != null) {
-            return services.getTermBuilder().addLabel(term, condition.second);
+            return services.getTermBuilder().addLabel(term, new ImmutableArray<>(condition.second));
         }
         return term;
     }
@@ -411,7 +422,4 @@ public class JmlIO {
     public void clearWarnings() {
         warnings = ImmutableSLList.nil();
     }
-
-    // region
-    // endregion
 }
