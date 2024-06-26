@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
+import java.util.Objects;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
@@ -16,15 +18,18 @@ import org.jspecify.annotations.Nullable;
 public abstract class AbstractOperator implements Operator {
     private final Name name;
     private final int arity;
+
+    // weigl: should rather be a bit field (int)
     private final @Nullable ImmutableArray<Boolean> whereToBind;
     private final Modifier modifier;
 
-    protected AbstractOperator(Name name, int arity,
-            @Nullable ImmutableArray<Boolean> whereToBind,
+    protected AbstractOperator(Name name, int arity, @Nullable ImmutableArray<Boolean> whereToBind,
             Modifier modifier) {
-        assert arity >= 0;
-        assert whereToBind == null || whereToBind.size() == arity;
-        this.name = name;
+        if (arity < 0)
+            throw new IllegalArgumentException("arity is negative");
+        if (whereToBind != null && whereToBind.size() != arity)
+            throw new AssertionError();
+        this.name = Objects.requireNonNull(name);
         this.arity = arity;
         this.whereToBind = whereToBind;
         this.modifier = modifier;
