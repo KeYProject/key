@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSLList {
 
@@ -32,19 +33,23 @@ public class TestSLList {
         assertEquals("[1,2,3,0]", l.replace(3, 0).toString());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void testReplaceBounds1() {
-        ImmutableList<Integer> l = ImmutableSLList.<Integer>nil().prepend(1, 2, 3, 4);
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
+            ImmutableList<Integer> l = ImmutableSLList.<Integer>nil().prepend(1, 2, 3, 4);
 
-        System.out.println(l.replace(-1, 0));
+            System.out.println(l.replace(-1, 0));
+        });
     }
 
     // revealed a bug
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void testReplaceBounds2() {
-        ImmutableList<Integer> l = ImmutableSLList.<Integer>nil().prepend(1, 2, 3, 4);
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
+            ImmutableList<Integer> l = ImmutableSLList.<Integer>nil().prepend(1, 2, 3, 4);
 
-        System.out.println(l.replace(4, 0));
+            System.out.println(l.replace(4, 0));
+        });
     }
 
 }
