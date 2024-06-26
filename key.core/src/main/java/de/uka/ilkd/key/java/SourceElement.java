@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * A source element is a piece of syntax. It does not necessarily have a semantics, at least none
@@ -12,7 +13,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  * to achieve an immutable structure
  */
 
-public interface SourceElement extends SVSubstitute {
+public interface SourceElement extends SyntaxElement {
 
 
     /**

@@ -557,18 +557,18 @@ public class TestTermLabelManager {
         TermLabel label = manager.parseLabel("ONE", null, services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("ONE", label.name().toString());
-        assertEquals(0, label.getChildCount());
+        assertEquals(0, label.getTLChildCount());
         // Test empty parameter
         label = manager.parseLabel("TWO", null, services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("TWO", label.name().toString());
-        assertEquals(0, label.getChildCount());
+        assertEquals(0, label.getTLChildCount());
         // Test with parameter
         label = manager.parseLabel("THREE", Collections.singletonList("Param"), services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("THREE", label.name().toString());
-        assertEquals(1, label.getChildCount());
-        assertEquals("Param", label.getChild(0));
+        assertEquals(1, label.getTLChildCount());
+        assertEquals("Param", label.getTLChild(0));
         // Test unsupported
         try {
             manager.parseLabel("UNKNOWN", null, services);
@@ -850,12 +850,12 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public Object getChild(int i) {
+        public Object getTLChild(int i) {
             return arguments.get(i);
         }
 
         @Override
-        public int getChildCount() {
+        public int getTLChildCount() {
             return arguments != null ? arguments.size() : 0;
         }
     }

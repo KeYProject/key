@@ -11,13 +11,13 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
@@ -50,10 +50,10 @@ public abstract class TypeResolver {
     }
 
 
-    public abstract boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+    public abstract boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
             SVInstantiations instMap, TermServices services);
 
-    public abstract Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+    public abstract Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
             SVInstantiations instMap, Services services);
 
 
@@ -74,13 +74,13 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
@@ -100,13 +100,13 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return true;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             return s;
         }
@@ -130,18 +130,18 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
 
             final Sort s;
 
-            final SVSubstitute inst = (SVSubstitute) (resolveSV == sv ? instCandidate
+            final SyntaxElement inst = (SyntaxElement) (resolveSV == sv ? instCandidate
                     : instMap.getInstantiation(resolveSV));
 
             if (inst instanceof ProgramVariable) {
@@ -178,18 +178,18 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate,
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
 
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             final Sort result;
 
-            final SVSubstitute inst = (SVSubstitute) (memberSV == sv ? instCandidate
+            final SyntaxElement inst = (SyntaxElement) (memberSV == sv ? instCandidate
                     : instMap.getInstantiation(memberSV));
 
             if (inst instanceof Operator) {
