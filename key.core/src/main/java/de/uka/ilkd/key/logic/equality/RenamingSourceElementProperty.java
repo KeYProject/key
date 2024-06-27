@@ -113,16 +113,18 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     public int hashCodeModThisProperty(SourceElement sourceElement) {
         /*
          * Currently, the best approach seems to be to walk through the SourceElement with a
-         * JavaASTTreeWalker and sum up hash codes.
+         * SyntaxElementCursor and sum up hash codes.
          */
-        JavaASTTreeWalker tw = new JavaASTTreeWalker(sourceElement);
-        SourceElement next = tw.currentNode();
 
         NameAbstractionMap absMap = new NameAbstractionMap();
 
         int hashCode = 1;
+        SyntaxElementCursor c = sourceElement.getCursor();
+        SyntaxElement next;
 
-        while (next != null) {
+        do {
+            // First node can never be null as cursor is initialized with 'this'
+            next = c.getCurrentNode();
             // Handle special cases so that hashCodeModThisProperty follows equalsModThisProperty
             if (next instanceof LabeledStatement ls) {
                 hashCode = 31 * hashCode + ls.getChildCount();
@@ -134,17 +136,15 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
                             + vs.getDimensions();
                 absMap.add(vs);
             } else if (next instanceof ProgramVariable || next instanceof ProgramElementName) {
-                hashCode = 31 * hashCode + absMap.getAbstractName(next);
+                hashCode = 31 * hashCode + absMap.getAbstractName((SourceElement) next);
             } else if (next instanceof JavaNonTerminalProgramElement jnte) {
                 hashCode = 31 * hashCode + jnte.getChildCount();
             } else {
                 // In the standard case, we just use the default hashCode implementation
                 hashCode = 31 * hashCode + next.hashCode();
             }
-
             // walk to the next nodes in the tree
-            next = tw.nextNode();
-        }
+        } while (c.goToNext());
 
         return hashCode;
     }
