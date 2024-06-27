@@ -5,6 +5,9 @@ package de.uka.ilkd.key.logic.equality;
 
 import java.util.Arrays;
 
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -19,12 +22,13 @@ import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for {@link TermEqualsModProperty}.
+ * Tests for {@link EqualsModProperty}.
  *
  * @author Tobias Reinhold
  */
@@ -63,14 +67,14 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         Term term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
-        assertFalse(term1.equalsModProperty(term2, RENAMING_PROPERTY),
+        assertFalse(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
             "Terms are different to begin with, so they shouldn't be equal");
-        assertFalse(term2.equalsModProperty(term1, RENAMING_PROPERTY),
+        assertFalse(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
             "Terms are different to begin with, so they shouldn't be equal");
         // other tests for equality already in TestTerm.java
 
         // ------------ comparison with something that is not a term
-        assertFalse(term1.equalsModProperty(1, RENAMING_PROPERTY),
+        assertFalse(term1.equalsModProperty(1, RENAMING_TERM_PROPERTY),
             "Should be false as other object is not a term");
 
         // ------------ differing labels
@@ -80,23 +84,23 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         ImmutableArray<TermLabel> labels1 = new ImmutableArray<>(irrelevantLabel);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
 
         labels1 = new ImmutableArray<>(relevantLabel1);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
 
         ImmutableArray<TermLabel> labels2 = new ImmutableArray<>(relevantLabel2);
         term2 = tb.label(term2, labels2);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
     }
 
@@ -283,5 +287,22 @@ public class TestEqualsModProperty {
             "Should be false as terms do not have the same relevant term labels");
         assertFalse(term2.equalsModProperty(term1, PROOF_IRRELEVANCY_PROPERTY),
             "Should be false as terms do not have the same relevant term labels");
+    }
+
+    @Test
+    public void renamingSourceElements() {
+        Term match1 = TacletForTests.parseTerm("\\<{ int i; int j; /*Test*/ }\\>true");
+        Term match2 = TacletForTests.parseTerm("\\<{ int i; /*Another test*/ int k; }\\>true");
+        assertTrue(
+            match1.equalsModProperty(match2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            "Terms should be equalModRenaming (0).");
+
+        Comment testComment = new Comment("test");
+        StringLiteral stringLiteral = new StringLiteral("testStringLiteral");
+
+        assertFalse(testComment.equalsModProperty(stringLiteral, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable()));
+        assertFalse(stringLiteral.equalsModProperty(testComment, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable()));
     }
 }

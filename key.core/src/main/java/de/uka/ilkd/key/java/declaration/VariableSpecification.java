@@ -257,16 +257,17 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         v.performActionOnVariableSpecification(this);
     }
 
-    /**
-     * equals modulo renaming is described in the corresponding comment in class SourceElement. The
-     * variables declared in the local variable declaration have to be added to the
-     * NameAbstractionTable.
-     */
     @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof VariableSpecification vs)) {
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
+
+        VariableSpecification vs = (VariableSpecification) o;
+
         if (dimensions != vs.getDimensions()) {
             return false;
         }
@@ -279,12 +280,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
                 return false;
             }
         }
-        nat.add(var, vs.getProgramVariable());
+
         if (vs.getChildCount() != getChildCount()) {
             return false;
         }
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equalsModRenaming(vs.getChildAt(i), nat)) {
+            if (!getChildAt(i).equals(vs.getChildAt(i))) {
                 return false;
             }
         }

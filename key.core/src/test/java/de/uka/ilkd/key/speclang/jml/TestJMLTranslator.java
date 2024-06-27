@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
@@ -185,7 +185,7 @@ public class TestJMLTranslator {
             services.getNamespaces().sorts().lookup(new Name("int")));
         Term expected = TB.all(i, TB.imp(TB.inInt(TB.var(i)),
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
-        assertTrue(result.equalsModProperty(expected, RENAMING_PROPERTY),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
     }
 
@@ -201,7 +201,7 @@ public class TestJMLTranslator {
             services.getNamespaces().sorts().lookup(new Name("int")));
         Term expected = TB.ex(i, TB.and(TB.inInt(TB.var(i)),
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
-        assertTrue(result.equalsModProperty(expected, RENAMING_PROPERTY),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
     }
 
@@ -217,7 +217,7 @@ public class TestJMLTranslator {
             TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i)));
         assertNotNull(result);
         Assertions.assertSame(q, result.sub(0).op());
-        assertTrue(result.equalsModProperty(expected, RENAMING_PROPERTY),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
     }
 
@@ -231,7 +231,7 @@ public class TestJMLTranslator {
         Term expected = TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i));
         assertNotNull(result);
         Assertions.assertSame(q, result.op());
-        assertTrue(result.equalsModProperty(expected, RENAMING_PROPERTY),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
     }
 
@@ -248,7 +248,7 @@ public class TestJMLTranslator {
             TB.not(TB.equals(TB.var(o), TB.NULL())));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
             TB.ife(guard, TB.empty(), TB.empty()));
-        assertTrue(result.equalsModProperty(expected, RENAMING_PROPERTY),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
     }
 
@@ -266,7 +266,7 @@ public class TestJMLTranslator {
             TB.or(TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
             TB.ife(guard, TB.empty(), TB.empty()));
-        assertTrue(result.equalsModProperty(expected, RENAMING_PROPERTY),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
     }
 
@@ -447,7 +447,7 @@ public class TestJMLTranslator {
                     TB.not(TB.equals(TB.var(qv), TB.NULL()))), // implicit non null
                 TB.equals(TB.var(qv), TB.var(selfVar))));
 
-        final boolean condition = result.equalsModProperty(expected, RENAMING_PROPERTY);
+        final boolean condition = result.equalsModProperty(expected, RENAMING_TERM_PROPERTY);
         assertTrue(condition, format("Expected:%s\n Was:%s",
             ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)));
     }

@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * Command that applies a calculus rule All parameters are passed as strings and converted by the
@@ -330,7 +330,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
             throws ScriptException {
         final boolean satisfiesFormulaParameter =
-            p.formula != null && sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY);
+            p.formula != null && sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY);
 
         final boolean satisfiesMatchesParameter = p.matches != null
                 && formatTermString(LogicPrinter.quickPrintTerm(sf.formula(), services))
@@ -361,7 +361,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             if (tacletApp instanceof PosTacletApp pta) {
                 boolean add =
                     p.on == null || pta.posInOccurrence().subTerm()
-                            .equalsModProperty(p.on, RENAMING_PROPERTY);
+                            .equalsModProperty(p.on, RENAMING_TERM_PROPERTY);
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
