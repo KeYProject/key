@@ -10,9 +10,11 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.visitor.JavaASTTreeWalker;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.SyntaxElementCursor;
 
 /**
  * A property that can be used in
@@ -63,13 +65,14 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
             nat = new NameAbstractionTable();
         }
 
-        JavaASTTreeWalker tw1 = new JavaASTTreeWalker(se1);
-        JavaASTTreeWalker tw2 = new JavaASTTreeWalker(se2);
+        SyntaxElementCursor c1 = se1.getCursor(), c2 = se2.getCursor();
+        SyntaxElement next1, next2;
+        boolean hasNext1, hasNext2; // Check at the end if both cursors have reached the end
 
-        SourceElement next1 = tw1.currentNode();
-        SourceElement next2 = tw2.currentNode();
-
-        while (next1 != null && next2 != null) {
+        do {
+            // First nodes can never be null as cursor is initialized with 'this'
+            next1 = c1.getCurrentNode();
+            next2 = c2.getCurrentNode();
             // Handle special cases of prior equalsModRenaming implementation
             if (next1 instanceof LabeledStatement ls) {
                 if (!handleLabeledStatement(ls, next2, nat)) {
@@ -93,13 +96,10 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
                     return false;
                 }
             }
-
             // walk to the next nodes in the tree
-            next1 = tw1.nextNode();
-            next2 = tw2.nextNode();
-        }
+        } while ((hasNext1 = c1.goToNext()) & (hasNext2 = c2.goToNext()));
 
-        return next1 == null && next2 == null;
+        return hasNext1 == hasNext2;
     }
 
     // TODO: hashCodeModThisProperty currently does not take a NameAbstractionTable as an argument.
@@ -151,14 +151,14 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     /*------------- Helper methods for special cases in equalsModThisProperty --------------*/
     /**
-     * Handles the standard case of comparing two {@link SourceElement}s modulo renaming.
+     * Handles the standard case of comparing two {@link SyntaxElement}s modulo renaming.
      *
-     * @param se1 the first {@link SourceElement} to be compared
-     * @param se2 the second {@link SourceElement} to be compared
+     * @param se1 the first {@link SyntaxElement} to be compared
+     * @param se2 the second {@link SyntaxElement} to be compared
      * @return {@code true} iff the two source elements are equal under the standard {@code equals}
      *         method
      */
-    private boolean handleStandard(SourceElement se1, SourceElement se2) {
+    private boolean handleStandard(SyntaxElement se1, SyntaxElement se2) {
         /*
          * As the prior implementations of equalsModRenaming for SourceElements were mostly the same
          * as their normal equals methods, we decided to move equalsModRenaming completely into the
@@ -170,15 +170,15 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     /**
      * Handles the special case of comparing a {@link JavaNonTerminalProgramElement} to a
-     * {@link SourceElement}.
+     * {@link SyntaxElement}.
      *
      * @param jnte the {@link JavaNonTerminalProgramElement} to be compared
-     * @param se the {@link SourceElement} to be compared
+     * @param se the {@link SyntaxElement} to be compared
      * @return {@code true} iff {@code se} is of the same class and has the same number of children
      *         as {@code jnte}
      */
     private boolean handleJavaNonTerminalProgramElements(JavaNonTerminalProgramElement jnte,
-            SourceElement se) {
+            SyntaxElement se) {
         /*
          * A JavaNonTerminalProgramElement is a special case of a SourceElement, as we must not
          * traverse the children recursively through the normal equals method. This is the case
@@ -196,15 +196,15 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     }
 
     /**
-     * Handles the special case of comparing a {@link LabeledStatement} to a {@link SourceElement}.
+     * Handles the special case of comparing a {@link LabeledStatement} to a {@link SyntaxElement}.
      *
      * @param ls the {@link LabeledStatement} to be compared
-     * @param se the {@link SourceElement} to be compared
+     * @param se the {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} the label of {@code ls} should be added to
      * @return {@code true} iff {@code se} is also a {@link LabeledStatement} and has the same
      *         number of children as {@code ls}
      */
-    private boolean handleLabeledStatement(LabeledStatement ls, SourceElement se,
+    private boolean handleLabeledStatement(LabeledStatement ls, SyntaxElement se,
             NameAbstractionTable nat) {
         /*
          * A LabeledStatement is a special case of a JavaNonTerminalProgramElement, as we must also
@@ -226,15 +226,15 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     /**
      * Handles the special case of comparing a {@link VariableSpecification} to a
-     * {@link SourceElement}.
+     * {@link SyntaxElement}.
      *
      * @param vs the {@link VariableSpecification} to be compared
-     * @param se the {@link SourceElement} to be compared
+     * @param se the {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} the variable of {@code vs} should be added to
      * @return {@code true} iff {@code se} is of the same class as {@code vs} and has the same
      *         number of children, dimensions and type
      */
-    private boolean handleVariableSpecification(VariableSpecification vs, SourceElement se,
+    private boolean handleVariableSpecification(VariableSpecification vs, SyntaxElement se,
             NameAbstractionTable nat) {
         /*
          * A VariableSpecification is a special case of a JavaNonTerminalProgramElement similar to
@@ -269,16 +269,16 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
 
     /**
      * Handles the special case of comparing a {@link ProgramVariable} or a
-     * {@link ProgramElementName} to a {@link SourceElement}.
+     * {@link ProgramElementName} to a {@link SyntaxElement}.
      *
-     * @param se1 the first {@link SourceElement} which is either a {@link ProgramVariable} or a
+     * @param se1 the first {@link SyntaxElement} which is either a {@link ProgramVariable} or a
      *        {@link ProgramElementName}
-     * @param se2 the second {@link SourceElement} to be compared
+     * @param se2 the second {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} that should be used to check whether {@code se1}
      *        and {@code se2} have the same abstract name
      * @return {@code true} iff {@code se1} and {@code se2} have the same abstract name
      */
-    private boolean handleProgramVariableOrElementName(SourceElement se1, SourceElement se2,
+    private boolean handleProgramVariableOrElementName(SyntaxElement se1, SyntaxElement se2,
             NameAbstractionTable nat) {
         /*
          * A ProgramVariable or a ProgramElementName is a special case of a SourceElement and one
@@ -288,7 +288,10 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         if (se1.getClass() != se2.getClass()) {
             return false;
         }
-        return nat.sameAbstractName(se1, se2);
+        // We can cast here as se1 is either a ProgramVariable or a ProgramElementName
+        // (this method is only called for these two classes in equalsModThisProperty)
+        // and se2 is of the same class as se1
+        return nat.sameAbstractName((SourceElement) se1, (SourceElement) se2);
     }
 
 

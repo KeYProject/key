@@ -816,11 +816,11 @@ public class LogicPrinter {
                 afterFirst = true;
             }
             layouter.print(l.name().toString());
-            if (l.getChildCount() > 0) {
+            if (l.getTLChildCount() > 0) {
                 layouter.print("(").beginC();
-                for (int i = 0; i < l.getChildCount(); i++) {
-                    layouter.print("\"" + l.getChild(i).toString() + "\"");
-                    if (i < l.getChildCount() - 1) {
+                for (int i = 0; i < l.getTLChildCount(); i++) {
+                    layouter.print("\"" + l.getTLChild(i).toString() + "\"");
+                    if (i < l.getTLChildCount() - 1) {
                         layouter.print(",").ind(1, 2);
                     }
                 }
