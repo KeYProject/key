@@ -1,7 +1,9 @@
 package org.key_project.rusty.logic;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.Equality;
 import org.key_project.rusty.logic.op.Junctor;
 import org.key_project.rusty.logic.op.Quantifier;
@@ -11,11 +13,13 @@ public class TermBuilder {
     private final TermFactory tf;
     private final Term tt;
     private final Term ff;
+    private final Services services;
 
-    public TermBuilder(TermFactory tf) {
+    public TermBuilder(TermFactory tf, Services services) {
         this.tf = tf;
         this.tt = tf.createTerm(Junctor.TRUE);
         this.ff = tf.createTerm(Junctor.FALSE);
+        this.services = services;
     }
 
     public TermFactory tf() {
@@ -159,5 +163,21 @@ public class TermBuilder {
         } else {
             return tf.createTerm(Equality.EQUALS, t1, t2);
         }
+    }
+
+    public Term func(Function f, Term... subs) {
+        return tf.createTerm(f, subs);
+    }
+
+    // -------------------------------------------------------------------------
+    // boolean operators
+    // -------------------------------------------------------------------------
+
+    public Term TRUE() {
+        return services.getLDTs().getBoolLDT().getTrueTerm();
+    }
+
+    public Term FALSE() {
+        return services.getLDTs().getBoolLDT().getFalseTerm();
     }
 }
