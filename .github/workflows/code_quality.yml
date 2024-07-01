@@ -20,7 +20,7 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.3.2
+        uses: gradle/actions/setup-gradle@v3.4.2
       - name: Build with Gradle
         run: ./gradlew -DENABLE_NULLNESS=true compileTest
 
@@ -49,7 +49,7 @@ jobs:
           java-version: '21'
           cache: 'gradle'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.3.2
+        uses: gradle/actions/setup-gradle@v3.4.2
       - name: SpotlessCheck
         run: ./gradlew --continue spotlessCheck
 
@@ -81,7 +81,7 @@ jobs:
           java-version: '21'
           cache: 'gradle'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.3.2
+        uses: gradle/actions/setup-gradle@v3.4.2
       - name: Checkstyle
         run: ./gradlew --continue checkstyleMainChanged
       - run: |
@@ -108,7 +108,7 @@ jobs:
           java-version: '21'
           cache: 'gradle'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.3.2
+        uses: gradle/actions/setup-gradle@v3.4.2
       - name: PMD checks
         run: ./gradlew --continue pmdMainChanged
 
