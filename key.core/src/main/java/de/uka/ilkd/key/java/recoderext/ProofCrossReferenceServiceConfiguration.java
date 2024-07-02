@@ -11,7 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-// This file is part of the RECODER library and protected by the LGPL.
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.ProgramFactory;
