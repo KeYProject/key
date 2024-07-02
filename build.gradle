@@ -17,6 +17,9 @@ plugins {
     //Some Licenses requires an entry in the credits (MIT, BSD)
     id "com.github.hierynomus.license-report" version "0.16.1"
 
+    // Code formatting
+    id "com.diffplug.spotless" version "6.25.0"
+
     id "org.sonarqube" version "3.3"
 
     // Gives `gradle dependencyUpdate` to show which dependency has a newer version
@@ -81,6 +84,7 @@ subprojects {
     apply plugin: "maven-publish"
     apply plugin: "idea"
     apply plugin: "eclipse"
+    apply plugin: "com.diffplug.spotless"
 
     group = rootProject.group
     version = rootProject.version
@@ -315,6 +319,62 @@ subprojects {
                     entries.findAll { it.path.endsWith('src/test/antlr') }.each { it.excludes = ["**/*.java"] }
                     entries.findAll { it.path.endsWith('/resources') }.each { it.excludes = ["**/*.java"] }
                 }
+            }
+        }
+    }
+
+    spotless {
+        // see https://github.com/diffplug/spotless/tree/main/plugin-gradle
+
+        // optional: limit format enforcement to just the files changed by this feature branch
+        // ratchetFrom 'origin/master'
+
+        format('Key') {
+            // define the files to apply `misc` to
+            //target '*.gradle', '*.md', '.gitignore'
+            target 'src/main/resources/**/*.key'
+            trimTrailingWhitespace()
+            //indentWithSpaces(4)       // this does not really work
+            endWithNewline()
+            // TODO: license headers are problematic at the moment,
+            //  see https://git.key-project.org/key/key/-/wikis/KaKeY%202022-09-30
+            //licenseHeaderFile("$rootDir/gradle/header", '\\s*\\\\\\w+')
+        }
+
+        antlr4 {
+            target 'src/*/antlr4/**/*.g4' // default value, you can change if you want
+            //licenseHeaderFile "$rootDir/gradle/header"
+        }
+
+        java {
+            //target("*.java")
+            // don't need to set target, it is inferred from java
+
+            // We ignore the build folder to avoid double checks and checks of generated code.
+            targetExclude 'build/**'
+
+            // allows us to use spotless:off / spotless:on to keep pre-formatted sections
+            toggleOffOn()
+
+            removeUnusedImports()
+            /* At the moment, we have to ensure that version 4.22 of the eclipse formatter is run, since newer versions
+             * of the formatter crash in SymbolicExecutionTreeBuilder (seems to be a but in the formatter)!
+             */
+            eclipse("4.22").configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
+            trimTrailingWhitespace()        // not sure how to set this in the xml file ...
+            //googleJavaFormat().aosp().reflowLongStrings()
+
+            // note: you can use an empty string for all the imports you didn't specify explicitly,
+            // '|' to join group without blank line, and '\\#` prefix for static imports
+            importOrder('java|javax', 'de.uka', 'org.key_project', '', '\\#')
+
+            // specific delimiter: normally just 'package', but spotless crashes for files in default package
+            // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
+            // with completely commented out code (which would probably better just be removed in future).
+            if(project.name == 'recoder') {
+                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
+            }else {
+                licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
             }
         }
     }
