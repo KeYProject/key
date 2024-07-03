@@ -6,7 +6,6 @@ package de.uka.ilkd.key.taclettranslation;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -16,6 +15,8 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.logic.Namespace;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Assertions;

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.*;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import org.key_project.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 

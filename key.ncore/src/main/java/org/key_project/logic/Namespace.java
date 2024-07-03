@@ -169,7 +169,8 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * @return Object with name "name" or null if no such an object has been found
      */
     public @Nullable E lookup(Name name) {
-        @Nullable E symbol = lookupLocally(name);
+        @Nullable
+        E symbol = lookupLocally(name);
         if (symbol != null) {
             return symbol;
         }
