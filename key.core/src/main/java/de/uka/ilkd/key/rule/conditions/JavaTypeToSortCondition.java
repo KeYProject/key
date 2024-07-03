@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Expression;
@@ -25,83 +29,82 @@ import de.uka.ilkd.key.util.Debug;
 public final class JavaTypeToSortCondition implements VariableCondition {
 
     private final SchemaVariable exprOrTypeSV;
-    private final GenericSort    sort;
+    private final GenericSort sort;
     private final boolean elemSort;
-    
-    
+
+
     public JavaTypeToSortCondition(final SchemaVariable exprOrTypeSV,
-                                   final GenericSort sort,
-                                   final boolean elemSort) {
+            final GenericSort sort,
+            final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         this.elemSort = elemSort;
-        
+
         if (!checkSortedSV(exprOrTypeSV)) {
-            throw new RuntimeException
-            ( "Expected a program schemavariable for expressions" );
+            throw new RuntimeException("Expected a program schemavariable for expressions");
         }
     }
 
 
     public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
-        final Sort svSort = exprOrTypeSV.sort ();
+        final Sort svSort = exprOrTypeSV.sort();
         if (svSort == ProgramSVSort.EXPRESSION
-             || svSort == ProgramSVSort.SIMPLEEXPRESSION
-             || svSort == ProgramSVSort.NONSIMPLEEXPRESSION
-             || svSort == ProgramSVSort.TYPE
-             || exprOrTypeSV.arity() == 0)  {
+                || svSort == ProgramSVSort.SIMPLEEXPRESSION
+                || svSort == ProgramSVSort.NONSIMPLEEXPRESSION
+                || svSort == ProgramSVSort.TYPE
+                || exprOrTypeSV.arity() == 0) {
             return true;
         }
         return false;
     }
-  
-    
+
+
     @Override
     public MatchConditions check(SchemaVariable var,
-                                 SVSubstitute svSubst,
-                                 MatchConditions matchCond,
-                                 Services services) {
-        if ( var != exprOrTypeSV ) {
+            SVSubstitute svSubst,
+            MatchConditions matchCond,
+            Services services) {
+        if (var != exprOrTypeSV) {
             return matchCond;
         }
-        
-        Debug.assertTrue ( svSubst instanceof Expression || 
+
+        Debug.assertTrue(svSubst instanceof Expression ||
                 svSubst instanceof TypeReference ||
                 svSubst instanceof Term);
-        
-        final SVInstantiations inst = matchCond.getInstantiations ();
+
+        final SVInstantiations inst = matchCond.getInstantiations();
         Sort type;
         if (svSubst instanceof Term) {
-            type = ((Term)svSubst).sort();
+            type = ((Term) svSubst).sort();
         } else if (svSubst instanceof TypeReference) {
-            type = ((TypeReference)svSubst).getKeYJavaType().getSort();
+            type = ((TypeReference) svSubst).getKeYJavaType().getSort();
         } else {
-            final Expression expr = (Expression)svSubst;          
-            type = expr.getKeYJavaType ( services, inst.getExecutionContext () ).getSort();
+            final Expression expr = (Expression) svSubst;
+            type = expr.getKeYJavaType(services, inst.getExecutionContext()).getSort();
         }
-        if(elemSort) {
-            if(type instanceof ArraySort) {
-        	type = ((ArraySort)type).elementSort();
+        if (elemSort) {
+            if (type instanceof ArraySort) {
+                type = ((ArraySort) type).elementSort();
             } else {
-        	return null;
+                return null;
             }
         }
         try {
-            return matchCond.setInstantiations ( inst.add( 
-        	    GenericSortCondition.createIdentityCondition(sort, type),
-        	    services) );
-        } catch ( SortException e ) {
+            return matchCond.setInstantiations(inst.add(
+                GenericSortCondition.createIdentityCondition(sort, type),
+                services));
+        } catch (SortException e) {
             return null;
-        }        
+        }
     }
 
-    
+
     @Override
-    public String toString () {
-        return "\\hasSort(" 
-               + (elemSort ? "\\elemSort(" + exprOrTypeSV + ")" : exprOrTypeSV)
-               + ", " 
-               + sort 
-               + ")";
+    public String toString() {
+        return "\\hasSort("
+            + (elemSort ? "\\elemSort(" + exprOrTypeSV + ")" : exprOrTypeSV)
+            + ", "
+            + sort
+            + ")";
     }
 }

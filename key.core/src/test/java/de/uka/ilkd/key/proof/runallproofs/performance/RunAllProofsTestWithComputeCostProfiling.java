@@ -1,10 +1,8 @@
-package de.uka.ilkd.key.proof.runallproofs.performance;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import org.junit.jupiter.api.*;
+package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,13 +10,21 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+
+import org.junit.jupiter.api.*;
+
 /**
  * Same as {@link RunAllProofsFunctional} but we alter
  * {@link JavaCardDLStrategy#computeCost(de.uka.ilkd.key.rule.RuleApp, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.proof.Goal)}
  * so that statistical data about that method can be recorded (time duration,
  * number of invocations and potentially other stuff).
  */
-@Tag("performance") @Tag("owntest")
+@Tag("performance")
+@Tag("owntest")
 public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
     private static ProfilingDirectories directories;
     static File plotScript;
@@ -36,7 +42,8 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     @TestFactory
     Stream<DynamicTest> data() throws Exception {
-        ProofCollection proofCollection = parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
+        ProofCollection proofCollection =
+            parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
         proofCollection.getSettings().getStatisticsFile().setUp();
         initDirectories(proofCollection.getSettings().runStart);
         return data(proofCollection);
@@ -65,7 +72,8 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
             // gnuplot -e "ruledatalocation=' /.../rulename'" plot2png.sh
             System.out.println("Plotting data for rule: " + ruleData.getName().split(".data")[0]);
-            ProcessBuilder pb = new ProcessBuilder("gnuplot", "-e", "ruledatalocation='" + ruleName + "'",
+            ProcessBuilder pb =
+                new ProcessBuilder("gnuplot", "-e", "ruledatalocation='" + ruleName + "'",
                     plotScript.getAbsolutePath());
             pb.inheritIO();
             try {

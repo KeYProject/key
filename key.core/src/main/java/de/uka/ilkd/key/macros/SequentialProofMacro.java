@@ -1,11 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -16,6 +18,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros
@@ -56,10 +60,10 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+            ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
-        if(macros.isEmpty()) {
+        if (macros.isEmpty()) {
             return false;
         } else {
             return macros.get(0).canApplyTo(proof, goals, posInOcc);
@@ -75,29 +79,29 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * unregisters itself after the last macro.
      *
      * @throws InterruptedException
-     *             if one of the wrapped macros is interrupted.
+     *         if one of the wrapped macros is interrupted.
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException, Exception {
+            Proof proof,
+            ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException, Exception {
         final List<Node> initNodes = new ArrayList<Node>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());
         }
-        final ImmutableList<Goal> gs = initNodes.isEmpty() ?
-                proof.openEnabledGoals() : proof.getSubtreeEnabledGoals(initNodes.get(0));
+        final ImmutableList<Goal> gs = initNodes.isEmpty() ? proof.openEnabledGoals()
+                : proof.getSubtreeEnabledGoals(initNodes.get(0));
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof, false);
         for (final ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
                 if (macro.canApplyTo(initNode, posInOcc)) {
                     final ProverTaskListener pml =
-                            new ProofMacroListener(macro.getName(), listener);
+                        new ProofMacroListener(macro.getName(), listener);
                     pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
-                    synchronized(macro) {
+                    synchronized (macro) {
                         // wait for macro to terminate
                         info = macro.applyTo(uic, initNode, posInOcc, pml);
                     }
@@ -115,7 +119,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * @return the proofMacros as an unmodifiable list.
      */
     public List<ProofMacro> getProofMacros() {
-        if(proofMacros == null) {
+        if (proofMacros == null) {
             this.proofMacros = createProofMacroArray();
             assert proofMacros != null;
             assert proofMacros.length > 0;

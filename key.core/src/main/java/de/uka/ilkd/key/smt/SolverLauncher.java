@@ -1,13 +1,17 @@
-package de.uka.ilkd.key.smt;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
-import de.uka.ilkd.key.smt.st.SolverType;
+package de.uka.ilkd.key.smt;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
+import de.uka.ilkd.key.smt.st.SolverType;
 
 /**
  * IN ORDER TO START THE SOLVERS USE THIS CLASS.<br>
@@ -111,9 +115,9 @@ public class SolverLauncher implements SolverListener {
      * calling thread is blocked until the method returns. (Synchronous method
      * call).
      *
-     * @param problem     The problem that should be translated and passed to the
-     *                    solvers
-     * @param services    The services object of the current proof.
+     * @param problem The problem that should be translated and passed to the
+     *        solvers
+     * @param services The services object of the current proof.
      * @param solverTypes A list of solver types that should be used for the problem.
      */
     public void launch(SMTProblem problem, Services services, SolverType... solverTypes) {
@@ -126,13 +130,13 @@ public class SolverLauncher implements SolverListener {
      * Calling this methods does not create an extra thread, i.e. the calling
      * thread is blocked until the method returns. (Synchronous method call).
      *
-     * @param problems    The problems that should be translated and passed to the
-     *                    solvers
-     * @param services    The services object of the current proof.
+     * @param problems The problems that should be translated and passed to the
+     *        solvers
+     * @param services The services object of the current proof.
      * @param solverTypes A list of solver types that should be used for the problem.
      */
     public void launch(Collection<SolverType> solverTypes,
-                       Collection<SMTProblem> problems, Services services) {
+            Collection<SMTProblem> problems, Services services) {
         checkLaunchCall();
         launchIntern(solverTypes, problems, services);
     }
@@ -151,7 +155,7 @@ public class SolverLauncher implements SolverListener {
      * Period of a timer task. Sometimes it happens that a timer event got lost.
      * Therefore the timer tasks are called periodly until it is canceld
      */
-	private static final int PERIOD = 50;
+    private static final int PERIOD = 50;
 
     /**
      * Used for synchronisation. This lock is used in the same way as the
@@ -198,7 +202,7 @@ public class SolverLauncher implements SolverListener {
      * problems.
      */
     private void prepareSolvers(Collection<SolverType> factories,
-                                Collection<SMTProblem> problems, Services services) {
+            Collection<SMTProblem> problems, Services services) {
         for (SMTProblem problem : problems) {
             for (SolverType factory : factories) {
                 if (factory.isInstalled(false)) {
@@ -211,7 +215,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void launchIntern(SMTProblem problem, Services services,
-                              SolverType[] solverTypes) {
+            SolverType[] solverTypes) {
         LinkedList<SolverType> types = new LinkedList<>();
         Collections.addAll(types, solverTypes);
         LinkedList<SMTProblem> problems = new LinkedList<>();
@@ -220,7 +224,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void launchIntern(Collection<SolverType> factories,
-                              Collection<SMTProblem> problems, Services services) {
+            Collection<SMTProblem> problems, Services services) {
         // consider only installed solvers.
         LinkedList<SolverType> installedSolvers = new LinkedList<>();
         for (SolverType type : factories) {
@@ -243,7 +247,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void launchIntern(Collection<SMTProblem> problems,
-                              Collection<SolverType> factories) {
+            Collection<SolverType> factories) {
 
         LinkedList<SMTSolver> solvers = new LinkedList<>();
         for (SMTProblem problem : problems) {
@@ -285,12 +289,12 @@ public class SolverLauncher implements SolverListener {
     private boolean startNextSolvers(Queue<SMTSolver> solvers) {
         return !solvers.isEmpty()
                 && session.getCurrentlyRunningCount() < settings
-                .getMaxConcurrentProcesses();
+                        .getMaxConcurrentProcesses();
     }
 
     private void launchSolvers(Queue<SMTSolver> solvers,
-                               Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
-        //Show progress dialog
+            Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
+        // Show progress dialog
         notifyListenersOfStart(problems, solverTypes);
 
         // Launch all solvers until the queue is empty or the launcher is
@@ -307,7 +311,8 @@ public class SolverLauncher implements SolverListener {
 
     }
 
-    private void notifyListenersOfStart(Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
+    private void notifyListenersOfStart(Collection<SMTProblem> problems,
+            Collection<SolverType> solverTypes) {
         for (SolverLauncherListener listener : listeners) {
             listener.launcherStarted(problems, solverTypes, this);
         }
@@ -422,7 +427,7 @@ public class SolverLauncher implements SolverListener {
 
     @Override
     public void processInterrupted(SMTSolver solver, SMTProblem problem,
-                                   Throwable e) {
+            Throwable e) {
         session.addProblemSolver(solver);
         notifySolverHasFinished(solver);
     }
@@ -437,6 +442,7 @@ public class SolverLauncher implements SolverListener {
     }
 
 }
+
 
 /**
  * The session class encapsulates some attributes that should be only accessed

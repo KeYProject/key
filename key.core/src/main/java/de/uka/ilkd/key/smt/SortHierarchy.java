@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt;
 
+
+import java.util.*;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 
 class SortWrapper {
@@ -43,8 +47,9 @@ class SortWrapper {
         return parentSorts;
     }
 
-    void computeParentSorts(LinkedList<SortWrapper> sorts, boolean explicitNullHierarchy, boolean explicitHierarchy,
-                            Services services) {
+    void computeParentSorts(LinkedList<SortWrapper> sorts, boolean explicitNullHierarchy,
+            boolean explicitHierarchy,
+            Services services) {
         for (SortWrapper sw : sorts) {
             if (this.extendsTrans(sw)) {
                 addParent(sw, explicitNullHierarchy, explicitHierarchy, services);
@@ -62,7 +67,7 @@ class SortWrapper {
     }
 
     private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy,
-                              boolean explicitHierarchy, Services services) {
+            boolean explicitHierarchy, Services services) {
         Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
         if ((explicitNullHierarchy && this.getSort() == nullOp.sort()) || explicitHierarchy) {
             parentSorts.add(parent);
@@ -84,6 +89,7 @@ class SortWrapper {
 
 }
 
+
 /**
  * The SortHierarchy works as a wrapper class for sorts.
  *
@@ -97,15 +103,15 @@ public class SortHierarchy {
      * Create a Sort Hierarchy.
      *
      * @param sortnames a HashMap of sorts mapped to the Strings which is displayed in
-     *                  Formulas
+     *        Formulas
      */
     protected SortHierarchy(Map<Sort, StringBuilder> sortnames,
-                            Map<Sort, StringBuilder> prednames,
-                            boolean explicitNullHierarchy, boolean explicitHierarchy,
-                            Services services) {
+            Map<Sort, StringBuilder> prednames,
+            boolean explicitNullHierarchy, boolean explicitHierarchy,
+            Services services) {
         for (Entry<Sort, StringBuilder> entry : sortnames.entrySet()) {
             sorts.add(new SortWrapper(entry.getKey(), entry.getValue(),
-                    prednames.get(entry.getKey())));
+                prednames.get(entry.getKey())));
         }
 
         for (SortWrapper sw : sorts) {

@@ -1,16 +1,14 @@
-/*
- * Created on 04.01.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.abstraction;
-
-import recoder.ModelException;
-import recoder.service.ProgramModelInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import recoder.ModelException;
+import recoder.service.ProgramModelInfo;
 
 /**
  * Represents an intersection type, which was introduced in java 5.
@@ -41,21 +39,28 @@ public class IntersectionType implements ClassType {
         return res.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getProgramModelInfo()
      */
     public ProgramModelInfo getProgramModelInfo() {
         return pmi;
     }
 
-    /* (non-Javadoc)
-     * @see recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
      */
     public void setProgramModelInfo(ProgramModelInfo pmi) {
         this.pmi = pmi;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.NamedModelElement#getName()
      */
     public String getName() {

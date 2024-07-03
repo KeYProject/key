@@ -1,3 +1,7 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.kit;
@@ -53,7 +57,7 @@ public class NameGenerator {
     /**
      * Create a generator for names based on the given name and style.
      *
-     * @param base     the base name.
+     * @param base the base name.
      * @param strategy the style to use.
      */
     public NameGenerator(String base, int strategy) {
@@ -80,12 +84,12 @@ public class NameGenerator {
     private static String[] getLetters(String base) {
         char c = Character.toLowerCase(base.charAt(0));
         if (c < 'y') {
-            return new String[]{base, "" + (char) (c + 1), "" + (char) (c + 2)};
+            return new String[] { base, "" + (char) (c + 1), "" + (char) (c + 2) };
         }
         if (c < 'z') {
-            return new String[]{base, "" + (char) (c + 1)};
+            return new String[] { base, "" + (char) (c + 1) };
         }
-        return new String[]{base};
+        return new String[] { base };
     }
 
     /**
@@ -258,7 +262,7 @@ public class NameGenerator {
             if (len == 1) {
                 derivates = getLetters(res.toString());
             } else {
-                derivates = new String[]{res.toString()};
+                derivates = new String[] { res.toString() };
             }
         } else {
             int c = 1;

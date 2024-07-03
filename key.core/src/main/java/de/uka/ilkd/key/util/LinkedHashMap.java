@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
 import java.util.Map;
 
 public class LinkedHashMap<K, V>
-    extends java.util.LinkedHashMap<K, V>
-    implements Iterable<Pair<K, V>> {
+        extends java.util.LinkedHashMap<K, V>
+        implements Iterable<Pair<K, V>> {
 
 
     private static final long serialVersionUID = 4295774122581786871L;
@@ -16,7 +20,7 @@ public class LinkedHashMap<K, V>
 
 
     public LinkedHashMap(Map<? extends K, ? extends V> m) {
-    super(m);
+        super(m);
     }
 
 
@@ -38,7 +42,7 @@ public class LinkedHashMap<K, V>
     }
 
 
-    public void putAll(K[] keys, V[]vals) {
+    public void putAll(K[] keys, V[] vals) {
         for (int i = 0; i < keys.length; i++) {
             if (i < vals.length) {
                 put(keys[i], vals[i]);
@@ -70,7 +74,7 @@ public class LinkedHashMap<K, V>
         private final LinkedHashMap<K, V> map;
         private K last = null;
 
-        public PairIterator (final LinkedHashMap<K, V> map) {
+        public PairIterator(final LinkedHashMap<K, V> map) {
             this.map = map;
             keyIt = map.keySet().iterator();
         }

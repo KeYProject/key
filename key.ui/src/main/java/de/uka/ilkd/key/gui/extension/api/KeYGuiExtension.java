@@ -1,16 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.extension.api;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
 import java.util.List;
-
+import javax.annotation.Nonnull;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
-
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;
@@ -93,14 +95,16 @@ public interface KeYGuiExtension {
         /**
          * A list of actions which should be added to the main menu.
          * <p>
-         * Actions should use the {@link de.uka.ilkd.key.gui.actions.KeyAction#PATH} and {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY}
+         * Actions should use the {@link de.uka.ilkd.key.gui.actions.KeyAction#PATH} and
+         * {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY}
          * to control their position in the menu.
          *
          * @param mainWindow the window of the main menu
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow);
+        @Nonnull
+        List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow);
     }
 
     /**
@@ -124,10 +128,11 @@ public interface KeYGuiExtension {
          * <p>
          * Called before any other method; can be used to construct the UI.
          *
-         * @param window   parent of this extension
+         * @param window parent of this extension
          * @param mediator the current mediator
          */
-        @Nonnull Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator);
+        @Nonnull
+        Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator);
     }
 
     /**
@@ -144,15 +149,16 @@ public interface KeYGuiExtension {
          * and {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY} to control their
          * position in the menu.
          *
-         * @param mediator         the window of the main menu
-         * @param kind             the type of context menu
+         * @param mediator the window of the main menu
+         * @param kind the type of context menu
          * @param underlyingObject the object for which the context menu is requested
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @Nonnull List<Action> getContextActions(@Nonnull KeYMediator mediator,
-                                                @Nonnull ContextMenuKind kind,
-                                                @Nonnull Object underlyingObject);
+        @Nonnull
+        List<Action> getContextActions(@Nonnull KeYMediator mediator,
+                @Nonnull ContextMenuKind kind,
+                @Nonnull Object underlyingObject);
     }
 
     /**
@@ -167,7 +173,8 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        @Nonnull JToolBar getToolbar(MainWindow mainWindow);
+        @Nonnull
+        JToolBar getToolbar(MainWindow mainWindow);
     }
 
     /**
@@ -234,7 +241,8 @@ public interface KeYGuiExtension {
          * @param component
          * @return non-null settings provider
          */
-        Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component);
+        Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+                JComponent component);
     }
 
     /**
@@ -247,10 +255,11 @@ public interface KeYGuiExtension {
     interface TermInfo {
         /**
          * @param mainWindow the main window.
-         * @param pos        the position of the term whose info shall be shown.
+         * @param pos the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        @Nonnull List<String> getTermInfoStrings(@Nonnull MainWindow mainWindow, @Nonnull PosInSequent pos);
+        @Nonnull
+        List<String> getTermInfoStrings(@Nonnull MainWindow mainWindow, @Nonnull PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;

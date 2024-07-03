@@ -1,11 +1,15 @@
-package de.uka.ilkd.key.proof.io;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.antlr.v4.runtime.CharStream;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import org.antlr.v4.runtime.CharStream;
 
 public abstract class RuleSource {
 
@@ -18,6 +22,7 @@ public abstract class RuleSource {
      * Provides an URL to the location the RuleSource is read from.
      * This is more general than returning a file (works also e.g. in case of jar files where the
      * file would be "jar:file:///...").
+     *
      * @return the location of the RuleSource as url
      * @throws IOException on I/O errors
      */

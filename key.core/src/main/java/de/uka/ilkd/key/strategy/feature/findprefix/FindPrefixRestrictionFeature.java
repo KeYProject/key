@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -68,7 +72,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * Construct a feature that checks the prefix with the passed
      * PrefixCheckers. Computes zero costs, if all PrefixCheckers return true,
      * otherwise computes top cost.
-     * 
+     *
      * @param prefixCheckers the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PrefixChecker... prefixCheckers) {
@@ -86,8 +90,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * @param prefixCheckers the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PositionModifier positionModifier,
-                                        PrefixChecker... prefixCheckers) {
-        this(new PositionModifier[]{positionModifier}, prefixCheckers);
+            PrefixChecker... prefixCheckers) {
+        this(new PositionModifier[] { positionModifier }, prefixCheckers);
     }
 
     /**
@@ -101,15 +105,15 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * @param prefixCheckers the PrefixCheckers to be used.
      */
     public FindPrefixRestrictionFeature(PositionModifier[] positionModifiers,
-                                        PrefixChecker... prefixCheckers) {
+            PrefixChecker... prefixCheckers) {
         this.positionModifiers = positionModifiers;
         this.prefixCheckers = prefixCheckers;
     }
 
     @Override
     protected boolean filter(TacletApp app,
-                             PosInOccurrence pos,
-                             Goal goal) {
+            PosInOccurrence pos,
+            Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers

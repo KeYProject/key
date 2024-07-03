@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -43,14 +47,12 @@ class ArithTermFeatures extends StaticFeatureCollection {
         literal = op(Z);
         negLiteral = opSub(Z, op(numbers.getNegativeNumberSign()));
         nonNegLiteral = opSub(Z, not(op(numbers.getNegativeNumberSign())));
-        zeroLiteral
-                = opSub(Z,
-                        opSub(numbers.getNumberLiteralFor(0),
-                                op(numbers.getNumberTerminator())));
-        oneLiteral
-                = opSub(Z,
-                        opSub(numbers.getNumberLiteralFor(1),
-                                op(numbers.getNumberTerminator())));
+        zeroLiteral = opSub(Z,
+            opSub(numbers.getNumberLiteralFor(0),
+                op(numbers.getNumberTerminator())));
+        oneLiteral = opSub(Z,
+            opSub(numbers.getNumberLiteralFor(1),
+                op(numbers.getNumberTerminator())));
         nonPosLiteral = or(zeroLiteral, negLiteral);
         posLiteral = add(nonNegLiteral, not(zeroLiteral));
         atLeastTwoLiteral = add(posLiteral, not(oneLiteral));
@@ -62,49 +64,38 @@ class ArithTermFeatures extends StaticFeatureCollection {
         atom = add(not(addF), not(mulF));
         linearMonomial = or(atom, opSub(mul, atom, literal));
 
-            // left-associatively arranged monomials, literals are only allowed
+        // left-associatively arranged monomials, literals are only allowed
         // as right-most term
-        monomial
-                = or(atom,
-                        opSub(mul,
-                                rec(mulF,
-                                        or(opSub(mul, any(), not(mulF)),
-                                                add(not(addF), not(literal)))),
-                                atom));
+        monomial = or(atom,
+            opSub(mul,
+                rec(mulF,
+                    or(opSub(mul, any(), not(mulF)),
+                        add(not(addF), not(literal)))),
+                atom));
 
         // left-associatively arranged polynomials
         polynomial = rec(addF, or(opSub(add, any(), not(addF)), monomial));
 
-        nonNegMonomial
-                = add(monomial, or(not(mulF), sub(any(), not(negLiteral))));
+        nonNegMonomial = add(monomial, or(not(mulF), sub(any(), not(negLiteral))));
         posMonomial = opSub(mul, monomial, posLiteral);
         negMonomial = opSub(mul, monomial, negLiteral);
-        nonCoeffMonomial
-                = add(monomial, or(not(mulF), sub(any(), not(literal))));
-        nonNegOrNonCoeffMonomial
-                = add(monomial, or(not(mulF), sub(any(), not(negLiteral))));
+        nonCoeffMonomial = add(monomial, or(not(mulF), sub(any(), not(literal))));
+        nonNegOrNonCoeffMonomial = add(monomial, or(not(mulF), sub(any(), not(negLiteral))));
         atLeastTwoCoeffMonomial = opSub(mul, monomial, atLeastTwoLiteral);
 
-        intEquation
-                = opSub(eq, add(intF, nonNegMonomial), add(intF, polynomial));
+        intEquation = opSub(eq, add(intF, nonNegMonomial), add(intF, polynomial));
         linearEquation = opSub(eq, linearMonomial, add(intF, polynomial));
-        monomialEquation
-                = opSub(eq, add(intF, nonNegMonomial), add(intF, monomial));
-        intInEquation
-                = add(or(leqF, geqF), sub(nonNegMonomial, polynomial));
-        linearInEquation
-                = add(or(leqF, geqF), sub(linearMonomial, polynomial));
-        intRelation
-                = add(or(leqF, geqF, eqF),
-                        sub(add(intF, nonNegMonomial), polynomial));
+        monomialEquation = opSub(eq, add(intF, nonNegMonomial), add(intF, monomial));
+        intInEquation = add(or(leqF, geqF), sub(nonNegMonomial, polynomial));
+        linearInEquation = add(or(leqF, geqF), sub(linearMonomial, polynomial));
+        intRelation = add(or(leqF, geqF, eqF),
+            sub(add(intF, nonNegMonomial), polynomial));
 
-        notContainsProduct
-                = rec(any(),
-                        ifZero(mulF, not(sub(not(literal), not(literal)))));
-        notContainsDivMod
-                = rec(any(),
-                        add(add(not(divF), not(modF)),
-                                add(not(jdivF), not(jmodF))));
+        notContainsProduct = rec(any(),
+            ifZero(mulF, not(sub(not(literal), not(literal)))));
+        notContainsDivMod = rec(any(),
+            add(add(not(divF), not(modF)),
+                add(not(jdivF), not(jmodF))));
     }
 
     final Sort intS;

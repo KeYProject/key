@@ -1,15 +1,8 @@
-package de.uka.ilkd.key.smt.newsmt2;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,6 +13,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * @author Rosa Abbasi, Jonas Schiffl, Mattias Ulbrich
@@ -32,13 +37,15 @@ public class FloatHandler implements SMTHandler {
     /** Java's FP semantics is always "round to nearest even". */
     private static final String ROUNDING_MODE = "RNE";
 
-    public enum SqrtMode { SMT, AXIOMS }
+    public enum SqrtMode {
+        SMT, AXIOMS
+    }
 
     public static final EnumProperty<SqrtMode> SQRT_PROPERTY =
-            new EnumProperty<SqrtMode>("sqrtSMTTranslation",
-                    "Translation of \"sqrt\" function",
-                    "Either SMT for a builtin bit-precise translation, or AXIOMS for a fast approximation using axioms",
-                    SqrtMode.class);
+        new EnumProperty<SqrtMode>("sqrtSMTTranslation",
+            "Translation of \"sqrt\" function",
+            "Either SMT for a builtin bit-precise translation, or AXIOMS for a fast approximation using axioms",
+            SqrtMode.class);
 
     private final Map<Operator, String> fpOperators = new HashMap<>();
     private final Set<String> roundingOperators = new HashSet<>();
@@ -50,7 +57,8 @@ public class FloatHandler implements SMTHandler {
     private boolean sqrtNative;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets)
+            throws IOException {
 
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();
@@ -62,20 +70,20 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(floatLDT.getGreaterThan(), "fp.gt");
         fpOperators.put(floatLDT.getLessOrEquals(), "fp.leq");
         fpOperators.put(floatLDT.getGreaterOrEquals(), "fp.geq");
-//        fpOperators.put(floatLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
+        // fpOperators.put(floatLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
         fpOperators.put(floatLDT.getAdd(), "fp.add");
         fpOperators.put(floatLDT.getSub(), "fp.sub");
         fpOperators.put(floatLDT.getMul(), "fp.mul");
         fpOperators.put(floatLDT.getDiv(), "fp.div");
 
-// From the smtlib manual on floats:
-//        (fp.isNormal (_ FloatingPoint eb sb) Bool)
-//        (fp.isSubnormal (_ FloatingPoint eb sb) Bool)
-//        (fp.isZero (_ FloatingPoint eb sb) Bool)
-//        (fp.isInfinite (_ FloatingPoint eb sb) Bool)
-//        (fp.isNaN (_ FloatingPoint eb sb) Bool)
-//        (fp.isNegative (_ FloatingPoint eb sb) Bool)
-//        (fp.isPositive (_ FloatingPoint eb sb) Bool)
+        // From the smtlib manual on floats:
+        // (fp.isNormal (_ FloatingPoint eb sb) Bool)
+        // (fp.isSubnormal (_ FloatingPoint eb sb) Bool)
+        // (fp.isZero (_ FloatingPoint eb sb) Bool)
+        // (fp.isInfinite (_ FloatingPoint eb sb) Bool)
+        // (fp.isNaN (_ FloatingPoint eb sb) Bool)
+        // (fp.isNegative (_ FloatingPoint eb sb) Bool)
+        // (fp.isPositive (_ FloatingPoint eb sb) Bool)
 
         fpOperators.put(floatLDT.getIsPositive(), "fp.isPositive");
         fpOperators.put(floatLDT.getAbs(), "fp.abs");
@@ -89,12 +97,12 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(floatLDT.getEquals(), "fp.eq");
         fpOperators.put(floatLDT.getNeg(), "fp.neg");
 
-//        // Double predicates and operations, translated identically to float operations
+        // // Double predicates and operations, translated identically to float operations
         fpOperators.put(doubleLDT.getLessThan(), "fp.lt");
         fpOperators.put(doubleLDT.getGreaterThan(), "fp.gt");
         fpOperators.put(doubleLDT.getLessOrEquals(), "fp.leq");
         fpOperators.put(doubleLDT.getGreaterOrEquals(), "fp.geq");
-//        fpOperators.put(doubleLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
+        // fpOperators.put(doubleLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
         fpOperators.put(doubleLDT.getAdd(), "fp.add");
         fpOperators.put(doubleLDT.getSub(), "fp.sub");
         fpOperators.put(doubleLDT.getMul(), "fp.mul");
@@ -128,7 +136,7 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getAcosDouble(), "acosDouble");
         fpOperators.put(doubleLDT.getAsinDouble(), "asinDouble");
         fpOperators.put(doubleLDT.getTanDouble(), "tanDouble");
-        fpOperators.put(doubleLDT.getAtan2Double(),"atan2Double");
+        fpOperators.put(doubleLDT.getAtan2Double(), "atan2Double");
         fpOperators.put(doubleLDT.getPowDouble(), "powDouble");
         fpOperators.put(doubleLDT.getExpDouble(), "exDouble");
         fpOperators.put(doubleLDT.getAtanDouble(), "atanDouble");
@@ -156,7 +164,7 @@ public class FloatHandler implements SMTHandler {
 
         Operator op = term.op();
         String fpOp = fpOperators.get(op);
-        if(fpOp != null) {
+        if (fpOp != null) {
             trans.introduceSymbol(fpOp);
 
             Sort sort = term.sort();
@@ -166,7 +174,7 @@ public class FloatHandler implements SMTHandler {
 
             List<SExpr> translatedSubs = new LinkedList<>();
 
-            if(roundingOperators.contains(fpOp)) {
+            if (roundingOperators.contains(fpOp)) {
                 translatedSubs.add(new SExpr(ROUNDING_MODE));
             }
 
@@ -249,7 +257,7 @@ public class FloatHandler implements SMTHandler {
     }
 
     private static long intFromTerm(Term term, Services services) {
-        if(term.op() == services.getTypeConverter().getIntegerLDT().getNumberTerminator()) {
+        if (term.op() == services.getTypeConverter().getIntegerLDT().getNumberTerminator()) {
             return 0L;
         } else {
             int digit = Integer.parseInt(term.op().name().toString());

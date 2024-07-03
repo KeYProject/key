@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui;
 
 import javax.swing.JTree;
@@ -19,7 +23,7 @@ public class InfoTree extends JTree {
     InfoTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         root.add(new InfoTreeNode("No proof loaded",
-                "In this pane, the available logical rules will be displayed and/or explained."));
+            "In this pane, the available logical rules will be displayed and/or explained."));
         setModel(new DefaultTreeModel(root));
         setShowsRootHandles(true);
         setRootVisible(false);

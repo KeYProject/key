@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.macros;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -17,6 +19,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This macro resolves the well-definedness transformer, i.e. it applies exactly
@@ -49,7 +53,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-                                      PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new WellDefinednessStrategy();
     }
 
@@ -67,17 +71,18 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         if (!(po instanceof FunctionalOperationContractPO)) {
             return false;
         }
-        for (Goal goal: goals) {
+        for (Goal goal : goals) {
             Node n = goal.node();
             while (n != null) {
-                // Applicable in a well-definedness branch (e.g. of a loop statement or a block contract)
+                // Applicable in a well-definedness branch (e.g. of a loop statement or a block
+                // contract)
                 if (n.getNodeInfo().getBranchLabel() != null
                         && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
                     return true;
                 }
                 n = n.parent();
             }
-        }        
+        }
         return false;
     }
 
@@ -100,7 +105,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if(name.startsWith(WD_PREFIX)) {
+            if (name.startsWith(WD_PREFIX)) {
                 return NumberRuleAppCost.getZeroCost();
             } else {
                 return TopRuleAppCost.INSTANCE;
@@ -119,7 +124,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
     }
 }

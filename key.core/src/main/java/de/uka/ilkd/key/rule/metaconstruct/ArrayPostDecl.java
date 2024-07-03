@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -14,6 +16,8 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Replaces a local variable declaration <code> #t #v[]; </code> with

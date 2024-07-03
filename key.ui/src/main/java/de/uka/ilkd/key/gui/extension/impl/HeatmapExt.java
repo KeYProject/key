@@ -1,20 +1,25 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.extension.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
-import net.miginfocom.layout.CC;
 
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.miginfocom.layout.CC;
 
 /**
  * Extension adapter for Heatmap
@@ -22,8 +27,9 @@ import java.util.Map;
  * @author Alexander Weigl
  */
 @KeYGuiExtension.Info(name = "Heatmap", optional = true,
-        description = "Colorize the formulae on the sequence based on the most recent changes\n" +
-                "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>", experimental = false)
+    description = "Colorize the formulae on the sequence based on the most recent changes\n" +
+        "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>",
+    experimental = false)
 public class HeatmapExt implements KeYGuiExtension,
         KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar,
@@ -47,7 +53,7 @@ public class HeatmapExt implements KeYGuiExtension,
 
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
-        getActions(mainWindow);//initialize
+        getActions(mainWindow);// initialize
         JToolBar tb = new JToolBar("Heatmap Options");
         JToggleButton comp = new JToggleButton(toggleAction);
         comp.setHideActionText(true);
@@ -61,6 +67,7 @@ public class HeatmapExt implements KeYGuiExtension,
         return new HeatmapSettingsProvider();
     }
 }
+
 
 /**
  * This Dialog contains options for highlighting sequent formulae or terms
@@ -87,14 +94,14 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
      * Text for introductory heatmap explanation
      */
     private static final String INTRO_LABEL = "Heatmaps can be used to "
-            + "highlight the most recent changes in the sequent.";
+        + "highlight the most recent changes in the sequent.";
 
     /**
      * Explanation for age textfield
      */
     private static final String TEXTFIELD_LABEL = "Maximum age of highlighted \n"
-            + "terms or formulae, or number of newest terms or formulae\n"
-            + "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
+        + "terms or formulae, or number of newest terms or formulae\n"
+        + "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
 
     private final JSpinner spinnerAge;
 
@@ -104,23 +111,25 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
                 false, false, false),
         SF_AGE("Sequent formulae up to age",
                 "All sequent formulae that have been added or changed in the last k steps are highlighted. \n"
-                        + "More recent formulae will have a stronger highlight. It is possible that less \n"
-                        + "than k formulae are highlighted, e.g. if one formula has changed multiple times.\n",
+                    + "More recent formulae will have a stronger highlight. It is possible that less \n"
+                    + "than k formulae are highlighted, e.g. if one formula has changed multiple times.\n",
                 true, true, false),
         SF_NEWEST("Newest sequent formulae",
                 "All formulae in the sequent are sorted by how new they are, i.e., how recently they have\n"
-                        + " been added or changed. The first k formulae of the sorted list are highlighted\n"
-                        + "according to their position in the list,\n"
-                        + " with the most recent formula receiving the strongest highlight.\n",
+                    + " been added or changed. The first k formulae of the sorted list are highlighted\n"
+                    + "according to their position in the list,\n"
+                    + " with the most recent formula receiving the strongest highlight.\n",
                 true, true, true),
-        TERMS_AGE("Terms up to age", "All terms that have been added or changed in the last k steps are highlighted. \n"
-                + "More recent terms will have a stronger highlight. It is possible that less than \n"
-                + "k terms are highlighted, e.g. if one term has changed multiple times.", true, false, false),
+        TERMS_AGE("Terms up to age",
+                "All terms that have been added or changed in the last k steps are highlighted. \n"
+                    + "More recent terms will have a stronger highlight. It is possible that less than \n"
+                    + "k terms are highlighted, e.g. if one term has changed multiple times.",
+                true, false, false),
         TERMS_NEWEST("Newest terms",
                 "All terms in the sequent are sorted by how new they are, i.e., how recently they\n"
-                        + "have been added or changed. The first k terms of the sorted list are highlighted\n"
-                        + "according to their position in the list,\n"
-                        + " with the most recent term receiving the strongest highlight.",
+                    + "have been added or changed. The first k terms of the sorted list are highlighted\n"
+                    + "according to their position in the list,\n"
+                    + " with the most recent term receiving the strongest highlight.",
                 true, false, true);
 
         final String text;
@@ -128,7 +137,8 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         boolean enableHeatmap, sequent, newest;
 
 
-        HeatmapMode(String shortText, String description, boolean enableHeatmap, boolean sequent, boolean newest) {
+        HeatmapMode(String shortText, String description, boolean enableHeatmap, boolean sequent,
+                boolean newest) {
             desc = description;
             text = shortText;
             this.enableHeatmap = enableHeatmap;
@@ -165,7 +175,8 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         addRadio(HeatmapMode.TERMS_NEWEST);
 
         spinnerAge = addNumberField("Maximal age:", MIN_AGE, MAX_AGE, 1, TEXTFIELD_LABEL, e -> {
-            //LIVE UPDATE: VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(), (int) valueSpinner.getValue()));
+            // LIVE UPDATE: VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(),
+            // VS.isHeatmapNewest(), (int) valueSpinner.getValue()));
         });
     }
 
@@ -187,7 +198,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
             if (mode.enableHeatmap == vs.isShowHeatmap() &&
                     (!mode.enableHeatmap
                             || (mode.sequent == vs.isHeatmapSF() &&
-                            mode.newest == vs.isHeatmapNewest()))) {
+                                    mode.newest == vs.isHeatmapNewest()))) {
                 entry.getValue().setSelected(true);
                 break;
             }
@@ -203,7 +214,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
             if (entry.getValue().isSelected()) {
                 HeatmapMode mode = entry.getKey();
                 vs.setHeatmapOptions(mode.enableHeatmap, mode.sequent, mode.newest,
-                                     (int) spinnerAge.getValue());
+                    (int) spinnerAge.getValue());
                 break;
             }
         }

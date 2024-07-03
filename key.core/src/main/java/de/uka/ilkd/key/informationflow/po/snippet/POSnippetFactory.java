@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.java.Services;
@@ -22,7 +26,7 @@ public class POSnippetFactory {
             Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }
-    
+
     public static BasicPOSnippetFactory getBasicFactory(
             LoopSpecification invariant,
             ProofObligationVars vars,
@@ -30,7 +34,7 @@ public class POSnippetFactory {
             Term guardTerm,
             Services services) {
         return new BasicPOSnippetFactoryImpl(invariant, vars, context,
-                                             guardTerm, services);
+            guardTerm, services);
     }
 
     public static BasicPOSnippetFactory getBasicFactory(
@@ -38,7 +42,7 @@ public class POSnippetFactory {
             ProofObligationVars vars,
             Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
-    }    
+    }
 
     public static BasicPOSnippetFactory getBasicFactory(
             BlockContract contract,
@@ -62,9 +66,9 @@ public class POSnippetFactory {
             Term guardTerm,
             Services services) {
         return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, context,
-                                               guardTerm, services);
+            guardTerm, services);
     }
-    
+
     public static InfFlowPOSnippetFactory getInfFlowFactory(
             InformationFlowContract contract,
             ProofObligationVars vars1,
@@ -72,7 +76,7 @@ public class POSnippetFactory {
             Services services) {
         return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, services);
     }
-    
+
     public static InfFlowPOSnippetFactory getInfFlowFactory(
             BlockContract contract,
             ProofObligationVars vars1,
@@ -80,7 +84,7 @@ public class POSnippetFactory {
             ExecutionContext context,
             Services services) {
         return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2,
-                                               context, services);
+            context, services);
     }
 
     static InfFlowPOSnippetFactory getInfFlowFactory(

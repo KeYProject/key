@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -8,10 +16,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * This handler treats KeY updated terms ({x:=5}x>4).
@@ -47,7 +51,7 @@ public class UpdateHandler implements SMTHandler {
     }
 
     private void collectUpdates(Term update, List<SExpr> individualUpdates, MasterHandler trans) {
-        if(update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term subUpd : update.subs()) {
                 collectUpdates(subUpd, individualUpdates, trans);
             }

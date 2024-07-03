@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
@@ -16,45 +20,45 @@ public class AssumptionFormula implements TacletFormula {
     TacletConditions conditions;
 
     public TacletConditions getConditions() {
-	return conditions;
+        return conditions;
     }
 
     public AssumptionFormula(Taclet taclet, Collection<Term> formula,
-	    String status)  {
-	this.taclet = taclet;
-	this.formula = formula;
-	this.status = status;
+            String status) {
+        this.taclet = taclet;
+        this.formula = formula;
+        this.status = status;
     }
-    
-    
+
+
 
     public AssumptionFormula(Taclet taclet, Collection<Term> formula,
-	    String status, TacletConditions conditions) throws IllegalTacletException {
-	super();
-	this.taclet = taclet;
-	this.formula = formula;
-	this.status = status;
-	this.conditions = conditions == null ? new TacletConditions(taclet)
-	        : conditions;
+            String status, TacletConditions conditions) throws IllegalTacletException {
+        super();
+        this.taclet = taclet;
+        this.formula = formula;
+        this.status = status;
+        this.conditions = conditions == null ? new TacletConditions(taclet)
+                : conditions;
 
     }
 
     public Term getFormula(TermServices services) {
-	return services.getTermBuilder().and(formula.toArray(new Term[formula.size()]));
-	// return formula;
+        return services.getTermBuilder().and(formula.toArray(new Term[formula.size()]));
+        // return formula;
     }
 
     public Taclet getTaclet() {
-	return taclet;
+        return taclet;
     }
 
     public String getStatus() {
-	return status;
+        return status;
     }
 
     public Collection<Term> getInstantiations() {
 
-	return formula;
+        return formula;
     }
 
 }

@@ -1,6 +1,7 @@
-/*
- * Created on Apr 14, 2005
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -25,9 +26,9 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
     }
 
     /**
-     * returns an <tt>G::instance(term.sub(1))</tt> term for the element sort of 
-     * the given array . It is assumed that <tt>term.sub(0)</tt> is either a term of 
-     * reference array sort or a term with an <tt>exactInstance</tt> symbol as top level 
+     * returns an <tt>G::instance(term.sub(1))</tt> term for the element sort of
+     * the given array . It is assumed that <tt>term.sub(0)</tt> is either a term of
+     * reference array sort or a term with an <tt>exactInstance</tt> symbol as top level
      * depending on a reference array sort.
      */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
@@ -35,8 +36,9 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
         final Term element = term.sub(1);
 
         final Sort arraySort;
-        if(array.op() instanceof SortDependingFunction
-           && ((SortDependingFunction)array.op()).getKind().equals(Sort.EXACT_INSTANCE_NAME)) {
+        if (array.op() instanceof SortDependingFunction
+                && ((SortDependingFunction) array.op()).getKind()
+                        .equals(Sort.EXACT_INSTANCE_NAME)) {
             arraySort = ((SortDependingFunction) array.op()).getSortDependingOn();
         } else {
             arraySort = array.sort();
@@ -46,11 +48,10 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         final Sort arrayElementSort = ((ArraySort) arraySort).elementSort();
 
-        Function instanceofSymbol
-            =  arrayElementSort.getInstanceofSymbol(services);
+        Function instanceofSymbol = arrayElementSort.getInstanceofSymbol(services);
         Debug.assertTrue(instanceofSymbol != null,
-                "Instanceof symbol not found for ", arrayElementSort);
-        
+            "Instanceof symbol not found for ", arrayElementSort);
+
         return services.getTermFactory().createTerm(instanceofSymbol, element);
     }
 

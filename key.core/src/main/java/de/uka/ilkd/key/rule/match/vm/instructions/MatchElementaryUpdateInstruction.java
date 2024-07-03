@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
@@ -13,14 +17,16 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpdate> {
 
     private final MatchOperatorInstruction leftHandSide;
-    
+
     protected MatchElementaryUpdateInstruction(ElementaryUpdate op) {
         super(op);
         if (op.lhs() instanceof LocationVariable) {
-            leftHandSide = new MatchOpIdentityInstruction<LocationVariable>((LocationVariable)op.lhs());        
+            leftHandSide =
+                new MatchOpIdentityInstruction<LocationVariable>((LocationVariable) op.lhs());
         } else {
             assert op.lhs() instanceof ProgramSV;
-            leftHandSide = (MatchOperatorInstruction) TacletMatchProgram.getMatchInstructionForSV((ProgramSV)op.lhs());
+            leftHandSide = (MatchOperatorInstruction) TacletMatchProgram
+                    .getMatchInstructionForSV((ProgramSV) op.lhs());
         }
     }
 
@@ -38,11 +44,12 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
         }
         return matchCond;
     }
-    
+
     @Override
     public MatchConditions match(TermNavigator termPosition,
             MatchConditions matchConditions, Services services) {
-        final MatchConditions result = match(termPosition.getCurrentSubterm(), matchConditions, services);
+        final MatchConditions result =
+            match(termPosition.getCurrentSubterm(), matchConditions, services);
         if (result != null) {
             termPosition.gotoNext();
         }

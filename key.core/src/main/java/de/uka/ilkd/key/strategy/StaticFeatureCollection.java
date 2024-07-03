@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -70,10 +74,10 @@ public abstract class StaticFeatureCollection {
         filterLoopInv.addRuleToSet(WhileInvariantRule.INSTANCE);
         final SetRuleFilter filterLoopScopeInv = new SetRuleFilter();
         filterLoopScopeInv.addRuleToSet(LoopScopeInvariantRule.INSTANCE);
-        
+
         return ConditionalFeature.createConditional(filterLoopInv, costStdInv,
-                ConditionalFeature.createConditional(filterLoopScopeInv,
-                        inftyConst()));
+            ConditionalFeature.createConditional(filterLoopScopeInv,
+                inftyConst()));
     }
 
     /**
@@ -142,7 +146,7 @@ public abstract class StaticFeatureCollection {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MergeRule.INSTANCE);
         return ConditionalFeature.createConditional(filter,
-                SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
+            SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
     }
 
     protected static Feature sequentContainsNoPrograms() {
@@ -154,10 +158,10 @@ public abstract class StaticFeatureCollection {
         TermBuffer sub = new TermBuffer();
 
         Feature countOccurrencesInSeq = sum(sf, SequentFormulasGenerator.sequent(),
-                sum(sub, SubtermGenerator.leftTraverse(sf, any()),
-                        // instead of any a condition which stops traversal when
-                        // depth(cutF) > depth(sub) would be better
-                        ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
+            sum(sub, SubtermGenerator.leftTraverse(sf, any()),
+                // instead of any a condition which stops traversal when
+                // depth(cutF) > depth(sub) would be better
+                ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
         return countOccurrencesInSeq;
     }
 
@@ -292,6 +296,7 @@ public abstract class StaticFeatureCollection {
      * Create a projection of taclet applications to the instantiation of the trigger variable of a
      * taclet. If the trigger variable is not instantiated for a particular taclet app, an error
      * will be raised
+     *
      * @return projection of taclet applications
      */
     protected static ProjectionToTerm instOfTriggerVariable() {
@@ -302,6 +307,7 @@ public abstract class StaticFeatureCollection {
      * Create a projection of taclet applications to the instantiation of the schema variables
      * <code>schemaVar</code>. If <code>schemaVar</code> is not instantiated for a particular taclet
      * app, an error will be raised
+     *
      * @param schemaVar schema variable
      * @return projection of taclet applications
      */
@@ -313,6 +319,7 @@ public abstract class StaticFeatureCollection {
      * Create a projection of taclet applications to the instantiation of the schema variables
      * <code>schemaVar</code>. The projection will be partial and undefined for those taclet
      * applications that do not instantiate <code>schemaVar</code>
+     *
      * @param schemaVar schema variable
      * @return projection of taclet applications
      */
@@ -399,6 +406,7 @@ public abstract class StaticFeatureCollection {
      * Invoke the term feature <code>tf</code> on the term that instantiation of
      * <code>schemaVar</code>. This is the strict/safe version that raises an error of
      * <code>schemaVar</code> is not instantiated for a particular taclet app
+     *
      * @param schemaVar schema variable
      * @param tf term feature
      * @return feature
@@ -411,6 +419,7 @@ public abstract class StaticFeatureCollection {
      * Invoke the term feature <code>tf</code> on the term that instantiation of
      * <code>schemaVar</code>. This is the non-strict/unsafe version that simply returns zero if
      * <code>schemaVar</code> is not instantiated for a particular taclet app
+     *
      * @param schemaVar schema variable
      * @param tf term feature
      * @return feature
@@ -423,6 +432,7 @@ public abstract class StaticFeatureCollection {
      * Evaluate the term feature <code>tf</code> for the term described by the projection
      * <code>term</code>. If <code>term</code> is undefined for a particular rule app, an exception
      * is raised
+     *
      * @param term term describing the projection
      * @param tf term feature
      * @return feature
@@ -435,6 +445,7 @@ public abstract class StaticFeatureCollection {
      * Evaluate the term feature <code>tf</code> for the term described by the projection
      * <code>term</code>. If <code>term</code> is undefined for a particular rule app, zero is
      * returned
+     *
      * @param term term describing the projection
      * @param tf term feature
      * @return feature

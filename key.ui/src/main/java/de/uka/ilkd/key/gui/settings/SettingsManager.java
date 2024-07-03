@@ -1,4 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.settings;
+
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -10,16 +24,6 @@ import de.uka.ilkd.key.gui.keyshortcuts.ShortcutSettings;
 import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Alexander Weigl
@@ -38,8 +42,8 @@ public class SettingsManager {
 
     static SettingsManager createWithExtensions() {
         SettingsManager sm = new SettingsManager();
-        KeYGuiExtensionFacade.getSettingsProvider().forEach(it ->
-                sm.settingsProviders.add(it.getSettings()));
+        KeYGuiExtensionFacade.getSettingsProvider()
+                .forEach(it -> sm.settingsProviders.add(it.getSettings()));
         return sm;
     }
 
@@ -47,11 +51,11 @@ public class SettingsManager {
         if (INSTANCE == null) {
             INSTANCE = createWithExtensions();
             INSTANCE.add(STANDARD_UI_SETTINGS);
-            //INSTANCE.add(SHORTCUT_SETTINGS);
+            // INSTANCE.add(SHORTCUT_SETTINGS);
             INSTANCE.add(SMT_SETTINGS);
             INSTANCE.add(EXTENSION_MANAGER);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
-            //INSTANCE.add(COLOR_SETTINGS);
+            // INSTANCE.add(COLOR_SETTINGS);
         }
         return INSTANCE;
     }
@@ -82,11 +86,13 @@ public class SettingsManager {
 
     public static ChoiceSettings getChoiceSettings(MainWindow window) {
         return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-/*        if (null != window.getMediator().getSelectedProof()) {
-            return window.getMediator().getSelectedProof().getSettings().getChoiceSettings();
-        } else {
-            return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-        }*/
+        /*
+         * if (null != window.getMediator().getSelectedProof()) {
+         * return window.getMediator().getSelectedProof().getSettings().getChoiceSettings();
+         * } else {
+         * return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+         * }
+         */
     }
 
     public static Properties loadProperties(File settingsFile) {
@@ -120,7 +126,8 @@ public class SettingsManager {
     }
 
     /**
-     * ensures that every given setting provider can update its model based on the current mainWindow.
+     * ensures that every given setting provider can update its model based on the current
+     * mainWindow.
      * This also includes the children of the settings.
      *
      * @param providers

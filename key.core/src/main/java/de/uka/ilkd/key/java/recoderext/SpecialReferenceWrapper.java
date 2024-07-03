@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.*;
@@ -24,7 +28,7 @@ public class SpecialReferenceWrapper extends ThisReference
 
 
     public SpecialReferenceWrapper(TypeReference typeRef,
-                                   ReferencePrefix myprefix) {
+            ReferencePrefix myprefix) {
         this.typeRef = typeRef;
         this.myprefix = myprefix;
         expressionParent = null;
@@ -70,7 +74,7 @@ public class SpecialReferenceWrapper extends ThisReference
         expressionParent = c;
     }
 
-    //don't think we need it
+    // don't think we need it
     public void accept(SourceVisitor v) {
     }
 

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
@@ -1855,7 +1859,7 @@ public enum MaterialDesignRegular implements IconFont {
     public Font getFont() throws IOException, FontFormatException {
         if (font == null)
             font = Font.createFont(Font.TRUETYPE_FONT,
-                    getClass().getResourceAsStream("/fonts/MaterialIcons-Regular.ttf"));
+                getClass().getResourceAsStream("/fonts/MaterialIcons-Regular.ttf"));
         return font;
     }
 

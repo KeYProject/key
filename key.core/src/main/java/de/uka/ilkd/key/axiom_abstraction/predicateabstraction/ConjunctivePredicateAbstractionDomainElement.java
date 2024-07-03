@@ -1,9 +1,13 @@
-package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableSet;
+package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * An abstract domain element for a predicate abstraction lattice based on the
@@ -18,13 +22,13 @@ public class ConjunctivePredicateAbstractionDomainElement extends
      * The bottom element of any predicate abstraction lattice.
      */
     public static final ConjunctivePredicateAbstractionDomainElement BOTTOM =
-            new ConjunctivePredicateAbstractionDomainElement(false);
+        new ConjunctivePredicateAbstractionDomainElement(false);
 
     /**
      * The top element of any predicate abstraction lattice.
      */
     public static final ConjunctivePredicateAbstractionDomainElement TOP =
-            new ConjunctivePredicateAbstractionDomainElement(true);
+        new ConjunctivePredicateAbstractionDomainElement(true);
 
     /**
      * Constructs a new {@link ConjunctivePredicateAbstractionDomainElement}
@@ -56,7 +60,7 @@ public class ConjunctivePredicateAbstractionDomainElement extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -65,8 +69,8 @@ public class ConjunctivePredicateAbstractionDomainElement extends
                 && (this != TOP || obj == TOP)
                 && (this != BOTTOM || obj == BOTTOM)
                 && this.getPredicates().equals(
-                        ((ConjunctivePredicateAbstractionDomainElement) obj)
-                                .getPredicates());
+                    ((ConjunctivePredicateAbstractionDomainElement) obj)
+                            .getPredicates());
     }
 
     @Override

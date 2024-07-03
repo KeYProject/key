@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic;
 
 
-import javax.annotation.Nonnull;
-
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * A choice is an option in a category.
@@ -43,8 +46,10 @@ public class Choice implements Named {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Choice choice = (Choice) o;
         return name.equals(choice.name);
     }

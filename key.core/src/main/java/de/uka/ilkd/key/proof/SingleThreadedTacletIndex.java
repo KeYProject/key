@@ -1,10 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
 import java.util.HashSet;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -12,15 +13,19 @@ import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 /**
- * The default taclet index implementation. It executes method 
+ * The default taclet index implementation. It executes method
  * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, Services)}
  * in a single thread (the thread invoking the method).
  *
  * Do not create this index directly. Use the {@link TacletIndexKit#createTacletIndex()} resp.
  * {@link TacletIndexKit#createTacletIndex(Iterable)}.
+ *
  * @see TacletIndex
- * @see TacletIndexKit 
+ * @see TacletIndexKit
  */
 final class SingleThreadedTacletIndex extends TacletIndex {
 
@@ -39,22 +44,23 @@ final class SingleThreadedTacletIndex extends TacletIndex {
             ImmutableList<NoPosTacletApp> noFindList,
             HashSet<NoPosTacletApp> partialInstantiatedRuleApps) {
         super(rwList, antecList, succList, noFindList,
-                partialInstantiatedRuleApps);
+            partialInstantiatedRuleApps);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
     @Override
     public TacletIndex copy() {
-        return new SingleThreadedTacletIndex((HashMap<Object, ImmutableList<NoPosTacletApp>>)rwList.clone(), 
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>)antecList.clone(), 
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>)succList.clone(), 
-                noFindList, (HashSet<NoPosTacletApp>)partialInstantiatedRuleApps.clone());
+        return new SingleThreadedTacletIndex(
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(),
+            noFindList, (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -67,11 +73,11 @@ final class SingleThreadedTacletIndex extends TacletIndex {
         }
 
         for (final NoPosTacletApp tacletApp : tacletApps) {
-            if ( !p_filter.filter(tacletApp.taclet()) ) {
+            if (!p_filter.filter(tacletApp.taclet())) {
                 continue;
-            }                    
+            }
             final NoPosTacletApp newTacletApp =
-                    tacletApp.matchFind(pos, services);
+                tacletApp.matchFind(pos, services);
             if (newTacletApp != null) {
                 result = result.prepend(newTacletApp);
             }

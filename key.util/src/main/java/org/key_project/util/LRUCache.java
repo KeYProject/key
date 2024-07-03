@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package org.key_project.util;
 
@@ -7,10 +10,10 @@ import java.util.Map;
 /**
  * Simple realisation of an LRU cache.
  */
-public class LRUCache<K,V> extends LinkedHashMap<K,V> {
+public class LRUCache<K, V> extends LinkedHashMap<K, V> {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4962274836567079680L;
     /** maximal cache size */
@@ -20,15 +23,15 @@ public class LRUCache<K,V> extends LinkedHashMap<K,V> {
      * creates a new LRU cached with maxEntires slots
      */
     public LRUCache(int maxEntries) {
-	super(maxEntries + 1, 1.0F, true);
-	this.maxEntries = maxEntries;
+        super(maxEntries + 1, 1.0F, true);
+        this.maxEntries = maxEntries;
     }
 
     /**
      * removes the eldest entry, i.e. the least recently used one
      */
     @Override
-    protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
-	return size() > maxEntries;
+    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+        return size() > maxEntries;
     }
 }

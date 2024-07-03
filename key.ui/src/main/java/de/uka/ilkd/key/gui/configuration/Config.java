@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.UIManager;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -13,23 +15,19 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 public class Config {
 
     /** name of different fonts */
-    public static final String KEY_FONT_PROOF_TREE 
-	= "KEY_FONT_PROOF_TREE";
-    public static final String KEY_FONT_SEQUENT_VIEW 
-	= "KEY_FONT_CURRENT_GOAL_VIEW";
-    public static final String KEY_FONT_GOAL_LIST_VIEW 
-	= "KEY_FONT_GOAL_LIST_VIEW";
-    public static final String KEY_FONT_PROOF_LIST_VIEW 
-	= "KEY_FONT_PROOF_LIST_VIEW";
+    public static final String KEY_FONT_PROOF_TREE = "KEY_FONT_PROOF_TREE";
+    public static final String KEY_FONT_SEQUENT_VIEW = "KEY_FONT_CURRENT_GOAL_VIEW";
+    public static final String KEY_FONT_GOAL_LIST_VIEW = "KEY_FONT_GOAL_LIST_VIEW";
+    public static final String KEY_FONT_PROOF_LIST_VIEW = "KEY_FONT_PROOF_LIST_VIEW";
 
     /** An array of font sizes for the goal view */
-    public static final int[] SIZES = new int[]{10,12,14,17,20,24};
+    public static final int[] SIZES = new int[] { 10, 12, 14, 17, 20, 24 };
 
     public static final Config DEFAULT = new Config();
-    
+
     /** The index of the current size */
-    private int sizeIndex; 
-    { 
+    private int sizeIndex;
+    {
         sizeIndex = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().sizeIndex();
         if (sizeIndex < 0 || sizeIndex > SIZES.length) {
             sizeIndex = 0;
@@ -37,8 +35,8 @@ public class Config {
     }
 
     /** cached ConfigChange event */
-    private ConfigChangeEvent configChangeEvent = 
-	new ConfigChangeEvent(this);
+    private ConfigChangeEvent configChangeEvent =
+        new ConfigChangeEvent(this);
 
     /** the listeners to this Config */
     private final List<ConfigChangeListener> listenerList =
@@ -49,64 +47,63 @@ public class Config {
     }
 
     public void larger() {
-	if (!isMaximumSize()) {
-	    sizeIndex++;
-	    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setFontIndex(sizeIndex);
-//	    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setFontIndex(sizeIndex);
-	    setDefaultFonts();
-	    fireConfigChange(); 
-	}
+        if (!isMaximumSize()) {
+            sizeIndex++;
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setFontIndex(sizeIndex);
+            // ProofSettings.DEFAULT_SETTINGS.getViewSettings().setFontIndex(sizeIndex);
+            setDefaultFonts();
+            fireConfigChange();
+        }
     }
 
     public void smaller() {
-	if (!isMinimumSize()) {
-	    sizeIndex--;
-	    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setFontIndex(sizeIndex);
-//	    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setFontIndex(sizeIndex);
-	    setDefaultFonts(); 
-	    fireConfigChange();
-	}
+        if (!isMinimumSize()) {
+            sizeIndex--;
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setFontIndex(sizeIndex);
+            // ProofSettings.DEFAULT_SETTINGS.getViewSettings().setFontIndex(sizeIndex);
+            setDefaultFonts();
+            fireConfigChange();
+        }
     }
 
     public boolean isMinimumSize() {
-	return sizeIndex==0;
+        return sizeIndex == 0;
     }
-    
+
     public boolean isMaximumSize() {
-	return sizeIndex== SIZES.length-1;
+        return sizeIndex == SIZES.length - 1;
     }
 
     public void setDefaultFonts() {
-	UIManager.put(KEY_FONT_PROOF_TREE, 
-		      new Font("Default", Font.PLAIN, SIZES[sizeIndex]));
-	UIManager.put(KEY_FONT_SEQUENT_VIEW, 
-		      new Font("Monospaced", Font.PLAIN, SIZES[sizeIndex]));
-	UIManager.put(KEY_FONT_GOAL_LIST_VIEW, 
-		      new Font("Default", Font.PLAIN, SIZES[2]));
-	UIManager.put(KEY_FONT_PROOF_LIST_VIEW, 
-		      new Font("Default", Font.PLAIN, SIZES[2]));
+        UIManager.put(KEY_FONT_PROOF_TREE,
+            new Font("Default", Font.PLAIN, SIZES[sizeIndex]));
+        UIManager.put(KEY_FONT_SEQUENT_VIEW,
+            new Font("Monospaced", Font.PLAIN, SIZES[sizeIndex]));
+        UIManager.put(KEY_FONT_GOAL_LIST_VIEW,
+            new Font("Default", Font.PLAIN, SIZES[2]));
+        UIManager.put(KEY_FONT_PROOF_LIST_VIEW,
+            new Font("Default", Font.PLAIN, SIZES[2]));
     }
 
 
     public void addConfigChangeListener(ConfigChangeListener listener) {
-	synchronized(listenerList) {
-	    listenerList.add(listener);	    
-	}
+        synchronized (listenerList) {
+            listenerList.add(listener);
+        }
     }
 
     public void removeConfigChangeListener(ConfigChangeListener listener) {
-	synchronized(listenerList) {
-	    listenerList.remove(listener);
-	}
-    }		
+        synchronized (listenerList) {
+            listenerList.remove(listener);
+        }
+    }
 
     public synchronized void fireConfigChange() {
-	synchronized(listenerList) {
-        for (ConfigChangeListener aListenerList : listenerList) {
-            aListenerList.
-                    configChanged(configChangeEvent);
+        synchronized (listenerList) {
+            for (ConfigChangeListener aListenerList : listenerList) {
+                aListenerList.configChanged(configChangeEvent);
+            }
         }
-	}
     }
 
 }

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.informationflow.macros;
 
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
@@ -26,8 +30,8 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
     @Override
     public String getDescription() {
         return "<html><ol><li>Start auxiliary computation" +
-               "<li>Finish symbolic execution" +
-               "<li>Try to close as many goals as possible</ol>";
+            "<li>Finish symbolic execution" +
+            "<li>Try to close as many goals as possible</ol>";
     }
 
 
@@ -40,12 +44,14 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
              * strategy setting.
              */
             private final int NUMBER_OF_TRY_STEPS =
-                    Integer.getInteger("key.autopilot.closesteps", 1000);
+                Integer.getInteger("key.autopilot.closesteps", 1000);
 
             @Override
             public String getName() { return ""; }
+
             @Override
             public String getCategory() { return null; }
+
             @Override
             public String getDescription() { return "Anonymous Macro"; }
 
@@ -55,22 +61,25 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                 // started at the same node. Therefore they are encapsulated in an
                 // own (anonymous) SequentialProofMacro.
                 SequentialProofMacro finishSymbExecAndTryToClose =
-                        new SequentialProofMacro() {
-                    @Override
-                    protected ProofMacro[] createProofMacroArray() {
-                        return new ProofMacro[]{ new FinishSymbolicExecutionMacro(),
-                                                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)};
-                    }
-                    @Override
-                    public String getName() { return ""; }
-                    @Override
-                    public String getCategory() { return null; }
-                    @Override
-                    public String getDescription() { return "Anonymous Macro"; }
-                };
+                    new SequentialProofMacro() {
+                        @Override
+                        protected ProofMacro[] createProofMacroArray() {
+                            return new ProofMacro[] { new FinishSymbolicExecutionMacro(),
+                                new TryCloseMacro(NUMBER_OF_TRY_STEPS) };
+                        }
 
-                return new ProofMacro[]{ new StartAuxiliaryComputationMacro(),
-                                         finishSymbExecAndTryToClose };
+                        @Override
+                        public String getName() { return ""; }
+
+                        @Override
+                        public String getCategory() { return null; }
+
+                        @Override
+                        public String getDescription() { return "Anonymous Macro"; }
+                    };
+
+                return new ProofMacro[] { new StartAuxiliaryComputationMacro(),
+                    finishSymbExecAndTryToClose };
             }
         };
     }

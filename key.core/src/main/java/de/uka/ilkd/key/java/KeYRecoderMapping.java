@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java;
 
 
@@ -10,109 +14,115 @@ import de.uka.ilkd.key.util.Debug;
 
 
 
-public class KeYRecoderMapping{
+public class KeYRecoderMapping {
 
 
     /** have special classes been parsed in */
     private boolean parsedSpecial = false;
 
-    /** maps a recoder programelement (or something similar, e.g. Type)
-    * to the KeY-equivalent
-    */
+    /**
+     * maps a recoder programelement (or something similar, e.g. Type)
+     * to the KeY-equivalent
+     */
     private HashMap<Object, Object> map;
 
     /** maps a KeY programelement to the Recoder-equivalent */
     private HashMap<Object, Object> revMap;
 
     /** a pseudo super class for all arrays used to declare length */
-    private KeYJavaType superArrayType=null;
+    private KeYJavaType superArrayType = null;
 
-    
+
     public KeYRecoderMapping() {
-	this.map = new LinkedHashMap<>();
-	this.revMap = new LinkedHashMap<>();
+        this.map = new LinkedHashMap<>();
+        this.revMap = new LinkedHashMap<>();
     }
 
 
     /**
-    * creates a KeYRecoderMapping object.
-    * Used for cloning and testing.
-    * @param map a HashMap mapping ProgramElements in Recoder to
-    * ProgramElements in KeY
-    * @param revMap the reverse map (KeY->Recoder)
-    * @param parsedSpecial boolean indicating if the special classes have been parsed in
-    */
+     * creates a KeYRecoderMapping object.
+     * Used for cloning and testing.
+     *
+     * @param map a HashMap mapping ProgramElements in Recoder to
+     *        ProgramElements in KeY
+     * @param revMap the reverse map (KeY->Recoder)
+     * @param parsedSpecial boolean indicating if the special classes have been parsed in
+     */
     KeYRecoderMapping(HashMap<Object, Object> map, HashMap<Object, Object> revMap,
-                             KeYJavaType superArrayType,
-			     boolean parsedSpecial) {
-        this.map      = map;
-        this.revMap   = revMap;
+            KeYJavaType superArrayType,
+            boolean parsedSpecial) {
+        this.map = map;
+        this.revMap = revMap;
         this.superArrayType = superArrayType;
-	this.parsedSpecial = parsedSpecial;
+        this.parsedSpecial = parsedSpecial;
     }
 
     /**
-    * returns a matching ProgramElement (KeY) to a given
-    * ProgramElement (Recoder)
-    * @param pe a recoder.java.ProgramElement
-    */
+     * returns a matching ProgramElement (KeY) to a given
+     * ProgramElement (Recoder)
+     *
+     * @param pe a recoder.java.ProgramElement
+     */
     public ProgramElement toKeY(recoder.java.ProgramElement pe) {
-        return (ProgramElement)map.get(pe);
+        return (ProgramElement) map.get(pe);
     }
 
     /**
-    * returns a matching ModelElement (KeY) to a given recoder.ModelElement
-    * @param pe a recoder.ModelElement
-    */
+     * returns a matching ModelElement (KeY) to a given recoder.ModelElement
+     *
+     * @param pe a recoder.ModelElement
+     */
     public ModelElement toKeY(recoder.ModelElement pe) {
-        return (ModelElement)map.get(pe);
+        return (ModelElement) map.get(pe);
     }
 
 
     /**
-    * returns the Recoder-equivalent to a given ProgramElement (KeY).
-    * If there's no RecodeR equivalent to program element pe, an
-    * assertion failure "Program Element <pe> not known" is emitted.
-    * @param pe a JavaProgramElement
-    */
+     * returns the Recoder-equivalent to a given ProgramElement (KeY).
+     * If there's no RecodeR equivalent to program element pe, an
+     * assertion failure "Program Element <pe> not known" is emitted.
+     *
+     * @param pe a JavaProgramElement
+     */
     public recoder.java.ProgramElement toRecoder(ProgramElement pe) {
-        Object res=revMap.get(pe);
-        Debug.assertTrue(res!=null, "Program Element not known", pe);
-        return (recoder.java.ProgramElement)res;
+        Object res = revMap.get(pe);
+        Debug.assertTrue(res != null, "Program Element not known", pe);
+        return (recoder.java.ProgramElement) res;
     }
 
 
     /**
-    * returns the Recoder-equivalent to a given ModelElement (KeY).
-    * If there's no Recoder-equivalent to the ModelElement pe a
-    * debug message "Model Element <pe> not known" is printed.
-    * @param pe a ModelElement
-    */
+     * returns the Recoder-equivalent to a given ModelElement (KeY).
+     * If there's no Recoder-equivalent to the ModelElement pe a
+     * debug message "Model Element <pe> not known" is printed.
+     *
+     * @param pe a ModelElement
+     */
     public recoder.ModelElement toRecoder(ModelElement pe) {
-        Object res=revMap.get(pe);
-        Debug.assertTrue(res!=null, "Model Element not known", pe);
+        Object res = revMap.get(pe);
+        Debug.assertTrue(res != null, "Model Element not known", pe);
 
-        return (recoder.ModelElement)res;
+        return (recoder.ModelElement) res;
     }
 
     public void put(Object rec, Object key) {
-	Object formerValue = map.put(rec, key);
-	Debug.assertTrue(formerValue == null, 
-			 "keyrecodermapping: duplicate registration of type:", key);
-	revMap.put(key, rec);
+        Object formerValue = map.put(rec, key);
+        Debug.assertTrue(formerValue == null,
+            "keyrecodermapping: duplicate registration of type:", key);
+        revMap.put(key, rec);
     }
 
     public boolean mapped(Object rec) {
-	return map.containsKey(rec);
+        return map.containsKey(rec);
     }
-    
+
 
     public Set<Object> elemsKeY() {
-	return revMap.keySet();
+        return revMap.keySet();
     }
 
     public Set<Object> elemsRec() {
-	return map.keySet();
+        return map.keySet();
     }
 
     public void setSuperArrayType(KeYJavaType superArrayType) {
@@ -123,13 +133,13 @@ public class KeYRecoderMapping{
         return this.superArrayType;
     }
 
-    
+
     @SuppressWarnings("unchecked")
     public KeYRecoderMapping copy() {
-	return new KeYRecoderMapping((HashMap<Object, Object>)map.clone(),
-				     (HashMap<Object, Object>)revMap.clone(),
-                                     superArrayType,
-				     parsedSpecial);
+        return new KeYRecoderMapping((HashMap<Object, Object>) map.clone(),
+            (HashMap<Object, Object>) revMap.clone(),
+            superArrayType,
+            parsedSpecial);
     }
 
     /**
@@ -137,17 +147,18 @@ public class KeYRecoderMapping{
      * some 'java.lang' classes. These are parsed in using method
      * parseSpecial of {@link Recoder2KeY}. To avoid multiple readings
      * this method indicates whether the special have been parsed in or
-     * not. 
+     * not.
+     *
      * @return true if special classes have been parsed in
      */
     public boolean parsedSpecial() {
-	return parsedSpecial;
+        return parsedSpecial;
     }
 
-    public int size(){
-	return map.size();
+    public int size() {
+        return map.size();
     }
-    
+
 
     /**
      * As long as we do not support lemmata we need the source code of
@@ -155,11 +166,12 @@ public class KeYRecoderMapping{
      * parseSpecial of {@link Recoder2KeY}. To avoid multiple readings
      * this method sets a flag whether the special have been parsed in or
      * not
+     *
      * @param b boolean indicating if the special classes have been
-     * parsed in
+     *        parsed in
      */
     public void parsedSpecial(boolean b) {
-	parsedSpecial = b;
+        parsedSpecial = b;
     }
 
 }

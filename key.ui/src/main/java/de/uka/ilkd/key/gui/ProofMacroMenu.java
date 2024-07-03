@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
 
@@ -6,12 +9,9 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
-
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-
-import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
@@ -21,6 +21,8 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
+
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 /**
  * This class provides the user interface to the macro extensions.
@@ -59,7 +61,7 @@ public class ProofMacroMenu extends JMenu {
      * This is used as iteration source in other parts of KeY's ui.
      */
     public static final Iterable<ProofMacro> REGISTERED_MACROS =
-            ClassLoaderUtil.loadServices(ProofMacro.class);
+        ClassLoaderUtil.loadServices(ProofMacro.class);
 
     /**
      * The number of defined macros.
@@ -73,7 +75,7 @@ public class ProofMacroMenu extends JMenu {
      *
      * @param mediator the mediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not
-     * available.
+     *        available.
      */
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy Macros");
@@ -88,27 +90,27 @@ public class ProofMacroMenu extends JMenu {
 
             boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
 
-            if(applicable) {
+            if (applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
 
                 String category = macro.getCategory();
                 JMenu submenu = this;
-                if(category != null) {
+                if (category != null) {
                     // find the submenu to be used. Create and store if necessary.
                     submenu = submenus.get(category);
-                    if(submenu == null) {
+                    if (submenu == null) {
                         submenu = new JMenu(category);
                         submenus.put(category, submenu);
                         add(submenu);
-            }
-        }
+                    }
+                }
 
                 submenu.add(menuItem);
                 count++;
             }
         }
 
-        if(Main.isExperimentalMode()) {
+        if (Main.isExperimentalMode()) {
             add(new JMenuItem(new ProofScriptFromFileAction(mediator)));
             add(new JMenuItem(new ProofScriptInputAction(mediator)));
         }
@@ -147,7 +149,8 @@ public class ProofMacroMenu extends JMenu {
                 if (mediator.isInAutoMode()) {
                     return;
                 }
-                mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
+                mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
+                    posInOcc);
             }
         });
 

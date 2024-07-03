@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 
@@ -25,13 +29,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  */
 public final class TypeComparisonCondition extends VariableConditionAdapter {
 
-    public static enum Mode 
-    {NOT_SAME,           /* checks if sorts are not same */
-        SAME,               /* checks if sorts are same */ 
-        IS_SUBTYPE,         /* checks subtype relationship */
-        NOT_IS_SUBTYPE,     /* checks subtype relationship */
-        STRICT_SUBTYPE,     /* checks for strict subtype */
-        DISJOINTMODULONULL} /* checks if sorts are disjoint */
+    public static enum Mode {
+        NOT_SAME, /* checks if sorts are not same */
+        SAME, /* checks if sorts are same */
+        IS_SUBTYPE, /* checks subtype relationship */
+        NOT_IS_SUBTYPE, /* checks subtype relationship */
+        STRICT_SUBTYPE, /* checks for strict subtype */
+        DISJOINTMODULONULL
+    } /* checks if sorts are disjoint */
 
     private final Mode mode;
     private final TypeResolver fst;
@@ -40,12 +45,13 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
     /**
      * creates a condition that checks if the declaration types of the
-     * schemavariable's instantiations are unequal 
+     * schemavariable's instantiations are unequal
+     *
      * @param fst one of the SchemaVariable whose type is checked
      * @param snd one of the SchemaVariable whose type is checked
      * @param mode an int encoding if testing of not same or not compatible
      */
-    public TypeComparisonCondition(TypeResolver fst, 
+    public TypeComparisonCondition(TypeResolver fst,
             TypeResolver snd,
             Mode mode) {
         this.fst = fst;
@@ -54,27 +60,27 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
 
-    public TypeResolver getFirstResolver(){
+    public TypeResolver getFirstResolver() {
         return fst;
     }
 
 
-    public TypeResolver getSecondResolver(){
+    public TypeResolver getSecondResolver() {
         return snd;
     }
 
 
-    public Mode getMode(){
+    public Mode getMode() {
         return mode;
     }
 
     @Override
-    public boolean check(SchemaVariable var, 
-            SVSubstitute subst, 
+    public boolean check(SchemaVariable var,
+            SVSubstitute subst,
             SVInstantiations svInst,
             Services services) {
 
-        if (!fst.isComplete(var, subst, svInst, services) 
+        if (!fst.isComplete(var, subst, svInst, services)
                 || !snd.isComplete(var, subst, svInst, services)) {
             // not yet complete
             return true;
@@ -86,14 +92,14 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
 
-    private boolean checkSorts(final Sort fstSort, 
-            final Sort sndSort, 
+    private boolean checkSorts(final Sort fstSort,
+            final Sort sndSort,
             final Services services) {
 
         boolean proxy1 = fstSort instanceof ProxySort;
         boolean proxy2 = sndSort instanceof ProxySort;
 
-        if(!proxy1 && !proxy2) {
+        if (!proxy1 && !proxy2) {
             // This is the standard case where no proxy sorts are involved
             switch (mode) {
             case SAME:
@@ -114,27 +120,27 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
             case SAME:
                 return fstSort == sndSort;
             case IS_SUBTYPE:
-                if(proxy2) {
+                if (proxy2) {
                     return false;
                 }
                 // If one of the extended types is a subtype to sndSort, then so
                 // is the proxy sort.
                 assert proxy1;
                 for (Sort extSort : fstSort.extendsSorts()) {
-                    if(extSort.extendsTrans(sndSort)) {
+                    if (extSort.extendsTrans(sndSort)) {
                         return true;
                     }
                 }
                 return false;
             case STRICT_SUBTYPE:
-                if(proxy2) {
+                if (proxy2) {
                     return false;
                 }
                 // If one of the extended types is a subtype to sndSort, then so
                 // is the proxy sort.
                 assert proxy1;
                 for (Sort extSort : fstSort.extendsSorts()) {
-                    if(extSort != sndSort && extSort.extendsTrans(sndSort)) {
+                    if (extSort != sndSort && extSort.extendsTrans(sndSort)) {
                         return true;
                     }
                 }
@@ -157,21 +163,21 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         Boolean result = null;
 
         final Map<Sort, Map<Sort, Boolean>> disjointnessCache = caches.getDisjointnessCache();
-        Map<Sort,Boolean> map;
+        Map<Sort, Boolean> map;
         synchronized (disjointnessCache) {
             map = disjointnessCache.get(s1);
         }
-        if(map != null) {
+        if (map != null) {
             synchronized (map) {
                 result = map.get(s2);
             }
         }
 
-        if(result == null) {
+        if (result == null) {
             synchronized (disjointnessCache) {
                 map = disjointnessCache.get(s2);
             }
-            if(map != null) {
+            if (map != null) {
                 synchronized (map) {
                     result = map.get(s1);
                 }
@@ -183,20 +189,20 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
     private static void putIntoCache(Sort s1, Sort s2, boolean b, ServiceCaches caches) {
         final Map<Sort, Map<Sort, Boolean>> disjointnessCache = caches.getDisjointnessCache();
-        Map<Sort,Boolean> map;
+        Map<Sort, Boolean> map;
         synchronized (disjointnessCache) {
             map = disjointnessCache.get(s1);
         }
-        
+
         if (map == null) {
-            map = new WeakHashMap<Sort,Boolean>();
+            map = new WeakHashMap<Sort, Boolean>();
             map.put(s2, b);
-        } else { 
-            synchronized(map) {
+        } else {
+            synchronized (map) {
                 map.put(s2, b);
             }
         }
-        
+
         synchronized (disjointnessCache) {
             disjointnessCache.put(s1, map);
         }
@@ -206,58 +212,57 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     /**
      * Checks for disjointness modulo "null".
      */
-    private boolean checkDisjointness(Sort fstSort, 
-            Sort sndSort, 
+    private boolean checkDisjointness(Sort fstSort,
+            Sort sndSort,
             Services services) {
-        //sorts identical?
-        if(fstSort == sndSort) {
+        // sorts identical?
+        if (fstSort == sndSort) {
             return false;
         }
 
-        //result cached?
+        // result cached?
         Boolean result = lookupInCache(fstSort, sndSort, services.getCaches());
 
-        //if not, compute it 
-        if(result == null) {
+        // if not, compute it
+        if (result == null) {
             final JavaInfo javaInfo = services.getJavaInfo();
 
-            //array sorts are disjoint if their element sorts are disjoint
+            // array sorts are disjoint if their element sorts are disjoint
             Sort fstElemSort = fstSort;
             Sort sndElemSort = sndSort;
-            while(fstElemSort instanceof ArraySort 
+            while (fstElemSort instanceof ArraySort
                     && sndElemSort instanceof ArraySort) {
-                fstElemSort = ((ArraySort)fstElemSort).elementSort();
-                sndElemSort = ((ArraySort)sndElemSort).elementSort();
+                fstElemSort = ((ArraySort) fstElemSort).elementSort();
+                sndElemSort = ((ArraySort) sndElemSort).elementSort();
             }
 
-            //object sorts?
-            final Sort objectSort = services.getJavaInfo().objectSort();	    
+            // object sorts?
+            final Sort objectSort = services.getJavaInfo().objectSort();
             boolean fstElemIsObject = fstElemSort.extendsTrans(objectSort);
             boolean sndElemIsObject = sndElemSort.extendsTrans(objectSort);
 
-            //try to get KeYJavaTypes (only works for types existing in program)
+            // try to get KeYJavaTypes (only works for types existing in program)
             final KeYJavaType fstKJT = javaInfo.getKeYJavaType(fstSort);
             final KeYJavaType sndKJT = javaInfo.getKeYJavaType(sndSort);
 
-            if(fstElemIsObject 
+            if (fstElemIsObject
                     && sndElemIsObject
                     && !(fstElemSort instanceof ArraySort)
                     && !(sndElemSort instanceof ArraySort)
-                    && (fstKJT != null && fstKJT.getJavaType() 
-                    instanceof InterfaceDeclaration
-                    || sndKJT != null && sndKJT.getJavaType() 
-                    instanceof InterfaceDeclaration)) {
-                //be conservative wrt. modularity: program extensions may add 
-                //new subtypes between object sorts, if none of them is
-                //an array sort and at least one of them is an interface sort
+                    && (fstKJT != null && fstKJT.getJavaType() instanceof InterfaceDeclaration
+                            || sndKJT != null
+                                    && sndKJT.getJavaType() instanceof InterfaceDeclaration)) {
+                // be conservative wrt. modularity: program extensions may add
+                // new subtypes between object sorts, if none of them is
+                // an array sort and at least one of them is an interface sort
                 result = false;
             } else {
-                //otherwise, we just check whether *currently* there is 
-                //some common subsort
+                // otherwise, we just check whether *currently* there is
+                // some common subsort
                 result = true;
-                for(Named n : services.getNamespaces().sorts().allElements()) {
+                for (Named n : services.getNamespaces().sorts().allElements()) {
                     final Sort s = (Sort) n;
-                    if(!(s instanceof NullSort)
+                    if (!(s instanceof NullSort)
                             && s.extendsTrans(fstSort)
                             && s.extendsTrans(sndSort)) {
                         result = false;
@@ -273,23 +278,23 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
 
-    @Override    
-    public String toString () {
+    @Override
+    public String toString() {
         switch (mode) {
         case SAME:
-            return "\\same("+fst+", "+snd+")";
+            return "\\same(" + fst + ", " + snd + ")";
         case NOT_SAME:
-            return "\\not\\same("+fst+", "+snd+")";
+            return "\\not\\same(" + fst + ", " + snd + ")";
         case IS_SUBTYPE:
-            return "\\sub(" + fst +", "+snd+")";
+            return "\\sub(" + fst + ", " + snd + ")";
         case STRICT_SUBTYPE:
-            return "\\strict\\sub(" + fst +", "+snd+")";
+            return "\\strict\\sub(" + fst + ", " + snd + ")";
         case NOT_IS_SUBTYPE:
-            return "\\not\\sub("+fst+", "+snd+")";
+            return "\\not\\sub(" + fst + ", " + snd + ")";
         case DISJOINTMODULONULL:
-            return "\\disjointModuloNull("+fst+", "+snd+")";
+            return "\\disjointModuloNull(" + fst + ", " + snd + ")";
         default:
-            return "invalid type comparison mode";         	    
+            return "invalid type comparison mode";
         }
     }
 }

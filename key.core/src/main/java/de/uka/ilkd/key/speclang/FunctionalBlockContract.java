@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -24,7 +28,7 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
     /**
      *
      * @param contract
-     *            a block contract.
+     *        a block contract.
      */
     FunctionalBlockContract(BlockContract contract) {
         super(contract);
@@ -33,9 +37,9 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
     /**
      *
      * @param contract
-     *            a block contract.
+     *        a block contract.
      * @param id
-     *            an ID.
+     *        an ID.
      */
     FunctionalBlockContract(BlockContract contract, int id) {
         super(contract, id);

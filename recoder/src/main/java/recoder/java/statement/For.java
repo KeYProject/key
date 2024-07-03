@@ -1,14 +1,17 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.java.*;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * For.
@@ -34,13 +37,14 @@ public class For extends LoopStatement implements VariableScope {
     /**
      * For.
      *
-     * @param inits   a loop initializer mutable list.
-     * @param guard   an expression.
+     * @param inits a loop initializer mutable list.
+     * @param guard an expression.
      * @param updates an expression mutable list.
-     * @param body    a statement.
+     * @param body a statement.
      */
 
-    public For(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates, Statement body) {
+    public For(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates,
+            Statement body) {
         super(body);
         setInitializers(inits);
         setGuard(guard);
@@ -130,7 +134,7 @@ public class For extends LoopStatement implements VariableScope {
 
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
-        // TODO maybe check if var is contained in inits? (consistency-check) 
+        // TODO maybe check if var is contained in inits? (consistency-check)
     }
 
     public void removeVariableFromScope(String name) {

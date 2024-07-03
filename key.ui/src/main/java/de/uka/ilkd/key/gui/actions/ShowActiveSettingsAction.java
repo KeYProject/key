@@ -1,19 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 /**
  * for debugging - opens a window with the settings from current Proof and the
@@ -34,10 +37,11 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ProofSettings settings = (getMediator().getSelectedProof() == null) ?
-                ProofSettings.DEFAULT_SETTINGS :
-                getMediator().getSelectedProof().getSettings();
-        SettingsTreeModel model = new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
+        ProofSettings settings =
+            (getMediator().getSelectedProof() == null) ? ProofSettings.DEFAULT_SETTINGS
+                    : getMediator().getSelectedProof().getSettings();
+        SettingsTreeModel model =
+            new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
         ViewSettingsDialog dialog = new ViewSettingsDialog(model, model.getStartComponent());
         dialog.setTitle("All active settings");
         dialog.setLocationRelativeTo(mainWindow);
@@ -81,8 +85,8 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
 
             getRootPane().registerKeyboardAction((e) -> dispose(),
-                    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
             getRootPane().setDefaultButton(okButton);
         }
 
@@ -101,7 +105,8 @@ public class ShowActiveSettingsAction extends MainWindowAction {
                     : new Dimension(0, 0);
 
             for (int i = 0; i < node.getChildCount(); i++) {
-                Dimension dimChild = computePreferredSize((DefaultMutableTreeNode) node.getChildAt(i));
+                Dimension dimChild =
+                    computePreferredSize((DefaultMutableTreeNode) node.getChildAt(i));
                 dim.width = Math.max(dimChild.width, dim.width);
                 dim.height = Math.max(dimChild.height, dim.height);
 
@@ -119,7 +124,8 @@ public class ShowActiveSettingsAction extends MainWindowAction {
                     if (path != null) {
                         Object node = path.getLastPathComponent();
                         if (node != null && node instanceof OptionContentNode) {
-                            getSplitPane().setRightComponent(((OptionContentNode) node).getComponent());
+                            getSplitPane()
+                                    .setRightComponent(((OptionContentNode) node).getComponent());
 
                         }
                     }
@@ -135,7 +141,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
                 splitPane.setAlignmentX(LEFT_ALIGNMENT);
                 splitPane.setLeftComponent(new JScrollPane(getOptionTree()));
                 splitPane.setRightComponent(getOptionPanel());
-                //splitPane.setResizeWeight(0.2);
+                // splitPane.setResizeWeight(0.2);
             }
             return splitPane;
 

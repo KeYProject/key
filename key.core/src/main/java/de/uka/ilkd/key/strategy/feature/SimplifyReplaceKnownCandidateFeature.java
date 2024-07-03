@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -16,53 +20,55 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  * replace-known rule). Used terminology is defined in Diss. by Martin Giese.
  */
 public class SimplifyReplaceKnownCandidateFeature
-       extends AbstractPolarityFeature implements Feature {
+        extends AbstractPolarityFeature implements Feature {
 
     public final static Feature INSTANCE =
-        new SimplifyReplaceKnownCandidateFeature ();
-    
-    private SimplifyReplaceKnownCandidateFeature () {}
-    
+        new SimplifyReplaceKnownCandidateFeature();
+
+    private SimplifyReplaceKnownCandidateFeature() {}
+
     /**
      * Compute the cost of a RuleApp.
+     *
      * @param ruleApp the RuleApp
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost computeCost (RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
-        
-        if ( !isAllowedPosition ( pos ) ) return BinaryFeature.TOP_COST;
-        
+
+        if (!isAllowedPosition(pos))
+            return BinaryFeature.TOP_COST;
+
         assert ruleApp instanceof TacletApp : "Feature is only applicable to taclet apps";
 
-        final TacletApp app = (TacletApp)ruleApp;
-        final Sequent ifSeq = app.taclet ().ifSequent ();
-        
-        assert ifSeq.size () == 1 : "Wrong number of if-formulas.";
-                
-        final Boolean pol = polarity ( pos, Boolean.valueOf(pos.isInAntec()) );
+        final TacletApp app = (TacletApp) ruleApp;
+        final Sequent ifSeq = app.taclet().ifSequent();
+
+        assert ifSeq.size() == 1 : "Wrong number of if-formulas.";
+
+        final Boolean pol = polarity(pos, Boolean.valueOf(pos.isInAntec()));
 
         final boolean ifForInAntec =
-            ifSeq.succedent ().isEmpty();        
-        
+            ifSeq.succedent().isEmpty();
+
         final boolean approved =
-                 pol == null
-                 || pol.booleanValue () != ifForInAntec
-                 || AbstractBetaFeature.alwaysReplace ( pos.subTerm () );
-        
+            pol == null
+                    || pol.booleanValue() != ifForInAntec
+                    || AbstractBetaFeature.alwaysReplace(pos.subTerm());
+
         return approved ? BinaryFeature.ZERO_COST : BinaryFeature.TOP_COST;
     }
 
-    private boolean isAllowedPosition ( PosInOccurrence pos ) {
-        final PIOPathIterator it = pos.iterator ();
-        
-        while ( it.next() != -1 ) {
-            if ( !( it.getSubTerm().op() instanceof UpdateApplication ) )
+    private boolean isAllowedPosition(PosInOccurrence pos) {
+        final PIOPathIterator it = pos.iterator();
+
+        while (it.next() != -1) {
+            if (!(it.getSubTerm().op() instanceof UpdateApplication))
                 return true;
         }
-        
+
         return false;
     }
 }

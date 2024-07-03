@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.keyshortcuts;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.*;
 
 /**
  * Manager of the configurable {@link KeyStroke}s for proof macros and GUI actions.
@@ -14,13 +17,14 @@ import java.util.Map;
  * If possible, all actions should ask this interface for a {@link KeyStroke},
  * by calling {@link #lookupAndOverride(Action)}.
  * <p>
- * The general guidelines for adding new keyboard shortcuts are<ul>
- * <li> they must not produce a printable character,
- * <li> they must not interfere with shortcuts already defined by the
+ * The general guidelines for adding new keyboard shortcuts are
+ * <ul>
+ * <li>they must not produce a printable character,
+ * <li>they must not interfere with shortcuts already defined by the
  * window manager (this probably includes all combinations using the Windows key),
- * <li> the <a href="http://en.wikipedia.org/wiki/Keyboard_shortcut#.22Sacred.22_keybindings">
+ * <li>the <a href="http://en.wikipedia.org/wiki/Keyboard_shortcut#.22Sacred.22_keybindings">
  * "sacred keybindings"</a> must not be touched,
- * <li> the theme for strategy macros should be consistent
+ * <li>the theme for strategy macros should be consistent
  * (currently either F keys or CTRL + SHIFT + letter).
  * </ul>
  *
@@ -60,7 +64,7 @@ public final class KeyStrokeManager {
      * <p>
      * Also thsi method sets the determined key stroke in the settings.
      *
-     * @param key          key
+     * @param key key
      * @param defaultValue default value
      * @return nullable
      * @see KeyStrokeSettings
@@ -161,4 +165,3 @@ public final class KeyStrokeManager {
         }
     }
 }
-

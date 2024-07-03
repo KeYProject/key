@@ -1,4 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog;
+
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Optional;
+import javax.swing.*;
+import javax.swing.border.Border;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -14,6 +34,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.key_project.ui.BoundsPopupMenuListener;
 import org.key_project.ui.interactionlog.algo.MUProofScriptExport;
 import org.key_project.ui.interactionlog.algo.MarkdownExport;
@@ -23,22 +44,6 @@ import org.key_project.ui.interactionlog.model.InteractionRecorderListener;
 import org.key_project.ui.interactionlog.model.NodeInteraction;
 import org.key_project.ui.interactionlog.model.UserNoteInteraction;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Optional;
-
 public class InteractionLogView extends JPanel implements InteractionRecorderListener, TabPanel {
     private static final long serialVersionUID = -7022558787824644419L;
     private static final Icon INTERACTION_LOG_ICON = IconFactory.INTERLOG_ICON.get();
@@ -47,11 +52,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private static final String MENU_ILOG_EXPORT = MENU_ILOG + ".Export";
 
     private static final IconFontProvider ICON_LOAD =
-            new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
+        new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
     private static final IconFontProvider ICON_ADD_USER_ACTION =
-            new IconFontProvider(FontAwesomeRegular.STICKY_NOTE);
+        new IconFontProvider(FontAwesomeRegular.STICKY_NOTE);
     private static final IconFontProvider ICON_TOGGLE_FAVOURITE =
-            new IconFontProvider(FontAwesomeSolid.HEART);
+        new IconFontProvider(FontAwesomeSolid.HEART);
 
 
     private final InteractionRecorder recorder = new InteractionRecorder();
@@ -68,7 +73,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private final ExportMarkdownAction actionExportMarkdown = new ExportMarkdownAction();
     private final ShowExtendedActionsAction actionShowExtended = new ShowExtendedActionsAction();
     private final ExportMUScriptClipboardAction actionMUCopyClipboard =
-            new ExportMUScriptClipboardAction();
+        new ExportMUScriptClipboardAction();
     private final PauseLoggingAction actionPauseLogging = new PauseLoggingAction();
 
 
@@ -94,10 +99,10 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         listInteraction.setCellRenderer(new InteractionCellRenderer());
 
         BoundsPopupMenuListener listener =
-                new BoundsPopupMenuListener(true, false);
+            new BoundsPopupMenuListener(true, false);
         interactionLogSelection.addPopupMenuListener(listener);
         interactionLogSelection.setPrototypeDisplayValue(
-                new InteractionLog("INTERACTION LOG"));
+            new InteractionLog("INTERACTION LOG"));
 
 
         JToolBar panelButtons = new JToolBar();
@@ -158,7 +163,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
                     Object textFlavour = tr.getTransferData(DataFlavor.stringFlavor);
                     dtde.acceptDrop(dtde.getDropAction());
                     dtde.dropComplete(true);
-                    SwingUtilities.invokeLater(() -> actionAddUserNote.doAddNote(textFlavour.toString()));
+                    SwingUtilities
+                            .invokeLater(() -> actionAddUserNote.doAddNote(textFlavour.toString()));
                     return;
                 } catch (UnsupportedFlavorException | IOException e) {
                     e.printStackTrace();
@@ -188,10 +194,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private void setCurrentProof(Proof proof) {
-        if (proof == null) return;
+        if (proof == null)
+            return;
         currentProof = proof;
         recorder.get(currentProof);
-        //rebuildList();
+        // rebuildList();
     }
 
     private void rebuildList() {
@@ -376,12 +383,12 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
                 try {
                     File file = fc.getSelectedFile();
                     recorder.readInteractionLog(file);
-                    //addInteractionLog(importedLog);
+                    // addInteractionLog(importedLog);
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(null,
-                            exception.getCause(),
-                            "IOException",
-                            JOptionPane.WARNING_MESSAGE);
+                        exception.getCause(),
+                        "IOException",
+                        JOptionPane.WARNING_MESSAGE);
                     exception.printStackTrace();
                 }
             }
@@ -398,7 +405,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setMenuPath(MENU_ILOG);
             setPriority(1);
             lookupAcceleratorKey();
-            //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_save.png")));
+            // new
+            // ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_save.png")));
         }
 
 
@@ -410,12 +418,12 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
                 InteractionLog activeInteractionLog = getSelectedItem();
                 try {
                     InteractionLogFacade.storeInteractionLog(activeInteractionLog,
-                            fc.getSelectedFile());
+                        fc.getSelectedFile());
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(null,
-                            exception.getCause(),
-                            "IOException",
-                            JOptionPane.WARNING_MESSAGE);
+                        exception.getCause(),
+                        "IOException",
+                        JOptionPane.WARNING_MESSAGE);
                     exception.printStackTrace();
                 }
             }
@@ -428,7 +436,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         AddUserNoteAction() {
             setName("Add Note...");
             setIcon(ICON_ADD_USER_ACTION.get(SMALL_ICON_SIZE));
-            //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
+            // new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
             setMenuPath(MENU_ILOG);
             setPriority(9);
             lookupAcceleratorKey();
@@ -440,10 +448,12 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         }
 
         void doAddNote(String prefilled) {
-            Optional<String> note = new MultiLineInputPrompt(InteractionLogView.this, prefilled).show();
+            Optional<String> note =
+                new MultiLineInputPrompt(InteractionLogView.this, prefilled).show();
             if (note.isPresent()) {
                 UserNoteInteraction interaction = new UserNoteInteraction(note.get());
-                InteractionLog interactionLog = (InteractionLog) interactionLogSelection.getSelectedItem();
+                InteractionLog interactionLog =
+                    (InteractionLog) interactionLogSelection.getSelectedItem();
                 if (interactionLog.getInteractions() != null)
                     interactionLog.getInteractions().add(interaction);
                 onInteraction(interaction);
@@ -458,7 +468,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         ToggleFavouriteAction() {
             setName("Toggle Favourite");
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
-            putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
+            putValue(Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
             setIcon(ICON_TOGGLE_FAVOURITE.get(SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG);
             setPriority(8);
@@ -468,7 +479,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         @Override
         public void actionPerformed(ActionEvent e) {
             if (listInteraction.getSelectedValue() != null) {
-                listInteraction.getSelectedValue().setFavoured(!listInteraction.getSelectedValue().isFavoured());
+                listInteraction.getSelectedValue()
+                        .setFavoured(!listInteraction.getSelectedValue().isFavoured());
             }
         }
     }
@@ -513,13 +525,15 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public void actionPerformed(ActionEvent e) {
             Interaction inter = listInteraction.getSelectedValue();
             try {
-                //Reapplication should be ignored by the logging.
+                // Reapplication should be ignored by the logging.
                 recorder.setDisableAll(true);
-                inter.reapply(/*TODO*/ null, mediator.getSelectedGoal());
+                inter.reapply(/* TODO */ null, mediator.getSelectedGoal());
             } catch (UnsupportedOperationException ex) {
                 JOptionPane.showMessageDialog(null,
-                        String.format("<html>Reapplication of %s is not implemented<br>If you know how to do it, then override the corresponding method in %s.</html>",
-                                inter.getClass()), "A very expected error.", JOptionPane.ERROR_MESSAGE);
+                    String.format(
+                        "<html>Reapplication of %s is not implemented<br>If you know how to do it, then override the corresponding method in %s.</html>",
+                        inter.getClass()),
+                    "A very expected error.", JOptionPane.ERROR_MESSAGE);
             } catch (Exception e1) {
                 e1.printStackTrace();
             } finally {
@@ -613,7 +627,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             JPopupMenu menu = createMenu();
             PointerInfo pi = MouseInfo.getPointerInfo();
             menu.show(btn, 0, 0);
-            //pi.getLocation().x, pi.getLocation().y);
+            // pi.getLocation().x, pi.getLocation().y);
         }
     }
 
@@ -651,6 +665,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         }
     }
 }
+
 
 class MultiLineInputPrompt {
     private final String text;
@@ -723,6 +738,7 @@ class MultiLineInputPrompt {
     }
 }
 
+
 class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interaction> {
     private static final long serialVersionUID = -2667005473245735632L;
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -738,13 +754,15 @@ class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interac
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends Interaction> list, Interaction value, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList<? extends Interaction> list,
+            Interaction value, int index, boolean isSelected, boolean cellHasFocus) {
         lblText.setText(
-                value != null ?
-                        df.format(value.getCreated()) + " " + value.toString() : "");
+            value != null ? df.format(value.getCreated()) + " " + value.toString() : "");
         lblIconRight.setIcon(value != null && value.isFavoured() ? iconHeart : null);
-        //TODO
-        setBorder(value != null && value.isFavoured() ? BorderFactory.createLineBorder(COLOR_FAVOURED) : null);
+        // TODO
+        setBorder(
+            value != null && value.isFavoured() ? BorderFactory.createLineBorder(COLOR_FAVOURED)
+                    : null);
 
         setComponentOrientation(list.getComponentOrientation());
 
@@ -753,12 +771,12 @@ class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interac
             setForeground(list.getSelectionForeground());
         } else {
             if (value != null) {
-                setBackground(value.getGraphicalStyle().getBackgroundColor() != null ?
-                        value.getGraphicalStyle().getBackgroundColor()
+                setBackground(value.getGraphicalStyle().getBackgroundColor() != null
+                        ? value.getGraphicalStyle().getBackgroundColor()
                         : list.getBackground());
 
-                setForeground(value.getGraphicalStyle().getForegroundColor() != null ?
-                        value.getGraphicalStyle().getForegroundColor()
+                setForeground(value.getGraphicalStyle().getForegroundColor() != null
+                        ? value.getGraphicalStyle().getForegroundColor()
                         : list.getForeground());
             }
         }

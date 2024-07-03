@@ -1,38 +1,44 @@
-package de.uka.ilkd.key.java.statement;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Statement;
 
+import org.key_project.util.ExtList;
+
 /**
- *    Default implementation for non-terminal Java statements.
- *    @author <TT>AutoDoc</TT>
+ * Default implementation for non-terminal Java statements.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public abstract class JavaStatement
- extends JavaNonTerminalProgramElement
- implements Statement {
+        extends JavaNonTerminalProgramElement
+        implements Statement {
 
 
-   /**
-     *      Java statement.
+    /**
+     * Java statement.
      */
     public JavaStatement() {
     }
 
     /**
-     *      Java statement.
+     * Java statement.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: Comments
+     *        May contain: Comments
      */
     public JavaStatement(ExtList children) {
-	super(children);
+        super(children);
     }
 
     public JavaStatement(ExtList children, PositionInfo pos) {
-       super(children, pos);
+        super(children, pos);
     }
 
     public JavaStatement(PositionInfo pos) {

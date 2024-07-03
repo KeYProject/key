@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros;
 
 import java.util.Set;
@@ -6,6 +10,7 @@ import java.util.Set;
  * This macro performs simplification of Heap and LocSet terms.
  * It applies simplification rules (including the "unoptimized" select rules),
  * One Step Simplification, alpha, and delta rules.
+ *
  * @author bruns
  *
  */
@@ -29,12 +34,12 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     @Override
     public String getDescription() {
         return "This macro performs simplification of Heap and LocSet terms.\n"
-                    +"It applies simplification rules (including the \"unoptimized\" select rules), "
-                    +"One Step Simplification, alpha, and delta rules.";
+            + "It applies simplification rules (including the \"unoptimized\" select rules), "
+            + "One Step Simplification, alpha, and delta rules.";
     }
 
     // note that rules in the 'concrete' rule set are usually not included here
-    private static final Set<String> ADMITTED_RULES_SET = asSet(new String[]{
+    private static final Set<String> ADMITTED_RULES_SET = asSet(new String[] {
         "selectOfStore",
         "selectOfCreate",
         "selectOfAnon",
@@ -161,8 +166,8 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         // normalization rules are currently not included
 
         // semantics blasting rules
-//        "equalityToElementOfRight",
-//        "subsetToElementOfRight",
+        // "equalityToElementOfRight",
+        // "subsetToElementOfRight",
         "disjointDefinition", // TODO: may have own rules in future
         "definitionAllElementsOfArray",
         "definitionAllElementsOfArrayLocsets",
@@ -176,8 +181,8 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "closeFalse",
         "ifthenelse_negated",
         // TODO: those must be more expensive
-//        "replace_known_left",
-//        "replace_known_right",
+        // "replace_known_left",
+        // "replace_known_right",
 
         // others
         "castDel",
@@ -194,7 +199,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     }
 
     @Override
-    protected boolean allowOSS () {
+    protected boolean allowOSS() {
         return true;
     }
 }

@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.proof.delayedcut;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.proof.delayedcut;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -10,10 +12,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * This class wraps the information about the delayed cut. It only wraps data
  * but not functional information.
- * 
+ *
  * @author Benjamin Niedermann
  */
 public class DelayedCut {
@@ -76,7 +80,7 @@ public class DelayedCut {
             ImmutableList<NodeGoalPair> goalsAfterUncovering) {
         if (this.goalsAfterUncovering != null) {
             throw new IllegalArgumentException(
-                    "There already exists a list of goals.");
+                "There already exists a list of goals.");
         }
         this.goalsAfterUncovering = goalsAfterUncovering;
     }

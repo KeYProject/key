@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.proof.io;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -9,6 +10,9 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 
 /**
  * This file rule source derivative wraps its input stream into a
@@ -25,7 +29,7 @@ public class GZipFileRuleSource extends FileRuleSource {
      * {@link RuleSourceFactory#initRuleFile(File, boolean)}.
      *
      * @param ruleFile
-     *            the file to read from.
+     *        the file to read from.
      */
     GZipFileRuleSource(File ruleFile) {
         super(ruleFile);
@@ -45,12 +49,12 @@ public class GZipFileRuleSource extends FileRuleSource {
     public CharStream getCharStream() throws IOException {
         try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
             return CharStreams.fromChannel(
-                    channel,
-                    StandardCharsets.UTF_8,
-                    4096,
-                    CodingErrorAction.REPLACE,
-                    file().toString(),
-                    -1);
+                channel,
+                StandardCharsets.UTF_8,
+                4096,
+                CodingErrorAction.REPLACE,
+                file().toString(),
+                -1);
         }
     }
 }

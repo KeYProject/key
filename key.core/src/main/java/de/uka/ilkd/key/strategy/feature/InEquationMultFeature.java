@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
@@ -19,29 +23,29 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     protected final ProjectionToTerm targetCandidate;
     protected final ProjectionToTerm mult1Candidate;
     protected final ProjectionToTerm mult2Candidate;
-    
+
     /**
      * Return zero iff the multiplication of mult1 and mult2 is allowed,
      * because the resulting product is partially covered by target.
      *
      * @param mult1Candidate
-     *            the left side of the first inequation to be multiplied
+     *        the left side of the first inequation to be multiplied
      * @param mult2Candidate
-     *            the left side of the second inequation to be multiplied
+     *        the left side of the second inequation to be multiplied
      * @param targetCandidate
-     *            the left side of the inequation that is supposed to bound the
-     *            other two inequations
+     *        the left side of the inequation that is supposed to bound the
+     *        other two inequations
      */
     public static Feature partiallyBounded(ProjectionToTerm mult1Candidate,
-                                           ProjectionToTerm mult2Candidate,
-                                           ProjectionToTerm targetCandidate) {
-        return new InEquationMultFeature ( mult1Candidate,
-                                           mult2Candidate,
-                                           targetCandidate ) {
+            ProjectionToTerm mult2Candidate,
+            ProjectionToTerm targetCandidate) {
+        return new InEquationMultFeature(mult1Candidate,
+            mult2Candidate,
+            targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
-                return !mult2M.reduce ( targetM ).variablesDisjoint ( mult1M )
-                       && !mult1M.reduce ( targetM ).variablesDisjoint ( mult2M );
-            }            
+                return !mult2M.reduce(targetM).variablesDisjoint(mult1M)
+                        && !mult1M.reduce(targetM).variablesDisjoint(mult2M);
+            }
         };
     }
 
@@ -49,14 +53,14 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
      * Return zero iff the product of mult1 and mult2 is a factor of target
      */
     public static Feature totallyBounded(ProjectionToTerm mult1Candidate,
-                                         ProjectionToTerm mult2Candidate,
-                                         ProjectionToTerm targetCandidate) {
-        return new InEquationMultFeature ( mult1Candidate,
-                                           mult2Candidate,
-                                           targetCandidate ) {
+            ProjectionToTerm mult2Candidate,
+            ProjectionToTerm targetCandidate) {
+        return new InEquationMultFeature(mult1Candidate,
+            mult2Candidate,
+            targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
-                return targetM.variablesSubsume ( mult1M.multiply ( mult2M ) );
-            }            
+                return targetM.variablesSubsume(mult1M.multiply(mult2M));
+            }
         };
     }
 
@@ -64,41 +68,41 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
      * Return zero iff the product of mult1 and mult2 is target
      */
     public static Feature exactlyBounded(ProjectionToTerm mult1Candidate,
-                                         ProjectionToTerm mult2Candidate,
-                                         ProjectionToTerm targetCandidate) {
-        return new InEquationMultFeature ( mult1Candidate,
-                                           mult2Candidate,
-                                           targetCandidate ) {
+            ProjectionToTerm mult2Candidate,
+            ProjectionToTerm targetCandidate) {
+        return new InEquationMultFeature(mult1Candidate,
+            mult2Candidate,
+            targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
-                return targetM.variablesEqual ( mult1M.multiply ( mult2M ) );
-            }            
+                return targetM.variablesEqual(mult1M.multiply(mult2M));
+            }
         };
     }
 
     protected InEquationMultFeature(ProjectionToTerm mult1Candidate,
-                                     ProjectionToTerm mult2Candidate,
-                                     ProjectionToTerm targetCandidate) {
+            ProjectionToTerm mult2Candidate,
+            ProjectionToTerm targetCandidate) {
         this.mult1Candidate = mult1Candidate;
         this.mult2Candidate = mult2Candidate;
         this.targetCandidate = targetCandidate;
     }
 
     protected final boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final Services services = goal.proof ().getServices ();
+        final Services services = goal.proof().getServices();
         final Monomial targetM =
-            Monomial.create ( targetCandidate.toTerm ( app, pos, goal ),
-                              services );
+            Monomial.create(targetCandidate.toTerm(app, pos, goal),
+                services);
         final Monomial mult1M =
-            Monomial.create ( mult1Candidate.toTerm ( app, pos, goal ),
-                              services );                
+            Monomial.create(mult1Candidate.toTerm(app, pos, goal),
+                services);
         final Monomial mult2M =
-            Monomial.create ( mult2Candidate.toTerm ( app, pos, goal ),
-                              services );
-        
-        return filter ( targetM, mult1M, mult2M );
+            Monomial.create(mult2Candidate.toTerm(app, pos, goal),
+                services);
+
+        return filter(targetM, mult1M, mult2M);
     }
 
     protected abstract boolean filter(Monomial targetM,
-                                      Monomial mult1M,
-                                      Monomial mult2M);
+            Monomial mult1M,
+            Monomial mult2M);
 }

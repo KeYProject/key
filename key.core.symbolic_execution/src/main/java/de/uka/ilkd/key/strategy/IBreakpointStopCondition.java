@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.strategy;
 
@@ -9,24 +12,28 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 /**
  * Defines the basic functionality of an {@link StopCondition} which
  * stops applying rules when at least one {@link IBreakpoint} is hit.
+ *
  * @author Martin Hentschel
  */
 public interface IBreakpointStopCondition extends StopCondition {
-   /**
-    * Adds a new {@link IBreakpoint}.
-    * @param breakpoint The {@link IBreakpoint} to add.
-    */
-   public void addBreakpoint(IBreakpoint breakpoint);
-   
-   /**
-    * Removes an {@link IBreakpoint}.
-    * @param breakpoint The {@link IBreakpoint} to remove.
-    */
-   public void removeBreakpoint(IBreakpoint breakpoint);
-   
-   /**
-    * Returns all available {@link IBreakpoint}s.
-    * @return The available {@link IBreakpoint}s.
-    */
-   public Set<IBreakpoint> getBreakpoints();
+    /**
+     * Adds a new {@link IBreakpoint}.
+     *
+     * @param breakpoint The {@link IBreakpoint} to add.
+     */
+    public void addBreakpoint(IBreakpoint breakpoint);
+
+    /**
+     * Removes an {@link IBreakpoint}.
+     *
+     * @param breakpoint The {@link IBreakpoint} to remove.
+     */
+    public void removeBreakpoint(IBreakpoint breakpoint);
+
+    /**
+     * Returns all available {@link IBreakpoint}s.
+     *
+     * @return The available {@link IBreakpoint}s.
+     */
+    public Set<IBreakpoint> getBreakpoints();
 }

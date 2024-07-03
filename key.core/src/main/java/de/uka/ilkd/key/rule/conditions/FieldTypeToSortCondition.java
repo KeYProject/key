@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -18,7 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Variable condition that enforces a given generic sort to be instantiated with
  * the type of a field constant.
- * 
+ *
  * The condition can only be fulfilled if the given field term is constant of
  * which the referred type is known.
  */
@@ -28,7 +32,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     private final GenericSort sort;
 
     public FieldTypeToSortCondition(final SchemaVariable exprOrTypeSV,
-                                   final GenericSort sort) {
+            final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         assert checkSortedSV(exprOrTypeSV);
@@ -48,10 +52,10 @@ public final class FieldTypeToSortCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var,
-                                 SVSubstitute svSubst,
-                                 MatchConditions matchCond,
-                                 Services services) {
-            
+            SVSubstitute svSubst,
+            MatchConditions matchCond,
+            Services services) {
+
         if (var != exprOrTypeSV) {
             return matchCond;
         }
@@ -62,43 +66,43 @@ public final class FieldTypeToSortCondition implements VariableCondition {
             Operator op = ((Term) svSubst).op();
             if (op instanceof Function) {
                 String name = op.name().toString();
-                
+
                 String className;
                 String attributeName;
-                
+
                 // check for normal attribute
-                int endOfClassName = name.indexOf("::$");                
-                
-                int startAttributeName = endOfClassName + 3;                
-                
-                     
-                if ( endOfClassName < 0) {
-                        // not a normal attribute, maybe an implicit attribute like <created>?
-                        endOfClassName = name.indexOf("::<");
-                        startAttributeName = endOfClassName + 2;
+                int endOfClassName = name.indexOf("::$");
+
+                int startAttributeName = endOfClassName + 3;
+
+
+                if (endOfClassName < 0) {
+                    // not a normal attribute, maybe an implicit attribute like <created>?
+                    endOfClassName = name.indexOf("::<");
+                    startAttributeName = endOfClassName + 2;
                 }
 
-                if ( endOfClassName < 0 ) {
-                        return null;
+                if (endOfClassName < 0) {
+                    return null;
                 }
-    
 
-                className     = name.substring(0, endOfClassName);
+
+                className = name.substring(0, endOfClassName);
                 attributeName = name.substring(startAttributeName);
 
                 ProgramVariable attribute = services.getJavaInfo()
                         .getAttribute(attributeName, className);
-                
+
                 if (attribute == null) {
                     return null;
                 }
 
                 Sort targetSort = attribute.getKeYJavaType().getSort();
-                
+
                 return matchCond.setInstantiations(inst.add(
-                        GenericSortCondition.createIdentityCondition(sort,
-                                targetSort),
-                        services));
+                    GenericSortCondition.createIdentityCondition(sort,
+                        targetSort),
+                    services));
             }
         }
 

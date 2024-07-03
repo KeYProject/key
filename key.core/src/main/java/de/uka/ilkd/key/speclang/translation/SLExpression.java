@@ -1,8 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang.translation;
+
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import javax.annotation.Nonnull;
 
 /**
  * This class represents the translation of an expression of an arbitrary
@@ -17,7 +22,7 @@ public final class SLExpression {
     public SLExpression(@Nonnull Term term, @Nonnull KeYJavaType type, boolean isTerm) {
         if (term.sort() != type.getSort())
             throw new IllegalArgumentException(
-                    String.format("term has sort: %s; type has sort: %s", term.sort(), type.getSort()));
+                String.format("term has sort: %s; type has sort: %s", term.sort(), type.getSort()));
         this.term = term;
         this.type = type;
         this.isTerm = isTerm;

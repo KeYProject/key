@@ -1,14 +1,12 @@
-/*
- * Created on 25.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.abstraction;
 
-import recoder.service.ProgramModelInfo;
-
 import java.util.List;
+
+import recoder.service.ProgramModelInfo;
 
 /**
  * @author Tobias Gutzmann
@@ -22,7 +20,7 @@ public interface TypeParameter extends ClassType {
 
     List<? extends TypeArgument> getBoundTypeArguments(int boundidx);
 
-    //public Member getDeclaringMember();
+    // public Member getDeclaringMember();
     ClassType getContainingClassType();
 
     /**
@@ -56,9 +54,10 @@ public interface TypeParameter extends ClassType {
                         continue;
                     TypeParameter tryUpwards = null;
                     {
-//						find ridx
+                        // find ridx
                         int ridx = -1;
-                        List<? extends TypeArgument> rl = ((ParameterizedType) superCT).getTypeArgs();
+                        List<? extends TypeArgument> rl =
+                            ((ParameterizedType) superCT).getTypeArgs();
                         for (int j = 0; j < rl.size(); j++) {
                             TypeArgument ta = rl.get(j);
                             if (ta.getTypeName().equals(t1.getName())) {

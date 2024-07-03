@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.taclettranslation.assumptions;
+
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -12,16 +18,16 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 interface VariablePool {
     LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv);
 
     LogicVariable getLogicVariable(Name name, Sort sort);
 }
+
 
 public class AssumptionGenerator implements TacletTranslator, VariablePool {
     protected Map<String, LogicVariable> usedVariables = new LinkedHashMap<>();
@@ -38,7 +44,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     }
 
-    public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts, int maxGeneric) throws IllegalTacletException {
+    public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts, int maxGeneric)
+            throws IllegalTacletException {
 
         // determine the variable conditions.
         this.conditions = new TacletConditions(t);
@@ -67,7 +74,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         // step: translate the generics sorts.
         result = new LinkedList<>();
         for (Term te : result2) {
-            result.addAll(genericTranslator.translate(te, sorts, t, conditions, services, maxGeneric));
+            result.addAll(
+                genericTranslator.translate(te, sorts, t, conditions, services, maxGeneric));
         }
 
         return new AssumptionFormula(t, result, "", conditions);
@@ -96,7 +104,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         }
 
-        term = services.getTermFactory().createTerm(term.op(), subTerms, variables, JavaBlock.EMPTY_JAVABLOCK);
+        term = services.getTermFactory().createTerm(term.op(), subTerms, variables,
+            JavaBlock.EMPTY_JAVABLOCK);
 
         term = changeTerm(term);
 
@@ -113,7 +122,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     public LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv) {
         LogicVariable res = getLogicVariable(
-                new Name(instantiation.name().toString() + "__" + lv.name().toString()), instantiation);
+            new Name(instantiation.name().toString() + "__" + lv.name().toString()), instantiation);
         for (TranslationListener l : listener) {
             l.eventSort(instantiation);
         }
@@ -121,13 +130,15 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     }
 
     public static boolean isAbstractOrInterface(Sort sort, Services services) {
-        if (!isReferenceSort(sort, services)) return false;
+        if (!isReferenceSort(sort, services))
+            return false;
         return sort.isAbstract();
 
     }
 
     public static boolean isReferenceSort(Sort sort, Services services) {
-        return (sort.extendsTrans(services.getJavaInfo().objectSort()) && !(sort instanceof NullSort));
+        return (sort.extendsTrans(services.getJavaInfo().objectSort())
+                && !(sort instanceof NullSort));
 
     }
 
@@ -207,12 +218,13 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * allowed. For example: the notSame-Condition is hurted.
      */
     public static void checkTable(byte[][] referenceTable, Sort[] instTable, Sort[] genericTable,
-                                  TacletConditions conditions, Services services) {
+            TacletConditions conditions, Services services) {
 
         for (int r = 0; r < referenceTable.length; r++) {
             for (int c = 0; c < referenceTable[r].length; c++) {
                 int index = referenceTable[r][c];
-                if (referenceTable[r][0] == -1) break;
+                if (referenceTable[r][0] == -1)
+                    break;
 
                 final var a = conditions.containsIsReferenceCondition(genericTable[c]) > 0
                         && !isReferenceSort(instTable[index], services);
@@ -220,10 +232,11 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                         && !isAbstractOrInterface(instTable[index], services);
                 final var g = conditions.containsNotAbstractInterfaceCondition(genericTable[c])
                         && isAbstractOrInterface(instTable[index], services);
-                final var d = !conditions.containsIsSubtypeRelation(genericTable[c], instTable[index],
+                final var d =
+                    !conditions.containsIsSubtypeRelation(genericTable[c], instTable[index],
                         Mode.IS_SUBTYPE);
                 final var e = !conditions.containsIsSubtypeRelation(genericTable[c],
-                        instTable[index], Mode.NOT_IS_SUBTYPE);
+                    instTable[index], Mode.NOT_IS_SUBTYPE);
                 final var f = !isReferenceSort(instTable[index], services)
                         && isReferenceSort(genericTable[c], services);
                 if (a || b || g || d || e || f) {
@@ -235,26 +248,27 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                     int index2 = referenceTable[r][c2]; // not
                     // same
 
-                    final var b1 = conditions.containsNotSameCondition(genericTable[c], genericTable[c2])
-                            && instTable[index].equals(instTable[index2]);
+                    final var b1 =
+                        conditions.containsNotSameCondition(genericTable[c], genericTable[c2])
+                                && instTable[index].equals(instTable[index2]);
                     final var b2 = genericTable[c].extendsTrans(genericTable[c2])
                             && !instTable[index].extendsTrans(instTable[index2]);
                     final var b3 = conditions.containsComparisionCondition(
-                            genericTable[c], genericTable[c2], Mode.SAME)
+                        genericTable[c], genericTable[c2], Mode.SAME)
                             && !instTable[index].equals(instTable[index2]);
                     final var b4 = conditions.containsComparisionCondition(
-                            genericTable[c], genericTable[c2], Mode.IS_SUBTYPE)
+                        genericTable[c], genericTable[c2], Mode.IS_SUBTYPE)
                             && !instTable[index].extendsTrans(instTable[index2]);
                     final var b5 = conditions.containsComparisionCondition(
-                            genericTable[c], genericTable[c2], Mode.IS_SUBTYPE)
+                        genericTable[c], genericTable[c2], Mode.IS_SUBTYPE)
                             && !instTable[index2].extendsTrans(instTable[index]);
                     final var b6 = genericTable[c2].extendsTrans(genericTable[c])
                             && !instTable[index2].extendsTrans(instTable[index]);
                     final var b7 = conditions.containsComparisionCondition(
-                            genericTable[c], genericTable[c2], Mode.NOT_IS_SUBTYPE)
+                        genericTable[c], genericTable[c2], Mode.NOT_IS_SUBTYPE)
                             && instTable[index2].extendsTrans(instTable[index]);
                     final var b8 = conditions.containsComparisionCondition(
-                            genericTable[c], genericTable[c2], Mode.NOT_IS_SUBTYPE)
+                        genericTable[c], genericTable[c2], Mode.NOT_IS_SUBTYPE)
                             && instTable[index].extendsTrans(instTable[index2]);
                     if (b1 || b2 || b3 || b4 || b5 || b8 || b7 || b2 || b6) {
                         referenceTable[r][0] = -1;
@@ -270,17 +284,18 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * Quantifies a term, i.d. every free variable is bounded by a
      * allquantor.
      *
-     * @param term     the term to be quantify.
+     * @param term the term to be quantify.
      * @return the quantified term.
      */
-    protected static Term quantifyTerm(Term term, TermServices services) throws IllegalTacletException {
+    protected static Term quantifyTerm(Term term, TermServices services)
+            throws IllegalTacletException {
         TermBuilder tb = services.getTermBuilder();
         // Quantify over all free variables.
         for (QuantifiableVariable qv : term.freeVars()) {
 
             if (!(qv instanceof LogicVariable)) {
                 throw new IllegalTacletException("Error of translation: "
-                        + "There is a free variable that is not of type LogicVariable: " + qv);
+                    + "There is a free variable that is not of type LogicVariable: " + qv);
             }
 
             term = tb.all(qv, term);
@@ -339,8 +354,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         return toReturn.toString();
     }
 
-    private static StringBuilder removeIllegalChars(StringBuilder template, ArrayList<String> toReplace,
-                                                    ArrayList<String> replacement) {
+    private static StringBuilder removeIllegalChars(StringBuilder template,
+            ArrayList<String> toReplace,
+            ArrayList<String> replacement) {
         // replace one String
         for (int i = 0; i < toReplace.size(); i++) {
             String toRep = toReplace.get(i);
@@ -367,7 +383,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         // translate schema variables into logical variables
         if (term.op() instanceof SchemaVariable && !term.sort().equals(Sort.FORMULA)) {
-                term = tb.var(getLogicVariable(term.op().name(), term.sort()));
+            term = tb.var(getLogicVariable(term.op().name(), term.sort()));
         }
 
         // It can be that a quantifiable variable is not a logical
@@ -384,7 +400,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
             ImmutableArray<QuantifiableVariable> array = new ImmutableArray<>(list);
 
             term = services.getTermFactory().createTerm(term.op(), term.subs(), array,
-                    JavaBlock.EMPTY_JAVABLOCK, term.getLabels());
+                JavaBlock.EMPTY_JAVABLOCK, term.getLabels());
 
         }
 

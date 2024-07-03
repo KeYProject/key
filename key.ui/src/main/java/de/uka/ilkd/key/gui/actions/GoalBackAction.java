@@ -1,23 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This action is one part of the previous UndoLastStepAction:
@@ -26,8 +29,8 @@ import de.uka.ilkd.key.settings.GeneralSettings;
  * is set (to save memory).
  *
  * The action is enabled if:
- *  1. the proof is not empty (just the root node exists) and
- *  2. either pruning of closed branches is enabled or the selected node is open
+ * 1. the proof is not empty (just the root node exists) and
+ * 2. either pruning of closed branches is enabled or the selected node is open
  *
  * @author Pfeifer (enabled goalBack in closed branches)
  */
@@ -45,9 +48,10 @@ public final class GoalBackAction extends MainWindowAction {
 
     /**
      * Creates a new GoalBackAction.
+     *
      * @param mainWindow the main window this action belongs to
      * @param longName true iff long names (including the name of the rule to undo)
-     * shall be displayed (e.g. in menu items)
+     *        shall be displayed (e.g. in menu items)
      */
     public GoalBackAction(MainWindow mainWindow, boolean longName) {
         super(mainWindow);
@@ -90,8 +94,10 @@ public final class GoalBackAction extends MainWindowAction {
 
         getMediator().addKeYSelectionListener(selListener);
 
-        /* This method delegates the request only to the UserInterfaceControl which implements the
-         * functionality. No functionality is allowed in this method body! */
+        /*
+         * This method delegates the request only to the UserInterfaceControl which implements the
+         * functionality. No functionality is allowed in this method body!
+         */
         getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
             @Override
             public void autoModeStarted(ProofEvent e) {
@@ -129,8 +135,10 @@ public final class GoalBackAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         final Node selNode = getMediator().getSelectedNode();
 
-        /* first check if a goal is selected, if not try to find one in the subtree under the
-         * selected node */
+        /*
+         * first check if a goal is selected, if not try to find one in the subtree under the
+         * selected node
+         */
         Goal selGoal = getMediator().getSelectedGoal();
         if (selGoal == null && selNode != null) {
             selGoal = findNewestGoal(selNode);
@@ -146,10 +154,11 @@ public final class GoalBackAction extends MainWindowAction {
 
     /**
      * Finds the newest goal (the goal with the highest serial number) in the given subtree.
+     *
      * @param subtree the root of the subtree to search. If it is null, the return value is null.
      * @return the newest goal in the given subtree or null, if no suitable goal is found in the
-     * open/closedGoals lists. This may be the case if the flag "--no-pruning-closed" is set
-     * (which means that the closedGoals list is empty) and the given subtree is closed.
+     *         open/closedGoals lists. This may be the case if the flag "--no-pruning-closed" is set
+     *         (which means that the closedGoals list is empty) and the given subtree is closed.
      */
     private Goal findNewestGoal(Node subtree) {
         if (subtree == null) {
@@ -161,8 +170,10 @@ public final class GoalBackAction extends MainWindowAction {
         ImmutableList<Goal> closedGoals = proof.getClosedSubtreeGoals(subtree);
         ImmutableList<Goal> openGoals = proof.getSubtreeGoals(subtree);
 
-        /* determine the goal which was last changed (which has the highest serial nr.)
-         * in this branch */
+        /*
+         * determine the goal which was last changed (which has the highest serial nr.)
+         * in this branch
+         */
         int closedID = -1;
         Goal closed = null;
         int openID = -1;

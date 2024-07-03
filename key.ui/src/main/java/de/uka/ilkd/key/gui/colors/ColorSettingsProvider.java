@@ -1,20 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.colors;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
-
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
 /**
  * @author Alexander Weigl
@@ -28,7 +32,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     public ColorSettingsProvider() {
         super();
         setHeaderText(getDescription());
-        setSubHeaderText("Color settings are stored in: " + ColorSettings.SETTINGS_FILE.getAbsolutePath());
+        setSubHeaderText(
+            "Color settings are stored in: " + ColorSettings.SETTINGS_FILE.getAbsolutePath());
         add(new JScrollPane(tblColors));
     }
 
@@ -39,15 +44,14 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        List<ColorPropertyData> properties
-                = ColorSettings.getInstance().getProperties()
+        List<ColorPropertyData> properties = ColorSettings.getInstance().getProperties()
                 .map(it -> new ColorPropertyData(it, it.get()))
                 .collect(Collectors.toList());
 
         modelColor = new ColorSettingsTableModel(properties);
         tblColors.setModel(modelColor);
 
-        //tblColors.getColumnModel().getColumn(2).setCellEditor(new ColorChooserEditor());
+        // tblColors.getColumnModel().getColumn(2).setCellEditor(new ColorChooserEditor());
 
         TableRowSorter<ColorSettingsTableModel> sorter = new TableRowSorter<>(modelColor);
         tblColors.setRowSorter(sorter);
@@ -62,10 +66,12 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
             private static final long serialVersionUID = -7602735597024671100L;
 
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
                 Color c = (Color) value;
                 String s = ColorSettings.toHex(c);
-                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, s, isSelected, hasFocus, row, column);
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, s, isSelected,
+                    hasFocus, row, column);
                 lbl.setIcon(drawRect(c, lbl.getFont().getSize()));
                 return lbl;
             }
@@ -89,7 +95,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
     private static class ColorSettingsTableModel extends AbstractTableModel {
         private static final long serialVersionUID = 4722928883386296559L;
-        private static final String[] COLUMNS = new String[]{"Key", "Description", "Color"};
+        private static final String[] COLUMNS = new String[] { "Key", "Description", "Color" };
         private final List<ColorPropertyData> colorData;
 
         public ColorSettingsTableModel(List<ColorPropertyData> properties) {
@@ -114,19 +120,20 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
-                case 0:
-                    return colorData.get(rowIndex).property.getKey();
-                case 1:
-                    return colorData.get(rowIndex).property.getDescription();
-                case 2:
-                    return colorData.get(rowIndex).color;
+            case 0:
+                return colorData.get(rowIndex).property.getKey();
+            case 1:
+                return colorData.get(rowIndex).property.getDescription();
+            case 2:
+                return colorData.get(rowIndex).color;
             }
             return "";
         }
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 2) return Color.class;
+            if (columnIndex == 2)
+                return Color.class;
             return String.class;
         }
 
@@ -157,6 +164,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
 
 }
+
 
 class HexColorCellEditor extends DefaultCellEditor {
     private static final long serialVersionUID = -4352607386521686931L;
@@ -201,9 +209,10 @@ class HexColorCellEditor extends DefaultCellEditor {
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+            int row, int column) {
         Component txt = super.getTableCellEditorComponent(table,
-                ColorSettings.toHex((Color) value), isSelected, row, column);
+            ColorSettings.toHex((Color) value), isSelected, row, column);
         Color c = (Color) value;
         txt.setBackground(c);
         txt.setForeground(ColorSettings.invert(c));
@@ -213,33 +222,33 @@ class HexColorCellEditor extends DefaultCellEditor {
 
 /*
  * FROM: http://www.java2s.com/Tutorial/Java/0240__Swing/ColorChooserEditor.htm
-/*class ColorChooserEditor extends AbstractCellEditor implements TableCellEditor {
-    private Color savedColor;
-    private JButton delegate = new JButton();
-
-    public ColorChooserEditor() {
-        ActionListener actionListener = actionEvent -> {
-            Color color = JColorChooser.showDialog(delegate, "Color Chooser", savedColor);
-            ColorChooserEditor.this.changeColor(color);
-        };
-        delegate.addActionListener(actionListener);
-    }
-
-    public Object getCellEditorValue() {
-        return savedColor;
-    }
-
-    private void changeColor(Color color) {
-        if (color != null) {
-            savedColor = color;
-            delegate.setBackground(color);
-        }
-    }
-
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                 int row, int column) {
-        changeColor((Color) value);
-        return delegate;
-    }
-}
-*/
+ * /*class ColorChooserEditor extends AbstractCellEditor implements TableCellEditor {
+ * private Color savedColor;
+ * private JButton delegate = new JButton();
+ *
+ * public ColorChooserEditor() {
+ * ActionListener actionListener = actionEvent -> {
+ * Color color = JColorChooser.showDialog(delegate, "Color Chooser", savedColor);
+ * ColorChooserEditor.this.changeColor(color);
+ * };
+ * delegate.addActionListener(actionListener);
+ * }
+ *
+ * public Object getCellEditorValue() {
+ * return savedColor;
+ * }
+ *
+ * private void changeColor(Color color) {
+ * if (color != null) {
+ * savedColor = color;
+ * delegate.setBackground(color);
+ * }
+ * }
+ *
+ * public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+ * int row, int column) {
+ * changeColor((Color) value);
+ * return delegate;
+ * }
+ * }
+ */

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -26,7 +30,7 @@ public class AssumeCommand
     public FormulaParameter evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
         return state.getValueInjector().inject(this, new FormulaParameter(),
-                arguments);
+            arguments);
     }
 
     @Override
@@ -43,7 +47,7 @@ public class AssumeCommand
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
         app = app.addCheckedInstantiation(sv, parameter.formula,
-                state.getProof().getServices(), true);
+            state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 

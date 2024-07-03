@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.parser;
+
+import java.net.URL;
 
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.util.parsing.LocatableException;
+
 import recoder.java.Expression;
 import recoder.java.reference.UncollatedReferenceQualifier;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * @author Alexander Weigl
@@ -19,7 +23,7 @@ public final class ParserUtil {
      * The given token is used for positional information.
      */
     public static void checkValidSingletonReference(Expression expr, Token tok) {
-        //weigl: I hope I catch them all.
+        // weigl: I hope I catch them all.
         if (expr instanceof VariableReference
                 || expr instanceof ThisReference
                 || expr instanceof ArrayReference

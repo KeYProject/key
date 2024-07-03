@@ -1,18 +1,24 @@
-package de.uka.ilkd.key.speclang.jml.pretranslation;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import de.uka.ilkd.key.util.Triple;
-import org.antlr.v4.runtime.ParserRuleContext;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableList;
+
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -31,7 +37,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause, @Nonnull Name heap) {
+    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause,
+            @Nonnull Name heap) {
         List<LabeledParserRuleContext> seq = clauses.stream()
                 .filter(it -> it.clauseType.equals(clause))
                 .filter(it -> Objects.equals(it.heap, heap))
@@ -131,7 +138,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, null, ctx);
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, LabeledParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
+            LabeledParserRuleContext ctx) {
         if (heapName == null)
             heapName = HeapLDT.BASE_HEAP_NAME;
         clauses.add(new Entry(clause, ctx, heapName));
@@ -147,7 +155,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, null, new LabeledParserRuleContext(ctx));
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, ParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
+            ParserRuleContext ctx) {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
@@ -173,7 +182,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addName(String n) {
         this.name = n;
-        //setPosition(n);
+        // setPosition(n);
     }
 
     public Behavior getBehavior() {
@@ -187,21 +196,21 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     @Override
     public String toString() {
         return "TextualJMLSpecCase{" +
-                "behavior=" + behavior +
-                ", clauses=" + clauses +
-                ", mods=" + mods +
-                ", name='" + name + '\'' +
-                '}';
+            "behavior=" + behavior +
+            ", clauses=" + clauses +
+            ", mods=" + mods +
+            ", name='" + name + '\'' +
+            '}';
     }
 
 
-    //region legacy api
+    // region legacy api
     public void addRequires(LabeledParserRuleContext label) {
         addClause(REQUIRES, label);
     }
 
     public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
-        /* weigl: prepare for future use of generated abbreviations from JML specifications*/
+        /* weigl: prepare for future use of generated abbreviations from JML specifications */
         return new Triple[0];
     }
 
@@ -239,9 +248,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private ImmutableList<LabeledParserRuleContext> getList(Object key) {
         List<LabeledParserRuleContext> seq =
-                clauses.stream().filter(it -> it.clauseType.equals(key))
-                        .map(it -> it.ctx)
-                        .collect(Collectors.toList());
+            clauses.stream().filter(it -> it.clauseType.equals(key))
+                    .map(it -> it.ctx)
+                    .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 
@@ -256,12 +265,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<LabeledParserRuleContext> getSignals() {
         return getList(SIGNALS);
     }
-    //endregion
+    // endregion
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TextualJMLSpecCase)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof TextualJMLSpecCase))
+            return false;
         TextualJMLSpecCase that = (TextualJMLSpecCase) o;
         return getBehavior() == that.getBehavior() &&
                 clauses.equals(that.clauses);

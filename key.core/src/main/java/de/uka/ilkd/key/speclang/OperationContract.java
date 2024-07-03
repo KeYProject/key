@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableList;
 
 public interface OperationContract extends Contract {
 
@@ -31,47 +35,47 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      *
-     * @param heapVar   the heap variable.
-     * @param selfVar   the self variable.
+     * @param heapVar the heap variable.
+     * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
-     * @param services  the services object.
+     * @param services the services object.
      * @return the modifies clause.
      */
     public Term getMod(LocationVariable heapVar, ProgramVariable selfVar,
-                       ImmutableList<ProgramVariable> paramVars,
-                       Services services);
+            ImmutableList<ProgramVariable> paramVars,
+            Services services);
 
     /**
      * Returns the modifies clause of the contract.
      *
-     * @param heapVar    the heap variable
-     * @param heapTerm   the heap variable term.
-     * @param selfTerm   the self variable term.
+     * @param heapVar the heap variable
+     * @param heapTerm the heap variable term.
+     * @param selfTerm the self variable term.
      * @param paramTerms the list of parameter variable terms.
-     * @param services   the services object.
+     * @param services the services object.
      * @return the modifies clause.
      */
     public Term getMod(LocationVariable heapVar, Term heapTerm,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Services services);
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Services services);
 
     public Term getFreePre(LocationVariable heap,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                           Services services);
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services);
 
     public Term getFreePre(List<LocationVariable> heapContext,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                           Services services);
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services);
 
     public Term getFreePre(LocationVariable heap,
-                           Term heapTerm,
-                           Term selfTerm,
-                           ImmutableList<Term> paramTerms,
-                           Map<LocationVariable,Term> atPres,
-                           Services services);
+            Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Map<LocationVariable, Term> atPres,
+            Services services);
 }

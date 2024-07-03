@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.speclang;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
+package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -11,6 +12,9 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Extracts specifications from comments.
@@ -41,6 +45,7 @@ public interface SpecExtractor {
 
     /**
      * Returns the block contracts for the passed block.
+     *
      * @param method the program method
      * @param block the statement block
      * @return the block contracts
@@ -51,6 +56,7 @@ public interface SpecExtractor {
 
     /**
      * Returns the loop contracts for the passed block.
+     *
      * @param method the program method containing the block.
      * @param block the block.
      * @return the loop contracts
@@ -62,6 +68,7 @@ public interface SpecExtractor {
 
     /**
      * Returns the loop contracts for the passed loop.
+     *
      * @param method the program method containing the loop.
      * @param loop the loop.
      * @return the loop contracts
@@ -76,7 +83,7 @@ public interface SpecExtractor {
      * {@link MergePointStatement}.
      *
      * @param methodParams
-     *            TODO
+     *        TODO
      */
     public ImmutableSet<MergeContract> extractMergeContracts(
             IProgramMethod method, MergePointStatement mps,
@@ -86,6 +93,7 @@ public interface SpecExtractor {
     /**
      * Returns the block contracts for the passed labeled statement if it labels
      * a block.
+     *
      * @param method the program method
      * @param labeled the labeled statement
      * @return the block contracts
@@ -98,6 +106,7 @@ public interface SpecExtractor {
     /**
      * Returns the loop contracts for the passed labeled statement if it labels
      * a block.
+     *
      * @param method the program method
      * @param labeled the labeled statement
      * @return the loop contracts

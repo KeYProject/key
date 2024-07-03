@@ -1,9 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.java.Services;
-import org.key_project.util.Streams;
-
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.java.Services;
+
+import org.key_project.util.Streams;
 
 /**
  * This class provides some infrastructure to the smt translation proceess.
@@ -28,11 +33,12 @@ import java.util.ServiceLoader;
  */
 public class SMTHandlerServices {
 
-    /** The name of the package where this class resides. Used for
+    /**
+     * The name of the package where this class resides. Used for
      * prefixing when loading handlers.
      */
     private static final String PACKAGE_PREFIX =
-            SMTHandlerServices.class.getPackageName() + ".";
+        SMTHandlerServices.class.getPackageName() + ".";
 
     /** Singleton instance */
     private static SMTHandlerServices theInstance;
@@ -77,14 +83,14 @@ public class SMTHandlerServices {
      * @throws IOException if the resources cannot be read
      */
     public List<SMTHandler> getOriginalHandlers() throws IOException {
-        if(handlers != null) {
+        if (handlers != null) {
             return handlers;
         }
 
         synchronized (theCreationLock) {
             // Make sure that there is at most one invocation of makeHandlers,
             // and that everyone waits for the result.
-            if(handlers != null) {
+            if (handlers != null) {
                 return handlers;
             }
             this.handlers = makeHandlers();
@@ -95,6 +101,7 @@ public class SMTHandlerServices {
     /**
      * Load all handlers using a service loader. Load the snippets that belong
      * to them.
+     *
      * @return an unmodifiable view on a freshly created list
      * @throws IOException if the resources cannot be read
      */
@@ -103,7 +110,7 @@ public class SMTHandlerServices {
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
             Properties handlerSnippets = loadSnippets(smtHandler.getClass());
             if (handlerSnippets != null) {
-                snippetMap.put(smtHandler,  handlerSnippets);
+                snippetMap.put(smtHandler, handlerSnippets);
             }
             smtProperties.addAll(smtHandler.getProperties());
             result.add(smtHandler);
@@ -137,7 +144,8 @@ public class SMTHandlerServices {
                 className = PACKAGE_PREFIX + className;
             }
             try {
-                SMTHandler smtHandler = (SMTHandler) Class.forName(className).getConstructor().newInstance();
+                SMTHandler smtHandler =
+                    (SMTHandler) Class.forName(className).getConstructor().newInstance();
                 result.add(smtHandler);
             } catch (Exception e) {
                 throw new IOException("Cannot instantiate SMTHandler " + className, e);
@@ -147,7 +155,7 @@ public class SMTHandlerServices {
         for (SMTHandler smtHandler : result) {
             Properties handlerSnippets = loadSnippets(smtHandler.getClass());
             if (handlerSnippets != null) {
-                snippetMap.put(smtHandler,  handlerSnippets);
+                snippetMap.put(smtHandler, handlerSnippets);
             }
             smtProperties.addAll(smtHandler.getProperties());
         }
@@ -172,7 +180,8 @@ public class SMTHandlerServices {
      * @throws IOException if the resources cannot be read
      */
 
-    public List<SMTHandler> getFreshHandlers(Services services, @Nullable List<SMTHandler> smtHandlers, MasterHandler mh) throws IOException {
+    public List<SMTHandler> getFreshHandlers(Services services,
+            @Nullable List<SMTHandler> smtHandlers, MasterHandler mh) throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();
 
@@ -200,7 +209,7 @@ public class SMTHandlerServices {
      *
      * @param aClass class reference for localisation
      * @return freshly created property object, null if the resource does not
-     * exist
+     *         exist
      * @throws IOException may be thrown during reading of the resource
      */
     private static Properties loadSnippets(Class<?> aClass) throws IOException {
@@ -227,12 +236,11 @@ public class SMTHandlerServices {
         try {
             if (preamble == null) {
                 synchronized (theCreationLock) {
-                    if(preamble == null) {
+                    if (preamble == null) {
                         // make sure this is only ever read once and everyone
                         // waits for it.
                         preamble = Streams.toString(
-                                SMTHandlerServices.class.
-                                        getResourceAsStream("preamble.smt2"));
+                            SMTHandlerServices.class.getResourceAsStream("preamble.smt2"));
                     }
                 }
             }

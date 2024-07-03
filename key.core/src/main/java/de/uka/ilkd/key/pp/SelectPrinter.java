@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
@@ -43,17 +47,18 @@ class SelectPrinter extends FieldPrinter {
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
             if (fieldTerm.op() == heapLDT.getArr()) {
-				KeYJavaType kjt = lp.services.getJavaInfo().getKeYJavaType(objectTerm.sort());
-				Type jtype = null;
-				if (kjt != null) {
-					jtype = kjt.getJavaType();
-				}
-				if (jtype instanceof ArrayType
-				    && ((ArrayType)jtype).getBaseType().getKeYJavaType().getSort() == t.sort()) {
-				    printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
-				} else {
-				    lp.printFunctionTerm(t);
-				}
+                KeYJavaType kjt = lp.services.getJavaInfo().getKeYJavaType(objectTerm.sort());
+                Type jtype = null;
+                if (kjt != null) {
+                    jtype = kjt.getJavaType();
+                }
+                if (jtype instanceof ArrayType
+                        && ((ArrayType) jtype).getBaseType().getKeYJavaType().getSort() == t
+                                .sort()) {
+                    printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
+                } else {
+                    lp.printFunctionTerm(t);
+                }
             } else if (t.sort().equals(Sort.ANY)) {
                 /*
                  * This section deals with PP of frame conditions (and similar).
@@ -69,19 +74,19 @@ class SelectPrinter extends FieldPrinter {
                 // object properties denoted like o.<created>
                 printBuiltinObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
             } else if (isStaticFieldConstant(objectTerm, fieldTerm)
-                       && getFieldSort(fieldTerm).equals(t.sort())) {
+                    && getFieldSort(fieldTerm).equals(t.sort())) {
                 // static field access
-                    printStaticJavaFieldConstant(fieldTerm, heapTerm, tacitHeap);
+                printStaticJavaFieldConstant(fieldTerm, heapTerm, tacitHeap);
             } else if (isJavaFieldConstant(fieldTerm)
-                       && getFieldSort(fieldTerm).equals(t.sort())) {
+                    && getFieldSort(fieldTerm).equals(t.sort())) {
                 // non-static field access
-                    printNonStaticJavaFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
-                } else {
-                    lp.printFunctionTerm(t);
-                }
+                printNonStaticJavaFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
             } else {
                 lp.printFunctionTerm(t);
             }
+        } else {
+            lp.printFunctionTerm(t);
+        }
     }
 
     /*
@@ -101,7 +106,7 @@ class SelectPrinter extends FieldPrinter {
     private void printHeap(Term heapTerm, Term tacitHeap) throws IOException {
         // print heap term if it is not the standard heap
         if (!heapTerm.equals(tacitHeap)) {
-            lp.layouter./*brk(1, -3).*/print("@");
+            lp.layouter./* brk(1, -3). */print("@");
             lp.markStartSub(0);
             // if, one day, there are infix heap expressions, this needs to be
             // maybeParens(...):
@@ -126,7 +131,8 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Print a static field constant.
      */
-    private void printStaticJavaFieldConstant(final Term fieldTerm, final Term heapTerm, Term tacitHeap) throws IOException {
+    private void printStaticJavaFieldConstant(final Term fieldTerm, final Term heapTerm,
+            Term tacitHeap) throws IOException {
         lp.startTerm(3);
         /*
          * Is consideration for static arrays missing in this?
@@ -162,7 +168,8 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Print a non-static field constant.
      */
-    private void printNonStaticJavaFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
+    private void printNonStaticJavaFieldConstant(final Term heapTerm, final Term objectTerm,
+            final Term fieldTerm, Term tacitHeap) throws IOException {
         lp.startTerm(3);
         lp.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);
@@ -179,7 +186,8 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Print a term of the form: any::select(heap, object, field).
      */
-    private void printAnySelect(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
+    private void printAnySelect(final Term heapTerm, final Term objectTerm, final Term fieldTerm,
+            Term tacitHeap) throws IOException {
         lp.startTerm(3);
         lp.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);
@@ -221,12 +229,13 @@ class SelectPrinter extends FieldPrinter {
     }
 
     /*
-     * Print a select-term of the following form: 
-     *      T::select( ... , ... , java.lang.Object::<...>)
+     * Print a select-term of the following form:
+     * T::select( ... , ... , java.lang.Object::<...>)
      * For example:
-     *      boolean::select(heap, object, java.lang.Object::<created>)
+     * boolean::select(heap, object, java.lang.Object::<created>)
      */
-    private void printBuiltinObjectProperty(Term t, Term heapTerm, Term objectTerm, Term fieldTerm, Term tacitHeap) throws IOException {
+    private void printBuiltinObjectProperty(Term t, Term heapTerm, Term objectTerm, Term fieldTerm,
+            Term tacitHeap) throws IOException {
 
         JavaInfo javaInfo = lp.services.getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());
@@ -236,7 +245,8 @@ class SelectPrinter extends FieldPrinter {
 
             assert fieldTerm.op().name().toString().contains("::<");
             String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
-            ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
+            ProgramVariable pv =
+                javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
 
             if (pv != null && pv.sort().equals(t.sort())) {
                 lp.startTerm(3);

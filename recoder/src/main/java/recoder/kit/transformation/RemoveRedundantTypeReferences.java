@@ -1,4 +1,11 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Type;
@@ -21,9 +28,6 @@ import recoder.kit.TypeKit;
 import recoder.service.SourceInfo;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that removes all redundant type references from a compilation
@@ -63,17 +67,18 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
      * Creates a new transformation object that removes redundant type
      * references from extends/implements and throws clauses.
      *
-     * @param sc               the service configuration to use.
-     * @param list             the compilation units that shall be stripped of references.
+     * @param sc the service configuration to use.
+     * @param list the compilation units that shall be stripped of references.
      * @param removeInterfaces switch that allows removal of superfluously inherited
-     *                         interface.
+     *        interface.
      * @param removeExceptions switch that allows removal of superfluously declared
-     *                         exceptions.
-     * @param removeTypeCasts  switch that allows removal of superfluously declared type
-     *                         casts.
+     *        exceptions.
+     * @param removeTypeCasts switch that allows removal of superfluously declared type
+     *        casts.
      */
-    public RemoveRedundantTypeReferences(CrossReferenceServiceConfiguration sc, List<CompilationUnit> list,
-                                         boolean removeInterfaces, boolean removeExceptions, boolean removeTypeCasts) {
+    public RemoveRedundantTypeReferences(CrossReferenceServiceConfiguration sc,
+            List<CompilationUnit> list,
+            boolean removeInterfaces, boolean removeExceptions, boolean removeTypeCasts) {
         super(sc);
         if (list == null) {
             throw new IllegalArgumentException("Missing units");
@@ -109,7 +114,8 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
             while (tw.next()) {
                 ProgramElement p = tw.getProgramElement();
                 if (removeInterfaces && p instanceof TypeDeclaration) {
-                    references.addAll(TypeKit.getRedundantSuperInterfaces(si, ((TypeDeclaration) p)));
+                    references
+                            .addAll(TypeKit.getRedundantSuperInterfaces(si, ((TypeDeclaration) p)));
                 } else if (removeExceptions && p instanceof Throws) {
                     references.addAll(TypeKit.getRedundantExceptions(si, (Throws) p));
                 } else if (removeTypeCasts && p instanceof TypeCast) {

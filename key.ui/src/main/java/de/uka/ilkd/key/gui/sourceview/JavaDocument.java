@@ -1,12 +1,15 @@
-package de.uka.ilkd.key.gui.sourceview;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
+package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.Color;
 import java.util.*;
 import java.util.regex.Pattern;
-
 import javax.swing.text.*;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 
@@ -29,30 +32,30 @@ public class JavaDocument extends DefaultStyledDocument {
 
     /** highight color for Java keywords (dark red/violet) */
     private static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
-            ColorSettings.define("[java]keyword", "",
+        ColorSettings.define("[java]keyword", "",
             new Color(0x7f0055));
 
-    //private static final Color JAVA_STRING_COLOR = new Color(0x000000);
+    // private static final Color JAVA_STRING_COLOR = new Color(0x000000);
 
     /** highight color for comments (dull green) */
     private static final ColorSettings.ColorProperty COMMENT_COLOR =
-            ColorSettings.define("[java]comment", "",
-                    new Color(0x3f7f5f));
+        ColorSettings.define("[java]comment", "",
+            new Color(0x3f7f5f));
 
     /** highight color for JavaDoc (dull green) */
     private static final ColorSettings.ColorProperty JAVADOC_COLOR =
-            ColorSettings.define("[java]javadoc", "",
-                    new Color(0x3f7f5f));
+        ColorSettings.define("[java]javadoc", "",
+            new Color(0x3f7f5f));
 
     /** highight color for JML (dark blue) */
     private static final ColorSettings.ColorProperty JML_COLOR =
-            ColorSettings.define("[java]jml", "",
-                    new Color(0x0000c0));
+        ColorSettings.define("[java]jml", "",
+            new Color(0x0000c0));
 
     /** highight color for JML keywords (blue) */
     private static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
-            ColorSettings.define("[java]jmlKeyword", "",
-                    new Color(0x0000f0));
+        ColorSettings.define("[java]jmlKeyword", "",
+            new Color(0x0000f0));
 
     /**
      * Enum to indicate the current mode (environment) of the parser.
@@ -61,7 +64,7 @@ public class JavaDocument extends DefaultStyledDocument {
      */
     private enum Mode {
         /** parser is currently inside a String */
-        //STRING,                                           // currently not in use
+        // STRING, // currently not in use
         /** parser is currently inside normal java code */
         NORMAL,
         /** parser is currently inside a keyword */
@@ -70,11 +73,11 @@ public class JavaDocument extends DefaultStyledDocument {
         COMMENT,
         /** parser is currently inside a line comment (starting with "&#47;&#47;") */
         LINE_COMMENT,
-        /** parser is currently inside a line JML annotation (starting with "&#47;&#47;&#64;")*/
+        /** parser is currently inside a line JML annotation (starting with "&#47;&#47;&#64;") */
         LINE_JML,
         /** parser is currently inside JavaDoc (starting with "&#47;&#42;&#42;") */
         JAVADOC,
-        /** parser is currently inside an annotation (starting with "&#64;")*/
+        /** parser is currently inside an annotation (starting with "&#64;") */
         ANNOTATION,
         /** parser is currently inside a JML annotation (starting with "&#47;&#42;&#64;") */
         JML,
@@ -95,15 +98,19 @@ public class JavaDocument extends DefaultStyledDocument {
         COMMENT,
         /** last processed chars were "&#47;&#47;" */
         LINECOMMENT,
-        /** current token could be a JML annotation marker
+        /**
+         * current token could be a JML annotation marker
          * (see JML reference manual 4.4,
          * <a href="http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29">
-         * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29</a>) */
+         * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29</a>)
+         */
         JML_ANNOTATION,
-        /** current token could be a JML annotation marker inside single line JML
+        /**
+         * current token could be a JML annotation marker inside single line JML
          * (see JML reference manual 4.4,
          * <a href="http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29">
-         * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29</a>) */
+         * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC29</a>)
+         */
         JML_ANNOTATION_LINE,
         /** last processed char was "&#42;" */
         MAYBEEND;
@@ -116,12 +123,11 @@ public class JavaDocument extends DefaultStyledDocument {
     private static final String DELIM = "[\\Q .;{}[]\n\r()+-*/%!=<>?:~&|^@'\"\\E]";
 
     /** Pattern to match JML start with annotation marker(s). */
-    private static final Pattern JML_ANNOT_MARKER
-        = Pattern.compile("/\\*([+|-][$_a-zA-Z0-9]+)+@");
+    private static final Pattern JML_ANNOT_MARKER = Pattern.compile("/\\*([+|-][$_a-zA-Z0-9]+)+@");
 
     /** Pattern to match single line JML start with annotation marker(s). */
-    private static final Pattern JML_ANNOT_MARKER_LINE
-        = Pattern.compile("//([+|-][$_a-zA-Z0-9]+)+@");
+    private static final Pattern JML_ANNOT_MARKER_LINE =
+        Pattern.compile("//([+|-][$_a-zA-Z0-9]+)+@");
 
     /**
      * Stores the Java keywords which have to be highlighted.
@@ -140,8 +146,8 @@ public class JavaDocument extends DefaultStyledDocument {
         "native", "new", "package", "private", "protected", "public", "return", "short",
         "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws",
         "transient", "try", "void", "volatile", "while",
-        "true", "false", "null"        // literals
-        // "const", "goto" // reserved, but currently not used in Java
+        "true", "false", "null" // literals
+            // "const", "goto" // reserved, but currently not used in Java
     };
 
     /**
@@ -208,7 +214,7 @@ public class JavaDocument extends DefaultStyledDocument {
     private final SimpleAttributeSet annotation = new SimpleAttributeSet();
 
     /** the style of strings */
-    //private SimpleAttributeSet string = new SimpleAttributeSet();
+    // private SimpleAttributeSet string = new SimpleAttributeSet();
 
     /** default style */
     private final SimpleAttributeSet normal = new SimpleAttributeSet();
@@ -255,7 +261,7 @@ public class JavaDocument extends DefaultStyledDocument {
     private JavaDocument.Mode mode = Mode.NORMAL;
 
     /**
-     *  Stores the current comment state of the parser to recognize comments/comment ends.
+     * Stores the current comment state of the parser to recognize comments/comment ends.
      */
     private JavaDocument.CommentState state = CommentState.NO;
 
@@ -263,7 +269,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * Creates a new JavaDocument and sets the syntax highlighting styles
      * (as in eclipse default settings).
      */
-    public JavaDocument () {
+    public JavaDocument() {
         updateStyles();
         ColorSettings.getInstance().addSettingsListener(e -> updateStyles());
         // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
@@ -280,7 +286,7 @@ public class JavaDocument extends DefaultStyledDocument {
         StyleConstants.setForeground(keyword, JAVA_KEYWORD_COLOR.get());
         StyleConstants.setForeground(comment, COMMENT_COLOR.get());
         StyleConstants.setForeground(javadoc, JAVADOC_COLOR.get());
-        //StyleConstants.setForeground(string, JAVA_STRING_COLOR);
+        // StyleConstants.setForeground(string, JAVA_STRING_COLOR);
         StyleConstants.setForeground(jml, JML_COLOR.get());
         StyleConstants.setForeground(jmlkeyword, JML_KEYWORD_COLOR.get());
         StyleConstants.setBold(jmlkeyword, true);
@@ -288,17 +294,18 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private void checkAt() {
         token += '@';
-        if (state == CommentState.COMMENT) {                // "/*@"
+        if (state == CommentState.COMMENT) { // "/*@"
             state = CommentState.NO;
             mode = Mode.JML;
-        } else if (state == CommentState.LINECOMMENT) {      // "//@"
+        } else if (state == CommentState.LINECOMMENT) { // "//@"
             state = CommentState.NO;
             mode = Mode.LINE_JML;
         } else if (mode == Mode.NORMAL
-                && state == CommentState.NO) {              // "@"
+                && state == CommentState.NO) { // "@"
             mode = Mode.ANNOTATION;
             tokenStart = currentPos;
-        } else if (state == CommentState.JML_ANNOTATION || state == CommentState.JML_ANNOTATION_LINE) {
+        } else if (state == CommentState.JML_ANNOTATION
+                || state == CommentState.JML_ANNOTATION_LINE) {
             boolean lineComment = state == CommentState.JML_ANNOTATION_LINE;
             state = CommentState.NO;
             String features = token.substring(2); // cut-off '//' or '/*'
@@ -318,11 +325,11 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private void checkPlusMinus(char c) {
         if (state == CommentState.LINECOMMENT
-            || state == CommentState.JML_ANNOTATION_LINE) {   // "//+" or "//-"
+                || state == CommentState.JML_ANNOTATION_LINE) { // "//+" or "//-"
             token += c;
             state = CommentState.JML_ANNOTATION_LINE;
         } else if (state == CommentState.COMMENT
-            || state == CommentState.JML_ANNOTATION) {    // "/*+" or "/*-"
+                || state == CommentState.JML_ANNOTATION) { // "/*+" or "/*-"
             token += c;
             state = CommentState.JML_ANNOTATION;
         } else {
@@ -333,50 +340,50 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private void checkLinefeed() throws BadLocationException {
         state = CommentState.NO;
-        if (mode == Mode.LINE_COMMENT) {                    // "// ... \n"
+        if (mode == Mode.LINE_COMMENT) { // "// ... \n"
             insertCommentString(token, tokenStart);
-            mode = Mode.NORMAL;     // reset
-            token = "\n";             // reset token
+            mode = Mode.NORMAL; // reset
+            token = "\n"; // reset token
             tokenStart = currentPos;
-        } else if (mode == Mode.LINE_JML) {                 // "//@ ... \n"
+        } else if (mode == Mode.LINE_JML) { // "//@ ... \n"
             insertJMLString(token, tokenStart);
-            mode = Mode.NORMAL;     // reset
-            token = "\n";             // reset token
+            mode = Mode.NORMAL; // reset
+            token = "\n"; // reset token
             tokenStart = currentPos;
-        } else if (mode == Mode.ANNOTATION) {               // "@ ... \n"
+        } else if (mode == Mode.ANNOTATION) { // "@ ... \n"
             insertAnnotation(token, tokenStart);
-            mode = Mode.NORMAL;     // reset
-            token = "\n";             // reset token
+            mode = Mode.NORMAL; // reset
+            token = "\n"; // reset token
             tokenStart = currentPos;
-        } else if (mode == Mode.NORMAL) {                   // normal mode
+        } else if (mode == Mode.NORMAL) { // normal mode
             insertNormalString(token, tokenStart);
-            token = "\n";             // reset token
+            token = "\n"; // reset token
             tokenStart = currentPos;
-        } else {    // modes: JML, Comment, JavaDoc
+        } else { // modes: JML, Comment, JavaDoc
             token += '\n';
         }
     }
 
     private void checkStar() throws BadLocationException {
-        if (state == CommentState.MAYBE) {              // "/*"
-         // insert what we have in this line so far
+        if (state == CommentState.MAYBE) { // "/*"
+            // insert what we have in this line so far
             insertNormalString(token.substring(0, token.length() - 1), tokenStart);
             token = "/*";
             tokenStart = currentPos - 1;
             state = CommentState.COMMENT;
             mode = Mode.COMMENT;
-        } else if (state == CommentState.COMMENT) {     // "/**"
+        } else if (state == CommentState.COMMENT) { // "/**"
             // tokenStart should be already set here
             token += '*';
             state = CommentState.MAYBEEND;
             mode = Mode.JAVADOC;
-        } else if (mode == Mode.COMMENT                 // "/* ... *"
-                || mode == Mode.JAVADOC                 // "/*@ ... *"
-                || mode == Mode.JML) {                  // "/** ... *"
+        } else if (mode == Mode.COMMENT // "/* ... *"
+                || mode == Mode.JAVADOC // "/*@ ... *"
+                || mode == Mode.JML) { // "/** ... *"
             // tokenStart should be already set here
             token += '*';
             state = CommentState.MAYBEEND;
-        } else {                                        // multiplication
+        } else { // multiplication
             token += '*';
             state = CommentState.NO;
         }
@@ -384,22 +391,22 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private void checkSlash() throws BadLocationException {
         if (mode == Mode.NORMAL
-                 && state == CommentState.NO) {          // "/"
+                && state == CommentState.NO) { // "/"
             token += '/';
             state = CommentState.MAYBE;
-        } else if (state == CommentState.MAYBE) {        // "//"
+        } else if (state == CommentState.MAYBE) { // "//"
             // insert what we have in this line so far
             insertNormalString(token.substring(0, token.length() - 1), tokenStart);
             token = "//";
             tokenStart = currentPos - 1;
             state = CommentState.LINECOMMENT;
             mode = Mode.LINE_COMMENT;
-        } else if (state == CommentState.MAYBEEND) {     // "/* ... */"
+        } else if (state == CommentState.MAYBEEND) { // "/* ... */"
             token += '/';
             if (mode == Mode.COMMENT) {
                 insertCommentString(token, tokenStart);
             } else if (mode == Mode.JAVADOC) {
-                if (token.equals("/**/")) {            // "/**/" is no JavaDoc
+                if (token.equals("/**/")) { // "/**/" is no JavaDoc
                     insertCommentString(token, tokenStart);
                 } else {
                     insertJavadocString(token, tokenStart);
@@ -409,7 +416,7 @@ public class JavaDocument extends DefaultStyledDocument {
             }
             state = CommentState.NO;
             mode = Mode.NORMAL;
-            token = "";             // reset token
+            token = ""; // reset token
             tokenStart = currentPos + 1;
         } else {
             // not NORMAL_MODE
@@ -417,7 +424,7 @@ public class JavaDocument extends DefaultStyledDocument {
         }
     }
 
-    private void checkQuote() {                 // TODO: separate style for Strings
+    private void checkQuote() { // TODO: separate style for Strings
         state = CommentState.NO;
         token += '"';
     }
@@ -443,7 +450,7 @@ public class JavaDocument extends DefaultStyledDocument {
         case '\n':
             checkLinefeed();
             break;
-        case '\t':  // all tabs should have been replaced earlier!
+        case '\t': // all tabs should have been replaced earlier!
         case ' ':
             checkSpaceTab(strChar);
             break;
@@ -461,8 +468,8 @@ public class JavaDocument extends DefaultStyledDocument {
         case '-':
             checkPlusMinus(strChar);
             break;
-        //case '*':
-        //case '/':
+        // case '*':
+        // case '/':
         case '(':
         case ')':
         case '[':
@@ -483,10 +490,10 @@ public class JavaDocument extends DefaultStyledDocument {
         case '>':
         case '=':
         case '\'':
-        //case ' ':
-        //case '"':
-        //case '\'':
-        //case '\n':
+            // case ' ':
+            // case '"':
+            // case '\'':
+            // case '\n':
             checkDelimiter(strChar);
             break;
         default:

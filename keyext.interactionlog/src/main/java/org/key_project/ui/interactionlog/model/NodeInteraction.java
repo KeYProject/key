@@ -1,11 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.model;
+
+import java.beans.Transient;
+import javax.xml.bind.annotation.XmlTransient;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import org.key_project.ui.interactionlog.api.Interaction;
 
-import javax.xml.bind.annotation.XmlTransient;
-import java.beans.Transient;
+import org.key_project.ui.interactionlog.api.Interaction;
 
 @XmlTransient
 public abstract class NodeInteraction extends Interaction {
@@ -15,7 +20,7 @@ public abstract class NodeInteraction extends Interaction {
 
     private NodeIdentifier nodeId;
 
-    public NodeInteraction() { }
+    public NodeInteraction() {}
 
     protected NodeInteraction(Node node) {
         this.serialNr = node.serialNr();

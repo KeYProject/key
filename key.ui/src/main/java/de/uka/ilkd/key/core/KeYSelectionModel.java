@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.core;
+
+import java.util.*;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 public class KeYSelectionModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
@@ -295,7 +299,7 @@ public class KeYSelectionModel {
 
     public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            if(!listenerList.contains(listener)) {
+            if (!listenerList.contains(listener)) {
                 addKeYSelectionListener(listener);
             }
         }
@@ -310,7 +314,7 @@ public class KeYSelectionModel {
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.info("Removing {}",  listener.getClass());
+            LOGGER.info("Removing {}", listener.getClass());
             listenerList.remove(listener);
         }
     }

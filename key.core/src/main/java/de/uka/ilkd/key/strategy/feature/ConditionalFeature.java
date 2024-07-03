@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -12,87 +16,87 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  * of a <code>RuleFilter</code>
  */
 public class ConditionalFeature implements Feature {
-    
-    private ConditionalFeature (RuleFilter p_cond,
-                                Feature    p_thenFeature,
-                                Feature    p_elseFeature) {
-        cond        = p_cond;
+
+    private ConditionalFeature(RuleFilter p_cond,
+            Feature p_thenFeature,
+            Feature p_elseFeature) {
+        cond = p_cond;
         thenFeature = p_thenFeature;
         elseFeature = p_elseFeature;
     }
-    
-    public RuleAppCost computeCost (RuleApp app, PosInOccurrence pos, Goal goal) {
-        if ( cond.filter ( app.rule() ) )
-            return thenFeature.computeCost ( app, pos, goal );
+
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        if (cond.filter(app.rule()))
+            return thenFeature.computeCost(app, pos, goal);
         else
-            return elseFeature.computeCost ( app, pos, goal );
+            return elseFeature.computeCost(app, pos, goal);
     }
 
     /**
      * @param cond the filter that decides which value is to be returned
      * @param thenValue the value of the feature, if <code>filter</code>
-     * returns true
+     *        returns true
      */
-    public static Feature createConditional (RuleFilter  cond,
-                                             RuleAppCost thenValue) {
-        return createConditional ( cond,
-                                   ConstFeature.createConst ( thenValue ) );
+    public static Feature createConditional(RuleFilter cond,
+            RuleAppCost thenValue) {
+        return createConditional(cond,
+            ConstFeature.createConst(thenValue));
     }
 
     /**
      * @param cond the filter that decides which value is to be returned
      * @param thenValue the value of the feature, if <code>filter</code>
-     * returns true
+     *        returns true
      * @param elseValue the value of the feature, if <code>filter</code>
-     * returns false
+     *        returns false
      */
-    public static Feature createConditional (RuleFilter  cond,
-                                             RuleAppCost thenValue,
-                                             RuleAppCost elseValue) {
-        return createConditional ( cond,
-                                   ConstFeature.createConst ( thenValue ),
-                                   ConstFeature.createConst ( elseValue ) );
+    public static Feature createConditional(RuleFilter cond,
+            RuleAppCost thenValue,
+            RuleAppCost elseValue) {
+        return createConditional(cond,
+            ConstFeature.createConst(thenValue),
+            ConstFeature.createConst(elseValue));
     }
 
     /**
      * @param cond the filter that decides which value is to be returned
      * @param thenFeature the feature that is evaluted, if <code>filter</code>
-     * returns true
-     * returns false
+     *        returns true
+     *        returns false
      */
-    public static Feature createConditional (RuleFilter cond,
-            				     Feature    thenFeature) {
-        return createConditional ( cond,
-                                   thenFeature,
-                                   NumberRuleAppCost.getZeroCost() );
+    public static Feature createConditional(RuleFilter cond,
+            Feature thenFeature) {
+        return createConditional(cond,
+            thenFeature,
+            NumberRuleAppCost.getZeroCost());
     }
 
     /**
      * @param cond the filter that decides which value is to be returned
      * @param thenFeature the feature that is evaluted, if <code>filter</code>
-     * returns true
+     *        returns true
      * @param elseValue the value of the feature, if <code>filter</code>
-     * returns false
+     *        returns false
      */
-    public static Feature createConditional (RuleFilter  cond,
-                                             Feature     thenFeature,
-                                             RuleAppCost elseValue) {
-        return createConditional ( cond,
-                                   thenFeature,
-                                   ConstFeature.createConst ( elseValue ) );
+    public static Feature createConditional(RuleFilter cond,
+            Feature thenFeature,
+            RuleAppCost elseValue) {
+        return createConditional(cond,
+            thenFeature,
+            ConstFeature.createConst(elseValue));
     }
 
     /**
      * @param cond the filter that decides which value is to be returned
      * @param thenFeature the feature that is evaluted, if <code>filter</code>
-     * returns true
+     *        returns true
      * @param elseFeature the feature that is evaluted, if <code>filter</code>
-     * returns false
+     *        returns false
      */
-    public static Feature createConditional (RuleFilter cond,
-                                             Feature    thenFeature,
-                                             Feature    elseFeature) {
-        return new ConditionalFeature ( cond, thenFeature, elseFeature );
+    public static Feature createConditional(RuleFilter cond,
+            Feature thenFeature,
+            Feature elseFeature) {
+        return new ConditionalFeature(cond, thenFeature, elseFeature);
     }
 
     /**
@@ -103,10 +107,10 @@ public class ConditionalFeature implements Feature {
     /**
      * The feature for positive results of <code>filter</code>
      */
-    private final Feature    thenFeature;
+    private final Feature thenFeature;
 
     /**
      * The feature for negative results of <code>filter</code>
      */
-    private final Feature    elseFeature;
+    private final Feature elseFeature;
 }

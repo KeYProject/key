@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -14,13 +18,13 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  */
 public class CountMaxDPathFeature extends AbstractBetaFeature {
 
-    public final static Feature INSTANCE = new CountMaxDPathFeature ();
+    public final static Feature INSTANCE = new CountMaxDPathFeature();
 
-    private CountMaxDPathFeature () {}
-    
+    private CountMaxDPathFeature() {}
+
     @Override
-    protected RuleAppCost doComputation (PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
-        return NumberRuleAppCost.create ( maxDPath ( findTerm, !pos.isInAntec (), caches ) );
+    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+        return NumberRuleAppCost.create(maxDPath(findTerm, !pos.isInAntec(), caches));
     }
 
 }

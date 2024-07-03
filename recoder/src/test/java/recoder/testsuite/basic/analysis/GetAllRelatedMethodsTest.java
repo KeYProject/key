@@ -1,4 +1,11 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic.analysis;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,9 +16,6 @@ import recoder.kit.MethodKit;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -50,7 +54,7 @@ public class GetAllRelatedMethodsTest {
         checkRelatedMethodsCount(ct, "childAndIFirstMethod", 2);
         checkRelatedMethodsCount(ct, "baseAndChildAndIFirstMethod", 3);
         checkRelatedMethodsCount(ct, "baseAndIFirstMethod", 2);
-        //checkRelatedMethodsCount(ct, "clone",3); // Should be all classes
+        // checkRelatedMethodsCount(ct, "clone",3); // Should be all classes
         // overriding clone
 
         ct = loadClass("Base");
@@ -61,7 +65,8 @@ public class GetAllRelatedMethodsTest {
     }
 
     private void checkRelatedMethodsCount(ClassType ct, String methodName, int expectedNumber) {
-        List<Method> ml = MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<Type>(0));
+        List<Method> ml =
+            MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<Type>(0));
         if (ml.size() != expectedNumber) {
             System.err.println("Aha");
         }

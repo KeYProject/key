@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.List;
@@ -33,14 +37,14 @@ public class PolymorphicHandler implements SMTHandler {
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
-        if(op == Equality.EQUALS) {
+        if (op == Equality.EQUALS) {
             List<SExpr> children = trans.translate(term.subs());
             children.set(0, SExprs.coerce(children.get(0), Type.UNIVERSE));
             children.set(1, SExprs.coerce(children.get(1), Type.UNIVERSE));
             return new SExpr("=", Type.BOOL, children);
         }
 
-        if(op == IfThenElse.IF_THEN_ELSE) {
+        if (op == IfThenElse.IF_THEN_ELSE) {
             List<SExpr> children = trans.translate(term.subs());
             children.set(0, SExprs.coerce(children.get(0), Type.BOOL));
             children.set(1, SExprs.coerce(children.get(1), Type.UNIVERSE));

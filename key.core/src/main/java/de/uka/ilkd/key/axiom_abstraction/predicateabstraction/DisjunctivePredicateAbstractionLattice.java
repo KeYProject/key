@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
 import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
-
-import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists
@@ -28,9 +32,9 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 public class DisjunctivePredicateAbstractionLattice extends
         AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "_OR_";
-    
+
     private List<AbstractionPredicate> predicates =
-            new ArrayList<AbstractionPredicate>();
+        new ArrayList<AbstractionPredicate>();
 
     /**
      * Constructs a new {@link DisjunctivePredicateAbstractionLattice} for the
@@ -38,7 +42,7 @@ public class DisjunctivePredicateAbstractionLattice extends
      * sure that no combinations of predicates are valid.
      *
      * @param applicablePredicates
-     *            The predicates to generate the lattice from.
+     *        The predicates to generate the lattice from.
      */
     public DisjunctivePredicateAbstractionLattice(
             List<AbstractionPredicate> applicablePredicates) {
@@ -50,7 +54,7 @@ public class DisjunctivePredicateAbstractionLattice extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice#join(de.uka.ilkd
      * .key.axiom_abstraction.AbstractDomainElement,
@@ -64,7 +68,7 @@ public class DisjunctivePredicateAbstractionLattice extends
          * the union of the respective predicates.
          */
         return super.join(a, b, (set1, set2) -> (set1.union(set2)),
-                set -> new DisjunctivePredicateAbstractionDomainElement(set));
+            set -> new DisjunctivePredicateAbstractionDomainElement(set));
     }
 
     /**
@@ -88,7 +92,7 @@ public class DisjunctivePredicateAbstractionLattice extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -97,7 +101,7 @@ public class DisjunctivePredicateAbstractionLattice extends
                 && ((DisjunctivePredicateAbstractionLattice) obj).predicates
                         .equals(this.predicates);
     }
-    
+
     @Override
     public int hashCode() {
         return 31 * 2 + predicates.hashCode();
@@ -105,13 +109,13 @@ public class DisjunctivePredicateAbstractionLattice extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         return "Disjunctive Predicate Abstraction Lattice of size " + size()
-                + " with predicates " + predicates.toString();
+            + " with predicates " + predicates.toString();
     }
 
     /**
@@ -137,13 +141,13 @@ public class DisjunctivePredicateAbstractionLattice extends
             if (predicates == null) {
                 predicates = new ArrayList<AbstractionPredicate>();
             }
-            
+
             nrZeroes = predicates.size();
         }
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.util.Iterator#hasNext()
          */
         @Override
@@ -153,7 +157,7 @@ public class DisjunctivePredicateAbstractionLattice extends
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.util.Iterator#next()
          */
         @Override
@@ -169,26 +173,24 @@ public class DisjunctivePredicateAbstractionLattice extends
             }
 
             ImmutableSet<AbstractionPredicate> predicatesForElem =
-                    DefaultImmutableSet.<AbstractionPredicate> nil();
+                DefaultImmutableSet.<AbstractionPredicate>nil();
 
             ImmutableFixedLengthBitSet currBitSet =
-                    getBitSetsByNumZeroes().get(nrZeroes).get(idx);
+                getBitSetsByNumZeroes().get(nrZeroes).get(idx);
 
             for (int nonZeroPosition : currBitSet.getNonzeroPositions()) {
                 try {
                     predicatesForElem =
-                            predicatesForElem.addUnique(predicates
-                                    .get(nonZeroPosition));
-                }
-                catch (NotUniqueException e) {
+                        predicatesForElem.addUnique(predicates
+                                .get(nonZeroPosition));
+                } catch (NotUniqueException e) {
                     // Not unique -- just don't add
                 }
             }
 
             if (getBitSetsByNumZeroes().get(nrZeroes).size() - 1 > idx) {
                 idx++;
-            }
-            else {
+            } else {
                 nrZeroes--;
                 idx = 0;
             }

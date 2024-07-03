@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
 
@@ -8,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
@@ -27,7 +29,7 @@ import de.uka.ilkd.key.logic.Name;
  */
 public class TermLabelMenu extends JMenu {
     public static final String TERM_LABEL_MENU = "Term Labels";
-   
+
     /**
      *
      */
@@ -36,16 +38,17 @@ public class TermLabelMenu extends JMenu {
     private final Map<Name, TermLabelCheckBox> checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
     private final MainWindow mainWindow;
     private final DisplayLabelsCheckBox displayLabelsCheckBox;
-    
+
     /**
      * Observes changes on {@link #visibleTermLabels}.
      */
-    private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener = new TermLabelVisibilityManagerListener() {
-       @Override
-       public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-          handleVisibleLabelsChanged(e);
-       }
-    };
+    private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener =
+        new TermLabelVisibilityManagerListener() {
+            @Override
+            public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+                handleVisibleLabelsChanged(e);
+            }
+        };
 
     public TermLabelMenu(final MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -64,12 +67,13 @@ public class TermLabelMenu extends JMenu {
              */
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
-                Set<Name> labelNames
-                        = mainWindow.getMediator().getSelectedNode().sequent().getOccuringTermLabels();
+                Set<Name> labelNames =
+                    mainWindow.getMediator().getSelectedNode().sequent().getOccuringTermLabels();
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
                     TermLabelCheckBox checkBox = entry.getValue();
                     /*
-                     * Font style indicates whether a label occurs in the currently displayed sequent.
+                     * Font style indicates whether a label occurs in the currently displayed
+                     * sequent.
                      */
                     if (labelNames.contains(entry.getKey())) {
                         checkBox.setBoldFont();
@@ -89,24 +93,25 @@ public class TermLabelMenu extends JMenu {
         });
     }
 
-   /**
-    * When the visible term labels have changed.
-    * <p>
-    * <b>Attention:</b> This can happen in an Eclipse context outside of the checkbox items!
-    * @param e The event object.
-    */
-   protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-      if (displayLabelsCheckBox != null) {
-         displayLabelsCheckBox.setSelected(visibleTermLabels.isShowLabels());
-      }
-      for (TermLabelCheckBox box : checkBoxMap.values()) {
-         box.setEnabled(visibleTermLabels.isShowLabels());
-         box.setSelected(!visibleTermLabels.isHidden(box.labelName));
-      }
-      mainWindow.makePrettyView();
-   }
+    /**
+     * When the visible term labels have changed.
+     * <p>
+     * <b>Attention:</b> This can happen in an Eclipse context outside of the checkbox items!
+     *
+     * @param e The event object.
+     */
+    protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+        if (displayLabelsCheckBox != null) {
+            displayLabelsCheckBox.setSelected(visibleTermLabels.isShowLabels());
+        }
+        for (TermLabelCheckBox box : checkBoxMap.values()) {
+            box.setEnabled(visibleTermLabels.isShowLabels());
+            box.setSelected(!visibleTermLabels.isHidden(box.labelName));
+        }
+        mainWindow.makePrettyView();
+    }
 
-   private void rebuildMenu() {
+    private void rebuildMenu() {
         removeAll();
         add(displayLabelsCheckBox);
         addSeparator();
@@ -116,7 +121,7 @@ public class TermLabelMenu extends JMenu {
          */
         List<Name> labelNames = mainWindow.getSortedTermLabelNames();
 
-        /* 
+        /*
          * Create list of {@link TermLabelCheckBox} instances.
          */
         ArrayList<TermLabelCheckBox> checkBoxList = new ArrayList<TermLabelCheckBox>();
@@ -143,8 +148,9 @@ public class TermLabelMenu extends JMenu {
 
     public class DisplayLabelsCheckBox extends KeYMenuCheckBox {
         public static final String LABEL = "Display Term Labels in Formulas";
-        
-        public static final String TOOL_TIP = "Use this checkbox to toggle visibility for all term labels.";
+
+        public static final String TOOL_TIP =
+            "Use this checkbox to toggle visibility for all term labels.";
 
         /**
          *
@@ -213,7 +219,8 @@ public class TermLabelMenu extends JMenu {
 
         private void setItalicFont() {
             setFont(getFont().deriveFont(Font.ITALIC));
-            setEnabledToolTipText("Term label " + labelName + " does not occur in the current sequent.");
+            setEnabledToolTipText(
+                "Term label " + labelName + " does not occur in the current sequent.");
         }
 
         private void setBoldFont() {
@@ -237,7 +244,7 @@ public class TermLabelMenu extends JMenu {
                 setToolTipText(enabledToolTipText);
             } else {
                 setToolTipText("You turned off visibility for all term labels. "
-                        + "This checkbox is disabled.");
+                    + "This checkbox is disabled.");
             }
         }
 

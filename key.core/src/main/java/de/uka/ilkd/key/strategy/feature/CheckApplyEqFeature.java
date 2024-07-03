@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -20,50 +24,51 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new CheckApplyEqFeature();
 
-    private CheckApplyEqFeature () {}
-    
-    protected boolean filter ( TacletApp p_app, PosInOccurrence pos, Goal goal ) {
-        Debug.assertTrue ( pos != null, 
-                "Need to know the position of " +
-               "the application of the taclet" );
-    
-        IfFormulaInstantiation ifInst = p_app.ifFormulaInstantiations ().head ();
+    private CheckApplyEqFeature() {}
 
-        Debug.assertTrue ( ifInst != null,
-                   "Need to know the equation the taclet" +
-                   " is used with" );
+    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal) {
+        Debug.assertTrue(pos != null,
+            "Need to know the position of " +
+                "the application of the taclet");
 
-        return isNotSelfApplication ( pos, ifInst )
-//               && equationIsDirected ( ifInst, p_app.constraint() )
-               ;
+        IfFormulaInstantiation ifInst = p_app.ifFormulaInstantiations().head();
+
+        Debug.assertTrue(ifInst != null,
+            "Need to know the equation the taclet" +
+                " is used with");
+
+        return isNotSelfApplication(pos, ifInst)
+        // && equationIsDirected ( ifInst, p_app.constraint() )
+        ;
     }
 
     private boolean isNotSelfApplication(PosInOccurrence pos,
-                                         IfFormulaInstantiation ifInst) {
-        if ( ! ( ifInst instanceof IfFormulaInstSeq )
-             || ifInst.getConstrainedFormula () != pos.sequentFormula ()
-             || ( (IfFormulaInstSeq)ifInst ).inAntec () != pos.isInAntec () )
-                return true;
-        
+            IfFormulaInstantiation ifInst) {
+        if (!(ifInst instanceof IfFormulaInstSeq)
+                || ifInst.getConstrainedFormula() != pos.sequentFormula()
+                || ((IfFormulaInstSeq) ifInst).inAntec() != pos.isInAntec())
+            return true;
+
         // Position may not be one of the terms compared in
         // the equation
 
-        final PIOPathIterator it = pos.iterator ();
+        final PIOPathIterator it = pos.iterator();
 
-        it.next ();
+        it.next();
 
         // leading updates are not interesting
-        while ( it.getSubTerm ().op () instanceof UpdateApplication ) {
-            if ( !it.hasNext () ) return true;
-            it.next ();
+        while (it.getSubTerm().op() instanceof UpdateApplication) {
+            if (!it.hasNext())
+                return true;
+            it.next();
         }
 
-        if ( ! ( it.getSubTerm ().op () instanceof Equality ) || !it.hasNext () )
-                return true;
+        if (!(it.getSubTerm().op() instanceof Equality) || !it.hasNext())
+            return true;
 
-        if ( it.getChild () == 0 )
-        // we don't allow rewriting in the left term of the equation
-                return false;
+        if (it.getChild() == 0)
+            // we don't allow rewriting in the left term of the equation
+            return false;
 
         return true;
     }

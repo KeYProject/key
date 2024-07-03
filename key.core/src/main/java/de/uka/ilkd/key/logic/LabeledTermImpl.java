@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic;
 
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
-
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * The labeled term class is used for terms that have a label attached.
@@ -31,11 +35,11 @@ class LabeledTermImpl extends TermImpl {
     /**
      * creates an instance of a labeled term.
      *
-     * @param op        the top level operator
-     * @param subs      the Term that are the subterms of this term
+     * @param op the top level operator
+     * @param subs the Term that are the subterms of this term
      * @param boundVars logic variables bound by the operator
      * @param javaBlock contains the program part of the term (if any)
-     * @param labels    the terms labels (must not be null or empty)
+     * @param labels the terms labels (must not be null or empty)
      */
     public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
@@ -123,7 +127,7 @@ class LabeledTermImpl extends TermImpl {
         StringBuilder result = new StringBuilder(super.toString());
 
         String labelsStr = labels.stream()
-                //.filter(TermLabel::isProofRelevant)
+                // .filter(TermLabel::isProofRelevant)
                 .map(TermLabel::toString)
                 .collect(Collectors.joining(", "));
 

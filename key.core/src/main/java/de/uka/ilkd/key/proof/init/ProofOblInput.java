@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -15,7 +19,7 @@ public interface ProofOblInput {
      * Returns the name of the proof obligation input.
      */
     String name();
-        
+
     void readProblem() throws ProofInputException;
 
     /**
@@ -29,10 +33,12 @@ public interface ProofOblInput {
      * If true, then this PO implies the passed one.
      */
     boolean implies(ProofOblInput po);
-    
+
     /**
      * Returns the {@link KeYJavaType} in which the proven element is contained in.
-     * @return The {@link KeYJavaType} in which the proven element is contained in or {@code null} if not available.
+     *
+     * @return The {@link KeYJavaType} in which the proven element is contained in or {@code null}
+     *         if not available.
      */
     KeYJavaType getContainerType();
- }
+}

@@ -1,6 +1,12 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.kit.transformation;
+
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
@@ -9,8 +15,6 @@ import recoder.abstraction.Type;
 import recoder.java.declaration.*;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
-
-import java.util.List;
 
 /**
  * Syntactic transformation that adds the given MemberDeclaration to the list in
@@ -37,15 +41,16 @@ public class AppendMember extends TwoPassTransformation {
      * Creates a new transformation object that adds the given MemberDeclaration
      * to the list in the given TypeDeclaration at a convenient position.
      *
-     * @param sc        the service configuration to use.
+     * @param sc the service configuration to use.
      * @param isVisible flag indicating if this transformation shall be visible.
-     * @param decl      the declaration to modify. may not be <CODE>null</CODE> and
-     *                  must denote a valid identifier name.
-     * @param code      the modifier to create, encoded using the codes from
-     *                  {@link recoder.kit.ModifierKit}.
+     * @param decl the declaration to modify. may not be <CODE>null</CODE> and
+     *        must denote a valid identifier name.
+     * @param code the modifier to create, encoded using the codes from
+     *        {@link recoder.kit.ModifierKit}.
      */
-    public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible, MemberDeclaration child,
-                        TypeDeclaration parent) {
+    public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible,
+            MemberDeclaration child,
+            TypeDeclaration parent) {
         super(sc);
         if (child == null || parent == null) {
             throw new IllegalArgumentException("Missing declaration");

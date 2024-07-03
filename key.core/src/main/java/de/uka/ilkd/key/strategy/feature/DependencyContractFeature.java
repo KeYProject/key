@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +15,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.util.collection.ImmutableSLList;
 
 public final class DependencyContractFeature extends BinaryFeature {
 
@@ -41,7 +45,7 @@ public final class DependencyContractFeature extends BinaryFeature {
                 : HeapContext.getModHeaps(goal.proof().getServices(), false);
 
         final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(
-                heapContext, pos, goal.sequent(), goal.proof().getServices());
+            heapContext, pos, goal.sequent(), goal.proof().getServices());
         if (steps.isEmpty()) {
             return false;
         }
@@ -60,7 +64,7 @@ public final class DependencyContractFeature extends BinaryFeature {
 
         // instantiate with arbitrary remaining step
         bapp = bapp.setIfInsts(
-                ImmutableSLList.<PosInOccurrence> nil().prepend(steps.get(0)));
+            ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
         return true;
     }
 }

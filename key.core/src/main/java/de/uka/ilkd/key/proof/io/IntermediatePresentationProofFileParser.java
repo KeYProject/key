@@ -1,12 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.io;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
@@ -21,6 +22,9 @@ import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Parses a KeY proof file into an intermediate representation. The parsed
@@ -82,8 +86,8 @@ public class IntermediatePresentationProofFileParser
 
     /**
      * @param proof
-     *            Proof object for storing meta information about the parsed
-     *            proof.
+     *        Proof object for storing meta information about the parsed
+     *        proof.
      */
     public IntermediatePresentationProofFileParser(Proof proof) {
         this.proof = proof;
@@ -205,7 +209,7 @@ public class IntermediatePresentationProofFileParser
 
             if (builtinInfo.builtinIfInsts == null) {
                 builtinInfo.builtinIfInsts = ImmutableSLList
-                        .<Pair<Integer, PosInTerm>> nil();
+                        .<Pair<Integer, PosInTerm>>nil();
             }
             builtinInfo.currIfInstFormula = 0;
             builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
@@ -213,7 +217,7 @@ public class IntermediatePresentationProofFileParser
 
         case NEW_NAMES: // newnames
             final String[] newNames = str.split(",");
-            ruleInfo.currNewNames = ImmutableSLList.<Name> nil();
+            ruleInfo.currNewNames = ImmutableSLList.<Name>nil();
             for (int in = 0; in < newNames.length; in++) {
                 ruleInfo.currNewNames = ruleInfo.currNewNames
                         .append(new Name(newNames[in]));
@@ -256,7 +260,7 @@ public class IntermediatePresentationProofFileParser
             try {
                 ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType =
                     (Class<? extends AbstractPredicateAbstractionLattice>) Class
-                        .forName(str);
+                            .forName(str);
             } catch (ClassNotFoundException e) {
                 errors.add(e);
             }
@@ -408,7 +412,7 @@ public class IntermediatePresentationProofFileParser
      * Loads proof settings.
      *
      * @param preferences
-     *            The preferences to load.
+     *        The preferences to load.
      */
     private void loadPreferences(String preferences) {
         final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
@@ -455,9 +459,9 @@ public class IntermediatePresentationProofFileParser
         /* + Taclet Information */
         protected LinkedList<String> loadedInsts = null;
         protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList
-                .<String> nil();
+                .<String>nil();
         protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList
-                .<String> nil();
+                .<String>nil();
 
         public TacletInformation(String ruleName) {
             super(ruleName);
@@ -482,8 +486,8 @@ public class IntermediatePresentationProofFileParser
         protected int currCorrespondingMergeNodeId = 0;
         protected int currMergeNodeId = 0;
         protected String currDistFormula = null;
-        protected Class<? extends AbstractPredicateAbstractionLattice>
-            currPredAbstraLatticeType = null;
+        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
+            null;
         protected String currAbstractionPredicates = null;
         public String currUserChoices = null;
 

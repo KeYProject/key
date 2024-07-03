@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
@@ -37,9 +41,9 @@ public class ShannonTermFeature implements TermFeature {
     private final TermFeature elseFeature;
 
     private ShannonTermFeature(TermFeature p_cond,
-                               RuleAppCost p_trueCost,
-                               TermFeature p_thenFeature,
-                               TermFeature p_elseFeature) {
+            RuleAppCost p_trueCost,
+            TermFeature p_thenFeature,
+            TermFeature p_elseFeature) {
         cond = p_cond;
         trueCost = p_trueCost;
         thenFeature = p_thenFeature;
@@ -47,46 +51,45 @@ public class ShannonTermFeature implements TermFeature {
     }
 
     public RuleAppCost compute(Term term, Services services) {
-        if ( cond.compute ( term, services ).equals ( trueCost ) )
-            return thenFeature.compute ( term, services );
+        if (cond.compute(term, services).equals(trueCost))
+            return thenFeature.compute(term, services);
         else
-            return elseFeature.compute ( term, services );
+            return elseFeature.compute(term, services);
     }
 
     /**
      * @param cond
-     *            the feature that decides which value is to be returned
+     *        the feature that decides which value is to be returned
      * @param thenFeature
-     *            the value of the feature if <code>cond</code> returns zero
+     *        the value of the feature if <code>cond</code> returns zero
      * @param elseFeature
-     *            the value of the feature if <code>cond</code> does not
-     *            return zero
+     *        the value of the feature if <code>cond</code> does not
+     *        return zero
      * @return the value of <code>thenFeature</code> if <code>cond</code>
      *         returns zero, the value of <code>elseFeature</code> otherwise
      */
     public static TermFeature createConditionalBinary(TermFeature cond,
-                                                      TermFeature thenFeature,
-                                                      TermFeature elseFeature) {
-        return new ShannonTermFeature ( cond,
-                                        BinaryTermFeature.ZERO_COST,
-                                        thenFeature,
-                                        elseFeature );
+            TermFeature thenFeature,
+            TermFeature elseFeature) {
+        return new ShannonTermFeature(cond,
+            BinaryTermFeature.ZERO_COST,
+            thenFeature,
+            elseFeature);
     }
 
     /**
      * @param cond
-     *            the feature that decides which value is to be returned
+     *        the feature that decides which value is to be returned
      * @param thenFeature
-     *            the value of the feature if <code>cond</code> returns zero
+     *        the value of the feature if <code>cond</code> returns zero
      * @return the value of <code>thenFeature</code> if <code>cond</code>
      *         returns zero, zero otherwise
      */
-    public static TermFeature createConditionalBinary (TermFeature cond,
-                                                       TermFeature thenFeature) {
-        return createConditionalBinary ( cond,
-                                         thenFeature,
-                                         ConstTermFeature.createConst
-                                         	(NumberRuleAppCost.getZeroCost()) );
+    public static TermFeature createConditionalBinary(TermFeature cond,
+            TermFeature thenFeature) {
+        return createConditionalBinary(cond,
+            thenFeature,
+            ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()));
     }
 
 }

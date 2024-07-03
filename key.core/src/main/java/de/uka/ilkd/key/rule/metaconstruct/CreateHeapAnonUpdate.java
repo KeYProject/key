@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedHashMap;
@@ -37,7 +41,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term loopTerm = term.sub(0);
         final Optional<LoopSpecification> loopSpec = //
-                MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
+            MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
 
         if (!loopSpec.isPresent()) {
             return null;
@@ -48,9 +52,9 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final Term anonPermissionsHeapTerm = term.sub(3);
 
         return createHeapAnonUpdate(loopSpec.get(),
-                MiscTools.isTransaction((Modality) loopTerm.op()),
-                MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
-                anonPermissionsHeapTerm, services);
+            MiscTools.isTransaction((Modality) loopTerm.op()),
+            MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
+            anonPermissionsHeapTerm, services);
     }
 
     /**
@@ -58,9 +62,9 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      *
      * @param loopSpec The {@link LoopSpecification}.
      * @param isTransaction set to true iff we're in a transaction modality (then,
-     * there are more heaps available).
+     *        there are more heaps available).
      * @param isPermissions set to true if the permissions profile is active (then,
-     * the permissions heap is available).
+     *        the permissions heap is available).
      * @param anonHeapTerm The term with the Skolem heap.
      * @param anonSavedHeapTerm The term with the Skolem saved heap.
      * @param anonPermissionsHeapTerm The term with the Skolem permissions heap.
@@ -74,7 +78,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
         final List<LocationVariable> heapContext = //
-                HeapContext.getModHeaps(services, isTransaction);
+            HeapContext.getModHeaps(services, isTransaction);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         // The call to MiscTools.removeSingletonPVs removes from the assignable clause
         // the program variables which of course should not be part of an anonymizing
@@ -83,24 +87,24 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         // clauses, since for an abstract statement they cannot be extracted like for
         // concrete statements (such as loop bodies). (DS, 2019-07-05)
         heapContext.forEach(heap -> mods.put(heap,
-                loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
+            loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         Term anonUpdate = tb.skip();
 
         anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getHeap(),
-                anonHeapTerm, mods.get(heapLDT.getHeap()), services));
+            anonHeapTerm, mods.get(heapLDT.getHeap()), services));
 
         if (isTransaction) {
             anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getSavedHeap(),
-                    anonHeapTerm, mods.get(heapLDT.getSavedHeap()), services));
+                anonHeapTerm, mods.get(heapLDT.getSavedHeap()), services));
         }
 
         if (isPermissions) {
             anonUpdate = tb.parallel(anonUpdate,
-                    createElementaryAnonUpdate(heapLDT.getPermissionHeap(), anonPermissionsHeapTerm,
-                            mods.get(heapLDT.getPermissionHeap()), services));
+                createElementaryAnonUpdate(heapLDT.getPermissionHeap(), anonPermissionsHeapTerm,
+                    mods.get(heapLDT.getPermissionHeap()), services));
         }
 
         return anonUpdate;
@@ -113,7 +117,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * @param heap The heap variable.
      * @param anonHeap The anonymized heap term.
      * @param mod The modifies clause, only for checking whether it's strictly
-     * nothing (then the elementary update is a skip).
+     *        nothing (then the elementary update is a skip).
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return An elementary anonymizing heap update.
      */

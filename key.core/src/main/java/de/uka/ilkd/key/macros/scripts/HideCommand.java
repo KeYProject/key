@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
+
+import java.util.Map;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -6,27 +12,18 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import org.key_project.util.collection.ImmutableList;
-
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Proof script command to hide a formula from the sequent.
  *
  * Usage:
+ *
  * <pre>
  *     hide "f1, f2 ==> f3, f4"
  * </pre>
@@ -49,7 +46,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(),
-                arguments);
+            arguments);
     }
 
     @Override
@@ -65,7 +62,8 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
             SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
             app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
-            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true), service);
+            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
+                service);
             goal.apply(app);
         }
 
@@ -76,14 +74,15 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
             SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
             app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
-            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false), service);
+            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
+                service);
             goal.apply(app);
         }
     }
 
     private SequentFormula find(SequentFormula sf, Semisequent semiseq) throws ScriptException {
         for (SequentFormula s : semiseq) {
-            if(s.formula().equalsModTermLabels(sf.formula())) {
+            if (s.formula().equalsModTermLabels(sf.formula())) {
                 return s;
             }
         }

@@ -1,13 +1,17 @@
-package de.uka.ilkd.key.proof.io;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import javax.annotation.Nonnull;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 
 public class FileRuleSource extends RuleSource {
 
@@ -15,8 +19,7 @@ public class FileRuleSource extends RuleSource {
      * The non-<code>null</code> reference to the file from which rules are
      * read.
      */
-    protected @Nonnull
-    final File ruleFile;
+    protected @Nonnull final File ruleFile;
 
     private long numberOfChars;
 
@@ -55,7 +58,8 @@ public class FileRuleSource extends RuleSource {
         try {
             return new BufferedInputStream(new FileInputStream(ruleFile));
         } catch (final FileNotFoundException exception) {
-            throw new RuntimeException("Error while opening a file stream to " + ruleFile, exception);
+            throw new RuntimeException("Error while opening a file stream to " + ruleFile,
+                exception);
         }
     }
 

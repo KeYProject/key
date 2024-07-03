@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.net.URL;
-
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -55,10 +58,10 @@ public class ProofScriptInputAction extends AbstractAction {
 
             okButton.addActionListener(event -> {
                 ProofScriptWorker psw = new ProofScriptWorker(
-                        mediator,
-                        textArea.getText(),
-                        new Location((URL) null, 0, 0),
-                        mediator.getSelectedGoal());
+                    mediator,
+                    textArea.getText(),
+                    new Location((URL) null, 0, 0),
+                    mediator.getSelectedGoal());
 
                 dispose();
 

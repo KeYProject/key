@@ -1,10 +1,14 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.list.generic;
-
-import recoder.java.SourceElement;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
+import recoder.java.SourceElement;
 
 public class ASTArrayList<E extends SourceElement> extends ArrayList<E> implements ASTList<E> {
 

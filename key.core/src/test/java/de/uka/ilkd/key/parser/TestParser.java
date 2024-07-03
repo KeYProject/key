@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.parser;
+
+import java.io.File;
+import java.io.IOException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -11,11 +18,9 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,7 +46,7 @@ public class TestParser {
 
         final Includes expected = new Includes();
         expected.put(include.toString(),
-                RuleSourceFactory.initRuleFile(include.toURI().toURL()));
+            RuleSourceFactory.initRuleFile(include.toURI().toURL()));
         final String keyFile = "\\include \"" + include.getPath() + "\";";
         KeyAst.File file = ParsingFacade.parseFile(CharStreams.fromString(keyFile));
         Includes actual = file.getIncludes(new File(".").toURI().toURL());
@@ -55,8 +60,8 @@ public class TestParser {
     @Test
     public void testGenericSort() throws IOException {
         String content = "\\sorts { \\generic gen; } \n\n" +
-                "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n" +
-                "\\problem { true }";
+            "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n" +
+            "\\problem { true }";
 
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);
@@ -77,7 +82,7 @@ public class TestParser {
         assertThrows(ProblemLoaderException.class, () -> {
             File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/39/A.java");
             KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file,
-                    null, null, null);
+                null, null, null);
         });
 
     }

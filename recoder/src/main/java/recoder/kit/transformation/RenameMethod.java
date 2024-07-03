@@ -1,5 +1,11 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
@@ -9,9 +15,6 @@ import recoder.java.reference.MemberReference;
 import recoder.java.reference.MethodReference;
 import recoder.kit.*;
 import recoder.service.CrossReferenceSourceInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that renames a method and all known references to that method.
@@ -38,12 +41,13 @@ public class RenameMethod extends TwoPassTransformation {
      * redefined versions and all references to them. The new name should not
      * conflict with another method in any of the occurances.
      *
-     * @param sc      the service configuration to use.
-     * @param method  the method to be renamed; may not be <CODE>null</CODE>.
+     * @param sc the service configuration to use.
+     * @param method the method to be renamed; may not be <CODE>null</CODE>.
      * @param newName the new name for the element; may not be <CODE>null</CODE>
-     *                and must denote a valid identifier name.
+     *        and must denote a valid identifier name.
      */
-    public RenameMethod(CrossReferenceServiceConfiguration sc, MethodDeclaration method, String newName) {
+    public RenameMethod(CrossReferenceServiceConfiguration sc, MethodDeclaration method,
+            String newName) {
         super(sc);
         if (method == null) {
             throw new IllegalArgumentException("Missing method");
@@ -59,11 +63,11 @@ public class RenameMethod extends TwoPassTransformation {
      * Collects all related methods and all references.
      *
      * @return the problem report: {@link recoder.kit.Identity}(the name has
-     * not changed), {@link recoder.kit.Equivalence}, or
-     * {@link MissingMethodDeclarations}(some of related methods are
-     * not available as source code), or {@link IllegalName}.
+     *         not changed), {@link recoder.kit.Equivalence}, or
+     *         {@link MissingMethodDeclarations}(some of related methods are
+     *         not available as source code), or {@link IllegalName}.
      * @see recoder.kit.MethodKit#getAllRelatedMethods(CrossReferenceSourceInfo,
-     * Method)
+     *      Method)
      */
     public ProblemReport analyze() {
         if (newName.equals(methodToRename.getName())) {

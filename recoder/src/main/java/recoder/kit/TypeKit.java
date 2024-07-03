@@ -1,10 +1,17 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ProgramFactory;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.TreeWalker;
 import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
@@ -17,9 +24,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.*;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * this class implements basic functions for type handling.
@@ -54,17 +58,19 @@ public class TypeKit {
      * Factory method that creates a type reference with prefices
      * (UncollatedReferenceQualifiers) from a qualified name.
      *
-     * @param f             the program factory to use.
+     * @param f the program factory to use.
      * @param qualifiedName a qualified (= potentially dotted) name.
      * @return a type reference to the given type; parent links of the reference
-     * are made valid.
+     *         are made valid.
      */
     public static TypeReference createTypeReference(ProgramFactory f, String qualifiedName) {
         return MiscKit.createUncollatedReferenceQualifier(f, qualifiedName).toTypeReference();
     }
 
-    public static ASTList<TypeArgumentDeclaration> makeTypeArgRef(ProgramFactory f, List<? extends TypeArgument> tas) {
-        ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>(tas.size());
+    public static ASTList<TypeArgumentDeclaration> makeTypeArgRef(ProgramFactory f,
+            List<? extends TypeArgument> tas) {
+        ASTList<TypeArgumentDeclaration> res =
+            new ASTArrayList<TypeArgumentDeclaration>(tas.size());
         for (TypeArgument ta : tas) {
             TypeReference tr = createTypeReference(f, ta.getTypeName());
             if (ta.getTypeArguments() != null)
@@ -107,7 +113,7 @@ public class TypeKit {
      * @param f the program factory to be used.
      * @param t the type which shall be referenced.
      * @return a type reference to the given type; parent links of the reference
-     * are made valid.
+     *         are made valid.
      */
     public static TypeReference createTypeReference(ProgramFactory f, Type t) {
         return createTypeReference(f, t, false);
@@ -119,12 +125,12 @@ public class TypeKit {
      * context for the type reference. The context should describe the position
      * the type reference will be inserted into, usually a statement container.
      *
-     * @param si      the source info to be used.
-     * @param t       the type which shall be referenced.
+     * @param si the source info to be used.
+     * @param t the type which shall be referenced.
      * @param context a program element from which the type shall be addressed (may
-     *                not be <CODE>null</CODE>).
+     *        not be <CODE>null</CODE>).
      * @return a minimal type reference to the given type; parent links of the
-     * reference are made valid.
+     *         reference are made valid.
      */
     public static TypeReference createTypeReference(SourceInfo si, Type t, ProgramElement context) {
         TypeReference result = null;
@@ -155,18 +161,21 @@ public class TypeKit {
      * @param concrete public class to abstractify
      */
     public static InterfaceDeclaration createAbstractSuperClass(NameInfo ni, ClassDeclaration cdecl,
-                                                                String abstractsupername) throws NameClashException {
+            String abstractsupername) throws NameClashException {
         // assert that c is a public class and not an interface
         /*
          * Problems may still occur with nested classes, especially anonymous
          * classes.
          */
-        String message = "Sorry, only public classes which are neither interfaces nor enums can be transformed.";
-        Debug.assertBoolean(cdecl.isPublic() && !cdecl.isInterface() && !cdecl.isEnumType(), message);
+        String message =
+            "Sorry, only public classes which are neither interfaces nor enums can be transformed.";
+        Debug.assertBoolean(cdecl.isPublic() && !cdecl.isInterface() && !cdecl.isEnumType(),
+            message);
 
         if (ni.getType(abstractsupername) != null) {
             // problem: abstractsupername already is a type
-            throw new NameClashException("Error: Name " + abstractsupername + "is already declared.");
+            throw new NameClashException(
+                "Error: Name " + abstractsupername + "is already declared.");
         }
         /*
          * Iterate through members directly defined in the class cdecl. - Put
@@ -209,9 +218,9 @@ public class TypeKit {
                     MethodDeclaration md = (MethodDeclaration) cmemd;
 
                     if (!md.isStatic() && md.isPublic() && !(md instanceof ConstructorDeclaration)
-                        //!!!!!!!!!!!!!!!!!! Die folgende Methode gibt es noch
-                        // nicht !!!!!!!!!!!!!
-                        // && !cdecl.overridesInherited(md)
+                    // !!!!!!!!!!!!!!!!!! Die folgende Methode gibt es noch
+                    // nicht !!!!!!!!!!!!!
+                    // && !cdecl.overridesInherited(md)
                     ) {
                         imembers.add(MethodKit.createAbstractMethodDeclaration(md, true));
                     } else
@@ -232,9 +241,9 @@ public class TypeKit {
                     imods.add((DeclarationSpecifier) vis.deepClone());
                 }
                 InterfaceDeclaration idecl = pf.createInterfaceDeclaration(imods, // modifiers
-                        iid, // name of the new interface
-                        null, // the interface does not extend others
-                        imembers); // the extracted field and method
+                    iid, // name of the new interface
+                    null, // the interface does not extend others
+                    imembers); // the extracted field and method
                 // declarations
 
                 // !!!!!!!!!!!!! Folgenden Teil zur Modifikation von cdecl
@@ -328,7 +337,8 @@ public class TypeKit {
                 if (cmemd instanceof ConstructorDeclaration || cmemd.isStatic()) {
                     continue;
                 }
-                imembers.add(MethodKit.createAbstractMethodDeclaration((MethodDeclaration) cmemd, true));
+                imembers.add(
+                    MethodKit.createAbstractMethodDeclaration((MethodDeclaration) cmemd, true));
             } else if (cmemd instanceof TypeDeclaration) {
                 imembers.add((TypeDeclaration) cmemd.deepClone());
             }
@@ -344,7 +354,8 @@ public class TypeKit {
      * m(int i, int i2) { ..}
      * <p>
      * m2(int i, int i2) { ..}
-     * <p>}
+     * <p>
+     * }
      * <p>
      * the created class is
      * <p>
@@ -353,17 +364,22 @@ public class TypeKit {
      * m(int i, int i2) { delegatingObject.m(i,i2); }
      * <p>
      * m2(int i, int i2) { delegatingObject.m2(i,i2); }
-     * <p>}
+     * <p>
+     * }
      *
      * @deprecated needs rework
      */
-    public static ClassDeclaration createAdapterClass(String adapterName, ClassDeclaration classDecl) {
+    public static ClassDeclaration createAdapterClass(String adapterName,
+            ClassDeclaration classDecl) {
         ProgramFactory factory = classDecl.getFactory();
-        ReferencePrefix delegationObject = new FieldReference(factory.createIdentifier("delegationObject"
+        ReferencePrefix delegationObject =
+            new FieldReference(factory.createIdentifier("delegationObject"
                 + classDecl.getName()));
-        ClassDeclaration adapterClass = factory.createClassDeclaration(new ASTArrayList<DeclarationSpecifier>(), factory
-                        .createIdentifier(adapterName), factory.createExtends(), factory.createImplements(),
-                new ASTArrayList<MemberDeclaration>());
+        ClassDeclaration adapterClass = factory.createClassDeclaration(
+            new ASTArrayList<DeclarationSpecifier>(), factory
+                    .createIdentifier(adapterName),
+            factory.createExtends(), factory.createImplements(),
+            new ASTArrayList<MemberDeclaration>());
 
         // Create an adapter interface with delegating methods
         for (int i2 = 0; i2 < classDecl.getMembers().size(); i2++) {
@@ -372,7 +388,8 @@ public class TypeKit {
                 MethodDeclaration method = (MethodDeclaration) member;
                 if (method.isPublic()) {
                     Debug.info(2, "adapting public method " + method.getName());
-                    MethodDeclaration clone = MethodKit.createAdapterMethod(delegationObject, method);
+                    MethodDeclaration clone =
+                        MethodKit.createAdapterMethod(delegationObject, method);
                     if (clone != null)
                         adapterClass.getMembers().add(clone);
                 }
@@ -386,19 +403,20 @@ public class TypeKit {
      * to that type. The new name should not hide another type in the
      * declaration context.
      *
-     * @param ch      the change history (may be <CODE>null</CODE>).
-     * @param xr      the cross referencer service.
-     * @param ni      the name info service.
-     * @param type    the type declaration to be renamed; may not be <CODE>null
+     * @param ch the change history (may be <CODE>null</CODE>).
+     * @param xr the cross referencer service.
+     * @param ni the name info service.
+     * @param type the type declaration to be renamed; may not be <CODE>null
      *                </CODE>.
      * @param newName the new name for the element; may not be <CODE>null</CODE>
-     *                and must denote a valid identifier name.
+     *        and must denote a valid identifier name.
      * @return <CODE>true</CODE>, if a rename has been necessary, <CODE>
      * false</CODE> otherwise.
      * @deprecated replaced by recoder.kit.transformation.RenameType
      */
-    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, NameInfo ni, TypeDeclaration type,
-                                 String newName) {
+    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, NameInfo ni,
+            TypeDeclaration type,
+            String newName) {
         Debug.assertNonnull(xr, ni, type, newName);
         Debug.assertNonnull(type.getName());
         if (!newName.equals(type.getName())) {
@@ -435,8 +453,9 @@ public class TypeKit {
     /**
      * @deprecated still untested.
      */
-    public static List<TypeReference> getInfluencedReferences(CrossReferenceSourceInfo xr, String newTypeName,
-                                                              NonTerminalProgramElement context) {
+    public static List<TypeReference> getInfluencedReferences(CrossReferenceSourceInfo xr,
+            String newTypeName,
+            NonTerminalProgramElement context) {
         Debug.assertNonnull(xr, newTypeName, context);
         // check from the point of view of a scope defining element
         context = MiscKit.getScopeDefiningElement(context);
@@ -469,17 +488,17 @@ public class TypeKit {
      * faster if the tree contains more nodes than there are global references
      * to the given type.
      *
-     * @param xr       the cross referencer to use.
-     * @param t        a type.
-     * @param root     the root of an arbitrary syntax tree.
+     * @param xr the cross referencer to use.
+     * @param t a type.
+     * @param root the root of an arbitrary syntax tree.
      * @param scanTree flag indicating the search strategy; if <CODE>true</CODE>,
-     *                 local cross reference information is build, otherwise the
-     *                 global cross reference information is filtered.
+     *        local cross reference information is build, otherwise the
+     *        global cross reference information is filtered.
      * @return the list of references to the given type in the given tree, can
-     * be empty but not <CODE>null</CODE>.
+     *         be empty but not <CODE>null</CODE>.
      */
     public static List<TypeReference> getReferences(CrossReferenceSourceInfo xr, Type t,
-                                                    NonTerminalProgramElement root, boolean scanTree) {
+            NonTerminalProgramElement root, boolean scanTree) {
         Debug.assertNonnull(xr, t, root);
         List<TypeReference> result = new ArrayList<TypeReference>();
         if (scanTree) {
@@ -564,9 +583,9 @@ public class TypeKit {
      * @param x the first member.
      * @param y the second member.
      * @return <CODE>true</CODE> if the first member is less visible than the
-     * second (in the order "private" - "" (package) - "protected" -
-     * "public" where applicable), <CODE>false</CODE> if it is as
-     * least as visible.
+     *         second (in the order "private" - "" (package) - "protected" -
+     *         "public" where applicable), <CODE>false</CODE> if it is as
+     *         least as visible.
      */
     public static boolean isLessVisible(Member x, Member y) {
         if (x.isPublic()) {
@@ -590,12 +609,13 @@ public class TypeKit {
      * or equally strict that the other.
      *
      * @param tsi the type system info to use.
-     * @param x   a class list, may not be <CODE>null</CODE>.
-     * @param y   a class list, may not be <CODE>null</CODE>.
+     * @param x a class list, may not be <CODE>null</CODE>.
+     * @param y a class list, may not be <CODE>null</CODE>.
      * @return <CODE>true</CODE> if the first list of class types is covered
-     * by the second one, <CODE>false</CODE> otherwise.
+     *         by the second one, <CODE>false</CODE> otherwise.
      */
-    public static boolean isCovered(ProgramModelInfo pmi, List<? extends ClassType> x, List<? extends ClassType> y) {
+    public static boolean isCovered(ProgramModelInfo pmi, List<? extends ClassType> x,
+            List<? extends ClassType> y) {
         Debug.assertNonnull(x, y);
         boolean found = true;
         for (int i = x.size() - 1; (i >= 0) && found; i -= 1) {
@@ -620,7 +640,7 @@ public class TypeKit {
      *
      * @param member a potential interface member.
      * @return <CODE>true</CODE> if the given member could become a member of
-     * an interface, <CODE>false</CODE> otherwise.
+     *         an interface, <CODE>false</CODE> otherwise.
      */
     public static boolean isValidInterfaceMember(MemberDeclaration member) {
         if (!member.isPublic()) {
@@ -649,13 +669,14 @@ public class TypeKit {
      * Gets all types in the given list that are subtypes of other types in the
      * list.
      *
-     * @param pmi  the program model info service to use.
+     * @param pmi the program model info service to use.
      * @param list a list of class types.
      * @return a list of class types that have supertypes in the list.
      * @see #removeCoveredSubtypes
      * @since 0.71
      */
-    public static List<? extends ClassType> getCoveredSubtypes(ProgramModelInfo pmi, List<? extends ClassType> list) {
+    public static List<? extends ClassType> getCoveredSubtypes(ProgramModelInfo pmi,
+            List<? extends ClassType> list) {
         List<ClassType> copy = new ArrayList<ClassType>();
         copy.addAll(list);
         return removeCoveredSubtypes(pmi, copy);
@@ -665,14 +686,15 @@ public class TypeKit {
      * Removes types in the given list that are subtypes of other types in the
      * list and returns the removed types in a new list.
      *
-     * @param pmi  the program model info service to use.
+     * @param pmi the program model info service to use.
      * @param list a mutable list of class types.
      * @return a set of class types that have supertypes in the list and that
-     * have been removed.
+     *         have been removed.
      * @see #getCoveredSubtypes
      * @since 0.71
      */
-    public static List<ClassType> removeCoveredSubtypes(ProgramModelInfo pmi, List<ClassType> list) {
+    public static List<ClassType> removeCoveredSubtypes(ProgramModelInfo pmi,
+            List<ClassType> list) {
         List<ClassType> removed = new ArrayList<ClassType>();
         for (int i = list.size() - 1; i >= 0; i -= 1) {
             ClassType ct = list.get(i);
@@ -701,7 +723,8 @@ public class TypeKit {
      * @param td the type declaration to check for inheritance redundancy.
      * @since 0.71
      */
-    public static List<TypeReference> getRedundantSuperInterfaces(SourceInfo si, TypeDeclaration td) {
+    public static List<TypeReference> getRedundantSuperInterfaces(SourceInfo si,
+            TypeDeclaration td) {
         // get all super interface references
         ClassType superclass = null;
         List<TypeReference> superinterfaces = new ArrayList<TypeReference>(0);
@@ -755,7 +778,7 @@ public class TypeKit {
      * declarations as well as transitive exceptions.
      *
      * @param si the source info service to use.
-     * @param t  the throws clause to check for redundancy.
+     * @param t the throws clause to check for redundancy.
      * @since 0.71
      */
     public static List<TypeReference> getRedundantExceptions(SourceInfo si, Throws t) {

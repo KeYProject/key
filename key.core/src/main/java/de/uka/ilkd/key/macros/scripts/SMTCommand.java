@@ -1,20 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
+
+import java.util.*;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
@@ -34,26 +38,29 @@ public class SMTCommand
         return Collections.unmodifiableMap(result);
     }
 
-    @Override public SMTCommandArguments evaluateArguments(EngineState state,
+    @Override
+    public SMTCommandArguments evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
         return ValueInjector.injection(this, new SMTCommandArguments(), arguments);
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "smt";
     }
 
-    @Override public void execute(SMTCommandArguments args)
+    @Override
+    public void execute(SMTCommandArguments args)
             throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
         ImmutableList<Goal> goals;
         if (args.all) {
-             goals = state.getProof().openGoals();
+            goals = state.getProof().openGoals();
         } else {
-             goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
+            goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
         }
-        
+
         for (Goal goal : goals) {
             runSMT(args, su, goal);
         }
@@ -61,12 +68,12 @@ public class SMTCommand
 
     private void runSMT(SMTCommandArguments args, SolverTypeCollection su, Goal goal) {
         DefaultSMTSettings settings = new DefaultSMTSettings(
-                goal.proof().getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                goal.proof().getSettings().getNewSMTSettings(),
-                goal.proof());
+            goal.proof().getSettings().getSMTSettings(),
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+            goal.proof().getSettings().getNewSMTSettings(),
+            goal.proof());
 
-        if(args.timeout >= 0) {
+        if (args.timeout >= 0) {
             settings = new SMTSettingsTimeoutWrapper(settings, args.timeout);
         }
 
@@ -83,11 +90,11 @@ public class SMTCommand
                 IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
                         .setTitle(args.solver);
                 problem.getGoal().apply(app);
-}
+            }
             System.err.println("SMT Runtime, goal " +
-                    goal.node().serialNr() + ": " +
-                    timerListener.getRuntime() + " ms; " +
-                    finalResult);
+                goal.node().serialNr() + ": " +
+                timerListener.getRuntime() + " ms; " +
+                finalResult);
         }
     }
 
@@ -107,7 +114,7 @@ public class SMTCommand
     public static class SMTCommandArguments {
         @Option("solver")
         public String solver = "Z3";
-        
+
         @Option(value = "all", required = false)
         public boolean all = false;
 
@@ -120,12 +127,14 @@ public class SMTCommand
         private long stop;
 
         @Override
-        public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes, SolverLauncher launcher) {
+        public void launcherStarted(Collection<SMTProblem> problems,
+                Collection<SolverType> solverTypes, SolverLauncher launcher) {
             this.start = System.currentTimeMillis();
         }
 
         @Override
-        public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers) {
+        public void launcherStopped(SolverLauncher launcher,
+                Collection<SMTSolver> finishedSolvers) {
             this.stop = System.currentTimeMillis();
         }
 
@@ -139,7 +148,7 @@ public class SMTCommand
 
         public SMTSettingsTimeoutWrapper(DefaultSMTSettings settings, int timeout) {
             super(settings.getPdSettings(), settings.getPiSettings(),
-                    settings.getNewTranslationSettings(), settings.getProof());
+                settings.getNewTranslationSettings(), settings.getProof());
             this.timeout = timeout;
         }
 

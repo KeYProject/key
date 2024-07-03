@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.algo;
 
-import org.key_project.ui.interactionlog.api.Markdownable;
+import java.io.PrintWriter;
+
 import org.key_project.ui.interactionlog.api.Interaction;
+import org.key_project.ui.interactionlog.api.Markdownable;
 import org.key_project.ui.interactionlog.model.InteractionLog;
 import org.key_project.ui.markdown.Markdown;
-
-import java.io.PrintWriter;
 
 public class MarkdownExport {
     private final PrintWriter writer;

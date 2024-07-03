@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 /**
@@ -82,7 +85,8 @@ public class Sorting {
     }
 
     protected final static Object median(Object x, Object y, Object z, Order o) {
-        return o.less(x, y) ? (o.less(y, z) ? y : (o.less(x, z) ? z : x)) : (o.less(y, z) ? y : (o.less(z, x) ? z : x));
+        return o.less(x, y) ? (o.less(y, z) ? y : (o.less(x, z) ? z : x))
+                : (o.less(y, z) ? y : (o.less(z, x) ? z : x));
     }
 
     public static void quickSort(Object[] a) {
@@ -169,4 +173,3 @@ public class Sorting {
      */
 
 }
-

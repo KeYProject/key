@@ -1,12 +1,16 @@
-package de.uka.ilkd.key.java.declaration.modifier;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.java.declaration.modifier;
 
 import de.uka.ilkd.key.java.declaration.Modifier;
 
+import org.key_project.util.ExtList;
+
 
 /**
- *  The JML modifier "ghost".
+ * The JML modifier "ghost".
  */
 public class Ghost extends Modifier {
 
@@ -14,7 +18,7 @@ public class Ghost extends Modifier {
 
 
     public Ghost(ExtList children) {
-        super (children);
+        super(children);
     }
 
 

@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.abstraction;
 
 import java.util.List;
@@ -15,7 +18,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * Checks if this class type denotes an interface (i.e. ordinary interface or annotation type).
      *
      * @return <CODE>true</CODE> if this object represents an interface,
-     * <CODE>false</CODE> otherwise.
+     *         <CODE>false</CODE> otherwise.
      */
     boolean isInterface();
 
@@ -23,7 +26,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * Checks if this class type denotes an ordinary (i.e. not annotation type) interface.
      *
      * @return <CODE>true</CODE> if this object represents an ordinary interface,
-     * <CODE>false</CODE> otherwise.
+     *         <CODE>false</CODE> otherwise.
      */
     boolean isOrdinaryInterface();
 
@@ -31,7 +34,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * Checks if this class type denotes an annotation type
      *
      * @return <CODE>true</CODE> if this object represents an annotation type,
-     * <CODE>false</CODE> otherwise
+     *         <CODE>false</CODE> otherwise
      */
     boolean isAnnotationType();
 
@@ -39,7 +42,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * Checks if this class type denotes an enum type
      *
      * @return <CODE>true</CODE> if this object represents an enum type,
-     * <CODE>false</CODE> otherwise
+     *         <CODE>false</CODE> otherwise
      */
     boolean isEnumType();
 
@@ -47,7 +50,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * Checks if this class type denotes an ordinary (i.e. not an enum) class.
      *
      * @return <CODE>true</CODE> if this object represents an ordinary class type,
-     * <CODE>false</CODE> otherwise
+     *         <CODE>false</CODE> otherwise
      */
     boolean isOrdinaryClass();
 
@@ -90,7 +93,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * inheritance hierarchy.
      *
      * @return the list of visible field members of this type and its
-     * supertypes.
+     *         supertypes.
      */
     List<Field> getAllFields();
 
@@ -126,7 +129,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * including visible inherited types.
      *
      * @return a list of class types that are members of this type or any of its
-     * supertypes.
+     *         supertypes.
      * @see #getAllSupertypes
      */
     List<ClassType> getAllTypes();

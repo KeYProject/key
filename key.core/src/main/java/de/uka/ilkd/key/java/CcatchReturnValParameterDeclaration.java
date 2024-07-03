@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A "\Return int v" parameter declaration of a ccatch clause.
@@ -51,10 +55,10 @@ public class CcatchReturnValParameterDeclaration extends
      * array
      *
      * @param index
-     *            an index into this node's "virtual" child array
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     *            if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {

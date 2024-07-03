@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.util.removegenerics;
 
@@ -13,12 +16,12 @@ import recoder.java.SourceElement.Position;
 /**
  * This class has been used to repair a bug in recoder. It can be removed as
  * soon as this bug is solved.
- * 
+ *
  * The problem is that sometimes comments do not print a newline in the end,
  * which is ensured by {@link #repairSingleLineComments(ProgramElement)}
- * 
+ *
  * TODO remove as soon as recoder is patched
- * 
+ *
  * @author MU
  */
 public class SingleLineCommentRepairer {

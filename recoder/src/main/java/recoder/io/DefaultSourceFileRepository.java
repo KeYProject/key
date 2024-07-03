@@ -1,5 +1,13 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.util.*;
 
 import recoder.AbstractService;
 import recoder.ParserException;
@@ -12,11 +20,6 @@ import recoder.service.*;
 import recoder.util.Debug;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.util.*;
 
 /**
  * @author RN
@@ -34,7 +37,8 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
     /**
      * Cache: data location to compilation units.
      */
-    private final Map<DataLocation, CompilationUnit> location2cu = new HashMap<DataLocation, CompilationUnit>();
+    private final Map<DataLocation, CompilationUnit> location2cu =
+        new HashMap<DataLocation, CompilationUnit>();
     /**
      * Set of units that have been changed and have to be rewritten.
      */
@@ -102,7 +106,8 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
             // would have changed; if so, invalidate them
             searchPathList = serviceConfiguration.getProjectSettings().getSearchPathList();
         } else if (changedProp.equals(ProjectSettings.OUTPUT_PATH)) {
-            outputPath = new File(serviceConfiguration.getProjectSettings().getProperty(ProjectSettings.OUTPUT_PATH));
+            outputPath = new File(
+                serviceConfiguration.getProjectSettings().getProperty(ProjectSettings.OUTPUT_PATH));
         }
     }
 
@@ -193,7 +198,7 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
      * Searches for the location of the source file for the given class.
      *
      * @param classname the name of the class for which the source file should be
-     *                  looked up.
+     *        looked up.
      */
     public DataLocation findSourceFile(String classname) {
         // possible optimzation: cache it !!!
@@ -201,7 +206,8 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
         return getSearchPathList().find(file);
     }
 
-    protected CompilationUnit getCompilationUnitFromLocation(DataLocation loc) throws ParserException {
+    protected CompilationUnit getCompilationUnitFromLocation(DataLocation loc)
+            throws ParserException {
         Debug.assertNonnull(loc, "Null location for compilation unit");
         CompilationUnit result = location2cu.get(loc);
         if (result != null) {
@@ -218,7 +224,7 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
             in.close();
             loc.readerClosed();
             result.setDataLocation(loc);
-            location2cu.put(loc, result); //let this be done by the history
+            location2cu.put(loc, result); // let this be done by the history
             changeHistory.attached(result);
         } catch (IOException e) {
             Debug.error("Exception while reading from input stream: " + e);
@@ -248,12 +254,14 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
         return loc != null ? getCompilationUnitFromLocation(loc) : null;
     }
 
-    public List<CompilationUnit> getCompilationUnitsFromFiles(String[] filenames) throws ParserException {
+    public List<CompilationUnit> getCompilationUnitsFromFiles(String[] filenames)
+            throws ParserException {
         Debug.assertNonnull(filenames);
         List<CompilationUnit> res = new ArrayList<CompilationUnit>();
         listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
         for (int i = 0; i < filenames.length; i += 1) {
-            listeners.fireProgressEvent(i, new StringBuffer("Parsing ").append(filenames[i]).toString());
+            listeners.fireProgressEvent(i,
+                new StringBuffer("Parsing ").append(filenames[i]).toString());
             CompilationUnit cu = getCompilationUnitFromFile(filenames[i]);
             if (cu != null) {
                 res.add(cu);
@@ -294,7 +302,8 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
         return getAllCompilationUnitsFromPath(JAVA_FILENAME_FILTER);
     }
 
-    public List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter) throws ParserException {
+    public List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter)
+            throws ParserException {
         DataLocation[] locations = getSearchPathList().findAll(filter);
         List<CompilationUnit> res = new ArrayList<CompilationUnit>(locations.length);
         listeners.fireProgressEvent(0, res.size(), "Importing Source Files From Path");
@@ -395,8 +404,8 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
     }
 
     public String information() {
-        return "" + location2cu.size() + " compilation units (" + changedUnits.size() + " currently changed)";
+        return "" + location2cu.size() + " compilation units (" + changedUnits.size()
+            + " currently changed)";
     }
 
 }
-

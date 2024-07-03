@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.proof_references.analyst;
 
@@ -13,30 +16,31 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
 
 /**
  * Extracts inlined methods.
+ *
  * @author Martin Hentschel
  */
 public class MethodBodyExpandProofReferencesAnalyst implements IProofReferencesAnalyst {
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
-      if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
-         NodeInfo info = node.getNodeInfo();
-         if (info.getActiveStatement() instanceof MethodBodyStatement) {
-            MethodBodyStatement mbs = (MethodBodyStatement)info.getActiveStatement();
-            IProgramMethod pm = mbs.getProgramMethod(services);
-            DefaultProofReference<IProgramMethod> reference = new DefaultProofReference<IProgramMethod>(IProofReference.INLINE_METHOD, node, pm);
-            LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
-            result.add(reference);
-            return result;
-         }
-         else {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+        if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
+            NodeInfo info = node.getNodeInfo();
+            if (info.getActiveStatement() instanceof MethodBodyStatement) {
+                MethodBodyStatement mbs = (MethodBodyStatement) info.getActiveStatement();
+                IProgramMethod pm = mbs.getProgramMethod(services);
+                DefaultProofReference<IProgramMethod> reference =
+                    new DefaultProofReference<IProgramMethod>(IProofReference.INLINE_METHOD, node,
+                        pm);
+                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+                result.add(reference);
+                return result;
+            } else {
+                return null;
+            }
+        } else {
             return null;
-         }
-      }
-      else {
-         return null;
-      }
-   }
+        }
+    }
 }

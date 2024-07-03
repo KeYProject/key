@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.java.statement;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
@@ -11,22 +12,25 @@ import de.uka.ilkd.key.java.TypeScope;
 import de.uka.ilkd.key.java.VariableScope;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
 /**
- *  Switch.
+ * Switch.
  */
 
 public class Switch extends BranchStatement
-    implements ExpressionContainer,
-    VariableScope, TypeScope {
+        implements ExpressionContainer,
+        VariableScope, TypeScope {
 
     /**
- *      Branches.
+     * Branches.
      */
 
     protected final ImmutableArray<Branch> branches;
 
     /**
- *      Expression.
+     * Expression.
      */
 
     protected final Expression expression;
@@ -34,71 +38,79 @@ public class Switch extends BranchStatement
 
 
     /**
- *      Switch.
+     * Switch.
      */
 
     public Switch() {
-	this.branches=null;
-        this.expression=null;
+        this.branches = null;
+        this.expression = null;
     }
 
     /**
- *      Switch.
- *      @param e an expression.
+     * Switch.
+     *
+     * @param e an expression.
      */
 
     public Switch(Expression e) {
-	this.branches=null;
-        this.expression=e;
+        this.branches = null;
+        this.expression = e;
     }
 
     /**
- *      Switch.
- *      @param e an expression.
- *      @param branches a branch array
+     * Switch.
+     *
+     * @param e an expression.
+     * @param branches a branch array
      */
 
     public Switch(Expression e, Branch[] branches) {
-	this.branches=new ImmutableArray<Branch>(branches);
-        this.expression=e;
+        this.branches = new ImmutableArray<Branch>(branches);
+        this.expression = e;
     }
 
     /**
- *      Switch.
- *      @param children a list with all children
+     * Switch.
+     *
+     * @param children a list with all children
      */
 
     public Switch(ExtList children) {
         super(children);
-	this.expression = children.get(Expression.class);
-	this.branches=new ImmutableArray<Branch>(children.collect(Branch.class)); 
+        this.expression = children.get(Expression.class);
+        this.branches = new ImmutableArray<Branch>(children.collect(Branch.class));
     }
 
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) result++;
-        if (branches   != null) result += branches.size();
+        if (expression != null)
+            result++;
+        if (branches != null)
+            result += branches.size();
         return result;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *            of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) return expression;
+            if (index == 0)
+                return expression;
             index--;
         }
         if (branches != null) {
@@ -108,8 +120,9 @@ public class Switch extends BranchStatement
     }
 
     /**
- *      Get the number of expressions in this container.
- *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
@@ -117,13 +130,16 @@ public class Switch extends BranchStatement
     }
 
     /*
-      Return the expression at the specified index in this node's
-      "virtual" expression array.
-      @param index an index for an expression.
-      @return the expression with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the expression at the specified index in this node's
+     * "virtual" expression array.
+     *
+     * @param index an index for an expression.
+     *
+     * @return the expression with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     * of bounds.
+     */
 
     public Expression getExpressionAt(int index) {
         if (expression != null && index == 0) {
@@ -133,8 +149,9 @@ public class Switch extends BranchStatement
     }
 
     /**
- *      Get expression.
- *      @return the expression.
+     * Get expression.
+     *
+     * @return the expression.
      */
 
     public Expression getExpression() {
@@ -143,8 +160,9 @@ public class Switch extends BranchStatement
 
 
     /**
- *      Get the number of branches in this container.
- *      @return the number of branches.
+     * Get the number of branches in this container.
+     *
+     * @return the number of branches.
      */
 
     public int getBranchCount() {
@@ -152,13 +170,16 @@ public class Switch extends BranchStatement
     }
 
     /*
-      Return the branch at the specified index in this node's
-      "virtual" branch array.
-      @param index an index for a branch.
-      @return the branch with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the branch at the specified index in this node's
+     * "virtual" branch array.
+     *
+     * @param index an index for a branch.
+     *
+     * @return the branch with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     * of bounds.
+     */
 
     public Branch getBranchAt(int index) {
         if (branches != null) {
@@ -168,19 +189,23 @@ public class Switch extends BranchStatement
     }
 
 
-    /* Return the branch array wrapper
+    /*
+     * Return the branch array wrapper
+     *
      * @return the array wrapper of the branches
      */
     public ImmutableArray<Branch> getBranchList() {
-	return branches;
+        return branches;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnSwitch(this);
+        v.performActionOnSwitch(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

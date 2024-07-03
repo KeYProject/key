@@ -1,9 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -25,9 +30,9 @@ public interface Operator extends Named, SVSubstitute {
      * assumption that the constructed term would be allowed is not checked.
      *
      * @param terms an array of Term containing the subterms of a (potential)
-     *              term with this operator as top level operator
+     *        term with this operator as top level operator
      * @return sort of the term with this operator as top level operator of the
-     * given substerms
+     *         given substerms
      */
     Sort sort(ImmutableArray<Term> terms);
 
@@ -58,7 +63,7 @@ public interface Operator extends Named, SVSubstitute {
 
     /**
      * @return true iff the top level structure of
-     * the {@link Term} is valid, i.e. its parameters and types are correct.
+     *         the {@link Term} is valid, i.e. its parameters and types are correct.
      */
     default boolean validTopLevel(Term term) {
         try {

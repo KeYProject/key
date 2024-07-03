@@ -1,23 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.declaration;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.key_project.util.ExtList;
-
-import recoder.java.declaration.EnumConstantDeclaration;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.key_project.util.ExtList;
+
+import recoder.java.declaration.EnumConstantDeclaration;
+
 /**
  * This class is used for wrapping an enum into a standard class type.
- * 
- * <p>In addition the programvariables that represent enum constants are memorized. Thus
- * this class is able to have queries on the enum constants. 
- * 
+ *
+ * <p>
+ * In addition the programvariables that represent enum constants are memorized. Thus
+ * this class is able to have queries on the enum constants.
+ *
  * @author mulbrich
  * @since 2006-12-10
  */
@@ -33,15 +39,15 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * create a new EnumClassDeclaration that describes an enum defintion. It
      * merely wraps a ClassDeclaration but has memory about which fields have
      * been declared as enum constants.
-     * 
+     *
      * @param children
-     *            children in the ast (members)
+     *        children in the ast (members)
      * @param fullName
-     *            of the class/enum
+     *        of the class/enum
      * @param isLibrary
-     *            see class constructor
+     *        see class constructor
      * @param enumConstantDeclarations
-     *            the declarations for the enum constants
+     *        the declarations for the enum constants
      */
     public EnumClassDeclaration(ExtList children, ProgramElementName fullName,
             boolean isLibrary,
@@ -57,11 +63,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
     /*
      * find the program variable for a constant given by name.
-     * 
+     *
      * The "<Name>::" have to be prepended to obtain the internal name.
      * Throw IllegalStateException if name is not an attribute of this.
      * This will never happen.
-     * 
+     *
      */
     private IProgramVariable findAttr(String fieldName) {
         String completeName = getFullName() + "::" + fieldName;
@@ -75,7 +81,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
             }
         }
         throw new IllegalStateException(fieldName + " is not an attribute of "
-                + this.getFullName());
+            + this.getFullName());
     }
 
     /*
@@ -91,6 +97,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
     /**
      * get the index of the program variable amongst the enumconstants of THIS enum.
+     *
      * @param pv PV to look up
      * @return -1 if not found, otherwise the 0-based index.
      */
@@ -104,6 +111,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
     /**
      * get the number of defined enum constants in this type.
+     *
      * @return the number of defined enum constants in this type
      */
     public int getNumberOfConstants() {
@@ -112,6 +120,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
     /**
      * check whether a PV is an enum constant of any enum type.
+     *
      * @param attribute ProgramVariable to check.
      * @return true iff attribute is an enum constant.
      */
@@ -123,7 +132,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         else
             return false;
     }
-    
+
     // TODO DOC
     public static int indexOf(ProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();

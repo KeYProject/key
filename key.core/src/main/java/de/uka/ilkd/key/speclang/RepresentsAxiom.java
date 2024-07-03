@@ -1,4 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -14,15 +24,10 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.UnaryOperator;
 
 /**
  * A class axiom corresponding to a JML* represents clause.
@@ -43,27 +48,27 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final ImmutableList<ProgramVariable> originalParamVars;
 
     public RepresentsAxiom(String name,
-                           IObserverFunction target,
-                           KeYJavaType kjt,
-                           VisibilityModifier visibility,
-                           Term pre,
-                           Term rep,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           Map<LocationVariable, ProgramVariable> atPreVars) {
+            IObserverFunction target,
+            KeYJavaType kjt,
+            VisibilityModifier visibility,
+            Term pre,
+            Term rep,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ProgramVariable> atPreVars) {
         this(name, null, target, kjt, visibility, pre, rep, selfVar, paramVars, atPreVars);
     }
 
     public RepresentsAxiom(String name,
-                           String displayName,
-                           IObserverFunction target,
-                           KeYJavaType kjt,
-                           VisibilityModifier visibility,
-                           Term pre,
-                           Term rep,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           Map<LocationVariable, ProgramVariable> atPreVars) {
+            String displayName,
+            IObserverFunction target,
+            KeYJavaType kjt,
+            VisibilityModifier visibility,
+            Term pre,
+            Term rep,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ProgramVariable> atPreVars) {
         assert name != null;
         assert kjt != null;
         assert target != null;
@@ -84,8 +89,8 @@ public final class RepresentsAxiom extends ClassAxiom {
     @Override
     public SpecificationElement map(UnaryOperator<Term> op, Services services) {
         return new RepresentsAxiom(name, displayName, target, kjt, visibility,
-                op.apply(originalPre), op.apply(originalRep),
-                originalSelfVar, originalParamVars, atPreVars);
+            op.apply(originalPre), op.apply(originalRep),
+            originalSelfVar, originalParamVars, atPreVars);
     }
 
     @Override
@@ -116,18 +121,18 @@ public final class RepresentsAxiom extends ClassAxiom {
         return originalRep.op() instanceof Equality
                 && originalRep.sub(0).op() == target
                 && (target.isStatic()
-                || originalRep.sub(0)
-                .sub(target.getStateCount() * target.getHeapCount(services))
-                .op().equals(originalSelfVar));
+                        || originalRep.sub(0)
+                                .sub(target.getStateCount() * target.getHeapCount(services))
+                                .op().equals(originalSelfVar));
     }
 
     public Term getAxiom(ParsableVariable heapVar,
-                         ParsableVariable selfVar,
-                         Services services) {
+            ParsableVariable selfVar,
+            Services services) {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
-        final Map<ProgramVariable, ParsableVariable> map
-                = new LinkedHashMap<ProgramVariable, ParsableVariable>();
+        final Map<ProgramVariable, ParsableVariable> map =
+            new LinkedHashMap<ProgramVariable, ParsableVariable>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
         if (selfVar != null) {
             map.put(originalSelfVar, selfVar);
@@ -175,39 +180,40 @@ public final class RepresentsAxiom extends ClassAxiom {
         if (isFunctional(services)) {
             ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
             res = res.union(tg.generateFunctionalRepresentsTaclets(
-                    tacletName, originalPre, originalRep, kjt, target, heaps, self,
-                    originalParamVars, atPreVars, toLimit, true, services));
+                tacletName, originalPre, originalRep, kjt, target, heaps, self,
+                originalParamVars, atPreVars, toLimit, true, services));
             res = res.union(tg.generateFunctionalRepresentsTaclets(
-                    tacletName, originalPre, originalRep, kjt, target, heaps, self,
-                    originalParamVars, atPreVars, toLimit, false, services));
+                tacletName, originalPre, originalRep, kjt, target, heaps, self,
+                originalParamVars, atPreVars, toLimit, false, services));
             return res;
         } else {
-           if (originalPre != null) {
-               //FIXME weigl: this was a runtime exception, I am not sure why.
-               //             I need a little bit help, why this is triggerd for my JML thing.
-               throw new IllegalStateException("Only functional represents for model methods is currently supported,"
-                       + "this should not have occured.");
-           }
+            if (originalPre != null) {
+                // FIXME weigl: this was a runtime exception, I am not sure why.
+                // I need a little bit help, why this is triggerd for my JML thing.
+                throw new IllegalStateException(
+                    "Only functional represents for model methods is currently supported,"
+                        + "this should not have occured.");
+            }
             Taclet tacletWithShowSatisfiability = tg.generateRelationalRepresentsTaclet(tacletName,
-                    originalRep,
-                    kjt,
-                    target,
-                    heaps,
-                    self,
-                    originalParamVars,
-                    atPreVars,
-                    true,
-                    services);
+                originalRep,
+                kjt,
+                target,
+                heaps,
+                self,
+                originalParamVars,
+                atPreVars,
+                true,
+                services);
             Taclet tacletWithTreatAsAxiom = tg.generateRelationalRepresentsTaclet(tacletName,
-                    originalRep,
-                    kjt,
-                    target,
-                    heaps,
-                    self,
-                    originalParamVars,
-                    atPreVars,
-                    false,
-                    services);
+                originalRep,
+                kjt,
+                target,
+                heaps,
+                self,
+                originalParamVars,
+                atPreVars,
+                false,
+                services);
             return DefaultImmutableSet.<Taclet>nil()
                     .add(tacletWithShowSatisfiability).add(tacletWithTreatAsAxiom);
         }
@@ -230,18 +236,22 @@ public final class RepresentsAxiom extends ClassAxiom {
 
     public RepresentsAxiom setKJT(KeYJavaType newKjt) {
         String newName = "JML represents clause for " + target
-                + " (subclass " + newKjt.getName() + ")";
+            + " (subclass " + newKjt.getName() + ")";
         return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalPre,
-                originalRep, originalSelfVar, originalParamVars, atPreVars);
+            originalRep, originalSelfVar, originalParamVars, atPreVars);
     }
 
     /**
-     * <p> Conjoins two represents clauses with minimum visibility. An exception is thrown if the
-     * targets or types are different. </p>
+     * <p>
+     * Conjoins two represents clauses with minimum visibility. An exception is thrown if the
+     * targets or types are different.
+     * </p>
      *
-     * <p> <b>Known issue</b>: public clauses in subclasses are hidden
+     * <p>
+     * <b>Known issue</b>: public clauses in subclasses are hidden
      * by protected clauses in superclasses; this only applies to observers outside the package of
-     * the subclass (whenever package-privacy is implemented). </p>
+     * the subclass (whenever package-privacy is implemented).
+     * </p>
      *
      * @param ax some represents clause.
      * @param tb a term builder.
@@ -264,11 +274,11 @@ public final class RepresentsAxiom extends ClassAxiom {
             newPre = tb.and(originalPre, ax.originalPre);
         }
         return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newPre,
-                newRep, originalSelfVar, originalParamVars, atPreVars);
+            newRep, originalSelfVar, originalParamVars, atPreVars);
     }
 
     public OriginalVariables getOrigVars() {
         return new OriginalVariables(originalSelfVar, null, null,
-                atPreVars, originalParamVars);
+            atPreVars, originalParamVars);
     }
 }

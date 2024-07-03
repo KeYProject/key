@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic.sort;
 
-import de.uka.ilkd.key.rule.HasOrigin;
-import org.key_project.util.collection.ImmutableSet;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.rule.HasOrigin;
 
-import javax.annotation.Nullable;
+import org.key_project.util.collection.ImmutableSet;
 
 
 public interface Sort extends Named, HasOrigin {
@@ -64,7 +68,7 @@ public interface Sort extends Named, HasOrigin {
     /**
      * @param s some sort.
      * @return whether the given sort is a reflexive, transitive subsort of this
-     * sort.
+     *         sort.
      */
     boolean extendsTrans(Sort s);
 
@@ -98,5 +102,5 @@ public interface Sort extends Named, HasOrigin {
      * This field is typical set by the parser, who captures the documentation comments.
      */
     @Nullable
-    default String getDocumentation() {return null;}
+    default String getDocumentation() { return null; }
 }

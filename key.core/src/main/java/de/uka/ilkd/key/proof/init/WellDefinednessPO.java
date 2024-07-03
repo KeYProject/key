@@ -1,14 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -32,12 +31,18 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * <p>
  * The proof obligation for well-definedness checks.
  * </p>
  * <p>
  * The generated {@link Sequent} has the following form:
+ *
  * <pre>
  * <code>
  * ==>
@@ -60,6 +65,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     /**
      * Constructor
+     *
      * @param initConfig The initial Configuration
      * @param check The Well-Definedness Check
      */
@@ -68,21 +74,22 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         this.check = check;
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Internal Methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     private static Function createAnonHeap(LocationVariable heap,
-                                           Services services) {
+            Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name anonHeapName = new Name(services.getTermBuilder().newName("anon_"+heap.toString()));
+        final Name anonHeapName =
+            new Name(services.getTermBuilder().newName("anon_" + heap.toString()));
         final Function anonHeap = new Function(anonHeapName, heapLDT.targetSort());
         return anonHeap;
     }
 
     private static LocationVariable createSelf(IProgramMethod pm,
-                                               KeYJavaType selfKJT,
-                                               TermServices services) {
+            KeYJavaType selfKJT,
+            TermServices services) {
         if (pm == null) {
             return services.getTermBuilder().selfVar(selfKJT, false);
         } else {
@@ -91,7 +98,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static ProgramVariable createResult(IProgramMethod pm,
-                                                TermServices services) {
+            TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -100,7 +107,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static ProgramVariable createException(IProgramMethod pm,
-                                                   TermServices services) {
+            TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -109,22 +116,22 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static Map<LocationVariable, ProgramVariable> createAtPres(LocationVariable heap,
-                                                                       TermServices services) {
+            TermServices services) {
         final Map<LocationVariable, ProgramVariable> res =
-                new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<LocationVariable, ProgramVariable>();
         final ProgramVariable atPre =
-              services.getTermBuilder().heapAtPreVar(heap.name()+"AtPre", heap.sort(), true);
+            services.getTermBuilder().heapAtPreVar(heap.name() + "AtPre", heap.sort(), true);
         res.put(heap, atPre);
         return res;
     }
 
     /** Make sure ghost parameters appear in the list of parameter variables. */
-    private static ImmutableList<ProgramVariable>
-                            addGhostParams(ImmutableList<ProgramVariable> paramVars,
-                                           ImmutableList<ProgramVariable> origParams) {
+    private static ImmutableList<ProgramVariable> addGhostParams(
+            ImmutableList<ProgramVariable> paramVars,
+            ImmutableList<ProgramVariable> origParams) {
         // make sure ghost parameters are present
         ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.<ProgramVariable>nil();
-        for (ProgramVariable param: origParams) {
+        for (ProgramVariable param : origParams) {
             if (param.isGhost())
                 ghostParams = ghostParams.append(param);
         }
@@ -133,21 +140,22 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static ImmutableList<ProgramVariable> createParams(IObserverFunction target,
-                                                               ImmutableList<ProgramVariable>
-                                                                          origParams,
-                                                               TermServices services) {
-        final ImmutableList<ProgramVariable> params = services.getTermBuilder().paramVars(target, true);
+            ImmutableList<ProgramVariable> origParams,
+            TermServices services) {
+        final ImmutableList<ProgramVariable> params =
+            services.getTermBuilder().paramVars(target, true);
         return addGhostParams(params, origParams);
     }
 
     /**
      * This should only be executed once per proof.
+     *
      * @param check the underlying well-definedness check
      * @param services
      * @return new variables to be used in the actual check
      */
     private static Variables buildVariables(WellDefinednessCheck check,
-                                            Services services) {
+            Services services) {
         final OriginalVariables vars = check.getOrigVars();
         final KeYJavaType kjt = check.getKJT();
         final LocationVariable heap = check.getHeap();
@@ -155,7 +163,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
         final IProgramMethod pm;
         if (target instanceof IProgramMethod) {
-            pm = (IProgramMethod)target;
+            pm = (IProgramMethod) target;
         } else {
             pm = null;
         }
@@ -179,7 +187,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             exception = null;
         }
         final Map<LocationVariable, ProgramVariable> atPres =
-                createAtPres(heap, services);
+            createAtPres(heap, services);
         final ImmutableList<ProgramVariable> params;
         if (vars.params != null && !vars.params.isEmpty()) {
             params = createParams(target, vars.params, services);
@@ -191,10 +199,11 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     /**
      * Registers the new variables
+     *
      * @param vars variables to be used in the check
      */
     private void register(Variables vars, Services proofServices) {
-        register((Function)vars.anonHeap.op(), proofServices);
+        register((Function) vars.anonHeap.op(), proofServices);
         register(vars.self, proofServices);
         register(vars.result, proofServices);
         register(vars.exception, proofServices);
@@ -205,10 +214,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     @Override
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.<ClassAxiom>nil();
-        for(ClassAxiom axiom: specRepos.getClassAxioms(kjt)) {
-            if(axiom instanceof ClassAxiom && check instanceof ClassWellDefinedness) {
+        for (ClassAxiom axiom : specRepos.getClassAxioms(kjt)) {
+            if (axiom instanceof ClassAxiom && check instanceof ClassWellDefinedness) {
                 final ClassAxiom classAxiom = axiom;
-                final ClassWellDefinedness cwd = (ClassWellDefinedness)check;
+                final ClassWellDefinedness cwd = (ClassWellDefinedness) check;
                 final String kjtName = cwd.getKJT().getFullName();
                 final String invName = "in " + cwd.getKJT().getName();
                 if (!classAxiom.getName().endsWith(invName)
@@ -222,13 +231,13 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return result;
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Public Interface
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     public IObserverFunction getTarget() {
         return getContract().getTarget();
-     }
+    }
 
     public KeYJavaType getKJT() {
         return getContract().getKJT();
@@ -237,15 +246,15 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     @Override
     public void readProblem() throws ProofInputException {
         assert proofConfig == null;
-        
+
         final Services proofServices = postInit();
-        
+
         final Variables vars = buildVariables(check, proofServices);
 
         register(vars, proofServices);
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
-                check.getPre(po.pre, vars.self, vars.heap, vars.params, false, proofServices);
+            check.getPre(po.pre, vars.self, vars.heap, vars.params, false, proofServices);
         final Term wdPre = tb.wd(preCond.term);
         final Term wdMod = tb.wd(po.mod);
         final Term wdRest = tb.and(tb.wd(po.rest));
@@ -254,12 +263,12 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Term post = check.getPost(po.post, vars.result, proofServices);
         final Term pre = preCond.term;
         final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
-                                              vars.anonHeap, proofServices);
+            vars.anonHeap, proofServices);
         final Term wfAnon = tb.wellFormed(vars.anonHeap);
-        final Term uPost = check instanceof ClassWellDefinedness ?
-                tb.tt() : tb.apply(updates, tb.wd(post));
+        final Term uPost =
+            check instanceof ClassWellDefinedness ? tb.tt() : tb.apply(updates, tb.wd(post));
         final Term imp = tb.imp(tb.and(pre, wfAnon),
-                                tb.and(wdMod, wdRest, uPost));
+            tb.and(wdMod, wdRest, uPost));
         final Term poTerms = tb.and(wdPre, imp);
         assignPOTerms(poTerms);
         // add axioms
@@ -306,6 +315,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     /**
      * Instantiates a new proof obligation with the given settings.
+     *
      * @param initConfig The already load {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
@@ -313,17 +323,16 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
             throws IOException {
-       String contractName = properties.getProperty("wd check");
-       final Contract contract =
-               initConfig.getServices().getSpecificationRepository()
-                                .getContractByName(contractName);
-       if (contract == null) {
-           throw new RuntimeException("Contract not found: " + contractName);
-       }
-       else {
-           final ProofOblInput po = contract.createProofObl(initConfig);
-           return new LoadedPOContainer(po);
-       }
+        String contractName = properties.getProperty("wd check");
+        final Contract contract =
+            initConfig.getServices().getSpecificationRepository()
+                    .getContractByName(contractName);
+        if (contract == null) {
+            throw new RuntimeException("Contract not found: " + contractName);
+        } else {
+            final ProofOblInput po = contract.createProofObl(initConfig);
+            return new LoadedPOContainer(po);
+        }
     }
 
     /**
@@ -345,45 +354,46 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         public final Term anonHeap;
 
         public Variables(final ProgramVariable self,
-                         final ProgramVariable result,
-                         final ProgramVariable exception,
-                         final Map<LocationVariable, ProgramVariable> atPres,
-                         final ImmutableList<ProgramVariable> params,
-                         final LocationVariable heap,
-                         final Term anonHeap) {
+                final ProgramVariable result,
+                final ProgramVariable exception,
+                final Map<LocationVariable, ProgramVariable> atPres,
+                final ImmutableList<ProgramVariable> params,
+                final LocationVariable heap,
+                final Term anonHeap) {
             this.self = self;
             this.result = result;
             this.exception = exception;
             this.atPres = atPres;
             this.params = params;
             this.heap = heap;
-            this.heapAtPre = (atPres == null || atPres.get(heap) == null) ?
-                    this.heap : atPres.get(heap);
+            this.heapAtPre =
+                (atPres == null || atPres.get(heap) == null) ? this.heap : atPres.get(heap);
             this.anonHeap = anonHeap;
         }
 
         private Variables(final ProgramVariable self,
-                          final ProgramVariable result,
-                          final ProgramVariable exception,
-                          final Map<LocationVariable, ProgramVariable> atPres,
-                          final ImmutableList<ProgramVariable> params,
-                          final LocationVariable heap,
-                          final Function anonHeap, TermServices services) {
+                final ProgramVariable result,
+                final ProgramVariable exception,
+                final Map<LocationVariable, ProgramVariable> atPres,
+                final ImmutableList<ProgramVariable> params,
+                final LocationVariable heap,
+                final Function anonHeap, TermServices services) {
             this(self, result, exception, atPres, params, heap,
-                  services.getTermBuilder().label(services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
+                services.getTermBuilder().label(services.getTermBuilder().func(anonHeap),
+                    ParameterlessTermLabel.ANON_HEAP_LABEL));
         }
     }
 
-   @Override
-   protected InitConfig getCreatedInitConfigForSingleProof() {
-      return proofConfig;
-   }
+    @Override
+    protected InitConfig getCreatedInitConfigForSingleProof() {
+        return proofConfig;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public KeYJavaType getContainerType() {
-      return getContract().getKJT();
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KeYJavaType getContainerType() {
+        return getContract().getKJT();
+    }
 }

@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -11,6 +13,8 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 
@@ -68,6 +72,7 @@ public interface InformationFlowContract extends Contract {
 
     /**
      * Get the exception-variable which is used in this contract.
+     *
      * @return used exception-variable
      */
     public Term getExc();
@@ -103,6 +108,7 @@ public interface InformationFlowContract extends Contract {
 
     /**
      * Get the self-variable which is used in this contract.
+     *
      * @return originally used self-variable
      */
     Term getSelf();
@@ -110,6 +116,7 @@ public interface InformationFlowContract extends Contract {
 
     /**
      * Get the parameter-variables which is used in this contract.
+     *
      * @return originally used parameter-variables
      */
     ImmutableList<Term> getParams();
@@ -121,11 +128,12 @@ public interface InformationFlowContract extends Contract {
      */
     @Override
     public InformationFlowContract setTarget(KeYJavaType newKJT,
-                                             IObserverFunction newPM);
+            IObserverFunction newPM);
 
 
     /**
      * Get the result-variable which is used in this contract.
+     *
      * @return used result-variable
      */
     Term getResult();
@@ -136,6 +144,7 @@ public interface InformationFlowContract extends Contract {
 
     /**
      * For generating contract name of SymbolicExecutionPO
+     *
      * @return String "Method Contract"
      */
     public String getPODisplayName();

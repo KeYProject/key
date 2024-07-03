@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.prooftree;
-/** this class implements a TreeModel that can be displayed using the
- * JTree class framework 
+/**
+ * this class implements a TreeModel that can be displayed using the
+ * JTree class framework
  */
 
 import javax.swing.tree.TreeNode;
@@ -15,35 +19,36 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
     private GUIAbstractTreeNode[] children;
 
     public GUIProofTreeNode(GUIProofTreeModel tree, Node node) {
-	super(tree, node);
+        super(tree, node);
     }
 
     public TreeNode getChildAt(int childIndex) {
         ensureChildrenArray();
-	return children[childIndex];
+        return children[childIndex];
     }
 
     public int getChildCount() {
         ensureChildrenArray();
-	return children.length;
+        return children.length;
     }
 
     public TreeNode getParent() {
-	Node n = getNode();
-	if(n==null)return null;
-	while (n.parent()!=null
-	       && findChild ( n.parent() ) != null ) {
-	    n = n.parent();
-	}
-	return findBranch(n);
+        Node n = getNode();
+        if (n == null)
+            return null;
+        while (n.parent() != null
+                && findChild(n.parent()) != null) {
+            n = n.parent();
+        }
+        return findBranch(n);
     }
 
     public boolean isLeaf() {
-	return getChildCount() == 0;
+        return getChildCount() == 0;
     }
 
     public String toString() {
-	// changed to serial:name for searching
+        // changed to serial:name for searching
         // the proof tree in ProofTreeView.java
         Node n = getNode();
         if (n != null) {
@@ -55,20 +60,21 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
 
     /**
      * Ensure that the children array is valid.
-     * 
+     *
      * Nodes may have children if they represent a One step simplification.
      * If so, the array of children is read from the rule app object
      */
     private void ensureChildrenArray() {
-        if(children == null) {
+        if (children == null) {
             Node node = getNode();
-            if(node != null && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-                Protocol protocol = ((OneStepSimplifierRuleApp)node.getAppliedRuleApp()).getProtocol();
-                if(protocol != null) {
+            if (node != null && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
+                Protocol protocol =
+                    ((OneStepSimplifierRuleApp) node.getAppliedRuleApp()).getProtocol();
+                if (protocol != null) {
                     children = new GUIAbstractTreeNode[protocol.size()];
                     for (int i = 0; i < children.length; i++) {
-                        children[i] = new GUIOneStepChildTreeNode(getProofTreeModel(), 
-                                this, protocol.get(i));
+                        children[i] = new GUIOneStepChildTreeNode(getProofTreeModel(),
+                            this, protocol.get(i));
                     }
                     return;
                 }
@@ -78,8 +84,8 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
             children = new GUIAbstractTreeNode[0];
         }
     }
-    
-    @Override 
+
+    @Override
     public void flushCache() {
         children = null;
     }

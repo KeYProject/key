@@ -1,14 +1,17 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Package;
 import recoder.java.reference.PackageReference;
 import recoder.kit.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that renames a package by renaming all known references to
@@ -29,10 +32,10 @@ public class RenamePackage extends TwoPassTransformation {
      * Creates a new transformation object that renames a package and all
      * references to it. The new name should not conflict with another package.
      *
-     * @param sc      the service configuration to use.
-     * @param pkg     the package to be renamed; may not be <CODE>null</CODE>.
+     * @param sc the service configuration to use.
+     * @param pkg the package to be renamed; may not be <CODE>null</CODE>.
      * @param newName the new name for the element; may not be <CODE>null</CODE>
-     *                and must denote a valid identifier name.
+     *        and must denote a valid identifier name.
      */
     public RenamePackage(CrossReferenceServiceConfiguration sc, Package pkg, String newName) {
         super(sc);
@@ -89,4 +92,3 @@ public class RenamePackage extends TwoPassTransformation {
 
     }
 }
-

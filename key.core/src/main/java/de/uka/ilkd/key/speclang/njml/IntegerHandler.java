@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang.njml;
+
+import java.util.EnumMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -7,25 +15,21 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
-import java.util.EnumMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 
-public class IntegerHandler extends LDTHandler  {
+public class IntegerHandler extends LDTHandler {
 
     private final Map<JMLOperator, Operator> jmlIntMap =
-            new EnumMap<>(JMLOperator.class);
+        new EnumMap<>(JMLOperator.class);
 
     private final Map<JMLOperator, Operator> jmlLongMap =
-            new EnumMap<>(JMLOperator.class);
+        new EnumMap<>(JMLOperator.class);
 
     private final Map<JMLOperator, Operator> jmlBigintMap =
-            new EnumMap<>(JMLOperator.class);
+        new EnumMap<>(JMLOperator.class);
 
     private final Map<PrimitiveType, Map<JMLOperator, Operator>> opCategories =
-            new IdentityHashMap<>();
+        new IdentityHashMap<>();
 
     private final Services services;
 

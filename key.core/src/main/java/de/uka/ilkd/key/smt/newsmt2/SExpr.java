@@ -1,12 +1,7 @@
-/*
- * KEY
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-/*
- * This file is part of AlgoVer.
- *
- * Copyright (C) 2015-2016 Karlsruhe Institute of Technology
- */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
@@ -226,7 +221,7 @@ public class SExpr implements Writable {
      */
     private String getEscapedName() {
         if (name.length() > 0 && name.charAt(0) == '|' && name.charAt(name.length() - 1) == '|') {
-            return name; //already escaped
+            return name; // already escaped
         }
         if (type == Type.VERBATIM) {
             return name;
@@ -246,10 +241,10 @@ public class SExpr implements Writable {
     @Override
     public void appendTo(StringBuilder sb) {
         boolean noSpace = name.isEmpty();
-        if(children.size() > 0 || noSpace) {
+        if (children.size() > 0 || noSpace) {
             sb.append("(").append(getEscapedName());
             for (SExpr child : children) {
-                if(!noSpace) {
+                if (!noSpace) {
                     sb.append(" ");
                 } else {
                     noSpace = false;
@@ -270,10 +265,11 @@ public class SExpr implements Writable {
      * @param mapFunction a non-null function to be applied to the children.
      *
      * @return a new SEXpr with the same name and type and with the mapFunction
-     *          applied to all children.
+     *         applied to all children.
      */
     public SExpr map(Function<SExpr, SExpr> mapFunction) {
-        return new SExpr(name, type, children.stream().map(mapFunction).collect(Collectors.toList()));
+        return new SExpr(name, type,
+            children.stream().map(mapFunction).collect(Collectors.toList()));
     }
 
 }

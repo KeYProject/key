@@ -1,8 +1,7 @@
-/*
- * Created on 24.02.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.abstraction.AnnotationUse;
@@ -17,7 +16,8 @@ import recoder.list.generic.ASTList;
  *
  * @author gutzmann
  */
-public class AnnotationUseSpecification extends JavaNonTerminalProgramElement implements AnnotationUse, DeclarationSpecifier, TypeReferenceContainer, Expression {
+public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
+        implements AnnotationUse, DeclarationSpecifier, TypeReferenceContainer, Expression {
 
     /**
      * serialization id
@@ -55,32 +55,41 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
         makeParentRoleValid();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
         v.visitAnnotationUse(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#deepClone()
      */
     public AnnotationUseSpecification deepClone() {
         return new AnnotationUseSpecification(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildCount()
      */
     public int getChildCount() {
         int res = 0;
-        if (reference != null) res++;
+        if (reference != null)
+            res++;
         if (elementValuePairs != null)
             res += elementValuePairs.size();
         return res;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildAt(int)
      */
     public ProgramElement getChildAt(int index) {
@@ -92,14 +101,18 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
         return elementValuePairs.get(index);// may throw IndexOutOfBoundsException
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
      */
     public int getChildPositionCode(ProgramElement child) {
-        if (child == null) throw new NullPointerException();
+        if (child == null)
+            throw new NullPointerException();
         // role 0: reference
         // role 1 (idx): element value pair
-        if (child == reference) return 0;
+        if (child == reference)
+            return 0;
         if (elementValuePairs != null) {
             int idx = elementValuePairs.indexOf(child);
             if (idx >= -1)
@@ -108,19 +121,25 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
         return -1;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#makeParentRoleValid()
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (reference != null) reference.setParent(this);
+        if (reference != null)
+            reference.setParent(this);
         if (elementValuePairs != null)
             for (int i = 0, max = elementValuePairs.size(); i < max; i++)
                 elementValuePairs.get(i).setParent(this);
     }
 
-    /* (non-Javadoc)
-     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement, recoder.java.ProgramElement)
+    /*
+     * (non-Javadoc)
+     *
+     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement,
+     * recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null) {
@@ -190,14 +209,18 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
         this.reference = tr;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceCount()
      */
     public int getTypeReferenceCount() {
         return reference == null ? 0 : 1;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
      */
     public TypeReference getTypeReferenceAt(int index) {
@@ -214,14 +237,18 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
         this.elementValuePairs = elementValuePairs;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.Expression#getExpressionContainer()
      */
     public ExpressionContainer getExpressionContainer() {
         return parent instanceof ExpressionContainer ? (ExpressionContainer) parent : null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.Expression#setExpressionContainer(recoder.java.ExpressionContainer)
      */
     public void setExpressionContainer(ExpressionContainer c) {

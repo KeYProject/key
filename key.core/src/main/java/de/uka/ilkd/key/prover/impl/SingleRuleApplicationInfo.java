@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -5,7 +9,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Instances of this class are used to store if a rule could be applied automatically and if not
- * to store the reason why no rule applications could be performed. Because of performance reason the
+ * to store the reason why no rule applications could be performed. Because of performance reason
+ * the
  * success case returns the singleton {@link SingleRuleApplicationInfo#SUCCESS}
  */
 public class SingleRuleApplicationInfo {

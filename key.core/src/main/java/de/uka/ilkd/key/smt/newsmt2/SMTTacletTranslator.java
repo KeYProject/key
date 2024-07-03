@@ -1,4 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -11,16 +20,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.taclettranslation.DefaultTacletTranslator;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This class uses the existing taclet translation technology to translate
@@ -31,13 +35,13 @@ import java.util.Map;
 public class SMTTacletTranslator {
 
     private SkeletonGenerator tacletTranslator =
-            new DefaultTacletTranslator() {
-                @Override
-                protected Term getFindFromTaclet(FindTaclet findTaclet) {
-                    Term org = super.getFindFromTaclet(findTaclet);
-                    return services.getTermBuilder().label(org, DefinedSymbolsHandler.TRIGGER_LABEL);
-                }
-            };
+        new DefaultTacletTranslator() {
+            @Override
+            protected Term getFindFromTaclet(FindTaclet findTaclet) {
+                Term org = super.getFindFromTaclet(findTaclet);
+                return services.getTermBuilder().label(org, DefinedSymbolsHandler.TRIGGER_LABEL);
+            }
+        };
 
     private Services services;
 
@@ -48,7 +52,9 @@ public class SMTTacletTranslator {
     public Term translate(Taclet taclet) throws SMTTranslationException {
 
         if (!taclet.getVariableConditions().isEmpty()) {
-            throw new SMTTranslationException("Only unconditional taclets without varconds can be used as SMT axioms: " + taclet.name());
+            throw new SMTTranslationException(
+                "Only unconditional taclets without varconds can be used as SMT axioms: "
+                    + taclet.name());
         }
 
         Term skeleton = tacletTranslator.translate(taclet, services);
@@ -60,9 +66,10 @@ public class SMTTacletTranslator {
         return quantify(skeleton, variables);
     }
 
-    private Term quantify(Term smt, Map<SchemaVariable, LogicVariable> variables) throws SMTTranslationException {
+    private Term quantify(Term smt, Map<SchemaVariable, LogicVariable> variables)
+            throws SMTTranslationException {
 
-        if(variables.isEmpty()) {
+        if (variables.isEmpty()) {
             return smt;
         }
 
@@ -71,17 +78,19 @@ public class SMTTacletTranslator {
         return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null);
     }
 
-    private Term variablify(Term term, Map<SchemaVariable, LogicVariable> variables) throws SMTTranslationException {
+    private Term variablify(Term term, Map<SchemaVariable, LogicVariable> variables)
+            throws SMTTranslationException {
 
         Operator op = term.op();
         if (op instanceof SchemaVariable) {
             SchemaVariable sv = (SchemaVariable) op;
             if (!(sv instanceof TermSV || sv instanceof FormulaSV)) {
-                throw new SMTTranslationException("Only a few schema variables can be translated. " +
+                throw new SMTTranslationException(
+                    "Only a few schema variables can be translated. " +
                         "This one cannot. Type " + sv.getClass());
             }
             LogicVariable lv = variables.computeIfAbsent(sv,
-                    x -> new LogicVariable(x.name(), x.sort()));
+                x -> new LogicVariable(x.name(), x.sort()));
             return services.getTermFactory().createTerm(lv);
         }
 
@@ -103,7 +112,7 @@ public class SMTTacletTranslator {
                 if (boundVar instanceof SchemaVariable) {
                     SchemaVariable sv = (SchemaVariable) boundVar;
                     LogicVariable lv = variables.computeIfAbsent(sv,
-                            x -> new LogicVariable(x.name(), x.sort()));
+                        x -> new LogicVariable(x.name(), x.sort()));
                     qvars.add(lv);
                     changes = true;
                 } else {

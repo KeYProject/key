@@ -1,9 +1,8 @@
-package de.uka.ilkd.key.informationflow.rule;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
+package de.uka.ilkd.key.informationflow.rule;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
 import de.uka.ilkd.key.logic.Choice;
@@ -19,6 +18,11 @@ import de.uka.ilkd.key.rule.TacletAttributes;
 import de.uka.ilkd.key.rule.TacletPrefix;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
+
 
 /**
  * A normal RewriteTaclet except that the formula which is added by this taclet
@@ -27,7 +31,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  * by the macros UseInformationFlowContractMacro and
  * PrepareInfFlowContractPreBranchesMacro to decide how to prepare the formulas
  * resulting from information flow contract applications.
- * 
+ *
  * @author christoph
  */
 public class InfFlowContractAppTaclet extends RewriteTaclet {
@@ -35,7 +39,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
     public static final String USE_IF = "Use information flow contract for ";
     private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.nil();
 
-  
+
 
     public static boolean hasType(Rule rule) {
         return rule != null && rule.name().toString().startsWith(USE_IF);
@@ -62,49 +66,51 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
 
     public InfFlowContractAppTaclet(Name name,
-                         TacletApplPart applPart,
-                         ImmutableList<TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
-                         TacletAttributes attrs,
-                         Term find,
-                         ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-                         int p_applicationRestriction,
-                         ImmutableSet<Choice> choices,
-                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, p_applicationRestriction, choices, tacletAnnotations);
+            TacletApplPart applPart,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            Term find,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            int p_applicationRestriction,
+            ImmutableSet<Choice> choices,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
+            p_applicationRestriction, choices, tacletAnnotations);
     }
 
 
     public InfFlowContractAppTaclet(Name name,
-                         TacletApplPart applPart,
-                         ImmutableList<TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
-                         TacletAttributes attrs,
-                         Term find,
-                         ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-                         int p_applicationRestriction,
-                         ImmutableSet<Choice> choices,
-                         boolean surviveSymbExec,
-                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, p_applicationRestriction, choices, surviveSymbExec, tacletAnnotations);
+            TacletApplPart applPart,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            Term find,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            int p_applicationRestriction,
+            ImmutableSet<Choice> choices,
+            boolean surviveSymbExec,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
+            p_applicationRestriction, choices, surviveSymbExec, tacletAnnotations);
     }
 
     @Override
     protected void createAndInitializeExecutor() {
         executor = new InfFlowContractAppTacletExecutor(this);
     }
-  
+
     @Override
-    public InfFlowContractAppTaclet setName(String s) {        
-        final TacletApplPart applPart = 
-                new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(), 
+    public InfFlowContractAppTaclet setName(String s) {
+        final TacletApplPart applPart =
+            new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes();
         attrs.setDisplayName(displayName());
-        
-        return new InfFlowContractAppTaclet(new Name(s), 
-                applPart, goalTemplates(), getRuleSets(), attrs, find, prefixMap, 
-                getApplicationRestriction(), choices, getSurviveSymbExec(), tacletAnnotations);
+
+        return new InfFlowContractAppTaclet(new Name(s),
+            applPart, goalTemplates(), getRuleSets(), attrs, find, prefixMap,
+            getApplicationRestriction(), choices, getSurviveSymbExec(), tacletAnnotations);
     }
-  
+
 }

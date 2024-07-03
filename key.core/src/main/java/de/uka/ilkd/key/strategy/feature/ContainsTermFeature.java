@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -29,31 +33,31 @@ public class ContainsTermFeature implements Feature {
 
 
     /**
-     * @param proj        the ProjectionToTerm to the instantiation is supposed
-     *                    to be inspected
+     * @param proj the ProjectionToTerm to the instantiation is supposed
+     *        to be inspected
      * @param termFeature the term feature to use
-     * @param noInstCost  result if <code>schemaVar</code> is not instantiated
-     * @param demandInst  if <code>true</code> then raise an exception if
-     *                    <code>schemaVar</code> is not instantiated (otherwise:
-     *                    return <code>noInstCost</code>)
+     * @param noInstCost result if <code>schemaVar</code> is not instantiated
+     * @param demandInst if <code>true</code> then raise an exception if
+     *        <code>schemaVar</code> is not instantiated (otherwise:
+     *        return <code>noInstCost</code>)
      */
     private ContainsTermFeature(ProjectionToTerm proj1,
-                                ProjectionToTerm proj2) {
+            ProjectionToTerm proj2) {
         this.proj1 = proj1;
         this.proj2 = proj2;
     }
 
 
     public static Feature create(ProjectionToTerm proj1,
-                                 ProjectionToTerm proj2) {
+            ProjectionToTerm proj2) {
         return new ContainsTermFeature(proj1, proj2);
     }
 
 
     @Override
     public RuleAppCost computeCost(RuleApp app,
-                               PosInOccurrence pos,
-                               Goal goal) {
+            PosInOccurrence pos,
+            Goal goal) {
         final Term t1 = proj1.toTerm(app, pos, goal);
         final Term t2 = proj2.toTerm(app, pos, goal);
         ContainsTermVisitor visitor = new ContainsTermVisitor(t2);

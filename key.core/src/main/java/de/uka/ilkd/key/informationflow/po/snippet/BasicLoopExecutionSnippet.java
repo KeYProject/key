@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -20,6 +21,9 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
@@ -33,8 +37,8 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
             posts = posts.append(d.tb.box(guardJb,
-                                          d.tb.equals(poVars.post.guard,
-                                                      d.origVars.guard)));
+                d.tb.equals(poVars.post.guard,
+                    d.origVars.guard)));
         }
         Iterator<Term> localVars = d.origVars.localVars.iterator();
         Iterator<Term> localVarsAtPost = poVars.post.localVars.iterator();
@@ -45,24 +49,24 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
                 posts = posts.append(d.tb.equals(o, i));
         }
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
-        
+
         return buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
     }
 
     private Term buildProgramTerm(BasicSnippetData d,
-                                  ProofObligationVars vs,
-                                  Term postTerm,
-                                  TermBuilder tb) {
+            ProofObligationVars vs,
+            Term postTerm,
+            TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a " +
-                                                    "program-term for a loop without modality.");
+                "program-term for a loop without modality.");
         }
-        //create java block
+        // create java block
         Modality modality =
-                (Modality) d.get(BasicSnippetData.Key.MODALITY);
+            (Modality) d.get(BasicSnippetData.Key.MODALITY);
         final Pair<JavaBlock, JavaBlock> jb = buildJavaBlock(d);
 
-        //create program term
+        // create program term
         final Modality symbExecMod;
         if (modality == Modality.BOX) {
             symbExecMod = Modality.DIA;
@@ -70,30 +74,30 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             symbExecMod = Modality.BOX;
         }
         final Term guardPreTrueTerm = d.tb.equals(vs.pre.guard,
-                                                  d.tb.TRUE());
+            d.tb.TRUE());
         final Term guardPreFalseTerm = d.tb.equals(vs.pre.guard,
-                                                   d.tb.FALSE());
+            d.tb.FALSE());
         final Term guardPreEqTerm = d.tb.equals(d.origVars.guard,
-                                                vs.pre.guard);
+            vs.pre.guard);
         final Term bodyTerm = tb.prog(symbExecMod, jb.first, postTerm);
         final Term guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
         final Term guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
         final Term guardPreAndTrueTerm =
-                tb.prog(modality, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
+            tb.prog(modality, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
         final Term programTerm = d.tb.and(guardPreAndTrueTerm, guardFalseBody);
 
-        //create update
+        // create update
         Term update = tb.skip();
         Iterator<Term> paramIt = vs.pre.localVars.iterator();
         Iterator<Term> origParamIt = d.origVars.localVars.iterator();
         while (paramIt.hasNext()) {
             Term paramUpdate =
-                    d.tb.elementary(origParamIt.next(), paramIt.next());
+                d.tb.elementary(origParamIt.next(), paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
         if (vs.post.self != null) {
             Term selfUpdate =
-                    d.tb.elementary(d.origVars.self, vs.pre.self);
+                d.tb.elementary(d.origVars.self, vs.pre.self);
             update = tb.parallel(selfUpdate, update);
         }
         return tb.apply(update, programTerm);
@@ -101,23 +105,23 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
 
     private Pair<JavaBlock, JavaBlock> buildJavaBlock(BasicSnippetData d) {
         ExecutionContext context =
-                (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);        
+            (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
 
-        //create loop call
+        // create loop call
         LoopSpecification inv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
         final Assignment guardVarDecl =
-                new CopyAssignment((LocationVariable)d.origVars.guard.op(),
-                                   inv.getLoop().getGuardExpression());
+            new CopyAssignment((LocationVariable) d.origVars.guard.op(),
+                inv.getLoop().getGuardExpression());
         final Statement guardVarMethodFrame =
-                context == null ?
-                        guardVarDecl : new MethodFrame(null, context,
-                                                       new StatementBlock(guardVarDecl));
+            context == null ? guardVarDecl
+                    : new MethodFrame(null, context,
+                        new StatementBlock(guardVarDecl));
 
-        //create java block
+        // create java block
         final JavaBlock guardJb =
-                JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
+            JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock res = JavaBlock.createJavaBlock(new StatementBlock(s));
 

@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.strategy;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -10,6 +11,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A rule app manager that ensures that rules are only applied to a certain
@@ -53,7 +57,7 @@ public class FocussedRuleApplicationManager
             AutomatedRuleApplicationManager delegate, Goal goal,
             PosInOccurrence focussedSubterm) {
         this(delegate, goal, goal.getFormulaTagManager().getTagForPos(
-                focussedSubterm.topLevel()), focussedSubterm, true);
+            focussedSubterm.topLevel()), focussedSubterm, true);
 
         clearCache();
     }
@@ -71,7 +75,7 @@ public class FocussedRuleApplicationManager
     @Override
     public Object clone() {
         return new FocussedRuleApplicationManager(delegate.copy(), null,
-                focussedFormula, focussedSubterm, onlyModifyFocussedFormula);
+            focussedFormula, focussedSubterm, onlyModifyFocussedFormula);
     }
 
     @Override
@@ -136,7 +140,7 @@ public class FocussedRuleApplicationManager
     public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = ImmutableSLList
-                .<RuleApp> nil();
+                .<RuleApp>nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
                 applicableRules = applicableRules.prepend(r);

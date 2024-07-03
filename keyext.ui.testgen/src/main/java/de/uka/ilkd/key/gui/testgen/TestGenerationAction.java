@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.testgen;
+
+import java.awt.event.ActionEvent;
+import javax.swing.*;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -8,9 +15,6 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 
 /**
@@ -62,7 +66,8 @@ public class TestGenerationAction extends MainWindowAction {
             }
         };
         getMediator().addKeYSelectionListener(selListener);
-        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the
+        // functionality.
         // No functionality is allowed in this method body!
         getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
             @Override

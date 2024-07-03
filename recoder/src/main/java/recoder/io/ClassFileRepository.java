@@ -1,10 +1,13 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
+
+import java.util.List;
 
 import recoder.Service;
 import recoder.bytecode.ClassFile;
-
-import java.util.List;
 
 /**
  * Retrieval and storage of parsed bytecode files.
@@ -29,7 +32,7 @@ public interface ClassFileRepository extends Service {
      *
      * @param classname the fully qualified classname of the required class.
      * @return the ClassFile for that class, if sources are available,
-     * <tt>null</tt> otherwise.
+     *         <tt>null</tt> otherwise.
      */
     ClassFile getClassFile(String classname);
 

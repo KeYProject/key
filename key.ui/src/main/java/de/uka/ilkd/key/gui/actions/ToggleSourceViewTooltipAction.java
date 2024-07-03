@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.EventObject;
-
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -23,9 +26,9 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
 
     /** This action's tooltip. */
     public static final String TOOL_TIP = "If ticked, moving the mouse over a term in the"
-            + " source view will show a tooltip with additional information.";
+        + " source view will show a tooltip with additional information.";
 
-//    private static final long serialVersionUID = -3352122484627890921L;
+    // private static final long serialVersionUID = -3352122484627890921L;
 
     /** Listens to changes to the view settings to call {@link #updateSelectedState()}. */
     private final SettingsListener viewSettingsListener = new SettingsListener() {

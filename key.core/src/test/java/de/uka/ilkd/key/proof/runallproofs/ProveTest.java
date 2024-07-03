@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.runallproofs;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -11,11 +19,9 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +35,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * and {@link #assertUnProvability(String)}
  * correspond to the commands in the proof collection file.
  * <p>
- * Use the the member variables to configure the execution. Their meaning is identical to the variable in
+ * Use the the member variables to configure the execution. Their meaning is identical to the
+ * variable in
  * {@link de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection}.
  * <p>
  * This class is used by generated unit tests from the proof collections.
@@ -85,7 +92,8 @@ public class ProveTest {
         boolean success;
         try {
             // Initialize KeY environment and load proof.
-            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair = load(keyFile);
+            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
+                load(keyFile);
             env = pair.first;
             Pair<String, Location> script = pair.second;
             loadedProof = env.getLoadedProof();
@@ -109,7 +117,8 @@ public class ProveTest {
                 success = (testProperty == TestProperty.PROVABLE) == loadedProof.closed();
                 debugOut("... finished proof: " + (success ? "closed." : "open goal(s)"));
                 appendStatistics(loadedProof, keyFile);
-                if (success) reload(proofFile, loadedProof);
+                if (success)
+                    reload(proofFile, loadedProof);
             }
         } finally {
             if (loadedProof != null) {
@@ -121,10 +130,10 @@ public class ProveTest {
         }
 
         String message = String.format("%sVerifying property \"%s\"%sfor file: %s",
-                success ? "pass: " : "FAIL: ",
-                testProperty.toString().toLowerCase(),
-                success ? " was successful " : " failed ",
-                keyFile);
+            success ? "pass: " : "FAIL: ",
+            testProperty.toString().toLowerCase(),
+            success ? " was successful " : " failed ",
+            keyFile);
 
         if (!success) {
             fail(message);
@@ -142,7 +151,7 @@ public class ProveTest {
             boolean reloadedClosed = reloadProof(proofFile);
 
             assertEquals(loadedProof.closed(), reloadedClosed,
-                    "Reloaded proof did not close: " + proofFile);
+                "Reloaded proof did not close: " + proofFile);
             debugOut("... success: reloaded.");
         }
     }
@@ -152,7 +161,7 @@ public class ProveTest {
      * for instance if we want to use a different strategy.
      */
     private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                          Pair<String, Location> script) throws Exception {
+            Pair<String, Location> script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -167,7 +176,8 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(File keyFile)
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
+            File keyFile)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
@@ -203,8 +213,9 @@ public class ProveTest {
             return reloadedProof.closed();
         } catch (Throwable t) {
             throw new Exception(
-                    "Exception while loading proof (see cause for details): "
-                            + proofFile, t);
+                "Exception while loading proof (see cause for details): "
+                    + proofFile,
+                t);
         } finally {
             if (reloadedProof != null) {
                 reloadedProof.dispose();

@@ -1,15 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
-import de.uka.ilkd.key.proof.io.RuleSource;
-import org.antlr.v4.runtime.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.antlr.v4.runtime.tree.TerminalNode;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -20,11 +14,22 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
 import java.util.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
+import de.uka.ilkd.key.proof.io.RuleSource;
+
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This facade provides low-level access to the ANTLR4 Parser and Lexer.
  * <p>
- * You should only use it if you need access to the parse trees instead of terms or taclet structure.
+ * You should only use it if you need access to the parse trees instead of terms or taclet
+ * structure.
  *
  * @author Alexander Weigl
  * @version 1 (19.08.19)
@@ -37,7 +42,8 @@ public final class ParsingFacade {
 
     /**
      * Use this function to retrieve the {@link ParserRuleContext} inside and {@link KeyAst} object.
-     * <b>The use of this method is discourage and should be avoided in all high level scenarios.</b>
+     * <b>The use of this method is discourage and should be avoided in all high level
+     * scenarios.</b>
      *
      * @param ast a key ast object
      * @param <T> parse tree type
@@ -74,8 +80,7 @@ public final class ParsingFacade {
      *
      * @param ctxs non-null list
      */
-    public static @Nonnull
-    ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
+    public static @Nonnull ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -100,14 +105,14 @@ public final class ParsingFacade {
     public static KeyAst.File parseFile(URL url) throws IOException {
         long start = System.currentTimeMillis();
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
-             ReadableByteChannel channel = Channels.newChannel(is)) {
+                ReadableByteChannel channel = Channels.newChannel(is)) {
             CodePointCharStream stream = CharStreams.fromChannel(
-                    channel,
-                    Charset.defaultCharset(),
-                    4096,
-                    CodingErrorAction.REPLACE,
-                    url.toString(),
-                    -1);
+                channel,
+                Charset.defaultCharset(),
+                4096,
+                CodingErrorAction.REPLACE,
+                url.toString(),
+                -1);
             return parseFile(stream);
         } finally {
             long stop = System.currentTimeMillis();
@@ -151,8 +156,8 @@ public final class ParsingFacade {
      * @param ctx non-null context
      * @return non-null string
      */
-    public static @Nonnull
-    String getValueDocumentation(@Nonnull KeYParser.String_valueContext ctx) {
+    public static @Nonnull String getValueDocumentation(
+            @Nonnull KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1)
                 .replace("\\\"", "\"")
                 .replace("\\\\", "\\");
@@ -177,6 +182,6 @@ public final class ParsingFacade {
             return null;
         }
         String value = docComment.getText();
-        return value.substring(3, value.length() - 2);//remove leading "/*!" and trailing "*/"
+        return value.substring(3, value.length() - 2);// remove leading "/*!" and trailing "*/"
     }
 }

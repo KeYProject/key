@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.convenience;
 
 import recoder.java.NonTerminalProgramElement;
@@ -25,11 +28,13 @@ public class ASTIteratorAdapter implements ASTIteratorListener {
         return ENTER_ALL;
     }
 
-    public boolean enterChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode) {
+    public boolean enterChildNode(ASTIterator it, NonTerminalProgramElement thisNode,
+            ProgramElement childNode) {
         return true;
     }
 
-    public void returnedFromChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode) {
+    public void returnedFromChildNode(ASTIterator it, NonTerminalProgramElement thisNode,
+            ProgramElement childNode) {
         // defaults to nothing
     }
 

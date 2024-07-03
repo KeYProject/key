@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java;
+
+import java.util.*;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -13,15 +19,14 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
@@ -51,14 +56,14 @@ public final class JavaInfo {
      */
     protected KeYJavaType[] commonTypes = new KeYJavaType[3];
 
-    //some caches for the getKeYJavaType methods.
+    // some caches for the getKeYJavaType methods.
     private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
     private HashMap<Type, KeYJavaType> type2KJTCache = null;
     private HashMap<String, KeYJavaType> name2KJTCache = null;
 
 
-    private LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache
-            = new LRUCache<>(200);
+    private LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache =
+        new LRUCache<>(200);
 
     private int nameCachedSize = 0;
     private int sortCachedSize = 0;
@@ -163,7 +168,7 @@ public final class JavaInfo {
         return services;
     }
 
-    //------------------- common services ----------------------
+    // ------------------- common services ----------------------
 
     /**
      * returns the full name of a given {@link
@@ -252,20 +257,20 @@ public final class JavaInfo {
             return "[S";
         else if ("char[]".equals(s))
             return "[C";
-// Strangely, this one is not n
-//        else if ("boolean[]".equals(s))
-//            return "[Z";
-// Not sure if these are needed, commented out for efficiency
-//        else if ("char[]".equals(s))
-//            return "[C";
-//        else if ("double[]".equals(s))
-//            return "[D";
-//        else if ("float[]".equals(s))
-//            return "[F";
-//      else if ("\\real[]".equals(s))
-//            return "[R";
-//      else if ("\\bigint[]".equals(s))
-//            return "[Y";
+        // Strangely, this one is not n
+        // else if ("boolean[]".equals(s))
+        // return "[Z";
+        // Not sure if these are needed, commented out for efficiency
+        // else if ("char[]".equals(s))
+        // return "[C";
+        // else if ("double[]".equals(s))
+        // return "[D";
+        // else if ("float[]".equals(s))
+        // return "[F";
+        // else if ("\\real[]".equals(s))
+        // return "[R";
+        // else if ("\\bigint[]".equals(s))
+        // return "[Y";
         return s;
     }
 
@@ -275,7 +280,8 @@ public final class JavaInfo {
      * taken. In case of an unqualified name to which no type is found in the default package,
      * the type is looked for in package <code>cjava.lang</code>
      *
-     * @param className the fully qualified class name (or an unqualified name from package java.lang)
+     * @param className the fully qualified class name (or an unqualified name from package
+     *        java.lang)
      * @return a class matching the name
      */
     public KeYJavaType getTypeByClassName(String className) {
@@ -295,7 +301,7 @@ public final class JavaInfo {
      * program type model
      *
      * @return all known KeYJavaTypes of the current
-     * program type model
+     *         program type model
      */
     public Set<KeYJavaType> getAllKeYJavaTypes() {
         final Set<KeYJavaType> result = new LinkedHashSet<>();
@@ -309,7 +315,8 @@ public final class JavaInfo {
 
 
     public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
-        if (type == null) throw new IllegalArgumentException("Given type is null");
+        if (type == null)
+            throw new IllegalArgumentException("Given type is null");
 
 
         if (type2KJTCache != null && type2KJTCache.containsKey(type)) {
@@ -331,11 +338,12 @@ public final class JavaInfo {
         Sort sort = sorts.lookup(ldtName);
 
         if (sort == null) {
-            throw new IllegalStateException("Could not find sort " + ldtName + " for type: " + type);
+            throw new IllegalStateException(
+                "Could not find sort " + ldtName + " for type: " + type);
         }
 
         KeYJavaType result = new KeYJavaType(type, sort);
-        if(type2KJTCache != null) {
+        if (type2KJTCache != null) {
             type2KJTCache.put(type, result);
         }
 
@@ -407,8 +415,9 @@ public final class JavaInfo {
     public static boolean isVisibleTo(SpecificationElement ax, KeYJavaType visibleTo) {
         final KeYJavaType kjt = ax.getKJT();
         // elements of private types are not visible
-        if (isPrivate(kjt)) return kjt.equals(visibleTo);
-        //TODO: package information not yet available
+        if (isPrivate(kjt))
+            return kjt.equals(visibleTo);
+        // TODO: package information not yet available
         // BUGFIX: package-private is understood as private (see bug #1268)
         final boolean visibleToPackage = false;
         final VisibilityModifier visibility = ax.getVisibility();
@@ -523,7 +532,7 @@ public final class JavaInfo {
     }
 
     public IProgramMethod getConstructor(KeYJavaType kjt,
-                                         ImmutableList<KeYJavaType> signature) {
+            ImmutableList<KeYJavaType> signature) {
         return kpmi.getConstructor(kjt, signature);
     }
 
@@ -531,40 +540,42 @@ public final class JavaInfo {
      * returns the program methods defined in the given KeYJavaType with name
      * m and the list of types as signature of the method
      *
-     * @param classType  the KeYJavaType of the class where to look for the
-     *                   method
+     * @param classType the KeYJavaType of the class where to look for the
+     *        method
      * @param methodName the name of the method
-     * @param signature  a IList<Type> with the arguments types
-     * @param context    the KeYJavaType of the class context from <em>where</em>
-     *                   the method is called
+     * @param signature a IList<Type> with the arguments types
+     * @param context the KeYJavaType of the class context from <em>where</em>
+     *        the method is called
      * @return a matching program method
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType,
-                                           String methodName,
-                                           ImmutableList<? extends Type> signature,
-                                           KeYJavaType context) {
+            String methodName,
+            ImmutableList<? extends Type> signature,
+            KeYJavaType context) {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
 
     public IProgramMethod getProgramMethod(KeYJavaType classType,
-                                           String methodName,
-                                           ImmutableArray<? extends Type> signature,
-                                           KeYJavaType context) {
+            String methodName,
+            ImmutableArray<? extends Type> signature,
+            KeYJavaType context) {
         return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
     }
 
     private IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
-                                                                String methodName,
-                                                                List<List<KeYJavaType>> signature,
-                                                                ImmutableList<KeYJavaType> partialSignature,
-                                                                KeYJavaType context) {
+            String methodName,
+            List<List<KeYJavaType>> signature,
+            ImmutableList<KeYJavaType> partialSignature,
+            KeYJavaType context) {
         if (signature.isEmpty()) {
             return getProgramMethod(classType, methodName, partialSignature, context);
         } else {
             List<KeYJavaType> types = signature.get(0);
             assert !types.isEmpty();
             for (KeYJavaType t : types) {
-                IProgramMethod programMethod = getProgramMethodFromPartialSignature(classType, methodName, signature.subList(1, signature.size()), partialSignature.append(t), context);
+                IProgramMethod programMethod = getProgramMethodFromPartialSignature(classType,
+                    methodName, signature.subList(1, signature.size()), partialSignature.append(t),
+                    context);
                 if (programMethod != null) {
                     return programMethod;
                 }
@@ -582,11 +593,12 @@ public final class JavaInfo {
      * char, byte, short, int, long
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType,
-                                           String methodName,
-                                           List<List<KeYJavaType>> signature,
-                                           KeYJavaType context) {
+            String methodName,
+            List<List<KeYJavaType>> signature,
+            KeYJavaType context) {
         ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
-        return getProgramMethodFromPartialSignature(classType, methodName, signature, partialSignature, context);
+        return getProgramMethodFromPartialSignature(classType, methodName, signature,
+            partialSignature, context);
     }
 
     /**
@@ -594,19 +606,19 @@ public final class JavaInfo {
      * variable clv, with the name m, and the KeYJavaTypes of the given array
      * of program variables as signatures.
      *
-     * @param classType  the KeYJavaType of the class where to look for the
-     *                   method
+     * @param classType the KeYJavaType of the class where to look for the
+     *        method
      * @param methodName the name of the method
-     * @param args       an array of ProgramVariables as the arguments of the
-     *                   method
-     * @param context    the KeYJavaType of the class context from <em>where</em>
-     *                   the method is called
+     * @param args an array of ProgramVariables as the arguments of the
+     *        method
+     * @param context the KeYJavaType of the class context from <em>where</em>
+     *        the method is called
      * @return a matching program method
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType,
-                                           String methodName,
-                                           ProgramVariable[] args,
-                                           KeYJavaType context) {
+            String methodName,
+            ProgramVariable[] args,
+            KeYJavaType context) {
         ImmutableList<Type> types = ImmutableSLList.<Type>nil();
         for (int i = args.length - 1; i >= 0; i--) {
             types = types.prepend(args[i].getKeYJavaType());
@@ -615,16 +627,16 @@ public final class JavaInfo {
     }
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt,
-                                        String methodName,
-                                        ImmutableList<KeYJavaType> sig) {
+            String methodName,
+            ImmutableList<KeYJavaType> sig) {
         return findToplevelPM(kjt, methodName, sig, kjt);
     }
 
     /* This method has been introduced as bugfix to #1487 */
     private IProgramMethod findToplevelPM(KeYJavaType kjt,
-                                          String methodName,
-                                          ImmutableList<KeYJavaType> sig,
-                                          KeYJavaType context) {
+            String methodName,
+            ImmutableList<KeYJavaType> sig,
+            KeYJavaType context) {
 
         ImmutableList<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
         ImmutableList<KeYJavaType> removed = allSupertypes.removeAll(kjt);
@@ -640,11 +652,10 @@ public final class JavaInfo {
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt, IProgramMethod pm) {
         final String methodName = pm.getName();
-        final ImmutableList<KeYJavaType> sig
-                = ImmutableSLList.<KeYJavaType>nil()
+        final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
                 .append(pm.getParamTypes()
                         .toArray(
-                                new KeYJavaType[pm.getNumParams()]));
+                            new KeYJavaType[pm.getNumParams()]));
         return getToplevelPM(kjt, methodName, sig);
     }
 
@@ -664,10 +675,10 @@ public final class JavaInfo {
     }
 
     public Term getProgramMethodTerm(Term prefix,
-                                     String methodName,
-                                     Term[] args,
-                                     String className,
-                                     boolean traverseHierarchy) {
+            String methodName,
+            Term[] args,
+            String className,
+            boolean traverseHierarchy) {
 
         /*
          * This is just a safety measure. To avoid null pointers, try to call
@@ -710,12 +721,14 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
 
-    public Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, Term[] args, Term prefix) throws IllegalArgumentException {
+    public Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className,
+            Term[] args, Term prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException("Program method " + methodName
-                    + " in " + className + " not found.");
+                + " in " + className + " not found.");
         }
-        Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
+        Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length
+                + (pm.isStatic() ? 0 : 1)];
         int offset = 0;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             if (offset >= pm.getHeapCount(services)) {
@@ -733,8 +746,8 @@ public final class JavaInfo {
         assert pm.getReturnType() != null;
         if (pm.isVoid()) {
             throw new IllegalArgumentException("Program method " + methodName
-                    + " in " + className + " must have"
-                    + " a non-void type.");
+                + " in " + className + " must have"
+                + " a non-void type.");
         }
         return services.getTermBuilder().tf().createTerm(pm, subs);
     }
@@ -772,7 +785,7 @@ public final class JavaInfo {
      * retrieves the direct extended superclass for the given class
      *
      * @param type the KeYJavaType of the type whose superclass
-     *             has to be determined
+     *        has to be determined
      * @return KeYJavaType of the extended supertype
      */
     public KeYJavaType getSuperclass(KeYJavaType type) {
@@ -816,8 +829,7 @@ public final class JavaInfo {
         if (args != null) {
             for (int i = args.size() - 1; i >= 0; i--) {
                 final Expression argument = args.get(i);
-                result = result.prepend
-                        (getTypeConverter().getKeYJavaType(argument));
+                result = result.prepend(getTypeConverter().getKeYJavaType(argument));
             }
         }
         return result;
@@ -828,10 +840,11 @@ public final class JavaInfo {
      * retrieves the signature according to the given expressions
      *
      * @param arguments ArrayOf<Expression> of which we try to construct a
-     *                  signature
+     *        signature
      * @return the signature
      */
-    public ImmutableList<KeYJavaType> createSignature(ImmutableArray<? extends Expression> arguments) {
+    public ImmutableList<KeYJavaType> createSignature(
+            ImmutableArray<? extends Expression> arguments) {
         return getKeYJavaTypes(arguments);
     }
 
@@ -852,7 +865,7 @@ public final class JavaInfo {
      * The returned list is in source code order.
      *
      * @param cl the ClassDeclaration where to look for the implicit
-     *           attributes
+     *        attributes
      * @return all implicit attributes declared in <tt>cl</tt>
      */
     public ImmutableList<Field> getImplicitFields(ClassDeclaration cl) {
@@ -865,20 +878,20 @@ public final class JavaInfo {
      * The returned list is in source code order.
      *
      * @param classDecl the ClassDeclaration whose attributes shall be collected
-     * @param filter    the Filter to be satisifed by the attributes to
-     *                  be returned
+     * @param filter the Filter to be satisifed by the attributes to
+     *        be returned
      * @return all attributes declared in class <tt>cl</tt> satisfying the
-     * given filter
+     *         given filter
      */
     private ImmutableList<Field> filterLocalDeclaredFields(TypeDeclaration classDecl,
-                                                           Filter filter) {
+            Filter filter) {
         ImmutableList<Field> fields = ImmutableSLList.<Field>nil();
         final ImmutableArray<MemberDeclaration> members = classDecl.getMembers();
         for (int i = members.size() - 1; i >= 0; i--) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof FieldDeclaration) {
                 final ImmutableArray<FieldSpecification> specs =
-                        ((FieldDeclaration) member).getFieldSpecifications();
+                    ((FieldDeclaration) member).getFieldSpecifications();
                 for (int j = specs.size() - 1; j >= 0; j--) {
                     final FieldSpecification fieldSpec = specs.get(j);
                     if (filter.isSatisfiedBy(fieldSpec)) {
@@ -890,7 +903,7 @@ public final class JavaInfo {
         return fields;
     }
 
-    //----------------- parsing services --------------------------
+    // ----------------- parsing services --------------------------
 
     /**
      * reads a Java block given as a string java as it was in the given
@@ -902,7 +915,7 @@ public final class JavaInfo {
             cd = (ClassDeclaration) asIn;
         } else {
             LOGGER.debug("Reading Java Block from an InterfaceDeclaration:"
-                    + " Not yet implemented.");
+                + " Not yet implemented.");
         }
         final NamespaceSet nss = services.getNamespaces().copy();
         final JavaBlock block = kpmi.readBlock(java, cd, nss);
@@ -940,17 +953,16 @@ public final class JavaInfo {
      * retrieves a field with the given name out of the list
      *
      * @param programName a String with the name of the field to be looked for
-     * @param fields      the IList<Field> where we have to look for the field
+     * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not
-     * found
+     *         found
      */
     private final ProgramVariable find(String programName,
-                                       ImmutableList<Field> fields) {
+            ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             if (programName.equals(field.getProgramName())) {
-                return (ProgramVariable)
-                        field.getProgramVariable();
+                return (ProgramVariable) field.getProgramVariable();
             }
         }
         return null;
@@ -960,9 +972,9 @@ public final class JavaInfo {
      * extracts all fields out of fielddeclaration
      *
      * @param field the FieldDeclaration of which the field
-     *              specifications have to be extracted
+     *        specifications have to be extracted
      * @return a IList<Field> the includes all field specifications found
-     * int the field declaration of the given list
+     *         int the field declaration of the given list
      */
     private final ImmutableList<Field> getFields(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
@@ -978,17 +990,16 @@ public final class JavaInfo {
      * list. Therefore it descends into field declarations.
      *
      * @param list the ArrayOf<MemberDeclaration> with the members of a
-     *             type declaration
+     *        type declaration
      * @return a IList<Field> the includes all field specifications found
-     * int the field declaration of the given list
+     *         int the field declaration of the given list
      */
     private ImmutableList<Field> getFields(ImmutableArray<MemberDeclaration> list) {
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             final MemberDeclaration pe = list.get(i);
             if (pe instanceof FieldDeclaration) {
-                result = result.append
-                        (getFields((FieldDeclaration) pe));
+                result = result.append(getFields((FieldDeclaration) pe));
             }
         }
         return result;
@@ -999,21 +1010,21 @@ public final class JavaInfo {
      * has to be fully qualified, i.e. <tt>declarationType::attributeName</tt>
      *
      * @param fullyQualifiedName the String with the fully qualified attribute
-     *                           name
+     *        name
      * @return an attribute program variable of the given name
      * @throws IllegalArgumentException if the given name is not fully
-     *                                  qualified
+     *         qualified
      */
     public ProgramVariable getAttribute(String fullyQualifiedName) {
         final int idx = fullyQualifiedName.indexOf("::");
 
         if (idx == -1) {
             throw new IllegalArgumentException(fullyQualifiedName +
-                    " is not a fully qualified attribute name");
+                " is not a fully qualified attribute name");
         }
 
         return getAttribute(fullyQualifiedName.substring(idx + 2),
-                fullyQualifiedName.substring(0, idx));
+            fullyQualifiedName.substring(0, idx));
     }
 
 
@@ -1021,16 +1032,16 @@ public final class JavaInfo {
      * returns the programvariable for the specified attribute declared in
      * the specified class
      *
-     * @param programName        the String with the name of the attribute
+     * @param programName the String with the name of the attribute
      * @param qualifiedClassName the String with the full (inclusive package) qualified
-     *                           class name
+     *        class name
      * @return the attribute program variable of the given name
      * @throws IllegalArgumentException if the qualified class name is empty or
-     *                                  null
+     *         null
      * @throws UnknownJavaTypeException if the qualified name refers to an unknown type
      */
     public ProgramVariable getAttribute(String programName,
-                                        String qualifiedClassName) {
+            String qualifiedClassName) {
         if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
             throw new IllegalArgumentException("Missing qualified classname");
         }
@@ -1060,11 +1071,11 @@ public final class JavaInfo {
      * @return the attribute of the given name declared in <tt>classType</tt>
      */
     public ProgramVariable getAttribute(final String name,
-                                        KeYJavaType classType) {
+            KeYJavaType classType) {
         if (classType.getJavaType() instanceof ArrayDeclaration) {
             ProgramVariable res = find(name,
-                    getFields(((ArrayDeclaration) classType.getJavaType())
-                            .getMembers()));
+                getFields(((ArrayDeclaration) classType.getJavaType())
+                        .getMembers()));
             if (res == null) {
                 return getAttribute(name, getJavaLangObject());
             }
@@ -1076,7 +1087,7 @@ public final class JavaInfo {
                 final Field f = aList;
                 if (f != null
                         && (f.getName().equals(name) || f.getProgramName()
-                        .equals(name))) {
+                                .equals(name))) {
                     return (ProgramVariable) f
                             .getProgramVariable();
                 }
@@ -1098,7 +1109,7 @@ public final class JavaInfo {
      * Traverses the type hierarchy to find the first {@link KeYJavaType} in which
      * a field of name {@code fieldName} is declared, starting from parameter {@code kjt}. And
      * then returns a {@link ProgramVariable} for that field/type combination.
-
+     *
      * Type detection in this method is canonical, i.e. selecting a field of name
      * {@code fieldName} on an object of (dynamic) type {@code kjt} during Java program
      * execution would end up in the same type as the type of the returned {@link ProgramVariable}.
@@ -1113,7 +1124,7 @@ public final class JavaInfo {
     }
 
     public ImmutableList<ProgramVariable> getAllAttributes(String programName,
-                                                           KeYJavaType type) {
+            KeYJavaType type) {
         return getAllAttributes(programName, type, true);
     }
 
@@ -1125,29 +1136,29 @@ public final class JavaInfo {
      * The type must not denote the null type
      * </ol>
      *
-     * @param programName      the String with name of the attribute as declared
-     *                         in a program
-     * @param type             the KeYJavaType specifying the part of the hierarchy
-     *                         where to look for
+     * @param programName the String with name of the attribute as declared
+     *        in a program
+     * @param type the KeYJavaType specifying the part of the hierarchy
+     *        where to look for
      * @param traverseSubtypes The method will visit subtypes of {@code type}
-     *                         while traversing its type hierarchy iff this is set to true. Otherwise
-     *                         only supertypes will be visited.
+     *        while traversing its type hierarchy iff this is set to true. Otherwise
+     *        only supertypes will be visited.
      * @return list of found attributes with name <tt>programName</tt>
      */
     public ImmutableList<ProgramVariable> getAllAttributes(String programName,
-                                                           KeYJavaType type,
-                                                           boolean traverseSubtypes) {
+            KeYJavaType type,
+            boolean traverseSubtypes) {
         ImmutableList<ProgramVariable> result =
-                ImmutableSLList.<ProgramVariable>nil();
+            ImmutableSLList.<ProgramVariable>nil();
 
         if (!(type.getSort().extendsTrans(objectSort()))) {
             return result;
         }
 
         if (type.getJavaType() instanceof ArrayType) {
-            ProgramVariable var = find(programName, getFields
-                    (((ArrayDeclaration) type.getJavaType())
-                            .getMembers()));
+            ProgramVariable var =
+                find(programName, getFields(((ArrayDeclaration) type.getJavaType())
+                        .getMembers()));
             if (var != null) {
                 result = result.prepend(var);
             }
@@ -1168,7 +1179,7 @@ public final class JavaInfo {
         }
 
         hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));
-        //weigl: unclear assertion: assert hierarchy.head() == type;
+        // weigl: unclear assertion: assert hierarchy.head() == type;
 
 
         final Iterator<KeYJavaType> it = hierarchy.iterator();
@@ -1187,10 +1198,11 @@ public final class JavaInfo {
 
 
     protected void fillCommonTypesCache() {
-        if (commonTypesCacheValid) return;
+        if (commonTypesCacheValid)
+            return;
 
-        final String[] fullNames = new String[]{"java.lang.Object",
-                "java.lang.Cloneable", "java.io.Serializable"};
+        final String[] fullNames = new String[] { "java.lang.Object",
+            "java.lang.Cloneable", "java.io.Serializable" };
 
         for (int i = 0; i < fullNames.length; i++) {
             commonTypes[i] = getTypeByClassName(fullNames[i]);
@@ -1283,13 +1295,12 @@ public final class JavaInfo {
     }
 
     /**
-     * returns the KeYJavaType  representing the type of 'null'
+     * returns the KeYJavaType representing the type of 'null'
      */
     public KeYJavaType getNullType() {
         if (nullType == null) {
             nullType = getTypeByClassName("null");
-            Debug.assertTrue(nullType != null
-                    , "we should already have it in the map");
+            Debug.assertTrue(nullType != null, "we should already have it in the map");
         }
         return nullType;
     }
@@ -1308,9 +1319,10 @@ public final class JavaInfo {
                 readJava("{}");
             }
             final KeYJavaType kjt =
-                    getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+                getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             defaultExecutionContext =
-                    new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
+                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
+                    DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
         }
         return defaultExecutionContext;
     }
@@ -1358,13 +1370,13 @@ public final class JavaInfo {
      * or one of its supertypes
      *
      * @param programName the String containing the name of the
-     *                    field to be looked up. The name is in short notation,
-     *                    i.e. not fully qualified
-     * @param classType   the KeYJavaType of the class used as context
+     *        field to be looked up. The name is in short notation,
+     *        i.e. not fully qualified
+     * @param classType the KeYJavaType of the class used as context
      * @return the field of the given name
      */
     public ProgramVariable lookupVisibleAttribute(String programName,
-                                                  KeYJavaType classType) {
+            KeYJavaType classType) {
         return find(programName, kpmi.getAllVisibleFields(classType));
     }
 
@@ -1416,11 +1428,9 @@ public final class JavaInfo {
     public ProgramVariable getArrayLength() {
         if (length == null) {
             final SuperArrayDeclaration sad =
-                    (SuperArrayDeclaration)
-                            rec2key().getSuperArrayType().getJavaType();
+                (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
             length =
-                    (ProgramVariable) sad.length().getVariables().
-                            get(0).getProgramVariable();
+                (ProgramVariable) sad.length().getVariables().get(0).getProgramVariable();
             assert "length".equals(length.name().toString()) : "Wrong array length";
         }
 
@@ -1428,24 +1438,38 @@ public final class JavaInfo {
     }
 
     /**
-     * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of an object.
+     * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of
+     * an object.
      *
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
-        // TODO: Create function when source code is parsed and register it in namespace. Return only function from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <inv> symbol.
-        if (inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO: Why is the initial check with the heaps needed?
-            inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
+        // TODO: Create function when source code is parsed and register it in namespace. Return
+        // only function from namespace here. No lazy creation to ensure that all proofs of the same
+        // proof environment have the same <inv> symbol.
+        if (inv == null
+                || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO:
+                                                                                                    // Why
+                                                                                                    // is
+                                                                                                    // the
+                                                                                                    // initial
+                                                                                                    // check
+                                                                                                    // with
+                                                                                                    // the
+                                                                                                    // heaps
+                                                                                                    // needed?
+            inv = (ObserverFunction) services.getNamespaces().functions()
+                    .lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
             if (inv == null) {
                 inv = new ObserverFunction("<inv>",
-                        Sort.FORMULA,
-                        null,
-                        services.getTypeConverter().getHeapLDT().targetSort(),
-                        getJavaLangObject(),
-                        false,
-                        new ImmutableArray<>(),
-                        HeapContext.getModHeaps(services, false).size(),
-                        1);
+                    Sort.FORMULA,
+                    null,
+                    services.getTypeConverter().getHeapLDT().targetSort(),
+                    getJavaLangObject(),
+                    false,
+                    new ImmutableArray<>(),
+                    HeapContext.getModHeaps(services, false).size(),
+                    1);
                 services.getNamespaces().functions().add(inv);
             }
         }
@@ -1462,30 +1486,34 @@ public final class JavaInfo {
         if (invProgVar == null) {
             ProgramElementName pen = new ProgramElementName("<inv>", "java.lang.Object");
             invProgVar = new LocationVariable(pen,
-                    getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
-                    getJavaLangObject(), false, true);
+                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+                getJavaLangObject(), false, true);
         }
         return invProgVar;
     }
 
     /**
-     * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static invariant of a type.
+     * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static
+     * invariant of a type.
      */
     public IObserverFunction getStaticInv(KeYJavaType target) {
-        // TODO: Create functions when source code is parsed and register them in namespace. Return only functions from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <$inv> symbols.
+        // TODO: Create functions when source code is parsed and register them in namespace. Return
+        // only functions from namespace here. No lazy creation to ensure that all proofs of the
+        // same proof environment have the same <$inv> symbols.
         ObserverFunction inv = staticInvs.get(target);
         if (inv == null) {
-            inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
+            inv = (ObserverFunction) services.getNamespaces().functions()
+                    .lookup(ObserverFunction.createName("<$inv>", target));
             if (inv == null) {
                 inv = new ObserverFunction("<$inv>",
-                        Sort.FORMULA,
-                        null,
-                        services.getTypeConverter().getHeapLDT().targetSort(),
-                        target,
-                        true,
-                        new ImmutableArray<>(),
-                        HeapContext.getModHeaps(services, false).size(),
-                        1);
+                    Sort.FORMULA,
+                    null,
+                    services.getTypeConverter().getHeapLDT().targetSort(),
+                    target,
+                    true,
+                    new ImmutableArray<>(),
+                    HeapContext.getModHeaps(services, false).size(),
+                    1);
                 services.getNamespaces().functions().add(inv);
             }
             staticInvs.put(target, inv);
@@ -1496,11 +1524,11 @@ public final class JavaInfo {
     /**
      * This is used for pretty printing observer terms.
      *
-     * @param method  the program method.
+     * @param method the program method.
      * @param context the KeYJavaType.
      * @return whether the program method is canonical.
      * @throws NullPointerException e.g., if the receiver of the observer happens to be
-     *                              replaced by "null".
+     *         replaced by "null".
      */
     public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context)
             throws NullPointerException {
@@ -1514,7 +1542,8 @@ public final class JavaInfo {
              */
             ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(context);
             Iterator<KeYJavaType> iterator = allSupertypes.iterator();
-            iterator.next(); // skip first element (it equals context and was already processed above)
+            iterator.next(); // skip first element (it equals context and was already processed
+                             // above)
             while (iterator.hasNext()) {
                 KeYJavaType next = iterator.next();
                 IProgramMethod programMethod = getProgramMethod(next, name, paramTypes, context);
@@ -1558,7 +1587,7 @@ public final class JavaInfo {
          *
          * @param pe the ProgramElement to be filtered
          * @return true iff program element <tt>pe</tt> satisfies the filter
-         * condition
+         *         condition
          */
         public abstract boolean isSatisfiedBy(ProgramElement pe);
     }
@@ -1569,7 +1598,7 @@ public final class JavaInfo {
      * then in the <code>java.lang</code>
      * package.
      *
-     * @param name          the name of the type (if possible fully qualified)
+     * @param name the name of the type (if possible fully qualified)
      * @param containerType the KeYJavaType of the context in which the type should be resolved
      * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
      */
@@ -1581,14 +1610,14 @@ public final class JavaInfo {
             }
 
             if (result == null) {
-                final int lastSep = (containerType == null ?
-                        -1 : containerType.getFullName().lastIndexOf('.'));
+                final int lastSep =
+                    (containerType == null ? -1 : containerType.getFullName().lastIndexOf('.'));
 
                 // try if class is in same package
                 if (lastSep >= 0) {
                     result = getTypeByClassName(
-                            containerType.getFullName().substring(0, lastSep) +
-                                    "." + name);
+                        containerType.getFullName().substring(0, lastSep) +
+                            "." + name);
                 }
 
                 if (result == null) {

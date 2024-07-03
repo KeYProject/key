@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt;
+
+import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
-
-import java.util.ArrayList;
 
 /**
  * The translation for the SMT2-format. It nearly the same as for the SMT1-format.
@@ -64,7 +68,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
      *
-     * @param sequent  The sequent which shall be translated.
+     * @param sequent The sequent which shall be translated.
      * @param services The Services Object belonging to the sequent.
      */
     public SmtLib2Translator(Sequent sequent, Services services, Configuration config) {
@@ -97,13 +101,13 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder buildCompleteText(StringBuilder formula,
-                                              ArrayList<StringBuilder> assumptions,
-                                              ArrayList<ContextualBlock> assumptionBlocks,
-                                              ArrayList<ArrayList<StringBuilder>> functions,
-                                              ArrayList<ArrayList<StringBuilder>> predicates,
-                                              ArrayList<ContextualBlock> predicateBlocks,
-                                              ArrayList<StringBuilder> types, SortHierarchy sortHierarchy,
-                                              SMTSettings settings) {
+            ArrayList<StringBuilder> assumptions,
+            ArrayList<ContextualBlock> assumptionBlocks,
+            ArrayList<ArrayList<StringBuilder>> functions,
+            ArrayList<ArrayList<StringBuilder>> predicates,
+            ArrayList<ContextualBlock> predicateBlocks,
+            ArrayList<StringBuilder> types, SortHierarchy sortHierarchy,
+            SMTSettings settings) {
         StringBuilder result = new StringBuilder();
         if (getConfig().mentionLogic()) {
             result.append("(set-logic " + settings.getLogic() + " )\n");
@@ -140,21 +144,29 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     }
 
     private StringBuilder createAssumptions(ArrayList<StringBuilder> assumptions,
-                                            ArrayList<ContextualBlock> assumptionBlocks) {
+            ArrayList<ContextualBlock> assumptionBlocks) {
         String[] commentAssumption = new String[9];
-        commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "Assumptions for dummy variables:";
-        commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "Assumptions for function definitions:";
-        commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "Assumptions for sort predicates:";
-        commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "Assumptions for type hierarchy:";
-        commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "Assumptions for taclets:";
-        commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT] = "Assumptions for uniqueness of functions:";
-        commentAssumption[ContextualBlock.ASSUMPTION_INTEGER] = "Assumptions for very small and very big integers:";
-        commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION] = "Assumptions for uninterpreted multiplication:";
+        commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] =
+            "Assumptions for dummy variables:";
+        commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] =
+            "Assumptions for function definitions:";
+        commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] =
+            "Assumptions for sort predicates:";
+        commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] =
+            "Assumptions for type hierarchy:";
+        commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] =
+            "Assumptions for taclets:";
+        commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT] =
+            "Assumptions for uniqueness of functions:";
+        commentAssumption[ContextualBlock.ASSUMPTION_INTEGER] =
+            "Assumptions for very small and very big integers:";
+        commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION] =
+            "Assumptions for uninterpreted multiplication:";
         commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY] =
-                "Assumptions for sorts - there is at least one object of every sort:";
+            "Assumptions for sorts - there is at least one object of every sort:";
 
 
-        //add the assumptions
+        // add the assumptions
         ArrayList<StringBuilder> AssumptionsToRemove = new ArrayList<>();
         StringBuilder assump = new StringBuilder();
         boolean needsAnd = assumptions.size() > 1;
@@ -163,7 +175,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
             ContextualBlock block = assumptionBlocks.get(k);
 
             if (block.getStart() <= block.getEnd()) {
-                assump.append("\n" + GAP + "; ").append(commentAssumption[block.getType()]).append("\n");
+                assump.append("\n" + GAP + "; ").append(commentAssumption[block.getType()])
+                        .append("\n");
                 for (int i = block.getStart(); i <= block.getEnd(); i++) {
                     AssumptionsToRemove.add(assumptions.get(i));
                     assump.append(assumptions.get(i));
@@ -193,9 +206,9 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     }
 
     private void createFunctionDeclarations(StringBuilder result,
-                                            ArrayList<ArrayList<StringBuilder>> predicates,
-                                            ArrayList<ContextualBlock> predicateBlocks,
-                                            ArrayList<ArrayList<StringBuilder>> functions) {
+            ArrayList<ArrayList<StringBuilder>> predicates,
+            ArrayList<ContextualBlock> predicateBlocks,
+            ArrayList<ArrayList<StringBuilder>> functions) {
         StringBuilder temp = new StringBuilder();
         createPredicateDeclaration(temp, predicates, predicateBlocks);
         createFunctionDeclaration(temp, functions);
@@ -204,7 +217,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         }
     }
 
-    private void createFunctionDeclaration(StringBuilder result, ArrayList<ArrayList<StringBuilder>> functions) {
+    private void createFunctionDeclaration(StringBuilder result,
+            ArrayList<ArrayList<StringBuilder>> functions) {
         // add the function declarations
         if (!functions.isEmpty()) {
             result.append(translateComment(1, "Function declarations\n"));
@@ -215,8 +229,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     }
 
     private void createPredicateDeclaration(StringBuilder result,
-                                            ArrayList<ArrayList<StringBuilder>> predicates,
-                                            ArrayList<ContextualBlock> predicateBlocks) {
+            ArrayList<ArrayList<StringBuilder>> predicates,
+            ArrayList<ContextualBlock> predicateBlocks) {
         String[] commentPredicate = new String[2];
         commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "Predicates used in formula:\n";
         commentPredicate[ContextualBlock.PREDICATE_TYPE] = "Types expressed by predicates:\n";
@@ -258,7 +272,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     }
 
     private void createFunctionDeclaration(ArrayList<StringBuilder> function, boolean isPredicate,
-                                           StringBuilder result) {
+            StringBuilder result) {
         result.append("(declare-fun ");
         StringBuilder name = function.remove(0);
         StringBuilder returnType = isPredicate ? BOOL : function.remove(function.size() - 1);
@@ -291,11 +305,11 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     /**
      * Translate a sort.
      *
-     * @param name     the sorts name
+     * @param name the sorts name
      * @param isIntVal true, if the sort should represent some kind of
-     *                 integer
+     *        integer
      * @return Argument 1 of the return value is the sort used in var
-     * declarations, Argument2 is the sort used for type predicates
+     *         declarations, Argument2 is the sort used for type predicates
      */
     protected StringBuilder translateSort(String name, boolean isIntVal) {
         return makeUnique(new StringBuilder(name));
@@ -313,7 +327,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateFunction(StringBuilder name,
-                                              ArrayList<StringBuilder> args) {
+            ArrayList<StringBuilder> args) {
         return buildFunction(name, args);
     }
 
@@ -324,7 +338,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateIntegerDiv(StringBuilder arg1,
-                                                StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -334,7 +348,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateIntegerGeq(StringBuilder arg1,
-                                                StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -343,7 +357,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateIntegerGt(StringBuilder arg1,
-                                               StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -352,7 +366,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateIntegerLeq(StringBuilder arg1,
-                                                StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -361,7 +375,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateIntegerLt(StringBuilder arg1,
-                                               StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -370,7 +384,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateIntegerMinus(StringBuilder arg1,
-                                                  StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -379,13 +393,13 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateIntegerMod(StringBuilder arg1,
-                                                StringBuilder arg2) {
+            StringBuilder arg2) {
         return new StringBuilder("unknownOp");
     }
 
     @Override
     protected StringBuilder translateIntegerMult(StringBuilder arg1,
-                                                 StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -394,7 +408,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateIntegerPlus(StringBuilder arg1,
-                                                 StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -437,7 +451,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateLogicalAll(StringBuilder var,
-                                                StringBuilder type, StringBuilder form) {
+            StringBuilder type, StringBuilder form) {
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("(");
         toReturn.append(ALLSTRING);
@@ -456,7 +470,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateLogicalAnd(StringBuilder arg1,
-                                                StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -465,7 +479,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateLogicalEquivalence(StringBuilder arg1,
-                                                        StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -482,7 +496,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateLogicalExist(StringBuilder var,
-                                                  StringBuilder type, StringBuilder form) {
+            StringBuilder type, StringBuilder form) {
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("(");
         toReturn.append(EXISTSTRING);
@@ -506,7 +520,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateLogicalImply(StringBuilder arg1,
-                                                  StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -522,7 +536,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateLogicalOr(StringBuilder arg1,
-                                               StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -536,7 +550,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateObjectEqual(StringBuilder arg1,
-                                                 StringBuilder arg2) {
+            StringBuilder arg2) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(arg1);
         args.add(arg2);
@@ -545,7 +559,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateLogicalIfThenElse(StringBuilder cond, StringBuilder ifterm,
-                                                       StringBuilder elseterm) {
+            StringBuilder elseterm) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(cond);
         args.add(ifterm);
@@ -555,7 +569,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translateTermIfThenElse(StringBuilder cond, StringBuilder ifterm,
-                                                    StringBuilder elseterm) {
+            StringBuilder elseterm) {
         ArrayList<StringBuilder> args = new ArrayList<>();
         args.add(cond);
         args.add(ifterm);
@@ -565,7 +579,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuilder translatePredicate(StringBuilder name,
-                                               ArrayList<StringBuilder> args) {
+            ArrayList<StringBuilder> args) {
 
         return buildFunction(name, args);
     }
@@ -598,7 +612,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         for (int j = 0; j < fw.length; j++) {
             for (int i = 0; i < fw[j].getFunction().arity(); i++) {
                 Sort sort = fw[j].getFunction().argSorts().get(i);
-                rightSide = translateLogicalAll(temp.get(j).get(i), usedDisplaySort.get(sort), rightSide);
+                rightSide =
+                    translateLogicalAll(temp.get(j).get(i), usedDisplaySort.get(sort), rightSide);
 
             }
         }
@@ -607,7 +622,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     }
 
     private StringBuilder buildFunction(StringBuilder name,
-                                        ArrayList<StringBuilder> args) {
+            ArrayList<StringBuilder> args) {
         StringBuilder toReturn = new StringBuilder();
         if (args.isEmpty()) {
             toReturn.append(name);

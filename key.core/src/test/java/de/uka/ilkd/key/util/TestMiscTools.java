@@ -1,13 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util;
 
-
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.key_project.util.java.IOUtil;
-import recoder.io.ArchiveDataLocation;
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,6 +18,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+
+import org.key_project.util.java.IOUtil;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import recoder.io.ArchiveDataLocation;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
+
 import static de.uka.ilkd.key.util.MiscTools.containsWholeWord;
 import static de.uka.ilkd.key.util.MiscTools.isJMLComment;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,7 +37,8 @@ public class TestMiscTools {
     @Test
     public void testDisectFilenameUnix() {
         // run only on UNIX-like systems
-        if (File.separatorChar != '/') return;
+        if (File.separatorChar != '/')
+            return;
         String s = "/home/daniel//workspace/key";
         Object[] ls = MiscTools.disectFilename(s).toArray();
         assertEquals("", ls[0]);
@@ -39,33 +46,35 @@ public class TestMiscTools {
         s = s.substring(1);
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals("home", ls[0]);
-        s = s+"/";
+        s = s + "/";
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals(4, ls.length);
         assertEquals("key", ls[3]);
-        s = "."+s;
+        s = "." + s;
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals(4, ls.length);
         assertEquals("key", ls[3]);
     }
-    
+
     @Test
     public void testDisectFilenameWindows() {
         // run only on Windows systems
-        if (File.separatorChar != '\\') return;
+        if (File.separatorChar != '\\')
+            return;
         String s = "C:\\Windows\\Users\\";
         Object[] ls = MiscTools.disectFilename(s).toArray();
         assertEquals("C:", ls[0]);
     }
-    
+
     @Test
     public void testMakeFilenameRelativeUnix() {
         // run only on UNIX-like systems
-        if (File.separatorChar != '/') return;
-        
+        if (File.separatorChar != '/')
+            return;
+
         String s = "/home/daniel/bla";
         String t = "/home/daniel/blubb";
-        String u = MiscTools.makeFilenameRelative(s,t);
+        String u = MiscTools.makeFilenameRelative(s, t);
         assertEquals("../bla", u);
         // s shorter than t
         t = "/home/daniel/bla/foo/bar";
@@ -78,12 +87,13 @@ public class TestMiscTools {
         t = "/home";
         assertEquals("daniel", MiscTools.makeFilenameRelative(s, t));
     }
-    
+
     @Test
     public void testMakeFilenameRelativeWindows() {
         // run only on Windows systems
-        if (File.separatorChar != '\\') return;
-        
+        if (File.separatorChar != '\\')
+            return;
+
         // test windows delimiters
         String s = "C:\\Windows";
         String t = "c:\\";
@@ -94,21 +104,21 @@ public class TestMiscTools {
             t = File.separator + "home" + File.separator + "daniel";
             u = MiscTools.makeFilenameRelative(s, t);
             fail();
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             assertTrue(true);
         }
-        
+
     }
-    
+
     @Test
-    public void testToValidFileName(){
+    public void testToValidFileName() {
         assertEquals("foo_bar", MiscTools.toValidFileName("foo:bar"));
         assertEquals("foo_bar", MiscTools.toValidFileName("foo\\bar"));
         assertEquals("foo(bar)", MiscTools.toValidFileName("foo[bar]"));
     }
-    
+
     @Test
-    public void testContainsWholeWord(){
+    public void testContainsWholeWord() {
         assertTrue(containsWholeWord("foo bar", "foo"));
         assertTrue(containsWholeWord("foo;", "foo"));
         assertTrue(containsWholeWord("\rfoo\t", "foo"));
@@ -116,9 +126,9 @@ public class TestMiscTools {
         Assertions.assertFalse(containsWholeWord("foobar", "foo"));
         Assertions.assertFalse(containsWholeWord("bar", "foo"));
     }
-    
+
     @Test
-    public void testIsJMLComment(){
+    public void testIsJMLComment() {
         assertTrue(isJMLComment("/*@iarijagjs"));
         assertTrue(isJMLComment("//@ sasahgue"));
         assertTrue(isJMLComment("//+KeY@"));
@@ -131,11 +141,12 @@ public class TestMiscTools {
 
     /**
      * This is a test for the method {@link MiscTools#extractURI(DataLocation)}.
-     * It tests URI extraction all four known kinds of DataLocations:<ul>
-     *     <li>URLDataLocations</li>
-     *     <li>ArchiveDataLocations</li>
-     *     <li>SpecDataLocations</li>
-     *     <li>DataFileLocations</li>
+     * It tests URI extraction all four known kinds of DataLocations:
+     * <ul>
+     * <li>URLDataLocations</li>
+     * <li>ArchiveDataLocations</li>
+     * <li>SpecDataLocations</li>
+     * <li>DataFileLocations</li>
      * </ul>
      * Note: This test creates two temporary files.
      */
@@ -158,7 +169,7 @@ public class TestMiscTools {
         Path zipP = Files.createTempFile("test with whitespace!", ".zip");
 
         try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
-            ZipOutputStream zos = new ZipOutputStream(fos)) {
+                ZipOutputStream zos = new ZipOutputStream(fos)) {
             zos.putNextEntry(new ZipEntry("entry.txt"));
             zos.putNextEntry(new ZipEntry("entry with whitespace.txt"));
             zos.putNextEntry(new ZipEntry("entry with !bang!.txt"));
@@ -171,8 +182,10 @@ public class TestMiscTools {
             DataLocation entry2 = new ArchiveDataLocation(zf, "entry with !bang!.txt");
 
             URI tmpZipURI = zipP.toUri();
-            assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt", MiscTools.extractURI(entry0).toString());
-            assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt", MiscTools.extractURI(entry1).toString());
+            assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt",
+                MiscTools.extractURI(entry0).toString());
+            assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
+                MiscTools.extractURI(entry1).toString());
             URI read = MiscTools.extractURI(entry2);
 
             // we can not simply use read.toURL().openStream(), because that uses caches and thus
@@ -205,6 +218,7 @@ public class TestMiscTools {
      * This is a test for the method {@link MiscTools#parseURL(String)}.
      * It tests for some strings if they can be converted to URLs correctly.
      * Note: This test creates a temporary zip file.
+     *
      * @throws Exception if a string can not be converted successfully
      */
     @Test
@@ -254,7 +268,7 @@ public class TestMiscTools {
         String entryName = "entry with whitespace.txt";
         Path zipP = Files.createTempFile("test with whitespace!", ".zip");
         try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
-             ZipOutputStream zos = new ZipOutputStream(fos)) {
+                ZipOutputStream zos = new ZipOutputStream(fos)) {
             zos.putNextEntry(new ZipEntry(entryName));
             zos.write(b);
         }

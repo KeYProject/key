@@ -1,29 +1,37 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util.pp;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-/** The intermediate layer of the pretty printing library.  Using the
+/**
+ * The intermediate layer of the pretty printing library. Using the
  * block size information provided by the {@link Layouter} class, this
- * decides where to insert line breaks.  It tries to break as few
- * blocks as possible.  */
+ * decides where to insert line breaks. It tries to break as few
+ * blocks as possible.
+ */
 
 class Printer {
 
-    /** Mask for break type flags.  These flags are logically or-ed
+    /**
+     * Mask for break type flags. These flags are logically or-ed
      * onto the margins in the marginStack to remember what happens
-     * with the block in question. */
-    private static final int BREAK_MASK   = 0x70000000;
+     * with the block in question.
+     */
+    private static final int BREAK_MASK = 0x70000000;
     /** Flag to indicate this block fits into the current line */
-    private static final int FITS         = 0x00000000;
+    private static final int FITS = 0x00000000;
     /** Flag to indicate this block will be broken consistently */
-    private static final int CONSISTENT   = 0x10000000;
+    private static final int CONSISTENT = 0x10000000;
     /** Flag to indicate this block will be broken inconsistently */
     private static final int INCONSISTENT = 0x20000000;
 
     /** total line length available */
     private final int lineWidth;
-    
+
     /** position in current line. */
     private int pos;
 
@@ -34,134 +42,136 @@ class Printer {
     private ArrayList<Integer> marginStack = new ArrayList<Integer>(10);
 
 
-    /** Create a printer.  It will write its output to <code>writer</code>.
-     * Lines have a maximum width of <code>lineWidth</code>. */
+    /**
+     * Create a printer. It will write its output to <code>writer</code>.
+     * Lines have a maximum width of <code>lineWidth</code>.
+     */
     Printer(Backend back) {
-	this.back = back;
-	lineWidth = back.lineWidth();
-	pos = 0;
+        this.back = back;
+        lineWidth = back.lineWidth();
+        pos = 0;
     }
 
 
     /** write the String <code>s</code> to <code>out</code> */
     void print(String s) throws IOException {
-	back.print(s);
-	pos+=back.measure(s);
+        back.print(s);
+        pos += back.measure(s);
     }
 
     /** begin a block */
-    void openBlock(boolean consistent,int indent,
-		   int followingLength) {
-	if (followingLength + pos > lineWidth) {
-	    push(pos+indent,consistent?CONSISTENT:INCONSISTENT);
-	} else {
-	    push(0,FITS);
-	}
+    void openBlock(boolean consistent, int indent,
+            int followingLength) {
+        if (followingLength + pos > lineWidth) {
+            push(pos + indent, consistent ? CONSISTENT : INCONSISTENT);
+        } else {
+            push(0, FITS);
+        }
     }
 
     /** end a block */
     void closeBlock() {
-	pop();
+        pop();
     }
 
     /**
-     * write a break.  <code>followingLength</code> should be the
+     * write a break. <code>followingLength</code> should be the
      * space needed by the material up to the next corresponding
      * closeBlock() or printBreak(), and is used to decide whether the
      * current line is continues, or a new (indented) line is begun.
-     * */
-    void printBreak(int width,int offset, int followingLength) 
-	throws IOException {
+     */
+    void printBreak(int width, int offset, int followingLength)
+            throws IOException {
 
-	if (topBreak()==CONSISTENT || 
-	    (topBreak()==INCONSISTENT 
-	     && followingLength > (lineWidth-pos)) ) {
-	    
-	    pos = topMargin() + offset;
+        if (topBreak() == CONSISTENT ||
+                (topBreak() == INCONSISTENT
+                        && followingLength > (lineWidth - pos))) {
 
-	    newLine();
-	} else {
-	    writeSpaces(width);
-	    pos+=width;
-	}
+            pos = topMargin() + offset;
+
+            newLine();
+        } else {
+            writeSpaces(width);
+            pos += width;
+        }
     }
 
     void mark(Object o) {
-	back.mark(o);
+        back.mark(o);
     }
 
-    void indent(int width, int offset) 
-	throws IOException
-    {
-	int newMargin = topMargin()+offset;
-	if (topBreak() != FITS) {
-	    if(newMargin > pos) {
-		writeSpaces(newMargin-pos);
-		pos=newMargin;
-	    }
-	} else {
-	    writeSpaces(width);
-	    pos+=width;
-	}
+    void indent(int width, int offset)
+            throws IOException {
+        int newMargin = topMargin() + offset;
+        if (topBreak() != FITS) {
+            if (newMargin > pos) {
+                writeSpaces(newMargin - pos);
+                pos = newMargin;
+            }
+        } else {
+            writeSpaces(width);
+            pos += width;
+        }
     }
 
     /** Close the output stream. */
     void close() throws IOException {
-	back.close();
+        back.close();
     }
 
     /** Flush the output stream. */
     void flush() throws IOException {
-	back.flush();
+        back.flush();
     }
 
     /** Return the amount of space currently left on this line. */
     int space() {
-	return lineWidth-pos;
+        return lineWidth - pos;
     }
 
     /** Return the line width of this Printer. */
     int lineWidth() {
-	return lineWidth;
+        return lineWidth;
     }
 
-    private void push(int n,int breaks) {
-	marginStack.add(Integer.valueOf(n|breaks));
+    private void push(int n, int breaks) {
+        marginStack.add(Integer.valueOf(n | breaks));
     }
 
     /** Pop one element from the space stack. */
     private void pop() {
-	try {
-	    marginStack.remove(marginStack.size()-1);
-	} catch (IndexOutOfBoundsException e) {
-	    throw new UnbalancedBlocksException();
-	}
+        try {
+            marginStack.remove(marginStack.size() - 1);
+        } catch (IndexOutOfBoundsException e) {
+            throw new UnbalancedBlocksException();
+        }
     }
 
     /** return the topmost element of the space stack without popping it. */
     private int top() {
-	try {
-	    return marginStack.get(marginStack.size()-1).intValue();
-	} catch (IndexOutOfBoundsException e) {
-	    throw new UnbalancedBlocksException();
-	}
+        try {
+            return marginStack.get(marginStack.size() - 1).intValue();
+        } catch (IndexOutOfBoundsException e) {
+            throw new UnbalancedBlocksException();
+        }
     }
 
     private int topMargin() {
-	return top() & ~BREAK_MASK;
+        return top() & ~BREAK_MASK;
     }
 
     private int topBreak() {
-	return top() & BREAK_MASK;
+        return top() & BREAK_MASK;
     }
 
-    /** Start a new line and indent according to <code>pos</code>
+    /**
+     * Start a new line and indent according to <code>pos</code>
      */
     private void newLine() throws IOException {
-	back.newLine();
-	if (pos>0) {
-	    writeSpaces(pos);
-	}
+        back.newLine();
+        if (pos > 0) {
+            writeSpaces(pos);
+        }
     }
 
     /** how many spaces */
@@ -172,18 +182,18 @@ class Printer {
 
     /* initialize spaces */
     static {
-	StringBuffer sb = new StringBuffer(SPACES);
-	for(int i=0;i<SPACES;i++) {
-	    sb.append(' ');
-	}
-	spaces = sb.toString();	
+        StringBuffer sb = new StringBuffer(SPACES);
+        for (int i = 0; i < SPACES; i++) {
+            sb.append(' ');
+        }
+        spaces = sb.toString();
     }
 
     private void writeSpaces(int n) throws IOException {
-	while (n>SPACES) {
-	    back.print(spaces);
-	    n-=SPACES;
-	}
-	back.print(spaces.substring(0,n));
+        while (n > SPACES) {
+            back.print(spaces);
+            n -= SPACES;
+        }
+        back.print(spaces.substring(0, n));
     }
 }

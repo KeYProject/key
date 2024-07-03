@@ -1,4 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.model;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
@@ -16,14 +26,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import org.key_project.util.collection.ImmutableMapEntry;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 /**
  * @author weigl
@@ -58,14 +62,17 @@ public final class RuleInteraction extends NodeInteraction {
 
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
-            /*SequentFormula seqForm = pos.getPosInOccurrence().sequentFormula();
-            String sfTerm = LogicPrinter.quickPrintTerm(seqForm.formula(), services);
-            String onTerm = LogicPrinter.quickPrintTerm(pos.getPosInOccurrence().subTerm(), services);
-            sb.append("\n    formula=`").append(sfTerm).append("`");
-            sb.append("\n    on=`").append(onTerm).append("`");
-            sb.append("\n    occ=?;");
-            */
-            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> iter = tapp.instantiations().pairIterator();
+            /*
+             * SequentFormula seqForm = pos.getPosInOccurrence().sequentFormula();
+             * String sfTerm = LogicPrinter.quickPrintTerm(seqForm.formula(), services);
+             * String onTerm = LogicPrinter.quickPrintTerm(pos.getPosInOccurrence().subTerm(),
+             * services);
+             * sb.append("\n    formula=`").append(sfTerm).append("`");
+             * sb.append("\n    on=`").append(onTerm).append("`");
+             * sb.append("\n    occ=?;");
+             */
+            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> iter =
+                tapp.instantiations().pairIterator();
             while (iter.hasNext()) {
                 ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = iter.next();
                 var p = entry.key();
@@ -87,7 +94,7 @@ public final class RuleInteraction extends NodeInteraction {
     private static String printTerm(Term term) {
         final NotationInfo ni = new NotationInfo();
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, null,
-                new TermLabelVisibilityManager());
+            new TermLabelVisibilityManager());
         p.setLineWidth(100);
         p.reset();
 
@@ -153,8 +160,8 @@ public final class RuleInteraction extends NodeInteraction {
         out.append(String.format("## Rule applied %s%n%n", getRuleName()));
         out.append(String.format("* applied on%s%n", getPosInOccurrence()));
         out.append(String.format("* Parameters %n"));
-        getArguments().forEach((key, value) ->
-                out.append(String.format("  * %s : %s%n", key, value)));
+        getArguments()
+                .forEach((key, value) -> out.append(String.format("  * %s : %s%n", key, value)));
         out.append('\n');
         return out.toString();
     }

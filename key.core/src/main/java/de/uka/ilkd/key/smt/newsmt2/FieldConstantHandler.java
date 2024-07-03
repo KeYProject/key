@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.Map;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -8,10 +15,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.Map;
-import java.util.Properties;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This SMT translation handler takes care of field constants.
@@ -24,7 +29,7 @@ import java.util.Properties;
  *
  * To this end a function fieldIdentifier is used and an assertion like the following
  * is added which states for C::$f
- *   (assert (= (fieldIdentifier |field_C::$f|) -42)
+ * (assert (= (fieldIdentifier |field_C::$f|) -42)
  *
  * Each function symbol gets a new unique negative integer.
  * Positive integers are kept for the arr() function to make sure that is an injection.
@@ -54,7 +59,7 @@ public class FieldConstantHandler implements SMTHandler {
         return op.arity() == 0
                 && op.sort(NO_ARGS) == heapLDT.getFieldSort()
                 && op instanceof Function
-                && ((Function)op).isUnique()
+                && ((Function) op).isUnique()
                 && (op.name().toString().contains("::$") || op.name().toString().contains("::<"))
                 || op == heapLDT.getArr();
     }
@@ -83,9 +88,9 @@ public class FieldConstantHandler implements SMTHandler {
             trans.addAxiom(HandlerUtil.funTypeAxiom((SortedOperator) op, smtName, trans));
 
             trans.addAxiom(new SExpr("assert",
-                    new SExpr("=",
-                            new SExpr("fieldIdentifier", smtName),
-                            new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
+                new SExpr("=",
+                    new SExpr("fieldIdentifier", smtName),
+                    new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
 
             state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
             trans.addKnownSymbol(smtName);

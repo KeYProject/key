@@ -1,15 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.core;
 
-import java.util.Collection;
 import java.util.EventObject;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
@@ -56,6 +55,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
 
 /**
@@ -261,7 +262,7 @@ public class KeYMediator {
             public String toString() {
                 return "Proof has been pruned: "
                     + (proof.openGoals().size() == 1 ? "one open goal remains."
-                        : (proof.openGoals().size() + " open goals remain."));
+                            : (proof.openGoals().size() + " open goals remain."));
             }
         };
         this.ui.taskFinished(info);
@@ -566,11 +567,13 @@ public class KeYMediator {
                 if (b) {
                     inAutoMode = true;
                     getUI().getProofControl()
-                        .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is this
-                                                                                  // wrong use of
-                                                                                  // auto mode
-                                                                                  // really
-                                                                                  // required?
+                            .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
+                                                                                      // this
+                                                                                      // wrong use
+                                                                                      // of
+                                                                                      // auto mode
+                                                                                      // really
+                                                                                      // required?
                 }
             }
         };
@@ -585,11 +588,13 @@ public class KeYMediator {
                 if (b) {
                     inAutoMode = false;
                     getUI().getProofControl()
-                        .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is this
-                                                                                  // wrong use of
-                                                                                  // auto mode
-                                                                                  // really
-                                                                                  // required?
+                            .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
+                                                                                      // this
+                                                                                      // wrong use
+                                                                                      // of
+                                                                                      // auto mode
+                                                                                      // really
+                                                                                      // required?
                 }
                 ui.notifyAutomodeStopped();
                 if (getSelectedProof() != null) {
@@ -617,13 +622,13 @@ public class KeYMediator {
      * Retrieves a user-defined data.
      *
      * @param service the class for which the data were registered
-     * @param <T>     any class
+     * @param <T> any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
     public <T> T lookup(Class<T> service) {
         try {
-            if(userData==null){
+            if (userData == null) {
                 return null;
             }
             return userData.get(service);
@@ -636,7 +641,7 @@ public class KeYMediator {
      * Register a user-defined data in this node info.
      *
      * @param obj an object to be registered
-     * @param service  the key under it should be registered
+     * @param service the key under it should be registered
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
@@ -645,6 +650,7 @@ public class KeYMediator {
 
     /**
      * Remove a previous registered user-defined data.
+     *
      * @param obj registered object
      * @param service the key under which the data was registered
      * @param <T> arbitray object
@@ -661,13 +667,14 @@ public class KeYMediator {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if(userData == null) userData = new Lookup();
+        if (userData == null)
+            userData = new Lookup();
         return userData;
     }
 
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
-       private boolean pruningInProcess;
+        private boolean pruningInProcess;
 
         @Override
         public void proofClosed(ProofTreeEvent e) {
@@ -852,13 +859,13 @@ public class KeYMediator {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
 
-//    /**
-//     * returns the prover task listener of the main frame
-//     */
-//    // TODO used 1 time, drop it? (MU)
-//    public ProverTaskListener getProverTaskListener() {
-//        return ui;
-//    }
+    // /**
+    // * returns the prover task listener of the main frame
+    // */
+    // // TODO used 1 time, drop it? (MU)
+    // public ProverTaskListener getProverTaskListener() {
+    // return ui;
+    // }
 
     public boolean processDelayedCut(final Node invokedNode) {
         if (ensureProofLoaded()) {
@@ -874,7 +881,7 @@ public class KeYMediator {
             }
 
             Term formula = InspectorForDecisionPredicates
-                .translate(getSelectedProof().getServices(), result);
+                    .translate(getSelectedProof().getServices(), result);
 
             DelayedCutProcessor processor = new DelayedCutProcessor(getSelectedProof(), invokedNode,
                 formula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
@@ -882,7 +889,7 @@ public class KeYMediator {
 
                 @Override
                 public void eventRebuildingTree(final int currentTacletNumber,
-                    final int totalNumber) {
+                        final int totalNumber) {
 
                     SwingUtilities.invokeLater(new Runnable() {
 

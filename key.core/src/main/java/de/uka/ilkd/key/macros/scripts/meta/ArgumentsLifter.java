@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import java.lang.reflect.Field;
@@ -11,28 +15,25 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
  * @version 1 (21.04.17)
  */
 public final class ArgumentsLifter {
-    //private static final Map<Class, Type> TYPE_MAP = new HashMap<>();
+    // private static final Map<Class, Type> TYPE_MAP = new HashMap<>();
 
     private ArgumentsLifter() {
     }
 
-    public static List<ProofScriptArgument>
-                    inferScriptArguments(Class<?> clazz,
-                                         ProofScriptCommand<?> command) {
+    public static List<ProofScriptArgument> inferScriptArguments(Class<?> clazz,
+            ProofScriptCommand<?> command) {
         List<ProofScriptArgument> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
             Option option = field.getDeclaredAnnotation(Option.class);
             if (option != null) {
                 args.add(lift(option, field));
-            }
-            else {
+            } else {
                 Flag flag = field.getDeclaredAnnotation(Flag.class);
                 if (flag != null) {
                     args.add(lift(flag, field));
-                }
-                else {
+                } else {
                     Varargs vargs = field.getDeclaredAnnotation(Varargs.class);
-                    if (vargs!=null) {
+                    if (vargs != null) {
                         args.add(lift(vargs, field));
                     }
                 }

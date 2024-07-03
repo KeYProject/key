@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.proofdiff;
 
@@ -9,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
-
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -33,11 +35,11 @@ import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Proof-of-concept implementation of a textual sequent comparison.
- * 
+ *
  * This class provides a frame which allows the user to display a in-place comparison of two
  * sequents. The comparison happens on the pretty-printed text only, no sophisticated tree
  * comparison. The algorithm is taken from a google library.
- * 
+ *
  * @see diff_match_patch
  * @author mattias ulbrich
  */
@@ -62,7 +64,7 @@ public class ProofDiffFrame extends JFrame {
             putValue(SHORT_DESCRIPTION, "Open a new proof node diff window.");
         }
 
-        @Override 
+        @Override
         public void actionPerformed(ActionEvent e) {
             ProofDiffFrame pdf = new ProofDiffFrame(mainWindow);
             pdf.setLocationRelativeTo(mainWindow);
@@ -93,9 +95,9 @@ public class ProofDiffFrame extends JFrame {
 
     /**
      * Instantiates a new proof-diff frame.
-     * 
+     *
      * @param mainWindow
-     *            the main window of the system
+     *        the main window of the system
      */
     public ProofDiffFrame(MainWindow mainWindow) {
         super("Visual difference between two sequents");
@@ -114,7 +116,7 @@ public class ProofDiffFrame extends JFrame {
             textArea.setContentType("text/html");
             Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
             textArea.setFont(myFont);
-            //            textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+            // textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
             textArea.setEditable(false);
             textArea.setText(getHelpText());
             JScrollPane scroll = new JScrollPane(textArea);
@@ -124,7 +126,8 @@ public class ProofDiffFrame extends JFrame {
             JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             {
                 this.from = new JTextField("", 5);
-                from.setToolTipText("Set the parent node to compare. May be empty for the direct predecessor");
+                from.setToolTipText(
+                    "Set the parent node to compare. May be empty for the direct predecessor");
                 bottom.add(new JLabel("Parent node:"));
                 bottom.add(from);
             }
@@ -135,10 +138,11 @@ public class ProofDiffFrame extends JFrame {
                 bottom.add(to);
             }
             {
-                JButton go =  new JButton("Show Diff");
+                JButton go = new JButton("Show Diff");
                 go.setToolTipText("Show difference between the two nodes specified here.");
                 go.addActionListener(new ActionListener() {
-                    @Override public void actionPerformed(ActionEvent e) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
                         showDiff();
                     }
                 });
@@ -147,9 +151,11 @@ public class ProofDiffFrame extends JFrame {
             }
             {
                 JButton last = new JButton("Show Selected Node");
-                last.setToolTipText("Show difference introduced by the rule application leading to the selected node");
+                last.setToolTipText(
+                    "Show difference introduced by the rule application leading to the selected node");
                 last.addActionListener(new ActionListener() {
-                    @Override public void actionPerformed(ActionEvent e) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
                         setSelectedNode();
                         showDiff();
                     }
@@ -159,7 +165,8 @@ public class ProofDiffFrame extends JFrame {
             {
                 JButton close = new JButton("Close");
                 close.addActionListener(new ActionListener() {
-                    @Override public void actionPerformed(ActionEvent e) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
                         ProofDiffFrame.this.setVisible(false);
                     }
                 });
@@ -177,7 +184,7 @@ public class ProofDiffFrame extends JFrame {
     private void setSelectedNode() {
         try {
             Node node = mainWindow.getMediator().getSelectedNode();
-            if(node == null) {
+            if (node == null) {
                 throw new IllegalArgumentException("There is no selected proof node or no proof!");
             }
 
@@ -191,7 +198,7 @@ public class ProofDiffFrame extends JFrame {
 
     /**
      * Initiate a diff calculation and set the content of the text area.
-     * 
+     *
      * It uses the result of {@link diff_match_patch#diff_main(String, String, boolean)}
      * and html markup to show the text.
      */
@@ -202,23 +209,24 @@ public class ProofDiffFrame extends JFrame {
         try {
             int toNo;
             String toText = to.getText();
-            if(toText.length() == 0) {
-                throw new IllegalArgumentException("At least the second proof node must be specified");
+            if (toText.length() == 0) {
+                throw new IllegalArgumentException(
+                    "At least the second proof node must be specified");
             } else {
                 toNo = Integer.parseInt(to.getText());
                 sTo = getProofNodeText(toNo);
             }
 
             String fromText = from.getText();
-            if(fromText.length() == 0) {
+            if (fromText.length() == 0) {
                 sFrom = getProofNodeText(getParent(toNo));
             } else {
                 int fromNo = Integer.parseInt(fromText);
                 sFrom = getProofNodeText(fromNo);
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "This is not a number: " + e.getMessage(), 
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "This is not a number: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -237,19 +245,19 @@ public class ProofDiffFrame extends JFrame {
                 sb.append(toHtml(diff.text));
                 break;
             case DELETE:
-                if(onlySpaces(diff.text)) {
+                if (onlySpaces(diff.text)) {
                     sb.append(diff.text);
                 } else {
-                    sb.append("<span style='background-color: #ff8080;'>").
-                    append(toHtml(diff.text)).append("</span>");
+                    sb.append("<span style='background-color: #ff8080;'>").append(toHtml(diff.text))
+                            .append("</span>");
                 }
                 break;
             case INSERT:
-                if(onlySpaces(diff.text)) {
+                if (onlySpaces(diff.text)) {
                     sb.append(diff.text);
                 } else {
-                    sb.append("<span style='background-color: #80ff80;'>").
-                    append(toHtml(diff.text)).append("</span>");
+                    sb.append("<span style='background-color: #80ff80;'>").append(toHtml(diff.text))
+                            .append("</span>");
                 }
                 break;
             }
@@ -263,7 +271,7 @@ public class ProofDiffFrame extends JFrame {
 
     private boolean onlySpaces(CharSequence text) {
         for (int i = 0; i < text.length(); i++) {
-            if(!Character.isWhitespace(text.charAt(i))) {
+            if (!Character.isWhitespace(text.charAt(i))) {
                 return false;
             }
         }
@@ -272,17 +280,17 @@ public class ProofDiffFrame extends JFrame {
 
     private int getParent(int no) {
         Proof proof = mainWindow.getMediator().getSelectedProof();
-        if(proof == null) {
+        if (proof == null) {
             throw new IllegalArgumentException("There is no open proof!");
         }
 
         Node node = findNode(proof.root(), no);
-        if(node == null) {
+        if (node == null) {
             throw new IllegalArgumentException(no + " is not a node in the proof");
         }
 
         Node parent = node.parent();
-        if(parent == null) {
+        if (parent == null) {
             throw new IllegalArgumentException(no + " has no parent node");
         }
 
@@ -291,9 +299,9 @@ public class ProofDiffFrame extends JFrame {
 
     /**
      * Render special html characters and spaces and new lines
-     * 
+     *
      * @param string
-     *            an arbitrary string
+     *        an arbitrary string
      * @return the string converted to html
      */
     private String toHtml(String string) {
@@ -307,32 +315,32 @@ public class ProofDiffFrame extends JFrame {
 
     /**
      * Gets the pretty printed node text for a node.
-     * 
+     *
      * @param nodeNumber
-     *            the number of the node to search
+     *        the number of the node to search
      * @return the proof node text
      * @throws IllegalArgumentException
-     *             if the number string is bad or there is no proof.
+     *         if the number string is bad or there is no proof.
      */
     private String getProofNodeText(int nodeNumber) {
 
         Proof proof = mainWindow.getMediator().getSelectedProof();
 
-        if(proof == null) {
+        if (proof == null) {
             throw new IllegalArgumentException("There is no open proof!");
         }
 
         Node node = findNode(proof.root(), nodeNumber);
 
-        if(node == null) {
+        if (node == null) {
             throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
         }
 
-        LogicPrinter logicPrinter = 
-                new LogicPrinter(new ProgramPrinter(null), 
-                        new NotationInfo(),
-                        proof.getServices(),
-                        true);
+        LogicPrinter logicPrinter =
+            new LogicPrinter(new ProgramPrinter(null),
+                new NotationInfo(),
+                proof.getServices(),
+                true);
 
         logicPrinter.printSequent(node.sequent());
 
@@ -343,7 +351,7 @@ public class ProofDiffFrame extends JFrame {
 
     // This must have been implemented already, somewhere
     private Node findNode(Node node, int number) {
-        if(node.serialNr() == number) {
+        if (node.serialNr() == number) {
             return node;
         }
 
@@ -351,16 +359,16 @@ public class ProofDiffFrame extends JFrame {
             node = node.child(0);
         }
 
-        if(node.serialNr() == number) {
+        if (node.serialNr() == number) {
             return node;
         }
 
         Iterator<Node> it = node.childrenIterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Node n = it.next();
-            if(n.serialNr() <= number) {
+            if (n.serialNr() <= number) {
                 Node result = findNode(n, number);
-                if(result != null)
+                if (result != null)
                     return result;
             }
         }
@@ -370,29 +378,29 @@ public class ProofDiffFrame extends JFrame {
 
     private String getHelpText() {
         return "<h1>Visual diff between sequences of Proof Nodes</h1>" +
-                "<p>This window can be used to select one or two sequents of an " +
-                "ongoing or closed proof. All actions refer to the currently selected proof.</p>" +
-                "<p>The textarea shows the <i>in-place diff</i> between two pretty printed " +
-                "sequences. Parts in <span style='background-color: #ff8080;'>red</span>" +
-                " are only present in the parent sequent and " +
-                "parts in <span style='background-color: #80ff80;'>green</span> are added in the " +
-                "second proof node.</p>" +
-                "<h3>One node mode</h3>" +
-                "<p>If you keep the left field (parent node) empty, the difference between the" +
-                "proof node and its direct predecessor is displayed in the text area.</p>" +
-                "<h3>Two node mode</h3>" +
-                "<p>If you specify two nodes, the difference between the declared sequents " +
-                "are displayed.</p>" +
-                "<h3>'Show selected node'</h3>" +
-                "<p>Use this button to use the currently selected proof node of the proof " +
-                "component as displayed proof node.";
+            "<p>This window can be used to select one or two sequents of an " +
+            "ongoing or closed proof. All actions refer to the currently selected proof.</p>" +
+            "<p>The textarea shows the <i>in-place diff</i> between two pretty printed " +
+            "sequences. Parts in <span style='background-color: #ff8080;'>red</span>" +
+            " are only present in the parent sequent and " +
+            "parts in <span style='background-color: #80ff80;'>green</span> are added in the " +
+            "second proof node.</p>" +
+            "<h3>One node mode</h3>" +
+            "<p>If you keep the left field (parent node) empty, the difference between the" +
+            "proof node and its direct predecessor is displayed in the text area.</p>" +
+            "<h3>Two node mode</h3>" +
+            "<p>If you specify two nodes, the difference between the declared sequents " +
+            "are displayed.</p>" +
+            "<h3>'Show selected node'</h3>" +
+            "<p>Use this button to use the currently selected proof node of the proof " +
+            "component as displayed proof node.";
     }
 
     // Use this to test the layout of this class.
     public static void main(String[] args) {
         ProofDiffFrame pdf = new ProofDiffFrame(null);
         pdf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        pdf.setSize(500,500);
+        pdf.setSize(500, 500);
         pdf.setVisible(true);
     }
 }

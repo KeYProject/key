@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.lang.reflect.InvocationTargetException;
@@ -20,12 +24,12 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  * @author christoph
  */
 class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
-    
+
     /**
      * Collection of data important for the production of snippets.
      */
     private final BasicSnippetData data;
-    
+
     /**
      * Variables belonging to the proof obligation.
      */
@@ -34,8 +38,8 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     /**
      * Registered snippet factory methods.
      */
-    private final EnumMap<Snippet, FactoryMethod> factoryMethods
-             = new EnumMap<Snippet, FactoryMethod>(Snippet.class);
+    private final EnumMap<Snippet, FactoryMethod> factoryMethods =
+        new EnumMap<Snippet, FactoryMethod>(Snippet.class);
 
 
     BasicPOSnippetFactoryImpl(BasicSnippetData data, ProofObligationVars poVars) {
@@ -46,18 +50,18 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     BasicPOSnippetFactoryImpl(FunctionalOperationContract contract,
-                              ProofObligationVars poVars,
-                              Services services) {
+            ProofObligationVars poVars,
+            Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
-    
+
     BasicPOSnippetFactoryImpl(LoopSpecification invariant,
-                              ProofObligationVars poVars,
-                              ExecutionContext context,
-                              Term guardTerm,
-                              Services services) {
+            ProofObligationVars poVars,
+            ExecutionContext context,
+            Term guardTerm,
+            Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars = poVars;
         registerFactoryMethods();
@@ -65,8 +69,8 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     BasicPOSnippetFactoryImpl(InformationFlowContract contract,
-                              ProofObligationVars poVars,
-                              Services services) {
+            ProofObligationVars poVars,
+            Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
         registerFactoryMethods();
@@ -74,9 +78,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     BasicPOSnippetFactoryImpl(BlockContract contract,
-                              ProofObligationVars poVars,
-                              ExecutionContext context,
-                              Services services) {
+            ProofObligationVars poVars,
+            ExecutionContext context,
+            Services services) {
         this.data = new BasicSnippetData(contract, context, services);
         this.poVars = poVars;
         registerFactoryMethods();
@@ -87,27 +91,21 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
         try {
             for (Snippet s : Snippet.values()) {
                 FactoryMethod fm =
-                        (FactoryMethod)s.c.getDeclaredConstructor().newInstance();
+                    (FactoryMethod) s.c.getDeclaredConstructor().newInstance();
                 factoryMethods.put(s, fm);
             }
         } catch (InstantiationException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchMethodException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -118,13 +116,13 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
             FactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {
                 throw new UnsupportedOperationException("Unknown factory "
-                        + "method for snippet \"" + snippet.name() + ".");
+                    + "method for snippet \"" + snippet.name() + ".");
             }
             return m.produce(data, poVars);
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for "
-                    + "snippet \"" + snippet.name() + " threw "
-                    + "TermCreationException: " + e.getMessage(), e);
+                + "snippet \"" + snippet.name() + " threw "
+                + "TermCreationException: " + e.getMessage(), e);
         }
     }
 

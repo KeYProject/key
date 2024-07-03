@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.Expression;
@@ -17,9 +24,6 @@ import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object
  * has to be created, in KeY this is quite similar to take it out of a list of
@@ -37,9 +41,8 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     private final Map<ClassDeclaration, Identifier> class2identifier;
 
 
-    public CreateObjectBuilder
-            (CrossReferenceServiceConfiguration services,
-             TransformerCache cache) {
+    public CreateObjectBuilder(CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
         super(services, cache);
         class2identifier = new LinkedHashMap<>();
     }
@@ -52,27 +55,22 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     private StatementBlock createBody(ClassDeclaration recoderClass) {
 
         ASTList<Statement> result = new ASTArrayList<>(10);
-        LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, class2identifier.get(recoderClass));
+        LocalVariableDeclaration local =
+            declare(NEW_OBJECT_VAR_NAME, class2identifier.get(recoderClass));
 
 
         result.add(local);
 
         final ASTList<Expression> arguments = new ASTArrayList<>(0);
 
-        result.add
-                (assign(new VariableReference
-                                (new Identifier(NEW_OBJECT_VAR_NAME)),
-                        new MethodReference(new TypeReference
-                                (class2identifier.get(recoderClass)),
-                                new ImplicitIdentifier
-                                        (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
-                                arguments)));
+        result.add(assign(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME)),
+            new MethodReference(new TypeReference(class2identifier.get(recoderClass)),
+                new ImplicitIdentifier(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+                arguments)));
 
         MethodReference createRef =
-                (new MethodReference(new VariableReference
-                        (new Identifier(NEW_OBJECT_VAR_NAME)),
-                        new ImplicitIdentifier
-                                (CreateBuilder.IMPLICIT_CREATE)));
+            (new MethodReference(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME)),
+                new ImplicitIdentifier(CreateBuilder.IMPLICIT_CREATE)));
 
         // July 08 - mulbrich: wraps createRef into a method body statement to
         // avoid unnecessary dynamic dispatch.
@@ -80,11 +78,9 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
         // Use a method call there
         if (recoderClass.getIdentifier() == null) {
             // anonymous
-            result.add
-                    (new MethodReference(new VariableReference
-                            (new Identifier(NEW_OBJECT_VAR_NAME)),
-                            new ImplicitIdentifier
-                                    (CreateBuilder.IMPLICIT_CREATE)));
+            result.add(
+                new MethodReference(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME)),
+                    new ImplicitIdentifier(CreateBuilder.IMPLICIT_CREATE)));
         } else {
             TypeReference tyref;
             tyref = makeTyRef(recoderClass);
@@ -116,7 +112,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
      * method that takes the object to be created out of the pool
      *
      * @param type the TypeDeclaration for which the
-     *             <code>&lt;prepare&gt;</code> is created
+     *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
@@ -124,18 +120,17 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
         modifiers.add(new Public());
         modifiers.add(new Static());
 
-        MethodDeclaration md = new MethodDeclaration
-                (modifiers,
-                        new TypeReference(class2identifier.get(type)),
-                        new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE),
-						new ASTArrayList<>(0),
-                        null,
-                        createBody(type));
+        MethodDeclaration md = new MethodDeclaration(modifiers,
+            new TypeReference(class2identifier.get(type)),
+            new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE),
+            new ASTArrayList<>(0),
+            null,
+            createBody(type));
         md.makeAllParentRolesValid();
         return md;
     }
 
-	@Override
+    @Override
     public ProblemReport analyze() {
         for (final ClassDeclaration cd : classDeclarations()) {
             class2identifier.put(cd, getId(cd));
@@ -152,7 +147,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     protected void makeExplicit(TypeDeclaration td) {
         if (td instanceof ClassDeclaration) {
             attach(createMethod((ClassDeclaration) td), td,
-                    td.getMembers().size());
+                td.getMembers().size());
         }
     }
 }

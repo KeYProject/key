@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashMap;
@@ -25,7 +29,7 @@ public class MergeWithPredicateAbstractionFactory extends
         MergeWithPredicateAbstraction {
 
     private static final MergeWithPredicateAbstractionFactory INSTANCE =
-            new MergeWithPredicateAbstractionFactory();
+        new MergeWithPredicateAbstractionFactory();
 
     /**
      * Hidden constructor since this class is a Singleton.
@@ -40,14 +44,14 @@ public class MergeWithPredicateAbstractionFactory extends
     public static MergeWithPredicateAbstractionFactory instance() {
         return INSTANCE;
     }
-    
+
     @Override
     public ValuesMergeResult mergeValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
         throw new UnsupportedOperationException(
-                "You need to create an instance of MergeWithPredicateAbstraction.");
+            "You need to create an instance of MergeWithPredicateAbstraction.");
     }
 
     @Override
@@ -59,10 +63,10 @@ public class MergeWithPredicateAbstractionFactory extends
      * Creates a complete instance of {@link MergeWithPredicateAbstraction}.
      *
      * @param predicates
-     *            The predicates for the lattices to create.
+     *        The predicates for the lattices to create.
      * @param latticeType
-     *            The concrete lattice type which determines how abstract
-     *            elements are generated from abstraction predicates.
+     *        The concrete lattice type which determines how abstract
+     *        elements are generated from abstraction predicates.
      * @return A complete instance of {@link MergeWithPredicateAbstraction}.
      */
     public MergeWithPredicateAbstraction instantiate(

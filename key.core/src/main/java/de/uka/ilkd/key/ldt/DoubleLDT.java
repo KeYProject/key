@@ -1,23 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.logic.op.Operator;
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+
+import org.key_project.util.ExtList;
 
 public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
@@ -72,55 +71,55 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     public DoubleLDT(TermServices services) {
         super(NAME, services);
 
-        doubleLit             = addFunction(services, DOUBLELIT_NAME.toString());
-        javaUnaryMinusDouble  = addFunction(services, NEGATIVE_LITERAL.toString());
-        lessThan              = addFunction(services, "ltDouble");
-        greaterThan           = addFunction(services, "gtDouble");
-        lessOrEquals          = addFunction(services, "leqDouble");
-        greaterOrEquals       = addFunction(services, "geqDouble");
-        eqDouble              = addFunction(services, "eqDouble");
+        doubleLit = addFunction(services, DOUBLELIT_NAME.toString());
+        javaUnaryMinusDouble = addFunction(services, NEGATIVE_LITERAL.toString());
+        lessThan = addFunction(services, "ltDouble");
+        greaterThan = addFunction(services, "gtDouble");
+        lessOrEquals = addFunction(services, "leqDouble");
+        greaterOrEquals = addFunction(services, "geqDouble");
+        eqDouble = addFunction(services, "eqDouble");
 
-        javaAddDouble         = addFunction(services, "javaAddDouble");
-        javaSubDouble         = addFunction(services, "javaSubDouble");
-        javaMulDouble         = addFunction(services, "javaMulDouble");
-        javaDivDouble         = addFunction(services, "javaDivDouble");
-        javaModDouble         = addFunction(services, "javaModDouble");
-        javaMaxDouble         = addFunction(services, "javaMaxDouble");
-        javaMinDouble         = addFunction(services, "javaMinDouble");
+        javaAddDouble = addFunction(services, "javaAddDouble");
+        javaSubDouble = addFunction(services, "javaSubDouble");
+        javaMulDouble = addFunction(services, "javaMulDouble");
+        javaDivDouble = addFunction(services, "javaDivDouble");
+        javaModDouble = addFunction(services, "javaModDouble");
+        javaMaxDouble = addFunction(services, "javaMaxDouble");
+        javaMinDouble = addFunction(services, "javaMinDouble");
 
-        addDouble             = addFunction(services, "addDouble");
-        subDouble             = addFunction(services, "subDouble");
-        mulDouble             = addFunction(services, "mulDouble");
-        divDouble             = addFunction(services, "divDouble");
-        doubleAbs             = addFunction(services, "absDouble");
-        negDouble             = addFunction(services, "negDouble");
+        addDouble = addFunction(services, "addDouble");
+        subDouble = addFunction(services, "subDouble");
+        mulDouble = addFunction(services, "mulDouble");
+        divDouble = addFunction(services, "divDouble");
+        doubleAbs = addFunction(services, "absDouble");
+        negDouble = addFunction(services, "negDouble");
 
-        isNormal              = addFunction(services, "doubleIsNormal");
-        isSubnormal           = addFunction(services, "doubleIsSubnormal");
-        isNaN                 = addFunction(services, "doubleIsNaN");
-        isZero                = addFunction(services, "doubleIsZero");
-        isNice                = addFunction(services, "doubleIsNice");
-        isInfinite            = addFunction(services, "doubleIsInfinite");
-        isPositive            = addFunction(services, "doubleIsPositive");
-        isNegative            = addFunction(services, "doubleIsNegative");
+        isNormal = addFunction(services, "doubleIsNormal");
+        isSubnormal = addFunction(services, "doubleIsSubnormal");
+        isNaN = addFunction(services, "doubleIsNaN");
+        isZero = addFunction(services, "doubleIsZero");
+        isNice = addFunction(services, "doubleIsNice");
+        isInfinite = addFunction(services, "doubleIsInfinite");
+        isPositive = addFunction(services, "doubleIsPositive");
+        isNegative = addFunction(services, "doubleIsNegative");
 
-        sinDouble             = addFunction(services, "sinDouble");
-        cosDouble             = addFunction(services, "cosDouble");
-        acosDouble            = addFunction(services, "acosDouble");
-        asinDouble            = addFunction(services, "asinDouble");
-        tanDouble             = addFunction(services, "tanDouble");
-        atan2Double           = addFunction(services, "atan2Double");
-        sqrtDouble            = addFunction(services, "sqrtDouble");
-        powDouble             = addFunction(services, "powDouble");
-        expDouble             = addFunction(services, "expDouble");
-        atanDouble            = addFunction(services, "atanDouble");
+        sinDouble = addFunction(services, "sinDouble");
+        cosDouble = addFunction(services, "cosDouble");
+        acosDouble = addFunction(services, "acosDouble");
+        asinDouble = addFunction(services, "asinDouble");
+        tanDouble = addFunction(services, "tanDouble");
+        atan2Double = addFunction(services, "atan2Double");
+        sqrtDouble = addFunction(services, "sqrtDouble");
+        powDouble = addFunction(services, "powDouble");
+        expDouble = addFunction(services, "expDouble");
+        atanDouble = addFunction(services, "atanDouble");
     }
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-                                 Term[] subs,
-                                 Services services,
-                                 ExecutionContext ec) {
+            Term[] subs,
+            Services services,
+            ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
         } else if (subs.length == 2) {
@@ -131,11 +130,11 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-                                 Term left,
-                                 Term right,
-                                 Services services,
-                                 ExecutionContext ec) {
-        if(left != null
+            Term left,
+            Term right,
+            Services services,
+            ExecutionContext ec) {
+        if (left != null
                 && left.sort().extendsTrans(targetSort())
                 && right != null
                 && right.sort().extendsTrans(targetSort())) {
@@ -146,10 +145,10 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-                                 Term sub,
-                                 TermServices services,
-                                 ExecutionContext ec) {
-        if(sub != null && sub.sort().extendsTrans(targetSort())) {
+            Term sub,
+            TermServices services,
+            ExecutionContext ec) {
+        if (sub != null && sub.sort().extendsTrans(targetSort())) {
             return op instanceof Negative;
         }
         return false;
@@ -158,8 +157,8 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        assert lit instanceof DoubleLiteral : "Literal '"+lit+"' is not a double literal.";
-        String s = ((DoubleLiteral)lit).getValue();
+        assert lit instanceof DoubleLiteral : "Literal '" + lit + "' is not a double literal.";
+        String s = ((DoubleLiteral) lit).getValue();
         double doubleVal = Double.parseDouble(s);
         return services.getTermBuilder().dfpTerm(doubleVal);
     }
@@ -167,34 +166,52 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     @Override
     public Function getFunctionFor(String op, Services services) {
         switch (op) {
-            case "gt": return getGreaterThan();
-            case "geq": return getGreaterOrEquals();
-            case "lt": return getLessThan();
-            case "leq": return getLessOrEquals();
-            case "div": return getDiv();
-            case "mul": return getMul();
-            case "add": return getAdd();
-            case "sub": return getSub();
-            case "neg": return getNeg();
+        case "gt":
+            return getGreaterThan();
+        case "geq":
+            return getGreaterOrEquals();
+        case "lt":
+            return getLessThan();
+        case "leq":
+            return getLessOrEquals();
+        case "div":
+            return getDiv();
+        case "mul":
+            return getMul();
+        case "add":
+            return getAdd();
+        case "sub":
+            return getSub();
+        case "neg":
+            return getNeg();
 
-            // Floating point extensions with "\fp_"
-            case "nan": return getIsNaN();
-            case "zero": return getIsZero();
-            case "infinite": return getIsInfinite();
-            case "nice": return getIsNice();
-            case "abs": return getAbs();
-            case "negative": return getIsNegative();
-            case "positive": return getIsPositive();
-            case "subnormal": return getIsSubnormal();
-            case "normal": return getIsNormal();
+        // Floating point extensions with "\fp_"
+        case "nan":
+            return getIsNaN();
+        case "zero":
+            return getIsZero();
+        case "infinite":
+            return getIsInfinite();
+        case "nice":
+            return getIsNice();
+        case "abs":
+            return getAbs();
+        case "negative":
+            return getIsNegative();
+        case "positive":
+            return getIsPositive();
+        case "subnormal":
+            return getIsSubnormal();
+        case "normal":
+            return getIsNormal();
         }
         return null;
     }
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
-                                   Services services,
-                                   ExecutionContext ec) {
+            Services services,
+            ExecutionContext ec) {
         if (op instanceof Negative) {
             return getJavaUnaryMinus();
         } else {
@@ -204,15 +221,15 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public boolean hasLiteralFunction(Function f) {
-        return containsFunction(f) && (f.arity()==0);
+        return containsFunction(f) && (f.arity() == 0);
     }
 
     @Override
     public DoubleLiteral translateTerm(Term t, ExtList children, Services services) {
-        Function f = (Function)t.op();
+        Function f = (Function) t.op();
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
-        if(f == doubleLit) {
+        if (f == doubleLit) {
             // Use IntegerLDT to translate to literals
             String digits = intLDT.toNumberString(t.sub(0));
             long bits = Long.parseUnsignedLong(digits);
@@ -227,7 +244,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public Type getType(Term t) {
-        if(t.sort() == targetSort()) {
+        if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_DOUBLE;
         } else {
             return null;

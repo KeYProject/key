@@ -1,17 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.model;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import org.key_project.ui.interactionlog.algo.LogPrinter;
-
-import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.xml.bind.annotation.*;
+
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.ui.interactionlog.algo.LogPrinter;
 
 /**
  * @author Alexander Weigl
@@ -60,7 +65,8 @@ public class NodeIdentifier implements Serializable {
     public String toString() {
         return list.stream()
                 .map(Object::toString)
-                .collect(Collectors.joining(".")) + " => " + serialNr;
+                .collect(Collectors.joining("."))
+            + " => " + serialNr;
     }
 
 

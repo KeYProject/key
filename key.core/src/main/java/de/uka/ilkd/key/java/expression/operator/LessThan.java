@@ -1,23 +1,28 @@
-package de.uka.ilkd.key.java.expression.operator;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.util.ExtList;
+
 /**
- *  Less than.
+ * Less than.
  */
 
 public class LessThan extends ComparativeOperator {
 
 
     /**
-     *      Less than.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the  right side.
+     * Less than.
+     *
+     * @param children an ExtList with all children of this node
+     *        the first children in list will be the one on the left
+     *        side, the second the one on the right side.
      */
     public LessThan(ExtList children) {
         super(children);
@@ -25,6 +30,7 @@ public class LessThan extends ComparativeOperator {
 
     /**
      * Less than.
+     *
      * @param lhs the expression that is checked to be less than rhs
      * @param rhs the expression that is checked to be greater than lhs
      */
@@ -34,6 +40,7 @@ public class LessThan extends ComparativeOperator {
 
     /**
      * Get precedence.
+     *
      * @return the int value.
      */
 
@@ -41,12 +48,14 @@ public class LessThan extends ComparativeOperator {
         return 5;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnLessThan(this);
+        v.performActionOnLessThan(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

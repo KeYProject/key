@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
 
@@ -15,25 +18,28 @@ import de.uka.ilkd.key.settings.SettingsListener;
  */
 public class MinimizeInteraction extends KeYMenuCheckBox {
     public static final String NAME = "Minimize Interaction";
-    public static final String TOOL_TIP = "If ticked and automated strategy (play button) is used, the prover tries to minimize user interaction, "
-                                          + "e.g., if the prover can find instantiations by itself, it will not ask the user to provide them.";
+    public static final String TOOL_TIP =
+        "If ticked and automated strategy (play button) is used, the prover tries to minimize user interaction, "
+            + "e.g., if the prover can find instantiations by itself, it will not ask the user to provide them.";
 
     /**
      *
      */
     private static final long serialVersionUID = -3381517803006651928L;
     private final MainWindow mainWindow;
-    
+
     /**
-     * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()}.
+     * Listens for changes on
+     * {@code ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()}.
      * <p>
-     * Such changes can occur in the Eclipse context when settings are changed in for instance the KeYIDE.
+     * Such changes can occur in the Eclipse context when settings are changed in for instance the
+     * KeYIDE.
      */
     private final SettingsListener generalSettingsListener = new SettingsListener() {
-       @Override
-       public void settingsChanged(EventObject e) {
-          handleGeneralSettingsChanged(e);
-       }
+        @Override
+        public void settingsChanged(EventObject e) {
+            handleGeneralSettingsChanged(e);
+        }
     };
 
     public MinimizeInteraction(MainWindow mainWindow) {
@@ -41,28 +47,33 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
         this.mainWindow = mainWindow;
         setName("MinimizeInteractionInstance");
         setTooltip(TOOL_TIP);
-        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addSettingsListener(generalSettingsListener); // Attention: The listener is never removed, because there is only one MainWindow!
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .addSettingsListener(generalSettingsListener); // Attention: The listener is never
+                                                               // removed, because there is only one
+                                                               // MainWindow!
         updateSelectedState();
     }
-    
+
     protected void updateSelectedState() {
-       setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
+        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
     }
 
     @Override
     public void handleClickEvent() {
         boolean tacletFilter = isSelected();
         updateMainWindow(tacletFilter);
-        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setTacletFilter(tacletFilter);
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .setTacletFilter(tacletFilter);
     }
-    
+
     protected void updateMainWindow(boolean b) {
-       mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b);
+        mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b);
     }
 
     protected void handleGeneralSettingsChanged(EventObject e) {
-       updateSelectedState();
-       final boolean tacletFilter = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
-       updateMainWindow(tacletFilter);
+        updateSelectedState();
+        final boolean tacletFilter =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+        updateMainWindow(tacletFilter);
     }
 }

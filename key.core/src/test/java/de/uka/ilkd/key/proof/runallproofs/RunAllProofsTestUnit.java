@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
@@ -15,41 +19,41 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 
 /**
  * A single unit that will be tested during {@link RunAllProofsTest} run.
- * 
+ *
  * @author Kai Wallisch
  */
 public final class RunAllProofsTestUnit implements Serializable {
     private static final long serialVersionUID = -2406881153415390252L;
 
-   /**
-    * The name of this test.
-    */
+    /**
+     * The name of this test.
+     */
     private String testName;
 
     private final ProofCollectionSettings settings;
     private final List<TestFile> testFiles;
     private final boolean ungrouped;
 
-   /**
-    * Method {@link Object#toString()} is used by class {@link RunAllProofsTest}
-    * to determine the name of a test case. It is overridden here so that test
-    * cases can be easily recognized by their name.
-    */
-   @Override
-   public String toString() {
-      return testName;
-   }
+    /**
+     * Method {@link Object#toString()} is used by class {@link RunAllProofsTest}
+     * to determine the name of a test case. It is overridden here so that test
+     * cases can be easily recognized by their name.
+     */
+    @Override
+    public String toString() {
+        return testName;
+    }
 
-   public RunAllProofsTestUnit(String name, ProofCollectionSettings settings,
-         List<TestFile> testFiles, boolean ungrouped) {
-      this.testName = name;
-      this.settings = settings;
-      this.testFiles = testFiles;
-      this.ungrouped = ungrouped;
-   }
+    public RunAllProofsTestUnit(String name, ProofCollectionSettings settings,
+            List<TestFile> testFiles, boolean ungrouped) {
+        this.testName = name;
+        this.settings = settings;
+        this.testFiles = testFiles;
+        this.ungrouped = ungrouped;
+    }
 
-   /**
-    * Run the test of this unit and return a {@link TestResult}.
+    /**
+     * Run the test of this unit and return a {@link TestResult}.
      *
      * If {@link #ungrouped} is true, the result is the result of that single
      * test. Otherwise all results are aggregated into a single testresult.
@@ -64,24 +68,24 @@ public final class RunAllProofsTestUnit implements Serializable {
         /*
          * List of test results containing one test result for each test
          * file contained in this group.
-    */
+         */
         List<TestResult> testResults;
 
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
-        if(verbose) {
+        if (verbose) {
             System.out.println("Running test " + testName);
         }
 
         boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
-        if(ignoreTest) {
-            if(verbose) {
+        if (ignoreTest) {
+            if (verbose) {
                 System.out.println("... ignoring this test due to 'ignore=true' in file");
             }
             return new TestResult("Test case has been ignored", true);
         }
 
         ForkMode forkMode = settings.getForkMode();
-        switch(forkMode) {
+        switch (forkMode) {
         case PERGROUP:
             testResults = ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
             break;
@@ -98,7 +102,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {
                 TestResult testResult =
-                        ForkedTestFileRunner.processTestFile(testFile, getTempDir());
+                    ForkedTestFileRunner.processTestFile(testFile, getTempDir());
                 testResults.add(testResult);
             }
             break;
@@ -107,7 +111,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
         }
 
-        if(verbose) {
+        if (verbose) {
             System.out.println("Returning from test " + testName);
         }
 
@@ -115,7 +119,7 @@ public final class RunAllProofsTestUnit implements Serializable {
          * Merge list of test results into one single test result, unless it is a
          * singleton case outside any group declaration.
          */
-        if(ungrouped) {
+        if (ungrouped) {
             assert testResults.size() == 1 : "Ungrouped test runs must have one case";
             return testResults.get(0);
         }
@@ -133,23 +137,23 @@ public final class RunAllProofsTestUnit implements Serializable {
         return testName;
     }
 
-   /*
-    * Temporary directory used by this test unit to store serialized data when
-    * running in fork mode.
-    */
-   private Path tempDir = null;
+    /*
+     * Temporary directory used by this test unit to store serialized data when
+     * running in fork mode.
+     */
+    private Path tempDir = null;
 
-   public Path getTempDir() throws IOException {
-      File runAllProofsTempDir = settings.getTempDir();
-      if (tempDir == null) {
-         if (!runAllProofsTempDir.exists()) {
-            runAllProofsTempDir.mkdirs();
-         }
-         tempDir = Files.createTempDirectory(runAllProofsTempDir.toPath(),
-               testName + "-");
-      }
-      return tempDir;
-   }
+    public Path getTempDir() throws IOException {
+        File runAllProofsTempDir = settings.getTempDir();
+        if (tempDir == null) {
+            if (!runAllProofsTempDir.exists()) {
+                runAllProofsTempDir.mkdirs();
+            }
+            tempDir = Files.createTempDirectory(runAllProofsTempDir.toPath(),
+                testName + "-");
+        }
+        return tempDir;
+    }
 
     public List<TestFile> getTestFiles() {
         return testFiles;

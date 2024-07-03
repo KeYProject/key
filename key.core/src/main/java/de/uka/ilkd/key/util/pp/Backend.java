@@ -1,18 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util.pp;
 
 /**
- * The backend for a {@link Layouter}.  An object satisfying this
+ * The backend for a {@link Layouter}. An object satisfying this
  * interface can act as a receiver for the layed out text produced by
- * a {@link Layouter}.  A <code>Backend</code> must also provide the
+ * a {@link Layouter}. A <code>Backend</code> must also provide the
  * maximum line width available through the {@link #lineWidth()}
- * method.  Finally, it is responsible for calculating (with {@link
+ * method. Finally, it is responsible for calculating (with {@link
  * #measure(String)} the amount of space it actually needs to print a
- * given string.  For instance, if strings printed through a {@link
+ * given string. For instance, if strings printed through a {@link
  * Layouter} are actually known to be in HTML, {@link
  * #measure(String)} can return the size of the text, not including
  * markup.
  *
- * <P>There is currently no provision to handle proportional fonts,
+ * <P>
+ * There is currently no provision to handle proportional fonts,
  * and there might never be.
  *
  * @author Martin Giese
@@ -21,8 +26,10 @@ package de.uka.ilkd.key.util.pp;
  */
 
 public interface Backend {
-    /** Append a String <code>s</code> to the output.  <code>s</code> 
-     * contains no newlines. */
+    /**
+     * Append a String <code>s</code> to the output. <code>s</code>
+     * contains no newlines.
+     */
     void print(String s) throws java.io.IOException;
 
     /** Start a new line. */

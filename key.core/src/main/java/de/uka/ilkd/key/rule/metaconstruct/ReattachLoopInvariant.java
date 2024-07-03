@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -28,13 +32,13 @@ public class ReattachLoopInvariant extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe,
             Services services, SVInstantiations svInst) {
         final ProgramElement context = //
-                svInst.getContextInstantiation().contextProgram();
+            svInst.getContextInstantiation().contextProgram();
 
         if (context != null) {
             final Statement activeStmt = (Statement) JavaTools
                     .getActiveStatement(JavaBlock.createJavaBlock(
-                            (StatementBlock) svInst.getContextInstantiation()
-                                    .contextProgram()));
+                        (StatementBlock) svInst.getContextInstantiation()
+                                .contextProgram()));
             assert activeStmt instanceof LoopStatement;
 
             final LoopStatement loop = (LoopStatement) activeStmt;

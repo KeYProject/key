@@ -1,12 +1,8 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
-
-import recoder.AbstractService;
-import recoder.ServiceConfiguration;
-import recoder.parser.JavaCCParser;
-import recoder.service.DefaultErrorHandler;
-import recoder.service.ErrorHandler;
-import recoder.util.FileUtils;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -16,6 +12,13 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import recoder.AbstractService;
+import recoder.ServiceConfiguration;
+import recoder.parser.JavaCCParser;
+import recoder.service.DefaultErrorHandler;
+import recoder.service.ErrorHandler;
+import recoder.util.FileUtils;
 
 /**
  * The project settings object manages global properties such as search and
@@ -136,10 +139,10 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      * registered listeners. The method will automatically remove all segments
      * from the search path that do not exist.
      *
-     * @param key   the name of the property to set.
+     * @param key the name of the property to set.
      * @param value the value of the property to set.
      * @return the old value associated with the key, or <CODE>null</CODE> if
-     * this property has not been set.
+     *         this property has not been set.
      */
     public String setProperty(String key, String value) {
         String oldValue = properties.getProperty(key);
@@ -226,7 +229,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      * called explicitly after creation of a service configuration.
      *
      * @return <CODE>true</CODE>, if the class file repository knows how to
-     * find "Object", <CODE>false</CODE> otherwise.
+     *         find "Object", <CODE>false</CODE> otherwise.
      */
     public boolean ensureSystemClassesAreInPath() {
         ClassFileRepository cfr = serviceConfiguration.getClassFileRepository();

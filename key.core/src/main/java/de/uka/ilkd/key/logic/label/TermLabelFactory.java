@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
@@ -23,7 +27,7 @@ import de.uka.ilkd.key.logic.TermServices;
  * </p>
  *
  * @param <T>
- *            the type of term labels which are returned by this factory.
+ *        the type of term labels which are returned by this factory.
  *
  * @see SingletonLabelFactory
  * @author Mattias Ulbrich
@@ -38,16 +42,16 @@ public interface TermLabelFactory<T extends TermLabel> {
      * arguments cannot be parsed correctly for this type.
      *
      * @param arguments
-     *            the arguments for parsing, not <code>null</code>, no entry
-     *            <code>null</code>
+     *        the arguments for parsing, not <code>null</code>, no entry
+     *        <code>null</code>
      * @param services
-     *            a non-<code>null</code> services object to look up symbols.
+     *        a non-<code>null</code> services object to look up symbols.
      *
      * @return the according term label with the given arguments, not
      *         <code>null</code>
      *
      * @throws TermLabelException
-     *             if the parameters were illegally formatted
+     *         if the parameters were illegally formatted
      */
     public T parseInstance(List<String> arguments, TermServices services) throws TermLabelException;
 }

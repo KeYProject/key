@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.pp;
 
 import java.util.regex.Pattern;
@@ -44,7 +48,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 
     /**
      * @param search the String we are looking for
-     * @param regex  indicating whether search string should be treated as regex
+     * @param regex indicating whether search string should be treated as regex
      * @return A pattern matching the input String
      * @throws IllegalRegexException if the given pattern is not a valid regex
      */
@@ -81,6 +85,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 
     /**
      * creates a pattern with the current search string and regex option
+     *
      * @return a brand new shiny pattern
      */
     protected Pattern createPattern() {

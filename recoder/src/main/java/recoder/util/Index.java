@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.util.Enumeration;
@@ -66,7 +69,7 @@ public class Index implements Cloneable {
         int newCapacity = oldCapacity * 2;
         ld -= 1;
         Entry[] newMap = table = new Entry[newCapacity];
-        for (int i = oldCapacity; i-- > 0; ) {
+        for (int i = oldCapacity; i-- > 0;) {
             Entry e = oldMap[i];
             while (e != null) {
                 int index = (-1640531527 * e.hash) >>> ld;
@@ -80,7 +83,7 @@ public class Index implements Cloneable {
 
     public boolean contains(long value) {
         Entry[] tab = table;
-        for (int i = tab.length; i-- > 0; ) {
+        for (int i = tab.length; i-- > 0;) {
             for (Entry e = tab[i]; e != null; e = e.next) {
                 if (e.value == value) {
                     return true;
@@ -121,9 +124,9 @@ public class Index implements Cloneable {
     /**
      * assigns the given long value to the specified key.
      *
-     * @param key   the object to assign a value to
+     * @param key the object to assign a value to
      * @param value the long value to be assigned. This value must be greater or
-     *              equal to 0
+     *        equal to 0
      */
     public long put(Object key, long value) {
         Debug.assertBoolean(value >= 0);
@@ -164,7 +167,7 @@ public class Index implements Cloneable {
 
     public void clear() {
         Entry[] tab = table;
-        for (int index = tab.length; --index >= 0; ) {
+        for (int index = tab.length; --index >= 0;) {
             tab[index] = null;
         }
         count = 0;
@@ -174,7 +177,7 @@ public class Index implements Cloneable {
         try {
             Index t = (Index) super.clone();
             t.table = new Entry[table.length];
-            for (int i = table.length; i-- > 0; ) {
+            for (int i = table.length; i-- > 0;) {
                 t.table[i] = (table[i] != null) ? (Entry) table[i].clone() : null;
             }
             return t;

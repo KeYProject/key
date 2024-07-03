@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
 
@@ -5,14 +8,14 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-import de.uka.ilkd.key.gui.TaskTree;
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
+
+import org.key_project.util.java.IOUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +63,8 @@ public final class QuickSaveAction extends MainWindowAction {
                 LOGGER.debug(status);
             } catch (IOException x) {
                 mainWindow.popupWarning(
-                        "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
-                        "Quicksave failed");
+                    "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
+                    "Quicksave failed");
                 LOGGER.debug("Quicksaving file " + filename + " failed.", x);
             }
         } else {

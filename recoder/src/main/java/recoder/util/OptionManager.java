@@ -1,3 +1,7 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.util;
@@ -31,7 +35,7 @@ public class OptionManager {
     public static final int ZERO_OR_ONE = 2;
     public static final int ONE_OR_MORE = 4;
     public static final int ZERO_OR_MORE = 8;
-    private static final String[] optVals = {"", "on|off", "true|false", "<n>", "<s>",};
+    private static final String[] optVals = { "", "on|off", "true|false", "<n>", "<s>", };
     private static final int SINGLE = ONE | ZERO_OR_ONE;
 
     private static final int MULTI = ZERO_OR_MORE | ONE_OR_MORE;
@@ -63,9 +67,11 @@ public class OptionManager {
     /**
      * adds the given option to the registered ones
      */
-    public void addOption(int type, int multiplicity, String shortOpt, String longOpt, String description) {
+    public void addOption(int type, int multiplicity, String shortOpt, String longOpt,
+            String description) {
         Debug.assertBoolean(SIMPLE <= type && type <= STRING, "Illegal option type");
-        Debug.assertBoolean(ONE <= multiplicity && multiplicity <= ZERO_OR_MORE, "Illegal multiplicity specification");
+        Debug.assertBoolean(ONE <= multiplicity && multiplicity <= ZERO_OR_MORE,
+            "Illegal multiplicity specification");
         Debug.assertNonnull(shortOpt, "No short id specified");
         Debug.assertNonnull(longOpt, "No long id specified");
         Debug.assertNonnull(description, "No description specified");
@@ -91,7 +97,8 @@ public class OptionManager {
     /**
      * parses the argument at the given position
      */
-    int parseArg(String[] args, int offset) throws UnknownOptionException, OptionMultiplicityException,
+    int parseArg(String[] args, int offset)
+            throws UnknownOptionException, OptionMultiplicityException,
             IllegalOptionValueException, MissingOptionValueException {
         String opt = args[offset];
         OptionDescription descr = (OptionDescription) str2opt.get(opt);
@@ -113,37 +120,37 @@ public class OptionManager {
         }
         Object optval = null;
         switch (descr.type) {
-            case SIMPLE:
+        case SIMPLE:
+            optval = TRUE;
+            break;
+        case SWITCH:
+            if ("on".equals(sval)) {
+                optval = ON;
+            } else if ("off".equals(sval)) {
+                optval = OFF;
+            } else {
+                throw new IllegalOptionValueException(opt, sval);
+            }
+            break;
+        case BOOL:
+            if ("true".equals(sval)) {
                 optval = TRUE;
-                break;
-            case SWITCH:
-                if ("on".equals(sval)) {
-                    optval = ON;
-                } else if ("off".equals(sval)) {
-                    optval = OFF;
-                } else {
-                    throw new IllegalOptionValueException(opt, sval);
-                }
-                break;
-            case BOOL:
-                if ("true".equals(sval)) {
-                    optval = TRUE;
-                } else if ("false".equals(sval)) {
-                    optval = FALSE;
-                } else {
-                    throw new IllegalOptionValueException(opt, sval);
-                }
-                break;
-            case NUM:
-                try {
-                    optval = new Integer(sval);
-                } catch (NumberFormatException nfe) {
-                    throw new IllegalOptionValueException(opt, sval);
-                }
-                break;
-            case STRING:
-                optval = sval;
-                break;
+            } else if ("false".equals(sval)) {
+                optval = FALSE;
+            } else {
+                throw new IllegalOptionValueException(opt, sval);
+            }
+            break;
+        case NUM:
+            try {
+                optval = new Integer(sval);
+            } catch (NumberFormatException nfe) {
+                throw new IllegalOptionValueException(opt, sval);
+            }
+            break;
+        case STRING:
+            optval = sval;
+            break;
         }
         Debug.assertNonnull(optval);
         descr.values.addElement(optval);
@@ -154,14 +161,15 @@ public class OptionManager {
      * parses all the options within the given arguments and return the
      * remaining unparsed arguments.
      */
-    public String[] parseArgs(String[] args) throws UnknownOptionException, OptionMultiplicityException,
+    public String[] parseArgs(String[] args)
+            throws UnknownOptionException, OptionMultiplicityException,
             IllegalOptionValueException, MissingOptionValueException, MissingArgumentException {
         int offset = 0;
         while (offset < args.length && args[offset].startsWith("-")) {
             offset = parseArg(args, offset);
         }
         // check if all mandatory arguments have been set
-        for (Enumeration mand = mandatories.elements(); mand.hasMoreElements(); ) {
+        for (Enumeration mand = mandatories.elements(); mand.hasMoreElements();) {
             OptionDescription descr = (OptionDescription) mand.nextElement();
             if (descr.values.size() == 0) {
                 throw new MissingArgumentException(descr.shortOpt);
@@ -176,18 +184,18 @@ public class OptionManager {
         String baseinfo = ("-" + descr.shortOpt + " " + optVals[descr.type]).trim();
         String arginfo = "";
         switch (descr.multiplicity) {
-            case ONE:
-                arginfo = " " + baseinfo;
-                break;
-            case ZERO_OR_ONE:
-                arginfo = " [" + baseinfo + "]";
-                break;
-            case ONE_OR_MORE:
-                arginfo = " " + baseinfo + " [" + baseinfo + " ... " + baseinfo + "]";
-                break;
-            case ZERO_OR_MORE:
-                arginfo = " [" + baseinfo + " ... " + baseinfo + "]";
-                break;
+        case ONE:
+            arginfo = " " + baseinfo;
+            break;
+        case ZERO_OR_ONE:
+            arginfo = " [" + baseinfo + "]";
+            break;
+        case ONE_OR_MORE:
+            arginfo = " " + baseinfo + " [" + baseinfo + " ... " + baseinfo + "]";
+            break;
+        case ZERO_OR_MORE:
+            arginfo = " [" + baseinfo + " ... " + baseinfo + "]";
+            break;
         }
         out.print(arginfo);
     }

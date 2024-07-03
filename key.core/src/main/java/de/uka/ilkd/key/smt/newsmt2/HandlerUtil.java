@@ -1,4 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -7,11 +16,6 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * A collection of static methods that {@link SMTHandler}s are likely to use.
@@ -26,38 +30,38 @@ public class HandlerUtil {
      * binders.
      */
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_NOBINDERS =
-            new SMTHandlerProperty.BooleanProperty("NoBinders",
-                    "Disable binder translation",
-                    "To translate binders (like seqDef or bsum)," +
-                            "a new function symbol must be introduced for every term." +
-                            "This may make the translation slow.");
+        new SMTHandlerProperty.BooleanProperty("NoBinders",
+            "Disable binder translation",
+            "To translate binders (like seqDef or bsum)," +
+                "a new function symbol must be introduced for every term." +
+                "This may make the translation slow.");
 
     /**
      * A user SMT property to decide whether the type hierarchy is translated
      * at all. It introduces a lot of quantifiers that are often not needed.
      */
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_NO_TYPE_HIERARCHY =
-            new BooleanProperty("NoTypeHierarchy",
-                    "Disable type hierarchy encoding",
-                    "Type hierarchy is encoded with a number of quantified " +
-                            "axioms. They make the translation more precise, but may " +
-                            "also cost efficiency.");
+        new BooleanProperty("NoTypeHierarchy",
+            "Disable type hierarchy encoding",
+            "Type hierarchy is encoded with a number of quantified " +
+                "axioms. They make the translation more precise, but may " +
+                "also cost efficiency.");
 
     public static final SMTHandlerProperty.BooleanProperty NO_QUANTIFIERS =
-            new BooleanProperty("NoQuantifiers",
-                    "Reduce the number of introduced universal quantifiers",
-                    "TODO");
+        new BooleanProperty("NoQuantifiers",
+            "Reduce the number of introduced universal quantifiers",
+            "TODO");
 
     /**
      * This lists the handler properties that do not belong to a particular
      * SMT handler.
      */
     public static final List<? extends SMTHandlerProperty<?>> GLOBAL_PROPERTIES =
-            Arrays.asList(PROPERTY_NO_TYPE_HIERARCHY,
-                    new EnumProperty<>("identifier",
-                            "Smt some heading",
-                            "lorem ipsim lorem ipsim lorem ipsim lorem ipsim lorem ipsim lorem ipsim ",
-                            ProofStatus.class));
+        Arrays.asList(PROPERTY_NO_TYPE_HIERARCHY,
+            new EnumProperty<>("identifier",
+                "Smt some heading",
+                "lorem ipsim lorem ipsim lorem ipsim lorem ipsim lorem ipsim lorem ipsim ",
+                ProofStatus.class));
 
     private HandlerUtil() {
         throw new Error("do not instantiate");
@@ -82,12 +86,14 @@ public class HandlerUtil {
      * function along with assertions as to parameter types.
      * "f : int -> boolean" will be translated as a function "ui_f (U) U" along
      * with the assertion that if x is an int, f(x) will be a boolean.
+     *
      * @param op the operator to translate
      * @param name the name of the function
      * @param master the associated master handler
      * @return the function expression
      */
-    static SExpr funTypeAxiom(SortedOperator op, String name, MasterHandler master) throws SMTTranslationException {
+    static SExpr funTypeAxiom(SortedOperator op, String name, MasterHandler master)
+            throws SMTTranslationException {
         return funTypeAxiom(name, op.arity(), op.sort(), master);
     }
 
@@ -96,13 +102,15 @@ public class HandlerUtil {
      * function along with assertions as to parameter types.
      * "f : int -> boolean" will be translated as a function "ui_f (U) U" along
      * with the assertion that if x is an int, f(x) will be a boolean.
+     *
      * @param name the name of the function
      * @param arity the number of parameters that the function accepts
      * @param sort the result type of the function
      * @param master the associated master handler
      * @return the function expression
      */
-    static SExpr funTypeAxiom(String name, int arity, Sort sort, MasterHandler master) throws SMTTranslationException {
+    static SExpr funTypeAxiom(String name, int arity, Sort sort, MasterHandler master)
+            throws SMTTranslationException {
         List<SExpr> vars_U = new ArrayList<>();
         List<SExpr> vars = new ArrayList<>();
         for (int i = 0; i < arity; ++i) {
@@ -111,20 +119,20 @@ public class HandlerUtil {
         }
 
         List<SExpr> tos = new ArrayList<>();
-//        int i = 0;
-//        for (Sort sort : op.argSorts()) {
-//            // TODO MU: are these restrictions actually needed?
-//            // It is way simpler to leave them out. Still sound? I assume so ...
-//            master.addSort(sort);
-//            SExpr var = new SExpr(LogicalVariableHandler.VAR_PREFIX + i);
-//            tos.add(SExprs.instanceOf(var, SExprs.sortExpr(sort)));
-//            ++i;
-//        }
+        // int i = 0;
+        // for (Sort sort : op.argSorts()) {
+        // // TODO MU: are these restrictions actually needed?
+        // // It is way simpler to leave them out. Still sound? I assume so ...
+        // master.addSort(sort);
+        // SExpr var = new SExpr(LogicalVariableHandler.VAR_PREFIX + i);
+        // tos.add(SExprs.instanceOf(var, SExprs.sortExpr(sort)));
+        // ++i;
+        // }
 
         SExpr ante = SExprs.and(tos);
         master.addSort(sort);
         SExpr cons = SExprs.instanceOf(new SExpr(name, vars),
-                SExprs.sortExpr(sort));
+            SExprs.sortExpr(sort));
         SExpr matrix = SExprs.imp(ante, cons);
         SExpr pattern = SExprs.patternSExpr(matrix, new SExpr(name, vars));
         SExpr axiom = SExprs.forall(vars_U, pattern);

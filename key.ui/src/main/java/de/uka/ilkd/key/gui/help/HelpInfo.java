@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.help;
 
 import java.lang.annotation.ElementType;
@@ -10,7 +14,7 @@ import java.lang.annotation.Target;
  * @version 1 (10.04.19)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 /**
  * Annotate the help page for your component.
  *

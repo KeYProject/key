@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Iterator;
@@ -28,7 +32,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
     public void execute(Parameters args) throws ScriptException, InterruptedException {
         if (args.key == null ^ args.value == null) {
             throw new IllegalArgumentException(
-                    "When using key or value in a set command, you have to use both.");
+                "When using key or value in a set command, you have to use both.");
         }
 
         final Proof proof = state.getProof();
@@ -38,8 +42,8 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
         if (args.oneStepSimplification != null) {
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
-                    args.oneStepSimplification ? StrategyProperties.OSS_ON
-                            : StrategyProperties.OSS_OFF);
+                args.oneStepSimplification ? StrategyProperties.OSS_ON
+                        : StrategyProperties.OSS_OFF);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
         } else if (args.proofSteps != null) {
@@ -77,7 +81,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
         final Profile profile = state.getProof().getServices().getProfile();
 
         final Iterator<StrategyFactory> supportedStrategies = //
-                profile.supportedStrategies().iterator();
+            profile.supportedStrategies().iterator();
         while (supportedStrategies.hasNext()) {
             final StrategyFactory s = supportedStrategies.next();
             if (state.getProof().getActiveStrategy().name().equals(s.name())) {

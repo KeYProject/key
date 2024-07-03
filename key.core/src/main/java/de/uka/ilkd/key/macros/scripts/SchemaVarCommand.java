@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
+
+import java.util.Map;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -7,8 +13,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.pp.AbbrevMap;
-
-import java.util.Map;
 
 /**
  *
@@ -20,12 +24,14 @@ public class SchemaVarCommand
         super(Parameters.class);
     }
 
-    @Override public Parameters evaluateArguments(EngineState state,
+    @Override
+    public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
-    @Override public void execute(Parameters args)
+    @Override
+    public void execute(Parameters args)
             throws ScriptException, InterruptedException {
 
         if (args.type == null || args.var == null) {
@@ -44,8 +50,7 @@ public class SchemaVarCommand
             SchemaVariable sv;
             if ("Formula".equals(args.type)) {
                 sv = SchemaVariableFactory.createFormulaSV(schemaVar);
-            }
-            else {
+            } else {
                 Sort sort = state.toSort(args.type);
                 sv = SchemaVariableFactory.createTermSV(schemaVar, sort);
             }
@@ -54,14 +59,14 @@ public class SchemaVarCommand
                     .createTerm(sv);
 
             abbrMap.put(term, args.var, true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ScriptException(e);
         }
 
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "schemaVar";
     }
 

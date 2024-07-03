@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.utilities;
 
@@ -10,7 +13,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
-
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
@@ -37,13 +39,13 @@ public final class GuiUtilities {
         if (pane instanceof JScrollPane) {
             ((JScrollPane) pane).getViewport().setBackground(Color.white);
         }
-        pane.setMinimumSize(new java.awt.Dimension(150,0));
+        pane.setMinimumSize(new java.awt.Dimension(150, 0));
     }
 
     public static String writeTerm(Term term) {
         final NotationInfo ni = new NotationInfo();
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, null,
-                new TermLabelVisibilityManager());
+            new TermLabelVisibilityManager());
         p.setLineWidth(LINE_WIDTH);
         p.reset();
 
@@ -80,7 +82,7 @@ public final class GuiUtilities {
 
         // indent inner lines once again
         var innerIndent = " ".repeat(2 + width);
-        args.forEach((k, v) ->  {
+        args.forEach((k, v) -> {
             out.format(format, k, indentStringWith(v, innerIndent).trim());
         });
 
@@ -111,7 +113,7 @@ public final class GuiUtilities {
 
     public static void setClipboardText(String text) {
         java.awt.datatransfer.StringSelection ss =
-                new java.awt.datatransfer.StringSelection(text);
+            new java.awt.datatransfer.StringSelection(text);
         java.awt.Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(ss, ss);
     }
@@ -121,8 +123,8 @@ public final class GuiUtilities {
      * Center a component on the screen.
      *
      * @param comp
-     *            the component to be centered relative to the screen. It must
-     *            already have its final size set.
+     *        the component to be centered relative to the screen. It must
+     *        already have its final size set.
      * @preconditions comp.getSize() as on screen.
      * @see #setCenter(Component, Component)
      */
@@ -135,17 +137,18 @@ public final class GuiUtilities {
         if (frameSize.width > screenSize.width) {
             frameSize.width = screenSize.width;
         }
-        comp.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+        comp.setLocation((screenSize.width - frameSize.width) / 2,
+            (screenSize.height - frameSize.height) / 2);
     }
 
     /**
      * Center a component within a parental component.
      *
      * @param comp
-     *            the component to be centered.
+     *        the component to be centered.
      * @param parent
-     *            center relative to what. <code>null</code> to center relative
-     *            to screen.
+     *        center relative to what. <code>null</code> to center relative
+     *        to screen.
      * @see #setCenter(Component)
      */
     public static void setCenter(Component comp, Component parent) {
@@ -155,9 +158,10 @@ public final class GuiUtilities {
         }
         Dimension dlgSize = comp.getPreferredSize();
         Dimension frmSize = parent.getSize();
-        Point	  loc = parent.getLocation();
+        Point loc = parent.getLocation();
         if (dlgSize.width < frmSize.width && dlgSize.height < frmSize.height) {
-            comp.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height - dlgSize.height) / 2 + loc.y);
+            comp.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
+                (frmSize.height - dlgSize.height) / 2 + loc.y);
         } else {
             setCenter(comp);
         }

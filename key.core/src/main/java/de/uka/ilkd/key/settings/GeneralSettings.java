@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.settings;
 
 import java.util.EventObject;
@@ -28,8 +32,7 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     public static boolean disableSpecs = false;
     private static final String TACLET_FILTER = "[General]StupidMode";
-    private static final String DND_DIRECTION_SENSITIVE_KEY
-        = "[General]DnDDirectionSensitive";
+    private static final String DND_DIRECTION_SENSITIVE_KEY = "[General]DnDDirectionSensitive";
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSavePeriod";
@@ -49,7 +52,8 @@ public class GeneralSettings implements Settings, Cloneable {
     /** JML is active by default */
     private boolean useJML = true;
 
-    /** auto save is disabled by default.
+    /**
+     * auto save is disabled by default.
      * Positive values indicate save period.
      */
     private int autoSave = 0;
@@ -60,7 +64,7 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     private boolean ensureSourceConsistency = true;
 
-    private LinkedList<SettingsListener> listenerList = 
+    private LinkedList<SettingsListener> listenerList =
         new LinkedList<SettingsListener>();
 
     GeneralSettings() {
@@ -72,7 +76,7 @@ public class GeneralSettings implements Settings, Cloneable {
         return tacletFilter;
     }
 
-    public boolean isDndDirectionSensitive() {        
+    public boolean isDndDirectionSensitive() {
         return dndDirectionSensitive;
     }
 
@@ -95,20 +99,20 @@ public class GeneralSettings implements Settings, Cloneable {
     // setter
     public void setTacletFilter(boolean b) {
         if (tacletFilter != b) {
-          tacletFilter = b;
-          fireSettingsChanged();
+            tacletFilter = b;
+            fireSettingsChanged();
         }
     }
-    
+
     public void setDnDDirectionSensitivity(boolean b) {
         if (dndDirectionSensitive != b) {
-          dndDirectionSensitive = b;
-          fireSettingsChanged();
+            dndDirectionSensitive = b;
+            fireSettingsChanged();
         }
     }
 
     public void setRightClickMacros(boolean b) {
-        if(this.rightClickMacros != b) {
+        if (this.rightClickMacros != b) {
             rightClickMacros = b;
             fireSettingsChanged();
         }
@@ -117,7 +121,7 @@ public class GeneralSettings implements Settings, Cloneable {
     public void setUseJML(boolean b) {
         if (useJML != b) {
             useJML = b;
-          fireSettingsChanged();
+            fireSettingsChanged();
         }
     }
 
@@ -129,6 +133,7 @@ public class GeneralSettings implements Settings, Cloneable {
     /**
      * Sets the ensureSourceConsistency flag. This enables/disables caching of source files at first
      * use via a FileRepo.
+     *
      * @param b the new truth value of the flag
      */
     public void setEnsureSourceConsistency(boolean b) {
@@ -138,7 +143,8 @@ public class GeneralSettings implements Settings, Cloneable {
         }
     }
 
-    /** gets a Properties object and has to perform the necessary
+    /**
+     * gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
@@ -167,7 +173,8 @@ public class GeneralSettings implements Settings, Cloneable {
         if (val != null) {
             try {
                 autoSave = Integer.parseInt(val);
-                if (autoSave < 0) autoSave = 0;
+                if (autoSave < 0)
+                    autoSave = 0;
             } catch (NumberFormatException e) {
                 autoSave = 0;
             }
@@ -179,21 +186,24 @@ public class GeneralSettings implements Settings, Cloneable {
         }
     }
 
-    /** implements the method required by the Settings interface. The
-     * settings are written to the given Properties object. Only entries of the form 
+    /**
+     * implements the method required by the Settings interface. The
+     * settings are written to the given Properties object. Only entries of the form
      * <key> = <value> (,<value>)* are allowed.
+     *
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-	props.setProperty(TACLET_FILTER, "" + tacletFilter);
+        props.setProperty(TACLET_FILTER, "" + tacletFilter);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
         props.setProperty(USE_JML_KEY, "" + useJML);
-        props.setProperty(AUTO_SAVE, ""+ autoSave);
+        props.setProperty(AUTO_SAVE, "" + autoSave);
         props.setProperty(ENSURE_SOURCE_CONSISTENCY, "" + ensureSourceConsistency);
     }
 
-    /** sends the message that the state of this setting has been
+    /**
+     * sends the message that the state of this setting has been
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
@@ -202,8 +212,9 @@ public class GeneralSettings implements Settings, Cloneable {
         }
     }
 
-    /** 
-     * adds a listener to the settings object 
+    /**
+     * adds a listener to the settings object
+     *
      * @param l the listener
      */
     public void addSettingsListener(SettingsListener l) {
@@ -212,6 +223,7 @@ public class GeneralSettings implements Settings, Cloneable {
 
     /**
      * removes the listener from the settings object
+     *
      * @param l the listener to remove
      */
     public void removeSettingsListener(SettingsListener l) {

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 
@@ -12,8 +16,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
- *  This variable condition checks if a schemavariable is instantiated 
- *  with a reference or primitive type
+ * This variable condition checks if a schemavariable is instantiated
+ * with a reference or primitive type
  */
 public final class TypeCondition extends VariableConditionAdapter {
 
@@ -23,37 +27,38 @@ public final class TypeCondition extends VariableConditionAdapter {
 
 
     /**
-     * create a type condition     
+     * create a type condition
+     *
      * @param tr the TypeResolver for the type to be checked
      * @param isReference check for reference or primitive type
-     *                     (weigl: This parameter is used as negation)
-     * @param nonNull if Sort null should be allowed (only important when 
-     * isReference is set to true)
+     *        (weigl: This parameter is used as negation)
+     * @param nonNull if Sort null should be allowed (only important when
+     *        isReference is set to true)
      */
     public TypeCondition(TypeResolver tr, boolean isReference, boolean nonNull) {
         this.resolver = tr;
         this.isReference = isReference;
         this.nonNull = nonNull;
     }
-    
-    public TypeResolver getResolver(){
-	return resolver;
+
+    public TypeResolver getResolver() {
+        return resolver;
     }
-    
-    public boolean getIsReference(){
-	return isReference;
+
+    public boolean getIsReference() {
+        return isReference;
     }
-    
-    public boolean getNonNull(){
-	return nonNull;
+
+    public boolean getNonNull() {
+        return nonNull;
     }
-    
-    
+
+
     @Override
-    public boolean check(SchemaVariable p_var, 
-			 SVSubstitute candidate, 
-			 SVInstantiations svInst,
-			 Services services) {
+    public boolean check(SchemaVariable p_var,
+            SVSubstitute candidate,
+            SVInstantiations svInst,
+            Services services) {
 
         if (!resolver.isComplete(p_var, candidate, svInst, services)) {
             // instantiation not yet complete
@@ -64,7 +69,7 @@ public final class TypeCondition extends VariableConditionAdapter {
         Sort objectSort = services.getJavaInfo().objectSort();
 
         boolean isProxySort = s instanceof ProxySort;
-        if(!isProxySort) {
+        if (!isProxySort) {
             // for normal sorts this is ...
             if (isReference) {
                 return (s.extendsTrans(objectSort)
@@ -74,16 +79,16 @@ public final class TypeCondition extends VariableConditionAdapter {
             }
         } else {
             // for proxy sorts this is ...
-            if(isReference && nonNull) {
+            if (isReference && nonNull) {
                 // non-null cannot be guaranteed since there is no lower bound to type var
                 return false;
             }
-            if(isReference) {
+            if (isReference) {
                 // one extended sort must have the property and we are fine
                 for (Sort extSort : s.extendsSorts()) {
                     // same as:
-                    // extends && isReference  ||  !extends && !isReference
-                    if(extSort.extendsTrans(objectSort) == isReference) {
+                    // extends && isReference || !extends && !isReference
+                    if (extSort.extendsTrans(objectSort) == isReference) {
                         return true;
                     }
                 }
@@ -92,19 +97,19 @@ public final class TypeCondition extends VariableConditionAdapter {
         }
     }
 
-    
+
     @Override
-    public String toString () {
+    public String toString() {
         String prefix = "\\isReference";
         if (isReference && nonNull) {
             prefix += "[non_null]";
-        }               
-        return (isReference ? "" : "\\not" ) + prefix + "( " + resolver + " )";            
+        }
+        return (isReference ? "" : "\\not") + prefix + "( " + resolver + " )";
     }
-    
+
 
     /**
      * @return returns value of <code>resolver</code>.
      */
-    public TypeResolver getTypeResolver() {return resolver;}
+    public TypeResolver getTypeResolver() { return resolver; }
 }

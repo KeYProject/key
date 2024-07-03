@@ -1,4 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.ui;
+
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import javax.swing.*;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.ProofControl;
@@ -14,20 +24,16 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import org.key_project.util.collection.ImmutableList;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A {@link ProofControl} which performs the automode in a {@link SwingWorker}.
  *
  * @author Martin Hentschel
  */
-// TODO: This class should not know/use the AbstractMediatorUserInterfaceControl and the KeYMediator.
+// TODO: This class should not know/use the AbstractMediatorUserInterfaceControl and the
+// KeYMediator.
 // Refactor the implementation and use events to update the user interface.
 public class MediatorProofControl extends AbstractProofControl {
     private final AbstractMediatorUserInterfaceControl ui;
@@ -133,10 +139,11 @@ public class MediatorProofControl extends AbstractProofControl {
         worker.execute();
     }
 
-    /* <p>
+    /*
+     * <p>
      * Invoking start() on the SwingWorker causes a new Thread
      * to be created that will call construct(), and then
-     * finished().  Note that finished() is called even if
+     * finished(). Note that finished() is called even if
      * the worker is interrupted because we catch the
      * InterruptedException in doWork().
      * </p>
@@ -145,7 +152,7 @@ public class MediatorProofControl extends AbstractProofControl {
      * freeze the MainWindow via
      * {@code
      * mediator().stopInterface(true);
-     *   mediator().setInteractive(false);
+     * mediator().setInteractive(false);
      * }. The thread itself unfreezes the UI when it is finished.
      * </p>
      */
@@ -157,12 +164,13 @@ public class MediatorProofControl extends AbstractProofControl {
         private ApplyStrategyInfo info;
 
         public AutoModeWorker(final Proof proof,
-                              final ImmutableList<Goal> goals,
-                              ProverTaskListener ptl) {
+                final ImmutableList<Goal> goals,
+                ProverTaskListener ptl) {
             this.proof = proof;
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
-            this.applyStrategy = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+            this.applyStrategy = new ApplyStrategy(
+                proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
             if (ptl != null) {
                 applyStrategy.addProverTaskObserver(ptl);
             }
@@ -198,25 +206,26 @@ public class MediatorProofControl extends AbstractProofControl {
             }
         }
 
-        protected void emitInteractiveAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info) {
+        protected void emitInteractiveAutoMode(List<Node> initialGoals, Proof proof,
+                ApplyStrategyInfo info) {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
         private void notifyException(final Exception exception) {
             ui.notify(new GeneralFailureEvent("An exception occurred during"
-                    + " strategy execution.\n Exception:" + exception));
+                + " strategy execution.\n Exception:" + exception));
         }
 
         @Override
         protected ApplyStrategyInfo doInBackground() throws Exception {
             boolean stopMode = proof.getSettings().getStrategySettings()
                     .getActiveStrategyProperties().getProperty(
-                            StrategyProperties.STOPMODE_OPTIONS_KEY)
+                        StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
 
             info = applyStrategy.start(
-                    proof, goals, ui.getMediator().getMaxAutomaticSteps(),
-                    ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
+                proof, goals, ui.getMediator().getMaxAutomaticSteps(),
+                ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
 
             return info;
         }

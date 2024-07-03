@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic;
 
 import java.util.LinkedList;
@@ -5,16 +9,16 @@ import java.util.StringTokenizer;
 
 /**
  * Describes the position within a term by a sequence of integers.
- * 
- * To create a position  
+ *
+ * To create a position
  * <ul>
  * <li>obtain the position object representing the top level position, which refers to
- *  the term as a whole.</li>
+ * the term as a whole.</li>
  * <li>use method {@link #down(int)} to keep track of the current position. Pass as argument the
  * position of the subterm to be taken. Attention: Each invocation creates a new position in term
  * object which has to be used for further navigation. The original one remains unchanged.</li>
  * </ul>
- * 
+ *
  */
 public final class PosInTerm {
 
@@ -23,52 +27,55 @@ public final class PosInTerm {
     // to save memory, we use 16bit integers (unsigned) instead of 32bit
     private final char[] positions;
     private final char size;
-    private volatile char hash = (char)-1;
+    private volatile char hash = (char) -1;
     private volatile boolean copy;
 
-    
-    /** 
+
+    /**
      * create a position from the string
-     * 
+     *
      * The string contains a comma separated list of integers.
-     * The position created from the string encapsulated the given list but in 
+     * The position created from the string encapsulated the given list but in
      * reverse order
-     * 
-     * @param s the String with the list of integers to be interpreted as term indices in 
-     * reverse order
+     *
+     * @param s the String with the list of integers to be interpreted as term indices in
+     *        reverse order
      * @return the PosInTerm encapsulating the integer list in reverse order
      */
     public static PosInTerm parseReverseString(String s) {
         if ("".equals(s)) {
             return getTopLevel();
         }
-        
-        final LinkedList<Integer> list = new LinkedList<Integer>();        
-        final StringTokenizer tker = new StringTokenizer(s,",",false);
-        
+
+        final LinkedList<Integer> list = new LinkedList<Integer>();
+        final StringTokenizer tker = new StringTokenizer(s, ",", false);
+
         while (tker.hasMoreTokens()) {
             list.addFirst(Integer.decode(tker.nextToken()));
         }
-        
+
         final char[] positions = new char[list.size()];
         int i = 0;
         for (int j : list) {
-            if (j > Character.MAX_VALUE) throw new ArithmeticException("Position "+j+" out of bounds");
-            positions[i] = (char)j;
+            if (j > Character.MAX_VALUE)
+                throw new ArithmeticException("Position " + j + " out of bounds");
+            positions[i] = (char) j;
             ++i;
         }
-               
-        return positions.length == 0 ? getTopLevel() : new PosInTerm(positions, (char) positions.length, true);
+
+        return positions.length == 0 ? getTopLevel()
+                : new PosInTerm(positions, (char) positions.length, true);
     }
 
     /**
      * returns the instance representing the top level position
+     *
      * @return the top level position
      */
     public static PosInTerm getTopLevel() {
         return TOP_LEVEL;
     }
-    
+
     /**
      * only used once to create the singleton for the top level position
      */
@@ -81,8 +88,11 @@ public final class PosInTerm {
 
     /**
      * creates an instance representing the position <code>positions[0..size-1]</code>
-     * @param positions the integer array where each element describes the position to be taken (in top-to-bottom order)
-     * @param size the size of the integer list (attention: might be shorter than the length of the position array)
+     *
+     * @param positions the integer array where each element describes the position to be taken (in
+     *        top-to-bottom order)
+     * @param size the size of the integer list (attention: might be shorter than the length of the
+     *        position array)
      * @param copy indicates (i.e. true) if the position array has to be copied when going downwards
      */
     private PosInTerm(char[] positions, char size, boolean copy) {
@@ -94,6 +104,7 @@ public final class PosInTerm {
 
     /**
      * the depth of the sub term described by this position
+     *
      * @return the term depth
      */
     public int depth() {
@@ -102,6 +113,7 @@ public final class PosInTerm {
 
     /**
      * true if the position describes the top level position, i.e., the term as a whole
+     *
      * @return true iff top level
      */
     public boolean isTopLevel() {
@@ -110,20 +122,23 @@ public final class PosInTerm {
 
     /**
      * returns the position of the enclosing term
+     *
      * @return the position of the parent
      */
     public PosInTerm up() {
         if (size == 0) {
             return null;
         }
-        return size == 1 ? getTopLevel() : new PosInTerm(positions, (char)(size - 1), true);
+        return size == 1 ? getTopLevel() : new PosInTerm(positions, (char) (size - 1), true);
     }
 
     /**
      * returns the position of the <code>depth-n</code> parent term
-     * @param n the integer specifying the length of the prefix 
+     *
+     * @param n the integer specifying the length of the prefix
      * @return the prefix of this position of length <code>n</code>
-     * @throws IndexOutOfBoundsException if <code>n</code> is greater than the depth of this position
+     * @throws IndexOutOfBoundsException if <code>n</code> is greater than the depth of this
+     *         position
      */
     public PosInTerm firstN(int n) {
         if (n > size) {
@@ -133,85 +148,92 @@ public final class PosInTerm {
         } else if (n == size) {
             return this;
         }
-        return new PosInTerm(positions, (char)n, true);
+        return new PosInTerm(positions, (char) n, true);
     }
-    
+
     /**
-     * returns the position for the <code>i</code>-th subterm of the subterm described by this position  
+     * returns the position for the <code>i</code>-th subterm of the subterm described by this
+     * position
+     *
      * @param i the index of the subterm
      * @return the position of the i-th subterm
      */
     public PosInTerm down(int i) {
-        if (i > Character.MAX_VALUE) throw new ArithmeticException("Position "+i+" out of bounds");
-        
+        if (i > Character.MAX_VALUE)
+            throw new ArithmeticException("Position " + i + " out of bounds");
+
         boolean localCopy = true;
         if (!copy) { // at most one thread is allowed to enter the non-copy branch
             synchronized (positions) {
-                localCopy = copy; 
+                localCopy = copy;
                 if (copy == false) {
                     copy = true;
                 }
             }
         }
-        final PosInTerm result;        
-        if (localCopy) {        
-            final char[] newPositions = 
-                    new char[positions.length <= size ? size + 4 : positions.length];
+        final PosInTerm result;
+        if (localCopy) {
+            final char[] newPositions =
+                new char[positions.length <= size ? size + 4 : positions.length];
             System.arraycopy(positions, 0, newPositions, 0, size);
-            newPositions[size] = (char)i;
-            result = new PosInTerm(newPositions, (char)(size + 1), false);
+            newPositions[size] = (char) i;
+            result = new PosInTerm(newPositions, (char) (size + 1), false);
         } else {
-            copy   = true;
-            positions[size] = (char)i;
-            result = new PosInTerm(positions, (char)(size + 1), size >= positions.length - 1);            
+            copy = true;
+            positions[size] = (char) i;
+            result = new PosInTerm(positions, (char) (size + 1), size >= positions.length - 1);
         }
         return result;
     }
 
     /**
-     * returns the index of the subterm at depth <code>i</code>  
+     * returns the index of the subterm at depth <code>i</code>
+     *
      * @param i the depth of the subterm whose index it to be returned
-     * @return an int such that <code>term.subAt(this).sub(getIndex(i)) == term.subAt(firstN(i+1))</code>
+     * @return an int such that
+     *         <code>term.subAt(this).sub(getIndex(i)) == term.subAt(firstN(i+1))</code>
      */
     public int getIndexAt(int i) {
-        if (i<0 || i>=size) {
-            throw new IndexOutOfBoundsException("No position at index "+i);
+        if (i < 0 || i >= size) {
+            throw new IndexOutOfBoundsException("No position at index " + i);
         }
         return positions[i];
     }
 
-    /** 
+    /**
      * equivalent to <code>getIndexAt(depth() - 1)</code>
+     *
      * @return the index of the subterm described by this position
      */
     public int getIndex() {
         return size == 0 ? -1 : positions[size - 1];
     }
-    
-    
+
+
     /**
      * navigate to the subterm described by this position and return it
      * if the described position does not exist in the term an {@link IndexOutOfBoundsException}
      * is thrown
-     * @param t the {@link Term} 
-     * @return the sub term of term {@code t} at this position   
+     *
+     * @param t the {@link Term}
+     * @return the sub term of term {@code t} at this position
      * @throws an {@link IndexOutOfBoundsException} if no subterm exists at this position
      */
     public Term getSubTerm(Term t) {
         Term sub = t;
-        for (int i = 0; i<size; i++) {  
+        for (int i = 0; i < size; i++) {
             sub = sub.sub(positions[i]);
         }
         return sub;
     }
 
-    public int hashCode() {        
-        if (hash == (char)-1) {
+    public int hashCode() {
+        if (hash == (char) -1) {
             char localHash = 13;
             for (int i = 0; i < size; i++) {
                 localHash = (char) (13 * localHash + positions[i]);
-            }        
-            localHash = (localHash == (char)-1) ? 0 : localHash;
+            }
+            localHash = (localHash == (char) -1) ? 0 : localHash;
             hash = localHash;
         }
         return hash;
@@ -239,8 +261,10 @@ public final class PosInTerm {
     }
 
     /**
-     * returns a comma separated list of integers enclosed in brackets (the list contains all integers
-     * in the order as returned by the iterator)  
+     * returns a comma separated list of integers enclosed in brackets (the list contains all
+     * integers
+     * in the order as returned by the iterator)
+     *
      * @param it the iterator
      * @return the String with the list of integers
      */
@@ -256,9 +280,10 @@ public final class PosInTerm {
         return list.toString();
     }
 
-    
+
     /**
      * iterates through all indices in top to bottom order
+     *
      * @return iterator through all indices
      */
     public IntIterator iterator() {
@@ -267,6 +292,7 @@ public final class PosInTerm {
 
     /**
      * iterates through all indices in bottom to top order
+     *
      * @return iterator through all indices in reverse order
      */
     public IntIterator reverseIterator() {
@@ -316,14 +342,15 @@ public final class PosInTerm {
 
     /**
      * Checks whether this pit is the prefix of a given pit.
+     *
      * @param pit the given pit
      * @return true if this is a prefix of the given pit
      */
     public boolean isPrefixOf(PosInTerm pit) {
-        if(size >= pit.size) {
+        if (size >= pit.size) {
             return false;
         }
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             if (positions[i] != pit.positions[i]) {
                 return false;
             }

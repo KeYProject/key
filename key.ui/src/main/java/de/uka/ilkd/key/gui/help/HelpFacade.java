@@ -1,19 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.help;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
 
 /**
  * A gate to the KeY documentation system.
@@ -111,6 +114,7 @@ public class HelpFacade {
     /**
      * Creates a {@link CButton}, that can be add to dockables and opens the given
      * help pages at {@link #HELP_BASE_URL}
+     *
      * @param s path to help page
      * @return
      */

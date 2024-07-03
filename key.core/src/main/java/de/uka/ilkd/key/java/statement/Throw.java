@@ -1,26 +1,31 @@
-package de.uka.ilkd.key.java.statement;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.util.ExtList;
+
 /**
- *  Throw.
+ * Throw.
  */
 
 public class Throw extends ExpressionJumpStatement {
 
     /**
- *      Throw.
+     * Throw.
      */
 
     public Throw() {}
 
     /**
- *      Throw.
- *      @param expr an expression.
+     * Throw.
+     *
+     * @param expr an expression.
      */
 
     public Throw(Expression expr) {
@@ -31,20 +36,23 @@ public class Throw extends ExpressionJumpStatement {
     }
 
     /**
- *      Throw.
- *      @param children an ExtList with all children
+     * Throw.
+     *
+     * @param children an ExtList with all children
      */
 
     public Throw(ExtList children) {
         super(children);
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnThrow(this);
+        v.performActionOnThrow(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

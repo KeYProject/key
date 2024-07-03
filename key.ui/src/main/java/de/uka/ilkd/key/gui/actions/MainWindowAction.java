@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.actions;
+
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
-
-import javax.swing.*;
 
 public abstract class MainWindowAction extends KeyAction {
     /**

@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.communication;
+
+import java.io.IOException;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.st.SolverType;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
 
 /**
  * The socket for Z3.
@@ -17,7 +21,7 @@ public class Z3Socket extends AbstractSolverSocket {
      * Creates a new Z3Socket. Should not be called directly, better use the static factory method
      * {@link AbstractSolverSocket#createSocket(SolverType, ModelExtractor)}.
      *
-     * @param name  the name of the solver
+     * @param name the name of the solver
      * @param query the ModelExtractor for CE generation (unused by this socket)
      */
     public Z3Socket(String name, ModelExtractor query) {
@@ -41,39 +45,39 @@ public class Z3Socket extends AbstractSolverSocket {
         }
 
         switch (sc.getState()) {
-            case WAIT_FOR_RESULT:
-                if (msg.equals("unsat")) {
-                    sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                    // TODO: proof production is currently completely disabled, since it does not work
-                    //  with the legacy Z3 translation (proof-production not enabled) and also not
-                    //  really needed
-                    // pipe.sendMessage("(get-proof)");
+        case WAIT_FOR_RESULT:
+            if (msg.equals("unsat")) {
+                sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
+                // TODO: proof production is currently completely disabled, since it does not work
+                // with the legacy Z3 translation (proof-production not enabled) and also not
+                // really needed
+                // pipe.sendMessage("(get-proof)");
 
-                    pipe.sendMessage("(exit)");
-                    sc.setState(WAIT_FOR_DETAILS);
-                }
-                if (msg.equals("sat")) {
-                    sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-                    pipe.sendMessage("(get-model)");
-                    pipe.sendMessage("(exit)");
-                    sc.setState(WAIT_FOR_DETAILS);
+                pipe.sendMessage("(exit)");
+                sc.setState(WAIT_FOR_DETAILS);
+            }
+            if (msg.equals("sat")) {
+                sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+                pipe.sendMessage("(get-model)");
+                pipe.sendMessage("(exit)");
+                sc.setState(WAIT_FOR_DETAILS);
 
-                }
-                if (msg.equals("unknown")) {
-                    sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
-                    pipe.sendMessage("(exit)\n");
-                    sc.setState(WAIT_FOR_DETAILS);
-                }
-                break;
+            }
+            if (msg.equals("unknown")) {
+                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
+                pipe.sendMessage("(exit)\n");
+                sc.setState(WAIT_FOR_DETAILS);
+            }
+            break;
 
-            case WAIT_FOR_DETAILS:
-                // Currently we rely on the solver to terminate after receiving "(exit)". If this does
-                // not work in future, it may be that we have to forcibly close the pipe.
-//            if (msg.equals("success")) {
-//                pipe.sendMessage("(exit)");
-//                pipe.close();
-//            }
-                break;
+        case WAIT_FOR_DETAILS:
+            // Currently we rely on the solver to terminate after receiving "(exit)". If this does
+            // not work in future, it may be that we have to forcibly close the pipe.
+            // if (msg.equals("success")) {
+            // pipe.sendMessage("(exit)");
+            // pipe.close();
+            // }
+            break;
         }
     }
 }

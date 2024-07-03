@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
@@ -18,42 +22,42 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
     private final ProjectionToTerm dividend, divisor;
 
     private ReducibleMonomialsFeature(ProjectionToTerm dividend,
-                                      ProjectionToTerm divisor) {
+            ProjectionToTerm divisor) {
         this.dividend = dividend;
         this.divisor = divisor;
     }
 
     public static Feature createReducible(ProjectionToTerm dividend,
-                                          ProjectionToTerm divisor) {
-        return new ReducibleMonomialsFeature ( dividend, divisor ) {
+            ProjectionToTerm divisor) {
+        return new ReducibleMonomialsFeature(dividend, divisor) {
             protected boolean checkReducibility(Monomial mDividend,
-                                                Monomial mDivisor) {
-                return mDivisor.reducible ( mDividend );
-            }            
+                    Monomial mDivisor) {
+                return mDivisor.reducible(mDividend);
+            }
         };
     }
 
     public static Feature createDivides(ProjectionToTerm dividend,
-                                        ProjectionToTerm divisor) {
-        return new ReducibleMonomialsFeature ( dividend, divisor ) {
+            ProjectionToTerm divisor) {
+        return new ReducibleMonomialsFeature(dividend, divisor) {
             protected boolean checkReducibility(Monomial mDividend,
-                                                Monomial mDivisor) {
-                return mDivisor.divides ( mDividend );
-            }            
+                    Monomial mDivisor) {
+                return mDivisor.divides(mDividend);
+            }
         };
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {        
-        final Term dividendT = dividend.toTerm ( app, pos, goal );
-        final Term divisorT = divisor.toTerm ( app, pos, goal );
-        
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+        final Term dividendT = dividend.toTerm(app, pos, goal);
+        final Term divisorT = divisor.toTerm(app, pos, goal);
+
         final Services services = goal.proof().getServices();
-        final Monomial mDividend = Monomial.create ( dividendT, services );
-        final Monomial mDivisor = Monomial.create ( divisorT, services );
-        
-        return checkReducibility ( mDividend, mDivisor );
+        final Monomial mDividend = Monomial.create(dividendT, services);
+        final Monomial mDivisor = Monomial.create(divisorT, services);
+
+        return checkReducibility(mDividend, mDivisor);
     }
 
     protected abstract boolean checkReducibility(Monomial mDividend,
-                                                 Monomial mDivisor);
+            Monomial mDivisor);
 }

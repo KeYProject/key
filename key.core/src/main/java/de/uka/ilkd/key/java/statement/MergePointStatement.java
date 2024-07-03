@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.java.statement;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
@@ -10,6 +12,8 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+
+import org.key_project.util.ExtList;
 
 /**
  * A statement indicating a merge point.
@@ -47,7 +51,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
     public int getExpressionCount() {
@@ -57,14 +61,14 @@ public class MergePointStatement extends JavaStatement
     /**
      * Return the expression at the specified index in this node's "virtual"
      * expression array.
-     * 
+     *
      * @param index
-     *            an index for an expression.
-     * 
+     *        an index for an expression.
+     *
      * @return the expression with the given index.
-     * 
+     *
      * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     *            if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
         if (identifier != null && index == 0) {
@@ -75,7 +79,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Get expression.
-     * 
+     *
      * @return the expression.
      */
     public Expression getExpression() {
@@ -84,7 +88,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     public int getChildCount() {
@@ -97,12 +101,12 @@ public class MergePointStatement extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
+     *
      * @param index
-     *            an index into this node's "virtual" child array
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (identifier != null) {
@@ -116,9 +120,9 @@ public class MergePointStatement extends JavaStatement
     /**
      * calls the corresponding method of a visitor in order to perform some
      * action/transformation on this element
-     * 
+     *
      * @param v
-     *            the Visitor
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnMergePointStatement(this);

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.control;
 
 import java.util.Collections;
@@ -22,7 +26,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * The names of all term labels that should not be printed by default.
      */
-    private static final Name[] HIDDEN_BY_DEFAULT = { };
+    private static final Name[] HIDDEN_BY_DEFAULT = {};
 
     /**
      * The names of all term labels that should never be printed.
@@ -43,8 +47,8 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * All available {@link TermLabelVisibilityManagerListener}s.
      */
-    private final List<TermLabelVisibilityManagerListener> listeners
-        = new LinkedList<TermLabelVisibilityManagerListener>();
+    private final List<TermLabelVisibilityManagerListener> listeners =
+        new LinkedList<TermLabelVisibilityManagerListener>();
 
     /**
      * Constructs a new TermLabelVisibilityManager.
@@ -62,6 +66,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Gives the information whether currently term labels should be shown or not.
+     *
      * @return A boolean value whether currently term labels should be shown.
      */
     public boolean isShowLabels() {
@@ -70,6 +75,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Set the switch whether term labels should be shown to passed value.
+     *
      * @param showLabels A boolean value whether term labels should be shown
      */
     public void setShowLabels(boolean showLabels) {
@@ -81,6 +87,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Gives the information whether the term label with the passed name is currently hidden.
+     *
      * @param labelName The name of a term label
      * @return A boolean value whether the investigated term label is hidden.
      */
@@ -90,6 +97,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Sets the state of the term label with the passed name to hidden or not.
+     *
      * @param labelName The name of a term label
      * @param hidden The boolean value whether the term label should be hidden or not
      */
@@ -127,6 +135,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Registers the given {@link TermLabelVisibilityManagerListener}.
+     *
      * @param l The {@link TermLabelVisibilityManagerListener} to add.
      */
     public void addTermLabelVisibilityManagerListener(TermLabelVisibilityManagerListener l) {
@@ -137,6 +146,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Unregisters the given {@link TermLabelVisibilityManagerListener}.
+     *
      * @param l The {@link TermLabelVisibilityManagerListener} to remove.
      */
     public void removeTermLabelVisibilityManagerListener(TermLabelVisibilityManagerListener l) {
@@ -147,6 +157,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Returns all available {@link TermLabelVisibilityManagerListener}.
+     *
      * @return all available {@link TermLabelVisibilityManagerListener}.
      */
     public TermLabelVisibilityManagerListener[] getTermLabelVisibilityManagerListeners() {
@@ -156,8 +167,9 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * Fires the event
      * {@link TermLabelVisibilityManagerListener#visibleLabelsChanged(
-     *      TermLabelVisibilityManagerEvent)}
+     * TermLabelVisibilityManagerEvent)}
      * to all listeners.
+     *
      * @param e The event object.
      */
     protected void fireVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
@@ -169,6 +181,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Returns a sorted list of all term label names supported by the given {@link Proof}.
+     *
      * @param proof The given {@link Proof}.
      * @return The sorted list of supported term label names.
      */
@@ -178,6 +191,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Returns a sorted list of all term label names supported by the given {@link Profile}.
+     *
      * @param profile The given {@link Profile}.
      * @return The sorted list of supported term label names.
      */
@@ -188,6 +202,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * Returns a sorted list of all term TermLabelManager names supported by the given
      * {@link TermLabelManager}.
+     *
      * @param manager The given {@link Profile}.
      * @return The sorted list of supported term label names.
      */

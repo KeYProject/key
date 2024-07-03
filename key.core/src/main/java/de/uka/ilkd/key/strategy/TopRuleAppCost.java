@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy;
 
 /**
@@ -7,12 +11,12 @@ package de.uka.ilkd.key.strategy;
  */
 public class TopRuleAppCost implements RuleAppCost {
 
-    private TopRuleAppCost () {}
+    private TopRuleAppCost() {}
 
     public int compareTo(RuleAppCost o) {
-	if ( o instanceof TopRuleAppCost )
-	    return 0;
-	return 1;
+        if (o instanceof TopRuleAppCost)
+            return 0;
+        return 1;
     }
 
     public boolean equals(Object o) {
@@ -21,19 +25,19 @@ public class TopRuleAppCost implements RuleAppCost {
         }
         return false;
     }
-    
+
     public int hashCode() {
         return 91879827;
     }
-    
-    public final RuleAppCost add (RuleAppCost cost2) {
+
+    public final RuleAppCost add(RuleAppCost cost2) {
         return INSTANCE;
     }
 
-    public String toString () {
+    public String toString() {
         return "Costs infinite";
     }
 
-    public static final TopRuleAppCost INSTANCE = new TopRuleAppCost ();
+    public static final TopRuleAppCost INSTANCE = new TopRuleAppCost();
 
 }

@@ -1,11 +1,15 @@
-package de.uka.ilkd.key.smt;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.smt.st.SolverType;
+package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import de.uka.ilkd.key.smt.st.SolverType;
 
 /**
  * Stores a set of solver types. This class can be used in order to encapsulate multiple solvers.
@@ -20,20 +24,20 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     private int hashCode = -1;
 
     /**
-     * 
+     *
      * @param type
-     *            at least on solver type must be passed.
+     *        at least on solver type must be passed.
      * @param types
      * @param minUsableSolvers
-     *            specifies how many solvers at leas must be usable, so that
-     *            <code>isUsable</code> returns true.
+     *        specifies how many solvers at leas must be usable, so that
+     *        <code>isUsable</code> returns true.
      */
     public SolverTypeCollection(String name, int minUsableSolvers,
-	    SolverType type, SolverType... types) {
-	this.types.add(type);
-	this.name = name;
-	this.minUsableSolver = minUsableSolvers;
-	Collections.addAll(this.types, types);
+            SolverType type, SolverType... types) {
+        this.types.add(type);
+        this.name = name;
+        this.minUsableSolver = minUsableSolvers;
+        Collections.addAll(this.types, types);
     }
 
     /**
@@ -44,7 +48,7 @@ public class SolverTypeCollection implements Iterable<SolverType> {
      * @param types the types to add
      */
     public SolverTypeCollection(String name, int minUsableSolvers,
-                Collection<SolverType> types) {
+            Collection<SolverType> types) {
         this.name = name;
         this.minUsableSolver = minUsableSolvers;
         this.types.addAll(types);
@@ -59,14 +63,15 @@ public class SolverTypeCollection implements Iterable<SolverType> {
             return false;
         }
         SolverTypeCollection stc = (SolverTypeCollection) o;
-        return name.equals(stc.name) && minUsableSolver == stc.minUsableSolver && types.equals(stc.types);
+        return name.equals(stc.name) && minUsableSolver == stc.minUsableSolver
+                && types.equals(stc.types);
     }
 
     public int hashCode() {
         if (hashCode == -1) {
             hashCode = (minUsableSolver + 1) * name.hashCode();
-            for (SolverType type:types) {
-                hashCode = hashCode + 7*type.hashCode();
+            for (SolverType type : types) {
+                hashCode = hashCode + 7 * type.hashCode();
             }
             if (hashCode == -1) {
                 hashCode = 0;
@@ -75,46 +80,46 @@ public class SolverTypeCollection implements Iterable<SolverType> {
         return hashCode;
     }
 
-	public LinkedList<SolverType> getTypes() {
-		return types;
-	}
+    public LinkedList<SolverType> getTypes() {
+        return types;
+    }
 
-	public boolean isUsable() {
-		int usableCount = 0;
-		for (SolverType type : types) {
-			if (type.isInstalled(false)) {
-				usableCount++;
-			}
-		}
+    public boolean isUsable() {
+        int usableCount = 0;
+        for (SolverType type : types) {
+            if (type.isInstalled(false)) {
+                usableCount++;
+            }
+        }
 
-		return usableCount >= minUsableSolver;
-	}
+        return usableCount >= minUsableSolver;
+    }
 
-	public String name() {
-		return name;
-	}
+    public String name() {
+        return name;
+    }
 
-	public String toString() {
-		String s = "";
+    public String toString() {
+        String s = "";
 
-		int i = 0;
-		for (SolverType type : types) {
-			if (type.isInstalled(false)) {
-				if (i > 0) {
-					s += ", ";
-				}
-				s += type.getName();
-				i++;
-			}
-		}
-		if (s.isEmpty()) {
-			return "No solver available.";
-		}
-		return s;
-	}
+        int i = 0;
+        for (SolverType type : types) {
+            if (type.isInstalled(false)) {
+                if (i > 0) {
+                    s += ", ";
+                }
+                s += type.getName();
+                i++;
+            }
+        }
+        if (s.isEmpty()) {
+            return "No solver available.";
+        }
+        return s;
+    }
 
-	@Override
-	public Iterator<SolverType> iterator() {
-		return types.iterator();
-	}
+    @Override
+    public Iterator<SolverType> iterator() {
+        return types.iterator();
+    }
 }

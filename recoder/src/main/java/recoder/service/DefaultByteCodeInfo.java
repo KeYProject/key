@@ -1,17 +1,20 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
-
-import recoder.ServiceConfiguration;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-import recoder.bytecode.*;
-import recoder.convenience.Format;
-import recoder.util.Debug;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import recoder.ServiceConfiguration;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.bytecode.*;
+import recoder.convenience.Format;
+import recoder.util.Debug;
 
 
 public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements ByteCodeInfo {
@@ -20,12 +23,14 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
      * Containment relation. This could be made internal part of the
      * ByteCodeInfo hierarchy.
      */
-    private final Map<ProgramModelElement, ClassTypeContainer> element2container = new HashMap<ProgramModelElement, ClassTypeContainer>(256);
+    private final Map<ProgramModelElement, ClassTypeContainer> element2container =
+        new HashMap<ProgramModelElement, ClassTypeContainer>(256);
     /**
      * Member and inner type relation. This could be made part of the NameInfo
      * for packages and part of the ClassFile or the ClassFileCacheEntry.
      */
-    private final Map<ClassTypeContainer, List<ClassType>> containedTypes = new HashMap<ClassTypeContainer, List<ClassType>>(32);
+    private final Map<ClassTypeContainer, List<ClassType>> containedTypes =
+        new HashMap<ClassTypeContainer, List<ClassType>>(32);
     /**
      * signature caching
      */
@@ -211,7 +216,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                         Type t = null;
                         String basename = ptypes[i];
                         int dim;
-                        if ((dim = basename.indexOf('[')) != -1) // for now, dim isn't the real dimension.
+                        if ((dim = basename.indexOf('[')) != -1) // for now, dim isn't the real
+                                                                 // dimension.
                             basename = basename.substring(0, dim);
                         List<? extends TypeParameter> tpl;
                         boolean checkClassTypeParameters = true;
@@ -257,7 +263,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                             if (t instanceof ArrayType) {
                                 t = makeParameterizedArrayType(t, mi.getTypeArgumentsForParam(i));
                             } else {
-                                t = new ParameterizedType((ClassType) t, mi.getTypeArgumentsForParam(i));
+                                t = new ParameterizedType((ClassType) t,
+                                    mi.getTypeArgumentsForParam(i));
                             }
                         }
                         res.add(t);
@@ -342,7 +349,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                 register((ClassFile) outerClass);
             } else {
                 Debug.log("Found a non-ClassFile outer class of " + classname + ":"
-                        + Format.toString("%c %N", outerClass));
+                    + Format.toString("%c %N", outerClass));
             }
 
             // set containment
@@ -393,7 +400,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             c.setProgramModelInfo(this);
             element2container.put(c, cf);
         }
-        if (cl.isEmpty() && !cf.isInterface() && !cf.isEnumType() && Character.isJavaIdentifierStart(cf.getName().charAt(0))) {
+        if (cl.isEmpty() && !cf.isInterface() && !cf.isEnumType()
+                && Character.isJavaIdentifierStart(cf.getName().charAt(0))) {
             Debug.log("No constructor defined in " + cf.getFullName());
             // serviceConfiguration.getImplicitElementInfo().getDefaultConstructor(cf)
         }
@@ -440,8 +448,10 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             ClassType ct = ni.getClassType(sname);
             if (ct == null) {
                 getErrorHandler().reportError(
-                        new MissingClassFileException("Unknown byte code supertype " + sname + " in class "
-                                + cf.getFullName(), sname));
+                    new MissingClassFileException(
+                        "Unknown byte code supertype " + sname + " in class "
+                            + cf.getFullName(),
+                        sname));
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperClassTypeArguments();
@@ -455,8 +465,10 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             ClassType ct = ni.getClassType(iname);
             if (ct == null) {
                 getErrorHandler().reportError(
-                        new MissingClassFileException("Unknown byte code supertype " + iname + " in class "
-                                + cf.getFullName(), iname));
+                    new MissingClassFileException(
+                        "Unknown byte code supertype " + iname + " in class "
+                            + cf.getFullName(),
+                        iname));
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperInterfaceTypeArguments(i);

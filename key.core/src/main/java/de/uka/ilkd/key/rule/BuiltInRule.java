@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule;
+
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
-
-import javax.annotation.Nullable;
 
 /**
  * Buit-in rule interface.
@@ -21,7 +25,7 @@ public interface BuiltInRule extends Rule {
      * reasons)
      */
     boolean isApplicable(Goal goal, PosInOccurrence pio);
-    
+
     boolean isApplicableOnSubTerms();
 
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);

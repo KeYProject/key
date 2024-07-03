@@ -1,10 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.util.Iterator;
 import java.util.Vector;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -29,6 +30,9 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SortException;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class TacletInstantiationModel {
 
@@ -132,9 +136,9 @@ public class TacletInstantiationModel {
 
         if (size > 0) {
             ImmutableList<IfFormulaInstantiation> antecCand = IfFormulaInstSeq.createList(seq, true,
-                    services);
+                services);
             ImmutableList<IfFormulaInstantiation> succCand = IfFormulaInstSeq.createList(seq, false,
-                    services);
+                services);
 
             Iterator<SequentFormula> it = ifseq.iterator();
             Term ifFma;
@@ -146,7 +150,8 @@ public class TacletInstantiationModel {
                 ifFma = it.next().formula();
                 ifChoiceModel[i] = new TacletAssumesModel(ifFma, taclet().getMatcher()
                         .matchIf((i < asize ? antecCand : succCand), ifFma, matchCond, services)
-                        .getFormulas(), app, goal, services, nss, scm);
+                        .getFormulas(),
+                    app, goal, services, nss, scm);
             }
         } else {
             ifChoiceModel = EMPTY_IF_CHOICES;
@@ -171,8 +176,8 @@ public class TacletInstantiationModel {
 
         if (tacletApp == null) {
             throw new IfMismatchException("Mismatch of '\\assumes'-formulas.\n"
-                    + "Reasons may be: ambigous instantiation "
-                    + "of schemavariables or unsatisfiable constraints.");
+                + "Reasons may be: ambigous instantiation "
+                + "of schemavariables or unsatisfiable constraints.");
         }
 
         return tacletApp;

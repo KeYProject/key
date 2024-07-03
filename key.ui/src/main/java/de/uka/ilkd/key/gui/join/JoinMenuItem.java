@@ -1,14 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.join;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
-
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -18,6 +18,8 @@ import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.JoinProcessor.Listener;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The menu item for the "delayed-cut" join rule.
@@ -29,8 +31,9 @@ public class JoinMenuItem extends JMenuItem {
 
     private static final long serialVersionUID = -2602116358650063634L;
 
-    public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof, final KeYMediator mediator) {
-    super();
+    public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof,
+            final KeYMediator mediator) {
+        super();
 
         this.setText(toString());
         this.setAction(new AbstractAction(toString()) {
@@ -53,39 +56,41 @@ public class JoinMenuItem extends JMenuItem {
         });
     }
 
-    private void start(ProspectivePartner partner, Proof proof, final KeYMediator mediator){
+    private void start(ProspectivePartner partner, Proof proof, final KeYMediator mediator) {
 
 
         JoinProcessor processor = new JoinProcessor(partner, proof);
 
         processor.addListener(new Listener() {
 
-           @Override
-           public void exceptionWhileJoining(Throwable e) {
-              mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
-              mediator.startInterface(true);
-           }
+            @Override
+            public void exceptionWhileJoining(Throwable e) {
+                mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
+                mediator.startInterface(true);
+            }
 
-           @Override
-           public void endOfJoining(final ImmutableList<Goal> goals) {
-               SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void endOfJoining(final ImmutableList<Goal> goals) {
+                SwingUtilities.invokeLater(new Runnable() {
 
-                   @Override
-                   public void run() {
-                       mediator.startInterface(true);
-                       // This method delegates the request only to the UserInterfaceControl which implements the functionality.
-                     // No functionality is allowed in this method body!
-                     mediator.getUI().getProofControl().startAutoMode(mediator.getSelectedProof(), goals);
-
-
-                   }
-               });
+                    @Override
+                    public void run() {
+                        mediator.startInterface(true);
+                        // This method delegates the request only to the UserInterfaceControl which
+                        // implements the functionality.
+                        // No functionality is allowed in this method body!
+                        mediator.getUI().getProofControl()
+                                .startAutoMode(mediator.getSelectedProof(), goals);
 
 
-           }
-       });
+                    }
+                });
 
-        Thread thread = new Thread(processor,"ProofJoinProcessor");
+
+            }
+        });
+
+        Thread thread = new Thread(processor, "ProofJoinProcessor");
         thread.start();
     }
 

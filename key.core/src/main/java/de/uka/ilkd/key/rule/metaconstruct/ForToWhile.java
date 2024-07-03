@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -9,6 +10,9 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * converts a for-loop to a while loop. Invariant and other rules cannot be
@@ -65,12 +69,12 @@ public class ForToWhile extends ProgramTransformer {
      * creates an loop to while - ProgramTransformer
      *
      * @param loop
-     *            the LoopStatement contained by the meta construct
+     *        the LoopStatement contained by the meta construct
      * @param innerLabel
-     *            the label used to handle continue
+     *        the label used to handle continue
      * @param outerLabel
-     *            the label used to handle break (only needed for
-     *            do-while-loops)
+     *        the label used to handle break (only needed for
+     *        do-while-loops)
      */
     public ForToWhile(SchemaVariable innerLabel, SchemaVariable outerLabel,
             Statement loop) {
@@ -85,9 +89,9 @@ public class ForToWhile extends ProgramTransformer {
             Services services, SVInstantiations svInst) {
 
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
-                (ProgramElementName) svInst.getInstantiation(outerLabel),
-                (ProgramElementName) svInst.getInstantiation(innerLabel),
-                services);
+            (ProgramElementName) svInst.getInstantiation(outerLabel),
+            (ProgramElementName) svInst.getInstantiation(innerLabel),
+            services);
 
         w.start();
         return new ProgramElement[] { w.result() };
@@ -97,7 +101,7 @@ public class ForToWhile extends ProgramTransformer {
      * return a list of the SV that are relevant to this UnwindLoop
      *
      * @param svInst
-     *            the instantiations so far - ignored
+     *        the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override

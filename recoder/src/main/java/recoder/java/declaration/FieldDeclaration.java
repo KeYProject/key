@@ -1,13 +1,16 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Field declaration.
@@ -32,7 +35,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * Field specs.
      */
 
-    //protected RecoderProgramElementList<FieldSpecification> fieldSpecs;
+    // protected RecoderProgramElementList<FieldSpecification> fieldSpecs;
     protected ASTList<FieldSpecification> fieldSpecs;
 
     /**
@@ -47,7 +50,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * Field declaration.
      *
      * @param typeRef a type reference.
-     * @param name    an identifier.
+     * @param name an identifier.
      */
 
     public FieldDeclaration(TypeReference typeRef, Identifier name) {
@@ -61,13 +64,14 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Field declaration.
      *
-     * @param mods    a modifier mutable list.
+     * @param mods a modifier mutable list.
      * @param typeRef a type reference.
-     * @param name    an identifier.
-     * @param init    an expression.
+     * @param name an identifier.
+     * @param init an expression.
      */
 
-    public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name, Expression init) {
+    public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+            Identifier name, Expression init) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
         ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
@@ -79,12 +83,13 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Field declaration.
      *
-     * @param mods    a modifier mutable list.
+     * @param mods a modifier mutable list.
      * @param typeRef a type reference.
-     * @param vars    a variable specification mutable list.
+     * @param vars a variable specification mutable list.
      */
 
-    public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, ASTList<FieldSpecification> vars) {
+    public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+            ASTList<FieldSpecification> vars) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
         setFieldSpecifications(vars);

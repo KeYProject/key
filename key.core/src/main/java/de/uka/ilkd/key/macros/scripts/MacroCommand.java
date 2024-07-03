@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.HashMap;
@@ -15,7 +19,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.rule.TacletApp;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -44,7 +48,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(),
-                arguments);
+            arguments);
     }
 
     @Override
@@ -60,7 +64,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         ProofMacro macro = macroMap.get(args.macroName);
         if (macro == null) {
             throw new ScriptException(
-                    "Macro '" + args.macroName + "' not found");
+                "Macro '" + args.macroName + "' not found");
         }
 
         macro.resetParams();
@@ -71,17 +75,17 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                 if (macro.hasParameter(macroParam.getKey())) {
                     try {
                         macro.setParameter(macroParam.getKey(),
-                                macroParam.getValue());
+                            macroParam.getValue());
                     } catch (IllegalArgumentException e) {
                         throw new ScriptException(String.format(
-                                "Wrong format for parameter %s of macro %s: %s.\nMessage: %s",
-                                macroParam.getKey(), args.macroName,
-                                macroParam.getValue(), e.getMessage()));
+                            "Wrong format for parameter %s of macro %s: %s.\nMessage: %s",
+                            macroParam.getKey(), args.macroName,
+                            macroParam.getValue(), e.getMessage()));
                     }
                 } else {
                     throw new ScriptException(
-                            String.format("Unknown parameter %s for macro %s",
-                                    macroParam.getKey(), args.macroName));
+                        String.format("Unknown parameter %s for macro %s",
+                            macroParam.getKey(), args.macroName));
                 }
             }
         }
@@ -91,14 +95,14 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                 .getDefaultInfo(macro, state.getProof());
         try {
             uiControl.taskStarted(new DefaultTaskStartedInfo(
-                    TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
+                TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
             final Sequent sequent = g.node().sequent();
             PosInOccurrence pio = null;
 
             if (args.occ > -1) {
                 pio = new PosInOccurrence(sequent.getFormulabyNr(args.occ + 1),
-                        PosInTerm.getTopLevel(),
-                        args.occ + 1 <= sequent.antecedent().size());
+                    PosInTerm.getTopLevel(),
+                    args.occ + 1 <= sequent.antecedent().size());
             }
 
             final String matchRegEx = args.matches;
@@ -115,14 +119,15 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             }
         } catch (Exception e) {
             throw new ScriptException("Macro '" + args.macroName
-                    + "' raised an exception: " + e.getMessage(), e);
+                + "' raised an exception: " + e.getMessage(), e);
         } finally {
             uiControl.taskFinished(info);
             macro.resetParams();
         }
     }
 
-    private static PosInOccurrence findMatchingFormula(Sequent sequent, Term formula) throws ScriptException {
+    private static PosInOccurrence findMatchingFormula(Sequent sequent, Term formula)
+            throws ScriptException {
         ImmutableList<PosInOccurrence> allApps = ImmutableSLList.nil();
 
         for (SequentFormula sf : sequent.antecedent()) {
@@ -164,24 +169,24 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
         for (int i = 1; i < sequent.size() + 1; i++) {
             final boolean matchesRegex = formatTermString(
-                    LogicPrinter.quickPrintTerm(
-                            sequent.getFormulabyNr(i).formula(), services))
-                                    .matches(".*" + matchRegEx + ".*");
+                LogicPrinter.quickPrintTerm(
+                    sequent.getFormulabyNr(i).formula(), services))
+                            .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
                 if (matched) {
                     throw new ScriptException(
-                            "More than one occurrence of a matching term.");
+                        "More than one occurrence of a matching term.");
                 }
                 matched = true;
                 pio = new PosInOccurrence(sequent.getFormulabyNr(i),
-                        PosInTerm.getTopLevel(),
-                        i <= sequent.antecedent().size());
+                    PosInTerm.getTopLevel(),
+                    i <= sequent.antecedent().size());
             }
         }
 
         if (!matched) {
             throw new ScriptException(String.format(
-                    "Did not find a formula matching regex %s", matchRegEx));
+                "Did not find a formula matching regex %s", matchRegEx));
         }
 
         return pio;
@@ -191,7 +196,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
      * Removes spaces and line breaks from the string representation of a term.
      *
      * @param str
-     *            The string to "clean up".
+     *        The string to "clean up".
      * @return The original without spaces and line breaks.
      */
     private static String formatTermString(String str) {

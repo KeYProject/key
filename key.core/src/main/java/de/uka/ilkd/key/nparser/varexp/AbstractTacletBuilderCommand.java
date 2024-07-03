@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.nparser.varexp;
 
 import javax.annotation.Nonnull;
@@ -13,13 +17,14 @@ public abstract class AbstractTacletBuilderCommand implements TacletBuilderComma
     private final @Nonnull ArgumentType[] argumentsTypes;
 
     /**
-     * Construct this class with the parameters for {@link #isSuitableFor(String)} and {@link #getArgumentTypes()}.
+     * Construct this class with the parameters for {@link #isSuitableFor(String)} and
+     * {@link #getArgumentTypes()}.
      *
-     * @param triggerName    the name of this command.
+     * @param triggerName the name of this command.
      * @param argumentsTypes the argument type of this command.
      */
     public AbstractTacletBuilderCommand(@Nonnull String triggerName,
-                                        @Nonnull ArgumentType... argumentsTypes) {
+            @Nonnull ArgumentType... argumentsTypes) {
         this.triggerName = triggerName;
         this.argumentsTypes = argumentsTypes;
     }

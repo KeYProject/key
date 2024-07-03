@@ -1,9 +1,12 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
 
-import recoder.ProgramFactory;
-
 import java.io.Serializable;
+
+import recoder.ProgramFactory;
 
 /**
  * Top level implementation of a Java {@link SourceElement}. This class already
@@ -55,7 +58,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * operators.
      *
      * @return the first source element in the syntactical representation of
-     * this element, may be equals to this element.
+     *         this element, may be equals to this element.
      * @see #toSource()
      * @see #getStartPosition()
      */
@@ -71,7 +74,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * operators.
      *
      * @return the last source element in the syntactical representation of this
-     * element, may be equals to this element.
+     *         element, may be equals to this element.
      * @see #toSource()
      * @see #getEndPosition()
      */

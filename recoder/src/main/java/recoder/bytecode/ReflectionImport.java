@@ -1,3 +1,7 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.bytecode;
 
 import java.lang.reflect.Modifier;
@@ -64,12 +68,15 @@ public class ReflectionImport {
                     cvalue = f.get(null).toString();
                 } catch (IllegalAccessException iae) {
                     // this should never happen!
-                    throw new RuntimeException("Encountered IllegalAccessException during reflection import! Cause: ", iae);
+                    throw new RuntimeException(
+                        "Encountered IllegalAccessException during reflection import! Cause: ",
+                        iae);
                 }
             }
             // blank finals will be reported as constant
             // ARE blank finals part of compile-time constants???
-            fields.add(new FieldInfo(f.getModifiers(), f.getName(), getTypeName(f.getType()), cf, cvalue, null));
+            fields.add(new FieldInfo(f.getModifiers(), f.getName(), getTypeName(f.getType()), cf,
+                cvalue, null));
         }
         cf.setFields(fields);
 
@@ -77,8 +84,12 @@ public class ReflectionImport {
         List<ConstructorInfo> constructors = new ArrayList<ConstructorInfo>(dconstructors.length);
         for (int i = 0; i < dconstructors.length; i += 1) {
             java.lang.reflect.Constructor co = dconstructors[i];
-            constructors.add(new ConstructorInfo(co.getModifiers(), getShortName(co.getName()), getTypeNames(co
-                    .getParameterTypes()), getTypeNames(co.getExceptionTypes()), cf));
+            constructors
+                    .add(
+                        new ConstructorInfo(co.getModifiers(), getShortName(co.getName()),
+                            getTypeNames(co
+                                    .getParameterTypes()),
+                            getTypeNames(co.getExceptionTypes()), cf));
 
         }
         cf.setConstructors(constructors);
@@ -88,11 +99,14 @@ public class ReflectionImport {
         for (int i = 0; i < dmethods.length; i += 1) {
             java.lang.reflect.Method m = dmethods[i];
             if (c.isAnnotation()) {
-                methods.add(new AnnotationPropertyInfo(m.getModifiers(), getTypeName(m.getReturnType()), m.getName(),
-                        cf, m.getDefaultValue()));
+                methods.add(new AnnotationPropertyInfo(m.getModifiers(),
+                    getTypeName(m.getReturnType()), m.getName(),
+                    cf, m.getDefaultValue()));
             } else {
-                methods.add(new MethodInfo(m.getModifiers(), getTypeName(m.getReturnType()), m.getName(), getTypeNames(m
-                        .getParameterTypes()), getTypeNames(m.getExceptionTypes()), cf));
+                methods.add(new MethodInfo(m.getModifiers(), getTypeName(m.getReturnType()),
+                    m.getName(), getTypeNames(m
+                            .getParameterTypes()),
+                    getTypeNames(m.getExceptionTypes()), cf));
             }
         }
         cf.setMethods(methods);

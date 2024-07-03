@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros;
 
 import java.util.*;
@@ -23,6 +27,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
 import org.key_project.util.LRUCache;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
@@ -36,7 +41,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
 
     public AutoPilotPrepareProofMacro() { super(); }
-    
+
     @Override
     public String getName() {
         return "Auto Pilot (Preparation Only)";
@@ -50,8 +55,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" +
-                "<li>Separate proof obligations" +
-                "<li>Expand invariant definitions</ol>";
+            "<li>Separate proof obligations" +
+            "<li>Expand invariant definitions</ol>";
     }
 
     @Override
@@ -77,13 +82,13 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (ruleSetName.equals(rs.name())) 
+                if (ruleSetName.equals(rs.name()))
                     return true;
             }
         }
         return false;
     }
-    
+
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
@@ -106,17 +111,17 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
-                   // Assumptions are normally not considered by the cost
-                   // computation, because they are normally not yet
-                   // instantiated when the costs are computed. Because the
-                   // application of a rule sometimes makes sense only if
-                   // the assumptions are instantiated in a particular way
-                   // (for instance equalities should not be applied on
-                   // themselves), we need to give the delegate the possiblity
-                   // to reject the application of a rule by calling
-                   // isApprovedApp. Otherwise, in particular equalities may
-                   // be applied on themselves.
-                   delegate.isApprovedApp(app, pio, goal);
+            // Assumptions are normally not considered by the cost
+            // computation, because they are normally not yet
+            // instantiated when the costs are computed. Because the
+            // application of a rule sometimes makes sense only if
+            // the assumptions are instantiated in a particular way
+            // (for instance equalities should not be applied on
+            // themselves), we need to give the delegate the possiblity
+            // to reject the application of a rule by calling
+            // isApprovedApp. Otherwise, in particular equalities may
+            // be applied on themselves.
+                    delegate.isApprovedApp(app, pio, goal);
         }
 
         /*
@@ -129,13 +134,13 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             }
 
             // This is the faster comparison but rarely returns
-            if(term.op() instanceof Modality) {
+            if (term.op() instanceof Modality) {
                 return true;
             }
 
             var hasModality = false;
             for (Term sub : term.subs()) {
-                if(termHasModality(sub)) {
+                if (termHasModality(sub)) {
                     hasModality = true;
                     break;
                 }
@@ -170,25 +175,25 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
             Rule rule = app.rule();
-            if(isNonHumanInteractionTagged(rule)) {
+            if (isNonHumanInteractionTagged(rule)) {
                 return TopRuleAppCost.INSTANCE;
             }
 
-            if(hasModality(goal.node().sequent())) {
+            if (hasModality(goal.node().sequent())) {
                 return delegate.computeCost(app, pio, goal);
             }
 
             String name = rule.name().toString();
-            if(ADMITTED_RULES_SET.contains(name)) {
+            if (ADMITTED_RULES_SET.contains(name)) {
                 return NumberRuleAppCost.getZeroCost();
             }
-            
+
             // apply OSS to <inv>() calls.
-            if(rule instanceof OneStepSimplifier) {
+            if (rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();
-                if(target.op() instanceof UpdateApplication) {
+                if (target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
-                    if(updatedOp instanceof ObserverFunction) {
+                    if (updatedOp instanceof ObserverFunction) {
                         return NumberRuleAppCost.getZeroCost();
                     }
                 }
@@ -205,7 +210,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
 
     }

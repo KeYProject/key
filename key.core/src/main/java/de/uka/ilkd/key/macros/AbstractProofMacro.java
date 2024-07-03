@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.macros;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -10,6 +11,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.settings.ProofSettings;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Takes care of providing the whole ProofMacro interface by only making it
@@ -54,8 +58,8 @@ public abstract class AbstractProofMacro implements ProofMacro {
     public void setParameter(String paramName, String paramValue)
             throws IllegalArgumentException {
         throw new IllegalArgumentException(
-                String.format("There is no parameter of name %s in macro %s",
-                        paramName, this.getClass().getSimpleName()));
+            String.format("There is no parameter of name %s in macro %s",
+                paramName, this.getClass().getSimpleName()));
     }
 
     @Override
@@ -64,15 +68,15 @@ public abstract class AbstractProofMacro implements ProofMacro {
 
     @Override
     public boolean canApplyTo(Node node,
-                              PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return canApplyTo(node.proof(), getGoals(node), posInOcc);
     }
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Node node,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException, Exception {
+            Node node,
+            PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException, Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }
 
@@ -86,7 +90,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
         final int steps;
         if (proof != null) {
             steps = proof.getSettings()
-                         .getStrategySettings().getMaxSteps();
+                    .getStrategySettings().getMaxSteps();
         } else {
             steps = ProofSettings.DEFAULT_SETTINGS
                     .getStrategySettings().getMaxSteps();

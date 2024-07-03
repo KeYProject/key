@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -20,80 +22,86 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.util.collection.ImmutableArray;
+
 /**
  * Implementation of thin backward slicing.
+ *
  * @author Martin Hentschel
  */
 public class ThinBackwardSlicer extends AbstractBackwardSlicer {
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected boolean accept(Node node, 
-                            Node previousChild,
-                            Services services,
-                            Set<Location> relevantLocations, 
-                            SequentInfo info,
-                            SourceElement activeStatement) throws ProofInputException {
-      try {
-         boolean accept = false;
-         if (activeStatement instanceof CopyAssignment) {
-            CopyAssignment copyAssignment = (CopyAssignment) activeStatement;
-            ImmutableArray<Expression> arguments = copyAssignment.getArguments();
-            if (arguments.size() >= 1) {
-               SourceElement originalTarget = arguments.get(0);
-               ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
-               if (relevantTarget != null && removeRelevant(services, relevantTarget, relevantLocations, info)) {
-                  accept = true;
-                  for (int i = 1; i < arguments.size(); i++) {
-                     Expression read = arguments.get(i);
-                     updateRelevantLocations(read, relevantLocations, info, services);
-                  }
-               }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean accept(Node node,
+            Node previousChild,
+            Services services,
+            Set<Location> relevantLocations,
+            SequentInfo info,
+            SourceElement activeStatement) throws ProofInputException {
+        try {
+            boolean accept = false;
+            if (activeStatement instanceof CopyAssignment) {
+                CopyAssignment copyAssignment = (CopyAssignment) activeStatement;
+                ImmutableArray<Expression> arguments = copyAssignment.getArguments();
+                if (arguments.size() >= 1) {
+                    SourceElement originalTarget = arguments.get(0);
+                    ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
+                    if (relevantTarget != null
+                            && removeRelevant(services, relevantTarget, relevantLocations, info)) {
+                        accept = true;
+                        for (int i = 1; i < arguments.size(); i++) {
+                            Expression read = arguments.get(i);
+                            updateRelevantLocations(read, relevantLocations, info, services);
+                        }
+                    }
+                }
+            } else if (activeStatement instanceof MethodBodyStatement) {
+                MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
+                IProgramVariable resultVariable = mbs.getResultVariable();
+                ReferencePrefix relevantTarget = toReferencePrefix(resultVariable);
+                if (relevantTarget != null
+                        && removeRelevant(services, relevantTarget, relevantLocations, info)) {
+                    accept = true;
+                }
+            } else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp()) ||
+                    SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp()) ||
+                    SymbolicExecutionUtil.isBlockSpecificationElement(node,
+                        node.getAppliedRuleApp())) {
+                // Compute this reference
+                PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+                // Compute modified locations
+                List<Location> modifiedLocations = new LinkedList<Location>();
+                Term loopConditionModalityTerm =
+                    SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
+                if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
+                    throw new IllegalStateException(
+                        "Use Loop Invariant/Operation Contract rule implementation has changed at node "
+                            + node.serialNr() + ".");
+                }
+                Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
+                while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
+                    listModifiedLocations(UpdateApplication.getUpdate(updateTerm),
+                        services,
+                        services.getTypeConverter().getHeapLDT(),
+                        modifiedLocations,
+                        info.getExecutionContext(),
+                        info.getThisReference(),
+                        relevantLocations,
+                        previousChild);
+                    updateTerm = UpdateApplication.getTarget(updateTerm);
+                }
+                // Check modified locations
+                for (Location location : modifiedLocations) {
+                    if (removeRelevant(services, location, relevantLocations, info)) {
+                        accept = true;
+                    }
+                }
             }
-         }
-         else if (activeStatement instanceof MethodBodyStatement) {
-            MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
-            IProgramVariable resultVariable = mbs.getResultVariable();
-            ReferencePrefix relevantTarget = toReferencePrefix(resultVariable);
-            if (relevantTarget != null && removeRelevant(services, relevantTarget, relevantLocations, info)) {
-               accept = true;            
-            }
-         }
-         else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp()) ||
-                  SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp()) ||
-                  SymbolicExecutionUtil.isBlockSpecificationElement(node, node.getAppliedRuleApp())) {
-            // Compute this reference
-            PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-            // Compute modified locations
-            List<Location> modifiedLocations = new LinkedList<Location>();
-            Term loopConditionModalityTerm = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
-            if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
-               throw new IllegalStateException("Use Loop Invariant/Operation Contract rule implementation has changed at node " + node.serialNr() + ".");
-            }
-            Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
-            while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
-               listModifiedLocations(UpdateApplication.getUpdate(updateTerm), 
-                                     services, 
-                                     services.getTypeConverter().getHeapLDT(), 
-                                     modifiedLocations, 
-                                     info.getExecutionContext(), 
-                                     info.getThisReference(), 
-                                     relevantLocations,
-                                     previousChild);
-               updateTerm = UpdateApplication.getTarget(updateTerm);
-            }
-            // Check modified locations
-            for (Location location : modifiedLocations) {
-               if (removeRelevant(services, location, relevantLocations, info)) {
-                  accept = true;            
-               }
-            }
-         }
-         return accept;
-      }
-      catch (IllegalArgumentException e) {
-         return false; // Do not accept, expression with side effects is evaluated
-      }
-   }
+            return accept;
+        } catch (IllegalArgumentException e) {
+            return false; // Do not accept, expression with side effects is evaluated
+        }
+    }
 }

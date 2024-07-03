@@ -1,10 +1,14 @@
-package de.uka.ilkd.key.smt.communication;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.java.IOUtil;
+package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+
+import org.key_project.util.java.IOUtil;
 
 /**
  * Wraps BufferedReader in order to provide different message delimiters.
@@ -13,6 +17,7 @@ import java.io.StringWriter;
  * delimiters.
  *
  * For example:
+ *
  * <pre>
  *     delims = { "X", "Y" };
  *     br = new BufferedMessageReader(new StringReader("aXbYc"), delims);
@@ -41,6 +46,7 @@ class BufferedMessageReader {
 
     /**
      * Creates a new BufferedMessageReader wrapping the given Reader.
+     *
      * @param reader the Reader to wrap
      * @param delimiters the delimiters, where incoming messages should be split
      */
@@ -52,6 +58,7 @@ class BufferedMessageReader {
     /**
      * Call this method in order to read the next message from the given input stream. If there is
      * no message, it blocks until there is a further message or the stream has been closed.
+     *
      * @return a string between two delimiters or until the EOF.
      * @throws IOException if reading fails
      */
@@ -60,12 +67,12 @@ class BufferedMessageReader {
         StringBuilder sb = new StringBuilder();
         int c;
         while ((c = reader.read()) != -1) {
-            sb.append((char)c);
+            sb.append((char) c);
             for (String delim : delimiters) {
-                if(endsWith(sb, delim)) {
+                if (endsWith(sb, delim)) {
                     String result = sb.substring(0, sb.length() - delim.length());
 
-                    if(!result.isEmpty()) {
+                    if (!result.isEmpty()) {
                         return result;
                     }
 
@@ -103,7 +110,7 @@ class BufferedMessageReader {
         }
 
         for (int i = len - dlen, j = 0; i < len; i++, j++) {
-            if(sb.charAt(i) != s.charAt(j)) {
+            if (sb.charAt(i) != s.charAt(j)) {
                 return false;
             }
         }

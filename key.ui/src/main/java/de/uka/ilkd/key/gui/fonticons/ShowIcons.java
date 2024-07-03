@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.fonticons;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.*;
 
 /**
  * @author Alexander Weigl
@@ -10,7 +14,7 @@ import java.util.ArrayList;
  */
 public class ShowIcons extends JFrame {
     private static final long serialVersionUID = 8775474163870717215L;
-    //private Box box = new Box(BoxLayout.Y_AXIS);
+    // private Box box = new Box(BoxLayout.Y_AXIS);
     private JPanel box = new JPanel(new GridLayout(0, 10));
     private JPanel search = new JPanel();
     private ArrayList<JLabel> icons = new ArrayList<>();
@@ -27,10 +31,14 @@ public class ShowIcons extends JFrame {
         search.add(txtSearch);
         txtSearch.addActionListener(l -> filter(txtSearch.getText()));
 
-        for (IconFont fa : FontAwesomeRegular.values()) add(fa);
-        for (IconFont fa : FontAwesomeSolid.values()) add(fa);
-        for (IconFont fa : Entypo.values()) add(fa);
-        for (IconFont fa : Typicons.values()) add(fa);
+        for (IconFont fa : FontAwesomeRegular.values())
+            add(fa);
+        for (IconFont fa : FontAwesomeSolid.values())
+            add(fa);
+        for (IconFont fa : Entypo.values())
+            add(fa);
+        for (IconFont fa : Typicons.values())
+            add(fa);
 
         JScrollPane scroll = new JScrollPane(box);
         setSize(500, 500);

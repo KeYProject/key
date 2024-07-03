@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -32,11 +35,12 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      * such that no state changes take place between the statements and the
      * evaluation of the expression.
      *
-     * @param sc         the service configuration to use.
-     * @param x          the expression that shall be prepended.
+     * @param sc the service configuration to use.
+     * @param x the expression that shall be prepended.
      * @param statements the statements to prepend.
      */
-    public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x, ASTList<Statement> statements) {
+    public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x,
+            ASTList<Statement> statements) {
         super(sc);
         if (x == null) {
             throw new IllegalArgumentException("Missing expression");
@@ -53,18 +57,19 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      * that no state changes take place between the statement and the evaluation
      * of the expression.
      *
-     * @param sc        the service configuration to use.
-     * @param x         the expression that shall be prepended.
+     * @param sc the service configuration to use.
+     * @param x the expression that shall be prepended.
      * @param statement the statement to prepend.
      */
-    public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x, Statement statement) {
+    public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x,
+            Statement statement) {
         this(sc, x, new ASTArrayList<Statement>(statement));
     }
 
     /**
      * @return the problem report, may be
-     * {@link recoder.kit.Transformation#IDENTITY}, or
-     * {@link recoder.kit.Transformation#EQUIVALENCE}.
+     *         {@link recoder.kit.Transformation#IDENTITY}, or
+     *         {@link recoder.kit.Transformation#EQUIVALENCE}.
      */
     public ProblemReport analyze() {
         if (statements.isEmpty()) {
@@ -111,7 +116,8 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
         shifter.transform();
         Statement statement = shifter.getEnclosingStatement();
         // this is a syntactic transformation!
-        PrepareStatementList preparer = new PrepareStatementList(getServiceConfiguration(), statement, true);
+        PrepareStatementList preparer =
+            new PrepareStatementList(getServiceConfiguration(), statement, true);
         preparer.execute();
         ASTList<Statement> body = preparer.getStatementList();
         // the statement might have been cloned

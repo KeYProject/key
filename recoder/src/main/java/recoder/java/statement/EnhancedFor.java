@@ -1,8 +1,10 @@
-/*
- * Created on 07.01.2005
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
+
+import java.util.List;
 
 import recoder.java.LoopInitializer;
 import recoder.java.SourceVisitor;
@@ -12,12 +14,10 @@ import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
 
-import java.util.List;
-
 /**
  * @author gutzmann
- * <p>
- * This file is part of the RECODER library and protected by the LGPL.
+ *         <p>
+ *         This file is part of the RECODER library and protected by the LGPL.
  */
 public class EnhancedFor extends LoopStatement implements VariableScope {
 
@@ -47,7 +47,9 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
         makeParentRoleValid();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.statement.LoopStatement#isExitCondition()
      */
     public boolean isExitCondition() {
@@ -55,7 +57,9 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.statement.LoopStatement#isCheckedBeforeIteration()
      */
     public boolean isCheckedBeforeIteration() {
@@ -63,7 +67,9 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.VariableScope#getVariablesInScope()
      */
     public List<VariableSpecification> getVariablesInScope() {
@@ -71,18 +77,24 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
         return ((LocalVariableDeclaration) li).getVariables();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.VariableScope#getVariableInScope(java.lang.String)
      */
     public VariableSpecification getVariableInScope(String name) {
         VariableSpecification var = getVariablesInScope().get(0);
-        if (var.getName().equals(name)) return var;
-        /*else*/
+        if (var.getName().equals(name))
+            return var;
+        /* else */
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see recoder.java.VariableScope#addVariableToScope(recoder.java.declaration.VariableSpecification)
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * recoder.java.VariableScope#addVariableToScope(recoder.java.declaration.VariableSpecification)
      */
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
@@ -90,35 +102,45 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
             throw new IllegalArgumentException();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.VariableScope#removeVariableFromScope(java.lang.String)
      */
     public void removeVariableFromScope(@SuppressWarnings("unused") String name) {
         throw new UnsupportedOperationException();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ScopeDefiningElement#isDefinedScope()
      */
     public boolean isDefinedScope() {
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ScopeDefiningElement#setDefinedScope(boolean)
      */
     public void setDefinedScope(@SuppressWarnings("unused") boolean defined) {
         // ignore.
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
         v.visitEnhancedFor(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#deepClone()
      */
     public EnhancedFor deepClone() {

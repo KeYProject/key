@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -16,24 +18,26 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.util.ExtList;
+
 /**
  * This transformation is used to transform a for-loop into a while-loop.
- * 
+ *
  * This is done because there are some rules (invariant, induction, ...) that
  * are only available for while-loops, not for for-loops.
- * 
+ *
  * The transformation behaviour is very similar to the superclass' behaviour
  * only the outermost for loop is treated slightly differently.
- * 
+ *
  * @see ForToWhile Here is an example
  * @author MU
- * 
+ *
  */
 
 public class ForToWhileTransformation extends WhileLoopTransformation {
-    
+
     public ForToWhileTransformation(ProgramElement root,
-            ProgramElementName outerLabel, ProgramElementName innerLabel, 
+            ProgramElementName outerLabel, ProgramElementName innerLabel,
             Services services) {
         super(root, outerLabel, innerLabel, services);
     }
@@ -58,14 +62,14 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                 inits = (ILoopInit) changeList.removeFirst();
             }
 
-            Guard guard;            
-            if (x.getGuard() != null) {            
+            Guard guard;
+            if (x.getGuard() != null) {
                 guard = (Guard) changeList.removeFirst();
                 if (guard.getExpression() == null) {
-		    guard = KeYJavaASTFactory.trueGuard();
+                    guard = KeYJavaASTFactory.trueGuard();
                 }
             } else {
-		guard = KeYJavaASTFactory.trueGuard();
+                guard = KeYJavaASTFactory.trueGuard();
             }
 
             if (changeList.get(0) instanceof IForUpdates) {
@@ -75,12 +79,12 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             body = (Statement) changeList.removeFirst();
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
-		body = KeYJavaASTFactory.labeledStatement(
-			breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
+                body = KeYJavaASTFactory.labeledStatement(
+                    breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
             }
 
             final int updateSize = (updates == null ? 0 : updates.size());
-            
+
             Statement innerBlockStatements[] = new Statement[updateSize + 1];
             innerBlockStatements[0] = body;
             if (updates != null) {
@@ -99,24 +103,23 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                             .get(copyStatements);
                 }
             }
-            
-	    outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(
-		    guard.getExpression(),
-		    KeYJavaASTFactory.block(innerBlockStatements), null);
 
-	    Statement outerBlock = KeYJavaASTFactory
-		    .block(outerBlockStatements);
+            outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(
+                guard.getExpression(),
+                KeYJavaASTFactory.block(innerBlockStatements), null);
+
+            Statement outerBlock = KeYJavaASTFactory
+                    .block(outerBlockStatements);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
-		outerBlock = KeYJavaASTFactory.labeledStatement(
-			breakOuterLabel.getLabel(), outerBlock, PositionInfo.UNDEFINED);
+                outerBlock = KeYJavaASTFactory.labeledStatement(
+                    breakOuterLabel.getLabel(), outerBlock, PositionInfo.UNDEFINED);
             }
-            
+
             // copy loop invariant to the created while loop
-            LoopSpecification li 
-                = services.getSpecificationRepository().getLoopSpec(x);
+            LoopSpecification li = services.getSpecificationRepository().getLoopSpec(x);
             if (li != null) {
-                li = li.setLoop((While)outerBlockStatements[initSize]);
+                li = li.setLoop((While) outerBlockStatements[initSize]);
                 services.getSpecificationRepository().addLoopInvariant(li);
             }
 

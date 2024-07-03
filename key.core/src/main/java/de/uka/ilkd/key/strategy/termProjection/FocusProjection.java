@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -16,14 +20,14 @@ public class FocusProjection implements ProjectionToTerm {
     public static final ProjectionToTerm INSTANCE = create(0);
 
     private final int stepsUpwards;
-    
+
     private FocusProjection(int stepsUpwards) {
-       assert stepsUpwards >= 0;
+        assert stepsUpwards >= 0;
         this.stepsUpwards = stepsUpwards;
     }
 
     public static ProjectionToTerm create(int stepsUpwards) {
-        return new FocusProjection ( stepsUpwards );
+        return new FocusProjection(stepsUpwards);
     }
 
     @Override
@@ -31,11 +35,11 @@ public class FocusProjection implements ProjectionToTerm {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;
-        while ( n-- > 0 && !pos.isTopLevel() ) {
-            pos = pos.up ();
+        while (n-- > 0 && !pos.isTopLevel()) {
+            pos = pos.up();
         }
-        
-        return pos.subTerm ();
+
+        return pos.subTerm();
     }
-    
+
 }

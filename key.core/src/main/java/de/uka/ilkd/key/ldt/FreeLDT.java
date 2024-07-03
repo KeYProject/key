@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.ldt;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -14,22 +16,26 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 
-/** Generic data type, which has no predefined theory.
+import org.key_project.util.ExtList;
+
+/**
+ * Generic data type, which has no predefined theory.
  * It is meant as a basis to implement an additional abstract data type,
  * e.g., binary trees, stacks, etc. in <code>.key</code> files.
+ *
  * @author daniel
  *
  */
 public final class FreeLDT extends LDT {
 
     public static final Name NAME = new Name("Free");
-    
+
     // neutral element, the only pre-defined function
     private Function atom;
 
     public FreeLDT(TermServices services) {
         super(NAME, services);
-        atom      = addFunction(services, "atom");
+        atom = addFunction(services, "atom");
     }
 
     @Override
@@ -73,7 +79,7 @@ public final class FreeLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if(t.op() instanceof Function && hasLiteralFunction((Function)t.op())) {
+        if (t.op() instanceof Function && hasLiteralFunction((Function) t.op())) {
             return FreeLiteral.INSTANCE;
         }
         assert false;
@@ -85,8 +91,8 @@ public final class FreeLDT extends LDT {
         assert false;
         return null;
     }
-    
-    public Function getAtom(){
+
+    public Function getAtom() {
         return atom;
     }
 

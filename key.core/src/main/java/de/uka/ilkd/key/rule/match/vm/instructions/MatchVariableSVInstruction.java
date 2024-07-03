@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
@@ -17,16 +21,16 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, Services services) {                
+    public MatchConditions match(Term subst, MatchConditions mc, Services services) {
         if (subst.op() instanceof QuantifiableVariable) {
             final Term foundMapping = (Term) mc.getInstantiations().getInstantiation(op);
-            if(foundMapping == null) {
+            if (foundMapping == null) {
                 return addInstantiation(subst, mc, services);
             } else if (foundMapping.op() == subst.op()) {
                 return mc;
             }
         }
-        return null;        
+        return null;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
         if (result != null) {
             termPosition.gotoNextSibling();
         }
-        return result;           
+        return result;
     }
 
 }

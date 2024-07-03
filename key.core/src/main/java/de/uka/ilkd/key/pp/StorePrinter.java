@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
@@ -71,9 +75,11 @@ class StorePrinter extends FieldPrinter {
             if (isStaticFieldConstant(objectTerm, fieldTerm)) {
                 printStoreOnStaticField(heapTerm, fieldTerm, valueTerm, closingBrace);
             } else if (isBuiltinObjectProperty(fieldTerm)) {
-                printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
+                printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm,
+                    closingBrace);
             } else if (isJavaFieldConstant(fieldTerm)) {
-                printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
+                printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm,
+                    closingBrace);
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 printStoreOnArrayElement(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else {
@@ -87,7 +93,8 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents an array element.
      */
-    private void printStoreOnArrayElement(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnArrayElement(final Term heapTerm, final Term objectTerm,
+            final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -111,7 +118,8 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents a non-static field.
      */
-    private void printStoreOnJavaFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnJavaFieldConstant(final Term heapTerm, final Term objectTerm,
+            final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -129,7 +137,8 @@ class StorePrinter extends FieldPrinter {
         finishPrettyPrint(valueTerm, closingBrace);
     }
 
-    private void printStoreOnGenericFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnGenericFieldConstant(final Term heapTerm, final Term objectTerm,
+            final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -149,7 +158,8 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents a static field.
      */
-    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm,
+            final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());

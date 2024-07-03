@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import java.util.LinkedList;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * Encapsulates intermediate information for constructing a taclet application.
- * 
+ *
  * @author Dominic Scheurer
  */
 public class TacletAppIntermediate extends AppIntermediate {
@@ -27,7 +31,7 @@ public class TacletAppIntermediate extends AppIntermediate {
      *
      * @param tacletName Name of the taclet.
      * @param posInfo Position information (Integer representing position
-     *   of the target formula, PosInTerm for relevant term inside the formula).
+     *        of the target formula, PosInTerm for relevant term inside the formula).
      * @param insts Schema variable instantiations.
      * @param ifSeqFormulaList
      * @param ifDirectFormulaList
@@ -66,7 +70,9 @@ public class TacletAppIntermediate extends AppIntermediate {
         return ifDirectFormulaList;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
      */
     @Override

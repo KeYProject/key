@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.java.Services;
-
 import java.util.Map;
+
+import de.uka.ilkd.key.java.Services;
 
 /**
  * SMT handler properties are properties for the new modular smt handler.
@@ -36,7 +40,7 @@ public abstract class SMTHandlerProperty<T> {
     private final String description;
 
     public SMTHandlerProperty(String identifier, String label,
-                              String description) {
+            String description) {
         this.identifier = identifier;
         this.label = label;
         this.description = description;
@@ -54,7 +58,9 @@ public abstract class SMTHandlerProperty<T> {
     /**
      * Convert
      *
-     * <p>Precondition: {@code verify(s) == true}</p>
+     * <p>
+     * Precondition: {@code verify(s) == true}
+     * </p>
      *
      * @param s String to parse into a value
      * @return the value represented by s.
@@ -71,9 +77,10 @@ public abstract class SMTHandlerProperty<T> {
 
     /*
      * Part of the Visitor pattern
+     *
      * @see SMTHandlerPropertyVisitor
      */
-    public abstract <A,R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg);
+    public abstract <A, R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg);
 
     public String getIdentifier() {
         return identifier;
@@ -161,7 +168,8 @@ public abstract class SMTHandlerProperty<T> {
         private final int min;
         private final int max;
 
-        public IntegerProperty(String identifier, String heading, String description, int min, int max) {
+        public IntegerProperty(String identifier, String heading, String description, int min,
+                int max) {
             super(identifier, heading, description);
             this.min = min;
             this.max = max;
@@ -184,7 +192,7 @@ public abstract class SMTHandlerProperty<T> {
 
         @Override
         public Integer defaultValue() {
-            if(min <= 0 && 0 <= max) {
+            if (min <= 0 && 0 <= max) {
                 return 0;
             } else {
                 return min;
@@ -244,19 +252,20 @@ public abstract class SMTHandlerProperty<T> {
      * Default value is the first constant of E.
      *
      * @param <E> an enum class that is wrapped here. Must contain at least one
-     *           constant.
+     *        constant.
      */
     public static class EnumProperty<E extends Enum<E>> extends SMTHandlerProperty<E> {
         private final Class<E> enumType;
 
-        public EnumProperty(String identifier, String heading, String description, Class<E> enumType) {
+        public EnumProperty(String identifier, String heading, String description,
+                Class<E> enumType) {
             super(identifier, heading, description);
             this.enumType = enumType;
         }
 
         public E fromString(String value) {
             for (E enumConstant : enumType.getEnumConstants()) {
-                if(value.equalsIgnoreCase(enumConstant.toString())) {
+                if (value.equalsIgnoreCase(enumConstant.toString())) {
                     return enumConstant;
                 }
             }

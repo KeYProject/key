@@ -1,15 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.model;
 
-import de.uka.ilkd.key.proof.Proof;
-import org.key_project.ui.interactionlog.api.Interaction;
-import org.key_project.util.RandomName;
-
-import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.xml.bind.annotation.*;
+
+import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.ui.interactionlog.api.Interaction;
+import org.key_project.util.RandomName;
 
 /**
  * @author Alexander Weigl
@@ -44,7 +49,7 @@ public class InteractionLog implements Serializable {
     public InteractionLog(Proof proof) {
         int pos = Math.min(proof.name().toString().length(), 25);
         name = RandomName.getRandomName(" ")
-                + " (" + proof.name().toString().substring(0, pos) + ")";
+            + " (" + proof.name().toString().substring(0, pos) + ")";
         this.proof = new WeakReference<>(proof);
     }
 

@@ -1,11 +1,14 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
-import recoder.Service;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-
 import java.util.List;
+
+import recoder.Service;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
 
 /**
  * The program model info computes predicates for program model elements
@@ -22,7 +25,7 @@ public interface ProgramModelInfo extends Service {
      *
      * @param pme the program model element to analyze.
      * @return the type of the program element or <tt>null</tt> if the type is
-     * unknown or unavailable.
+     *         unknown or unavailable.
      */
     Type getType(ProgramModelElement pme);
 
@@ -52,7 +55,7 @@ public interface ProgramModelInfo extends Service {
      *
      * @param ct a class type.
      * @return a list of class types that are members of the given type or any
-     * of its supertypes.
+     *         of its supertypes.
      * @see #getAllSupertypes
      */
     List<ClassType> getAllTypes(ClassType ct);
@@ -80,7 +83,7 @@ public interface ProgramModelInfo extends Service {
      *
      * @param ct a class type.
      * @return the list of all supertypes of the given type in topological
-     * order.
+     *         order.
      */
     List<ClassType> getAllSupertypes(ClassType ct);
 
@@ -127,7 +130,7 @@ public interface ProgramModelInfo extends Service {
      *
      * @param ct a class type.
      * @return the list of visible field members of the given type and its
-     * supertypes.
+     *         supertypes.
      */
     List<Field> getAllFields(ClassType ct);
 
@@ -206,7 +209,7 @@ public interface ProgramModelInfo extends Service {
      * @param a a primitive type.
      * @param b a primitive type.
      * @return the promoted type for the pair of types, or null if a type
-     * represents the boolean type, while the other does not.
+     *         represents the boolean type, while the other does not.
      */
     PrimitiveType getPromotedType(PrimitiveType a, PrimitiveType b);
 
@@ -216,10 +219,10 @@ public interface ProgramModelInfo extends Service {
      * "smaller" type is widening to a "bigger" one.
      *
      * @param from a primitive type that might be widening into another type.
-     * @param to   a primitive type that is the destination of a widening
-     *             operation.
+     * @param to a primitive type that is the destination of a widening
+     *        operation.
      * @return <CODE>true</CODE> if the first type widens into the second one,
-     * <CODE>false</CODE> otherwise.
+     *         <CODE>false</CODE> otherwise.
      */
     boolean isWidening(PrimitiveType from, PrimitiveType to);
 
@@ -228,9 +231,9 @@ public interface ProgramModelInfo extends Service {
      * is the case iff the first type is a subtype of the second.
      *
      * @param from a class type that might be widening into another type.
-     * @param to   a class type that is the destination of a widening operation.
+     * @param to a class type that is the destination of a widening operation.
      * @return <CODE>true</CODE> if the first type widens into the second one,
-     * <CODE>false</CODE> otherwise.
+     *         <CODE>false</CODE> otherwise.
      */
     boolean isWidening(ClassType from, ClassType to);
 
@@ -239,9 +242,9 @@ public interface ProgramModelInfo extends Service {
      * rules are defined in the Java language specification.
      *
      * @param from an array type that might be widening into another type.
-     * @param to   an array type that is the destination of a widening operation.
+     * @param to an array type that is the destination of a widening operation.
      * @return <CODE>true</CODE> if the first type widens into the second one,
-     * <CODE>false</CODE> otherwise.
+     *         <CODE>false</CODE> otherwise.
      */
     boolean isWidening(ArrayType from, ArrayType to);
 
@@ -252,9 +255,9 @@ public interface ProgramModelInfo extends Service {
      * such as "Cloneable").
      *
      * @param from a type that might be widening into another type.
-     * @param to   a type that is the destination of a widening operation.
+     * @param to a type that is the destination of a widening operation.
      * @return <CODE>true</CODE> if the first type widens into the second one,
-     * <CODE>false</CODE> otherwise.
+     *         <CODE>false</CODE> otherwise.
      */
     boolean isWidening(Type from, Type to);
 
@@ -264,8 +267,8 @@ public interface ProgramModelInfo extends Service {
      * @param a class type.
      * @param b class type.
      * @return <CODE>true</CODE> if the first class type is a subtype of the
-     * second or if both types are equal, <CODE>false</CODE>
-     * otherwise.
+     *         second or if both types are equal, <CODE>false</CODE>
+     *         otherwise.
      */
     boolean isSubtype(ClassType a, ClassType b);
 
@@ -275,8 +278,8 @@ public interface ProgramModelInfo extends Service {
      * @param a class type.
      * @param b class type.
      * @return <CODE>true</CODE> if the first class type is a supertype of the
-     * second or if both types are equal, <CODE>false</CODE>
-     * otherwise.
+     *         second or if both types are equal, <CODE>false</CODE>
+     *         otherwise.
      */
     boolean isSupertype(ClassType a, ClassType b);
 
@@ -285,10 +288,10 @@ public interface ProgramModelInfo extends Service {
      * class type.
      *
      * @param m a member that might be referred to from within the given
-     *          classtype.
+     *        classtype.
      * @param t the class type that might refer to the given member.
      * @return <CODE>true</CODE> if the member is visible for the class type,
-     * <CODE>false</CODE> otherwise.
+     *         <CODE>false</CODE> otherwise.
      */
     boolean isVisibleFor(Member m, ClassType t);
 
@@ -302,32 +305,34 @@ public interface ProgramModelInfo extends Service {
      * @param a a signature.
      * @param b a signature.
      * @return <CODE>true</CODE> if the first signature is compatible with the
-     * second one, <CODE>false</CODE> otherwise.
+     *         second one, <CODE>false</CODE> otherwise.
      */
     boolean isCompatibleSignature(List<Type> a, List<Type> b);
 
     /**
      * Checks if the first signature is compatible to the second one.
      *
-     * @param a                      a signature
-     * @param b                      a signature
-     * @param allowAutoboxing        wether or not to allow autoboxing
+     * @param a a signature
+     * @param b a signature
+     * @param allowAutoboxing wether or not to allow autoboxing
      * @param bIsVariableArityMethod wether or not b denotes a variable arity method. This
-     *                               assumes the last element in b to be an array type!
+     *        assumes the last element in b to be an array type!
      * @return
      */
-    boolean isCompatibleSignature(List<Type> a, List<Type> b, boolean allowAutoboxing, boolean bIsVariableArityMethod);
+    boolean isCompatibleSignature(List<Type> a, List<Type> b, boolean allowAutoboxing,
+            boolean bIsVariableArityMethod);
 
     /**
      * Retains methods that are applicable for a given call. All other methods
      * are removed from the list.
      *
-     * @param list      the list of candidate methods.
-     * @param name      the name of the method as used by the caller.
+     * @param list the list of candidate methods.
+     * @param name the name of the method as used by the caller.
      * @param signature the types of the argument expressions of the call.
-     * @param context   the context where the call takes place.
+     * @param context the context where the call takes place.
      */
-    void filterApplicableMethods(List<Method> list, String name, List<Type> signature, ClassType context);
+    void filterApplicableMethods(List<Method> list, String name, List<Type> signature,
+            ClassType context);
 
     /**
      * Retains methods with signatures that are not compatible to each other. If
@@ -362,18 +367,19 @@ public interface ProgramModelInfo extends Service {
      * Returns the list of most specific methods with the given name
      * that are defined in the given type or in a supertype where they
      * are visible for a second given type, and have a signature that
-     * is compatible to the given one.  If used to resolve a method
+     * is compatible to the given one. If used to resolve a method
      * call, the result list should have exactly one element.
      *
-     * @param ct        the class type to get methods from.
-     * @param name      the name of the methods in question.
+     * @param ct the class type to get methods from.
+     * @param name the name of the methods in question.
      * @param signature the statical type signature of a callee.
-     * @param context   the access context, which is often but not always
-     *                  identical to <CODE>ct</CODE>.
+     * @param context the access context, which is often but not always
+     *        identical to <CODE>ct</CODE>.
      * @return the methods that correspond best to the given constraints.
      * @since 0.80 (added context parameter)
      */
-    List<Method> getMethods(ClassType ct, String name, List<Type> signature, List<? extends TypeArgument> typeArgs, ClassType context);
+    List<Method> getMethods(ClassType ct, String name, List<Type> signature,
+            List<? extends TypeArgument> typeArgs, ClassType context);
 
     /**
      * Returns the list of most specific methods with the given name that are
@@ -382,14 +388,15 @@ public interface ProgramModelInfo extends Service {
      * If used to resolve a method call, the result should be defined and
      * unambiguous.
      *
-     * @param ct        the class type to get methods from.
-     * @param name      the name of the methods in question.
+     * @param ct the class type to get methods from.
+     * @param name the name of the methods in question.
      * @param signature the statical type signature of a callee.
      * @return the methods that correspond best to the given constraints.
      */
     List<Method> getMethods(ClassType ct, String name, List<Type> signature);
 
-    List<Method> getMethods(ClassType ct, String name, List<Type> signature, List<? extends TypeArgument> typeArgs);
+    List<Method> getMethods(ClassType ct, String name, List<Type> signature,
+            List<? extends TypeArgument> typeArgs);
 
     /**
      * Returns the list of most specific constructors that are defined in the
@@ -397,7 +404,7 @@ public interface ProgramModelInfo extends Service {
      * used to resolve a constructor call, the result should be defined and
      * unambiguous.
      *
-     * @param ct        the class type to get constructors from.
+     * @param ct the class type to get constructors from.
      * @param signature the statical type signature of a callee.
      * @return the constructors that correspond best to the given constraints.
      */
@@ -419,7 +426,7 @@ public interface ProgramModelInfo extends Service {
      *
      * @param boxedType the ClassType to be unboxed
      * @return The PrimitveType this ClassType can be unboxed to,
-     * <code>null</code> if unboxing is not possible.
+     *         <code>null</code> if unboxing is not possible.
      */
     PrimitiveType getUnboxedType(ClassType boxedType);
 }

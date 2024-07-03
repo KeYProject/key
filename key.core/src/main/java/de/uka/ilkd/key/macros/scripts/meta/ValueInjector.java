@@ -1,11 +1,15 @@
-package de.uka.ilkd.key.macros.scripts.meta;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+package de.uka.ilkd.key.macros.scripts.meta;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 /**
  * @author Alexander Weigl
@@ -22,7 +26,11 @@ public class ValueInjector {
     /**
      * A mapping between desired types and suitable @{@link StringConverter}.
      * <p>
-     * Should be <pre>T --> StringConverter<T></pre>
+     * Should be
+     *
+     * <pre>
+     * T --> StringConverter<T>
+     * </pre>
      */
     private Map<Class, StringConverter> converters = new HashMap<>();
 
@@ -30,20 +38,20 @@ public class ValueInjector {
      * Injects the given {@code arguments} in the {@code obj}.
      * For more details see {@link #inject(ProofScriptCommand, Object, Map)}
      *
-     * @param command   a proof script command
-     * @param obj       a parameter class with annotation
+     * @param command a proof script command
+     * @param obj a parameter class with annotation
      * @param arguments a non-null map of string pairs
      * @param <T> an arbitrary type
      * @return the same object as {@code obj}
-     * @throws ArgumentRequiredException     a required argument was not given in {@code arguments}
-     * @throws InjectionReflectionException  an access on some reflection methods occurred
+     * @throws ArgumentRequiredException a required argument was not given in {@code arguments}
+     * @throws InjectionReflectionException an access on some reflection methods occurred
      * @throws NoSpecifiedConverterException unknown type for the current converter map
-     * @throws ConversionException           an converter could not translate the given value in
-     *                                       arguments
+     * @throws ConversionException an converter could not translate the given value in
+     *         arguments
      */
     public static <T> T injection(ProofScriptCommand<?> command,
-                                  T obj,
-                                  Map<String, String> arguments)
+            T obj,
+            Map<String, String> arguments)
             throws ArgumentRequiredException, InjectionReflectionException,
             NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
@@ -90,16 +98,16 @@ public class ValueInjector {
     /**
      * Injects the converted version of the given {@code arguments} in the given {@code obj}.
      *
-     * @param command   a proof script command
-     * @param obj       a non-null instance of a parameter class (with annotation)
+     * @param command a proof script command
+     * @param obj a non-null instance of a parameter class (with annotation)
      * @param arguments a non-null string map
-     * @param <T>       type safety
+     * @param <T> type safety
      * @return the same object as {@code obj}
-     * @throws ArgumentRequiredException     a required argument was not given in {@code arguments}
-     * @throws InjectionReflectionException  an access on some reflection methods occurred
+     * @throws ArgumentRequiredException a required argument was not given in {@code arguments}
+     * @throws InjectionReflectionException an access on some reflection methods occurred
      * @throws NoSpecifiedConverterException unknown type for the current converter map
-     * @throws ConversionException           an converter could not translate the given value
-     *                                       in arguments
+     * @throws ConversionException an converter could not translate the given value
+     *         in arguments
      * @see Option
      * @see Flag
      */
@@ -149,7 +157,7 @@ public class ValueInjector {
             return map;
         } catch (IllegalAccessException e) {
             throw new InjectionReflectionException(
-                    "Error on using reflection on class " + obj.getClass(), e, vararg);
+                "Error on using reflection on class " + obj.getClass(), e, vararg);
         }
     }
 
@@ -160,24 +168,25 @@ public class ValueInjector {
         if (val == null) {
             if (meta.isRequired()) {
                 throw new ArgumentRequiredException(
-                        String.format("Argument %s:%s is required, but %s was given. " +
-                                        "For comamnd class: '%s'",
-                                meta.getName(), meta.getField().getType(), val,
-                                meta.getCommand().getClass()), meta);
+                    String.format("Argument %s:%s is required, but %s was given. " +
+                        "For comamnd class: '%s'",
+                        meta.getName(), meta.getField().getType(), val,
+                        meta.getCommand().getClass()),
+                    meta);
             }
         } else {
             Object value = convert(meta, val);
             try {
-                //if (meta.getType() != value.getClass())
-                //    throw new ConversionException("The typed returned '" + val.getClass()
-                //            + "' from the converter mismatched with the
+                // if (meta.getType() != value.getClass())
+                // throw new ConversionException("The typed returned '" + val.getClass()
+                // + "' from the converter mismatched with the
                 // type of the field " + meta.getType(), meta);
                 // FIXME: I had to add this, otherwise I would receive an illegal access exception.
                 meta.getField().setAccessible(true);
                 meta.getField().set(obj, value);
             } catch (IllegalAccessException e) {
                 throw new InjectionReflectionException("Could not inject values via reflection",
-                        e, meta);
+                    e, meta);
             }
         }
     }
@@ -187,14 +196,15 @@ public class ValueInjector {
         StringConverter<?> converter = getConverter(meta.getType());
         if (converter == null) {
             throw new NoSpecifiedConverterException("No converter registered for class: " +
-                    meta.getField().getType(), meta);
+                meta.getField().getType(), meta);
         }
         try {
             return converter.convert(val);
         } catch (Exception e) {
             throw new ConversionException(
-                    String.format("Could not convert value %s to type %s",
-                            val, meta.getField().getType()), e, meta);
+                String.format("Could not convert value %s to type %s",
+                    val, meta.getField().getType()),
+                e, meta);
         }
     }
 
@@ -202,8 +212,8 @@ public class ValueInjector {
      * Registers the given converter for the specified class.
      *
      * @param clazz a class
-     * @param conv  a converter for the given class
-     * @param <T>   an arbitrary type
+     * @param conv a converter for the given class
+     * @param <T> an arbitrary type
      */
     public <T> void addConverter(Class<T> clazz, StringConverter<T> conv) {
         converters.put(clazz, conv);
@@ -213,7 +223,7 @@ public class ValueInjector {
      * Finds a converter for the given class.
      *
      * @param clazz a non-null class
-     * @param <T>   an arbitrary type
+     * @param <T> an arbitrary type
      * @return null or a suitable converter (registered) converter for the requested class.
      */
     @SuppressWarnings("unchecked")

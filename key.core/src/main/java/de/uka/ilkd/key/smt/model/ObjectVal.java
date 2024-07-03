@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.model;
 
 import java.util.*;
@@ -44,6 +48,7 @@ public class ObjectVal {
 
     /**
      * creates a new object value of the given name
+     *
      * @param name the Object's name
      */
     public ObjectVal(String name) {
@@ -55,6 +60,7 @@ public class ObjectVal {
 
     /**
      * associate the function name with the given value
+     *
      * @param fun the name of the function
      * @param val the value to be associated with the specified function
      */
@@ -64,6 +70,7 @@ public class ObjectVal {
 
     /**
      * set the i-th array element to the given value
+     *
      * @param i the array index
      * @param val the value
      */
@@ -73,6 +80,7 @@ public class ObjectVal {
 
     /**
      * returns the i-th array element
+     *
      * @param i the index of the array element to be returned
      * @return the value stores at index i
      */
@@ -82,8 +90,9 @@ public class ObjectVal {
 
     /**
      * sets the (exact) dynamic type of this object
+     *
      * @param exactInstance
-     *            the exactInstance to set
+     *        the exactInstance to set
      */
     public void setExactInstance(boolean exactInstance) {
         this.exactInstance = exactInstance;
@@ -98,6 +107,7 @@ public class ObjectVal {
 
     /**
      * returns all values stored in this array
+     *
      * @return map associating an index with the value stored at that index
      */
     public Map<Integer, String> getArrayValues() {
@@ -106,6 +116,7 @@ public class ObjectVal {
 
     /**
      * returns the associated values for the given function names
+     *
      * @return map of function name to associated value
      */
     public Map<String, String> getFunValues() {
@@ -114,6 +125,7 @@ public class ObjectVal {
 
     /**
      * sets the name of this entity
+     *
      * @param name the name
      */
     public void setName(String name) {
@@ -123,6 +135,7 @@ public class ObjectVal {
 
     /**
      * queries the name of this entity
+     *
      * @return the name
      */
     public String getName() {
@@ -132,6 +145,7 @@ public class ObjectVal {
 
     /**
      * queries the sort of this entity
+     *
      * @return the sort
      */
     public Sort getSort() {
@@ -140,6 +154,7 @@ public class ObjectVal {
 
     /**
      * sets the sort of this object/array/function
+     *
      * @param sort the sort
      */
     public void setSort(Sort sort) {
@@ -148,6 +163,7 @@ public class ObjectVal {
 
     /**
      * returns the length of this array
+     *
      * @return the length
      */
     public int getLength() {
@@ -156,6 +172,7 @@ public class ObjectVal {
 
     /**
      * sets the length of this array
+     *
      * @param length the length
      */
     public void setLength(int length) {
@@ -171,7 +188,7 @@ public class ObjectVal {
 
     /**
      * @param fieldvalues
-     *            the fieldvalues to set
+     *        the fieldvalues to set
      */
     public void setFieldvalues(Map<String, String> fieldvalues) {
         this.fieldvalues = fieldvalues;
@@ -179,6 +196,7 @@ public class ObjectVal {
 
     /**
      * returns the currently associated valut to the specified field
+     *
      * @param field the field name
      * @return the value associated to the field (or null if no value is known)
      */
@@ -188,6 +206,7 @@ public class ObjectVal {
 
     /**
      * associated a field to the given value
+     *
      * @param field the field
      * @param value the value assigned to the specified field
      * @return the old value of the field (or null if no value was known before)
@@ -198,6 +217,7 @@ public class ObjectVal {
 
     /**
      * the value of the field specified by its short name
+     *
      * @param name the short name of the field
      * @return the value associated to the field (or null if not known)
      */
@@ -206,7 +226,7 @@ public class ObjectVal {
         if (fieldvalues.containsKey(name)) {
             return fieldvalues.get(name);
         } else {
-            for (var pair: fieldvalues.entrySet()) {
+            for (var pair : fieldvalues.entrySet()) {
                 String field = pair.getKey();
                 if (field.endsWith(name) || field.endsWith(name + "|")) {
                     return pair.getValue();
@@ -218,6 +238,7 @@ public class ObjectVal {
 
     /**
      * textual representation of this object
+     *
      * @return the string representation of this object
      */
     public String toString() {
@@ -235,17 +256,19 @@ public class ObjectVal {
 
         result.append(tab).append(tab).append("length = ").append(length).append("\n");
         result.append(tab).append(tab).append("type =").append(type).append("\n");
-        result.append(tab).append(tab).append("exactInstance =").append(this.exactInstance).append("\n");
+        result.append(tab).append(tab).append("exactInstance =").append(this.exactInstance)
+                .append("\n");
 
         List<String> fields = new LinkedList<>(fieldvalues.keySet());
         Collections.sort(fields);
 
         for (String field : fields) {
-            result.append(tab).append(tab).append(field).append(" = ").append(fieldvalues.get(field));
+            result.append(tab).append(tab).append(field).append(" = ")
+                    .append(fieldvalues.get(field));
             result.append("\n");
         }
 
-        for (var pair  : funValues.entrySet()) {
+        for (var pair : funValues.entrySet()) {
             String fun = pair.getKey();
             result.append(tab).append(tab).append(fun).append(" = ").append(pair.getValue());
             result.append("\n");
@@ -255,7 +278,8 @@ public class ObjectVal {
         Collections.sort(arrfields);
 
         for (int i : arrfields) {
-            result.append(tab).append(tab).append("[").append(i).append("] = ").append(arrayValues.get(i));
+            result.append(tab).append(tab).append("[").append(i).append("] = ")
+                    .append(arrayValues.get(i));
             result.append("\n");
         }
         return result.toString();
@@ -263,6 +287,7 @@ public class ObjectVal {
 
     /**
      * computes the hashcode of this object
+     *
      * @return the hashcode
      */
     @Override
@@ -273,9 +298,10 @@ public class ObjectVal {
 
     /**
      * Objects with equal names are equal.
+     *
      * @param o the Object to be compared to
      * @return true if this object and o have
-     *   equal names
+     *         equal names
      */
     public boolean equals(Object o) {
         if (o instanceof ObjectVal) {
@@ -290,6 +316,7 @@ public class ObjectVal {
 
     /**
      * sets a set of values stored at the indexes of this arrays
+     *
      * @param newArrayValues the map associated an array element to its value
      */
     public void setArrayValues(Map<Integer, String> newArrayValues) {
@@ -298,6 +325,7 @@ public class ObjectVal {
 
     /**
      * sets a set of values to be associated with the given function names
+     *
      * @param newFunValues the map associated function names to their respective value
      */
     public void setFunValues(Map<String, String> newFunValues) {

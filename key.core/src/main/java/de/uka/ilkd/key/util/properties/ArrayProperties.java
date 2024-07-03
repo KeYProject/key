@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util.properties;
 
 import java.util.Arrays;
@@ -32,16 +36,16 @@ public class ArrayProperties extends AbstractProperties {
 
     private void ensurePresent(int number) {
         int size = number + 1;
-        if(data == null) {
+        if (data == null) {
             data = new Object[size];
-        } else if(data.length < size) {
+        } else if (data.length < size) {
             data = Arrays.copyOf(data, size);
         }
     }
 
     @Override
     public <T> T get(Property<T> property) {
-        if(data == null || property.getNumber() >= data.length) {
+        if (data == null || property.getNumber() >= data.length) {
             return null;
         } else {
             return property.getType().cast(data[property.getNumber()]);
@@ -55,7 +59,7 @@ public class ArrayProperties extends AbstractProperties {
 
     @Override
     public <T> void remove(Property<T> property) {
-        if(data == null || property.getNumber() >= data.length) {
+        if (data == null || property.getNumber() >= data.length) {
             // do nothing
         } else {
             T oldValue = get(property);

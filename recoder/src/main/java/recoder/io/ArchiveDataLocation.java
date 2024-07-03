@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
 
 import java.io.*;
@@ -29,7 +32,7 @@ public class ArchiveDataLocation implements DataLocation {
     /**
      * creates a new location object.
      *
-     * @param archive  the file that contains the archive
+     * @param archive the file that contains the archive
      * @param itemname the name of the item within the archive
      */
     public ArchiveDataLocation(ZipFile archive, String itemname) {
@@ -41,7 +44,7 @@ public class ArchiveDataLocation implements DataLocation {
      * creates a new location object.
      *
      * @param archivename the name of the archive file
-     * @param itemname    the name of the item within the archive
+     * @param itemname the name of the item within the archive
      */
     public ArchiveDataLocation(String archivename, String itemname) throws IOException {
         this(new ZipFile(archivename), itemname);
@@ -113,8 +116,8 @@ public class ArchiveDataLocation implements DataLocation {
      *
      * @return the according reader
      * @throws IOException thrown if an error occurs with retrieving the reader or
-     *                     the underlying input stream from the according data
-     *                     object.
+     *         the underlying input stream from the according data
+     *         object.
      */
     public Reader getReader() throws IOException {
         return new InputStreamReader(getInputStream());

@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
 
 import recoder.ModelElement;
@@ -88,7 +91,8 @@ public interface ProgramElement extends SourceElement, ModelElement {
             } else if (x == null) {
                 return 0;
             } else {
-                throw new IllegalArgumentException("Structural hashcodes are only defined for program elements");
+                throw new IllegalArgumentException(
+                    "Structural hashcodes are only defined for program elements");
             }
         }
 
@@ -115,7 +119,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
          * @param x the root of the first syntax tree.
          * @param y the root of the second syntax tree.
          * @return true, iff both roots have the same class and equal children
-         * (if any).
+         *         (if any).
          */
 
         public boolean equals(Object x, Object y) {
@@ -144,10 +148,12 @@ public interface ProgramElement extends SourceElement, ModelElement {
                 NonTerminalProgramElement b = (NonTerminalProgramElement) y;
                 int n = a.getChildCount();
                 int m = b.getChildCount();
-                if ((a instanceof ArrayLengthReference) && (b instanceof UncollatedReferenceQualifier)) {
+                if ((a instanceof ArrayLengthReference)
+                        && (b instanceof UncollatedReferenceQualifier)) {
                     m -= 1;
                 }
-                if ((b instanceof ArrayLengthReference) && (a instanceof UncollatedReferenceQualifier)) {
+                if ((b instanceof ArrayLengthReference)
+                        && (a instanceof UncollatedReferenceQualifier)) {
                     n -= 1;
                 }
                 if (n != m) {
@@ -174,7 +180,8 @@ public interface ProgramElement extends SourceElement, ModelElement {
                         return ((BooleanLiteral) x).getValue() == ((BooleanLiteral) y).getValue();
                     }
                     if (x instanceof StringLiteral) {
-                        return ((StringLiteral) x).getValue().equals(((StringLiteral) y).getValue());
+                        return ((StringLiteral) x).getValue()
+                                .equals(((StringLiteral) y).getValue());
                     }
                     if (x instanceof NullLiteral) {
                         return true;
@@ -183,7 +190,8 @@ public interface ProgramElement extends SourceElement, ModelElement {
                         return ((CharLiteral) x).getValue().equals(((CharLiteral) y).getValue());
                     }
                     if (x instanceof DoubleLiteral) {
-                        return ((DoubleLiteral) x).getValue().equals(((DoubleLiteral) y).getValue());
+                        return ((DoubleLiteral) x).getValue()
+                                .equals(((DoubleLiteral) y).getValue());
                     }
                     if (x instanceof LongLiteral) {
                         return ((LongLiteral) x).getValue().equals(((LongLiteral) y).getValue());
@@ -196,7 +204,8 @@ public interface ProgramElement extends SourceElement, ModelElement {
                 }
                 return true;
             } else {
-                throw new IllegalArgumentException("Structural equality is only defined for program elements");
+                throw new IllegalArgumentException(
+                    "Structural equality is only defined for program elements");
             }
         }
     }

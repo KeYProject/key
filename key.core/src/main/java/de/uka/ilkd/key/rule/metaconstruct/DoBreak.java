@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -23,7 +27,7 @@ public class DoBreak extends ProgramTransformer {
      * creates a do-break ProgramTransformer
      *
      * @param labeledBreak
-     *            the LabeledStatement contained by the meta construct
+     *        the LabeledStatement contained by the meta construct
      */
     public DoBreak(LabeledStatement labeledBreak) {
         super("do-break", labeledBreak);
@@ -34,10 +38,10 @@ public class DoBreak extends ProgramTransformer {
      * metaconstruct.
      *
      * @param block
-     *            the NonTerminalProgramElement to go through and look for the
-     *            label
+     *        the NonTerminalProgramElement to go through and look for the
+     *        label
      * @param breakLabel
-     *            the Label the break statement marked
+     *        the Label the break statement marked
      */
     private ProgramElement doBreak(NonTerminalProgramElement block,
             Label breakLabel, Break b) {
@@ -64,8 +68,8 @@ public class DoBreak extends ProgramTransformer {
      * transformation
      *
      * @param services
-     *            the Services with all necessary information about the java
-     *            programs
+     *        the Services with all necessary information about the java
+     *        programs
      * @return the transformated program
      */
     @Override

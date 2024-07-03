@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.communication;
 
+import java.io.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.*;
 
 /**
  * This class represents a simplified version of the existing pipe. It assumes that the external
@@ -14,26 +18,22 @@ public class SimplePipe implements Pipe {
     /**
      * The Reader that splits incoming messages at the given delimiters.
      */
-    private final @Nonnull
-    BufferedMessageReader reader;
+    private final @Nonnull BufferedMessageReader reader;
 
     /**
      *
      */
-    private final @Nonnull
-    SolverCommunication session;
+    private final @Nonnull SolverCommunication session;
 
     /**
      * The process this pipe is attached to.
      */
-    private final @Nonnull
-    Process process;
+    private final @Nonnull Process process;
 
     /**
      * The Writer connected to stdin of the external process.
      */
-    private final @Nonnull
-    Writer smtIn;
+    private final @Nonnull Writer smtIn;
 
     /**
      * Input of the SMT stdin
@@ -60,16 +60,16 @@ public class SimplePipe implements Pipe {
     /**
      * Creates a new SimplePipe.
      *
-     * @param input             the InputStream connected to the merged stdout and stderr of the external
-     *                          process
+     * @param input the InputStream connected to the merged stdout and stderr of the external
+     *        process
      * @param messageDelimiters the delimiters which separate one message from another
-     * @param output            the OutputStream connected to stdin of the external process
-     * @param session           the message list where to log the messages to
-     * @param process           the external process this pipe is connected to
+     * @param output the OutputStream connected to stdin of the external process
+     * @param session the message list where to log the messages to
+     * @param process the external process this pipe is connected to
      */
     public SimplePipe(@Nonnull InputStream input, @Nonnull String[] messageDelimiters,
-                      @Nonnull OutputStream output, @Nonnull SolverCommunication session,
-                      @Nonnull Process process) {
+            @Nonnull OutputStream output, @Nonnull SolverCommunication session,
+            @Nonnull Process process) {
         processWriter = new TeeWriter(new OutputStreamWriter(output), stdin);
         processReader = new TeeReader(new InputStreamReader(input), stdout);
 
@@ -98,7 +98,8 @@ public class SimplePipe implements Pipe {
                 tryToReadExhaustively();
                 int exit = process.exitValue();
                 throw new IllegalStateException(
-                        "Process terminated (exit code " + exit + "). Process report:\n" + getReadMessages());
+                    "Process terminated (exit code " + exit + "). Process report:\n"
+                        + getReadMessages());
             } else {
                 throw e;
             }
@@ -108,22 +109,20 @@ public class SimplePipe implements Pipe {
     public void tryToReadExhaustively() {
         try {
             while (-1 != processReader.read()) {
-                /*empty*/
+                /* empty */
             }
         } catch (IOException ignore) {
         }
     }
 
     @Override
-    public @Nullable
-    String readMessage() throws IOException, InterruptedException {
+    public @Nullable String readMessage() throws IOException, InterruptedException {
         // blocks if there is currently no message
         return reader.readMessage();
     }
 
     @Override
-    public @Nonnull
-    SolverCommunication getSolverCommunication() {
+    public @Nonnull SolverCommunication getSolverCommunication() {
         return session;
     }
 

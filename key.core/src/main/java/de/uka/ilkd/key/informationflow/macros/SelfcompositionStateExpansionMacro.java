@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.Services;
@@ -21,6 +23,8 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract
@@ -42,8 +46,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     @Override
     public String getDescription() {
         return "Extract the self-composed states after the merge of the "
-                + "symbolic execution goals which is included in the proof "
-                + "obligation generation from information flow contracts.";
+            + "symbolic execution goals which is included in the proof "
+            + "obligation generation from information flow contracts.";
     }
 
     private static final String[] ADMITTED_RULES = {
@@ -65,16 +69,17 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
+            Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
         if ("andLeft".equals(ruleName) &&
-            pio.sequentFormula().formula().op() instanceof UpdateApplication) {
+                pio.sequentFormula().formula().op() instanceof UpdateApplication) {
             return false;
         } else {
             return true;
         }
     }
-    
+
 
     /**
      * {@inheritDoc}
@@ -85,8 +90,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
      */
     @Override
     public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+            ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
 
         if (proof == null) {
             return false;
@@ -96,8 +101,9 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
             return false;
         }
         final ProofOblInput poForProof =
-                services.getSpecificationRepository().getProofOblInput(proof);
-        return (poForProof instanceof AbstractInfFlowPO) && super.canApplyTo(proof, goals, posInOcc);
+            services.getSpecificationRepository().getProofOblInput(proof);
+        return (poForProof instanceof AbstractInfFlowPO)
+                && super.canApplyTo(proof, goals, posInOcc);
     }
 
     @Override
@@ -112,8 +118,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     private class SelfCompExpansionStrategy implements Strategy {
 
         private final Name NAME =
-                new Name(SelfcompositionStateExpansionMacro.SelfCompExpansionStrategy
-                                .class.getSimpleName());
+            new Name(
+                SelfcompositionStateExpansionMacro.SelfCompExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
 
@@ -128,17 +134,17 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp,
-                                       PosInOccurrence pio,
-                                       Goal goal) {
+                PosInOccurrence pio,
+                Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if (    (   admittedRuleNames.contains(name)
-                     || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
-                 && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
+            if ((admittedRuleNames.contains(name)
+                    || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
+                    && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 JavaCardDLStrategyFactory strategyFactory =
-                        new JavaCardDLStrategyFactory();
+                    new JavaCardDLStrategyFactory();
                 Strategy javaDlStrategy =
-                        strategyFactory.create(goal.proof(),
-                                               new StrategyProperties());
+                    strategyFactory.create(goal.proof(),
+                        new StrategyProperties());
                 RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal);
                 if ("orLeft".equals(name)) {
                     costs = costs.add(NumberRuleAppCost.create(100));
@@ -161,7 +167,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
 
     }

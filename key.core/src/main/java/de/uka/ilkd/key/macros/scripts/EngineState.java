@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.File;
@@ -6,8 +10,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Observer;
 import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -22,13 +24,15 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * @author Alexander Weigl
  * @version 1 (28.03.17)
  */
 public class EngineState {
     private final static DefaultTermParser PARSER = new DefaultTermParser();
-    //private final Map<String, Object> arbitraryVariables = new HashMap<>();
+    // private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
     private AbbrevMap abbrevMap = new AbbrevMap();
     /**
@@ -45,7 +49,7 @@ public class EngineState {
      * only shows explicit echo messages.
      */
     private boolean echoOn = true;
-    
+
     /**
      * If set to true, an already closed proof leads to an exception if another goal
      * should be picked. Otherwise, script execution terminates without an
@@ -83,15 +87,15 @@ public class EngineState {
      * is true.
      *
      * @param checkAutomatic
-     *            Set to true if the returned {@link Goal} should be automatic.
+     *        Set to true if the returned {@link Goal} should be automatic.
      * @return the first open goal, which has to be automatic iff checkAutomatic
      *         is true.
      *
      * @throws ProofAlreadyClosedException
-     *             If the proof is already closed when calling this method.
+     *         If the proof is already closed when calling this method.
      * @throws ScriptException
-     *             If there is no such {@link Goal}, or something else goes
-     *             wrong.
+     *         If there is no such {@link Goal}, or something else goes
+     *         wrong.
      */
     @SuppressWarnings("unused")
     public Goal getFirstOpenGoal(boolean checkAutomatic)
@@ -122,7 +126,7 @@ public class EngineState {
 
         if (newGoal == null) {
             throw new ScriptException(
-                    "There must be an open goal at this point");
+                "There must be an open goal at this point");
         }
 
         return newGoal;
@@ -132,7 +136,7 @@ public class EngineState {
      * @return The first open and automatic {@link Goal}.
      *
      * @throws ScriptException
-     *             If there is no such {@link Goal}.
+     *         If there is no such {@link Goal}.
      */
     public Goal getFirstOpenAutomaticGoal() throws ScriptException {
         return getFirstOpenGoal(true);
@@ -205,7 +209,7 @@ public class EngineState {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
         Term formula = PARSER.parse(reader, sort, services,
-                getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
+            getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
         return formula;
     }
 
@@ -223,8 +227,8 @@ public class EngineState {
         Services services = proof.getServices();
 
         Sequent seq = PARSER.parseSeq(reader, services,
-                getFirstOpenAutomaticGoal().getLocalNamespaces(),
-                getAbbreviations());
+            getFirstOpenAutomaticGoal().getLocalNamespaces(),
+            getAbbreviations());
         return seq;
     }
 

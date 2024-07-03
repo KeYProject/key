@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.control;
+
+import java.util.List;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -12,8 +18,6 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
 
-import java.util.List;
-
 /**
  * @author Alexander Weigl
  * @version 1 (08.12.18)
@@ -23,10 +27,11 @@ public interface InteractionListener {
 
     void runPrune(Node node);
 
-    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info);
+    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc,
+            ProofMacroFinishedInfo info);
 
     void runBuiltInRule(Goal goal, IBuiltInRuleApp app, BuiltInRule rule,
-                        PosInOccurrence pos, boolean forced);
+            PosInOccurrence pos, boolean forced);
 
     void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info);
 

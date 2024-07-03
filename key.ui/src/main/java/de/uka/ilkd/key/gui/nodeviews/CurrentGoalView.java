@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -11,7 +14,6 @@ import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
 import java.util.EventObject;
 import java.util.LinkedList;
-
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -30,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,20 +50,20 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private static final long serialVersionUID = 8494000234215913553L;
 
     public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]defaultHighlight", "",
-                    new Color(70, 100, 170, 76));
+        ColorSettings.define("[currentGoal]defaultHighlight", "",
+            new Color(70, 100, 170, 76));
 
     public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]addtionalHighlight", "",
-                    new Color(0, 0, 0, 38));
+        ColorSettings.define("[currentGoal]addtionalHighlight", "",
+            new Color(0, 0, 0, 38));
 
     private static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]updateHighlight", "",
-                    new Color(0, 150, 130, 38));
+        ColorSettings.define("[currentGoal]updateHighlight", "",
+            new Color(0, 150, 130, 38));
 
     public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]dndHighlight", "",
-                    new Color(0, 150, 130, 104));
+        ColorSettings.define("[currentGoal]dndHighlight", "",
+            new Color(0, 150, 130, 104));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
 
@@ -82,7 +85,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * creates a viewer for a sequent
      *
      * @param mainWindow the MainWindow allowing access to the current system
-     * status
+     *        status
      */
     public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
@@ -239,10 +242,10 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
                 errorocc = false;
                 try {
                     setText(getSyntaxHighlighter().process(
-                            getLogicPrinter().toString(),
-                            getMainWindow().getMediator().getSelectedNode()));
+                        getLogicPrinter().toString(),
+                        getMainWindow().getMediator().getSelectedNode()));
                 } catch (Error e) {
-                    LOGGER.error("Error occurred while printing Sequent!",e);
+                    LOGGER.error("Error occurred while printing Sequent!", e);
                     errorocc = true;
                 }
             } while (errorocc);
@@ -278,9 +281,9 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     public void setPrinter(Goal goal) {
         getFilter().setSequent(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
-                                                    getMediator().getNotationInfo(),
-                                                    mediator.getServices(),
-                                                    getVisibleTermLabels()));
+            getMediator().getNotationInfo(),
+            mediator.getServices(),
+            getVisibleTermLabels()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
@@ -301,11 +304,12 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      *
      * @param taclet the selected Taclet
      * @param pos the PosInSequent describes the position where to apply the
-     * rule
+     *        rule
      */
     void selectedTaclet(TacletApp taclet, PosInSequent pos) {
         KeYMediator r = getMediator();
-      // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the
+        // functionality.
         // No functionality is allowed in this method body!
         Goal goal = r.getSelectedGoal();
         Debug.assertTrue(goal != null);
@@ -349,14 +353,14 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         final Insets insets = getAutoscrollInsets();
         final Rectangle outer = getVisibleRect();
         final Rectangle inner = new Rectangle(outer.x + insets.left,
-                outer.y + insets.top,
-                outer.width - (insets.left + insets.right),
-                outer.height - (insets.top + insets.bottom));
+            outer.y + insets.top,
+            outer.width - (insets.left + insets.right),
+            outer.height - (insets.top + insets.bottom));
 
         if (!inner.contains(loc)) {
             Rectangle scrollRect = new Rectangle(loc.x - insets.left,
-                    loc.y - insets.top, insets.left + insets.right,
-                    insets.top + insets.bottom);
+                loc.y - insets.top, insets.left + insets.right,
+                insets.top + insets.bottom);
             scrollRectToVisible(scrollRect);
         }
     }

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -59,7 +63,7 @@ public class MergePointStatement extends JavaStatement
      * Finds the source element that occurs first in the source.
      *
      * @return the last source element in the syntactical representation of this
-     * element, may be equals to this element.
+     *         element, may be equals to this element.
      */
     @Override
     public SourceElement getFirstElement() {
@@ -70,7 +74,7 @@ public class MergePointStatement extends JavaStatement
      * Finds the source element that occurs last in the source.
      *
      * @return the last source element in the syntactical representation of this
-     * element, may be equals to this element.
+     *         element, may be equals to this element.
      */
     @Override
     public SourceElement getLastElement() {

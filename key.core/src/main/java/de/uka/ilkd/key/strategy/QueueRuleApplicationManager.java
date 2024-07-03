@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
+
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Implementation of {@link AutomatedRuleApplicationManager} that stores
@@ -94,7 +98,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         // <code>FocussedRuleApplicationManager</code>) the rule index
         // reports its contents to the rule manager of the goal, which is not
         // necessarily this object
-        goal.ruleAppIndex().reportAutomatedRuleApps(goal.getRuleAppManager(), goal.proof().getServices());
+        goal.ruleAppIndex().reportAutomatedRuleApps(goal.getRuleAppManager(),
+            goal.proof().getServices());
     }
 
     /**
@@ -126,7 +131,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final ImmutableList<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal);
+        final ImmutableList<RuleAppContainer> containers =
+            RuleAppContainer.createAppContainers(rules, pos, goal);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
             queue = push(rac, queue);
@@ -148,7 +154,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Add a new rule app to the heap, provided that the rule app is not
      * infinitely expensive
      */
-    private ImmutableHeap<RuleAppContainer> push(RuleAppContainer c, ImmutableHeap<RuleAppContainer> sourceQueue) {
+    private ImmutableHeap<RuleAppContainer> push(RuleAppContainer c,
+            ImmutableHeap<RuleAppContainer> sourceQueue) {
         if (c.getCost() instanceof TopRuleAppCost) {
             return sourceQueue;
         } else {
@@ -185,7 +192,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          */
         ImmutableHeap<RuleAppContainer> furtherAppsQueue = ImmutableLeftistHeap.nilHeap();
         if (previousMinimum != null) {
-            furtherAppsQueue = push(previousMinimum.createFurtherApps(goal).iterator(), furtherAppsQueue);
+            furtherAppsQueue =
+                push(previousMinimum.createFurtherApps(goal).iterator(), furtherAppsQueue);
             previousMinimum = null;
         }
 
@@ -284,7 +292,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                      * obtained this way will be considered during the current
                      * round.
                      */
-                    furtherAppsQueue = push(minRuleAppContainer.createFurtherApps(goal).iterator(), furtherAppsQueue);
+                    furtherAppsQueue = push(minRuleAppContainer.createFurtherApps(goal).iterator(),
+                        furtherAppsQueue);
                 }
             } else {
                 /*

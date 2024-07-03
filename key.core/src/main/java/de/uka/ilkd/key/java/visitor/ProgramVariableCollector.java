@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -22,6 +24,8 @@ import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used
  * collect all LocationVariables and optional function locations.
@@ -36,9 +40,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * <tt>ProggramVariableCollector(root, false)</tt>
      *
      * @param root
-     *            the ProgramElement which is the root of the AST
+     *        the ProgramElement which is the root of the AST
      * @param services
-     *            the Services object
+     *        the Services object
      */
     public ProgramVariableCollector(ProgramElement root, Services services) {
         super(root, services);
@@ -79,9 +83,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnMergeContract(MergeContract x) {
         assert (x instanceof UnparameterizedMergeContract)
-                    || (x instanceof PredicateAbstractionMergeContract)
+                || (x instanceof PredicateAbstractionMergeContract)
                 : "Unexpected type of merge contract: "
-                        + x.getClass().getSimpleName();
+                    + x.getClass().getSimpleName();
 
         if (x instanceof UnparameterizedMergeContract) {
             return;
@@ -95,7 +99,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         Map<LocationVariable, Term> atPres = pamc.getAtPres();
 
         final ArrayList<AbstractionPredicate> preds =
-                pamc.getAbstractionPredicates(atPres, services);
+            pamc.getAbstractionPredicates(atPres, services);
         preds.forEach(pred -> {
             pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc);
         });
@@ -121,9 +125,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
 
         // free invariants
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             Term inv = x.getFreeInvariant(heap, selfTerm, atPres, services);
-            if(inv != null) {
+            if (inv != null) {
                 inv.execPostOrder(tpvc);
             }
         }
@@ -141,7 +145,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
             ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs(heap,
-                    selfTerm, atPres, services);
+                selfTerm, atPres, services);
             if (infFlowSpecs != null) {
                 for (InfFlowSpec infFlowSpec : infFlowSpecs) {
                     for (Term t : infFlowSpec.preExpressions) {

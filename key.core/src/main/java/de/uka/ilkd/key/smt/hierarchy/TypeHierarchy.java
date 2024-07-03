@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.hierarchy;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -6,11 +13,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Represents the hierarchy of the Java reference types known to KeY.
@@ -42,9 +47,9 @@ public class TypeHierarchy {
     public TypeHierarchy(Services services) {
         this.services = services;
 
-        //Find all sorts
+        // Find all sorts
         for (var sort : services.getNamespaces().sorts().allElements()) {
-            //don't add the null sort
+            // don't add the null sort
             if (!sort.equals(services.getTypeConverter().getHeapLDT().getNull().sort())) {
                 addSort(sort);
                 sortList.add(sort);
@@ -55,13 +60,13 @@ public class TypeHierarchy {
             }
         }
 
-        //For all found sorts find their parents and children.
+        // For all found sorts find their parents and children.
         for (Entry<Sort, SortNode> e : sortMap.entrySet()) {
             Sort s = e.getKey();
             SortNode n = e.getValue();
 
             for (Sort p : s.extendsSorts(services)) {
-                //get parent node
+                // get parent node
                 SortNode pn = sortMap.get(p);
                 if (pn == null) {
                     continue;
@@ -124,7 +129,7 @@ public class TypeHierarchy {
 
         JavaInfo info = services.getJavaInfo();
 
-        //find all interface sorts and contract them
+        // find all interface sorts and contract them
         Set<Sort> interfaceSorts = new HashSet<>();
         for (Sort s : sortMap.keySet()) {
 
@@ -132,7 +137,7 @@ public class TypeHierarchy {
             if (kjt != null) {
                 Type jt = kjt.getJavaType();
                 if (jt instanceof InterfaceDeclaration) {
-                    //contract interface sort
+                    // contract interface sort
                     contractNode(s);
                     interfaceSorts.add(s);
                 }
@@ -140,7 +145,7 @@ public class TypeHierarchy {
 
 
         }
-        //remove the found interface sorts from the map
+        // remove the found interface sorts from the map
         for (Sort sort : interfaceSorts) {
             sortMap.remove(sort);
         }
@@ -180,14 +185,14 @@ public class TypeHierarchy {
         Set<SortNode> children = node.getChildren();
 
 
-        //add children as children of parent
+        // add children as children of parent
         for (SortNode p : parents) {
             p.removeChild(node);
             for (SortNode c : children) {
                 p.addChild(c);
             }
         }
-        //add parents as parents of children
+        // add parents as parents of children
         for (SortNode c : children) {
             c.removeParent(node);
             for (SortNode p : parents) {

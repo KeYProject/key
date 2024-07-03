@@ -1,10 +1,14 @@
-package de.uka.ilkd.key.prover;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.prover;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Interface to be implemented by classes in order to customize the goal selection
@@ -14,8 +18,9 @@ public interface GoalChooser {
 
     /**
      * Initialise this DefaultGoalChooser for use with a given Proof and a list of goals.
+     *
      * @param p_proof
-     * *param p_goals the initial list of goals
+     *        *param p_goals the initial list of goals
      */
     public abstract void init(Proof p_proof, ImmutableList<Goal> p_goals);
 
@@ -33,6 +38,7 @@ public interface GoalChooser {
     /**
      * The given node has become an internal node of the proof tree, and the
      * children of the node are the given goals
+     *
      * @param node
      * @param newGoals
      */

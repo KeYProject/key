@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableSet;
+package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -16,6 +18,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Expects a loop body and creates the anonymizing update
@@ -47,7 +51,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         assert pe instanceof StatementBlock;
 
         final ImmutableSet<ProgramVariable> localOuts = //
-                MiscTools.getLocalOuts(pe, services);
+            MiscTools.getLocalOuts(pe, services);
         return createLocalAnonUpdate(localOuts, services);
     }
 
@@ -59,7 +63,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         for (ProgramVariable pv : localOuts) {
             final Function anonFunc = anonConstForPV(pv, services);
             final Term elemUpd = //
-                    tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+                tb.elementary((LocationVariable) pv, tb.func(anonFunc));
             anonUpdate = tb.parallel(anonUpdate, elemUpd);
         }
 

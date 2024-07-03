@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt;
 
 import java.io.BufferedReader;
@@ -22,13 +26,13 @@ public class VersionChecker {
             p.waitFor(MAX_DELAY, TimeUnit.MILLISECONDS);
             try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
                 String line = r.readLine();
-                // TODO weigl for Java 11 use "p.destroyForcibly();"                
+                // TODO weigl for Java 11 use "p.destroyForcibly();"
                 return line;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally{
-            if( p != null && p.isAlive() ) {
+        } finally {
+            if (p != null && p.isAlive()) {
                 p.destroy();
             }
         }

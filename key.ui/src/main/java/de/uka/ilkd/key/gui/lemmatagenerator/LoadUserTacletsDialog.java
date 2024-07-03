@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
@@ -8,7 +11,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -27,23 +29,27 @@ public class LoadUserTacletsDialog extends JPanel {
     /** the text to be displayed when the "Help" button is pressed */
     private static final String HELP_TEXT =
         "In this dialog you can choose the files that are used for loading user-defined taclets:" +
-        "\n\n" +
-        "User-Defined Taclets:\nThis file contains the taclets that should be loaded, so that " +
-        "they can be used for the current proof. For each taclet an extra proof obligation is " +
-        "built that must be provable, in order to sustain the correctness of the calculus.\n\n" +
-        "Definitions:\n" +
-        "This file contains the signature (function symbols, predicate symbols, sorts)" +
-        " that are used for creating the proof obligations mentioned above. In most cases it " +
-        "should be the same file as indicated in 'User-Defined Taclets'.\n\n" +
-        "Axioms:\nIn order to prove the correctness of the created lemmata," +
-        " for some user-defined taclets the introduction " +
-        "of additional axioms is necessary. At this point you can add them.\n" +
-        "Beware of the fact that it is crucial for the correctness of the calculus that the used " +
-        "axioms are consistent." +
-        "It is the responsibility of the user to guarantee this consistency.\n\n" +
-        "Technical Remarks:\nThe axioms must be stored in another file than the user-defined " +
-        "taclets. Furthermore the axioms are only loaded for the lemmata, but not for the " +
-        "current proof.";
+            "\n\n" +
+            "User-Defined Taclets:\nThis file contains the taclets that should be loaded, so that "
+            +
+            "they can be used for the current proof. For each taclet an extra proof obligation is "
+            +
+            "built that must be provable, in order to sustain the correctness of the calculus.\n\n"
+            +
+            "Definitions:\n" +
+            "This file contains the signature (function symbols, predicate symbols, sorts)" +
+            " that are used for creating the proof obligations mentioned above. In most cases it " +
+            "should be the same file as indicated in 'User-Defined Taclets'.\n\n" +
+            "Axioms:\nIn order to prove the correctness of the created lemmata," +
+            " for some user-defined taclets the introduction " +
+            "of additional axioms is necessary. At this point you can add them.\n" +
+            "Beware of the fact that it is crucial for the correctness of the calculus that the used "
+            +
+            "axioms are consistent." +
+            "It is the responsibility of the user to guarantee this consistency.\n\n" +
+            "Technical Remarks:\nThe axioms must be stored in another file than the user-defined " +
+            "taclets. Furthermore the axioms are only loaded for the lemmata, but not for the " +
+            "current proof.";
 
     /** warning text that will be shown when loading taclets without proving them */
     private static final String INFO_TEXT =
@@ -153,6 +159,7 @@ public class LoadUserTacletsDialog extends JPanel {
 
     /**
      * Creates a new dialog for loading user-defined taclets
+     *
      * @param mode either {@link Mode#PROVE} or {@link Mode#LOAD}
      */
     public LoadUserTacletsDialog(Mode mode) {
@@ -201,16 +208,16 @@ public class LoadUserTacletsDialog extends JPanel {
                 if (!lemmaCheckbox.isSelected()) {
                     lemmaCheckbox.setSelected(true);
                     boolean showDialogUsingAxioms = ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getLemmaGeneratorSettings()
-                        .isShowingDialogUsingAxioms();
+                            .getLemmaGeneratorSettings()
+                            .isShowingDialogUsingAxioms();
                     if (!showDialogUsingAxioms || infoDialog.showDialog(INFO_TEXT,
                         LoadUserTacletsDialog.this)) {
                         changedToNotSelected();
                         lemmaCheckbox.setSelected(false);
                         ProofIndependentSettings.DEFAULT_INSTANCE
-                            .getLemmaGeneratorSettings()
-                            .showDialogUsingAxioms(showDialogUsingAxioms && infoDialog
-                                .showThisDialogNextTime());
+                                .getLemmaGeneratorSettings()
+                                .showDialogUsingAxioms(showDialogUsingAxioms && infoDialog
+                                        .showThisDialogNextTime());
                     }
                 } else {
                     changedToSelected();
@@ -312,15 +319,15 @@ public class LoadUserTacletsDialog extends JPanel {
             addAxiomFileButton.addActionListener(e -> {
 
                 if (firstTimeAddingAxioms &&
-                    ProofIndependentSettings.DEFAULT_INSTANCE.
-                        getLemmaGeneratorSettings().isShowingDialogAddingAxioms()) {
+                        ProofIndependentSettings.DEFAULT_INSTANCE.getLemmaGeneratorSettings()
+                                .isShowingDialogAddingAxioms()) {
 
                     InfoDialog infoDialog = new InfoDialog();
                     firstTimeAddingAxioms = !infoDialog.showDialog(INFO_TEXT,
                         LoadUserTacletsDialog.this);
                     ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getLemmaGeneratorSettings()
-                        .showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
+                            .getLemmaGeneratorSettings()
+                            .showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
                     if (firstTimeAddingAxioms) {
                         return;
                     }

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.join;
 
 import java.util.LinkedList;
@@ -26,10 +30,10 @@ public class JoinIsApplicable {
 
     /**
      * @param goal
-     *            The goal to join.
+     *        The goal to join.
      * @param pio
-     *            Selected formula (symblic state - program counter part) for
-     *            the join.
+     *        Selected formula (symblic state - program counter part) for
+     *        the join.
      * @return The list of possible join partner objects -- may be empty (then,
      *         the join is not applicable).
      */
@@ -44,10 +48,10 @@ public class JoinIsApplicable {
      * Computes the partners for the given selection.
      *
      * @param goal
-     *            Goal which should be joined.
+     *        Goal which should be joined.
      * @param pio
-     *            Selected formula (symblic state - program counter part) for
-     *            the join.
+     *        Selected formula (symblic state - program counter part) for
+     *        the join.
      * @return The list of possible join partners.
      */
     public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
@@ -73,12 +77,12 @@ public class JoinIsApplicable {
      * this is the case and null otherwise.
      *
      * @param g1
-     *            Goal for the first node to join.
+     *        Goal for the first node to join.
      * @param pio
-     *            Selected formula (symbolic state - program counter part) for
-     *            the join.
+     *        Selected formula (symbolic state - program counter part) for
+     *        the join.
      * @param g2
-     *            Second goal for the join.
+     *        Second goal for the join.
      * @return A ProspectivePartner object if the given goals may be joined or
      *         null otherwise.
      */
@@ -107,8 +111,8 @@ public class JoinIsApplicable {
             }
             if (formula.equalsModRenaming(referenceFormula)) {
                 return new ProspectivePartner(referenceFormula, g1.node(),
-                        pio.sequentFormula(), update1, g2.node(), sf,
-                        update2);
+                    pio.sequentFormula(), update1, g2.node(), sf,
+                    update2);
             }
         }
         return null;

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util;
 
 
@@ -23,19 +27,19 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
 
     public KeYRecoderExcHandler(int errorThreshold) {
-	 setErrorThreshold(errorThreshold);
+        setErrorThreshold(errorThreshold);
     }
 
 
     public void clear() {
-	exceptions.clear();
+        exceptions.clear();
     }
 
 
     public List<Throwable> getExceptions() {
         List<Throwable> result = new LinkedList<Throwable>();
 
-        if(exceptions != null)
+        if (exceptions != null)
             result.addAll(exceptions);
 
         return result;
@@ -44,7 +48,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
     // Implementation of recoder.service.ErrorHandler
     public int getErrorCount() {
-         return exceptions.size();
+        return exceptions.size();
     }
 
 
@@ -66,7 +70,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
     protected void recoderExitAction() {
         String msg = "Recoder: " + exceptions.size() + " errors have occurred - aborting.";
         ExceptionHandlerException ex = new ExceptionHandlerException(msg);
-        if(exceptions != null && !exceptions.isEmpty()) {
+        if (exceptions != null && !exceptions.isEmpty()) {
             ex.initCause(exceptions.get(0));
         }
         clear();
@@ -92,7 +96,7 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
     @Override
     public void modelUpdated(EventObject event) {
         if (exceptions.size() > 0) {
-             recoderExitAction();
+            recoderExitAction();
         }
     }
 }

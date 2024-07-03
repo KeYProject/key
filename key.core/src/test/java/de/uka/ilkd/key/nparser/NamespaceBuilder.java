@@ -1,19 +1,20 @@
-package de.uka.ilkd.key.nparser;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortImpl;
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.nparser;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 
 /**
  * @author Alexander Weigl
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
 public class NamespaceBuilder {
     private NamespaceSet nss;
     private Pattern FUNCTION = Pattern.compile(
-            "(.+) (.+?) ?\\((?:(.+?)(?:, (.+?))*)?\\)");
+        "(.+) (.+?) ?\\((?:(.+?)(?:, (.+?))*)?\\)");
 
     public NamespaceBuilder() {
         this(new NamespaceSet());
@@ -52,7 +53,7 @@ public class NamespaceBuilder {
             } catch (IndexOutOfBoundsException e) {
             }
 
-            Function f = new Function(new Name(name), sort, args.toArray(new Sort[]{}));
+            Function f = new Function(new Name(name), sort, args.toArray(new Sort[] {}));
             nss.functions().add(f);
         }
         return this;

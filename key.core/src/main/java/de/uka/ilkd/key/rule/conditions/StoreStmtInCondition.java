@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -44,7 +48,7 @@ public class StoreStmtInCondition implements VariableCondition {
         }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
-                new LightweightSyntacticalReplaceVisitor(svInst, services);
+            new LightweightSyntacticalReplaceVisitor(svInst, services);
         term.execPostOrder(replVisitor);
         final Term instantiatedTerm = replVisitor.getTerm();
 
@@ -56,15 +60,15 @@ public class StoreStmtInCondition implements VariableCondition {
         assert ((StatementBlock) instantiatedTerm.javaBlock().program()).getChildCount() == 1;
 
         return matchCond.setInstantiations(//
-                svInst.add(storeInSV,
-                        (Statement) instantiatedTerm.javaBlock().program().getFirstElement(),
-                        services));
+            svInst.add(storeInSV,
+                (Statement) instantiatedTerm.javaBlock().program().getFirstElement(),
+                services));
     }
 
     @Override
     public String toString() {
         return String.format( //
-                "\\varcond (\\storeStmtIn(%s, %s))", storeInSV, term);
+            "\\varcond (\\storeStmtIn(%s, %s))", storeInSV, term);
     }
 
 }

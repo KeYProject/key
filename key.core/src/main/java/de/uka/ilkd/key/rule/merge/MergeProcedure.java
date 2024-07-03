@@ -1,10 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -16,21 +16,25 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * Defines a concrete merge procedure, in particular the result of merging two
  * terms for a given location variable in two Symbolic Execution states.
  * <p>
- * 
+ *
  * For example, computing the merge result for a variable x in one state where x
  * is 42 and another one where x is 17, the result could be the update x := c,
  * where c is constrained to be positive by a formula in the returned
  * constraints set.
  * <p>
- * 
+ *
  * New merge procedures need to be registered in the list CONCRETE_RULES!
- * 
+ *
  * @author Dominic Scheurer
- * 
+ *
  * @see MergeByIfThenElse
  * @see MergeIfThenElseAntecedent
  * @see MergeTotalWeakening
@@ -40,36 +44,36 @@ public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
     static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList
-            .<MergeProcedure> nil();
+            .<MergeProcedure>nil();
 
     static {
         CONCRETE_RULES =
-                ImmutableSLList.<MergeProcedure> nil()
-                        .prepend(MergeTotalWeakening.instance())
-                        .prepend(MergeWithPredicateAbstractionFactory.instance())
-                        .prepend(MergeIfThenElseAntecedent.instance())
-                        .prepend(MergeByIfThenElse.instance());
+            ImmutableSLList.<MergeProcedure>nil()
+                    .prepend(MergeTotalWeakening.instance())
+                    .prepend(MergeWithPredicateAbstractionFactory.instance())
+                    .prepend(MergeIfThenElseAntecedent.instance())
+                    .prepend(MergeByIfThenElse.instance());
     }
 
     /**
      * Merges two values valueInState1 and valueInState2 of corresponding SE
      * states state1 and state2 to a new value of a merge state.
-     * 
+     *
      * @param v
-     *            The variable for which the values should be merged
+     *        The variable for which the values should be merged
      * @param state1
-     *            First SE state.
+     *        First SE state.
      * @param valueInState1
-     *            Value in state1.
+     *        Value in state1.
      * @param state2
-     *            Second SE state.
+     *        Second SE state.
      * @param valueInState2
-     *            Value in state2.
+     *        Value in state2.
      * @param distinguishingFormula
-     *            The user-specified distinguishing formula. May be null (for
-     *            automatic generation).
+     *        The user-specified distinguishing formula. May be null (for
+     *        automatic generation).
      * @param services
-     *            The services object.
+     *        The services object.
      * @return The merge result.
      */
     public abstract ValuesMergeResult mergeValuesInStates(
@@ -99,7 +103,7 @@ public abstract class MergeProcedure {
      * Returns the merge procedure for the given name.
      *
      * @param procName
-     *            Name of the merge procedure.
+     *        Name of the merge procedure.
      * @return The merge procedure of the given name; null if there is no such
      *         procedure.
      */
@@ -121,7 +125,7 @@ public abstract class MergeProcedure {
     public static ImmutableList<MergeProcedure> getMergeProcedures() {
         return CONCRETE_RULES;
     }
-    
+
     /**
      * Encapsulates the result of a merge of values.
      *
@@ -132,7 +136,7 @@ public abstract class MergeProcedure {
         private Term mergeVal;
         private LinkedHashSet<Name> newNames;
         private LinkedHashSet<Term> sideConditions;
-        
+
         public ValuesMergeResult(ImmutableSet<Term> newConstraints,
                 Term mergeVal, LinkedHashSet<Name> newNames,
                 LinkedHashSet<Term> sideConditions) {

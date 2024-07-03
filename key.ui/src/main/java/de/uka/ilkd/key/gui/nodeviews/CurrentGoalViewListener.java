@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -9,18 +12,17 @@ import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Listener for a {@link CurrentGoalView}.
@@ -61,12 +63,12 @@ final class CurrentGoalViewListener
                         .getGeneralSettings().isRightClickMacro();
                 if (mediator != null && mousePos != null) {
                     if (me.isShiftDown()) {
-                        mediator.getUI().getProofControl().
-                                startFocussedAutoMode(mousePos.getPosInOccurrence(),
-                                mediator.getSelectedGoal());
+                        mediator.getUI().getProofControl().startFocussedAutoMode(
+                            mousePos.getPosInOccurrence(),
+                            mediator.getSelectedGoal());
                     } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {
                         ProofMacroMenu macroMenu = new ProofMacroMenu(mediator,
-                                mousePos.getPosInOccurrence());
+                            mousePos.getPosInOccurrence());
                         if (macroMenu.isEmpty()) {
                             macroMenu.add(new JLabel("No strategies available"));
                         }
@@ -74,20 +76,21 @@ final class CurrentGoalViewListener
                         popupMenu.setLabel("Strategy Macros");
                         popupMenu.show(getSequentView(), me.getX() - 5, me.getY() - 5);
                     } else if (!me.isControlDown() && SwingUtilities.isLeftMouseButton(me)) {
-                        //done before collecting the taclets because initialising
-                        //built in rules may have side effects on the set of applicable
-                        //taclets
-                        final ImmutableList<BuiltInRule> builtInRules
-                                = mediator.getUI().getProofControl().getBuiltInRule
-                         (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
+                        // done before collecting the taclets because initialising
+                        // built in rules may have side effects on the set of applicable
+                        // taclets
+                        final ImmutableList<BuiltInRule> builtInRules =
+                            mediator.getUI().getProofControl().getBuiltInRule(
+                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
 
                         menu = new CurrentGoalViewMenu(getSequentView(),
-                                mediator.getUI().getProofControl().getFindTaclet(
-                                        mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                                mediator.getUI().getProofControl().getRewriteTaclet(
-                                        mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                                mediator.getUI().getProofControl().getNoFindTaclet(
-                                        mediator.getSelectedGoal()), builtInRules, mousePos);
+                            mediator.getUI().getProofControl().getFindTaclet(
+                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
+                            mediator.getUI().getProofControl().getRewriteTaclet(
+                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
+                            mediator.getUI().getProofControl().getNoFindTaclet(
+                                mediator.getSelectedGoal()),
+                            builtInRules, mousePos);
 
                         showPopup(me, menu);
                     }
@@ -109,7 +112,7 @@ final class CurrentGoalViewListener
     public void mouseReleased(MouseEvent me) {
         if (!modalDragNDropEnabled() && menu.isPopupMenuVisible()
                 && !menu.getPopupMenu().contains(me.getX() - menu.getX(),
-                me.getY() - menu.getY())) {
+                    me.getY() - menu.getY())) {
             hideMenu(menu);
         }
     }
@@ -136,20 +139,19 @@ final class CurrentGoalViewListener
 
         if (localMousePos != null) {
             try {
-                getSequentView().getDragSource().
-                        startDrag(dgEvent,
-                        DragSource.DefaultCopyDrop,
-                        new PosInSequentTransferable(localMousePos,
+                getSequentView().getDragSource().startDrag(dgEvent,
+                    DragSource.DefaultCopyDrop,
+                    new PosInSequentTransferable(localMousePos,
                         mediator.getServices()),
-                        new DragSourceAdapter() {
-                            @Override
-                            public void dragDropEnd(DragSourceDropEvent event) {
-                                // Enable updating the subterm
-                                // highlightning ...
-                                getSequentView().disableHighlight(getSequentView().dndHighlight);
-                                getSequentView().setCurrentHighlight(oldHighlight);
-                            }
-                        });
+                    new DragSourceAdapter() {
+                        @Override
+                        public void dragDropEnd(DragSourceDropEvent event) {
+                            // Enable updating the subterm
+                            // highlightning ...
+                            getSequentView().disableHighlight(getSequentView().dndHighlight);
+                            getSequentView().setCurrentHighlight(oldHighlight);
+                        }
+                    });
             } catch (InvalidDnDOperationException dnd) {
                 // system not in proper dnd state
                 // Enable updating the subterm

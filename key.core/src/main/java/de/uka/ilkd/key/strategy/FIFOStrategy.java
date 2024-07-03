@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.Name;
@@ -13,54 +17,56 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
  * of a RuleApp.
  */
 public class FIFOStrategy implements Strategy {
-    
-    private static final Name NAME = new Name ( "FIFO" );
 
-    private FIFOStrategy () {
+    private static final Name NAME = new Name("FIFO");
+
+    private FIFOStrategy() {
     }
 
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
+     *
      * @return the cost of the rule application expressed as
-     * a <code>RuleAppCost</code> object.
-     * <code>TopRuleAppCost.INSTANCE</code> indicates
-     * that the rule shall not be applied at all 
-     * (it is discarded by the strategy).
+     *         a <code>RuleAppCost</code> object.
+     *         <code>TopRuleAppCost.INSTANCE</code> indicates
+     *         that the rule shall not be applied at all
+     *         (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost ( RuleApp         app,
-	                             PosInOccurrence pio,
-	                             Goal            goal ) {
-	return NumberRuleAppCost.create ( goal.getTime () );
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
+            Goal goal) {
+        return NumberRuleAppCost.create(goal.getTime());
     }
 
     /**
      * Re-Evaluate a <code>RuleApp</code>. This method is
      * called immediately before a rule is really applied
+     *
      * @return true iff the rule should be applied, false otherwise
      */
-    public boolean isApprovedApp (  RuleApp         app,
-	                            PosInOccurrence pio,
-	                            Goal            goal ) {
-	return true;
+    public boolean isApprovedApp(RuleApp app,
+            PosInOccurrence pio,
+            Goal goal) {
+        return true;
     }
 
     public void instantiateApp(RuleApp app,
-                               PosInOccurrence pio,
-                               Goal goal,
-                               RuleAppCostCollector collector) {}
+            PosInOccurrence pio,
+            Goal goal,
+            RuleAppCostCollector collector) {}
 
-    public Name name () {
+    public Name name() {
         return NAME;
     }
-    
-    public static Strategy INSTANCE = new FIFOStrategy ();
-    
+
+    public static Strategy INSTANCE = new FIFOStrategy();
+
     public static class Factory implements StrategyFactory {
-        public Name name () {
+        public Name name() {
             return NAME;
         }
-        
-        public Strategy create ( Proof proof, StrategyProperties properties ) {
+
+        public Strategy create(Proof proof, StrategyProperties properties) {
             return INSTANCE;
         }
 
@@ -72,7 +78,7 @@ public class FIFOStrategy implements Strategy {
 
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {
-       return false;
+        return false;
     }
 
 }

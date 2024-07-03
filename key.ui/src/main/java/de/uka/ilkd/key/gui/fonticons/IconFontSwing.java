@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.fonticons;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import javax.swing.*;
 
 public final class IconFontSwing {
     /**
      * Builds an image.
      *
      * @param iconCode the icon code.
-     * @param size     the size.
+     * @param size the size.
      * @return the image.
      */
     public static Image buildImage(IconFont iconCode, float size) {
@@ -21,8 +25,8 @@ public final class IconFontSwing {
      * Builds an image.
      *
      * @param iconCode the icon code.
-     * @param size     the size.
-     * @param color    the size.
+     * @param size the size.
+     * @param color the size.
      * @return the image.
      */
     public static Image buildImage(IconFont iconCode, float size, Color color) {
@@ -40,10 +44,11 @@ public final class IconFontSwing {
      */
     public static Image buildImage(IconFont iconCode, float size, Color color, double rotation) {
         Image img = buildImage(iconCode, size, color);
-        BufferedImage newImage = new BufferedImage((int) size, (int) size, BufferedImage.TYPE_INT_RGB);
+        BufferedImage newImage =
+            new BufferedImage((int) size, (int) size, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = (Graphics2D) newImage.getGraphics();
         AffineTransform transform = new AffineTransform();
-        transform.rotate(rotation, size/2,size/2);
+        transform.rotate(rotation, size / 2, size / 2);
         graphics.drawImage(img, transform, null);
         return img;
     }
@@ -52,7 +57,7 @@ public final class IconFontSwing {
      * Builds an icon.
      *
      * @param iconCode the icon code.
-     * @param size     the size.
+     * @param size the size.
      * @return the icon.
      */
     public static Icon buildIcon(IconFont iconCode, float size) {
@@ -63,8 +68,8 @@ public final class IconFontSwing {
      * Builds an icon.
      *
      * @param iconCode the icon code.
-     * @param size     the size.
-     * @param color    the size.
+     * @param size the size.
+     * @param color the size.
      * @return the icon.
      */
     public static Icon buildIcon(IconFont iconCode, float size, Color color) {
@@ -80,14 +85,14 @@ public final class IconFontSwing {
         int height = dim.height + 1;
         label.setSize(width, height);
         BufferedImage bufImage =
-                new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = bufImage.createGraphics();
         g2d.setRenderingHint(
-                RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2d.setRenderingHint(
-                RenderingHints.KEY_FRACTIONALMETRICS,
-                RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+            RenderingHints.KEY_FRACTIONALMETRICS,
+            RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         label.print(g2d);
         g2d.dispose();
         return bufImage;

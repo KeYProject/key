@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -28,22 +32,22 @@ public class ConstantCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var,
-                         SVSubstitute instCandidate,
-                         SVInstantiations instMap,
-                         Services services) {
+            SVSubstitute instCandidate,
+            SVInstantiations instMap,
+            Services services) {
         if ((!(var instanceof TermSV)
-                    || var != this.t)
+                || var != this.t)
                 && (!(var instanceof FormulaSV)
                         || var != this.t)) {
             return true;
         }
         if (var instanceof TermSV) {
-            Term tInst = (Term) instMap.getInstantiation((TermSV)t);
+            Term tInst = (Term) instMap.getInstantiation((TermSV) t);
             boolean atomic = (tInst.arity() == 0);
             return negated ? !atomic : atomic;
         }
         if (var instanceof FormulaSV) {
-            Term tInst = (Term) instMap.getInstantiation((FormulaSV)t);
+            Term tInst = (Term) instMap.getInstantiation((FormulaSV) t);
             boolean atomic = (tInst.arity() == 0);
             return negated ? !atomic : atomic;
         }
@@ -52,6 +56,6 @@ public class ConstantCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        return (negated ? "\\not":"") + "\\isConstant (" + t + ")";
+        return (negated ? "\\not" : "") + "\\isConstant (" + t + ")";
     }
 }

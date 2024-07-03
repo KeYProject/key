@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.java.declaration;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -9,96 +10,102 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
 /**
- *  Local variable declaration.
+ * Local variable declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
 public class LocalVariableDeclaration
-    extends VariableDeclaration implements LoopInitializer {
+        extends VariableDeclaration implements LoopInitializer {
 
 
     /**
-     *      Var specs.
+     * Var specs.
      */
 
     protected final ImmutableArray<VariableSpecification> varSpecs;
 
     /**
-     *      Local variable declaration.
+     * Local variable declaration.
      */
 
     public LocalVariableDeclaration() {
-	super();
-	this.varSpecs = null;
+        super();
+        this.varSpecs = null;
     }
 
 
     /**
-     *      Local variable declaration.
-     *      @param mods a modifier array.
-     *      @param typeRef a type reference.
-     *      @param vars a variable specification array.
+     * Local variable declaration.
+     *
+     * @param mods a modifier array.
+     * @param typeRef a type reference.
+     * @param vars a variable specification array.
      */
-    public LocalVariableDeclaration(Modifier[] mods, TypeReference
-				    typeRef, 
-				    VariableSpecification[] vars) {  
-	super(mods,typeRef,false);
-	this.varSpecs=new
-	    ImmutableArray<VariableSpecification>(vars); 
+    public LocalVariableDeclaration(Modifier[] mods, TypeReference typeRef,
+            VariableSpecification[] vars) {
+        super(mods, typeRef, false);
+        this.varSpecs = new ImmutableArray<VariableSpecification>(vars);
     }
 
     /**
-     *      Local variable declaration which declared exactly 
-     *      one variable.
-     *      @param typeRef a type reference.
-     *      @param var the variable specification
+     * Local variable declaration which declared exactly
+     * one variable.
+     *
+     * @param typeRef a type reference.
+     * @param var the variable specification
      */
-    public LocalVariableDeclaration(TypeReference typeRef, 
-				    VariableSpecification var) {  
-	this(new ImmutableArray<Modifier>(new Modifier[0]),typeRef,var);
+    public LocalVariableDeclaration(TypeReference typeRef,
+            VariableSpecification var) {
+        this(new ImmutableArray<Modifier>(new Modifier[0]), typeRef, var);
     }
 
 
     /**
-     *      Local variable declaration.
-     *      @param mods a modifier array.
-     *      @param typeRef a type reference.
-     *      @param var a variable specification .
+     * Local variable declaration.
+     *
+     * @param mods a modifier array.
+     * @param typeRef a type reference.
+     * @param var a variable specification .
      */
-    public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference
-				    typeRef, VariableSpecification var) {  
-	super(mods,typeRef,false);
-	this.varSpecs = new ImmutableArray<VariableSpecification>(var); 
+    public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
+            VariableSpecification var) {
+        super(mods, typeRef, false);
+        this.varSpecs = new ImmutableArray<VariableSpecification>(var);
     }
 
     /**
-     *      Local variable declaration.
-     *      @param mods a modifier array.
-     *      @param typeRef a type reference.
-     *      @param vars a variable specification array.
+     * Local variable declaration.
+     *
+     * @param mods a modifier array.
+     * @param typeRef a type reference.
+     * @param vars a variable specification array.
      */
-    public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference
-				    typeRef, VariableSpecification[] vars) {  
-	super(mods,typeRef,false);
-	this.varSpecs = new ImmutableArray<VariableSpecification>(vars); 
+    public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
+            VariableSpecification[] vars) {
+        super(mods, typeRef, false);
+        this.varSpecs = new ImmutableArray<VariableSpecification>(vars);
     }
 
 
     /**
-     * Local variable declaration. 
-     * @param children an ExtList containing the children. May include: 
-     *  several VariableSpecification (specifying the declared local variable),
-     * 	a TypeReference (as reference to the type of the declared variable),
-     * 	several Modifier (taken as modifiers of the declaration), 
-     * 	a Comment
+     * Local variable declaration.
+     *
+     * @param children an ExtList containing the children. May include:
+     *        several VariableSpecification (specifying the declared local variable),
+     *        a TypeReference (as reference to the type of the declared variable),
+     *        several Modifier (taken as modifiers of the declaration),
+     *        a Comment
      */
 
     public LocalVariableDeclaration(ExtList children) {
         super(children, false);
-        
-	this.varSpecs = new
-	    ImmutableArray<VariableSpecification>(children.collect(VariableSpecification.class));
+
+        this.varSpecs = new ImmutableArray<VariableSpecification>(
+            children.collect(VariableSpecification.class));
     }
 
     /**
@@ -116,26 +123,31 @@ public class LocalVariableDeclaration
     }
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (modArray     != null) result += modArray.size();
-        if (typeReference != null) result++;
-        if (varSpecs      != null) result += varSpecs.size();
+        if (modArray != null)
+            result += modArray.size();
+        if (typeReference != null)
+            result++;
+        if (varSpecs != null)
+            result += varSpecs.size();
         return result;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *            of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         int len;
@@ -147,7 +159,8 @@ public class LocalVariableDeclaration
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) return typeReference;
+            if (index == 0)
+                return typeReference;
             index--;
         }
         if (varSpecs != null) {
@@ -196,12 +209,14 @@ public class LocalVariableDeclaration
         return false;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnLocalVariableDeclaration(this);
+        v.performActionOnLocalVariableDeclaration(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

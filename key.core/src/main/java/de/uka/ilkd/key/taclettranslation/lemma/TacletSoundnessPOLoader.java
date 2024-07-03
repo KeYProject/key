@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.taclettranslation.lemma;
+
+import java.util.*;
 
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.Proof;
@@ -10,11 +16,10 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 public class TacletSoundnessPOLoader {
     private final boolean loadAsLemmata;
@@ -22,8 +27,10 @@ public class TacletSoundnessPOLoader {
     /**
      * If this InitConfig is unequal to null, the taclets will be loaded using this config
      * as well. This is used for the mode when a proof obligation already exists and the taclets
-     * should be added to that proof obligation. The taclets then are loaded twice. Once for generating
-     * proof obligations and once for adding them to the already existing proof obligation. This is necessary
+     * should be added to that proof obligation. The taclets then are loaded twice. Once for
+     * generating
+     * proof obligations and once for adding them to the already existing proof obligation. This is
+     * necessary
      * in order to omit name clashes.
      */
     private final InitConfig originalConfig;
@@ -82,7 +89,7 @@ public class TacletSoundnessPOLoader {
         }
 
         public TacletInfo(Taclet taclet, boolean alreadyInUse,
-                          boolean notSupported) {
+                boolean notSupported) {
             super();
             this.taclet = taclet;
             this.alreadyInUse = alreadyInUse;
@@ -92,7 +99,8 @@ public class TacletSoundnessPOLoader {
 
         @Override
         public String toString() {
-            return taclet.name().toString() + (notSupported ? " (not supported)" : isAlreadyInUse() ? "(already in use)" : "");
+            return taclet.name().toString() + (notSupported ? " (not supported)"
+                    : isAlreadyInUse() ? "(already in use)" : "");
         }
 
     }
@@ -147,10 +155,10 @@ public class TacletSoundnessPOLoader {
         } finally {
             for (LoaderListener listener : listeners) {
                 listener.stopped(
-                        resultingProof,
-                        isUsedOnlyForProvingTaclets() ?
-                                getResultingTaclets() : getResultingTacletsForOriginalProof(),
-                        !loadAsLemmata);
+                    resultingProof,
+                    isUsedOnlyForProvingTaclets() ? getResultingTaclets()
+                            : getResultingTacletsForOriginalProof(),
+                    !loadAsLemmata);
             }
         }
 
@@ -172,10 +180,10 @@ public class TacletSoundnessPOLoader {
             } finally {
                 for (LoaderListener listener : listeners) {
                     listener.stopped(
-                            resultingProof,
-                            isUsedOnlyForProvingTaclets() ?
-                                    getResultingTaclets() : getResultingTacletsForOriginalProof(),
-                            !loadAsLemmata);
+                        resultingProof,
+                        isUsedOnlyForProvingTaclets() ? getResultingTaclets()
+                                : getResultingTacletsForOriginalProof(),
+                        !loadAsLemmata);
                 }
             }
         }
@@ -186,7 +194,7 @@ public class TacletSoundnessPOLoader {
             ImmutableList<Taclet> taclets, ImmutableSet<Taclet> base) {
         List<TacletInfo> collectionOfTacletInfo = new ArrayList<>(base.size());
         TreeSet<Taclet> treeSet = new TreeSet<>(
-                Comparator.comparing(o -> o.name().toString()));
+            Comparator.comparing(o -> o.name().toString()));
         for (Taclet taclet : base) {
             treeSet.add(taclet);
         }
@@ -195,7 +203,7 @@ public class TacletSoundnessPOLoader {
             collectionOfTacletInfo
                     .add(new TacletInfo(taclet, treeSet
                             .contains(taclet),
-                            loadAsLemmata && check(taclet)));
+                        loadAsLemmata && check(taclet)));
         }
         return collectionOfTacletInfo;
     }
@@ -213,7 +221,7 @@ public class TacletSoundnessPOLoader {
 
 
         List<TacletInfo> collectionOfTacletInfo = createTacletInfo(
-                taclets, getAlreadyInUseTaclets());
+            taclets, getAlreadyInUseTaclets());
 
         // filter the taclets that should be proved.
         computeResultingTaclets(collectionOfTacletInfo);
@@ -222,10 +230,9 @@ public class TacletSoundnessPOLoader {
             return;
         }
 
-        resultingProof = loadAsLemmata ?
-                createProof(tacletLoader.getProofEnvForTaclets(),
-                        getResultingTaclets(),
-                        axioms, taclets) : null;
+        resultingProof = loadAsLemmata ? createProof(tacletLoader.getProofEnvForTaclets(),
+            getResultingTaclets(),
+            axioms, taclets) : null;
 
     }
 
@@ -233,15 +240,15 @@ public class TacletSoundnessPOLoader {
     private ImmutableSet<Taclet> computeCommonTaclets(
             ImmutableList<Taclet> taclets, ImmutableSet<Taclet> reference) {
         TreeSet<Taclet> treeSet = new TreeSet<Taclet>(
-                new Comparator<Taclet>() {
-                    @Override
-                    public int compare(Taclet o1, Taclet o2) {
-                        return o1.name()
-                                .toString()
-                                .compareTo(o2.name()
-                                        .toString());
-                    }
-                });
+            new Comparator<Taclet>() {
+                @Override
+                public int compare(Taclet o1, Taclet o2) {
+                    return o1.name()
+                            .toString()
+                            .compareTo(o2.name()
+                                    .toString());
+                }
+            });
         for (Taclet taclet : reference) {
             treeSet.add(taclet);
         }
@@ -261,10 +268,11 @@ public class TacletSoundnessPOLoader {
         if (!isUsedOnlyForProvingTaclets()) {
             assert tacletLoader instanceof TacletLoader.TacletFromFileLoader;
             TacletLoader loader =
-                    new TacletLoader.TacletFromFileLoader((TacletLoader.TacletFromFileLoader)
-                            tacletLoader, originalConfig.copy());
+                new TacletLoader.TacletFromFileLoader(
+                    (TacletLoader.TacletFromFileLoader) tacletLoader, originalConfig.copy());
             ImmutableList<Taclet> unfilteredResult = loader.loadTaclets();
-            resultingTacletsForOriginalProof = computeCommonTaclets(unfilteredResult, resultingTaclets);
+            resultingTacletsForOriginalProof =
+                computeCommonTaclets(unfilteredResult, resultingTaclets);
         }
 
     }
@@ -275,16 +283,16 @@ public class TacletSoundnessPOLoader {
 
     /**
      * @return returns <code>true</code> if and only if the taclets should be proved sound
-     * and are not added to an already existing proof obligation.
+     *         and are not added to an already existing proof obligation.
      */
     private boolean isUsedOnlyForProvingTaclets() {
         return isOnlyUsedForProvingTaclets;
     }
 
     private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
-                                       ImmutableSet<Taclet> tacletsToProve,
-                                       ImmutableSet<Taclet> axioms,
-                                       ImmutableList<Taclet> loadedTaclets) {
+            ImmutableSet<Taclet> tacletsToProve,
+            ImmutableSet<Taclet> axioms,
+            ImmutableList<Taclet> loadedTaclets) {
 
 
         ProofObligationCreator creator = new ProofObligationCreator();
@@ -310,7 +318,8 @@ public class TacletSoundnessPOLoader {
         if (isUsedOnlyForProvingTaclets()) {
             for (InitConfig proofConfig : proofConfigs)
                 for (Taclet taclet : proofConfig.getTaclets()) {
-                    proofConfig.getJustifInfo().addJustification(taclet, AxiomJustification.INSTANCE);
+                    proofConfig.getJustifInfo().addJustification(taclet,
+                        AxiomJustification.INSTANCE);
                 }
         }
 
@@ -320,7 +329,7 @@ public class TacletSoundnessPOLoader {
 
 
     public void registerProofs(ProofAggregate aggregate,
-                               ProofEnvironment proofEnv) {
+            ProofEnvironment proofEnv) {
         if (aggregate instanceof CompoundProof) {
             CompoundProof cp = (CompoundProof) aggregate;
             for (ProofAggregate child : cp.getChildren()) {

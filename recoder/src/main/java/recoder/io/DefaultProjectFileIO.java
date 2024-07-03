@@ -1,14 +1,18 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.io;
+
+import java.io.*;
+import java.util.*;
 
 import recoder.ServiceConfiguration;
 import recoder.convenience.Naming;
 import recoder.java.CompilationUnit;
 import recoder.util.FileUtils;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * Imports and exports simple properties files.
@@ -23,7 +27,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
      * Sets up a new project file IO facility that reads from and/or writes to
      * the specified (.properties) file.
      *
-     * @param system      the service configuration to initialize.
+     * @param system the service configuration to initialize.
      * @param projectFile the project file to load and/or save.
      */
     public DefaultProjectFileIO(ServiceConfiguration system, File projectFile) {
@@ -45,7 +49,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
 
     public String[] load() throws IOException {
         InputStream in = new FileInputStream(file);
-        Properties props = new Properties(); //defaults
+        Properties props = new Properties(); // defaults
         props.load(in);
         ProjectSettings ps = getProjectSettings();
         Enumeration enum2 = props.propertyNames();
@@ -137,7 +141,8 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
         StringBuffer newpath = new StringBuffer();
         StringTokenizer tok = new StringTokenizer(path, File.pathSeparator);
         while (true) {
-            newpath.append(FileUtils.getRelativePath(FileUtils.getUserDirectory(), new File(tok.nextToken())));
+            newpath.append(
+                FileUtils.getRelativePath(FileUtils.getUserDirectory(), new File(tok.nextToken())));
             if (tok.hasMoreTokens()) {
                 newpath.append(File.pathSeparator);
             } else {

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
@@ -19,7 +23,9 @@ public class BlockContractValidityTermLabel implements TermLabel {
 
     /**
      * Constructor.
-     * @param exceptionVariable the exception variable to distinguish normal from exceptional termination.
+     *
+     * @param exceptionVariable the exception variable to distinguish normal from exceptional
+     *        termination.
      */
     public BlockContractValidityTermLabel(ProgramVariable exceptionVariable) {
         this.exceptionVariable = exceptionVariable;
@@ -31,9 +37,11 @@ public class BlockContractValidityTermLabel implements TermLabel {
     public String toString() {
         return NAME.toString() + "(" + getExceptionVariable() + ")";
     }
-    
+
     /**
-     * retrieves the original exception variable as found in the local variable declaration statement
+     * retrieves the original exception variable as found in the local variable declaration
+     * statement
+     *
      * @return the original exception variable
      */
     public ProgramVariable getExceptionVariable() {
@@ -46,8 +54,10 @@ public class BlockContractValidityTermLabel implements TermLabel {
     @Override
     public ProgramVariable getChild(int i) {
         switch (i) {
-        case 0 : return getExceptionVariable();
-        default : return null;
+        case 0:
+            return getExceptionVariable();
+        default:
+            return null;
         }
     }
 
@@ -59,7 +69,7 @@ public class BlockContractValidityTermLabel implements TermLabel {
         return 1;
     }
 
-  
+
 
     /**
      * {@inheritDoc}

@@ -1,13 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.nparser.builder;
+
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProblemInformation;
-import org.key_project.util.java.StringUtil;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Objects;
+import org.key_project.util.java.StringUtil;
 
 /**
  * The visitor for extracting the {@link ProblemInformation}.
@@ -16,8 +21,7 @@ import java.util.Objects;
  * @see #getProblemInformation()
  */
 public class FindProblemInformation extends AbstractBuilder<Object> {
-    private final @Nonnull
-    ProblemInformation information = new ProblemInformation();
+    private final @Nonnull ProblemInformation information = new ProblemInformation();
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
@@ -30,8 +34,8 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         information.setProfile(acceptFirst(ctx.profile()));
         information.setPreferences(acceptFirst(ctx.preferences()));
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
-        ctx.classPaths().forEach(it ->
-                information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
+        ctx.classPaths().forEach(
+            it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
         information.setJavaSource(acceptFirst(ctx.javaSource()));
         return null;
     }
@@ -94,8 +98,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     /**
      * The found problem information.
      */
-    public @Nonnull
-    ProblemInformation getProblemInformation() {
+    public @Nonnull ProblemInformation getProblemInformation() {
         return information;
     }
 }

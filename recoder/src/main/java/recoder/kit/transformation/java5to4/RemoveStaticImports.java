@@ -1,10 +1,11 @@
-/*
- * Created on 25.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
@@ -20,9 +21,6 @@ import recoder.kit.MiscKit;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.kit.UnitKit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Removes static imports from a given Compilation Unit and adds
@@ -64,7 +62,8 @@ public class RemoveStaticImports extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(cu);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MemberReference && pe instanceof ReferenceSuffix && pe instanceof NameReference) {
+            if (pe instanceof MemberReference && pe instanceof ReferenceSuffix
+                    && pe instanceof NameReference) {
                 MemberReference r = (MemberReference) pe;
                 ReferenceSuffix s = (ReferenceSuffix) pe;
                 NameReference nr = (NameReference) pe;
@@ -72,9 +71,11 @@ public class RemoveStaticImports extends TwoPassTransformation {
                     continue; // not found through a static import
                 ClassType targetCT;
                 if (r instanceof MethodReference) {
-                    targetCT = getSourceInfo().getMethod((MethodReference) r).getContainingClassType();
+                    targetCT =
+                        getSourceInfo().getMethod((MethodReference) r).getContainingClassType();
                 } else if (r instanceof FieldReference) {
-                    targetCT = getSourceInfo().getField((FieldReference) r).getContainingClassType();
+                    targetCT =
+                        getSourceInfo().getField((FieldReference) r).getContainingClassType();
                 } else if (r instanceof TypeReference) {
                     Type t = getSourceInfo().getType((TypeReference) r);
                     if (!(t instanceof ClassType))
@@ -83,7 +84,8 @@ public class RemoveStaticImports extends TwoPassTransformation {
                 } else {
                     continue;
                 }
-                if (targetCT instanceof TypeDeclaration && UnitKit.getCompilationUnit((TypeDeclaration) targetCT) == cu)
+                if (targetCT instanceof TypeDeclaration
+                        && UnitKit.getCompilationUnit((TypeDeclaration) targetCT) == cu)
                     continue;
                 String n = nr.getName();
                 for (int i = 0, si = statics.size(); i < si; i++) {

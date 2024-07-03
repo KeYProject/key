@@ -1,8 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
-
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -10,7 +10,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -24,6 +23,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /*
  * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel.
@@ -40,8 +42,8 @@ public abstract class SearchBar extends JPanel {
     private JButton next;
     private JButton close;
     private final ColorSettings.ColorProperty ALERT_COLOR =
-            ColorSettings.define("[searchBar]alert", "",
-                    new Color(255, 178, 178));
+        ColorSettings.define("[searchBar]alert", "",
+            new Color(255, 178, 178));
 
     public SearchBar() {
         prev = new JButton(IconFactory.previous(16));
@@ -80,39 +82,40 @@ public abstract class SearchBar extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
             }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         searchField.getDocument()
                 .addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-                search();
-            }
+                    public void changedUpdate(DocumentEvent e) {
+                        search();
+                    }
 
-            public void insertUpdate(DocumentEvent e) {
-                search();
-            }
+                    public void insertUpdate(DocumentEvent e) {
+                        search();
+                    }
 
-            public void removeUpdate(DocumentEvent e) {
-                search();
-            }
-        });
-        
+                    public void removeUpdate(DocumentEvent e) {
+                        search();
+                    }
+                });
+
         // prepare search buttons
-        
+
         Font font = prev.getFont().deriveFont(20.0f);
         prev.setFont(font);
         next.setFont(font);
         close.setFont(font);
-        
+
         prev.setToolTipText("Jump to previous match");
         next.setToolTipText("Jump to next match");
         close.setToolTipText("Close search bar");
-        
+
         Insets insets = new Insets(0, 4, 0, 4);
         Border border = new CompoundBorder(
-                new LineBorder(Color.GRAY, 1),
-                new EmptyBorder(insets));
-        
+            new LineBorder(Color.GRAY, 1),
+            new EmptyBorder(insets));
+
         prev.setBorder(border);
         next.setBorder(border);
         close.setBorder(border);
@@ -134,7 +137,8 @@ public abstract class SearchBar extends JPanel {
 
     public abstract void searchNext();
 
-    /* The boolean return value of this function indicates,
+    /*
+     * The boolean return value of this function indicates,
      * whether search was successful or not.
      */
     public abstract boolean search(String s);
@@ -148,7 +152,8 @@ public abstract class SearchBar extends JPanel {
         }
     }
 
-    /* Override this method in case you want a custom UI
+    /*
+     * Override this method in case you want a custom UI
      * for the search bar.
      */
     public void createUI() {
@@ -156,10 +161,10 @@ public abstract class SearchBar extends JPanel {
         add(new JLabel("Search: "));
         add(searchField);
         add(prev);
-        prev.setMargin(new java.awt.Insets(2,1,2,1));
+        prev.setMargin(new java.awt.Insets(2, 1, 2, 1));
         add(next);
-        next.setMargin(new java.awt.Insets(2,1,2,1));
+        next.setMargin(new java.awt.Insets(2, 1, 2, 1));
         add(close);
-        close.setMargin(new java.awt.Insets(2,1,2,1));
+        close.setMargin(new java.awt.Insets(2, 1, 2, 1));
     }
 }

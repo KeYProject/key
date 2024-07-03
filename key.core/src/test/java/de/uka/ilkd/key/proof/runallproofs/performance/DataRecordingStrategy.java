@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
-import java.io.IOException;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -12,7 +15,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 
 /**
- * Modification of {@link JavaCardDLStrategy} so that profiling data gets collected during strategy run.
+ * Modification of {@link JavaCardDLStrategy} so that profiling data gets collected during strategy
+ * run.
  */
 class DataRecordingStrategy extends JavaCardDLStrategy {
 
@@ -22,14 +26,17 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     final DataRecordingTestFile dataRecordingTestFile;
 
     DataRecordingStrategy(Proof proof, DataRecordingTestFile dataRecordingTestFile) {
-        super(proof, proof.getInitConfig().getSettings().getStrategySettings().getActiveStrategyProperties());
+        super(proof, proof.getInitConfig().getSettings().getStrategySettings()
+                .getActiveStrategyProperties());
         this.dataRecordingTestFile = dataRecordingTestFile;
 
         File computeCostDataDir = dataRecordingTestFile.getProfileDirectories().computeCostDataDir;
         computeCostData = new FunctionPerformanceData(computeCostDataDir, dataRecordingTestFile);
 
-        File instantiateAppDataDir = dataRecordingTestFile.getProfileDirectories().instantiateAppDataDir;
-        instantiateAppData = new FunctionPerformanceData(instantiateAppDataDir, dataRecordingTestFile);
+        File instantiateAppDataDir =
+            dataRecordingTestFile.getProfileDirectories().instantiateAppDataDir;
+        instantiateAppData =
+            new FunctionPerformanceData(instantiateAppDataDir, dataRecordingTestFile);
     }
 
     @Override
@@ -42,7 +49,8 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal, RuleAppCostCollector collector) {
+    public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+            RuleAppCostCollector collector) {
         long begin = System.nanoTime();
         super.instantiateApp(app, pio, goal, collector);
         long end = System.nanoTime();

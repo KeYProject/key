@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.st;
+
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.Z3CESocket;
-
-import javax.annotation.Nonnull;
 
 /**
  * @author Alexander Weigl
@@ -24,9 +28,9 @@ public class Z3CounterExampleSolverType extends AbstractSolverType {
 
     @Override
     public SMTSolver createSolver(SMTProblem problem,
-                                  SolverListener listener, Services services) {
+            SolverListener listener, Services services) {
         return new SMTSolverImplementation(problem, listener,
-                services, this);
+            services, this);
     }
 
     @Override
@@ -41,7 +45,7 @@ public class Z3CounterExampleSolverType extends AbstractSolverType {
 
     @Override
     public String[] getSupportedVersions() {
-        return new String[]{"version 4.3.1"};
+        return new String[] { "version 4.3.1" };
     }
 
     @Override
@@ -51,7 +55,7 @@ public class Z3CounterExampleSolverType extends AbstractSolverType {
 
     @Override
     public String[] getDelimiters() {
-        return new String[]{"\n", "\r"};
+        return new String[] { "\n", "\r" };
     }
 
     @Override
@@ -62,24 +66,24 @@ public class Z3CounterExampleSolverType extends AbstractSolverType {
     @Override
     public SMTTranslator createTranslator(Services services) {
         return new SmtLib2Translator(services,
-                new AbstractSMTTranslator.Configuration(false, false));
+            new AbstractSMTTranslator.Configuration(false, false));
     }
 
 
     @Override
     public String getInfo() {
         return "";
-        //                        return "Z3 does not use quantifier elimination by default. This means for example that"
-        //                                        + " the following problem cannot be solved automatically by default:\n\n"
-        //                                        + "\\functions{\n"
-        //                                        + "\tint n;\n"
-        //                                        + "}\n\n"
-        //                                        + "\\problem{\n"
-        //                                        + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
-        //                                        + "}"
-        //                                        + "\n\n"
-        //                                        + "You can activate quantifier elimination by appending QUANT_FM=true to"
-        //                                        + " the execution command.";
+        // return "Z3 does not use quantifier elimination by default. This means for example that"
+        // + " the following problem cannot be solved automatically by default:\n\n"
+        // + "\\functions{\n"
+        // + "\tint n;\n"
+        // + "}\n\n"
+        // + "\\problem{\n"
+        // + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
+        // + "}"
+        // + "\n\n"
+        // + "You can activate quantifier elimination by appending QUANT_FM=true to"
+        // + " the execution command.";
     }
 
 

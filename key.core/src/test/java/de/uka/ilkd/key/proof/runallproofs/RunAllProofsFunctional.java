@@ -1,12 +1,16 @@
-package de.uka.ilkd.key.proof.runallproofs;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
-import org.antlr.runtime.RecognitionException;
-import org.junit.jupiter.api.*;
+package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.IOException;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
+
+import org.junit.jupiter.api.*;
 
 /**
  * This test case captures all functional run-all-proof scenarios.
@@ -18,9 +22,12 @@ import java.util.stream.Stream;
  *
  * @author M. Ulbrich
  */
-@Tag("slow") @Tag("owntest") @Tag("testRunAllProofs")
+@Tag("slow")
+@Tag("owntest")
+@Tag("testRunAllProofs")
 public final class RunAllProofsFunctional extends RunAllProofsTest {
-    public static final Boolean SKIP_FUNCTIONAL_PROPERTY = Boolean.getBoolean("key.runallproofs.skipFunctional");
+    public static final Boolean SKIP_FUNCTIONAL_PROPERTY =
+        Boolean.getBoolean("key.runallproofs.skipFunctional");
     public static final String INDEX_FILE = "index/automaticJAVADL.txt";
     private static final ProofCollection proofCollection = getProofCollection();
 

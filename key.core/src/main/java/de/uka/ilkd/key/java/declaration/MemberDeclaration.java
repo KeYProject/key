@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 
 /**
- *  Member declaration.
+ * Member declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 

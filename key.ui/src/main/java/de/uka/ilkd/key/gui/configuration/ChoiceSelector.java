@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.configuration;
 
@@ -12,7 +15,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -28,40 +30,44 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ChoiceSelector extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChoiceSelector.class);
     private static final long serialVersionUID = -4470713015801365801L;
-    private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
+    private static final String EXPLANATIONS_RESOURCE =
+        "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private final ChoiceSettings settings;
     private final HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;
-    private boolean changed=false;
+    private boolean changed = false;
 
 
-    /** the JList with the categories of choices*/
+    /** the JList with the categories of choices */
     private JList<String> catList;
     /** the JList with the choices for one category */
     private JList<ChoiceEntry> choiceList;
     private JTextArea explanationArea;
     private static Properties explanationMap;
 
-    /** Creates a new dialog for choosing taclet options.
+    /**
+     * Creates a new dialog for choosing taclet options.
+     *
      * @param mainWindow the parent window (dialog is centered on this)
-     * @param settings the currently selected settings */
+     * @param settings the currently selected settings
+     */
     public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
         super(mainWindow, "Taclet Base Configuration", true);
         this.settings = settings;
         category2DefaultChoice = settings.getDefaultChoices();
-        if(category2DefaultChoice.isEmpty()) {
+        if (category2DefaultChoice.isEmpty()) {
             JOptionPane.showConfirmDialog(ChoiceSelector.this,
                 "There are no Taclet Options available as the rule-files have not been parsed yet!",
                 "No Options available",
@@ -89,9 +95,9 @@ public class ChoiceSelector extends JDialog {
             catList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             catList.setSelectedIndex(0);
             catList.addListSelectionListener(e -> setChoiceList());
-            JScrollPane catListScroll = new
-                    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            JScrollPane catListScroll =
+                new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             catListScroll.setBorder(new TitledBorder("Category"));
             catListScroll.getViewport().setView(catList);
             Dimension paneDim = new Dimension(200, 300);
@@ -106,16 +112,16 @@ public class ChoiceSelector extends JDialog {
             choiceList.addListSelectionListener(e -> {
                 ChoiceEntry selectedValue = choiceList.getSelectedValue();
                 if (selectedValue != null) {
-                   setDefaultChoice(selectedValue.getChoice());
+                    setDefaultChoice(selectedValue.getChoice());
 
                 } else {
-                   setDefaultChoice(null);
+                    setDefaultChoice(null);
                 }
             });
 
             JScrollPane choiceScrollPane =
                 new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             choiceScrollPane.getViewport().setView(choiceList);
             choiceScrollPane.setBorder(new TitledBorder("Choice"));
             Dimension paneDim = new Dimension(300, 300);
@@ -138,18 +144,17 @@ public class ChoiceSelector extends JDialog {
         {
             JButton okButton = new JButton("OK");
             okButton.addActionListener(e -> {
-                if(changed){
-                    int res = JOptionPane.showOptionDialog
-                            (ChoiceSelector.this,
-                                    "Your changes will become effective when "+
-                                            "the next problem is loaded.\n",
-                                            "Taclet Options",
-                                            JOptionPane.DEFAULT_OPTION,
-                                            JOptionPane.QUESTION_MESSAGE, null,
-                                            new Object[]{"OK", "Cancel"}, "OK");
-                    if (res==0){
+                if (changed) {
+                    int res = JOptionPane.showOptionDialog(ChoiceSelector.this,
+                        "Your changes will become effective when " +
+                            "the next problem is loaded.\n",
+                        "Taclet Options",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE, null,
+                        new Object[] { "OK", "Cancel" }, "OK");
+                    if (res == 0) {
                         settings.setDefaultChoices(
-                                category2DefaultChoice);
+                            category2DefaultChoice);
                     }
                 }
                 setVisible(false);
@@ -165,15 +170,15 @@ public class ChoiceSelector extends JDialog {
                 dispose();
             });
             ActionListener escapeListener = event -> {
-                if(event.getActionCommand().equals("ESC")) {
+                if (event.getActionCommand().equals("ESC")) {
                     cancelButton.doClick();
                 }
             };
             cancelButton.registerKeyboardAction(
-                    escapeListener,
-                    "ESC",
-                    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+                escapeListener,
+                "ESC",
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
             buttonPanel.add(cancelButton);
         }
 
@@ -185,32 +190,35 @@ public class ChoiceSelector extends JDialog {
     }
 
 
-    /** is called to set the selected choice in 
-     * <code>category2DefaultChoice</code>*/
+    /**
+     * is called to set the selected choice in
+     * <code>category2DefaultChoice</code>
+     */
     private void setDefaultChoice(String sel) {
-	String category = catList.getSelectedValue();
-	if(sel != null){
-	    category2DefaultChoice.put(category,sel);
-	    changed = true;
-	}
+        String category = catList.getSelectedValue();
+        if (sel != null) {
+            category2DefaultChoice.put(category, sel);
+            changed = true;
+        }
     }
 
-    /** is called if the selection of left list has changed, and causes the
+    /**
+     * is called if the selection of left list has changed, and causes the
      * right one to display the possible choices for the category chosen on
      * the left side
      */
     private void setChoiceList() {
-	String selection = catList.getSelectedValue();
-	ChoiceEntry[] choices = createChoiceEntries(category2Choices.get(selection));
-	choiceList.setListData(choices);
-	ChoiceEntry selectedChoice = findChoice(choices, category2DefaultChoice.get(selection));
-	choiceList.setSelectedValue(selectedChoice, false);
-	explanationArea.setBorder(BorderFactory.createTitledBorder(selection));
-	explanationArea.setText(getExplanation(selection));
-	explanationArea.setCaretPosition(0);
+        String selection = catList.getSelectedValue();
+        ChoiceEntry[] choices = createChoiceEntries(category2Choices.get(selection));
+        choiceList.setListData(choices);
+        ChoiceEntry selectedChoice = findChoice(choices, category2DefaultChoice.get(selection));
+        choiceList.setSelectedValue(selectedChoice, false);
+        explanationArea.setBorder(BorderFactory.createTitledBorder(selection));
+        explanationArea.setText(getExplanation(selection));
+        explanationArea.setCaretPosition(0);
     }
 
-   /**
+    /**
      * <p>
      * Returns the explanation for the given category.
      * </p>
@@ -218,12 +226,13 @@ public class ChoiceSelector extends JDialog {
      * This method should be public and static because it is independent
      * from the {@link JDialog} and it is also used by the eclipse projects.
      * </p>
+     *
      * @param category The category for which the explanation is requested.
      * @return The explanation for the given category.
      */
     public static String getExplanation(String category) {
         synchronized (ChoiceSelector.class) {
-            if(explanationMap == null) {
+            if (explanationMap == null) {
                 explanationMap = new Properties();
                 InputStream is = ChoiceSelector.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
@@ -237,253 +246,255 @@ public class ChoiceSelector extends JDialog {
             }
         }
         String result = explanationMap.getProperty(category);
-        if(result == null) {
+        if (result == null) {
             result = "No explanation for " + category + " available.";
         }
-        
+
         return result;
     }
-    
+
     /**
      * Checks if the given choice makes a proof unsound.
+     *
      * @param choice The choice to check.
-     * @return {@code true} proof will be unsound, {@code false} proof will be sound as long as all other choices are sound.
+     * @return {@code true} proof will be unsound, {@code false} proof will be sound as long as all
+     *         other choices are sound.
      */
     public static boolean isUnsound(String choice) {
-       return "runtimeExceptions:ignore".equals(choice) ||
-              "initialisation:disableStaticInitialisation".equals(choice) ||
-              "intRules:arithmeticSemanticsIgnoringOF".equals(choice);
+        return "runtimeExceptions:ignore".equals(choice) ||
+                "initialisation:disableStaticInitialisation".equals(choice) ||
+                "intRules:arithmeticSemanticsIgnoringOF".equals(choice);
     }
-    
+
     /**
      * Checks if the given choice makes a proof incomplete.
+     *
      * @param choice The choice to check.
-     * @return {@code true} proof will be incomplete, {@code false} proof will be complete as long as all other choices are complete.
+     * @return {@code true} proof will be incomplete, {@code false} proof will be complete as long
+     *         as all other choices are complete.
      */
     public static boolean isIncomplete(String choice) {
-       return "runtimeExceptions:ban".equals(choice) ||
-              "Strings:off".equals(choice) ||
-              "intRules:arithmeticSemanticsCheckingOF".equals(choice) ||
-              "integerSimplificationRules:minimal".equals(choice) ||
-              "programRules:None".equals(choice);
+        return "runtimeExceptions:ban".equals(choice) ||
+                "Strings:off".equals(choice) ||
+                "intRules:arithmeticSemanticsCheckingOF".equals(choice) ||
+                "integerSimplificationRules:minimal".equals(choice) ||
+                "programRules:None".equals(choice);
     }
-    
+
     /**
      * Checks if additional information for the choice are available.
+     *
      * @param choice The choice to check.
      * @return The additional information or {@code null} if no information are available.
      */
     public static String getInformation(String choice) {
-       if ("JavaCard:on".equals(choice)) {
-          return "Sound if a JavaCard program is proven.";
-       }
-       else if ("JavaCard:off".equals(choice)) {
-          return "Sound if a Java program is proven.";
-       }
-       else if ("assertions:on".equals(choice)) {
-          return "Sound if JVM is started with enabled assertions for the whole system.";
-       }
-       else if ("assertions:off".equals(choice)) {
-          return "Sound if JVM is started with disabled assertions for the whole system.";
-       }
-       else {
-          return null;
-       }
+        if ("JavaCard:on".equals(choice)) {
+            return "Sound if a JavaCard program is proven.";
+        } else if ("JavaCard:off".equals(choice)) {
+            return "Sound if a Java program is proven.";
+        } else if ("assertions:on".equals(choice)) {
+            return "Sound if JVM is started with enabled assertions for the whole system.";
+        } else if ("assertions:off".equals(choice)) {
+            return "Sound if JVM is started with disabled assertions for the whole system.";
+        } else {
+            return null;
+        }
     }
 
     /**
      * Searches the choice in the given {@link ChoiceEntry}s.
+     *
      * @param choices The {@link ChoiceEntry}s to search in.
      * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
-       return ArrayUtil.search(choices, element -> element.getChoice().equals(choice));
+        return ArrayUtil.search(choices, element -> element.getChoice().equals(choice));
     }
 
     /**
      * Creates {@link ChoiceEntry}s for all given choices.
+     *
      * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
     public static ChoiceEntry[] createChoiceEntries(Set<String> choices) {
-       if (choices != null) {
-          ChoiceEntry[] entries = new ChoiceEntry[choices.size()];
-          int i = 0;
-          for (String choice : choices) {
-             entries[i] = createChoiceEntry(choice);
-             i++;
-          }
-          return entries;
-       }
-       else {
-          return null;
-       }
+        if (choices != null) {
+            ChoiceEntry[] entries = new ChoiceEntry[choices.size()];
+            int i = 0;
+            for (String choice : choices) {
+                entries[i] = createChoiceEntry(choice);
+                i++;
+            }
+            return entries;
+        } else {
+            return null;
+        }
     }
 
     /**
      * Creates a {@link ChoiceEntry} for the given choice.
+     *
      * @param choice The choice.
      * @return The created {@link ChoiceEntry}.
      */
     public static ChoiceEntry createChoiceEntry(String choice) {
-       return new ChoiceEntry(choice, 
-                              isUnsound(choice), 
-                              isIncomplete(choice), 
-                              getInformation(choice));
+        return new ChoiceEntry(choice,
+            isUnsound(choice),
+            isIncomplete(choice),
+            getInformation(choice));
     }
-    
-   /**
-    * Represents a choice with all its meta information.
-    * @author Martin Hentschel
-    */
-   public static class ChoiceEntry {
-      /**
-       * Text shown to the user in case of incompletness.
-       */
-      public static final String INCOMPLETE_TEXT = "incomplete";
-      
-      /**
-       * Text shown to the user in case of unsoundness.
-       */
-      public static final String UNSOUND_TEXT = "Java modeling unsound";
-      
-      /**
-       * The choice.
-       */
-      private final String choice;
 
-      /**
-       * Is unsound?
-       */
-      private final boolean unsound;
+    /**
+     * Represents a choice with all its meta information.
+     *
+     * @author Martin Hentschel
+     */
+    public static class ChoiceEntry {
+        /**
+         * Text shown to the user in case of incompletness.
+         */
+        public static final String INCOMPLETE_TEXT = "incomplete";
 
-      /**
-       * Is incomplete?
-       */
-      private final boolean incomplete;
-      
-      /**
-       * An optionally information.
-       */
-      private final String information;
+        /**
+         * Text shown to the user in case of unsoundness.
+         */
+        public static final String UNSOUND_TEXT = "Java modeling unsound";
 
-      /**
-       * Constructor.
-       * @param choice The choice.
-       * @param unsound Is unsound?
-       * @param incomplete Is incomplete?
-       * @param information An optionally information.
-       */
-      public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
-         assert choice != null;
-         this.choice = choice;
-         this.unsound = unsound;
-         this.incomplete = incomplete;
-         this.information = information;
-      }
+        /**
+         * The choice.
+         */
+        private final String choice;
 
-      /**
-       * Returns the choice.
-       * @return The choice.
-       */
-      public String getChoice() {
-         return choice;
-      }
+        /**
+         * Is unsound?
+         */
+        private final boolean unsound;
 
-      /**
-       * Checks for soundness.
-       * @return {@code true} unsound, {@code false} sound.
-       */
-      public boolean isUnsound() {
-         return unsound;
-      }
+        /**
+         * Is incomplete?
+         */
+        private final boolean incomplete;
 
-      /**
-       * Checks for completeness.
-       * @return {@code true} incomplete, {@code false} complete.
-       */
-      public boolean isIncomplete() {
-         return incomplete;
-      }
+        /**
+         * An optionally information.
+         */
+        private final String information;
 
-      /**
-       * Returns the optionally information.
-       * @return The optionally information.
-       */
-      public String getInformation() {
-         return information;
-      }
+        /**
+         * Constructor.
+         *
+         * @param choice The choice.
+         * @param unsound Is unsound?
+         * @param incomplete Is incomplete?
+         * @param information An optionally information.
+         */
+        public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
+            assert choice != null;
+            this.choice = choice;
+            this.unsound = unsound;
+            this.incomplete = incomplete;
+            this.information = information;
+        }
 
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public int hashCode() {
-         int hashcode = 5;
-         hashcode = hashcode * 17 + choice.hashCode();
-         hashcode = hashcode * 17 + (incomplete ? 5 : 3);
-         hashcode = hashcode * 17 + (unsound ? 5 : 3);
-         if (information != null) {
-            hashcode = hashcode * 17 + information.hashCode();          
-         }
-         return hashcode;
-      }
+        /**
+         * Returns the choice.
+         *
+         * @return The choice.
+         */
+        public String getChoice() {
+            return choice;
+        }
 
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public boolean equals(Object obj) {
-         if (obj instanceof ChoiceEntry) {
-            ChoiceEntry other = (ChoiceEntry)obj;
-            return choice.equals(other.getChoice()) &&
-                   incomplete == other.isIncomplete() &&
-                   unsound == other.isUnsound() &&
-                   ObjectUtil.equals(information, other.getInformation());
-         }
-         else {
-            return false;
-         }
-      }
+        /**
+         * Checks for soundness.
+         *
+         * @return {@code true} unsound, {@code false} sound.
+         */
+        public boolean isUnsound() {
+            return unsound;
+        }
 
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public String toString() {
-         if (unsound && incomplete) {
+        /**
+         * Checks for completeness.
+         *
+         * @return {@code true} incomplete, {@code false} complete.
+         */
+        public boolean isIncomplete() {
+            return incomplete;
+        }
+
+        /**
+         * Returns the optionally information.
+         *
+         * @return The optionally information.
+         */
+        public String getInformation() {
+            return information;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            int hashcode = 5;
+            hashcode = hashcode * 17 + choice.hashCode();
+            hashcode = hashcode * 17 + (incomplete ? 5 : 3);
+            hashcode = hashcode * 17 + (unsound ? 5 : 3);
             if (information != null) {
-               return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", " + information + ")";
+                hashcode = hashcode * 17 + information.hashCode();
             }
-            else {
-               return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
+            return hashcode;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof ChoiceEntry) {
+                ChoiceEntry other = (ChoiceEntry) obj;
+                return choice.equals(other.getChoice()) &&
+                        incomplete == other.isIncomplete() &&
+                        unsound == other.isUnsound() &&
+                        ObjectUtil.equals(information, other.getInformation());
+            } else {
+                return false;
             }
-         }
-         else if (unsound) {
-            if (information != null) {
-               return choice + " (" + UNSOUND_TEXT + ", " + information + ")";
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            if (unsound && incomplete) {
+                if (information != null) {
+                    return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", "
+                        + information + ")";
+                } else {
+                    return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
+                }
+            } else if (unsound) {
+                if (information != null) {
+                    return choice + " (" + UNSOUND_TEXT + ", " + information + ")";
+                } else {
+                    return choice + " (" + UNSOUND_TEXT + ")";
+                }
+            } else if (incomplete) {
+                if (information != null) {
+                    return choice + " (" + INCOMPLETE_TEXT + ", " + information + ")";
+                } else {
+                    return choice + " (" + INCOMPLETE_TEXT + ")";
+                }
+            } else {
+                if (information != null) {
+                    return choice + " (" + information + ")";
+                } else {
+                    return choice;
+                }
             }
-            else {
-               return choice + " (" + UNSOUND_TEXT + ")";
-            }
-         }
-         else if (incomplete) {
-            if (information != null) {
-               return choice + " (" + INCOMPLETE_TEXT + ", " + information + ")";
-            }
-            else {
-               return choice + " (" + INCOMPLETE_TEXT + ")";
-            }
-         }
-         else {
-            if (information != null) {
-               return choice + " (" + information + ")";
-            }
-            else {
-               return choice;
-            }
-         }
-      }
-   }
+        }
+    }
 }

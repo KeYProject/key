@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
@@ -15,12 +19,15 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A Feature that computes the cost for using the query expand rule.
+ *
  * @author gladisch
  */
 public class QueryExpandCost implements Feature {
@@ -29,11 +36,13 @@ public class QueryExpandCost implements Feature {
     /** Constant that represents the boolean value true */
     public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
     /** Constant that represents the boolean value false */
-    public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
+    public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
-    /** If the literals in a query become greater than abs(ConsideredAsBigLiteral), then
-     *  this is interpreted as a "loop smell", i.e. the proof construction is in a loop
-     *  and produces big literals.*/
+    /**
+     * If the literals in a query become greater than abs(ConsideredAsBigLiteral), then
+     * this is interpreted as a "loop smell", i.e. the proof construction is in a loop
+     * and produces big literals.
+     */
     public static final int CONSIDERED_AS_BIG_LITERAL = 7;
 
     /**
@@ -47,16 +56,16 @@ public class QueryExpandCost implements Feature {
     /**
      * @param baseCost Should be set to 200. This was the cost before this class was introduced.
      * @param maxRepetitionsOnSameTerm Search in the current branch if query expand
-     *       has been already applied on this term.
-     *       For each such application a penalty cost is added.
+     *        has been already applied on this term.
+     *        For each such application a penalty cost is added.
      *        If this limit is exceeded the cost is set to TOP_COST,
      *        i.e. the rule is not applied.
      * @param termAgeFactor This factor (must be >= 0) sets the cost of older queries lower,
-     *       than that of younger queries (i.e. that occur later in proofs). The effect is a
-     *       breath-first search
-     *       on the expansion of queries.
-     *       In class <code>QueryExpand</code> the time is stored, when queries can be
-     *       expanded for the first time.
+     *        than that of younger queries (i.e. that occur later in proofs). The effect is a
+     *        breath-first search
+     *        on the expansion of queries.
+     *        In class <code>QueryExpand</code> the time is stored, when queries can be
+     *        expanded for the first time.
      * @param useExperimentalHeuristics Activates experimental, pattern-based heuristics.
      */
     public QueryExpandCost(int baseCost,
@@ -79,7 +88,7 @@ public class QueryExpandCost implements Feature {
         long cost = baseCost;
 
         if (useExperimentalHeuristics) {
-            //If the factor is too small, then higher cost has no effect for some reason.
+            // If the factor is too small, then higher cost has no effect for some reason.
             int litcost = maxIntliteralInArgumentsTimesTwo(t, integerLDT, services);
             if (litcost > CONSIDERED_AS_BIG_LITERAL * 2) {
                 return TOP_COST;
@@ -88,7 +97,7 @@ public class QueryExpandCost implements Feature {
 
         if (maxRepetitionsOnSameTerm != -1 && maxRepetitionsOnSameTerm < Integer.MAX_VALUE) {
             int count = queryExpandAlreadyAppliedAtPos(app, pos, goal);
-            if(count > maxRepetitionsOnSameTerm) {
+            if (count > maxRepetitionsOnSameTerm) {
                 return TOP_COST;
             } else {
                 cost += count * 2000L;
@@ -101,8 +110,9 @@ public class QueryExpandCost implements Feature {
                 cost += qtime * termAgeFactor;
             } else {
                 LOGGER.info(
-                        "QueryExpandCost::compute. Time of query should have been set already."
-                                + "The query was: {}", t);
+                    "QueryExpandCost::compute. Time of query should have been set already."
+                        + "The query was: {}",
+                    t);
             }
         }
 
@@ -112,7 +122,7 @@ public class QueryExpandCost implements Feature {
     /**
      * @param t the query that is considered for the rule expand query.
      * @return Cost that is computed base on the integer
-     *      literals occurring in the numerical arguments of the query t.
+     *         literals occurring in the numerical arguments of the query t.
      */
     private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv) {
         final Namespace<Sort> sorts = serv.getNamespaces().sorts();
@@ -129,21 +139,23 @@ public class QueryExpandCost implements Feature {
         return cost;
     }
 
-    /** Absolute values of literal occurring in t a used for cost computation.
-     *  The cost of literals is sorted the following way:0,1,-1,2,-2,3,-3,...
+    /**
+     * Absolute values of literal occurring in t a used for cost computation.
+     * The cost of literals is sorted the following way:0,1,-1,2,-2,3,-3,...
+     *
      * @param t The term is expected to be an argument of the query.
      * @return Sum* of the absolute values of integer literals occurring in t multiplied by two.
-              (*) The sum is modified by extrapolating negative numbers from zero by one. The
-                  cost of a query f(n-1) a slightly higher cost than the cost of f(n+1).
+     *         (*) The sum is modified by extrapolating negative numbers from zero by one. The
+     *         cost of a query f(n-1) a slightly higher cost than the cost of f(n+1).
      */
     private static int sumOfAbsLiteralsTimesTwo(Term t, IntegerLDT iLDT, Services serv) {
-        if(t.op() == iLDT.getNumberSymbol()) {
+        if (t.op() == iLDT.getNumberSymbol()) {
             String strVal = AbstractTermTransformer.convertToDecimalString(t, serv);
             int val = Integer.parseInt(strVal);
             if (val >= 0) {
                 return val * 2;
             } else {
-                //Negative numbers get a slightly higher cost than positive numbers.
+                // Negative numbers get a slightly higher cost than positive numbers.
                 return (val * -2) + 1;
             }
         } else {
@@ -155,9 +167,11 @@ public class QueryExpandCost implements Feature {
         }
     }
 
-    /** The method checks if the same rule has been applied earlier on this branch
-     *  at the same position in the sequent. This method detects repetitive rule
-     *  applications and is used to prevent loops in the proof tree.
+    /**
+     * The method checks if the same rule has been applied earlier on this branch
+     * at the same position in the sequent. This method detects repetitive rule
+     * applications and is used to prevent loops in the proof tree.
+     *
      * @param app The rule application.
      * @param pos The occurrence position.
      * @param goal The goal.
@@ -190,6 +204,7 @@ public class QueryExpandCost implements Feature {
      * step case or body preserves case. The search is done recursively for all
      * parent nodes until either there are no more parent nodes or we have found
      * an according (or opposing) branch label.
+     *
      * @param goal the current proof goal
      * @return a boolean saying whether the goal belongs to a step case
      */
@@ -197,9 +212,9 @@ public class QueryExpandCost implements Feature {
         Node node = goal.node();
         while (node != null) {
             NodeInfo ni = node.getNodeInfo();
-            if(ni != null && ni.getBranchLabel() != null) {
+            if (ni != null && ni.getBranchLabel() != null) {
                 String branchName = ni.getBranchLabel().toLowerCase();
-                if(branchName.contains("step case")
+                if (branchName.contains("step case")
                         || branchName.contains("body preserves")) {
                     return true;
                 } else if (branchName.contains("base case") ||

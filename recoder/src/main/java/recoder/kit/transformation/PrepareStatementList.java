@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -47,9 +50,10 @@ public class PrepareStatementList extends TwoPassTransformation {
      * statement block if necessary.
      *
      * @param sc the service configuration to use.
-     * @param s  a statement to be wrapped by a new statement block.
+     * @param s a statement to be wrapped by a new statement block.
      */
-    public PrepareStatementList(CrossReferenceServiceConfiguration sc, Statement s, boolean isVisible) {
+    public PrepareStatementList(CrossReferenceServiceConfiguration sc, Statement s,
+            boolean isVisible) {
         super(sc);
         if (s == null) {
             throw new IllegalArgumentException("Missing statement");
@@ -139,7 +143,7 @@ public class PrepareStatementList extends TwoPassTransformation {
      * initial argument is returned.
      *
      * @return the statement that has been wrapped, possibly a clone of the
-     * original statement.
+     *         original statement.
      */
     public Statement getStatement() {
         return statement;

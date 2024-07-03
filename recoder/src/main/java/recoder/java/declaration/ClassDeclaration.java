@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.java.*;
@@ -76,8 +79,9 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Construct a non-anonymous class.
      */
-    public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended, Implements implemented,
-                            ASTList<MemberDeclaration> members, ASTList<TypeParameterDeclaration> typeParameters) {
+    public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name,
+            Extends extended, Implements implemented,
+            ASTList<MemberDeclaration> members, ASTList<TypeParameterDeclaration> typeParameters) {
         super(declSpecs, name);
         setExtendedTypes(extended);
         setImplementedTypes(implemented);
@@ -86,8 +90,9 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         makeParentRoleValid();
     }
 
-    public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended, Implements implemented,
-                            ASTList<MemberDeclaration> members) {
+    public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name,
+            Extends extended, Implements implemented,
+            ASTList<MemberDeclaration> members) {
         this(declSpecs, name, extended, implemented, members, null);
     }
 

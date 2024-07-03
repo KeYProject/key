@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.File;
@@ -18,6 +22,7 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +139,8 @@ public class ProofScriptEngine {
                     throw new ScriptException("No command");
                 }
 
-                ProofScriptCommand<Object> command = (ProofScriptCommand<Object>) COMMANDS.get(name);
+                ProofScriptCommand<Object> command =
+                    (ProofScriptCommand<Object>) COMMANDS.get(name);
                 if (command == null) {
                     throw new ScriptException("Unknown command " + name);
                 }
@@ -152,25 +158,26 @@ public class ProofScriptEngine {
             } catch (ProofAlreadyClosedException e) {
                 if (stateMap.isFailOnClosedOn()) {
                     throw new ScriptException(
-                            String.format("Proof already closed while trying to fetch next goal.\n"
-                                    + "This error can be suppressed by setting '@failonclosed off'.\n\n"
-                                    + "Command: %s\nLine:%d\n",
-                                    argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
-                            initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
+                        String.format("Proof already closed while trying to fetch next goal.\n"
+                            + "This error can be suppressed by setting '@failonclosed off'.\n\n"
+                            + "Command: %s\nLine:%d\n",
+                            argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
+                        initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
                 } else {
                     LOGGER.info(
-                            "Proof already closed at command \"{}\" at line %d, terminating in line {}",
-                            argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
+                        "Proof already closed at command \"{}\" at line %d, terminating in line {}",
+                        argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
                     break;
                 }
             } catch (Exception e) {
                 LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
-                proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> LOGGER.debug("{}", g.sequent()));
+                proof.getSubtreeGoals(stateMap.getProof().root())
+                        .forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                        String.format("Error while executing script: %s\n\nCommand: %s",
-                                e.getMessage(), argMap.get(ScriptLineParser.LITERAL_KEY)),
-                        initialLocation.getFileURL(), mlp.getLine(),
-                        mlp.getColumn(), e);
+                    String.format("Error while executing script: %s\n\nCommand: %s",
+                        e.getMessage(), argMap.get(ScriptLineParser.LITERAL_KEY)),
+                    initialLocation.getFileURL(), mlp.getLine(),
+                    mlp.getColumn(), e);
             }
         }
     }
@@ -184,7 +191,7 @@ public class ProofScriptEngine {
      * command.
      *
      * @param monitor
-     *            the monitor to set
+     *        the monitor to set
      */
     public void setCommandMonitor(Observer monitor) {
         this.commandMonitor = monitor;

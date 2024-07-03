@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -13,6 +14,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Term generator that enumerates the subterms or subformulas of a given term.
@@ -29,16 +33,16 @@ public abstract class SubtermGenerator implements TermGenerator {
         this.cond = cond;
         this.completeTerm = completeTerm;
     }
-    
+
     /**
      * Left-traverse the subterms of a term in depth-first order. Each term is
      * returned before its proper subterms.
      */
     public static TermGenerator leftTraverse(ProjectionToTerm cTerm,
-                                             TermFeature cond) {
-        return new SubtermGenerator (cTerm, cond) {
+            TermFeature cond) {
+        return new SubtermGenerator(cTerm, cond) {
             public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return new LeftIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
+                return new LeftIterator(getTermInst(app, pos, goal), goal.proof().getServices());
             }
         };
     }
@@ -48,81 +52,81 @@ public abstract class SubtermGenerator implements TermGenerator {
      * returned before its proper subterms.
      */
     public static TermGenerator rightTraverse(ProjectionToTerm cTerm,
-                                              TermFeature cond) {
-        return new SubtermGenerator (cTerm, cond) {
+            TermFeature cond) {
+        return new SubtermGenerator(cTerm, cond) {
             public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return new RightIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
+                return new RightIterator(getTermInst(app, pos, goal), goal.proof().getServices());
             }
         };
     }
 
     protected Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return completeTerm.toTerm ( app, pos, goal );
+        return completeTerm.toTerm(app, pos, goal);
     }
-    
+
     private boolean descendFurther(Term t, Services services) {
-        return ! ( cond.compute ( t, services ) instanceof TopRuleAppCost );
+        return !(cond.compute(t, services) instanceof TopRuleAppCost);
     }
-        
+
     abstract class SubIterator implements Iterator<Term> {
         protected ImmutableList<Term> termStack;
-        
+
         protected final Services services;
 
         public SubIterator(Term t, Services services) {
-            termStack = ImmutableSLList.<Term>nil().prepend ( t );
+            termStack = ImmutableSLList.<Term>nil().prepend(t);
             this.services = services;
         }
 
         public boolean hasNext() {
-            return !termStack.isEmpty ();
+            return !termStack.isEmpty();
         }
     }
 
     class LeftIterator extends SubIterator {
         public LeftIterator(Term t, Services services) {
-            super ( t, services );
+            super(t, services);
         }
 
         public Term next() {
-            final Term res = termStack.head ();
-            termStack = termStack.tail ();
-            
-            if ( descendFurther ( res, services ) ) {
-                for ( int i = res.arity () - 1; i >= 0; --i )
-                    termStack = termStack.prepend ( res.sub ( i ) );
+            final Term res = termStack.head();
+            termStack = termStack.tail();
+
+            if (descendFurther(res, services)) {
+                for (int i = res.arity() - 1; i >= 0; --i)
+                    termStack = termStack.prepend(res.sub(i));
             }
-            
+
             return res;
         }
 
-        /** 
+        /**
          * throw an unsupported operation exception as generators do not remove
          */
         public void remove() {
             throw new UnsupportedOperationException();
         }
-   
+
     }
 
     class RightIterator extends SubIterator {
         public RightIterator(Term t, Services services) {
-            super ( t, services );
+            super(t, services);
         }
 
         public Term next() {
-            final Term res = termStack.head ();
-            termStack = termStack.tail ();
-            
-            if ( descendFurther ( res, services ) ) {
-                for ( int i = 0; i != res.arity (); ++i )
-                    termStack = termStack.prepend ( res.sub ( i ) );
+            final Term res = termStack.head();
+            termStack = termStack.tail();
+
+            if (descendFurther(res, services)) {
+                for (int i = 0; i != res.arity(); ++i)
+                    termStack = termStack.prepend(res.sub(i));
             }
-            
+
             return res;
         }
-        
-        /** 
+
+        /**
          * throw an unsupported operation exception as generators do not remove
          */
         public void remove() {

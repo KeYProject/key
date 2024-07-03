@@ -1,27 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.parser.proofjava;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.Expression;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import recoder.ParserException;
-import recoder.ServiceConfiguration;
-import recoder.java.Expression;
 
 /**
- * 
+ *
  * TestCases for a modified ProofJavaParser which supports <...> for generics
  * and for implicit identifiers.
- * 
+ *
  * @author mulbrich
  * @version 2006-10-27
  */
@@ -36,7 +35,7 @@ public class TestProofJavaParser {
     @BeforeEach
     public void setUp() throws Exception {
         sc = new KeYCrossReferenceServiceConfiguration(
-                new KeYRecoderExcHandler());
+            new KeYRecoderExcHandler());
         factory = (ProofJavaProgramFactory) sc.getProgramFactory();
     }
 
@@ -78,5 +77,5 @@ public class TestProofJavaParser {
         factory.parseMemberDeclaration("private <Default> getDefault() { };");
         factory.parseMemberDeclaration("private <T> Type m() { };");
     }
-        
+
 }

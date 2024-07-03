@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.logic.op;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -9,6 +11,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level
@@ -36,6 +40,7 @@ public class Transformer extends Function {
      * Looks up the function namespace for a term transformer with the given
      * attributes, assuming it to be uniquely defined by its name. If none is found,
      * a new term transformer is created.
+     *
      * @param name name of the term transformer
      * @param sort sort of the term transformer
      * @param argSorts array of the transformer's argument sorts
@@ -43,12 +48,12 @@ public class Transformer extends Function {
      * @return the term transformer of interest
      */
     public static Transformer getTransformer(Name name,
-                                                      Sort sort,
-                                                      ImmutableArray<Sort> argSorts,
-                                                      TermServices services) {
+            Sort sort,
+            ImmutableArray<Sort> argSorts,
+            TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
         if (f != null && f instanceof Transformer) {
-            Transformer t = (Transformer)f;
+            Transformer t = (Transformer) f;
             assert t.sort() == sort;
             assert t.argSorts().size() == argSorts.size();
             return t;
@@ -60,17 +65,19 @@ public class Transformer extends Function {
      * Takes a template for a term transformer and checks in the function
      * namespace, whether an equivalent already exists. If this is the case,
      * it returns the found transformer, otherwise it creates a new one.
+     *
      * @param t the template for a term transformer
      * @param services
      * @return the term transformer to be used
      */
     public static Transformer getTransformer(Transformer t,
-                                                      TermServices services) {
+            TermServices services) {
         return getTransformer(t.name(), t.sort(), t.argSorts(), services);
     }
 
     /**
      * Examines a position for whether it is inside a term transformer.
+     *
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
@@ -79,13 +86,13 @@ public class Transformer extends Function {
         if (pio == null) {
             return false;
         }
-        if ( pio.posInTerm () != null ) {
-            PIOPathIterator it = pio.iterator ();
-            Operator        op;
+        if (pio.posInTerm() != null) {
+            PIOPathIterator it = pio.iterator();
+            Operator op;
 
-            while ( it.next () != -1 && !trans) {
-                final Term t = it.getSubTerm ();
-                op = t.op ();
+            while (it.next() != -1 && !trans) {
+                final Term t = it.getSubTerm();
+                op = t.op();
                 trans = op instanceof Transformer;
             }
         }
@@ -95,19 +102,20 @@ public class Transformer extends Function {
     /**
      * Examines a position for whether it is inside a term transformer.
      * If this is the case, the found term transformer is returned.
+     *
      * @param pio A position in an occurrence of a term
      * @return the term transformer the position is in, null otherwise
      */
     public static Transformer getTransformer(PosInOccurrence pio) {
-        if ( pio.posInTerm () != null ) {
-            PIOPathIterator it = pio.iterator ();
-            Operator        op;
+        if (pio.posInTerm() != null) {
+            PIOPathIterator it = pio.iterator();
+            Operator op;
 
-            while ( it.next () != -1) {
-                final Term t = it.getSubTerm ();
-                op = t.op ();
+            while (it.next() != -1) {
+                final Term t = it.getSubTerm();
+                op = t.op();
                 if (op instanceof Transformer)
-                    return (Transformer)op;
+                    return (Transformer) op;
             }
         }
         return null;

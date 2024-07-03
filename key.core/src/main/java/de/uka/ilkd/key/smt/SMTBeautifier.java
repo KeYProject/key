@@ -1,6 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt;
 
-import org.key_project.util.java.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +99,7 @@ public abstract class SMTBeautifier {
      * The code may crash with some {@link IndexOutOfBoundsException} or
      * {@link NullPointerException} if invoked on illegal smt code.
      *
-     * @param smtCode    the code to indent.
+     * @param smtCode the code to indent.
      * @param lineLength the number of characters per line, > 0
      * @return a string representation equivalent to the input
      */
@@ -114,46 +117,46 @@ public abstract class SMTBeautifier {
     private static Element parse(String s, MutableInt pos) {
         while (pos.val < s.length()) {
             switch (s.charAt(pos.val)) {
-                case ' ':
-                case '\t':
-                case '\r':
-                case '\n':
-                    break;
+            case ' ':
+            case '\t':
+            case '\r':
+            case '\n':
+                break;
 
-                case '(':
-                    return parseParen(s, pos);
+            case '(':
+                return parseParen(s, pos);
 
-                case '|':
-                    int start = pos.val;
+            case '|':
+                int start = pos.val;
+                pos.val++;
+                while (s.charAt(pos.val) != '|') {
                     pos.val++;
-                    while (s.charAt(pos.val) != '|') {
-                        pos.val++;
-                    }
-                    Element result = new Element();
-                    pos.val++;
-                    result.head = s.substring(start, pos.val);
-                    return result;
+                }
+                Element result = new Element();
+                pos.val++;
+                result.head = s.substring(start, pos.val);
+                return result;
 
-                case ';':
-                    start = pos.val;
+            case ';':
+                start = pos.val;
+                pos.val++;
+                while (pos.val < s.length() && s.charAt(pos.val) != '\n') {
                     pos.val++;
-                    while (pos.val < s.length() && s.charAt(pos.val) != '\n') {
-                        pos.val++;
-                    }
-                    result = new Element();
-                    result.head = s.substring(start, pos.val);
-                    pos.val++;
-                    return result;
+                }
+                result = new Element();
+                result.head = s.substring(start, pos.val);
+                pos.val++;
+                return result;
 
-                default:
-                    start = pos.val;
+            default:
+                start = pos.val;
+                pos.val++;
+                while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) {
                     pos.val++;
-                    while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) {
-                        pos.val++;
-                    }
-                    result = new Element();
-                    result.head = s.substring(start, pos.val);
-                    return result;
+                }
+                result = new Element();
+                result.head = s.substring(start, pos.val);
+                return result;
             }
             pos.val++;
         }

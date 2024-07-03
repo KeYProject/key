@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util;
 
 import java.io.File;
@@ -5,6 +9,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+
+import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +24,14 @@ import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.reference.TypeReference;
 import recoder.service.SourceInfo;
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 
 /**
  * Find out for a collection of Java files which referenced types are not defined
  * within the source directory. Stubs using empty method or constructor bodies
  * are allowed.
- * 
+ *
  * @author MU
- * 
+ *
  */
 public class ReferenceLister {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceLister.class);
@@ -81,8 +86,8 @@ public class ReferenceLister {
         ProgramFactory factory = sc.getProgramFactory();
         FileReader fileReader = new FileReader(file);
         final CompilationUnit cu;
-        try { 
-           cu = factory.parseCompilationUnit(fileReader);
+        try {
+            cu = factory.parseCompilationUnit(fileReader);
         } finally {
             fileReader.close();
         }
@@ -91,6 +96,7 @@ public class ReferenceLister {
     }
 
 }
+
 
 class RefSolverServiceConfiguration extends CrossReferenceServiceConfiguration {
     @Override

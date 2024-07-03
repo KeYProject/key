@@ -1,19 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
+
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 /**
  * this dialog appears if a rule is selected to be applied and the rule has an
@@ -38,7 +42,7 @@ public class TacletIfSelectionDialog extends JPanel {
      * @param model the model to be displayed
      */
     public TacletIfSelectionDialog(TacletInstantiationModel model,
-                                   TacletMatchCompletionDialog owner) {
+            TacletMatchCompletionDialog owner) {
 
         this.model = model;
         this.owner = owner;
@@ -72,7 +76,7 @@ public class TacletIfSelectionDialog extends JPanel {
             final JPanel p = new JPanel();
             p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
             JLabel label = new JLabel(ProofSaver.printAnything(
-                    model.ifFma(i), model.proof().getServices())) {
+                model.ifFma(i), model.proof().getServices())) {
                 /**
                  *
                  */
@@ -91,7 +95,7 @@ public class TacletIfSelectionDialog extends JPanel {
 
                 public java.awt.Dimension getPreferredSize() {
                     return new java.awt.Dimension(800,
-                            (int) super.getPreferredSize().getHeight());
+                        (int) super.getPreferredSize().getHeight());
                 }
             };
             IfComboRenderer rend = new IfComboRenderer(model.proof().getServices());
@@ -199,16 +203,17 @@ public class TacletIfSelectionDialog extends JPanel {
         }
 
         public Component getListCellRendererComponent(JList<? extends IfFormulaInstantiation> list,
-                                                      IfFormulaInstantiation value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
+                IfFormulaInstantiation value,
+                int index,
+                boolean isSelected,
+                boolean cellHasFocus) {
             cellRenderer.setOpaque(true);
             final String valStr = value.toString(services);
             if (isSelected) {
                 list.setToolTipText(valStr);
             }
-            return cellRenderer.getListCellRendererComponent(list, valStr, index, isSelected, cellHasFocus);
+            return cellRenderer.getListCellRendererComponent(list, valStr, index, isSelected,
+                cellHasFocus);
         }
     }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -24,15 +27,15 @@ public class TacletInfoToggle extends JCheckBox {
         setName(getClass().getSimpleName());
     }
 
-   @Override
-   public void setSelected(boolean b) {
-      super.setSelected(b);
-      if (innerNodeView != null) {
-         innerNodeView.tacletInfo.setVisible(isSelected());
-      }
-   }
+    @Override
+    public void setSelected(boolean b) {
+        super.setSelected(b);
+        if (innerNodeView != null) {
+            innerNodeView.tacletInfo.setVisible(isSelected());
+        }
+    }
 
-   public void setSequentView(SequentView sequentView) {
+    public void setSequentView(SequentView sequentView) {
         if (sequentView instanceof InnerNodeView) {
             innerNodeView = (InnerNodeView) sequentView;
             setEnabled(true);

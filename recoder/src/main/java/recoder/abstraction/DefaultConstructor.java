@@ -1,13 +1,17 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.abstraction;
+
+import java.util.List;
 
 import recoder.ModelException;
 import recoder.convenience.Naming;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * Default constructor of class types.
@@ -95,7 +99,7 @@ public class DefaultConstructor implements Constructor {
      * Checks if this member is public.
      *
      * @return <CODE>true</CODE>, if the containing class type is public,
-     * <CODE>false</CODE> otherwise.
+     *         <CODE>false</CODE> otherwise.
      */
     public boolean isPublic() {
         return getContainingClassType().isPublic() && !getContainingClassType().isEnumType();
@@ -221,7 +225,9 @@ public class DefaultConstructor implements Constructor {
         return Naming.getFullName(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.Method#isVarArgMethod()
      */
     public boolean isVarArgMethod() {

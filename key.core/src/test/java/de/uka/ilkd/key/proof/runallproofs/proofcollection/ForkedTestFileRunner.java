@@ -1,9 +1,8 @@
-package de.uka.ilkd.key.proof.runallproofs.proofcollection;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.TestResult;
-import de.uka.ilkd.key.settings.PathConfig;
-import de.uka.ilkd.key.util.IOForwarder;
+package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,6 +11,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.util.IOForwarder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,7 +53,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
             throws IOException {
 
         try (ObjectOutputStream objectOutputStream =
-                     new ObjectOutputStream(Files.newOutputStream(path))) {
+            new ObjectOutputStream(Files.newOutputStream(path))) {
             objectOutputStream.writeObject(s);
         }
     }
@@ -60,7 +64,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
     private static <S> S readObject(Path path, Class<S> type) throws IOException,
             ClassNotFoundException {
         try (ObjectInputStream objectInputStream =
-                     new ObjectInputStream(Files.newInputStream(path))) {
+            new ObjectInputStream(Files.newInputStream(path))) {
             Object result = objectInputStream.readObject();
             return type.cast(result);
         }
@@ -70,7 +74,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * Process a single {@link TestFile} in a separate subprocess.
      */
     public static TestResult processTestFile(TestFile testFile,
-                                             Path pathToTempDir) throws Exception {
+            Path pathToTempDir) throws Exception {
         List<TestFile> files = List.of(testFile);
         return processTestFiles(files, pathToTempDir).get(0);
     }
@@ -82,20 +86,20 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * @param pathToTempDir a path to the temporary data directory
      */
     public static List<TestResult> processTestFiles(List<TestFile> testFiles,
-                                                    Path pathToTempDir) throws Exception {
+            Path pathToTempDir) throws Exception {
         if (testFiles.isEmpty()) {
             return new ArrayList<>();
         }
         ProofCollectionSettings settings = testFiles.get(0).getSettings();
 
         writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
-                testFiles.toArray(new TestFile[0]));
+            testFiles.toArray(new TestFile[0]));
 
         ProcessBuilder pb = new ProcessBuilder(
-                "java", "-classpath", System.getProperty("java.class.path"),
-                // pass through the value of key.disregardSettings
-                "-D" + PathConfig.DISREGARD_SETTINGS_PROPERTY + "=" +
-                        Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY));
+            "java", "-classpath", System.getProperty("java.class.path"),
+            // pass through the value of key.disregardSettings
+            "-D" + PathConfig.DISREGARD_SETTINGS_PROPERTY + "=" +
+                Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY));
         List<String> command = pb.command();
 
         // TODO make sure no injection happens here?
@@ -118,8 +122,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
                 throw new IOException("port number must be a number");
             }
             command.addAll(Arrays.asList("-Xdebug", "-Xnoagent",
-                    "-Djava.compiler=NONE", "-Xrunjdwp:transport=dt_socket,server=y,suspend=" +
-                            suspend + ",address=" + port));
+                "-Djava.compiler=NONE", "-Xrunjdwp:transport=dt_socket,server=y,suspend=" +
+                    suspend + ",address=" + port));
         }
 
         command.add(ForkedTestFileRunner.class.getName());
@@ -128,7 +132,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
         Process process = pb.start();
         IOForwarder.forward(process);
         process.waitFor();
-        assertEquals(0,process.exitValue(), "Executed process terminated with non-zero exit value.");
+        assertEquals(0, process.exitValue(),
+            "Executed process terminated with non-zero exit value.");
 
         /*
          * Check if an exception occured and rethrow it if one occured.
@@ -137,15 +142,17 @@ public abstract class ForkedTestFileRunner implements Serializable {
         if (exceptionFile.toFile().exists()) {
             Throwable t = ForkedTestFileRunner.readObject(exceptionFile, Throwable.class);
             throw new Exception(
-                    "Subprocess returned exception (see cause for details):\n"
-                            + t.getMessage(), t);
+                "Subprocess returned exception (see cause for details):\n"
+                    + t.getMessage(),
+                t);
         }
 
         /*
          * Read serialized list of test results and return.
          */
         Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
-        assertTrue(testResultsFile.toFile().exists(), "File containing serialized test results not present.");
+        assertTrue(testResultsFile.toFile().exists(),
+            "File containing serialized test results not present.");
         TestResult[] array = ForkedTestFileRunner.readObject(testResultsFile, TestResult[].class);
 
         return Arrays.asList(array);
@@ -160,13 +167,13 @@ public abstract class ForkedTestFileRunner implements Serializable {
         Path tempDirectory = Paths.get(args[0]);
         if (!tempDirectory.toFile().exists()) {
             throw new Error("RunAllProofs temporary directory does not exist: "
-                    + tempDirectory);
+                + tempDirectory);
         }
 
         boolean error = false;
         try {
             TestFile[] testFiles = ForkedTestFileRunner.readObject(
-                            getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
+                getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
             installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
             ArrayList<TestResult> testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {
@@ -178,7 +185,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                 }
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),
-                    testResults.toArray(new TestResult[0]));
+                testResults.toArray(new TestResult[0]));
         } catch (Throwable t) {
             try {
                 writeObject(getLocationOfSerializedException(tempDirectory), t);
@@ -203,10 +210,11 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * <p>
      * If no timeout has been specified, no thread is launched.
      *
-     * @param settings      the (non-null) settings to take the timeout from.
+     * @param settings the (non-null) settings to take the timeout from.
      * @param tempDirectory
      */
-    private static void installTimeoutWatchdog(ProofCollectionSettings settings, final Path tempDirectory) {
+    private static void installTimeoutWatchdog(ProofCollectionSettings settings,
+            final Path tempDirectory) {
 
         String timeoutString = settings.get(FORK_TIMEOUT_KEY);
         if (timeoutString == null) {
@@ -220,12 +228,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
             timeout = Integer.parseInt(timeoutString);
         } catch (NumberFormatException ex) {
             throw new RuntimeException("The setting forkTimeout requires an integer, not " +
-                    timeoutString, ex);
+                timeoutString, ex);
         }
 
         if (timeout <= 0) {
             throw new RuntimeException("The setting forkTimeout requires a positive integer, not " +
-                    timeoutString);
+                timeoutString);
         }
 
         Thread t = new Thread("Timeout watchdog") {
@@ -237,7 +245,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     }
                     Thread.sleep(timeout * 1000L);
                     InterruptedException ex =
-                            new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
+                        new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
                     writeObject(getLocationOfSerializedException(tempDirectory), ex);
                     // TODO consider something other than 0 here
                     if (verbose) {
@@ -245,7 +253,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     }
                     System.exit(0);
                 } catch (Exception ex) {
-                    System.err.println("The watchdog has been interrupted or failed. Timeout cancelled.");
+                    System.err.println(
+                        "The watchdog has been interrupted or failed. Timeout cancelled.");
                     ex.printStackTrace();
                 }
             }

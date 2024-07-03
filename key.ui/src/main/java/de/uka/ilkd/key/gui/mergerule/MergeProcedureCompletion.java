@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.util.Collection;
@@ -6,8 +10,8 @@ import java.util.function.Function;
 import de.uka.ilkd.key.gui.mergerule.predicateabstraction.PredicateAbstractionCompletion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.Pair;
@@ -52,11 +56,11 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
      * is already complete) or by demanding input from the user in a GUI.
      *
      * @param proc
-     *            {@link MergeProcedure} to complete.
+     *        {@link MergeProcedure} to complete.
      * @param mergeGoalPio
-     *            The {@link Goal} and {@link PosInOccurrence} identifying the merge goal.
+     *        The {@link Goal} and {@link PosInOccurrence} identifying the merge goal.
      * @param partners
-     *            The {@link MergePartner}s chosen.
+     *        The {@link MergePartner}s chosen.
      * @return The completed {@link MergeProcedure}.
      */
     public abstract C complete(
@@ -66,15 +70,14 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
 
     /**
      * Returns the completion for the given merge procedure class.
-     * 
+     *
      * @return The requested completion.
      */
     public static MergeProcedureCompletion<? extends MergeProcedure> getCompletionForClass(
             Class<? extends MergeProcedure> cls) {
         if (cls.equals(MergeWithPredicateAbstractionFactory.class)) {
             return new PredicateAbstractionCompletion();
-        }
-        else {
+        } else {
             return defaultCompletion();
         }
     }

@@ -1,5 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.List;
+import java.util.WeakHashMap;
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -17,33 +35,18 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.List;
-import java.util.WeakHashMap;
 
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
     public static final Icon GOAL_LIST_ICON =
-            IconFontSwing.buildIcon(FontAwesomeSolid.FLAG_CHECKERED,
-                                    MainWindowTabbedPane.TAB_ICON_SIZE);
+        IconFontSwing.buildIcon(FontAwesomeSolid.FLAG_CHECKERED,
+            MainWindowTabbedPane.TAB_ICON_SIZE);
     /**
      *
      */
@@ -108,7 +111,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
         addMouseListener(ml);
 
         updateUI();
-        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this, KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
+            KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
     }
 
     @Override
@@ -154,7 +158,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             setFont(myFont);
         } else {
             LOGGER.debug("goallist: Warning: Use standard font. Could not find font: {}",
-                    Config.KEY_FONT_GOAL_LIST_VIEW);
+                Config.KEY_FONT_GOAL_LIST_VIEW);
         }
     }
 
@@ -169,7 +173,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     private void unregister() {
-        if(mediator()!=null) {
+        if (mediator() != null) {
             mediator().removeKeYSelectionListener(selectionListener);
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality.
@@ -181,8 +185,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     public void removeNotify() { // not used?
-        //unregister();
-        //super.removeNotify();
+        // unregister();
+        // super.removeNotify();
     }
 
     private KeYMediator mediator() {
@@ -228,13 +232,14 @@ public class GoalList extends JList<Goal> implements TabPanel {
         String res = seqToString.get(seq);
         if (res == null) {
             LogicPrinter sp =
-                    new LogicPrinter(new ProgramPrinter(null), mediator()
-                            .getNotationInfo(), mediator().getServices(), true);
+                new LogicPrinter(new ProgramPrinter(null), mediator()
+                        .getNotationInfo(),
+                    mediator().getServices(), true);
             sp.printSequent(seq);
             res = sp.toString().replace('\n', ' ');
             res =
-                    res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH,
-                            res.length()));
+                res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH,
+                    res.length()));
 
             seqToString.put(seq, res);
         }
@@ -247,7 +252,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
          * listens to the proof
          */
         private final ProofTreeListener proofTreeListener =
-                new GoalListProofTreeListener();
+            new GoalListProofTreeListener();
         /**
          * the proof the model belongs to
          */
@@ -311,7 +316,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                     goals.add(aG);
                 }
                 fireIntervalAdded(this, goals.size() - g.size(),
-                        goals.size() - 1);
+                    goals.size() - 1);
             }
         }
 
@@ -444,13 +449,13 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 putValue(NAME, g.isAutomatic() ? "Interactive Goal"
                         : "Automatic Goal");
                 putValue(
-                        SHORT_DESCRIPTION,
-                        g.isAutomatic() ? "No automatic rules "
-                                + "will be applied when goal is set to interactive."
-                                : "Re-enable automatic rule application for this goal.");
+                    SHORT_DESCRIPTION,
+                    g.isAutomatic() ? "No automatic rules "
+                        + "will be applied when goal is set to interactive."
+                            : "Re-enable automatic rule application for this goal.");
                 putValue(SMALL_ICON,
-                        g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
-                                : KEY_HOLE_PULL_DOWN_MENU);
+                    g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
+                            : KEY_HOLE_PULL_DOWN_MENU);
                 enableGoals = !g.isAutomatic();
                 setEnabled(true);
             } else {
@@ -499,13 +504,13 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 putValue(NAME, g.isAutomatic() ? "Set Other Goals Interactive"
                         : "Set Other Goals Automatic");
                 putValue(
-                        SHORT_DESCRIPTION,
-                        g.isAutomatic() ? "No automatic rules "
-                                + "will be applied on all other goals."
-                                : "Re-enable automatic rule application for other goals.");
+                    SHORT_DESCRIPTION,
+                    g.isAutomatic() ? "No automatic rules "
+                        + "will be applied on all other goals."
+                            : "Re-enable automatic rule application for other goals.");
                 putValue(SMALL_ICON,
-                        g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
-                                : KEY_HOLE_PULL_DOWN_MENU);
+                    g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
+                            : KEY_HOLE_PULL_DOWN_MENU);
                 enableGoals = !g.isAutomatic();
 
                 setEnabled(getModel().getSize() > 1);
@@ -642,7 +647,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
          */
         private final ArrayList<Integer> entries = new ArrayList<>(10);
         private final DelegateListener delegateListener =
-                new DelegateListener();
+            new DelegateListener();
         /**
          * The last known size of the delegate model. This is used to recognise
          * addition or removal of rows
@@ -685,9 +690,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
         private boolean isHiddenGoal(final Goal goal) {
             return proof != null && /*
-             * that afterwards should always be false as
-             * goals exist only for open nodes
-             */goal.node().isClosed();
+                                     * that afterwards should always be false as
+                                     * goals exist only for open nodes
+                                     */goal.node().isClosed();
         }
 
         private void setup() {
@@ -755,7 +760,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         private void shiftTail(int begin, int amount) {
             for (; begin != entries.size(); ++begin)
                 entries.set(begin,
-                        getDelegateIndex(begin) + amount);
+                    getDelegateIndex(begin) + amount);
         }
 
         private int delegateSizeChange() {
@@ -781,14 +786,14 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 // not sufficiently tested
 
                 final int oldDelegateEnd =
-                        delegateEnd(e) - delegateSizeChange();
+                    delegateEnd(e) - delegateSizeChange();
                 final int begin =
-                        removeInterval(delegateBegin(e), oldDelegateEnd);
+                    removeInterval(delegateBegin(e), oldDelegateEnd);
 
                 shiftTail(begin, delegateSizeChange());
 
                 final int end =
-                        selectFromInterval(delegateBegin(e), delegateEnd(e));
+                    selectFromInterval(delegateBegin(e), delegateEnd(e));
 
                 updateDelegateSize();
 
@@ -801,7 +806,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             public void intervalAdded(ListDataEvent e) {
                 final int oldSize = entries.size();
                 final int end =
-                        selectFromInterval(delegateBegin(e), delegateEnd(e));
+                    selectFromInterval(delegateBegin(e), delegateEnd(e));
                 shiftTail(end, delegateSizeChange());
 
                 updateDelegateSize();
@@ -815,7 +820,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             public void intervalRemoved(ListDataEvent e) {
                 final int oldSize = entries.size();
                 final int begin =
-                        removeInterval(delegateBegin(e), delegateEnd(e));
+                    removeInterval(delegateBegin(e), delegateEnd(e));
                 shiftTail(begin, delegateSizeChange());
 
                 updateDelegateSize();
@@ -842,11 +847,11 @@ public class GoalList extends JList<Goal> implements TabPanel {
         }
 
         public Component getListCellRendererComponent(JList<?> list, Object value, // value
-                                                      // to
-                                                      // display
-                                                      int index, // cell index
-                                                      boolean isSelected, // is the cell selected
-                                                      boolean cellHasFocus) // the list and the cell have the focus
+                // to
+                // display
+                int index, // cell index
+                boolean isSelected, // is the cell selected
+                boolean cellHasFocus) // the list and the cell have the focus
         {
             String valueStr;
             Color col = Color.black;
@@ -859,21 +864,20 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 // printed String for better transparency and quicker
                 // access to features like visual node diff.
                 valueStr = "(#" + ((Goal) value).node().serialNr() + ") "
-                        + seqToString(seq);
+                    + seqToString(seq);
 
                 statusIcon =
-                        ((Goal) value).isLinked() ? linkedGoalIcon
-                                : ((Goal) value).isAutomatic() ? keyIcon
-                                : disabledGoalIcon;
+                    ((Goal) value).isLinked() ? linkedGoalIcon
+                            : ((Goal) value).isAutomatic() ? keyIcon
+                                    : disabledGoalIcon;
             } else {
                 valueStr = "" + value;
                 statusIcon = keyIcon;
             }
 
             DefaultListCellRenderer sup =
-                    (DefaultListCellRenderer) super
-                            .getListCellRendererComponent(list, valueStr,
-                                    index, isSelected, cellHasFocus);
+                (DefaultListCellRenderer) super.getListCellRendererComponent(list, valueStr,
+                    index, isSelected, cellHasFocus);
 
             sup.setIcon(statusIcon);
 

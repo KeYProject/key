@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.io.File;
@@ -55,8 +58,7 @@ public class FileCollector {
      * @return true iff there is a next file available for {@link #getFile()}.
      */
     public boolean next() {
-        outer:
-        while (count > 0) {
+        outer: while (count > 0) {
             current = stack[--count]; // pop
             while (current.isDirectory()) {
                 String[] content = current.list();
@@ -85,7 +87,7 @@ public class FileCollector {
      * "java").
      *
      * @return true iff there is a next file with the given extension available
-     * for {@link #getFile()}.
+     *         for {@link #getFile()}.
      */
     public boolean next(String suffix) {
         while (next()) {
@@ -101,7 +103,7 @@ public class FileCollector {
      * if this has been possible.
      *
      * @return true iff there is a next file available for {@link #getFile()}
-     * that is accepted by the filter.
+     *         that is accepted by the filter.
      */
     public boolean next(FilenameFilter filter) {
         String pname = "";
@@ -126,7 +128,7 @@ public class FileCollector {
      * Fetch the current file, or null if no one is available.
      *
      * @return the current file, or null if {@link #next()}has not been called
-     * before or returned false.
+     *         before or returned false.
      */
     public File getFile() {
         return current;

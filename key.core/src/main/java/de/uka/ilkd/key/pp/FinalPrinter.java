@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.pp;
+
+import java.io.IOException;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -7,8 +13,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-
-import java.io.IOException;
 
 /**
  * This class is used by LogicPrinter.java to print out final-terms, i.e. terms
@@ -90,8 +94,7 @@ class FinalPrinter extends FieldPrinter {
      * Print a static field constant.
      */
     private void printStaticJavaFieldConstant(
-            final Term fieldTerm
-    ) throws IOException {
+            final Term fieldTerm) throws IOException {
         lp.startTerm(2);
         /*
          * Is consideration for static arrays missing in this?
@@ -127,8 +130,7 @@ class FinalPrinter extends FieldPrinter {
      */
     private void printNonStaticJavaFieldConstant(
             final Term objectTerm,
-            final Term fieldTerm
-    ) throws IOException {
+            final Term fieldTerm) throws IOException {
         lp.startTerm(2);
         lp.markStartSub(0);
         lp.printTerm(objectTerm);
@@ -146,8 +148,7 @@ class FinalPrinter extends FieldPrinter {
      */
     private void printAnySelect(
             final Term objectTerm,
-            final Term fieldTerm
-    ) throws IOException {
+            final Term fieldTerm) throws IOException {
         lp.startTerm(2);
         lp.markStartSub(0);
         lp.printTerm(objectTerm);
@@ -160,15 +161,14 @@ class FinalPrinter extends FieldPrinter {
 
     /*
      * Print a select-term of the following form:
-     *      T::final( ... , ... , java.lang.Object::<...>)
+     * T::final( ... , ... , java.lang.Object::<...>)
      * For example:
-     *      boolean::final(heap, object, java.lang.Object::<created>)
+     * boolean::final(heap, object, java.lang.Object::<created>)
      */
     private void printBuiltinObjectProperty(
             Term t,
             Term objectTerm,
-            Term fieldTerm
-    ) throws IOException {
+            Term fieldTerm) throws IOException {
         JavaInfo javaInfo = lp.services.getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());
         KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
@@ -176,7 +176,8 @@ class FinalPrinter extends FieldPrinter {
         if (selectKJT != null && objectKJT != null) {
             assert fieldTerm.op().name().toString().contains("::<");
             String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
-            ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
+            ProgramVariable pv =
+                javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
 
             if (pv != null && pv.sort().equals(t.sort())) {
                 lp.startTerm(2);

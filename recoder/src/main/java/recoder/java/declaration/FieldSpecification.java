@@ -1,5 +1,10 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
+
+import java.util.List;
 
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
@@ -9,8 +14,6 @@ import recoder.java.Identifier;
 import recoder.java.SourceVisitor;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.List;
 
 public class FieldSpecification extends VariableSpecification implements Field {
 
@@ -51,9 +54,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param name       an identifier.
+     * @param name an identifier.
      * @param dimensions an int value.
-     * @param init       an expression.
+     * @param init an expression.
      */
 
     public FieldSpecification(Identifier name, int dimensions, Expression init) {

@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
@@ -31,12 +34,12 @@ public class MergeRuleMenuItem extends JMenuItem {
      * Creates a new menu item for the join rule.
      *
      * @param goal
-     *            The selected goal.
+     *        The selected goal.
      * @param pio
-     *            The position the join shall be applied to (symbolic state /
-     *            program counter formula).
+     *        The position the join shall be applied to (symbolic state /
+     *        program counter formula).
      * @param mediator
-     *            The KeY mediator.
+     *        The KeY mediator.
      */
     public MergeRuleMenuItem(final Goal goal, final PosInOccurrence pio,
             final KeYMediator mediator) {
@@ -63,10 +66,11 @@ public class MergeRuleMenuItem extends JMenuItem {
                         mediator.stopInterface(true);
 
                         mediator.getUI().taskStarted(new DefaultTaskStartedInfo(
-                                TaskKind.Other,
-                                "Merging " + (completedApp.getMergePartners()
-                                        .size() + 1) + " nodes",
-                                completedApp.getMergePartners().size()));
+                            TaskKind.Other,
+                            "Merging " + (completedApp.getMergePartners()
+                                    .size() + 1)
+                                + " nodes",
+                            completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 
                         completedApp.registerProgressListener(progress -> {
@@ -90,8 +94,8 @@ public class MergeRuleMenuItem extends JMenuItem {
                             protected void done() {
                                 completedApp.clearProgressListeners();
                                 mediator.getUI().taskFinished(
-                                        new DefaultTaskFinishedInfo(this, goal,
-                                                goal.proof(), duration, 1, 0));
+                                    new DefaultTaskFinishedInfo(this, goal,
+                                        goal.proof(), duration, 1, 0));
                                 mediator.startInterface(true);
                                 mediator.getSelectionModel()
                                         .setSelectedGoal(goal);

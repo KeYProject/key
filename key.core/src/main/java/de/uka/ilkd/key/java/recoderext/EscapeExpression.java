@@ -1,12 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
-
-import java.util.List;
 
 /**
  * Handles JML expressions that begin with an escape character '\'.
@@ -38,7 +43,8 @@ public abstract class EscapeExpression extends Operator {
         children = new ASTArrayList<Expression>(arguments);
     }
 
-    public static EscapeExpression getEscapeExpression(String functionName, List<Expression> arguments) {
+    public static EscapeExpression getEscapeExpression(String functionName,
+            List<Expression> arguments) {
         if (functionName.startsWith("\\dl_")) {
             return new DLEmbeddedExpression(functionName.substring(4), arguments);
         } else if (JmlIO.isKnownFunction(functionName)) {

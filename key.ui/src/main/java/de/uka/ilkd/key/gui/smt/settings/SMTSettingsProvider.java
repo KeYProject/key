@@ -1,4 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.smt.settings;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
@@ -9,20 +18,14 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.smt.st.SolverTypes;
 
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
 public class SMTSettingsProvider extends SettingsPanel implements SettingsProvider {
-    //de/uka/ilkd/key/gui/smt/settings/messages.xml
-    public static final ResourceBundle BUNDLE
-            = ResourceBundle.getBundle("de.uka.ilkd.key.gui.smt.settings.messages");
+    // de/uka/ilkd/key/gui/smt/settings/messages.xml
+    public static final ResourceBundle BUNDLE =
+        ResourceBundle.getBundle("de.uka.ilkd.key.gui.smt.settings.messages");
 
     public static final String PROGRESS_MODE_USER = "PROGRESS_MODE_USER";
     public static final String PROGRESS_MODE_CLOSE = "PROGRESS_MODE_CLOSE";
@@ -95,65 +98,70 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createLocSetBoundField() {
-        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setLocsetBound(e));
+        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1,
+            BUNDLE.getString(INFO_BOUND),
+            e -> settings.setLocsetBound(e));
     }
 
     private JSpinner createMaxProcesses() {
         return addNumberField("Concurrent processes:",
-                0, Integer.MAX_VALUE, 1,
-                BUNDLE.getString(INFO_MAX_PROCESSES),
-                e -> settings.setMaxConcurrentProcesses(e));
+            0, Integer.MAX_VALUE, 1,
+            BUNDLE.getString(INFO_MAX_PROCESSES),
+            e -> settings.setMaxConcurrentProcesses(e));
     }
 
     private JSpinner createTimeoutField() {
-        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
-                e -> settings.setTimeout(e * 1000L));
+        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1,
+            BUNDLE.getString(INFO_TIMEOUT_FIELD),
+            e -> settings.setTimeout(e * 1000L));
     }
 
     private JSpinner createIntBoundField() {
-        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setIntBound(e));
+        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1,
+            BUNDLE.getString(INFO_BOUND),
+            e -> settings.setIntBound(e));
     }
 
     private JSpinner createSeqBoundField() {
         return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setSeqBound(e));
+            e -> settings.setSeqBound(e));
     }
 
     private JSpinner createObjectBoundField() {
-        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
-                e -> settings.setObjectBound(e));
+        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1,
+            BUNDLE.getString(INFO_BOUND),
+            e -> settings.setObjectBound(e));
     }
 
     private JComboBox<String> getProgressModeBox() {
         return addComboBox("", BUNDLE.getString(INFO_PROGRESS_MODE_BOX), 0,
-                e -> settings.setModeOfProgressDialog(ProgressMode.values()[progressModeBox.getSelectedIndex()]),
-                getProgressMode(ProgressMode.USER),
-                getProgressMode(ProgressMode.CLOSE));
+            e -> settings.setModeOfProgressDialog(
+                ProgressMode.values()[progressModeBox.getSelectedIndex()]),
+            getProgressMode(ProgressMode.USER),
+            getProgressMode(ProgressMode.CLOSE));
     }
 
     private JCheckBox createSolverSupportCheck() {
         return addCheckBox("Check for support when a solver is started",
-                BUNDLE.getString(INFO_CHECK_FOR_SUPPORT),
-                false,
-                e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
+            BUNDLE.getString(INFO_CHECK_FOR_SUPPORT),
+            false,
+            e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
     }
 
     private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:",
-                "", BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL),
-                true, e -> settings.setPathForSMTTranslation(saveToFilePanel.getText()));
+            "", BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL),
+            true, e -> settings.setPathForSMTTranslation(saveToFilePanel.getText()));
     }
 
     private String getProgressMode(ProgressMode index) {
         switch (index) {
-            case USER:
-                return BUNDLE.getString(PROGRESS_MODE_USER);
-            case CLOSE:
-                return BUNDLE.getString(PROGRESS_MODE_CLOSE);
-            case CLOSE_FIRST:
-                return BUNDLE.getString(PROGRESS_MODE_CLOSE_FIRST);
+        case USER:
+            return BUNDLE.getString(PROGRESS_MODE_USER);
+        case CLOSE:
+            return BUNDLE.getString(PROGRESS_MODE_CLOSE);
+        case CLOSE_FIRST:
+            return BUNDLE.getString(PROGRESS_MODE_CLOSE_FIRST);
         }
         return "";
     }

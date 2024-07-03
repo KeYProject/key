@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.nparser.varexp;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+import java.util.List;
 import javax.annotation.Nonnull;
 
-import java.util.List;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 /**
  * This interface describes a commands that manipulate
@@ -28,7 +32,8 @@ public interface TacletBuilderCommand {
      * For example, if you want describe a sub-type test (instanceOf)
      * you would need two sorts {@code new ArgumentType[]{SORT,SORT} } as arguments.
      * <p>
-     * The parse guarantees, that the types are suitable, when calling {@link #apply(TacletBuilder, Object[], List, boolean)}.
+     * The parse guarantees, that the types are suitable, when calling
+     * {@link #apply(TacletBuilder, Object[], List, boolean)}.
      * </p>
      *
      * @see ArgumentType
@@ -38,10 +43,12 @@ public interface TacletBuilderCommand {
     /**
      * Applying this command on the given taclet builder.
      * <p>
-     * During application, this method should alter, e.g., add a {@link de.uka.ilkd.key.rule.VariableCondition},
+     * During application, this method should alter, e.g., add a
+     * {@link de.uka.ilkd.key.rule.VariableCondition},
      * to the taclet builder.
      * <p>
      * The given arguments are well-typed for supplied {@link #getArgumentTypes()}.
      */
-    void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated);
+    void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters,
+            boolean negated);
 }

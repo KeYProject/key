@@ -1,4 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.io.consistency;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -8,16 +18,12 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.util.java.IOUtil;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.java.IOUtil;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,12 +44,13 @@ public class TestProofBundleIO {
      */
     @BeforeAll
     public static void prepare() {
-        testDir = Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
+        testDir =
+            Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
 
         // remember settings to be able to reset after the test
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE
-                                                    .getGeneralSettings()
-                                                    .isEnsureSourceConsistency();
+                .getGeneralSettings()
+                .isEnsureSourceConsistency();
     }
 
     /**
@@ -53,8 +60,8 @@ public class TestProofBundleIO {
     public static void cleanUp() {
         // reset the settings to value before test
         ProofIndependentSettings.DEFAULT_INSTANCE
-                                .getGeneralSettings()
-                                .setEnsureSourceConsistency(ensureConsistency);
+                .getGeneralSettings()
+                .setEnsureSourceConsistency(ensureConsistency);
     }
 
     /**
@@ -62,13 +69,16 @@ public class TestProofBundleIO {
      * Afterwards checks that the generated bundle is loadable again.
      * The *.key file includes bootclasspath and multiple classpath statements with *.java, *.class,
      * and *.zip files.
+     *
      * @throws Exception on errors (should not happen)
      */
     @Test
     public void testComplexBundleGeneration() throws Exception {
-        /* size of file should be about 22 kb,
+        /*
+         * size of file should be about 22 kb,
          * to be robust against small changes (or different compression),
-         * we check only for 10 kb -> not empty */
+         * we check only for 10 kb -> not empty
+         */
         Path zip = testBundleGeneration("complexBundleGeneration", 10000);
 
         // test that bundle is loadable again and proof is closed
@@ -85,13 +95,16 @@ public class TestProofBundleIO {
      * Afterwards checks that the generated bundle is loadable again and that it does not
      * contain unnecessary files (no classpath, no bootclasspath).
      * The *.key file only includes javaSource.
+     *
      * @throws Exception on errors (should not happen)
      */
     @Test
     public void testSimpleBundleGeneration() throws Exception {
-        /* size of file should be about 2.5 kb,
+        /*
+         * size of file should be about 2.5 kb,
          * to be robust against small changes (or different compression),
-         * we check only for 1 kb -> not empty */
+         * we check only for 1 kb -> not empty
+         */
         Path zip = testBundleGeneration("simpleBundleGeneration", 1000);
 
         // test that bundle is loadable again and proof is closed
@@ -114,13 +127,14 @@ public class TestProofBundleIO {
 
     /**
      * Tests that the SimpleFileRepo is able to save a proof as bundle (without consistency).
+     *
      * @throws IOException on I/O errors
      */
     @Test
     public void testSimpleFileRepo() throws IOException {
         ProofIndependentSettings.DEFAULT_INSTANCE
-                                .getGeneralSettings()
-                                .setEnsureSourceConsistency(false);
+                .getGeneralSettings()
+                .setEnsureSourceConsistency(false);
 
         AbstractFileRepo simple = new SimpleFileRepo();
         Path base = testDir.resolve("simpleBundleGeneration");
@@ -150,6 +164,7 @@ public class TestProofBundleIO {
 
     /**
      * Loads a proof from a bundle.
+     *
      * @param p the path of the bundle
      * @return the loaded proof (currently, only a single proof is supported)
      * @throws ProblemLoaderException if loading fails
@@ -166,11 +181,12 @@ public class TestProofBundleIO {
     /**
      * Helper method for tests. Does the following:
      * <ul>
-     *   <li> loads a *.key file
-     *   <li> tries to close the proof with auto mode
-     *   <li> saves proof as a bundle.
+     * <li>loads a *.key file
+     * <li>tries to close the proof with auto mode
+     * <li>saves proof as a bundle.
      * </ul>
      * The saved bundle is deleted afterwards.
+     *
      * @param dirName the name of the directory with test resources (expects a file test.key here)
      * @param expectedSize the minimal size (in bytes) the generated bundle should have
      * @throws Exception on errors (should not happen)
@@ -178,8 +194,8 @@ public class TestProofBundleIO {
     private Path testBundleGeneration(String dirName, long expectedSize) throws Exception {
         // we test DiskFileRepo here!
         ProofIndependentSettings.DEFAULT_INSTANCE
-                                .getGeneralSettings()
-                                .setEnsureSourceConsistency(true);
+                .getGeneralSettings()
+                .setEnsureSourceConsistency(true);
 
         Path path = testDir.resolve(dirName).resolve("test.key");
 

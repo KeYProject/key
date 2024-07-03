@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -17,33 +21,33 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class FormulaAddedByRuleFeature extends BinaryFeature {
 
     private final RuleFilter filter;
-    
-    private FormulaAddedByRuleFeature (RuleFilter p_filter) {
+
+    private FormulaAddedByRuleFeature(RuleFilter p_filter) {
         filter = p_filter;
     }
 
-    public static Feature create (RuleFilter p_filter) {
-        return new FormulaAddedByRuleFeature ( p_filter );
+    public static Feature create(RuleFilter p_filter) {
+        return new FormulaAddedByRuleFeature(p_filter);
     }
 
-    public boolean filter (RuleApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final SequentFormula cfma = pos.sequentFormula ();
-        final boolean antec = pos.isInAntec ();
-        
-        Node node = goal.node ();
-        
-        while ( !node.root () ) {
-            final Node par = node.parent ();
-            final Sequent pseq = par.sequent ();
+        final SequentFormula cfma = pos.sequentFormula();
+        final boolean antec = pos.isInAntec();
 
-            if ( !( antec ? pseq.antecedent () : pseq.succedent () ).contains ( cfma ) )
-                return filter.filter ( par.getAppliedRuleApp ().rule () );
-            
+        Node node = goal.node();
+
+        while (!node.root()) {
+            final Node par = node.parent();
+            final Sequent pseq = par.sequent();
+
+            if (!(antec ? pseq.antecedent() : pseq.succedent()).contains(cfma))
+                return filter.filter(par.getAppliedRuleApp().rule());
+
             node = par;
         }
-        
+
         return false;
     }
 

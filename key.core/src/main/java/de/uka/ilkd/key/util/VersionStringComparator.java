@@ -1,14 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util;
 
 import java.util.Comparator;
 
 /**
  * Compares Strings by integer values of 'dot' separated components.
+ *
  * @author bruns
  *
  */
 public class VersionStringComparator implements Comparator<String> {
-    
+
     private final static String SEPARATOR_PATTERN = "\\D";
 
     private final LexicographicComparator<Integer> lxc = new LexicographicComparator<Integer>();
@@ -26,12 +31,11 @@ public class VersionStringComparator implements Comparator<String> {
                 r[i] = parseInt(p[i]);
             }
             return r;
-        }
-        else {
+        } else {
             return new Integer[0];
         }
     }
-    
+
     private static Integer parseInt(String s) {
         try {
             return Integer.parseInt(s);

@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -16,6 +17,9 @@ import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two
  * locations are assigned different values in the states, the value in the
@@ -23,12 +27,13 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * precision. In contrast to the {@link MergeByIfThenElse} rule, the distinction is
  * not realized in the update / symbolic state, but in the antecedent / path
  * condition. This can be much more efficient.
- * 
+ *
  * @author Dominic Scheurer
  * @see MergeByIfThenElse
  * @see MergeRule
  */
-public class MergeIfThenElseAntecedent extends MergeProcedure implements UnparametricMergeProcedure {
+public class MergeIfThenElseAntecedent extends MergeProcedure
+        implements UnparametricMergeProcedure {
 
     private static MergeIfThenElseAntecedent INSTANCE = null;
 
@@ -43,7 +48,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure implements Unparam
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.rule.merge.MergeProcedure#complete()
      */
     @Override
@@ -60,19 +65,20 @@ public class MergeIfThenElseAntecedent extends MergeProcedure implements Unparam
         final TermBuilder tb = services.getTermBuilder();
 
         Function newSkolemConst =
-                MergeRuleUtils.getNewSkolemConstantForPrefix(v.op().name()
-                        .toString(), v.sort(), services);
+            MergeRuleUtils.getNewSkolemConstantForPrefix(v.op().name()
+                    .toString(),
+                v.sort(), services);
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         newNames.add(newSkolemConst.name());
 
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
         newConstraints =
-                newConstraints.union(getIfThenElseConstraints(
-                        tb.func(newSkolemConst), valueInState1, valueInState2,
-                        state1, state2, distinguishingFormula, services));
+            newConstraints.union(getIfThenElseConstraints(
+                tb.func(newSkolemConst), valueInState1, valueInState2,
+                state1, state2, distinguishingFormula, services));
 
         return new ValuesMergeResult(newConstraints, tb.func(newSkolemConst),
-                newNames, new LinkedHashSet<Term>());
+            newNames, new LinkedHashSet<Term>());
 
     }
 
@@ -84,22 +90,22 @@ public class MergeIfThenElseAntecedent extends MergeProcedure implements Unparam
     /**
      * Returns a list of if-then-else constraints for the given constrained
      * term, states and if/else terms.
-     * 
+     *
      * @param constrained
-     *            The constrained term.
+     *        The constrained term.
      * @param ifTerm
-     *            The value for the if case.
+     *        The value for the if case.
      * @param elseTerm
-     *            The value for the else case.
+     *        The value for the else case.
      * @param state1
-     *            First SE state ("if").
+     *        First SE state ("if").
      * @param state2
-     *            Second SE state ("else").
+     *        Second SE state ("else").
      * @param distinguishingFormula
-     *            The user-specified distinguishing formula. May be null (for
-     *            automatic generation).
+     *        The user-specified distinguishing formula. May be null (for
+     *        automatic generation).
      * @param services
-     *            The services object.
+     *        The services object.
      * @return A list of if-then-else constraints for the given constrained
      *         term, states and if/else terms.
      */
@@ -113,8 +119,8 @@ public class MergeIfThenElseAntecedent extends MergeProcedure implements Unparam
 
         if (distinguishingFormula == null) {
             final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-                    MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1,
-                            state2, ifTerm, elseTerm, services);
+                MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1,
+                    state2, ifTerm, elseTerm, services);
 
             final Term cond = distFormAndRightSidesForITEUpd.first;
             final Term ifForm = distFormAndRightSidesForITEUpd.second;
@@ -133,14 +139,13 @@ public class MergeIfThenElseAntecedent extends MergeProcedure implements Unparam
                     .equals(constrained) && isSwapped)) {
                 result = result.add(tb.or(cond, varEqualsElseForm));
             }
-        }
-        else {
+        } else {
             final Term varEqualsIfForm = tb.equals(constrained, ifTerm);
             final Term varEqualsElseForm = tb.equals(constrained, elseTerm);
 
             result = result.add(tb.imp(distinguishingFormula, varEqualsIfForm));
             result =
-                    result.add(tb.or(distinguishingFormula, varEqualsElseForm));
+                result.add(tb.or(distinguishingFormula, varEqualsElseForm));
         }
 
         return result;

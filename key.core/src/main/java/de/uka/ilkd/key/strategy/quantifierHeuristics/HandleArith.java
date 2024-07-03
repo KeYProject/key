@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.LRUCache;
+package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -14,6 +16,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.util.LRUCache;
+
 /**
  * This class is used to prove some simple arithmetic problem which are
  * a==b, a>=b, a<=b; Besides it can be used to prove that a>=b or a<=b by
@@ -22,7 +26,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class HandleArith {
 
-    private HandleArith() { }
+    private HandleArith() {}
 
     /**
      * try to prove atom by using polynomial
@@ -36,7 +40,7 @@ public class HandleArith {
         final LRUCache<Term, Term> provedByArithCache = services.getCaches()
                 .getProvedByArithFstCache();
         Term result;
-        synchronized(provedByArithCache) {
+        synchronized (provedByArithCache) {
             result = provedByArithCache.get(problem);
         }
         if (result != null) {
@@ -49,20 +53,20 @@ public class HandleArith {
         final Term trueT = tb.tt();
         final Term falseT = tb.ff();
 
-        final Term arithTerm = formatArithTerm (problem, tb, integerLDT, services.getCaches());
-        if (arithTerm.equalsModIrrelevantTermLabels (falseT)) {
-            result = provedArithEqual (problem, tb, services);
+        final Term arithTerm = formatArithTerm(problem, tb, integerLDT, services.getCaches());
+        if (arithTerm.equalsModIrrelevantTermLabels(falseT)) {
+            result = provedArithEqual(problem, tb, services);
             putInTermCache(provedByArithCache, problem, result);
             return result;
         }
-        Polynomial poly1 = Polynomial.create (arithTerm.sub (0), services);
-        Polynomial poly2 = Polynomial.create (arithTerm.sub (1), services);
+        Polynomial poly1 = Polynomial.create(arithTerm.sub(0), services);
+        Polynomial poly2 = Polynomial.create(arithTerm.sub(1), services);
 
-        if (poly2.valueLeq (poly1)) {
+        if (poly2.valueLeq(poly1)) {
             putInTermCache(provedByArithCache, problem, trueT);
             return trueT;
         }
-        if (poly1.valueLess (poly2)) {
+        if (poly1.valueLess(poly2)) {
             putInTermCache(provedByArithCache, problem, falseT);
             return falseT;
         }
@@ -74,7 +78,7 @@ public class HandleArith {
 
     private static void putInTermCache(final LRUCache<Term, Term> provedByArithCache,
             final Term key, final Term value) {
-        synchronized(provedByArithCache) {
+        synchronized (provedByArithCache) {
             provedByArithCache.put(key, value);
         }
     }
@@ -90,20 +94,20 @@ public class HandleArith {
 
         boolean temp = true;
         Term pro = problem;
-        Operator op = pro.op ();
+        Operator op = pro.op();
         // may be here we should check wehre sub0 and sub1 is integer.
         while (op == Junctor.NOT) {
-            pro = pro.sub (0);
-            op = pro.op ();
+            pro = pro.sub(0);
+            op = pro.op();
             temp = !temp;
         }
         if (op == Equality.EQUALS) {
-            Term sub0 = pro.sub (0);
-            Term sub1 = pro.sub (1);
-            Polynomial poly1 = Polynomial.create (sub0, services);
-            Polynomial poly2 = Polynomial.create (sub1, services);
-            boolean gt = poly2.valueLeq (poly1);
-            boolean lt = poly1.valueLeq (poly2);
+            Term sub0 = pro.sub(0);
+            Term sub1 = pro.sub(1);
+            Polynomial poly1 = Polynomial.create(sub0, services);
+            Polynomial poly2 = Polynomial.create(sub1, services);
+            boolean gt = poly2.valueLeq(poly1);
+            boolean lt = poly1.valueLeq(poly2);
             if (gt && lt) {
                 return temp ? trueT : falseT;
             }
@@ -128,7 +132,7 @@ public class HandleArith {
     public static Term provedByArith(Term problem, Term axiom, Services services) {
         final Pair<Term, Term> key = new Pair<Term, Term>(problem, axiom);
         final LRUCache<Pair<Term, Term>, Term> provedByArithCache =
-                services.getCaches().getProvedByArithSndCache();
+            services.getCaches().getProvedByArithSndCache();
         Term result;
         synchronized (provedByArithCache) {
             result = provedByArithCache.get(key);
@@ -138,11 +142,11 @@ public class HandleArith {
         }
 
         final TermBuilder tb = services.getTermBuilder();
-        final IntegerLDT integerLDT = services.getTypeConverter ().getIntegerLDT ();
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final ServiceCaches caches = services.getCaches();
 
-        final Term cd = formatArithTerm (problem, tb, integerLDT, caches);
-        final Term ab = formatArithTerm (axiom, tb, integerLDT, caches);
+        final Term cd = formatArithTerm(problem, tb, integerLDT, caches);
+        final Term ab = formatArithTerm(axiom, tb, integerLDT, caches);
         final Term trueT = tb.tt();
         final Term falseT = tb.ff();
 
@@ -153,19 +157,19 @@ public class HandleArith {
             return problem;
         }
         Function addfun = integerLDT.getAdd();
-        Term arithTerm = tb.geq (tb.func (addfun, cd.sub (0), ab.sub (1)),
-                tb.func (addfun, ab.sub (0), cd.sub(1)));
-        Term res = provedByArith (arithTerm, services);
+        Term arithTerm = tb.geq(tb.func(addfun, cd.sub(0), ab.sub(1)),
+            tb.func(addfun, ab.sub(0), cd.sub(1)));
+        Term res = provedByArith(arithTerm, services);
         if (res.op() == Junctor.TRUE) {
             synchronized (provedByArithCache) {
                 provedByArithCache.put(key, trueT);
             }
             return trueT;
         }
-        Term t0 = formatArithTerm (tb.not (problem), tb, integerLDT, caches);
-        arithTerm = tb.geq (tb.func (addfun, t0.sub (0), ab.sub (1)),
-                tb.func (addfun, ab.sub (0), t0.sub (1)));
-        res = provedByArith (arithTerm, services);
+        Term t0 = formatArithTerm(tb.not(problem), tb, integerLDT, caches);
+        arithTerm = tb.geq(tb.func(addfun, t0.sub(0), ab.sub(1)),
+            tb.func(addfun, ab.sub(0), t0.sub(1)));
+        res = provedByArith(arithTerm, services);
         if (res.op() == Junctor.TRUE) {
             synchronized (provedByArithCache) {
                 provedByArithCache.put(key, falseT);
@@ -186,7 +190,8 @@ public class HandleArith {
      * @param problem
      * @return falseT if <code>term</code>'s operator is not >= or <=
      */
-    private static Term formatArithTerm(final Term problem, TermBuilder tb, IntegerLDT ig, ServiceCaches caches) {
+    private static Term formatArithTerm(final Term problem, TermBuilder tb, IntegerLDT ig,
+            ServiceCaches caches) {
         final LRUCache<Term, Term> formattedTermCache = caches.getFormattedTermCache();
         Term pro;
         synchronized (formattedTermCache) {
@@ -197,33 +202,33 @@ public class HandleArith {
         }
 
         pro = problem;
-        Operator op = pro.op ();
+        Operator op = pro.op();
         boolean opNot = false;
         while (op == Junctor.NOT) {
             opNot = !opNot;
-            pro = pro.sub (0);
-            op = pro.op ();
+            pro = pro.sub(0);
+            op = pro.op();
         }
-        final Function geq = ig.getGreaterOrEquals ();
-        final Function leq = ig.getLessOrEquals ();
+        final Function geq = ig.getGreaterOrEquals();
+        final Function leq = ig.getLessOrEquals();
         final Term falseT = tb.ff();
 
-        if(op == geq) {
+        if (op == geq) {
             if (opNot) {
-                pro = tb.geq (pro.sub (1),
-                        tb.func (ig.getAdd(),
-                                pro.sub (0),
-                                ig.one()));
+                pro = tb.geq(pro.sub(1),
+                    tb.func(ig.getAdd(),
+                        pro.sub(0),
+                        ig.one()));
             }
         } else {
             if (op == leq) {
                 if (opNot) {
-                    pro = tb.geq (pro.sub (0),
-                            tb.func (ig.getAdd (),
-                                    pro.sub (1),
-                                    ig.one()));
+                    pro = tb.geq(pro.sub(0),
+                        tb.func(ig.getAdd(),
+                            pro.sub(1),
+                            ig.one()));
                 } else {
-                    pro = tb.geq (pro.sub (1), pro.sub (0));
+                    pro = tb.geq(pro.sub(1), pro.sub(0));
                 }
             } else {
                 pro = falseT;

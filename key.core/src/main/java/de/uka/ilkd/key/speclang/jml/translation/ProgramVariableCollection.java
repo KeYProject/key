@@ -1,15 +1,16 @@
-/**
- *
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A collection of all program variables needed to translate a textual JML specification case.
@@ -61,18 +62,18 @@ public class ProgramVariableCollection {
      * Create a collection containing the specified variables.
      *
      * @param selfVar
-     *            {@code self}
+     *        {@code self}
      * @param paramVars
-     *            the list of method parameters if the textual specification case is a method
-     *            contract.
+     *        the list of method parameters if the textual specification case is a method
+     *        contract.
      * @param resultVar
-     *            {@code result}
+     *        {@code result}
      * @param excVar
-     *            {@code exception}
+     *        {@code exception}
      * @param atPreVars
-     *            a map from every variable {@code var} to {@code \old(var)}.
+     *        a map from every variable {@code var} to {@code \old(var)}.
      * @param atPres
-     *            a map from every variable {@code var} to {@code \old(var)}.
+     *        a map from every variable {@code var} to {@code \old(var)}.
      */
     public ProgramVariableCollection(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
@@ -85,22 +86,22 @@ public class ProgramVariableCollection {
      * Create a collection containing the specified variables.
      *
      * @param selfVar
-     *            {@code self}
+     *        {@code self}
      * @param paramVars
-     *            the list of method parameters if the textual specification case is a method
-     *            contract.
+     *        the list of method parameters if the textual specification case is a method
+     *        contract.
      * @param resultVar
-     *            {@code result}
+     *        {@code result}
      * @param excVar
-     *            {@code exception}
+     *        {@code exception}
      * @param atPreVars
-     *            a map from every variable {@code var} to {@code \old(var)}.
+     *        a map from every variable {@code var} to {@code \old(var)}.
      * @param atPres
-     *            a map from every variable {@code var} to {@code \old(var)}.
+     *        a map from every variable {@code var} to {@code \old(var)}.
      * @param atBeforeVars
-     *            a map from every variable {@code var} to {@code \before(var)} (if applicable).
+     *        a map from every variable {@code var} to {@code \before(var)} (if applicable).
      * @param atBefores
-     *            a map from every variable {@code var} to {@code \before(var)} (if applicable).
+     *        a map from every variable {@code var} to {@code \before(var)} (if applicable).
      */
     public ProgramVariableCollection(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,

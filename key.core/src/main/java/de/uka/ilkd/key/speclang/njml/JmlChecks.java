@@ -1,13 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.speclang.PositionedString;
-import org.antlr.v4.runtime.ParserRuleContext;
-
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Facade for implementing syntactical JML syntax checks.
@@ -32,10 +37,11 @@ public final class JmlChecks {
      * Returns a list of currently registered JML checks.
      */
     public static List<JmlCheck> getJmlChecks() {
-        //secure internal copy
+        // secure internal copy
         return new ArrayList<>(jmlChecks);
     }
 }
+
 
 class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
     private final List<PositionedString> warnings = new LinkedList<>();
@@ -49,12 +55,12 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
 
     protected void addWarning(ParserRuleContext ctx, String text) {
         PositionedString ps = new PositionedString(text,
-                ctx.start.getTokenSource().getSourceName(),
-                new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine())
-        );
+            ctx.start.getTokenSource().getSourceName(),
+            new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
         warnings.add(ps);
     }
 }
+
 
 /**
  * This check tests warns if a {@code requires} clause follows a non-{@code requires} clause.
@@ -78,8 +84,9 @@ class JmlWarnDifferentRequiresSemantics extends AbstractCheck implements JmlChec
 
             if (isRequiresClause(clause) && otherClause) {
                 addWarning(clause,
-                        "Diverging Semantics form JML Reference: Requires does not initiate a new contract. " +
-                                "See https://www.key-project.org/docs/user/JMLGrammar/#TODO");
+                    "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
+                        +
+                        "See https://www.key-project.org/docs/user/JMLGrammar/#TODO");
             }
         }
     }

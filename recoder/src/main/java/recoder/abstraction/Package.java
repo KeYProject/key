@@ -1,13 +1,16 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.abstraction;
+
+import java.util.List;
 
 import recoder.ModelException;
 import recoder.bytecode.ClassFile;
 import recoder.java.CompilationUnit;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * A program model element representing packages.
@@ -26,7 +29,7 @@ public class Package implements ClassTypeContainer {
      * model info.
      *
      * @param name the name of the package.
-     * @param pmi  the program model info responsible for this package.
+     * @param pmi the program model info responsible for this package.
      */
     public Package(String name, ProgramModelInfo pmi) {
         Debug.assertNonnull(name);
@@ -90,11 +93,13 @@ public class Package implements ClassTypeContainer {
      * @since 0.80
      */
     public List<? extends AnnotationUse> getPackageAnnotations() {
-        CompilationUnit cl = pmi.getServiceConfiguration().getSourceFileRepository().getCompilationUnit(getFullName() + ".package-info");
+        CompilationUnit cl = pmi.getServiceConfiguration().getSourceFileRepository()
+                .getCompilationUnit(getFullName() + ".package-info");
         if (cl != null) {
             return cl.getPackageSpecification().getAnnotations();
         }
-        ClassFile cf = pmi.getServiceConfiguration().getClassFileRepository().getClassFile(getFullName() + ".package-info");
+        ClassFile cf = pmi.getServiceConfiguration().getClassFileRepository()
+                .getClassFile(getFullName() + ".package-info");
         if (cf != null) {
             return cf.getAnnotations();
         }

@@ -1,11 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 import java.util.Iterator;
-
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -15,6 +15,10 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Class for analysing and modifying monomial expressions over the integers
@@ -29,8 +33,8 @@ public class Monomial {
         this.coefficient = coefficient;
     }
 
-    public static final Monomial ONE = new Monomial ( ImmutableSLList.<Term>nil(),
-                                                      BigInteger.ONE );
+    public static final Monomial ONE = new Monomial(ImmutableSLList.<Term>nil(),
+        BigInteger.ONE);
 
     public static Monomial create(Term monoTerm, Services services) {
         final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
@@ -38,52 +42,54 @@ public class Monomial {
         Monomial res;
 
         synchronized (monomialCache) {
-            res = monomialCache.get ( monoTerm );
+            res = monomialCache.get(monoTerm);
         }
 
-        if ( res == null ) {
-            res = createHelp ( monoTerm, services );
+        if (res == null) {
+            res = createHelp(monoTerm, services);
             synchronized (monomialCache) {
-                monomialCache.put ( monoTerm, res );
+                monomialCache.put(monoTerm, res);
             }
         }
         return res;
     }
 
     private static Monomial createHelp(Term monomial, Services services) {
-        final Analyser a = new Analyser ( services );
-        a.analyse ( monomial );
-        return new Monomial ( a.parts, a.coeff );
+        final Analyser a = new Analyser(services);
+        a.analyse(monomial);
+        return new Monomial(a.parts, a.coeff);
     }
 
     public Monomial setCoefficient(BigInteger c) {
-        return new Monomial ( parts, c );
+        return new Monomial(parts, c);
     }
 
     public Monomial multiply(BigInteger c) {
-        return new Monomial ( parts, coefficient.multiply ( c ) );
+        return new Monomial(parts, coefficient.multiply(c));
     }
 
     public Monomial multiply(Monomial m) {
-        return new Monomial ( parts.prepend ( m.parts ),
-                              coefficient.multiply ( m.coefficient ) );
+        return new Monomial(parts.prepend(m.parts),
+            coefficient.multiply(m.coefficient));
     }
 
     public Monomial addToCoefficient(BigInteger c) {
-        return new Monomial ( parts, coefficient.add ( c ) );
+        return new Monomial(parts, coefficient.add(c));
     }
 
     /**
      * @return true iff the monomial <code>this</code> divides the monomial
      *         <code>m</code>
      */
-    public boolean divides (Monomial m) {
-        if ( m.coefficient.signum () == 0 ) return true;
-        if ( this.coefficient.signum () == 0 ) return false;
-        if ( m.coefficient.remainder ( this.coefficient ).signum () != 0 )
-                return false;
+    public boolean divides(Monomial m) {
+        if (m.coefficient.signum() == 0)
+            return true;
+        if (this.coefficient.signum() == 0)
+            return false;
+        if (m.coefficient.remainder(this.coefficient).signum() != 0)
+            return false;
 
-        return difference ( this.parts, m.parts ).isEmpty ();
+        return difference(this.parts, m.parts).isEmpty();
     }
 
     /**
@@ -93,17 +99,17 @@ public class Monomial {
      *         in <code>this</code>
      */
     public boolean variablesSubsume(Monomial m) {
-        return this.parts.size () >= m.parts.size ()
-               && difference ( m.parts, this.parts ).isEmpty ();
+        return this.parts.size() >= m.parts.size()
+                && difference(m.parts, this.parts).isEmpty();
     }
 
     public boolean variablesEqual(Monomial m) {
-        return this.parts.size () == m.parts.size ()
-               && this.variablesSubsume ( m );
+        return this.parts.size() == m.parts.size()
+                && this.variablesSubsume(m);
     }
 
     public boolean variablesDisjoint(Monomial m) {
-        return difference ( m.parts, this.parts ).size () == m.parts.size ();
+        return difference(m.parts, this.parts).size() == m.parts.size();
     }
 
     /**
@@ -114,11 +120,11 @@ public class Monomial {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
 
-        if ( LexPathOrdering.compare ( a.add ( c ), a ) >= 0
-             && LexPathOrdering.compare ( a.subtract ( c ), a ) >= 0 )
+        if (LexPathOrdering.compare(a.add(c), a) >= 0
+                && LexPathOrdering.compare(a.subtract(c), a) >= 0)
             return false;
 
-        return difference ( this.parts, m.parts ).isEmpty ();
+        return difference(this.parts, m.parts).isEmpty();
     }
 
     /**
@@ -129,11 +135,11 @@ public class Monomial {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
 
-        if ( a.signum () == 0 || c.signum () == 0 )
-            return new Monomial ( ImmutableSLList.<Term>nil(), BigInteger.ZERO );
+        if (a.signum() == 0 || c.signum() == 0)
+            return new Monomial(ImmutableSLList.<Term>nil(), BigInteger.ZERO);
 
-        return new Monomial ( difference ( m.parts, this.parts ),
-                              LexPathOrdering.divide ( a, c ) );
+        return new Monomial(difference(m.parts, this.parts),
+            LexPathOrdering.divide(a, c));
     }
 
     /**
@@ -142,35 +148,35 @@ public class Monomial {
      *         <code>this</code>
      */
     public Monomial divideLCR(Monomial m) {
-        Debug.assertFalse ( coefficient.signum () == 0 );
-        Debug.assertFalse ( m.coefficient.signum () == 0 );
+        Debug.assertFalse(coefficient.signum() == 0);
+        Debug.assertFalse(m.coefficient.signum() == 0);
 
-        final ImmutableList<Term> newParts = difference ( m.parts, this.parts );
+        final ImmutableList<Term> newParts = difference(m.parts, this.parts);
 
-        final BigInteger gcd = coefficient.abs ().gcd ( m.coefficient.abs () );
-        return new Monomial ( newParts, m.coefficient.divide ( gcd ) );
+        final BigInteger gcd = coefficient.abs().gcd(m.coefficient.abs());
+        return new Monomial(newParts, m.coefficient.divide(gcd));
 
         /*
-         The code for groebner bases over the integers. We do not use that
-         anymore and instead compute groebner bases over the rationals
-         (using pseudo-reduction)
-
-        // in case one the coefficient of one of the monomials divides the other
-        // coefficient: simply make sure that the leading terms cancel out each
-        // other. this makes the whole algorithm a bit more robust concerning
-        // signs
-        if ( coefficient.remainder ( m.coefficient ).signum () == 0 )
-            return new Monomial ( newParts, BigInteger.ONE );
-        if ( m.coefficient.remainder ( coefficient ).signum () == 0 )
-            return new Monomial ( newParts, m.coefficient.divide ( coefficient ) );
-
-        BigInteger cofactor = cofactor ( coefficient, m.coefficient );
-        // (any)one of the two cofactors has to be negated
-        if ( coefficient.compareTo ( m.coefficient ) < 0 )
-            cofactor = cofactor.negate ();
-
-        return new Monomial ( newParts, cofactor );
-        */
+         * The code for groebner bases over the integers. We do not use that
+         * anymore and instead compute groebner bases over the rationals
+         * (using pseudo-reduction)
+         *
+         * // in case one the coefficient of one of the monomials divides the other
+         * // coefficient: simply make sure that the leading terms cancel out each
+         * // other. this makes the whole algorithm a bit more robust concerning
+         * // signs
+         * if ( coefficient.remainder ( m.coefficient ).signum () == 0 )
+         * return new Monomial ( newParts, BigInteger.ONE );
+         * if ( m.coefficient.remainder ( coefficient ).signum () == 0 )
+         * return new Monomial ( newParts, m.coefficient.divide ( coefficient ) );
+         *
+         * BigInteger cofactor = cofactor ( coefficient, m.coefficient );
+         * // (any)one of the two cofactors has to be negated
+         * if ( coefficient.compareTo ( m.coefficient ) < 0 )
+         * cofactor = cofactor.negate ();
+         *
+         * return new Monomial ( newParts, cofactor );
+         */
     }
 
     /**
@@ -179,55 +185,57 @@ public class Monomial {
      */
     @SuppressWarnings("unused")
     private BigInteger cofactor(BigInteger v0, BigInteger v1) {
-        final boolean neg = v0.signum () < 0;
-        v0 = v0.abs ();
-        v1 = v1.abs ();
+        final boolean neg = v0.signum() < 0;
+        v0 = v0.abs();
+        v1 = v1.abs();
         BigInteger c0 = BigInteger.ONE;
         BigInteger c1 = BigInteger.ZERO;
-        while ( v1.signum () != 0 ) {
-            final BigInteger[] divRem = v0.divideAndRemainder ( v1 );
+        while (v1.signum() != 0) {
+            final BigInteger[] divRem = v0.divideAndRemainder(v1);
             v0 = v1;
             v1 = divRem[1];
-            final BigInteger newC = c0.subtract ( c1.multiply ( divRem[0] ) );
+            final BigInteger newC = c0.subtract(c1.multiply(divRem[0]));
             c0 = c1;
             c1 = newC;
         }
-        if ( neg ) return c0.negate ();
+        if (neg)
+            return c0.negate();
         return c0;
     }
 
 
-    public Term toTerm (Services services) {
+    public Term toTerm(Services services) {
         final Operator mul =
-	    services.getTypeConverter().getIntegerLDT().getMul();
+            services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
 
-        final Iterator<Term> it = parts.iterator ();
-        if ( it.hasNext () ) {
-            res = it.next ();
-            while ( it.hasNext () )
-                res = services.getTermFactory().createTerm ( mul, res,
-                                                               it.next () );
+        final Iterator<Term> it = parts.iterator();
+        if (it.hasNext()) {
+            res = it.next();
+            while (it.hasNext())
+                res = services.getTermFactory().createTerm(mul, res,
+                    it.next());
         }
 
         final Term cTerm = services.getTermBuilder().zTerm(coefficient.toString());
 
-        if ( res == null )
+        if (res == null)
             res = cTerm;
-        else if ( !BigInteger.ONE.equals ( coefficient ) )
-            res = services.getTermFactory().createTerm ( mul, res, cTerm );
+        else if (!BigInteger.ONE.equals(coefficient))
+            res = services.getTermFactory().createTerm(mul, res, cTerm);
 
         return res;
     }
 
     @Override
     public String toString() {
-        final StringBuffer res = new StringBuffer ();
-        res.append ( coefficient );
+        final StringBuffer res = new StringBuffer();
+        res.append(coefficient);
 
-        for (Term part : parts) res.append(" * ").append(part);
+        for (Term part : parts)
+            res.append(" * ").append(part);
 
-        return res.toString ();
+        return res.toString();
     }
 
     private static class Analyser {
@@ -238,22 +246,22 @@ public class Monomial {
 
         public Analyser(final Services services) {
             this.services = services;
-	    final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+            final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             numbers = integerLDT.getNumberSymbol();
-            mul     = integerLDT.getMul();
+            mul = integerLDT.getMul();
         }
 
         public void analyse(Term monomial) {
-            if ( monomial.op () == mul ) {
-                analyse ( monomial.sub ( 0 ) );
-                analyse ( monomial.sub ( 1 ) );
-            } else if ( monomial.op () == numbers ) {
+            if (monomial.op() == mul) {
+                analyse(monomial.sub(0));
+                analyse(monomial.sub(1));
+            } else if (monomial.op() == numbers) {
                 final BigInteger c =
-                    new BigInteger ( AbstractTermTransformer
-                                     .convertToDecimalString ( monomial, services ) );
-                coeff = coeff.multiply ( c );
+                    new BigInteger(AbstractTermTransformer
+                            .convertToDecimalString(monomial, services));
+                coeff = coeff.multiply(c);
             } else {
-                parts = parts.prepend ( monomial );
+                parts = parts.prepend(monomial);
             }
         }
     }
@@ -261,21 +269,26 @@ public class Monomial {
 
     @Override
     public boolean equals(Object o) {
-        if ( o == this ) return true;
+        if (o == this)
+            return true;
 
-        if ( ! ( o instanceof Monomial ) ) return false;
+        if (!(o instanceof Monomial))
+            return false;
 
-        final Monomial m = (Monomial)o;
+        final Monomial m = (Monomial) o;
 
-        if ( !coefficient.equals ( m.coefficient ) ) return false;
-        if ( parts.size () != m.parts.size () ) return false;
-        return difference ( parts, m.parts ).isEmpty ();
+        if (!coefficient.equals(m.coefficient))
+            return false;
+        if (parts.size() != m.parts.size())
+            return false;
+        return difference(parts, m.parts).isEmpty();
     }
 
     @Override
     public int hashCode() {
-        int res = coefficient.hashCode ();
-        for (Term part : parts) res += part.hashCode();
+        int res = coefficient.hashCode();
+        for (Term part : parts)
+            res += part.hashCode();
         return res;
     }
 
@@ -286,9 +299,9 @@ public class Monomial {
      */
     private static ImmutableList<Term> difference(ImmutableList<Term> a, ImmutableList<Term> b) {
         ImmutableList<Term> res = a;
-        final Iterator<Term> it = b.iterator ();
-        while ( it.hasNext () && !res.isEmpty () )
-            res = res.removeFirst ( it.next () );
+        final Iterator<Term> it = b.iterator();
+        while (it.hasNext() && !res.isEmpty())
+            res = res.removeFirst(it.next());
         return res;
     }
 
@@ -301,7 +314,7 @@ public class Monomial {
     }
 
     public boolean variablesAreCoprime(Monomial m) {
-        return difference ( parts, m.parts ).equals ( parts );
+        return difference(parts, m.parts).equals(parts);
     }
 
 }

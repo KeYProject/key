@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
@@ -6,7 +10,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.MouseListener;
 import java.util.List;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
@@ -31,16 +34,16 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
  * {@link AbstractAuxiliaryContractRule}.
  *
  * @param <T>
- * 
+ *
  * @see AuxiliaryContractConfigurator
  * @see BlockContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
  * @see LoopContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
  */
 public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContract>
         extends JPanel {
-    
+
     private static final long serialVersionUID = 129743953718747490L;
-    
+
     protected final Services services;
     protected final JList<T> contractList;
     private final TitledBorder border;
@@ -50,7 +53,7 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
 
-        //create scroll pane
+        // create scroll pane
         JScrollPane scrollPane = new JScrollPane();
         border = new TitledBorder("Contracts");
         scrollPane.setBorder(border);
@@ -59,15 +62,15 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
         scrollPane.setMinimumSize(scrollPaneDim);
         add(scrollPane);
 
-        //create contract list
+        // create contract list
         contractList = new JList<T>();
         contractList.setSelectionMode(
-                multipleSelection
-                        ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
-                        : ListSelectionModel.SINGLE_SELECTION);
+            multipleSelection
+                    ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
+                    : ListSelectionModel.SINGLE_SELECTION);
         contractList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                if(contractList.isSelectionEmpty()) {
+                if (contractList.isSelectionEmpty()) {
                     contractList.setSelectedIndex(e.getFirstIndex());
                 }
             }
@@ -85,14 +88,13 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
                     boolean cellHasFocus) {
                 @SuppressWarnings("unchecked")
                 T contract = (T) value;
-                Component supComp
-                        = super.getListCellRendererComponent(list,
-                        value,
-                        index,
-                        isSelected,
-                        cellHasFocus);
+                Component supComp = super.getListCellRendererComponent(list,
+                    value,
+                    index,
+                    isSelected,
+                    cellHasFocus);
 
-                //create label and enclosing panel
+                // create label and enclosing panel
                 JLabel label = new JLabel();
                 label.setText(contract.getHtmlText(serv));
                 label.setFont(PLAINFONT);
@@ -102,13 +104,13 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
                 result.add(label);
                 label.setVerticalAlignment(SwingConstants.TOP);
 
-                //set background color
+                // set background color
                 result.setBackground(supComp.getBackground());
 
-                //set border
+                // set border
                 TitledBorder border = new TitledBorder(
-                        BorderFactory.createEtchedBorder(),
-                        contract.getDisplayName());
+                    BorderFactory.createEtchedBorder(),
+                    contract.getDisplayName());
 
                 Font borderFont = border.getTitleFont();
                 if (borderFont == null) { // MS Windows issues

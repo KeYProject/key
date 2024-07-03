@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.st;
 
-import de.uka.ilkd.key.smt.VersionChecker;
-
 import java.io.File;
+
+import de.uka.ilkd.key.smt.VersionChecker;
 
 /**
  * @author Alexander Weigl
@@ -37,7 +41,7 @@ abstract class AbstractSolverType implements SolverType {
      * check, if this solver is installed and can be used.
      *
      * @param recheck if false, the solver is not checked again, if a cached
-     *                value for this exists.
+     *        value for this exists.
      * @return true, if it is installed.
      */
     @Override

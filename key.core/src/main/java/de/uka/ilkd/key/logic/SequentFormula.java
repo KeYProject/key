@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -20,40 +24,44 @@ public class SequentFormula {
 
     private final int hashCode;
 
-    /** creates a new SequentFormula
+    /**
+     * creates a new SequentFormula
+     *
      * @param term a Term of sort Sort.FORMULA
      */
     public SequentFormula(Term term) {
-	if (term.sort() != Sort.FORMULA && term.sort() != AbstractTermTransformer.METASORT) {
-	    throw new RuntimeException("A Term instead of a formula: " + term);
-	}
-	this.term = term;
-	this.hashCode = term.hashCode () * 13;
+        if (term.sort() != Sort.FORMULA && term.sort() != AbstractTermTransformer.METASORT) {
+            throw new RuntimeException("A Term instead of a formula: " + term);
+        }
+        this.term = term;
+        this.hashCode = term.hashCode() * 13;
     }
 
     /** @return the stored Term */
     public Term formula() {
-	return term;
+        return term;
     }
 
     /** equal if terms and constraints are equal */
     public boolean equals(Object obj) {
-        if (this == obj) { return true; }
-	if (obj instanceof SequentFormula) {
-	    SequentFormula cmp=(SequentFormula)obj;
-	    if (term.equals(cmp.formula())) {
-		return true;
-	    }
-	}
-	return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof SequentFormula) {
+            SequentFormula cmp = (SequentFormula) obj;
+            if (term.equals(cmp.formula())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** String representation */
     public String toString() {
-	return term.toString();
+        return term.toString();
     }
 
-    public int hashCode () {
+    public int hashCode() {
         return hashCode;
     }
 }

@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.testgen;
+
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.InterruptListener;
@@ -15,9 +22,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
-
-import javax.swing.*;
-import java.util.List;
 
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener, StopRequest {
     private final TGInfoDialog tgInfoDialog;
@@ -93,11 +97,13 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     /**
      * Constructor.
      *
-     * @param mediator         The {@link KeYMediator} to use.
-     * @param originalProof    The {@link Proof} to generate test cases for.
-     * @param showInMainWindow Defines if created {@link Proof}s are visible in the {@link MainWindow} or not.
+     * @param mediator The {@link KeYMediator} to use.
+     * @param originalProof The {@link Proof} to generate test cases for.
+     * @param showInMainWindow Defines if created {@link Proof}s are visible in the
+     *        {@link MainWindow} or not.
      */
-    public MainWindowTestGenerator(KeYMediator mediator, Proof originalProof, boolean showInMainWindow) {
+    public MainWindowTestGenerator(KeYMediator mediator, Proof originalProof,
+            boolean showInMainWindow) {
         super(mediator.getUI(), originalProof);
         this.mediator = mediator;
         this.showInMainWindow = showInMainWindow;
@@ -129,13 +135,13 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      */
     @Override
     protected Proof createProof(UserInterfaceControl ui,
-                                Proof oldProof, String newName,
-                                Sequent newSequent) throws ProofInputException {
+            Proof oldProof, String newName,
+            Sequent newSequent) throws ProofInputException {
         if (showInMainWindow) {
             InitConfig initConfig = oldProof.getInitConfig().deepCopy();
             final Proof proof = new Proof(newName, newSequent, "", initConfig.createTacletIndex(),
-                    initConfig.createBuiltInRuleIndex(),
-                    initConfig.deepCopy());
+                initConfig.createBuiltInRuleIndex(),
+                initConfig.deepCopy());
             proof.setEnv(oldProof.getEnv());
             proof.setNamespaces(oldProof.getNamespaces());
 

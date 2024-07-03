@@ -1,8 +1,8 @@
-package de.uka.ilkd.key.rule;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -21,6 +21,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>
@@ -62,15 +66,14 @@ public class LoopApplyHeadRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
             throws RuleAbortException {
         assert application instanceof LoopApplyHeadBuiltInRuleApp;
-        LoopApplyHeadBuiltInRuleApp ruleApp
-                = (LoopApplyHeadBuiltInRuleApp) application;
+        LoopApplyHeadBuiltInRuleApp ruleApp = (LoopApplyHeadBuiltInRuleApp) application;
 
         ImmutableSet<LoopContract> contracts = ruleApp.contracts;
         LoopContract someContract = contracts.iterator().next();
 
         StatementBlock block = new StatementBlock(
-                new While(someContract.getGuard(), someContract.getBody()),
-                someContract.getTail());
+            new While(someContract.getGuard(), someContract.getBody()),
+            someContract.getTail());
         StatementBlock headAndBlock = new StatementBlock(someContract.getHead(), block);
 
         TermBuilder tb = services.getTermBuilder();
@@ -81,9 +84,9 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
         JavaBlock newJavaBlock;
         newJavaBlock = JavaBlock.createJavaBlock(
-                (StatementBlock) new ProgramElementReplacer(
-                        target.javaBlock().program(), services)
-                .replace(instantiation.statement, headAndBlock));
+            (StatementBlock) new ProgramElementReplacer(
+                target.javaBlock().program(), services)
+                        .replace(instantiation.statement, headAndBlock));
 
         for (LoopContract c : contracts) {
             LoopContract newContract = c.replaceEnhancedForVariables(block, services);
@@ -91,14 +94,14 @@ public class LoopApplyHeadRule implements BuiltInRule {
             services.getSpecificationRepository().removeLoopContract(c);
             services.getSpecificationRepository().addLoopContract(newContract, false);
             services.getSpecificationRepository().addBlockContract(
-                    c.toBlockContract().setBlock(headAndBlock));
+                c.toBlockContract().setBlock(headAndBlock));
         }
 
         Goal result = goal.split(1).head();
         result.changeFormula(
-                new SequentFormula(
-                        tb.apply(update, tb.prog(modality, newJavaBlock, target.sub(0)))),
-                ruleApp.pio);
+            new SequentFormula(
+                tb.apply(update, tb.prog(modality, newJavaBlock, target.sub(0)))),
+            ruleApp.pio);
         return ImmutableSLList.<Goal>nil().append(goal);
     }
 
@@ -133,9 +136,9 @@ public class LoopApplyHeadRule implements BuiltInRule {
             return false;
         }
 
-        final AbstractLoopContractRule.Instantiation instantiation
-                = new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
-                        goal.proof().getServices()).instantiate();
+        final AbstractLoopContractRule.Instantiation instantiation =
+            new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
+                goal.proof().getServices()).instantiate();
 
         if (instantiation == null) {
             return false;

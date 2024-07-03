@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.join;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -25,7 +29,7 @@ public class ProspectivePartner {
      * of a join operation.
      *
      * @param commonFormula The common formula of a join operation,
-     *   i.e. the "symbolic state - program counter" part of the join.
+     *        i.e. the "symbolic state - program counter" part of the join.
      * @param node1 The first node of the join.
      * @param formula1 The first join formula.
      * @param update1 The first symbolic state.

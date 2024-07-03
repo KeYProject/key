@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -40,6 +42,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableList;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
@@ -189,7 +193,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 f = tb.all(h, tb.all(o, f));
                 result.add(new SequentFormula(f));
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
     }
 
     private class SemanticsBlastingStrategy implements Strategy {

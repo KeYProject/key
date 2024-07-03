@@ -1,13 +1,14 @@
-/**
- * 
- */
-package de.uka.ilkd.key.proof.io.intermediate;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.proof.io.intermediate;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Encapsulates intermediate information for constructing a built-in rule application.
@@ -49,7 +50,9 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return builtInIfInsts;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
      */
     @Override

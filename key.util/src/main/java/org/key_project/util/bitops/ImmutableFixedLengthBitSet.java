@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.util.bitops;
 
 import java.util.ArrayList;
@@ -21,7 +25,7 @@ public class ImmutableFixedLengthBitSet {
      * represents the number 0).
      *
      * @param length
-     *            The length of the new {@link ImmutableFixedLengthBitSet}.
+     *        The length of the new {@link ImmutableFixedLengthBitSet}.
      */
     public ImmutableFixedLengthBitSet(int length) {
         this.bitSet = new boolean[length];
@@ -35,9 +39,9 @@ public class ImmutableFixedLengthBitSet {
      * make sure that this property holds.
      *
      * @param bitSet
-     *            The new bit set.
+     *        The new bit set.
      * @param value
-     *            The value for bitSet.
+     *        The value for bitSet.
      */
     private ImmutableFixedLengthBitSet(boolean[] bitSet, int value) {
         this.bitSet = bitSet;
@@ -68,7 +72,7 @@ public class ImmutableFixedLengthBitSet {
      * Sets this {@link ImmutableFixedLengthBitSet} to the given value.
      *
      * @param value
-     *            Value to set the {@link ImmutableFixedLengthBitSet} to.
+     *        Value to set the {@link ImmutableFixedLengthBitSet} to.
      */
     public ImmutableFixedLengthBitSet setToValue(int value) {
         assert value < intPow(2, bitSet.length) : "Value to high for this bit set.";
@@ -124,7 +128,7 @@ public class ImmutableFixedLengthBitSet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -148,9 +152,9 @@ public class ImmutableFixedLengthBitSet {
      * Power function for integers.
      *
      * @param a
-     *            The base.
+     *        The base.
      * @param b
-     *            The exponent.
+     *        The exponent.
      * @return a^b.
      */
     private static int intPow(int a, int b) {

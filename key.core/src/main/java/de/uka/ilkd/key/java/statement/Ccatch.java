@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.statement;
 
 import java.util.Optional;
-
-import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.CcatchNonstandardParameterDeclaration;
 import de.uka.ilkd.key.java.ParameterContainer;
@@ -14,6 +16,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.VariableScope;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Ccatch.
@@ -47,9 +51,9 @@ public class Ccatch extends BranchImp
      * Ccatch.
      *
      * @param e
-     *            a parameter declaration.
+     *        a parameter declaration.
      * @param body
-     *            a statement.
+     *        a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
         super();
@@ -62,9 +66,9 @@ public class Ccatch extends BranchImp
      * Ccatch.
      *
      * @param e
-     *            a parameter declaration.
+     *        a parameter declaration.
      * @param body
-     *            a statement.
+     *        a statement.
      */
     public Ccatch(CcatchNonstandardParameterDeclaration e,
             StatementBlock body) {
@@ -78,10 +82,10 @@ public class Ccatch extends BranchImp
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children
-     *            the children of this AST element as KeY classes. May contain:
-     *            Comments, a ParameterDeclaration (declaring the catched
-     *            exceptions) a StatementBlock (as the action to do when
-     *            catching)
+     *        the children of this AST element as KeY classes. May contain:
+     *        Comments, a ParameterDeclaration (declaring the catched
+     *        exceptions) a StatementBlock (as the action to do when
+     *        catching)
      */
     public Ccatch(ExtList children) {
         super(children);
@@ -127,10 +131,10 @@ public class Ccatch extends BranchImp
      * array
      *
      * @param index
-     *            an index into this node's "virtual" child array
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     *            if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -196,12 +200,12 @@ public class Ccatch extends BranchImp
      * "virtual" parameter declaration array.
      *
      * @param index
-     *            an index for a parameter declaration.
+     *        an index for a parameter declaration.
      *
      * @return the parameter declaration with the given index.
      *
      * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     *            if <tt>index</tt> is out of bounds.
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
@@ -216,12 +220,12 @@ public class Ccatch extends BranchImp
      * this node's "virtual" parameter declaration array.
      *
      * @param index
-     *            an index for a parameter declaration.
+     *        an index for a parameter declaration.
      *
      * @return the parameter declaration with the given index.
      *
      * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     *            if <tt>index</tt> is out of bounds.
      */
     public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(
             int index) {
@@ -263,7 +267,7 @@ public class Ccatch extends BranchImp
      * action/transformation on this element
      *
      * @param v
-     *            the Visitor
+     *        the Visitor
      */
     @Override
     public void visit(Visitor v) {

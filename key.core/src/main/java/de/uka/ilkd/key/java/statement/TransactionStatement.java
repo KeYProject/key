@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
@@ -9,17 +13,20 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 public class TransactionStatement extends JavaStatement {
 
-    public static final String[] names = { 
-        "#beginJavaCardTransaction", "#commitJavaCardTransaction", "#finishJavaCardTransaction", "#abortJavaCardTransaction"
-   };
+    public static final String[] names = {
+        "#beginJavaCardTransaction", "#commitJavaCardTransaction", "#finishJavaCardTransaction",
+        "#abortJavaCardTransaction"
+    };
 
     private int type;
-    
+
     public TransactionStatement(int type) {
         super();
-        if(type != de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.COMMIT 
-             && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.ABORT) {
-            throw new IllegalArgumentException("Wrong transaction statement type "+type);
+        if (type != de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN
+                && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.COMMIT
+                && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH
+                && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.ABORT) {
+            throw new IllegalArgumentException("Wrong transaction statement type " + type);
         }
         this.type = type;
     }
@@ -42,31 +49,31 @@ public class TransactionStatement extends JavaStatement {
     public void prettyPrint(de.uka.ilkd.key.java.PrettyPrinter p) throws java.io.IOException {
         p.printTransactionStatement(this);
     }
-    
+
     public int getPrecedence() {
         return 13;
     }
-    
+
     public String toString() {
         return names[type - 1];
     }
-    
+
     public boolean equals(Object o) {
         if (o != null && o instanceof TransactionStatement) {
-            return ((TransactionStatement)o).type == this.type;
+            return ((TransactionStatement) o).type == this.type;
         }
         return false;
     }
 
 
     public MatchConditions match(SourceData source, MatchConditions conditions) {
-        if(this.equals(source.getSource())) {
+        if (this.equals(source.getSource())) {
             source.next();
             return conditions;
         }
         return null;
     }
-    
+
     public boolean equalsModRenaming(SourceElement source, NameAbstractionTable nat) {
         return this.equals(source);
     }

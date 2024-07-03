@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -43,14 +47,14 @@ public class LoopVariantCondition implements VariableCondition {
             return null;
         }
         final Term variant = loopSpec.getVariant(loopSpec.getInternalSelfTerm(),
-                loopSpec.getInternalAtPres(), services);
+            loopSpec.getInternalAtPres(), services);
 
         if (variant == null) {
             return null;
         }
 
         return matchCond.setInstantiations(//
-                svInst.add(variantSV, variant, services));
+            svInst.add(variantSV, variant, services));
     }
 
     @Override

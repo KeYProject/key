@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.ArrayList;
@@ -55,7 +59,7 @@ public class Exec extends BranchStatement
      * Exec.
      *
      * @param body
-     *            a statement block.
+     *        a statement block.
      */
 
     public Exec(StatementBlock body) {
@@ -67,9 +71,9 @@ public class Exec extends BranchStatement
      * Exec.
      *
      * @param body
-     *            a statement block.
+     *        a statement block.
      * @param branches
-     *            a branch mutable list.
+     *        a branch mutable list.
      */
     public Exec(StatementBlock body, ASTList<Branch> branches) {
         setBranchList(branches);
@@ -81,7 +85,7 @@ public class Exec extends BranchStatement
      * Exec.
      *
      * @param proto
-     *            a Exec.
+     *        a Exec.
      */
     protected Exec(Exec proto) {
         super(proto);
@@ -155,10 +159,10 @@ public class Exec extends BranchStatement
      * array
      *
      * @param index
-     *            an index into this node's "virtual" child array
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     *            if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -209,12 +213,12 @@ public class Exec extends BranchStatement
      * replaced child is left untouched.
      *
      * @param p
-     *            the old child.
+     *        the old child.
      * @param p
-     *            the new child.
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
      * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     *            if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -271,7 +275,7 @@ public class Exec extends BranchStatement
      * Set body.
      *
      * @param body
-     *            a statement block.
+     *        a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -317,7 +321,7 @@ public class Exec extends BranchStatement
      * Set branch list.
      *
      * @param branches
-     *            a branch mutable list.
+     *        a branch mutable list.
      */
     public void setBranchList(ASTList<Branch> branches) {
         this.branches = branches;
@@ -353,8 +357,8 @@ public class Exec extends BranchStatement
         if (v instanceof SourceVisitorExtended) {
             ((SourceVisitorExtended) v).visitExec(this);
         } else {
-//            throw new IllegalStateException(
-//                "Method 'accept' not implemented in Exec");
+            // throw new IllegalStateException(
+            // "Method 'accept' not implemented in Exec");
         }
     }
 

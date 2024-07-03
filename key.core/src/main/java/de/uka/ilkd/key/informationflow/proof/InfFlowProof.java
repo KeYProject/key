@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.informationflow.proof;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.informationflow.proof;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.logic.Named;
@@ -15,13 +17,15 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * The proof object used by Information Flow Proofs.
- * 
+ *
  * It manages some additional data specific to their kind.
- * The concept of side proofs is actually more general than just to be useful for 
- * Information Flow proofs, but as only they are using the feature, it is currently 
- * moved into this subclass. 
+ * The concept of side proofs is actually more general than just to be useful for
+ * Information Flow proofs, but as only they are using the feature, it is currently
+ * moved into this subclass.
  */
 public class InfFlowProof extends Proof {
 
@@ -64,9 +68,9 @@ public class InfFlowProof extends Proof {
     public void addIFSymbol(Object s) {
         assert s != null;
         if (s instanceof Term) {
-            infFlowSymbols.add((Term)s);
+            infFlowSymbols.add((Term) s);
         } else if (s instanceof Named) {
-            infFlowSymbols.add((Named)s);
+            infFlowSymbols.add((Named) s);
         } else {
             throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
         }
@@ -75,9 +79,9 @@ public class InfFlowProof extends Proof {
     public void addLabeledIFSymbol(Object s) {
         assert s != null;
         if (s instanceof Term) {
-            infFlowSymbols.addLabeled((Term)s);
+            infFlowSymbols.addLabeled((Term) s);
         } else if (s instanceof Named) {
-            infFlowSymbols.addLabeled((Named)s);
+            infFlowSymbols.addLabeled((Named) s);
         } else {
             throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
         }
@@ -97,11 +101,11 @@ public class InfFlowProof extends Proof {
         assert t != null;
         ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
         assert temps != null;
-        for (TacletGoalTemplate tgt: temps) {
-            for (SequentFormula sf: tgt.sequent().antecedent().asList()) {
+        for (TacletGoalTemplate tgt : temps) {
+            for (SequentFormula sf : tgt.sequent().antecedent().asList()) {
                 addLabeledTotalTerm(sf.formula());
             }
-            for (SequentFormula sf: tgt.sequent().succedent().asList()) {
+            for (SequentFormula sf : tgt.sequent().succedent().asList()) {
                 addLabeledTotalTerm(sf.formula());
             }
         }
@@ -128,12 +132,12 @@ public class InfFlowProof extends Proof {
     public void addSideProof(InfFlowProof proof) {
         assert proof != null;
         if (proof.hasSideProofs()) {
-        	if (this.hasSideProofs()) {
-        		sideProofStatistics = sideProofStatistics.add(proof.sideProofStatistics);
-        	} else {
-        		sideProofStatistics = SideProofStatistics.create(proof.sideProofStatistics);
-        	}
-        	proof.sideProofStatistics = null;
+            if (this.hasSideProofs()) {
+                sideProofStatistics = sideProofStatistics.add(proof.sideProofStatistics);
+            } else {
+                sideProofStatistics = SideProofStatistics.create(proof.sideProofStatistics);
+            }
+            proof.sideProofStatistics = null;
         }
         addSideProofStatistics(proof.getStatistics());
     }
@@ -149,6 +153,7 @@ public class InfFlowProof extends Proof {
 
     /**
      * returns statistics of possible side proofs that contributed to this proof
+     *
      * @return the proof statistics
      */
     public SideProofStatistics getSideProofStatistics() {

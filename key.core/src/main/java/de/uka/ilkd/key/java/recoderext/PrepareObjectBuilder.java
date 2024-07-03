@@ -1,6 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
@@ -18,11 +28,6 @@ import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 /**
  * Creates the preparation method for pre-initilizing the object fields
  * with their default settings.
@@ -30,20 +35,17 @@ import java.util.List;
 public class PrepareObjectBuilder
         extends RecoderModelTransformer {
 
-    public static final String
-            IMPLICIT_OBJECT_PREPARE = "<prepare>";
+    public static final String IMPLICIT_OBJECT_PREPARE = "<prepare>";
 
-    public static final String
-            IMPLICIT_OBJECT_PREPARE_ENTER = "<prepareEnter>";
+    public static final String IMPLICIT_OBJECT_PREPARE_ENTER = "<prepareEnter>";
 
     private final HashMap<TypeDeclaration, ASTList<Statement>> class2fields;
 
     private ClassType javaLangObject;
 
 
-    public PrepareObjectBuilder
-            (CrossReferenceServiceConfiguration services,
-             TransformerCache cache) {
+    public PrepareObjectBuilder(CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
         super(services, cache);
         class2fields = new LinkedHashMap<>(getUnits().size());
     }
@@ -56,8 +58,7 @@ public class PrepareObjectBuilder
      */
     private List<Field> getFields(ClassDeclaration cd) {
         List<Field> result = new ArrayList<>(cd.getChildCount());
-        outer:
-        for (int i = 0; i < cd.getChildCount(); i++) {
+        outer: for (int i = 0; i < cd.getChildCount(); i++) {
             if (cd.getChildAt(i) instanceof FieldDeclaration) {
                 final FieldDeclaration fd = (FieldDeclaration) cd.getChildAt(i);
                 for (Modifier mod : fd.getModifiers()) {
@@ -65,9 +66,8 @@ public class PrepareObjectBuilder
                         continue outer;
                     }
                 }
-                final ASTList<FieldSpecification> fields
-                        = fd.getFieldSpecifications();
-				result.addAll(fields);
+                final ASTList<FieldSpecification> fields = fd.getFieldSpecifications();
+                result.addAll(fields);
             }
         }
         return result;
@@ -84,7 +84,7 @@ public class PrepareObjectBuilder
      *
      * @return status report if analyze encountered problems or not
      */
-	@Override
+    @Override
     public ProblemReport analyze() {
         javaLangObject = services.getNameInfo().getJavaLangObject();
         if (!(javaLangObject instanceof ClassDeclaration)) {
@@ -114,11 +114,8 @@ public class PrepareObjectBuilder
                 Identifier fieldId;
                 if (field.getName().charAt(0) != '<') {
                     fieldId = new Identifier(field.getName());
-                    result.add
-                            (assign((attribute(new ThisReference(), fieldId)),
-                                    getDefaultValue
-                                            (services.
-                                                    getCrossReferenceSourceInfo().getType(field))));
+                    result.add(assign((attribute(new ThisReference(), fieldId)),
+                        getDefaultValue(services.getCrossReferenceSourceInfo().getType(field))));
                 }
             }
         }
@@ -135,8 +132,8 @@ public class PrepareObjectBuilder
 
         if (classType != javaLangObject) {
             // we can access the implementation
-			body.add((new MethodReference(
-					new SuperReference(), new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
+            body.add((new MethodReference(
+                new SuperReference(), new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
             body.addAll(class2fields.get(classType));
         }
         return new StatementBlock(body);
@@ -147,19 +144,18 @@ public class PrepareObjectBuilder
      * sets the fields of the given type to its default values
      *
      * @param type the TypeDeclaration for which the
-     *             <code>&lt;prepare&gt;</code> is created
+     *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(TypeDeclaration type) {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(1);
         modifiers.add(new Protected());
-        MethodDeclaration md = new MethodDeclaration
-                (modifiers,
-                        null,
-                        new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE),
-						new ASTArrayList<>(0),
-                        null,
-                        createPrepareBody(new ThisReference(), type));
+        MethodDeclaration md = new MethodDeclaration(modifiers,
+            null,
+            new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE),
+            new ASTArrayList<>(0),
+            null,
+            createPrepareBody(new ThisReference(), type));
         md.makeAllParentRolesValid();
         return md;
     }
@@ -169,20 +165,19 @@ public class PrepareObjectBuilder
      * sets the fields of the given type to its default values
      *
      * @param type the TypeDeclaration for which the
-     *             <code>&lt;prepare&gt;</code> is created
+     *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration type) {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(1);
         modifiers.add(new Private());
 
-        MethodDeclaration md = new MethodDeclaration
-                (modifiers,
-                        null,
-                        new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE_ENTER),
-                        new ASTArrayList<>(0),
-                        null,
-                        createPrepareBody(new ThisReference(), type));
+        MethodDeclaration md = new MethodDeclaration(modifiers,
+            null,
+            new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE_ENTER),
+            new ASTArrayList<>(0),
+            null,
+            createPrepareBody(new ThisReference(), type));
         md.makeAllParentRolesValid();
         return md;
     }

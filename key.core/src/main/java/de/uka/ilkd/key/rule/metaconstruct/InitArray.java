@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -17,6 +19,8 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.ImmutableArray;
+
 /**
  * Split an array creation expression with explicit array initializer,
  * creating a creation expression with dimension expression and a list
@@ -25,38 +29,38 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class InitArray extends ProgramTransformer {
 
     public InitArray(String name, ProgramElement body) {
-	super(name, body);
+        super(name, body);
     }
 
     /**
      * Extract the variable initializers from the array initializer
      */
     protected ImmutableArray<Expression> extractInitializers(
-	    NewArray p_creationExpression) {
+            NewArray p_creationExpression) {
 
-	Debug.assertTrue ( p_creationExpression instanceof NewArray,
-			   "Don't know how to handle ", p_creationExpression );
+        Debug.assertTrue(p_creationExpression instanceof NewArray,
+            "Don't know how to handle ", p_creationExpression);
 
-	ArrayInitializer aInit = p_creationExpression.getArrayInitializer();
+        ArrayInitializer aInit = p_creationExpression.getArrayInitializer();
 
-	if ( aInit == null )
-	    // nothing to do for us
-	    return null;
+        if (aInit == null)
+            // nothing to do for us
+            return null;
 
-	return aInit.getArguments ();
+        return aInit.getArguments();
     }
 
     protected KeYJavaType getElementType(NewArray p_creationExpression) {
-	Debug.assertTrue ( p_creationExpression instanceof NewArray,
-			   "Don't know how to handle ", p_creationExpression );
+        Debug.assertTrue(p_creationExpression instanceof NewArray,
+            "Don't know how to handle ", p_creationExpression);
 
-	KeYJavaType aType = p_creationExpression.getKeYJavaType();
+        KeYJavaType aType = p_creationExpression.getKeYJavaType();
 
-	Debug.assertTrue ( aType.getJavaType () instanceof ArrayType,
-			   "Very strange are arrays of type ",
-			   aType.getJavaType () );
+        Debug.assertTrue(aType.getJavaType() instanceof ArrayType,
+            "Very strange are arrays of type ",
+            aType.getJavaType());
 
-	return ((ArrayType)aType.getJavaType ()).getBaseType ().getKeYJavaType ();
+        return ((ArrayType) aType.getJavaType()).getBaseType().getKeYJavaType();
     }
 
     /**
@@ -65,18 +69,18 @@ public abstract class InitArray extends ProgramTransformer {
      */
     protected Expression createArrayCreation(NewArray p_creationExpression) {
 
-	ImmutableArray<Expression> initializers =
-	    extractInitializers ( p_creationExpression );
+        ImmutableArray<Expression> initializers =
+            extractInitializers(p_creationExpression);
 
-	if ( initializers == null )
-	    return p_creationExpression;
+        if (initializers == null)
+            return p_creationExpression;
 
-	KeYJavaType arrayType = p_creationExpression.getKeYJavaType();
+        KeYJavaType arrayType = p_creationExpression.getKeYJavaType();
 
-	return KeYJavaASTFactory.newArray(
-		p_creationExpression.getTypeReference(),
-		p_creationExpression.getDimensions(),
-		KeYJavaASTFactory.intLiteral(initializers.size()), arrayType);
+        return KeYJavaASTFactory.newArray(
+            p_creationExpression.getTypeReference(),
+            p_creationExpression.getDimensions(),
+            KeYJavaASTFactory.intLiteral(initializers.size()), arrayType);
     }
 
 
@@ -86,32 +90,30 @@ public abstract class InitArray extends ProgramTransformer {
      * initializers, in which case valid creation expressions are
      * created by inserting the new-operator)
      */
-    protected ProgramVariable[] evaluateInitializers 
-	( Statement[] p_stmnts, 
-	  NewArray p_creationExpression,
-	  Services services ) {
+    protected ProgramVariable[] evaluateInitializers(Statement[] p_stmnts,
+            NewArray p_creationExpression,
+            Services services) {
 
-	ImmutableArray<Expression> initializers =
-	    extractInitializers ( p_creationExpression );
+        ImmutableArray<Expression> initializers =
+            extractInitializers(p_creationExpression);
 
-	if ( initializers == null )
-	  return new ProgramVariable[0] ;
+        if (initializers == null)
+            return new ProgramVariable[0];
 
-	KeYJavaType       elementType  =
-	    getElementType      ( p_creationExpression );
+        KeYJavaType elementType =
+            getElementType(p_creationExpression);
 
-	int               i   = initializers.size ();
-	ProgramVariable[] res = new ProgramVariable [ i ];
+        int i = initializers.size();
+        ProgramVariable[] res = new ProgramVariable[i];
 
-	while ( i-- != 0 ) {
-	    p_stmnts[i] = KeYJavaASTFactory.declare(services, "_tmpArray",
-		    initializers.get(i), elementType);
-	    res [i] = (ProgramVariable)
-		((LocalVariableDeclaration)p_stmnts[i]).
-		getVariables ().get ( 0 ).getProgramVariable ();
-	}
+        while (i-- != 0) {
+            p_stmnts[i] = KeYJavaASTFactory.declare(services, "_tmpArray",
+                initializers.get(i), elementType);
+            res[i] = (ProgramVariable) ((LocalVariableDeclaration) p_stmnts[i]).getVariables()
+                    .get(0).getProgramVariable();
+        }
 
-	return res;
+        return res;
     }
 
     /**
@@ -120,30 +122,30 @@ public abstract class InitArray extends ProgramTransformer {
      * which case valid creation expressions are created by inserting
      * the new-operator)
      */
-    protected void createArrayAssignments (int p_start, 
-					   Statement[] p_statements,
-					   ProgramVariable[] p_initializers,
-					   ReferencePrefix p_array,
-					   NewArray p_creationExpression) {
+    protected void createArrayAssignments(int p_start,
+            Statement[] p_statements,
+            ProgramVariable[] p_initializers,
+            ReferencePrefix p_array,
+            NewArray p_creationExpression) {
 
-	if ( p_initializers == null ||  
-	     p_initializers.length == 0 ) {
-	    return ;
-	}
+        if (p_initializers == null ||
+                p_initializers.length == 0) {
+            return;
+        }
 
-	KeYJavaType       elementType  = p_initializers[0].getKeYJavaType ();
-	TypeReference baseType = p_creationExpression.getTypeReference();
+        KeYJavaType elementType = p_initializers[0].getKeYJavaType();
+        TypeReference baseType = p_creationExpression.getTypeReference();
 
-	int         i   = p_initializers.length;
+        int i = p_initializers.length;
 
-	while ( i-- != 0 ) {
-	    p_statements [p_start + i] = 
-		createAssignment ( p_array,
-				   i,
-				   p_initializers[i],
-				   elementType,
-				   baseType );
-	}
+        while (i-- != 0) {
+            p_statements[p_start + i] =
+                createAssignment(p_array,
+                    i,
+                    p_initializers[i],
+                    elementType,
+                    baseType);
+        }
     }
 
     /**
@@ -152,24 +154,24 @@ public abstract class InitArray extends ProgramTransformer {
      * array initializer, in which case a valid creation expression is
      * created by inserting the new-operator)
      */
-    protected Statement createAssignment ( ReferencePrefix p_array,
-					   int            p_index,
-					   Expression     p_initializer,
-					   KeYJavaType    p_elementType,
-					   TypeReference p_baseType) {
-	if ( p_initializer instanceof ArrayInitializer ) {
-	    Debug.assertTrue ( p_elementType.getJavaType () instanceof ArrayType,
-			       "Very strange are arrays of type ",
-			       p_elementType.getJavaType () );
+    protected Statement createAssignment(ReferencePrefix p_array,
+            int p_index,
+            Expression p_initializer,
+            KeYJavaType p_elementType,
+            TypeReference p_baseType) {
+        if (p_initializer instanceof ArrayInitializer) {
+            Debug.assertTrue(p_elementType.getJavaType() instanceof ArrayType,
+                "Very strange are arrays of type ",
+                p_elementType.getJavaType());
 
-	    p_initializer = KeYJavaASTFactory.newArray(p_baseType,
-		    ((ArrayType) p_elementType.getJavaType()).getDimension(),
-		    (ArrayInitializer) p_initializer, p_elementType);
-	}
+            p_initializer = KeYJavaASTFactory.newArray(p_baseType,
+                ((ArrayType) p_elementType.getJavaType()).getDimension(),
+                (ArrayInitializer) p_initializer, p_elementType);
+        }
 
-	Expression indexExpr = KeYJavaASTFactory.intLiteral(p_index);
-	Expression lhs = KeYJavaASTFactory.arrayFieldAccess(p_array, indexExpr);
+        Expression indexExpr = KeYJavaASTFactory.intLiteral(p_index);
+        Expression lhs = KeYJavaASTFactory.arrayFieldAccess(p_array, indexExpr);
 
-	return KeYJavaASTFactory.assign(lhs, p_initializer);
+        return KeYJavaASTFactory.assign(lhs, p_initializer);
     }
 }

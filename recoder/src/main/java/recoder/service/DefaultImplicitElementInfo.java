@@ -1,16 +1,19 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
-
-import recoder.ServiceConfiguration;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-import recoder.java.declaration.EnumDeclaration;
-import recoder.util.Debug;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import recoder.ServiceConfiguration;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.java.declaration.EnumDeclaration;
+import recoder.util.Debug;
 
 /**
  * Handles requests for implicitely defined program model elements. In
@@ -21,14 +24,17 @@ import java.util.Map;
  * {@link recoder.abstraction.ImplicitEnumValues},
  * and {@link recoder.abstraction.IntersectionType}.
  */
-public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implements ImplicitElementInfo {
+public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
+        implements ImplicitElementInfo {
 
     /**
      * maps type declarations to default constructors
      */
-    private final Map<ClassType, DefaultConstructor> type2defaultConstructor = new HashMap<ClassType, DefaultConstructor>();
+    private final Map<ClassType, DefaultConstructor> type2defaultConstructor =
+        new HashMap<ClassType, DefaultConstructor>();
 
-    private final Map<EnumDeclaration, List<ImplicitEnumMethod>> type2implicitEnumMethods = new HashMap<EnumDeclaration, List<ImplicitEnumMethod>>();
+    private final Map<EnumDeclaration, List<ImplicitEnumMethod>> type2implicitEnumMethods =
+        new HashMap<EnumDeclaration, List<ImplicitEnumMethod>>();
     private List<ClassType> enumValueOfExceptions = null;
 
     /**
@@ -51,7 +57,8 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implemen
     }
 
     public List<ImplicitEnumMethod> getImplicitEnumMethods(EnumDeclaration etd) {
-        if (etd == null) throw new NullPointerException();
+        if (etd == null)
+            throw new NullPointerException();
         updateModel();
         List<ImplicitEnumMethod> res = type2implicitEnumMethods.get(etd);
         if (res == null) {
@@ -68,7 +75,8 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implemen
     }
 
     public Type getType(ProgramModelElement pme) {
-        if (pme instanceof NullType || pme instanceof ArrayType || pme instanceof IntersectionType) {
+        if (pme instanceof NullType || pme instanceof ArrayType
+                || pme instanceof IntersectionType) {
             return (Type) pme;
         } else if (pme instanceof Package) {
             // valid for Package
@@ -192,8 +200,10 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implemen
             if (enumValueOfExceptions == null) {
                 // since list is not visible as mutable to the outside, can cache result here.
                 enumValueOfExceptions = new ArrayList<ClassType>(2);
-                enumValueOfExceptions.add(getNameInfo().getClassType("java.lang.IllegalArgumentException"));
-                enumValueOfExceptions.add(getNameInfo().getClassType("java.lang.NullPointerException"));
+                enumValueOfExceptions
+                        .add(getNameInfo().getClassType("java.lang.IllegalArgumentException"));
+                enumValueOfExceptions
+                        .add(getNameInfo().getClassType("java.lang.NullPointerException"));
             }
             return enumValueOfExceptions;
         }
@@ -205,7 +215,8 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo implemen
         if (m instanceof ImplicitEnumValueOf) {
             return m.getContainingClassType();
         } else if (m instanceof ImplicitEnumValues) {
-            return getServiceConfiguration().getNameInfo().createArrayType(m.getContainingClassType());
+            return getServiceConfiguration().getNameInfo()
+                    .createArrayType(m.getContainingClassType());
         }
         // valid for Default Constructor
         return null;

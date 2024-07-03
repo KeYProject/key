@@ -1,8 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros;
 
 /**
  * A macro that performs all simplifications that are necessary in order to perform a translation
  * of the sequent to SMT. These include symbolic execution and heap simplification.
+ *
  * @author js
  */
 public class SMTPreparationMacro extends SequentialProofMacro {
@@ -57,8 +62,8 @@ public class SMTPreparationMacro extends SequentialProofMacro {
     @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" +
-                "<li>Separate proof obligations" +
-                "<li>Expand invariant definitions" +
-                "<li>Simplify heap expressions</ol>";
+            "<li>Separate proof obligations" +
+            "<li>Expand invariant definitions" +
+            "<li>Simplify heap expressions</ol>";
     }
 }

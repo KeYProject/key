@@ -1,6 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Variable;
@@ -17,8 +24,6 @@ import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.List;
 
 
 /**
@@ -63,34 +68,32 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      * <code>&lt;nextToCreate&gt;</code> etc.
      *
      * @param services the CrossReferenceServiceConfiguration to access
-     *                 model information
-     * @param cache    a cache object that stores information which is needed by
-     *                 and common to many transformations. it includes the compilation units,
-     *                 the declared classes, and information for local classes.
+     *        model information
+     * @param cache a cache object that stores information which is needed by
+     *        and common to many transformations. it includes the compilation units,
+     *        the declared classes, and information for local classes.
      */
     public ImplicitFieldAdder(CrossReferenceServiceConfiguration services,
-                              TransformerCache cache) {
+            TransformerCache cache) {
         super(services, cache);
     }
 
     /**
      * creates an implicit field of the given type and name
      *
-     * @param typeName  the name of the type of the new field to create
+     * @param typeName the name of the type of the new field to create
      * @param fieldName the name of the field
-     * @param isStatic  a boolean that is true if the field has to be
-     *                  created as static (class) field
+     * @param isStatic a boolean that is true if the field has to be
+     *        created as static (class) field
      * @return the new created field declaration
      */
-    public static FieldDeclaration createImplicitRecoderField
-    (String typeName, String fieldName,
-     boolean isStatic, boolean isPrivate) {
+    public static FieldDeclaration createImplicitRecoderField(String typeName, String fieldName,
+            boolean isStatic, boolean isPrivate) {
         return createImplicitRecoderField(typeName, fieldName, isStatic, isPrivate, false);
     }
 
-    public static FieldDeclaration createImplicitRecoderField
-            (String typeName, String fieldName,
-             boolean isStatic, boolean isPrivate, boolean isFinal) {
+    public static FieldDeclaration createImplicitRecoderField(String typeName, String fieldName,
+            boolean isStatic, boolean isPrivate, boolean isFinal) {
 
         final int modCount = 1 + (isStatic ? 1 : 0) + (isFinal ? 1 : 0);
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(modCount);
@@ -111,12 +114,12 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         int idx = typeName.indexOf('[');
         final String baseType = (idx == -1 ? typeName : typeName.substring(0, idx));
 
-        final Identifier id = typeName.charAt(0) == '<' ?
-                new ImplicitIdentifier(baseType) : new Identifier(baseType);
+        final Identifier id =
+            typeName.charAt(0) == '<' ? new ImplicitIdentifier(baseType) : new Identifier(baseType);
 
-        FieldDeclaration fd = new FieldDeclaration
-                (modifiers, new TypeReference(id, idx == -1 ? 0 : (typeName.length() - baseType.length()) / 2),
-                        new ImplicitIdentifier(fieldName), null);
+        FieldDeclaration fd = new FieldDeclaration(modifiers,
+            new TypeReference(id, idx == -1 ? 0 : (typeName.length() - baseType.length()) / 2),
+            new ImplicitIdentifier(fieldName), null);
 
         fd.makeAllParentRolesValid();
 
@@ -134,7 +137,8 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         attach(createImplicitRecoderField("boolean", IMPLICIT_INITIALIZED, false, false), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);
         attach(createImplicitRecoderField("int", IMPLICIT_TRANSIENT, false, false), td, 0);
-        attach(createImplicitRecoderField("boolean", IMPLICIT_TRANSACTION_UPDATED, false, false), td, 0);
+        attach(createImplicitRecoderField("boolean", IMPLICIT_TRANSACTION_UPDATED, false, false),
+            td, 0);
     }
 
 
@@ -142,18 +146,21 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      * adds implicit fields to the given type declaration
      *
      * @param td the recoder.java.TypeDeclaration to be enriched with
-     *           implicit fields
+     *        implicit fields
      */
     private void addImplicitRecoderFields(recoder.java.declaration.TypeDeclaration td) {
-        attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true), td, 0);
+        attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true),
+            td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
-        attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
+        attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td,
+            0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
 
         if (td instanceof ClassDeclaration &&
                 (td.getName() == null ||
                         ((ClassDeclaration) td).getStatementContainer() != null ||
-                        td.getContainingClassType() != null) &&
+                        td.getContainingClassType() != null)
+                &&
                 (containingMethod(td) == null || !containingMethod(td).isStatic()) &&
                 !td.isStatic()) {
             ClassDeclaration container = containingClass(td);
@@ -161,18 +168,19 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
             modifiers.add(new Private());
             Identifier id = getId(container);
 
-            FieldDeclaration fd = new FieldDeclaration
-                    (modifiers, new TypeReference(id),
-                            new ImplicitIdentifier(IMPLICIT_ENCLOSING_THIS), null);
+            FieldDeclaration fd = new FieldDeclaration(modifiers, new TypeReference(id),
+                new ImplicitIdentifier(IMPLICIT_ENCLOSING_THIS), null);
             fd.makeAllParentRolesValid();
             attach(fd, td, 0);
         }
     }
 
     protected void addClassInitializerStatusFields(recoder.java.declaration.TypeDeclaration td) {
-        attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true), td, 0);
+        attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true),
+            td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
-        attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
+        attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td,
+            0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
     }
 
@@ -180,14 +188,15 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         final List<Variable> vars = getLocalClass2FinalVar().get(td);
         if (vars != null) {
 
-            // not sure why, but doing it separated in two loops is much faster (for large programs) then just in one
+            // not sure why, but doing it separated in two loops is much faster (for large programs)
+            // then just in one
             // strangely, the effect is not measureable for e.g. the class init. fields...
             FieldDeclaration[] newFields = new FieldDeclaration[vars.size()];
 
             int i = 0;
             for (final Variable var : vars) {
                 newFields[i] = createImplicitRecoderField(var.getType().getName(),
-                        FINAL_VAR_PREFIX + var.getName(), false, true);
+                    FINAL_VAR_PREFIX + var.getName(), false, true);
                 i++;
             }
 

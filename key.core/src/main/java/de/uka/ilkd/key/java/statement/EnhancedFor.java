@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.java.statement;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -11,14 +13,16 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.util.ExtList;
+
 /**
  * The new enhanced form of a for-loop.
- * 
+ *
  * for(Type var : exp) Statement
- * 
+ *
  * LoopStatement.inits is initialized with "Type var" LoopStatement.guard is
  * initialized with "exp" LoopStatement.body with "statement"
- * 
+ *
  * @author mulbrich
  */
 public class EnhancedFor extends LoopStatement implements VariableScope {
@@ -31,17 +35,17 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
 
     /**
      * Used for the Recoder2KeY transformation.
-     * 
+     *
      * @param init
-     *            the initializers - here a single VariableDeclaration. may not be null.
+     *        the initializers - here a single VariableDeclaration. may not be null.
      * @param guard
-     *            a guard - here an expression of type Iterable. may not be null.
+     *        a guard - here an expression of type Iterable. may not be null.
      * @param statement
-     *            the statement of the loop
+     *        the statement of the loop
      * @param comments
-     *            collected comments
+     *        collected comments
      * @param info
-     *            position
+     *        position
      */
     public EnhancedFor(LoopInit init, Guard guard, Statement statement,
             ExtList comments, PositionInfo info) {
@@ -52,13 +56,15 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
 
     /**
      * Used by the {@link CreatingASTVisitor}.
-     * 
+     *
      * @param children a list of parameters
      */
     public EnhancedFor(ExtList children) {
         super(children.get(ILoopInit.class), children
-                .get(IGuard.class), null, children
-                .get(Statement.class), children);
+                .get(IGuard.class),
+            null, children
+                    .get(Statement.class),
+            children);
     }
 
     /**
@@ -85,14 +91,15 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printEnhancedFor(this);
     }
-    
+
     /**
      * get the local variable declaration of the enhanced for-loop
      * <code>for(type var : exp)</code> gives <code>type var</code>.
+     *
      * @return the local variable declaration.
      */
     public LocalVariableDeclaration getVariableDeclaration() {
-        return (LocalVariableDeclaration)getInitializers().get(0);
+        return (LocalVariableDeclaration) getInitializers().get(0);
     }
 
 }

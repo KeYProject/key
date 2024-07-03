@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.convenience;
 
 import java.io.*;
@@ -69,7 +72,7 @@ public class TaggedComment {
         TaggedComment tc = new TaggedComment(sw.toString());
         System.out.println("intro:");
         System.out.println(tc.getIntro());
-        for (Enumeration tags = tc.getTags(); tags.hasMoreElements(); ) {
+        for (Enumeration tags = tc.getTags(); tags.hasMoreElements();) {
             String tag = (String) tags.nextElement();
             System.out.println("@" + tag);
             System.out.println(tc.getTagValue(tag));
@@ -81,7 +84,7 @@ public class TaggedComment {
      * representing a single line.
      *
      * @param line the string representing the line. The line is assumed to be
-     *             non empty.
+     *        non empty.
      * @return the stripped and trimmed string
      */
     protected String stripCommentChars(String line) {

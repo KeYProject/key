@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -23,11 +27,13 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         super(Parameters.class);
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "cut";
     }
 
-    @Override public Parameters evaluateArguments(EngineState state,
+    @Override
+    public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
@@ -40,7 +46,8 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
      * @throws ScriptException
      * @throws InterruptedException
      */
-    @Override public void execute(AbstractUserInterfaceControl uiControl,
+    @Override
+    public void execute(AbstractUserInterfaceControl uiControl,
             Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
@@ -49,7 +56,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
         app = app.addCheckedInstantiation(sv, args.formula,
-                state.getProof().getServices(), true);
+            state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.ParameterContainer;
@@ -35,7 +39,7 @@ public class CcatchReturnValParameterDeclaration extends
      * Parameter declaration.
      *
      * @param proto
-     *            a parameter declaration.
+     *        a parameter declaration.
      */
     protected CcatchReturnValParameterDeclaration(
             CcatchReturnValParameterDeclaration proto) {
@@ -88,10 +92,10 @@ public class CcatchReturnValParameterDeclaration extends
      * array
      *
      * @param index
-     *            an index into this node's "virtual" child array
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     *            if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -118,12 +122,12 @@ public class CcatchReturnValParameterDeclaration extends
      * replaced child is left untouched.
      *
      * @param p
-     *            the old child.
+     *        the old child.
      * @param p
-     *            the new child.
+     *        the new child.
      * @return true if a replacement has occured, false otherwise.
      * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     *            if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -151,7 +155,7 @@ public class CcatchReturnValParameterDeclaration extends
      * Set parameter container.
      *
      * @param c
-     *            a parameter container.
+     *        a parameter container.
      */
     @Override
     public void setParameterContainer(ParameterContainer c) {

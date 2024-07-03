@@ -1,10 +1,14 @@
-package de.uka.ilkd.key.taclettranslation.assumptions;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
+package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This interface provides the mechanism of translating taclets to formulae. The
@@ -19,6 +23,7 @@ public interface TacletSetTranslation {
     /**
      * Builds the translation of the taclets given by calling the method
      * <code>setTacletSet()</code>.
+     *
      * @param sorts this sorts are used for the instantiation of generic types.
      * @return returns the resulting formulae of the taclets. Each formula of
      *         the resulting set is associated with one taclet.
@@ -28,7 +33,7 @@ public interface TacletSetTranslation {
     /**
      * Returns all taclet that have not been translated. The reason can be got
      * by {@link TacletFormula#getStatus}.
-     * 
+     *
      * @return a list of taclets.
      */
     public ImmutableList<TacletFormula> getNotTranslated();

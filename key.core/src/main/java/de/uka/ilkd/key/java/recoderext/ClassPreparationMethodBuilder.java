@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +25,6 @@ import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Each class is prepared before it is initialised. The preparation of
  * a class consists of pre-initialising the class fields with their
@@ -29,10 +33,10 @@ import java.util.Map;
  * preparation.
  */
 public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
 
-    public static final String
-            CLASS_PREPARE_IDENTIFIER = "<clprepare>";
+    public static final String CLASS_PREPARE_IDENTIFIER = "<clprepare>";
 
     /**
      * maps a class to its static NON CONSTANT fields
@@ -47,15 +51,14 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
      * which are declared in one of the given compilation units.
      *
      * @param services the CrossReferenceServiceConfiguration with the
-     *                 information about the recoder model
-     * @param cache    a cache object that stores information which is needed by
-     *                 and common to many transformations. it includes the
-     *                 compilation units, the declared classes, and information
-     *                 for local classes.
+     *        information about the recoder model
+     * @param cache a cache object that stores information which is needed by
+     *        and common to many transformations. it includes the
+     *        compilation units, the declared classes, and information
+     *        for local classes.
      */
-    public ClassPreparationMethodBuilder
-    (CrossReferenceServiceConfiguration services,
-     TransformerCache cache) {
+    public ClassPreparationMethodBuilder(CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
         super(services, cache);
         class2staticFields = new LinkedHashMap<>(10 * getUnits().size());
     }
@@ -64,7 +67,7 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
      * returns true if the given fieldspecification denotes a constant
      * field. A constant field is declared as final and static and
      * initialised with a time constant, which is not prepared or
-     * initialised here.  ATTENTION: this is a derivation from the JLS
+     * initialised here. ATTENTION: this is a derivation from the JLS
      * but the obtained behaviour is equivalent as we only consider
      * completely compiled programs and not partial compilations. The
      * reason for preparation and initialisation of comnpile time
@@ -105,19 +108,16 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
         for (FieldSpecification spec : fields) {
             if (spec.isStatic() && !isConstantField(spec)) {
                 Identifier ident = spec.getIdentifier();
-                result.add(new CopyAssignment
-                        (new PassiveExpression
-                                (new FieldReference(ident.deepClone())),
-                                getDefaultValue(spec.getType())));
+                result.add(
+                    new CopyAssignment(new PassiveExpression(new FieldReference(ident.deepClone())),
+                        getDefaultValue(spec.getType())));
             }
         }
 
-        result.add
-                (new CopyAssignment
-                        (new PassiveExpression(new FieldReference
-                                (new ImplicitIdentifier
-                                        (ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
-                                new BooleanLiteral(true)));
+        result.add(new CopyAssignment(
+            new PassiveExpression(new FieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
+            new BooleanLiteral(true)));
 
         return result;
     }
@@ -130,9 +130,8 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
                 if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
                     ClassDeclaration cd = (ClassDeclaration) cu.getTypeDeclarationAt(i);
                     if (cd.getTypeDeclarationCount() > 0) {
-                        LOGGER.debug
-                                ("clPrepBuilder: Inner Class detected. " +
-                                        "Reject building class initialisation methods.");
+                        LOGGER.debug("clPrepBuilder: Inner Class detected. " +
+                            "Reject building class initialisation methods.");
                     }
 
                     // collect initializers for transformation phase
@@ -149,7 +148,7 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
      * given type declaration
      *
      * @param td the TypeDeclaration to which the new created method
-     *           will be attached
+     *        will be attached
      * @return the created class preparation method
      */
     private MethodDeclaration createPrepareMethod(TypeDeclaration td) {
@@ -157,11 +156,11 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
         modifiers.add(new Static());
         modifiers.add(new Private());
         return new MethodDeclaration(modifiers,
-                null,  // return type is void
-                new ImplicitIdentifier(CLASS_PREPARE_IDENTIFIER),
-                new ASTArrayList<>(0),
-                null, // no throws
-                new StatementBlock(class2staticFields.get(td)));
+            null, // return type is void
+            new ImplicitIdentifier(CLASS_PREPARE_IDENTIFIER),
+            new ASTArrayList<>(0),
+            null, // no throws
+            new StatementBlock(class2staticFields.get(td)));
     }
 
 

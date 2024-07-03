@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.util.removegenerics;
 
@@ -45,8 +48,10 @@ public class TestMethodDeclaration extends ResolveGenericClass {
 
     @Test
     public void testToArray() throws Exception {
-        String before = "class AL<E> { E[] data; public void m(C c) { data = c.toArray(new java.lang.Object[5]); } }";
-        String after = "class AL { java.lang.Object[] data; public void m(C c) { data = c.toArray(new java.lang.Object[5]); } }";
+        String before =
+            "class AL<E> { E[] data; public void m(C c) { data = c.toArray(new java.lang.Object[5]); } }";
+        String after =
+            "class AL { java.lang.Object[] data; public void m(C c) { data = c.toArray(new java.lang.Object[5]); } }";
         equalCU(before, after);
     }
 

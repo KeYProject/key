@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.EventObject;
-
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -18,54 +20,65 @@ public class UnicodeToggleAction extends MainWindowAction {
     public static final String NAME = "Use Unicode Symbols";
 
     public static final String TOOL_TIP =
-            "If checked formulae are displayed with special Unicode characters"
-          + " (such as \"" + UnicodeHelper.AND + "\") instead of the traditional ASCII ones. \n"
-          + "Only works in combination with pretty printing (see above).";
-   
-   /**
-    * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
-    * <p>
-    * Such changes can occur in the Eclipse context when settings are changed in for instance the KeYIDE.
-    */
-   private final SettingsListener viewSettingsListener = new SettingsListener() {
-      @Override
-      public void settingsChanged(EventObject e) {
-         handleViewSettingsChanged(e);
-      }
-   };
+        "If checked formulae are displayed with special Unicode characters"
+            + " (such as \"" + UnicodeHelper.AND + "\") instead of the traditional ASCII ones. \n"
+            + "Only works in combination with pretty printing (see above).";
+
+    /**
+     * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+     * <p>
+     * Such changes can occur in the Eclipse context when settings are changed in for instance the
+     * KeYIDE.
+     */
+    private final SettingsListener viewSettingsListener = new SettingsListener() {
+        @Override
+        public void settingsChanged(EventObject e) {
+            handleViewSettingsChanged(e);
+        }
+    };
 
     public UnicodeToggleAction(MainWindow window) {
         super(window);
         setName(NAME);
         setTooltip(TOOL_TIP);
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(viewSettingsListener); // Attention: The listener is never removed, because there is only one MainWindow!
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addSettingsListener(viewSettingsListener); // Attention: The listener is never
+                                                            // removed, because there is only one
+                                                            // MainWindow!
         updateSelectedState();
     }
-    
+
     protected void updateSelectedState() {
-       final boolean useUnicode = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseUnicode();
-       final boolean usePretty = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-       setSelected((useUnicode && usePretty));
-       NotationInfo.DEFAULT_UNICODE_ENABLED = (useUnicode && usePretty);
-       setEnabled(usePretty);
-       //setSelected(NotationInfo.UNICODE_ENABLED);
+        final boolean useUnicode =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseUnicode();
+        final boolean usePretty =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        setSelected((useUnicode && usePretty));
+        NotationInfo.DEFAULT_UNICODE_ENABLED = (useUnicode && usePretty);
+        setEnabled(usePretty);
+        // setSelected(NotationInfo.UNICODE_ENABLED);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-       boolean useUnicode = ((JCheckBoxMenuItem) e.getSource()).isSelected(); 
-       boolean usePretty = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-       NotationInfo.DEFAULT_UNICODE_ENABLED = useUnicode && usePretty; // Needs to be executed before the ViewSettings are modified, because the UI will react on the settings change event!
-       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUseUnicode(useUnicode);
-       updateMainWindow();
+        boolean useUnicode = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+        boolean usePretty =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        NotationInfo.DEFAULT_UNICODE_ENABLED = useUnicode && usePretty; // Needs to be executed
+                                                                        // before the ViewSettings
+                                                                        // are modified, because the
+                                                                        // UI will react on the
+                                                                        // settings change event!
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUseUnicode(useUnicode);
+        updateMainWindow();
     }
-    
+
     protected void updateMainWindow() {
-       mainWindow.makePrettyView();
+        mainWindow.makePrettyView();
     }
 
     protected void handleViewSettingsChanged(EventObject e) {
-       updateSelectedState();
-       updateMainWindow();
+        updateSelectedState();
+        updateMainWindow();
     }
 }

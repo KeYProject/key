@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 
@@ -15,7 +19,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * ensures that the given instantiation for the schemavariable denotes a
  * constant of an enum type.
- * 
+ *
  * @author mulbrich
  * @since 2006-12-04
  * @version 2006-12-11
@@ -26,19 +30,19 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
 
     /**
      * the static reference condition checks if a suggested
-     * instantiation for a schema variable denotes a reference to 
+     * instantiation for a schema variable denotes a reference to
      * an enum constant.
      */
-    public EnumConstantCondition (SchemaVariable reference) {
-	this.reference = reference;
+    public EnumConstantCondition(SchemaVariable reference) {
+        this.reference = reference;
     }
 
 
     @Override
-    public boolean check(SchemaVariable var, 
-			 SVSubstitute subst, 
-			 SVInstantiations svInst,
-			 Services services) {
+    public boolean check(SchemaVariable var,
+            SVSubstitute subst,
+            SVInstantiations svInst,
+            Services services) {
 
         if (var == reference) {
             // new ObjectInspector(var).setVisible(true);
@@ -60,9 +64,9 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
         return true;
     }
 
-    
-    @Override    
-    public String toString () {
-	return "\\enumConstant(" + reference + ")";
+
+    @Override
+    public String toString() {
+        return "\\enumConstant(" + reference + ")";
     }
 }

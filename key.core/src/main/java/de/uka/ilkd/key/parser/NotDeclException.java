@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.TokenStream;
@@ -17,7 +21,7 @@ public class NotDeclException extends KeYSemanticException {
      * Returns a clean error message (no line number/column information)
      */
     private static String getMessage(String cat, String undeclaredSymbol, String addtl) {
-        return cat + "\n\t" + undeclaredSymbol + "\n" + "not declared "+addtl;
+        return cat + "\n\t" + undeclaredSymbol + "\n" + "not declared " + addtl;
     }
 
 }

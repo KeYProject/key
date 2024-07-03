@@ -1,5 +1,13 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import recoder.ProgramFactory;
 import recoder.abstraction.ArrayType;
@@ -24,11 +32,6 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 import recoder.util.Order;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class UnitKit {
 
@@ -56,7 +59,7 @@ public class UnitKit {
     }
 
     // creates an empty compilation unit in the package of "brother"
-    //CompilationUnit createCompilationUnit(CompilationUnit brother)
+    // CompilationUnit createCompilationUnit(CompilationUnit brother)
 
     private static ClassType getNecessaryImportedType(CrossReferenceSourceInfo xi, Import imp) {
         if (imp.isMultiImport()) {
@@ -65,7 +68,8 @@ public class UnitKit {
         TypeReference tr = imp.getTypeReference();
         ClassType ct = (ClassType) xi.getType(tr);
         if (ct == null) {
-            throw new RuntimeException("No type found for " + Format.toString(Formats.ELEMENT_LONG, tr));
+            throw new RuntimeException(
+                "No type found for " + Format.toString(Formats.ELEMENT_LONG, tr));
         }
         // there must be at least one reference to this import
         if (TypeKit.getReferences(xi, ct, imp.getASTParent(), false).size() > 1) {
@@ -75,7 +79,8 @@ public class UnitKit {
         }
     }
 
-    private static boolean isNecessaryMultiTypeImport(CrossReferenceSourceInfo xrsi, Import imp, Set coveredTypes) {
+    private static boolean isNecessaryMultiTypeImport(CrossReferenceSourceInfo xrsi, Import imp,
+            Set coveredTypes) {
         if (!imp.isMultiImport())
             return false;
         if (imp.isStaticImport())
@@ -116,10 +121,11 @@ public class UnitKit {
      * Static imports are not considered yet, which is a TODO
      *
      * @param xrsi the cross reference source info to use.
-     * @param cu   the compilation unit to find unnecessary imports in.
+     * @param cu the compilation unit to find unnecessary imports in.
      * @return a list of unnecessary imports in the unit.
      */
-    public static List<Import> getUnnecessaryImports(CrossReferenceSourceInfo xrsi, CompilationUnit cu) {
+    public static List<Import> getUnnecessaryImports(CrossReferenceSourceInfo xrsi,
+            CompilationUnit cu) {
         Debug.assertNonnull(xrsi, cu);
         List<Import> il = cu.getImports();
         if (il == null || il.isEmpty()) {
@@ -129,7 +135,8 @@ public class UnitKit {
         Set<ClassType> coveredTypes = new HashSet<ClassType>();
         for (int i = 0, s = il.size(); i < s; i += 1) {
             Import imp = il.get(i);
-            if (imp.isStaticImport()) continue; // TODO
+            if (imp.isStaticImport())
+                continue; // TODO
             if (!imp.isMultiImport()) {
                 ClassType ct = getNecessaryImportedType(xrsi, imp);
                 if (ct != null) {
@@ -141,7 +148,8 @@ public class UnitKit {
         }
         for (int i = 0, s = il.size(); i < s; i += 1) {
             Import imp = il.get(i);
-            if (imp.isStaticImport()) continue; // TODO
+            if (imp.isStaticImport())
+                continue; // TODO
             if (imp.isMultiImport() && !isNecessaryMultiTypeImport(xrsi, imp, coveredTypes)) {
                 removalList.add(imp);
             }
@@ -152,7 +160,8 @@ public class UnitKit {
     /**
      * @deprecated should become a first class transformation.
      */
-    public static void removeUnusedImports(ChangeHistory ch, CrossReferenceSourceInfo xrsi, CompilationUnit cu) {
+    public static void removeUnusedImports(ChangeHistory ch, CrossReferenceSourceInfo xrsi,
+            CompilationUnit cu) {
         Debug.assertNonnull(ch);
         List<Import> removalList = getUnnecessaryImports(xrsi, cu);
         for (int i = removalList.size() - 1; i >= 0; i -= 1) {
@@ -168,9 +177,11 @@ public class UnitKit {
     // are imported directly. All multi type imports are deleted,
     // as are all single type imports that are not necessary.
     // Static imports are left untouched for now (TODO - Gutzmann)
-    public static void normalizeImports(ChangeHistory ch, CrossReferenceSourceInfo xrsi, CompilationUnit cu,
-                                        boolean removeMultiTypeImports, boolean removeSingleTypeImports, boolean addJavaLangImports,
-                                        boolean addDefaultPackageImports) {
+    public static void normalizeImports(ChangeHistory ch, CrossReferenceSourceInfo xrsi,
+            CompilationUnit cu,
+            boolean removeMultiTypeImports, boolean removeSingleTypeImports,
+            boolean addJavaLangImports,
+            boolean addDefaultPackageImports) {
         Debug.assertNonnull(xrsi, cu);
         // first step: collect all external class types referred to in the unit
         Set<ClassType> importTypes = new HashSet<ClassType>();
@@ -186,8 +197,10 @@ public class UnitKit {
                     type = ((ArrayType) type).getBaseType();
                 }
                 if ((type instanceof ClassType)
-                        && !((type instanceof TypeDeclaration) && MiscKit.contains(cu, (TypeDeclaration) type))
-                        && (addDefaultPackageImports || ((ClassType) type).getPackage() != unitPackage)
+                        && !((type instanceof TypeDeclaration)
+                                && MiscKit.contains(cu, (TypeDeclaration) type))
+                        && (addDefaultPackageImports
+                                || ((ClassType) type).getPackage() != unitPackage)
                         && (addJavaLangImports || !type.getFullName().startsWith("java.lang."))) {
                     importTypes.add((ClassType) type);
                 }
@@ -212,23 +225,25 @@ public class UnitKit {
 
         Set<ClassType> commonTypes = new HashSet<ClassType>(importTypes.size());
         commonTypes.addAll(importTypes);
-        //commonTypes.intersect(importedTypes);
+        // commonTypes.intersect(importedTypes);
         commonTypes.retainAll(importedTypes);
 
         // compute the types that must be imported additionally
-        //importTypes.subtract(commonTypes);
+        // importTypes.subtract(commonTypes);
         importTypes.removeAll(commonTypes);
 
         // now find the types that do no longer have to be imported
-        //importedTypes.subtract(commonTypes);
+        // importedTypes.subtract(commonTypes);
         importedTypes.removeAll(commonTypes);
 
         // now, remove the no longer used imports including all multi imports
         for (int i = ilsize - 1; i >= 0; i -= 1) {
             Import imp = il.get(i);
-            if (imp.isStaticImport()) continue; // TODO - Gutzmann
+            if (imp.isStaticImport())
+                continue; // TODO - Gutzmann
             if ((imp.isMultiImport() && removeMultiTypeImports)
-                    || (!imp.isMultiImport() && removeSingleTypeImports && importedTypes.contains(classTypes[i]))) {
+                    || (!imp.isMultiImport() && removeSingleTypeImports
+                            && importedTypes.contains(classTypes[i]))) {
                 MiscKit.remove(ch, imp);
             }
         }
@@ -258,8 +273,8 @@ public class UnitKit {
      * type. This method does not check whether the import is needed or
      * redundant.
      *
-     * @param ch       the change history to notify (may be <CODE>null</CODE>).
-     * @param cu       the unit to create the import for.
+     * @param ch the change history to notify (may be <CODE>null</CODE>).
+     * @param cu the unit to create the import for.
      * @param typeName the class type name to create the import for.
      * @return the new import.
      * @deprecated should become a fully grown transformation.
@@ -280,16 +295,17 @@ public class UnitKit {
      * <CODE>null</CODE> is returned, otherwise the new import specification
      * that imports the type directly.
      *
-     * @param ch       the change history to report to (may be <CODE>null</CODE>).
-     * @param si       the source info service.
+     * @param ch the change history to report to (may be <CODE>null</CODE>).
+     * @param si the source info service.
      * @param typeName the fully qualified name of the type to be known at the unit
-     *                 level.
-     * @param context  the context in which the type should be known.
+     *        level.
+     * @param context the context in which the type should be known.
      * @return a new import specification as added to the compilation unit, or
-     * <CODE>null</CODE> if no new import was needed.
+     *         <CODE>null</CODE> if no new import was needed.
      * @deprecated needs further testing - use at your own risks
      */
-    public static Import ensureImport(ChangeHistory ch, SourceInfo si, String typeName, ProgramElement context) {
+    public static Import ensureImport(ChangeHistory ch, SourceInfo si, String typeName,
+            ProgramElement context) {
         Debug.assertNonnull(si, typeName, context);
         Debug.assertBoolean(typeName.length() > 0);
         if (si.getType(typeName, context) != null) {
@@ -302,10 +318,10 @@ public class UnitKit {
      * Transformation that ensures that all type references in the given subtree
      * are resolvable by importing the corresponding types on demand.
      *
-     * @param ch   the change history to report to (may be <CODE>null</CODE>).
-     * @param si   the source info service.
+     * @param ch the change history to report to (may be <CODE>null</CODE>).
+     * @param si the source info service.
      * @param root the root element in a subtree containing type references to
-     *             check.
+     *        check.
      * @deprecated needs further testing - use at your own risks
      */
     public static void ensureImports(ChangeHistory ch, SourceInfo si, ProgramElement root) {

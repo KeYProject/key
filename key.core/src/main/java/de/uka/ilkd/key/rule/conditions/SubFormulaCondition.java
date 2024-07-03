@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -30,7 +34,7 @@ public class SubFormulaCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
-                         SVInstantiations instMap, Services services) {        
+            SVInstantiations instMap, Services services) {
         if (!(var instanceof FormulaSV) || var != this.a) {
             return false;
         }
@@ -38,7 +42,7 @@ public class SubFormulaCondition extends VariableConditionAdapter {
         if (tInst.arity() == 0) {
             return negated;
         } else {
-            for (Term sub: tInst.subs()) {
+            for (Term sub : tInst.subs()) {
                 if (sub.sort() == Sort.FORMULA) {
                     return !negated;
                 }
@@ -49,6 +53,6 @@ public class SubFormulaCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        return (negated ? "\\not":"") + "\\hasSubFormulas (" + a + ")";
+        return (negated ? "\\not" : "") + "\\hasSubFormulas (" + a + ")";
     }
 }

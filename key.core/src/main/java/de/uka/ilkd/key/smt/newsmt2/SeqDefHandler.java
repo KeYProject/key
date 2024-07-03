@@ -1,4 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -13,19 +27,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * This handler handles the seqDef binder function specially.
@@ -74,12 +78,11 @@ public class SeqDefHandler implements SMTHandler {
         assert (op == seqLDT.getSeqDef());
 
         Map<String, Object> state = trans.getTranslationState();
-        Map<Term, SExpr> seqDefMap = (Map<Term, SExpr>)
-          state.computeIfAbsent("SEQDEF_MAP",
-                  x -> new LinkedHashMap<>());
+        Map<Term, SExpr> seqDefMap = (Map<Term, SExpr>) state.computeIfAbsent("SEQDEF_MAP",
+            x -> new LinkedHashMap<>());
 
         for (Entry<Term, SExpr> entry : seqDefMap.entrySet()) {
-            if(entry.getKey().equalsModRenaming(term)) {
+            if (entry.getKey().equalsModRenaming(term)) {
                 return entry.getValue();
             }
         }
@@ -105,11 +108,12 @@ public class SeqDefHandler implements SMTHandler {
         return result;
     }
 
-    private void collectVars(Term term, Set<ParsableVariable> vars, ImmutableSet<QuantifiableVariable> boundVars) {
+    private void collectVars(Term term, Set<ParsableVariable> vars,
+            ImmutableSet<QuantifiableVariable> boundVars) {
 
         Operator op = term.op();
         if (op instanceof LogicVariable && !boundVars.contains((QuantifiableVariable) op)) {
-            vars.add((LogicVariable)op);
+            vars.add((LogicVariable) op);
             return;
         }
 
@@ -130,7 +134,7 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     private SExpr makeSeqLenDefinition(String function, Set<ParsableVariable> vars,
-                                       Term term, MasterHandler trans) throws SMTTranslationException {
+            Term term, MasterHandler trans) throws SMTTranslationException {
         List<SExpr> qvars = new ArrayList<>();
         List<SExpr> params = new ArrayList<>();
         for (ParsableVariable var : vars) {
@@ -144,7 +148,7 @@ public class SeqDefHandler implements SMTHandler {
         SExpr app = new SExpr(function, params);
         SExpr seqLen = new SExpr(SEQLEN, app);
         SExpr len = SExprs.minus(trans.translate(term.sub(1), IntegerOpHandler.INT),
-                trans.translate(term.sub(0), IntegerOpHandler.INT));
+            trans.translate(term.sub(0), IntegerOpHandler.INT));
         SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.ZERO), len, SExprs.ZERO);
         SExpr eq = SExprs.eq(seqLen, ite);
         SExpr forall = SExprs.forall(qvars, eq);
@@ -152,7 +156,7 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     private SExpr makeSeqGetDefinition(String function, Set<ParsableVariable> vars,
-                                       Term term, MasterHandler trans) throws SMTTranslationException {
+            Term term, MasterHandler trans) throws SMTTranslationException {
 
         List<SExpr> qvars = new ArrayList<>();
         List<SExpr> guards = new ArrayList<>();
@@ -163,14 +167,14 @@ public class SeqDefHandler implements SMTHandler {
 
             trans.addSort(var.sort());
             SExpr smtVar = new SExpr(LogicalVariableHandler.VAR_PREFIX + name);
-            if(!var.sort().name().equals(IntegerLDT.NAME)) {
+            if (!var.sort().name().equals(IntegerLDT.NAME)) {
                 guards.add(SExprs.instanceOf(smtVar, SExprs.sortExpr(var.sort())));
             }
             params.add(smtVar);
         }
 
         // \forall i; \forall params;
-        //     and(guards, i_range) -> seqGet(function(params), i) = let i = i + lo in term
+        // and(guards, i_range) -> seqGet(function(params), i) = let i = i + lo in term
         SExpr app = makeApplication(function, vars);
         QuantifiableVariable last = term.boundVars().last();
         String name = last.name().toString();
@@ -184,15 +188,16 @@ public class SeqDefHandler implements SMTHandler {
         guards.add(SExprs.lessThan(i, len));
         SExpr smtTerm = trans.translate(term.sub(2), Type.UNIVERSE);
         SExpr replacedSMTTerm = SExprs.let(LogicalVariableHandler.VAR_PREFIX + name,
-                SExprs.coerce(SExprs.plus(i, lower), IntegerOpHandler.INT),
-                smtTerm);
+            SExprs.coerce(SExprs.plus(i, lower), IntegerOpHandler.INT),
+            smtTerm);
         SExpr seqGet = new SExpr(SEQGET, Type.UNIVERSE, app, new SExpr("i2u", i));
         SExpr imp = SExprs.imp(SExprs.and(guards), SExprs.eq(seqGet, replacedSMTTerm));
         SExpr forall = SExprs.forall(qvars, imp);
         return SExprs.assertion(forall);
     }
 
-    private SExpr makeTyping(String name, Set<ParsableVariable> vars, MasterHandler master) throws SMTTranslationException {
+    private SExpr makeTyping(String name, Set<ParsableVariable> vars, MasterHandler master)
+            throws SMTTranslationException {
         return HandlerUtil.funTypeAxiom(name, vars.size(), seqLDT.targetSort(), master);
     }
 
@@ -202,7 +207,8 @@ public class SeqDefHandler implements SMTHandler {
         return decl;
     }
 
-    private SExpr makeApplication(String name, Set<ParsableVariable> vars) throws SMTTranslationException {
+    private SExpr makeApplication(String name, Set<ParsableVariable> vars)
+            throws SMTTranslationException {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
             SExpr varRef = LogicalVariableHandler.makeVarRef(var.name().toString(), var.sort());
@@ -211,7 +217,8 @@ public class SeqDefHandler implements SMTHandler {
         return new SExpr(name, Type.UNIVERSE, args);
     }
 
-    private SExpr makeTermApplication(MasterHandler trans, String name, Set<ParsableVariable> vars) throws SMTTranslationException {
+    private SExpr makeTermApplication(MasterHandler trans, String name, Set<ParsableVariable> vars)
+            throws SMTTranslationException {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
             SExpr ref = trans.translate(termFactory.createTerm(var));

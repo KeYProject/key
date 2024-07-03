@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.expression.operator;
 
 import recoder.java.Expression;
@@ -31,7 +34,7 @@ public class Instanceof extends TypeOperator {
     /**
      * Instanceof.
      *
-     * @param child   an expression.
+     * @param child an expression.
      * @param typeref a type reference.
      */
 

@@ -1,19 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import java.awt.*;
+
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * Status line of the KeY MainWindow.
  * <p>
  * The status line hold a lblStatusText and a progress panel.
  * <p>
- * You add additional components by using the extension points {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine}
+ * You add additional components by using the extension points
+ * {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine}
  *
  * <p>
  * <ul>
@@ -28,7 +32,7 @@ class MainStatusLine extends JPanel {
     private static final long serialVersionUID = 2278249652314818379L;
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
-    //private boolean phantomBoxAdded = false;
+    // private boolean phantomBoxAdded = false;
 
     MainStatusLine(String initialText, Font font) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -41,11 +45,10 @@ class MainStatusLine extends JPanel {
         lblStatusText.setText(initialText);
         lblStatusText.setIcon(IconFactory.keyLogo(35, 20));
         lblStatusText.setBorder(BorderFactory.createCompoundBorder(
-                lblStatusText.getBorder(),
-                BorderFactory.createEmptyBorder(0, 10, 0, 0)
-        ));
+            lblStatusText.getBorder(),
+            BorderFactory.createEmptyBorder(0, 10, 0, 0)));
 
-        //add(Box.createHorizontalGlue());
+        // add(Box.createHorizontalGlue());
         add(lblStatusText);
         add(Box.createHorizontalStrut(50));
 
@@ -100,21 +103,24 @@ class MainStatusLine extends JPanel {
         if (visible) {
             setProgress(0);
 
-            /* To avoid later resizing of the status line, add an
-            // invisible element with the same height as the abort button
-            if (!phantomBoxAdded) {
-                phantomBoxAdded = true;
-                ComponentListener phantomAdder = new ComponentAdapter() {
-                    @Override
-                    public void componentResized(ComponentEvent e) {
-                        progressPanel.removeComponentListener(this);
-                        Dimension s = progressPanel.getSize();
-                        s = new Dimension(0, (int) s.getHeight());
-                        add(Box.createRigidArea(s));
-                    }
-                };
-                progressPanel.addComponentListener(phantomAdder);
-            }*/
+            /*
+             * To avoid later resizing of the status line, add an
+             * // invisible element with the same height as the abort button
+             * if (!phantomBoxAdded) {
+             * phantomBoxAdded = true;
+             * ComponentListener phantomAdder = new ComponentAdapter() {
+             *
+             * @Override
+             * public void componentResized(ComponentEvent e) {
+             * progressPanel.removeComponentListener(this);
+             * Dimension s = progressPanel.getSize();
+             * s = new Dimension(0, (int) s.getHeight());
+             * add(Box.createRigidArea(s));
+             * }
+             * };
+             * progressPanel.addComponentListener(phantomAdder);
+             * }
+             */
         }
     }
 

@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -26,16 +27,19 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 /**
- * Collects all schemavariables occurring in the 
- * <code>\find, \assumes</code> part or goal description of a taclet. 
- * The addrule section is scanned optionally.      
- *  
+ * Collects all schemavariables occurring in the
+ * <code>\find, \assumes</code> part or goal description of a taclet.
+ * The addrule section is scanned optionally.
+ *
  * Duplicates are not removed because the use of persistent
  * datastructure and up to now we just have a SetAsList-implementaion
- * causing to have O(sqr(n)) if it would used. 
- * 
- * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class 
+ * causing to have O(sqr(n)) if it would used.
+ *
+ * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class
  * to determine all uninstantiated schemavariables.
  */
 public class TacletSchemaVariableCollector extends DefaultVisitor {
@@ -43,70 +47,72 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
     /** collects all found variables */
     protected ImmutableList<SchemaVariable> varList;
     /** the instantiations needed for unwind loop constructs */
-    private SVInstantiations instantiations = 
-	SVInstantiations.EMPTY_SVINSTANTIATIONS;
+    private SVInstantiations instantiations =
+        SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
 
     public TacletSchemaVariableCollector() {
-	varList = ImmutableSLList.<SchemaVariable>nil();
+        varList = ImmutableSLList.<SchemaVariable>nil();
     }
 
-    
+
     /**
      * @param svInsts the SVInstantiations that have been already found
-     * (needed by unwind loop constructs to determine which labels are needed)
+     *        (needed by unwind loop constructs to determine which labels are needed)
      */
     public TacletSchemaVariableCollector(SVInstantiations svInsts) {
-	varList = ImmutableSLList.<SchemaVariable>nil();
-	instantiations = svInsts;
+        varList = ImmutableSLList.<SchemaVariable>nil();
+        instantiations = svInsts;
     }
 
-    
-    /** collects all SchemVariables that occur in the JavaBlock
+
+    /**
+     * collects all SchemVariables that occur in the JavaBlock
+     *
      * @param jb the JavaBlock where to look for Schemavariables
      * @param vars the IList<SchemaVariable> where to add the found
-     * SchemaVariables 
-     * @return the extended list of found schemavariables 
+     *        SchemaVariables
+     * @return the extended list of found schemavariables
      */
-    protected ImmutableList<SchemaVariable> collectSVInProgram
-	(JavaBlock jb, ImmutableList<SchemaVariable> vars) {
+    protected ImmutableList<SchemaVariable> collectSVInProgram(JavaBlock jb,
+            ImmutableList<SchemaVariable> vars) {
 
-	ProgramSVCollector prgSVColl = new 
-	    ProgramSVCollector(jb.program(), vars, instantiations);
-	prgSVColl.start();
-	return prgSVColl.getSchemaVariables();
+        ProgramSVCollector prgSVColl = new ProgramSVCollector(jb.program(), vars, instantiations);
+        prgSVColl.start();
+        return prgSVColl.getSchemaVariables();
     }
-    
-    
-    /** 
-     * visits the Term in post order {@link Term#execPostOrder(Visitor)} and 
-     * collects all found schema variables 
-     * @param t the Term whose schema variables are collected 
-     */  
+
+
+    /**
+     * visits the Term in post order {@link Term#execPostOrder(Visitor)} and
+     * collects all found schema variables
+     *
+     * @param t the Term whose schema variables are collected
+     */
     @Override
-    public void visit(Term t) {	
-	final Operator op = t.op();
-        if (op instanceof Modality || 
+    public void visit(Term t) {
+        final Operator op = t.op();
+        if (op instanceof Modality ||
                 op instanceof ModalOperatorSV) {
-	    varList = collectSVInProgram(t.javaBlock(), varList);
-	} else if (op instanceof ElementaryUpdate) {
-            varList = collectSVInElementaryUpdate((ElementaryUpdate)op, varList);
-        } 
-        
-	for (int j=0, ar = t.arity(); j<ar; j++) {
-	    for (int i=0, sz = t.varsBoundHere(j).size(); i<sz; i++) {
-		final QuantifiableVariable qVar = 
+            varList = collectSVInProgram(t.javaBlock(), varList);
+        } else if (op instanceof ElementaryUpdate) {
+            varList = collectSVInElementaryUpdate((ElementaryUpdate) op, varList);
+        }
+
+        for (int j = 0, ar = t.arity(); j < ar; j++) {
+            for (int i = 0, sz = t.varsBoundHere(j).size(); i < sz; i++) {
+                final QuantifiableVariable qVar =
                     t.varsBoundHere(j).get(i);
                 if (qVar instanceof SchemaVariable) {
-		    varList = varList.prepend((SchemaVariable)qVar);
-		}
-	    }
-	}
-        
-        if (op instanceof SchemaVariable) {
-            varList=varList.prepend((SchemaVariable)op);
+                    varList = varList.prepend((SchemaVariable) qVar);
+                }
+            }
         }
-        
+
+        if (op instanceof SchemaVariable) {
+            varList = varList.prepend((SchemaVariable) op);
+        }
+
         for (TermLabel label : t.getLabels()) {
             if (label instanceof TermLabelSV) {
                 varList = varList.prepend((SchemaVariable) label);
@@ -114,50 +120,53 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
         }
     }
 
-    
+
     /**
      * collects all schema variables occurring on the lhs of an elementary update
+     *
      * @param op the ElementaryUpdate operator to be scanned for schemavariables
      * @param vars the ImmutableList<SchemaVariable> with already found schema variables
-     * @return a list of schema variables containing the ones of <code>vars</code> 
-     *   together with the schema variables found in <code>op</code>
+     * @return a list of schema variables containing the ones of <code>vars</code>
+     *         together with the schema variables found in <code>op</code>
      */
     private ImmutableList<SchemaVariable> collectSVInElementaryUpdate(
-	    	ElementaryUpdate op, 
-	    	ImmutableList<SchemaVariable> vars) {
+            ElementaryUpdate op,
+            ImmutableList<SchemaVariable> vars) {
         ImmutableList<SchemaVariable> result = vars;
-        
-        if(op.lhs() instanceof SchemaVariable) {
+
+        if (op.lhs() instanceof SchemaVariable) {
             result = result.prepend((SchemaVariable) op.lhs());
         }
 
         return result;
     }
-    
+
     /** @return list of found Variables */
     public Iterable<SchemaVariable> vars() {
-   return varList;
+        return varList;
     }
-    
+
     /** @return iterator of the found Variables */
     public Iterator<SchemaVariable> varIterator() {
-	return varList.iterator();
+        return varList.iterator();
     }
-    
+
 
     /** @return number of the found variables */
     public int size() {
-	return varList.size();
+        return varList.size();
     }
 
-    
+
     /** @return true iff term contains the given variable */
     public boolean contains(SchemaVariable var) {
-	return varList.contains(var);
+        return varList.contains(var);
     }
 
-   
-    /** collects all variables in a Semisequent 
+
+    /**
+     * collects all variables in a Semisequent
+     *
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
@@ -166,35 +175,38 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
         }
     }
 
-    
-    /** goes through the given sequent an collects all vars found
+
+    /**
+     * goes through the given sequent an collects all vars found
+     *
      * @param seq the Sequent to visit
      */
     public void visit(Sequent seq) {
-	visit(seq.antecedent());
-	visit(seq.succedent());
+        visit(seq.antecedent());
+        visit(seq.succedent());
     }
 
-    /** 
+    /**
      * collects all schema variables of a taclet
+     *
      * @param taclet the Taclet where the variables have to be collected to
      * @param visitAddrules a boolean that contols if the addrule sections are
-     * to be ignored (iff false) or if the visitor descends into them (iff true) 
+     *        to be ignored (iff false) or if the visitor descends into them (iff true)
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
-	visit(taclet.ifSequent());
+        visit(taclet.ifSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
     }
-    
-    
+
+
     protected void visitFindPart(Taclet taclet) {
-	if (taclet instanceof FindTaclet) {
-	    (((FindTaclet)taclet).find()).execPostOrder(this);
-	}	
+        if (taclet instanceof FindTaclet) {
+            (((FindTaclet) taclet).find()).execPostOrder(this);
+        }
     }
-    
-    
+
+
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
         for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
             TacletGoalTemplate gt = tacletGoalTemplate;
@@ -215,12 +227,14 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
     }
 
 
-    /** collects all variables in a Taclet but ignores the variables that appear
+    /**
+     * collects all variables in a Taclet but ignores the variables that appear
      * only in the addrule sections of the Taclet
+     *
      * @param taclet the Taclet where the variables have to be collected to
      */
     public void visitWithoutAddrule(Taclet taclet) {
-	visit(taclet, false);
+        visit(taclet, false);
     }
-    
+
 }

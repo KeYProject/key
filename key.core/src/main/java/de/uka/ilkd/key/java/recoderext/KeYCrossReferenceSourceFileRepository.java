@@ -1,22 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext;
+
+import de.uka.ilkd.key.util.SpecDataLocation;
 
 import recoder.ServiceConfiguration;
 import recoder.io.DataLocation;
 import recoder.io.DefaultSourceFileRepository;
 import recoder.java.CompilationUnit;
-import de.uka.ilkd.key.util.SpecDataLocation;
 
 /**
  * This class is used to handle source files within recoder.
- * 
+ *
  * It does only overwrite one method: createDataLocation.
- * 
+ *
  * The original method in {@link DefaultSourceFileRepository} creates references
  * to possibly non-existing files which we do not want. Thus, we leave the location
  * already present.
- * 
+ *
  * @author MU
- * 
+ *
  */
 
 public class KeYCrossReferenceSourceFileRepository extends
@@ -29,12 +34,12 @@ public class KeYCrossReferenceSourceFileRepository extends
     /**
      * return the data location that is already stored in the compilation unit.
      * If there is no location stored so far, create a temporary invalid one.
-     * 
+     *
      * The super class would have created a location that does not represent the
      * existing sources.
-     * 
+     *
      * @param cu
-     *                Compilation unit to create the location for.
+     *        Compilation unit to create the location for.
      * @return location(cu) == null ? {@link SpecDataLocation#UNKNOWN_LOCATION} :
      *         location(cu)
      */

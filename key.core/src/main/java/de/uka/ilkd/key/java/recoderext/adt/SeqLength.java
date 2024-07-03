@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
@@ -26,37 +30,37 @@ public class SeqLength extends Operator {
     }
 
 
-    @Override    
+    @Override
     public SeqLength deepClone() {
         return new SeqLength(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
         return 1;
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return POSTFIX;
     }
 
 
-    @Override    
+    @Override
     public void accept(SourceVisitor v) {
 
     }
-    
-    public String toSource(){
-        return children.get(0).toSource()+".length";
+
+    public String toSource() {
+        return children.get(0).toSource() + ".length";
     }
 
 }

@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.pattern;
 
 import recoder.ModelElement;
@@ -41,8 +44,9 @@ public class Property implements DesignPattern {
         String fieldName = field.getVariables().get(0).getName();
         String typeName = typeRef.toString();
         String className = Naming.createClassName(fieldName);
-        String source = "public void set" + className + "(" + typeName + " " + fieldName + "){this." + fieldName + "="
-                + fieldName + ";}";
+        String source = "public void set" + className + "(" + typeName + " " + fieldName + "){this."
+            + fieldName + "="
+            + fieldName + ";}";
         try {
             setter = factory.parseMethodDeclaration(source);
             source = "public " + typeName + " get" + className + "(){return " + fieldName + ";}";
@@ -50,10 +54,12 @@ public class Property implements DesignPattern {
             if (typeRef.getDimensions() > 0) {
                 // cut last "[]"
                 typeName = typeName.substring(0, typeName.length() - 2);
-                source = "public void set" + className + "(int index, " + typeName + " " + fieldName + ") { this."
-                        + fieldName + "[index] = " + fieldName + "; }";
+                source = "public void set" + className + "(int index, " + typeName + " " + fieldName
+                    + ") { this."
+                    + fieldName + "[index] = " + fieldName + "; }";
                 indexedSetter = factory.parseMethodDeclaration(source);
-                source = "public " + typeName + " get" + className + "(int index){return " + fieldName + "[index];}";
+                source = "public " + typeName + " get" + className + "(int index){return "
+                    + fieldName + "[index];}";
                 indexedGetter = factory.parseMethodDeclaration(source);
             }
         } catch (ParserException pe) {
@@ -142,7 +148,8 @@ public class Property implements DesignPattern {
      */
     public void validate() throws ModelException {
         if (setter == null && getter == null) {
-            throw new InconsistentPatternException("Properties must have at least a setter or a getter method");
+            throw new InconsistentPatternException(
+                "Properties must have at least a setter or a getter method");
         }
         String gtype = null, stype = null, ftype = null;
         if (getter != null) {

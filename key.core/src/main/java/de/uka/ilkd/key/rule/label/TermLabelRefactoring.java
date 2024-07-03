@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.label;
 
 import java.util.List;
@@ -26,13 +30,14 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
  * <p>
  * A {@link TermLabelRefactoring} is used by
  * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence,
- *                                      Term, Rule, Goal, Term)}
+ * Term, Rule, Goal, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
  * For more information about {@link TermLabel}s and how they are maintained
  * during prove read the documentation of interface {@link TermLabel}.
  * </p>
+ *
  * @author Martin Hentschel
  * @see TermLabel
  * @see TermLabelManager
@@ -50,7 +55,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param rule the rule being applied.
      * @param goal the goal on which the rule is being applied.
      * @param hint an optional hint passed from the active rule to describe the term which
-     *  should be created.
+     *        should be created.
      * @return whether any refactorings should be applied on an application of the given rule.
      */
     public static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
@@ -59,17 +64,21 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
             if ((rule instanceof WhileInvariantRule
                     && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
                     (rule instanceof WhileInvariantRule
-                            && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
+                            && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint))
+                    ||
                     (rule instanceof UseOperationContractRule
-                            && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
+                            && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint))
+                    ||
                     (rule instanceof AbstractAuxiliaryContractRule
-                            && AbstractAuxiliaryContractRule
-                            .FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
+                            && AbstractAuxiliaryContractRule.FULL_PRECONDITION_TERM_HINT
+                                    .equals(hint))
+                    ||
                     (rule instanceof AbstractAuxiliaryContractRule
-                            && AbstractAuxiliaryContractRule
-                            .NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
-                    (rule instanceof CloseAfterMerge && CloseAfterMerge
-                            .FINAL_WEAKENING_TERM_HINT.equals(hint))) {
+                            && AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT
+                                    .equals(hint))
+                    ||
+                    (rule instanceof CloseAfterMerge
+                            && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
                 ProofOblInput problem = proof.getServices()
                         .getSpecificationRepository().getProofOblInput(proof);
                 if (problem instanceof AbstractOperationPO) {
@@ -87,17 +96,18 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
 
     /**
      * Defines if a refactoring is required and if so in which {@link RefactoringScope}.
+     *
      * @param state The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services} used by the {@link Proof}
-     *  on which a {@link Rule} is applied right now.
+     *        on which a {@link Rule} is applied right now.
      * @param applicationPosInOccurrence The {@link PosInOccurrence}
-     *  in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+     *        in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
      * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence}
-     *  in the previous {@link Sequent}.
+     *        in the previous {@link Sequent}.
      * @param rule The {@link Rule} which is applied.
      * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
      * @param hint An optional hint passed from the active rule
-     *      to describe the term which should be created.
+     *        to describe the term which should be created.
      * @param tacletTerm The optional taclet {@link Term}.
      * @return The required {@link RefactoringScope}.
      */
@@ -112,17 +122,18 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
 
     /**
      * This method is used to refactor the labels of the given {@link Term}.
+     *
      * @param state The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services} used by the {@link Proof} on which a
-     *  {@link Rule} is applied right now.
+     *        {@link Rule} is applied right now.
      * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous
-     *  {@link Sequent} which defines the {@link Term} that is rewritten.
+     *        {@link Sequent} which defines the {@link Term} that is rewritten.
      * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence}
-     *  in the previous {@link Sequent}.
+     *        in the previous {@link Sequent}.
      * @param rule The {@link Rule} which is applied.
      * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
      * @param hint An optional hint passed from the active rule to describe the term which
-     *  should be created.
+     *        should be created.
      * @param tacletTerm The optional taclet {@link Term}.
      * @param term The {@link Term} which is now refactored.
      * @param labels The new labels the {@link Term} will have after the refactoring.
@@ -140,6 +151,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
 
     /**
      * Possible refactoring scopes.
+     *
      * @author Martin Hentschel
      */
     public static enum RefactoringScope {

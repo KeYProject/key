@@ -1,28 +1,34 @@
-package de.uka.ilkd.key.logic.op;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableSet;
+package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * Schema variable matching modal operators.
  */
-public final class ModalOperatorSV extends AbstractSV  {
-    
-    /** 
-     * the set of modalities this sv can match 
+public final class ModalOperatorSV extends AbstractSV {
+
+    /**
+     * the set of modalities this sv can match
      */
-    private final ImmutableSet<Modality> modalities;    
-    
-    
-    /** creates a new SchemaVariable that is used as placeholder for
+    private final ImmutableSet<Modality> modalities;
+
+
+    /**
+     * creates a new SchemaVariable that is used as placeholder for
      * modal operators.
+     *
      * @param name the Name of the SchemaVariable
      * @param modalities modal operators matched by this SV
-     */    
+     */
     ModalOperatorSV(Name name, ImmutableSet<Modality> modalities) {
-        super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA, false, false);
+        super(name, new Sort[] { Sort.FORMULA }, Sort.FORMULA, false, false);
         this.modalities = modalities;
     }
 
@@ -32,28 +38,28 @@ public final class ModalOperatorSV extends AbstractSV  {
     public ImmutableSet<Modality> getModalities() {
         return modalities;
     }
-    
-    
+
+
     @Override
     public String toString() {
-	return toString(" (modal operator)");
+        return toString(" (modal operator)");
     }
-    
-    
-    @Override 
+
+
+    @Override
     public String proofToString() {
-	StringBuffer result = new StringBuffer();
-	result.append("\\schemaVar \\modalOperator {");
+        StringBuffer result = new StringBuffer();
+        result.append("\\schemaVar \\modalOperator {");
         boolean first = true;
-	for(Modality modality : modalities) {
-            if(!first) {
-              result.append(", ");
-            }else{
-              first = false;
+        for (Modality modality : modalities) {
+            if (!first) {
+                result.append(", ");
+            } else {
+                first = false;
             }
-	    result.append(modality);
-	}
-	result.append("} ").append(name()).append(";\n");
-	return result.toString();
+            result.append(modality);
+        }
+        result.append("} ").append(name()).append(";\n");
+        return result.toString();
     }
 }

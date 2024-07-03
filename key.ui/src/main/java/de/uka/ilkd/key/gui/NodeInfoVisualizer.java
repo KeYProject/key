@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui;
 
 import java.util.Collections;
@@ -8,7 +12,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import javax.swing.JComponent;
 
 import de.uka.ilkd.key.logic.Name;
@@ -17,7 +20,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 /**
  * <p>
- *  A UI component showing additional information about a {@link Node} in the current {@link Proof}.
+ * A UI component showing additional information about a {@link Node} in the current {@link Proof}.
  * </p>
  *
  * @author lanzinger
@@ -28,7 +31,7 @@ public abstract class NodeInfoVisualizer
 
     /** @see #getInstances(Node) */
     private static Map<Name, Map<Integer, SortedSet<NodeInfoVisualizer>>> instances =
-            new HashMap<>();
+        new HashMap<>();
 
     /**
      * @see #addListener(NodeInfoVisualizerListener)
@@ -66,7 +69,7 @@ public abstract class NodeInfoVisualizer
      *
      * @param node a node.
      * @return {@code true} iff there are any open {@code NodeInfoWindow}s
-     *  associated with the specified node.
+     *         associated with the specified node.
      */
     public static boolean hasInstances(Node node) {
         return !getInstances(node).isEmpty();

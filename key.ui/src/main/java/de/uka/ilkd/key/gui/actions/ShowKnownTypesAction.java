@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
 
@@ -6,7 +9,6 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -43,9 +45,9 @@ public class ShowKnownTypesAction extends MainWindowAction {
 
     private void showTypeHierarchy() {
         Proof currentProof = getMediator().getSelectedProof();
-        if(currentProof == null) {
+        if (currentProof == null) {
             mainWindow.notify(new GeneralInformationEvent("No Type Hierarchy available.",
-                    "If you wish to see the types "
+                "If you wish to see the types "
                     + "for a proof you have to load one first"));
         } else {
             final JDialog dialog = new JDialog(mainWindow, "Known types for this proof", true);
@@ -73,7 +75,7 @@ public class ShowKnownTypesAction extends MainWindowAction {
                     pane.add(panel, BorderLayout.SOUTH);
                     dialog.getRootPane().setDefaultButton(okButton);
                     ActionListener escapeListener = event -> {
-                        if(event.getActionCommand().equals("ESC")) {
+                        if (event.getActionCommand().equals("ESC")) {
                             okButton.doClick();
                         }
                     };

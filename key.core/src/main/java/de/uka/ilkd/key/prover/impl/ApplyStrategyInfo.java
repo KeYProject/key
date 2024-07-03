@@ -1,9 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
-/** The final result of the strategy application is stored in this container
+/**
+ * The final result of the strategy application is stored in this container
  * and returned to the instance that started the strategies.
  *
  * It contains statistic information about the number of applied rules, time needed or
@@ -27,9 +32,9 @@ public class ApplyStrategyInfo {
             long timeInMillis, int appliedRuleAppsCount, int nrClosedGoals) {
         this.message = message;
         this.proof = proof;
-        this.error   = error;
+        this.error = error;
         this.nonCloseableGoal = nonCloseableGoal;
-        this.timeInMillis    = timeInMillis;
+        this.timeInMillis = timeInMillis;
         this.appliedRuleAppsCount = appliedRuleAppsCount;
         this.nrClosedGoals = nrClosedGoals;
     }

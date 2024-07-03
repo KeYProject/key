@@ -1,5 +1,13 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import recoder.ProgramFactory;
 import recoder.abstraction.Type;
@@ -19,11 +27,6 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 public class StatementKit {
 
     private StatementKit() {
@@ -40,10 +43,10 @@ public class StatementKit {
      * If the statement has no parent, it is wrapped into a new statement list
      * which then is returned.
      *
-     * @param s  a statement; may not be <CODE>null</CODE>.
+     * @param s a statement; may not be <CODE>null</CODE>.
      * @param ch the change history; may be <CODE>null</CODE>.
      * @return the mutable statement list that the given statement is part of;
-     * the list is contained in a new StatementBlock if necessary.
+     *         the list is contained in a new StatementBlock if necessary.
      * @see #getStatementMutableList
      * @see #wrapWithStatementBlock
      * @deprecated replaced by first class transformation PrepareStatementList
@@ -79,7 +82,7 @@ public class StatementKit {
      *
      * @param s a statement; may not be <CODE>null</CODE>.
      * @return the mutable statement list that the given statement is part of,
-     * or <CODE>null</CODE> if there is none.
+     *         or <CODE>null</CODE> if there is none.
      */
     public static ASTList<Statement> getStatementMutableList(Statement s) {
         Debug.assertNonnull(s);
@@ -122,7 +125,8 @@ public class StatementKit {
             }
         }
         if (body == null) {
-            Debug.assertBoolean(true, "Could not handle container of statement " + Format.toString(Formats.ELEMENT_LONG, s));
+            Debug.assertBoolean(true, "Could not handle container of statement "
+                + Format.toString(Formats.ELEMENT_LONG, s));
         }
         if (body instanceof StatementBlock && body != s) {
             return ((StatementBlock) body).getBody();
@@ -140,7 +144,7 @@ public class StatementKit {
      * {@link recoder.java.declaration.LocalVariableDeclaration}containing a
      * variable that is actually referred.
      *
-     * @param s  a statement to be wrapped by a new statement block.
+     * @param s a statement to be wrapped by a new statement block.
      * @param ch the change history; may be <CODE>null</CODE>.
      * @return the new statement block replacing <CODE>s</CODE>.
      * @deprecated
@@ -169,12 +173,13 @@ public class StatementKit {
      * variable that is actually referred from outside.
      *
      * @param xr the cross referencer service used.
-     * @param s  a statement that might be wrapped.
+     * @param s a statement that might be wrapped.
      * @return <CODE>true</CODE> if wrapping the statement in a block would
-     * not change the program semantics, <CODE>false</CODE> otherwise.
+     *         not change the program semantics, <CODE>false</CODE> otherwise.
      * @deprecated
      */
-    public static boolean canSafelyWrapWithStatementBlock(CrossReferenceSourceInfo xr, Statement s) {
+    public static boolean canSafelyWrapWithStatementBlock(CrossReferenceSourceInfo xr,
+            Statement s) {
         Debug.assertNonnull(xr, s);
         if (s instanceof LocalVariableDeclaration) {
             LocalVariableDeclaration lvd = (LocalVariableDeclaration) s;
@@ -200,12 +205,13 @@ public class StatementKit {
      * variable initialized by the former return value. If necessary, a new
      * statement block is created wrapping the return or throw statement.
      *
-     * @param ch            the change history service (may be <CODE>null</CODE>).
-     * @param si            the source info service.
+     * @param ch the change history service (may be <CODE>null</CODE>).
+     * @param si the source info service.
      * @param returnOrThrow a return or throw statement.
      * @deprecated will become a first class transformation
      */
-    public static void preparePrepend(ChangeHistory ch, SourceInfo si, ExpressionJumpStatement returnOrThrow) {
+    public static void preparePrepend(ChangeHistory ch, SourceInfo si,
+            ExpressionJumpStatement returnOrThrow) {
         Debug.assertNonnull(si, returnOrThrow);
         List<Statement> destination = prepareStatementMutableList(returnOrThrow, ch);
         if (returnOrThrow.getExpressionCount() == 0) {
@@ -217,9 +223,11 @@ public class StatementKit {
         }
         ProgramFactory f = returnOrThrow.getFactory();
         Type type = si.getType(expr);
-        String vname = VariableKit.getNewVariableName(si, type, MiscKit.getScopeDefiningElement(expr));
+        String vname =
+            VariableKit.getNewVariableName(si, type, MiscKit.getScopeDefiningElement(expr));
         TypeReference tref = TypeKit.createTypeReference(si, type, expr);
-        LocalVariableDeclaration lvd = f.createLocalVariableDeclaration(tref, f.createIdentifier(vname));
+        LocalVariableDeclaration lvd =
+            f.createLocalVariableDeclaration(tref, f.createIdentifier(vname));
         lvd.getVariables().get(0).setInitializer(expr);
         lvd.makeAllParentRolesValid();
         VariableReference vref = f.createVariableReference(f.createIdentifier(vname));
@@ -244,7 +252,7 @@ public class StatementKit {
      * Checks if the specified statement is reachable as defined in the static
      * language semantics.
      *
-     * @param s  a statement.
+     * @param s a statement.
      * @param si the SourceInfo service to use.
      * @return <CODE>true</CODE> if the statement is reachable, <CODE>false
      * </CODE> otherwise.
@@ -266,7 +274,7 @@ public class StatementKit {
      * defined in the static language semantics.
      *
      * @param block a statement block.
-     * @param si    the SourceInfo service to use.
+     * @param si the SourceInfo service to use.
      * @return <CODE>true</CODE> if the end of the block is reachable, <CODE>
      * false</CODE> otherwise.
      * @since 0.71
@@ -290,7 +298,7 @@ public class StatementKit {
      *
      * @param s a labeled jump statement.
      * @return the corresponding labeled statement, or <CODE>null</CODE> if
-     * there is none.
+     *         there is none.
      * @since 0.71
      */
     public static LabeledStatement getCorrespondingLabel(LabelJumpStatement s) {
@@ -314,10 +322,10 @@ public class StatementKit {
      * exits, such as return or throw statements, and the body if its exit is
      * reachable. For other members, returns an empty list.
      *
-     * @param m  a member declaration.
+     * @param m a member declaration.
      * @param si the SourceInfo service to use.
      * @return a list of statements that finish the member's body after
-     * execution.
+     *         execution.
      * @since 0.72
      */
     public static List<Statement> getExits(MemberDeclaration mdecl, SourceInfo si) {
@@ -441,4 +449,3 @@ public class StatementKit {
     }
 
 }
-

@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.axiom_abstraction;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
+package de.uka.ilkd.key.axiom_abstraction;
 
 import java.util.Iterator;
 
@@ -10,12 +12,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
+
 /**
  * An abstract domain is a countable lattice with a partial order relation and a
  * join operator. It supplies methods to abstract from a concrete domain to this
  * abstract domain, and for iterating through the domain elements, thereby
  * respecting the partial order.
- * 
+ *
  * @author Dominic Scheurer
  *
  * @param <AbstrDomElem>
@@ -35,13 +39,13 @@ public abstract class AbstractDomainLattice implements
      * suitable abstract element. The returned abstract element should be as
      * precise as possible, that is there should not be a smaller abstract
      * element that also describes the concrete element.
-     * 
+     *
      * @param state
-     *            The state in which the abstraction should hold.
+     *        The state in which the abstraction should hold.
      * @param term
-     *            Element to abstract from.
+     *        Element to abstract from.
      * @param services
-     *            The services object.
+     *        The services object.
      * @return A suitable abstract domain element.
      */
     public AbstractDomainElement abstractFrom(SymbolicExecutionState state,
@@ -52,10 +56,10 @@ public abstract class AbstractDomainLattice implements
             AbstractDomainElement elem = it.next();
 
             Term toProve =
-                    getSideConditionForAxiom(state, term, elem, services);
+                getSideConditionForAxiom(state, term, elem, services);
 
             if (isProvableWithSplitting(toProve, services,
-                    AXIOM_PROVE_TIMEOUT_MS)) {
+                AXIOM_PROVE_TIMEOUT_MS)) {
                 return elem;
             }
         }
@@ -66,15 +70,15 @@ public abstract class AbstractDomainLattice implements
     /**
      * Returns a side condition which has to hold if elem is a correct
      * abstraction for term.
-     * 
+     *
      * @param state
-     *            The state in which the abstraction should hold.
+     *        The state in which the abstraction should hold.
      * @param term
-     *            Element to abstract from.
+     *        Element to abstract from.
      * @param elem
-     *            Abstract domain element to check.
+     *        Abstract domain element to check.
      * @param services
-     *            The services object.
+     *        The services object.
      * @return Side condition to prove in order to show that elem abstracts from
      *         term.
      */
@@ -92,11 +96,11 @@ public abstract class AbstractDomainLattice implements
     /**
      * A lattice join operation; finds an abstract element that is the least
      * upper bound of the set consisting of the elements a and b.
-     * 
+     *
      * @param a
-     *            First element to find the least upper bound for.
+     *        First element to find the least upper bound for.
      * @param b
-     *            Second element to find the least upper bound for.
+     *        Second element to find the least upper bound for.
      * @return The least upper bound of the set consisting of the elements a and
      *         b.
      */
@@ -113,11 +117,9 @@ public abstract class AbstractDomainLattice implements
         AbstractDomainElement joinRes = join(a, b);
         if (joinRes.equals(a)) {
             return PartialComparisonResult.GTE;
-        }
-        else if (joinRes.equals(b)) {
+        } else if (joinRes.equals(b)) {
             return PartialComparisonResult.LTE;
-        }
-        else {
+        } else {
             return PartialComparisonResult.UNDEF;
         }
 
@@ -138,14 +140,14 @@ public abstract class AbstractDomainLattice implements
      * {@link AbstractDomainElement} e, that
      * {@code fromString(e.toParseableString(),
      * services).equals(e)}.
-     * 
+     *
      * @param s
-     *            String to parse.
+     *        String to parse.
      * @param services
-     *            The services object.
+     *        The services object.
      * @return The corresponding {@link AbstractDomainElement}.
      * @throws RuntimeException
-     *             if s cannot be parsed.
+     *         if s cannot be parsed.
      */
     public AbstractDomainElement fromString(String s, Services services) {
         final Iterator<AbstractDomainElement> it = iterator();
@@ -157,7 +159,7 @@ public abstract class AbstractDomainLattice implements
         }
 
         throw new RuntimeException(
-                "No element is represented by the given String '" + s + "'.");
+            "No element is represented by the given String '" + s + "'.");
     }
 
 }

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 
@@ -26,37 +30,37 @@ public final class FinalReferenceCondition extends VariableConditionAdapter {
      * reference. The flag negation allows to reuse this condition for
      * ensuring non static references.
      */
-    public FinalReferenceCondition (SchemaVariable reference, 
-                    boolean negation) {
+    public FinalReferenceCondition(SchemaVariable reference,
+            boolean negation) {
         this.reference = reference;
-        this.negation  = negation;
+        this.negation = negation;
     }
 
 
     @Override
-    public boolean check(SchemaVariable var, 
-                    SVSubstitute subst, 
-                    SVInstantiations svInst,
-                    Services services) {
+    public boolean check(SchemaVariable var,
+            SVSubstitute subst,
+            SVInstantiations svInst,
+            Services services) {
 
         if (var == reference) {
             ProgramVariable attribute;
             if (subst instanceof FieldReference) {
-                attribute = ((FieldReference)subst).getProgramVariable();
-            } else if (subst instanceof ProgramVariable){
-                attribute = (ProgramVariable)subst;
-            } else{
+                attribute = ((FieldReference) subst).getProgramVariable();
+            } else if (subst instanceof ProgramVariable) {
+                attribute = (ProgramVariable) subst;
+            } else {
                 return !negation;
             }
-            return (negation ^ attribute.isFinal()) && 
-                            !(attribute instanceof ProgramConstant);
+            return (negation ^ attribute.isFinal()) &&
+                    !(attribute instanceof ProgramConstant);
         }
         return true;
     }
 
 
     @Override
-    public String toString () {
-        return (negation ? " \\not " : "" ) + "\\final(" + reference + ")";
+    public String toString() {
+        return (negation ? " \\not " : "") + "\\final(" + reference + ")";
     }
 }

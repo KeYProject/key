@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -18,75 +22,72 @@ import de.uka.ilkd.key.speclang.RepresentsAxiom;
 
 public class OracleInvariantTranslator {
 
-	private Services services;
-	
-	public OracleInvariantTranslator(Services services){
-		this.services = services;
-	}
+    private Services services;
 
-	public Term getInvariantTerm(Sort s){
-		JavaInfo info = services.getJavaInfo();
-		TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
-		SpecificationRepository spec = services.getSpecificationRepository();
+    public OracleInvariantTranslator(Services services) {
+        this.services = services;
+    }
 
-		Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+    public Term getInvariantTerm(Sort s) {
+        JavaInfo info = services.getJavaInfo();
+        TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
+        SpecificationRepository spec = services.getSpecificationRepository();
 
-		LogicVariable h = new LogicVariable(new Name("h"), heapSort);
+        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
 
-
-		KeYJavaType kjt = info.getKeYJavaType(s);
-
-		if(!(kjt.getJavaType() instanceof ClassDeclaration 
-				|| kjt.getJavaType() instanceof InterfaceDeclaration || kjt.getJavaType() instanceof ArrayDeclaration) 
-				)  {
-			return tb.tt();
-		}
-
-		LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
-		
-		Term result = tb.tt();
-		
-		for(ClassAxiom c : spec.getClassAxioms(kjt)){
-
-			if(c instanceof RepresentsAxiom && c.getKJT().equals(kjt)){
-				RepresentsAxiom ra = (RepresentsAxiom) c;
-				
-				 Term t = ra.getAxiom(h, o, services);
-				 
-				 if(t.op().equals(Equality.EQV)){
-					 
-					 Term[] heaps = new Term[1];
-                     heaps[0] = tb.var(h);
-
-                     Term inv = tb.inv(heaps, tb.var(o));
-                     Term left = t.sub(0);
-                     Term right = t.sub(1);
-                     
-                     if(left.op().name().equals(inv.op().name())){
-                    	 if(!right.equals(tb.tt())){
-                    		 result = tb.and(result, right);
-                    	 }
-                     }
-                     else if(right.op().name().equals(inv.op().name())){
-                    	 if(!left.equals(tb.tt())){
-                    		 result = tb.and(result, left);
-                    	 }
-                     }
-					 
-					 
-				 }
+        LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 
 
-			}
+        KeYJavaType kjt = info.getKeYJavaType(s);
 
-		}
+        if (!(kjt.getJavaType() instanceof ClassDeclaration
+                || kjt.getJavaType() instanceof InterfaceDeclaration
+                || kjt.getJavaType() instanceof ArrayDeclaration)) {
+            return tb.tt();
+        }
 
-		return tb.tt();
+        LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
 
+        Term result = tb.tt();
+
+        for (ClassAxiom c : spec.getClassAxioms(kjt)) {
+
+            if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
+                RepresentsAxiom ra = (RepresentsAxiom) c;
+
+                Term t = ra.getAxiom(h, o, services);
+
+                if (t.op().equals(Equality.EQV)) {
+
+                    Term[] heaps = new Term[1];
+                    heaps[0] = tb.var(h);
+
+                    Term inv = tb.inv(heaps, tb.var(o));
+                    Term left = t.sub(0);
+                    Term right = t.sub(1);
+
+                    if (left.op().name().equals(inv.op().name())) {
+                        if (!right.equals(tb.tt())) {
+                            result = tb.and(result, right);
+                        }
+                    } else if (right.op().name().equals(inv.op().name())) {
+                        if (!left.equals(tb.tt())) {
+                            result = tb.and(result, left);
+                        }
+                    }
+
+
+                }
+
+
+            }
+
+        }
+
+        return tb.tt();
 
 
 
-
-	}
+    }
 
 }

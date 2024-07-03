@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
@@ -8,8 +12,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -31,342 +33,345 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
+import org.key_project.util.collection.ImmutableSet;
+
 public class UserDefinedSymbols {
-        static class NamedComparator implements Comparator<Named>{
-                static NamedComparator INSTANCE = new NamedComparator();
-                @Override
-                public int compare(Named o1, Named o2) {
-                        return o1.name().compareTo(o2.name());
-                }
+    static class NamedComparator implements Comparator<Named> {
+        static NamedComparator INSTANCE = new NamedComparator();
+
+        @Override
+        public int compare(Named o1, Named o2) {
+            return o1.name().compareTo(o2.name());
+        }
+    }
+
+    final UserDefinedSymbols parent;
+    final Set<Function> usedExtraFunctions = new TreeSet<Function>(
+        NamedComparator.INSTANCE);
+    final Set<Function> usedExtraPredicates = new TreeSet<Function>(
+        NamedComparator.INSTANCE);
+    final Set<Sort> usedExtraSorts = new TreeSet<Sort>(
+        NamedComparator.INSTANCE);
+    final Set<QuantifiableVariable> usedExtraVariables =
+        new TreeSet<QuantifiableVariable>(NamedComparator.INSTANCE);
+    final Set<Named> usedSchemaVariables = new TreeSet<Named>(
+        NamedComparator.INSTANCE);
+    final ImmutableSet<Taclet> axioms;
+    private final NamespaceSet referenceNamespaces;
+    private String ruleHeader = null;
+
+
+    public UserDefinedSymbols(NamespaceSet referenceNamespaces,
+            ImmutableSet<Taclet> axioms) {
+        super();
+        this.referenceNamespaces = referenceNamespaces;
+        this.parent = null;
+        this.axioms = axioms;
+
+    }
+
+    public UserDefinedSymbols(UserDefinedSymbols parent) {
+        this.parent = parent;
+        this.axioms = parent.axioms;
+        this.referenceNamespaces = parent.referenceNamespaces;
+    }
+
+    private <T extends Named> void addUserDefiniedSymbol(T symbol, Set<T> set,
+            Namespace<T> excludeNamespace) {
+        if (!contains(symbol, set)) {
+            if (symbol instanceof SchemaVariable ||
+                    excludeNamespace.lookup(symbol.name()) == null) {
+                set.add(symbol);
+            }
         }
 
-        final UserDefinedSymbols parent;
-        final Set<Function> usedExtraFunctions = new TreeSet<Function>(
-                        NamedComparator.INSTANCE);
-        final Set<Function> usedExtraPredicates = new TreeSet<Function>(
-                        NamedComparator.INSTANCE);
-        final Set<Sort> usedExtraSorts = new TreeSet<Sort>(
-                        NamedComparator.INSTANCE);
-        final Set<QuantifiableVariable> usedExtraVariables =
-                new TreeSet<QuantifiableVariable>(NamedComparator.INSTANCE);
-        final Set<Named> usedSchemaVariables = new TreeSet<Named>(
-                        NamedComparator.INSTANCE);
-        final ImmutableSet<Taclet> axioms;
-        private final NamespaceSet referenceNamespaces;
-        private String ruleHeader = null;
+    }
 
-
-        public UserDefinedSymbols(NamespaceSet referenceNamespaces,
-                        ImmutableSet<Taclet> axioms) {
-                super();
-                this.referenceNamespaces = referenceNamespaces;
-                this.parent = null;
-                this.axioms = axioms;
-          
+    private <T extends Named> boolean contains(T symbol, Set<T> set) {
+        if (parent != null && parent.contains(symbol, set)) {
+            return true;
         }
 
-        public UserDefinedSymbols(UserDefinedSymbols parent) {
-                this.parent = parent;
-                this.axioms = parent.axioms;
-                this.referenceNamespaces = parent.referenceNamespaces;
-        }
+        return set.contains(symbol);
+    }
 
-        private <T extends Named> void addUserDefiniedSymbol(T symbol, Set<T> set,
-                        Namespace<T> excludeNamespace) {
-                if (!contains(symbol, set)){
-                        if(symbol instanceof SchemaVariable ||
-                                excludeNamespace.lookup(symbol.name()) == null) {
-                                set.add(symbol);
-                        }
-                }
-                
-        }
+    public void addFunction(Function symbol) {
+        addUserDefiniedSymbol(symbol, usedExtraFunctions,
+            referenceNamespaces.functions());
+    }
 
-        private <T extends Named>boolean contains(T symbol, Set<T> set) {
-                if (parent != null && parent.contains(symbol, set)) {
-                        return true;
-                }
-
-                return set.contains(symbol);
-        }
-
-        public void addFunction(Function symbol) {
-                addUserDefiniedSymbol(symbol, usedExtraFunctions,
-                                referenceNamespaces.functions());
-        }
-
-        public void addPredicate(Function symbol) {
-                addUserDefiniedSymbol(symbol, usedExtraPredicates,
-                                referenceNamespaces.functions());
-        }
-        
-    
-
-        public void addSort(Named symbol) {
-                if (symbol != Sort.FORMULA) {
-                        Sort sort = (Sort) symbol;
-                        if(!(sort instanceof NullSort)){
-                                for(Sort parentSort : sort.extendsSorts()){
-                                        addSort(parentSort);
-                                }
-                       }
-                        addUserDefiniedSymbol(sort, usedExtraSorts,
-                                        referenceNamespaces.sorts());
-                }
-        }
-
-        public void addVariable(QuantifiableVariable symbol) {
-                addUserDefiniedSymbol(symbol, usedExtraVariables,
-                                referenceNamespaces.variables());
-        }
-
-        public void addSchemaVariable(SchemaVariable symbol) {
-            // FIXME: This breaks the generics of namespace
-                addUserDefiniedSymbol(symbol, usedSchemaVariables,
-                                (Namespace)referenceNamespaces.variables());
-        }
-
-        public void addSymbolsToNamespaces(NamespaceSet namespaces) {
-                addSymbolsToNamespace(namespaces.functions(),
-                                usedExtraFunctions);
-                addSymbolsToNamespace(namespaces.functions(),
-                                usedExtraPredicates);
-                addSymbolsToNamespace(namespaces.sorts(), usedExtraSorts);
-                addSymbolsToNamespace(namespaces.variables(),
-                                usedExtraVariables);
-        }
-
-        private <T extends Named> void addSymbolsToNamespace(Namespace<T> namespace,
-                        Collection<T> symbols) {
-                for (T symbol : symbols) {
-                        namespace.addSafely(symbol);
-                }
-        }
-
-        public String getRuleHeader(Services services) {
-                if (parent == null) {
-                        if (ruleHeader == null) {
-                                ruleHeader = createRuleHeader(services);
-                        }
-                        return ruleHeader;
-                } else {
-                        return parent.getRuleHeader(services);
-                }
-        }
-
-        private String createRuleHeader(Services services) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append("\\rules{");
-                for (Taclet taclet : axioms) {
-                        buffer.append("\n\n");
-                        buffer.append(createHeaderFor(taclet, services));
-                }
-                buffer.append("\n}");
-                String result = buffer.toString();
-                result = result.replaceAll("\\[", "");
-                result = result.replaceAll("\\]", "");
-                return result;
-
-        }
-        
-        private StringBuffer createHeaderFor(Taclet taclet, Services services){
-            NotationInfo info = new NotationInfo();
-            StringBackend backend = new StringBackend(80);
-            LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),info, backend,services,true);
-            printer.printTaclet(taclet);
-
-            return new StringBuffer(backend.getString()+";");
-        }
+    public void addPredicate(Function symbol) {
+        addUserDefiniedSymbol(symbol, usedExtraPredicates,
+            referenceNamespaces.functions());
+    }
 
 
-        public void replaceGenericByProxySorts() {
-            Set<Sort> result = new HashSet<Sort>();
-            for (Sort sort : usedExtraSorts) {
-                if (sort instanceof GenericSort) {
-                    GenericSort genSort = (GenericSort) sort;
-                    ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
-                    result.add(proxySort);
-                } else {
-                    result.add(sort);
+
+    public void addSort(Named symbol) {
+        if (symbol != Sort.FORMULA) {
+            Sort sort = (Sort) symbol;
+            if (!(sort instanceof NullSort)) {
+                for (Sort parentSort : sort.extendsSorts()) {
+                    addSort(parentSort);
                 }
             }
-
-            usedExtraSorts.clear();
-            usedExtraSorts.addAll(result);
+            addUserDefiniedSymbol(sort, usedExtraSorts,
+                referenceNamespaces.sorts());
         }
+    }
 
+    public void addVariable(QuantifiableVariable symbol) {
+        addUserDefiniedSymbol(symbol, usedExtraVariables,
+            referenceNamespaces.variables());
+    }
 
-        public String createHeader(Services services) {
-                StringBuffer result = new StringBuffer();
-            
-                result.append("\n\n\\sorts{\n");
-                createHeaderForSorts(result);
-                result.append("}\n\n\\predicates{\n");
-                createHeaderForPredicates(result);
-                result.append("}\n\n\\functions{\n");
-                createHeaderForFunctions(result);
-                result.append("}\n\n\\schemaVariables{\n");
-                createHeaderForSchemaVariables(result);
-                result.append("}\n\n");
-                result.append(getRuleHeader(services));
-                result.append("\n\n");
-                return result.toString();
-        }
-        
-        private LinkedList<Named> ensureRightOrderOfSorts(LinkedList<Named> list){
-                LinkedList<TreeSet<Named>> sortContainers = new LinkedList<TreeSet<Named>>();
-                for(Named sort : list){
-                      boolean added = false;
-                      for(TreeSet<Named> container : sortContainers){
-                              if(container.add(sort)){
-                                      added = true;
-                                      break;
-                              }
-                      }
-                      if(!added){
-                              sortContainers.add(new TreeSet<Named>(new Comparator<Named>() {
+    public void addSchemaVariable(SchemaVariable symbol) {
+        // FIXME: This breaks the generics of namespace
+        addUserDefiniedSymbol(symbol, usedSchemaVariables,
+            (Namespace) referenceNamespaces.variables());
+    }
 
-                                      @Override
-                                      public int compare(Named o1, Named o2) {
-                                              Sort s1 = (Sort) o1;
-                                              Sort s2 = (Sort) o2;
-                                              if(s1.extendsTrans(s2)){
-                                                      return 1;
-                                              }
-                                              if(s2.extendsTrans(s1)){
-                                                      return -1;
-                                              }
-                                              return 0;
-                                      }
-                              }));
-                              sortContainers.getLast().add(sort);
-                      }
-                }
-                LinkedList<Named> sorts = new LinkedList<Named>();
-                for(TreeSet<Named> container : sortContainers){
-                        sorts.addAll(container);
-                }
-                return sorts;
+    public void addSymbolsToNamespaces(NamespaceSet namespaces) {
+        addSymbolsToNamespace(namespaces.functions(),
+            usedExtraFunctions);
+        addSymbolsToNamespace(namespaces.functions(),
+            usedExtraPredicates);
+        addSymbolsToNamespace(namespaces.sorts(), usedExtraSorts);
+        addSymbolsToNamespace(namespaces.variables(),
+            usedExtraVariables);
+    }
+
+    private <T extends Named> void addSymbolsToNamespace(Namespace<T> namespace,
+            Collection<T> symbols) {
+        for (T symbol : symbols) {
+            namespace.addSafely(symbol);
         }
-        
-        private void getAllSorts(LinkedList<Named> resultingSorts){
-                resultingSorts.addAll(usedExtraSorts);
-                if(parent != null){
-                        parent.getAllSorts(resultingSorts);                        
-                }
-               
-        }
-        
-        public Map<Name, Sort> getExtraSorts() {
-            Map<Name, Sort> result = new HashMap<Name, Sort>();
-            for (Named sort : usedExtraSorts) {
-                result.put(sort.name(), (Sort) sort);
+    }
+
+    public String getRuleHeader(Services services) {
+        if (parent == null) {
+            if (ruleHeader == null) {
+                ruleHeader = createRuleHeader(services);
             }
-            return result;
+            return ruleHeader;
+        } else {
+            return parent.getRuleHeader(services);
+        }
+    }
+
+    private String createRuleHeader(Services services) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("\\rules{");
+        for (Taclet taclet : axioms) {
+            buffer.append("\n\n");
+            buffer.append(createHeaderFor(taclet, services));
+        }
+        buffer.append("\n}");
+        String result = buffer.toString();
+        result = result.replaceAll("\\[", "");
+        result = result.replaceAll("\\]", "");
+        return result;
+
+    }
+
+    private StringBuffer createHeaderFor(Taclet taclet, Services services) {
+        NotationInfo info = new NotationInfo();
+        StringBackend backend = new StringBackend(80);
+        LogicPrinter printer =
+            new LogicPrinter(new ProgramPrinter(), info, backend, services, true);
+        printer.printTaclet(taclet);
+
+        return new StringBuffer(backend.getString() + ";");
+    }
+
+
+    public void replaceGenericByProxySorts() {
+        Set<Sort> result = new HashSet<Sort>();
+        for (Sort sort : usedExtraSorts) {
+            if (sort instanceof GenericSort) {
+                GenericSort genSort = (GenericSort) sort;
+                ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
+                result.add(proxySort);
+            } else {
+                result.add(sort);
+            }
         }
 
-        private void createHeaderForSorts(StringBuffer result){
-                LinkedList<Named> sorts  = new LinkedList<Named>();              
-                getAllSorts(sorts);
-                sorts = ensureRightOrderOfSorts(sorts);
-                
-                for(Named symbol : sorts){
-                        result.append(symbol.name());
-                        Sort sort = (Sort) symbol;
-                        if(!sort.extendsSorts().isEmpty()){
-                             String res = "\\extends ";
-                             boolean extendsAtLeastOneSort = false;
-                             for(Sort sortParent : sort.extendsSorts()){
-                                     if(sortParent !=    Sort.ANY){
-                                             res += sortParent.name()+", ";
-                                             extendsAtLeastOneSort = true;
-                                     }
-                             }
-                             if(extendsAtLeastOneSort){
-                                     int index = res.lastIndexOf(", ");
-                                     res = res.substring(0,index == -1 ? res.length() : index);
-                                     result.append(res);
-                             }
+        usedExtraSorts.clear();
+        usedExtraSorts.addAll(result);
+    }
+
+
+    public String createHeader(Services services) {
+        StringBuffer result = new StringBuffer();
+
+        result.append("\n\n\\sorts{\n");
+        createHeaderForSorts(result);
+        result.append("}\n\n\\predicates{\n");
+        createHeaderForPredicates(result);
+        result.append("}\n\n\\functions{\n");
+        createHeaderForFunctions(result);
+        result.append("}\n\n\\schemaVariables{\n");
+        createHeaderForSchemaVariables(result);
+        result.append("}\n\n");
+        result.append(getRuleHeader(services));
+        result.append("\n\n");
+        return result.toString();
+    }
+
+    private LinkedList<Named> ensureRightOrderOfSorts(LinkedList<Named> list) {
+        LinkedList<TreeSet<Named>> sortContainers = new LinkedList<TreeSet<Named>>();
+        for (Named sort : list) {
+            boolean added = false;
+            for (TreeSet<Named> container : sortContainers) {
+                if (container.add(sort)) {
+                    added = true;
+                    break;
+                }
+            }
+            if (!added) {
+                sortContainers.add(new TreeSet<Named>(new Comparator<Named>() {
+
+                    @Override
+                    public int compare(Named o1, Named o2) {
+                        Sort s1 = (Sort) o1;
+                        Sort s2 = (Sort) o2;
+                        if (s1.extendsTrans(s2)) {
+                            return 1;
                         }
-                        result.append(";\n");
-                }
-        }
-        
-        private void createHeaderForFunctions(StringBuffer result){
-                if(parent != null){
-                    parent.createHeaderForFunctions(result);                     
-                }
-                for(Named symbol : usedExtraFunctions){
-                        Function op = (Function) symbol;
-                        result.append(op.sort().name()+" ");
-                        result.append(symbol.name());
-                        result.append(createSignature(op));
-                        result.append(";\n");
-                }
-        }
-        
-        private void createHeaderForPredicates(StringBuffer result){
-                if(parent != null){
-                    parent.createHeaderForPredicates(result);                     
-                }
-                for(Named symbol : usedExtraPredicates){
-                        Function op = (Function) symbol;
-                        result.append(symbol.name());
-                        result.append(createSignature(op));
-                        result.append(";\n");
-                }
-        }
-        
-        private void createHeaderForSchemaVariables(StringBuffer result){
-                if(parent != null){
-                    parent.createHeaderForSchemaVariables(result);                     
-                }
-                for(Named symbol : usedSchemaVariables){
-                        SchemaVariable sv = (SchemaVariable) symbol;
-                        String prefix = sv instanceof FormulaSV ? "\\formula " : 
-                                             sv instanceof TermSV? "\\term " : "\\variables ";
-                        result.append(prefix);
-                        result.append(sv.sort().name()+" ");
-                        result.append(symbol.name());
-                        result.append(";\n");
-                }
-        }
-        
-        private String createSignature(Function op){
-                String s="";
-                for (int i = 0; i < op.arity(); i++) {
-                         s+=(i == 0 ? "(" : ",");
-                         s+=(op.argSort(i));
-                         s+=(i == op.arity() - 1 ? ")"
-                                                : "");
+                        if (s2.extendsTrans(s1)) {
+                            return -1;
                         }
-                
-                return s;
+                        return 0;
+                    }
+                }));
+                sortContainers.getLast().add(sort);
+            }
+        }
+        LinkedList<Named> sorts = new LinkedList<Named>();
+        for (TreeSet<Named> container : sortContainers) {
+            sorts.addAll(container);
+        }
+        return sorts;
+    }
+
+    private void getAllSorts(LinkedList<Named> resultingSorts) {
+        resultingSorts.addAll(usedExtraSorts);
+        if (parent != null) {
+            parent.getAllSorts(resultingSorts);
         }
 
+    }
 
-
-
-        public String toString() {
-
-                String symbols = "functions:\n";
-                for (Named named : usedExtraFunctions) {
-                        symbols += named.name() + ", ";
-                }
-                symbols += "\npredicates:\n";
-                for (Named named : usedExtraPredicates) {
-                        symbols += named.name() + ", ";
-                }
-                symbols += "\nsorts:\n";
-                for (Named named : usedExtraSorts) {
-                        symbols += named.name() + ", ";
-                }
-                symbols += "\nschema variables:\n";
-                for (Named named : usedSchemaVariables) {
-                        symbols += named.name() + ", ";
-                }
-                symbols += parent != null ? "\n\n Parent: " + parent.toString()
-                                : "";
-                return symbols;
+    public Map<Name, Sort> getExtraSorts() {
+        Map<Name, Sort> result = new HashMap<Name, Sort>();
+        for (Named sort : usedExtraSorts) {
+            result.put(sort.name(), (Sort) sort);
         }
+        return result;
+    }
+
+    private void createHeaderForSorts(StringBuffer result) {
+        LinkedList<Named> sorts = new LinkedList<Named>();
+        getAllSorts(sorts);
+        sorts = ensureRightOrderOfSorts(sorts);
+
+        for (Named symbol : sorts) {
+            result.append(symbol.name());
+            Sort sort = (Sort) symbol;
+            if (!sort.extendsSorts().isEmpty()) {
+                String res = "\\extends ";
+                boolean extendsAtLeastOneSort = false;
+                for (Sort sortParent : sort.extendsSorts()) {
+                    if (sortParent != Sort.ANY) {
+                        res += sortParent.name() + ", ";
+                        extendsAtLeastOneSort = true;
+                    }
+                }
+                if (extendsAtLeastOneSort) {
+                    int index = res.lastIndexOf(", ");
+                    res = res.substring(0, index == -1 ? res.length() : index);
+                    result.append(res);
+                }
+            }
+            result.append(";\n");
+        }
+    }
+
+    private void createHeaderForFunctions(StringBuffer result) {
+        if (parent != null) {
+            parent.createHeaderForFunctions(result);
+        }
+        for (Named symbol : usedExtraFunctions) {
+            Function op = (Function) symbol;
+            result.append(op.sort().name() + " ");
+            result.append(symbol.name());
+            result.append(createSignature(op));
+            result.append(";\n");
+        }
+    }
+
+    private void createHeaderForPredicates(StringBuffer result) {
+        if (parent != null) {
+            parent.createHeaderForPredicates(result);
+        }
+        for (Named symbol : usedExtraPredicates) {
+            Function op = (Function) symbol;
+            result.append(symbol.name());
+            result.append(createSignature(op));
+            result.append(";\n");
+        }
+    }
+
+    private void createHeaderForSchemaVariables(StringBuffer result) {
+        if (parent != null) {
+            parent.createHeaderForSchemaVariables(result);
+        }
+        for (Named symbol : usedSchemaVariables) {
+            SchemaVariable sv = (SchemaVariable) symbol;
+            String prefix = sv instanceof FormulaSV ? "\\formula "
+                    : sv instanceof TermSV ? "\\term " : "\\variables ";
+            result.append(prefix);
+            result.append(sv.sort().name() + " ");
+            result.append(symbol.name());
+            result.append(";\n");
+        }
+    }
+
+    private String createSignature(Function op) {
+        String s = "";
+        for (int i = 0; i < op.arity(); i++) {
+            s += (i == 0 ? "(" : ",");
+            s += (op.argSort(i));
+            s += (i == op.arity() - 1 ? ")"
+                    : "");
+        }
+
+        return s;
+    }
+
+
+
+    public String toString() {
+
+        String symbols = "functions:\n";
+        for (Named named : usedExtraFunctions) {
+            symbols += named.name() + ", ";
+        }
+        symbols += "\npredicates:\n";
+        for (Named named : usedExtraPredicates) {
+            symbols += named.name() + ", ";
+        }
+        symbols += "\nsorts:\n";
+        for (Named named : usedExtraSorts) {
+            symbols += named.name() + ", ";
+        }
+        symbols += "\nschema variables:\n";
+        for (Named named : usedSchemaVariables) {
+            symbols += named.name() + ", ";
+        }
+        symbols += parent != null ? "\n\n Parent: " + parent.toString()
+                : "";
+        return symbols;
+    }
 }

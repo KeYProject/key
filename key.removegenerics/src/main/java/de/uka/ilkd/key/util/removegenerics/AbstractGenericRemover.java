@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.io.File;
@@ -8,115 +12,119 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.io.PathList;
 import recoder.java.CompilationUnit;
-import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
 public abstract class AbstractGenericRemover {
-   private final GenericRemoverMonitor monitor;
+    private final GenericRemoverMonitor monitor;
 
-   private final CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
+    private final CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
 
-   private final Map<CompilationUnit, String> allUnits = new LinkedHashMap<CompilationUnit, String>();
+    private final Map<CompilationUnit, String> allUnits =
+        new LinkedHashMap<CompilationUnit, String>();
 
-   private final List<String> sourceFiles = new ArrayList<String>();
-   
-   public AbstractGenericRemover(GenericRemoverMonitor monitor) {
-      assert monitor != null;
-      this.monitor = monitor;
-   }
-   
-   public void addSearchPath(String path) {
-      PathList searchPaths = sc.getProjectSettings().getSearchPathList();
-      searchPaths.add(path);
-   }
-   
-   public void addSourceFiles(Collection<String> sourceFiles) {
-      sourceFiles.addAll(sourceFiles);
-   }
+    private final List<String> sourceFiles = new ArrayList<String>();
 
-   public void addSourceFile(String file) {
-      sourceFiles.add(file);
-   }
-   
-   public PathList getSearchPath() {
-      return sc.getProjectSettings().getSearchPathList();
-   }
-   
-   public List<String> getSourceFiles() {
-      return sourceFiles;
-   }
+    public AbstractGenericRemover(GenericRemoverMonitor monitor) {
+        assert monitor != null;
+        this.monitor = monitor;
+    }
 
-   public void removeGenerics() throws ParserException, IOException {
-      for (String fileName : sourceFiles) {
-         File file = new File(fileName);
-         if (file.isDirectory())
-             processDirectory(file);
-         else
-             processFile(file);
-     }
+    public void addSearchPath(String path) {
+        PathList searchPaths = sc.getProjectSettings().getSearchPathList();
+        searchPaths.add(path);
+    }
 
-     List<ResolveGenerics> allTransformations = new ArrayList<ResolveGenerics>();
+    public void addSourceFiles(Collection<String> sourceFiles) {
+        sourceFiles.addAll(sourceFiles);
+    }
 
-     monitor.taskStarted("Analysing ...");
+    public void addSourceFile(String file) {
+        sourceFiles.add(file);
+    }
 
-     sc.getChangeHistory().updateModel();
+    public PathList getSearchPath() {
+        return sc.getProjectSettings().getSearchPathList();
+    }
 
-     for (CompilationUnit cu : allUnits.keySet()) {
-         ResolveGenerics transformation = new ResolveGenerics(sc, cu);
+    public List<String> getSourceFiles() {
+        return sourceFiles;
+    }
 
-         // add also the empty transformation ... so that unchanged files are
-         // copied
-         transformation.analyze();
-         allTransformations.add(transformation);
-     }
+    public void removeGenerics() throws ParserException, IOException {
+        for (String fileName : sourceFiles) {
+            File file = new File(fileName);
+            if (file.isDirectory())
+                processDirectory(file);
+            else
+                processFile(file);
+        }
 
-     monitor.taskStarted("Transformation ...");
-     for (ResolveGenerics transformation : allTransformations) {
-         transformation.transform();
-         CompilationUnit cu = transformation.getCU();
+        List<ResolveGenerics> allTransformations = new ArrayList<ResolveGenerics>();
 
-         // repair spacing around single line comments
-         SingleLineCommentRepairer.repairSingleLineComments(cu);
+        monitor.taskStarted("Analysing ...");
 
-         // save new content
-         String filename = allUnits.get(cu);
-         saveModifiedCompilationUnit(cu, filename);
-     }
-     
-     monitor.taskStarted("Remove Generics completed.");
-   }
+        sc.getChangeHistory().updateModel();
 
-   protected abstract void saveModifiedCompilationUnit(CompilationUnit cu, String filename) throws IOException;
+        for (CompilationUnit cu : allUnits.keySet()) {
+            ResolveGenerics transformation = new ResolveGenerics(sc, cu);
 
-   private void processDirectory(File dir) throws ParserException {
+            // add also the empty transformation ... so that unchanged files are
+            // copied
+            transformation.analyze();
+            allTransformations.add(transformation);
+        }
 
-       for (File f : dir.listFiles()) {
-           if (f.isDirectory())
-               processDirectory(f);
-           else if (f.getName().toLowerCase().endsWith(".java"))
-               processFile(f);
-       }
+        monitor.taskStarted("Transformation ...");
+        for (ResolveGenerics transformation : allTransformations) {
+            transformation.transform();
+            CompilationUnit cu = transformation.getCU();
 
-   }
+            // repair spacing around single line comments
+            SingleLineCommentRepairer.repairSingleLineComments(cu);
 
-   private void processFile(File file) throws ParserException {
-       monitor.taskStarted("Reading from " + file);
-       if (!file.exists()) {
-           monitor.warningOccurred(file + " does not exist");
-           return;
-       }
+            // save new content
+            String filename = allUnits.get(cu);
+            saveModifiedCompilationUnit(cu, filename);
+        }
 
-       if (!file.canRead()) {
-           monitor.warningOccurred(file + " cannot be read");
-           return;
-       }
+        monitor.taskStarted("Remove Generics completed.");
+    }
 
-       CompilationUnit cu = sc.getSourceFileRepository().getCompilationUnitFromFile(file.getPath());
-       String filename = file.getName();
+    protected abstract void saveModifiedCompilationUnit(CompilationUnit cu, String filename)
+            throws IOException;
 
-       allUnits.put(cu, filename);
-   }
+    private void processDirectory(File dir) throws ParserException {
+
+        for (File f : dir.listFiles()) {
+            if (f.isDirectory())
+                processDirectory(f);
+            else if (f.getName().toLowerCase().endsWith(".java"))
+                processFile(f);
+        }
+
+    }
+
+    private void processFile(File file) throws ParserException {
+        monitor.taskStarted("Reading from " + file);
+        if (!file.exists()) {
+            monitor.warningOccurred(file + " does not exist");
+            return;
+        }
+
+        if (!file.canRead()) {
+            monitor.warningOccurred(file + " cannot be read");
+            return;
+        }
+
+        CompilationUnit cu =
+            sc.getSourceFileRepository().getCompilationUnitFromFile(file.getPath());
+        String filename = file.getName();
+
+        allUnits.put(cu, filename);
+    }
 }

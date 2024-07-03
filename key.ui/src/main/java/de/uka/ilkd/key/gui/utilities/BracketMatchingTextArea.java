@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.utilities;
 
@@ -5,7 +8,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
-
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
@@ -59,14 +61,14 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * matching parens of same kind.
      */
     private static final HighlightPainter SAME_PAINTER =
-            new BorderPainter(HIGHLIGHT_COLOR_SAME_PARENS);
+        new BorderPainter(HIGHLIGHT_COLOR_SAME_PARENS);
 
     /**
      * The Constant PAINTER is the painter which is used to draw the highlighting for
      * matching parens of different kind.
      */
     private static final HighlightPainter DIFF_PAINTER =
-            new BorderPainter(HIGHLIGHT_COLOR_DIFFERENT_PARENS);
+        new BorderPainter(HIGHLIGHT_COLOR_DIFFERENT_PARENS);
 
     /**
      * The Constant OPENING_PARENS holds the characters which serve as opening parenthesis
@@ -90,7 +92,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
 
     /**
-     * Constructs a new TextArea.  A default model is set, the initial string
+     * Constructs a new TextArea. A default model is set, the initial string
      * is null, and rows/columns are set to 0.
      */
     public BracketMatchingTextArea() {
@@ -100,7 +102,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
     /**
      * Constructs a new JTextArea with the specified number of rows
-     * and columns, and the given model.  All of the constructors
+     * and columns, and the given model. All of the constructors
      * feed through this constructor.
      *
      * @param doc the model to use, or create a default one if null
@@ -108,7 +110,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns
-     *  arguments are negative.
+     *            arguments are negative.
      */
     public BracketMatchingTextArea(Document doc, String text, int rows,
             int columns) {
@@ -120,7 +122,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * Constructs a new JTextArea with the given document model, and defaults
      * for all of the other arguments (null, 0, 0).
      *
-     * @param doc  the model to use
+     * @param doc the model to use
      */
     public BracketMatchingTextArea(Document doc) {
         super(doc);
@@ -129,13 +131,13 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
     /**
      * Constructs a new empty TextArea with the specified number of
-     * rows and columns.  A default model is created, and the initial
+     * rows and columns. A default model is created, and the initial
      * string is null.
      *
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns
-     *  arguments are negative.
+     *            arguments are negative.
      */
     public BracketMatchingTextArea(int rows, int columns) {
         super(rows, columns);
@@ -144,13 +146,13 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
     /**
      * Constructs a new TextArea with the specified text and number
-     * of rows and columns.  A default model is created.
+     * of rows and columns. A default model is created.
      *
      * @param text the text to be displayed, or null
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns
-     *  arguments are negative.
+     *            arguments are negative.
      */
     public BracketMatchingTextArea(String text, int rows, int columns) {
         super(text, rows, columns);
@@ -196,26 +198,26 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
             int dot = getCaretPosition();
             String text = getText();
             char charOn = dot == text.length() ? 0 : text.charAt(dot);
-            char charBefore = dot == 0 ? 0 : text.charAt(dot-1);
+            char charBefore = dot == 0 ? 0 : text.charAt(dot - 1);
             int begin = -1;
             int end = -1;
 
-            if(OPENING_PARENS.indexOf(charOn) != -1) {
+            if (OPENING_PARENS.indexOf(charOn) != -1) {
                 end = findMatchingClose(dot);
-                if(end > 0)
+                if (end > 0)
                     end++;
                 begin = dot;
-            } else if(CLOSING_PARENS.indexOf(charBefore) != -1) {
+            } else if (CLOSING_PARENS.indexOf(charBefore) != -1) {
                 end = dot;
-                begin = findMatchingOpen(dot-1);
+                begin = findMatchingOpen(dot - 1);
             }
 
-            if(end != -1 && begin != -1) {
+            if (end != -1 && begin != -1) {
                 assert begin < end : "begin=" + begin + " end=" + end;
                 assert end > 0;
 
-                if (CLOSING_PARENS.indexOf(text.charAt(end - 1)) !=
-                      OPENING_PARENS.indexOf(text.charAt(begin))) {
+                if (CLOSING_PARENS.indexOf(text.charAt(end - 1)) != OPENING_PARENS
+                        .indexOf(text.charAt(begin))) {
                     theHighlight = theDiffParensHighlight;
                 } else {
                     theHighlight = theSameParensHighlight;
@@ -238,6 +240,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
     /**
      * resets both highlights
+     *
      * @throws BadLocationException if the caret is invalid
      */
     protected void resetHighlights() throws BadLocationException {
@@ -252,7 +255,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * open/close parens in between
      *
      * @param dot
-     *                position to start search from (must be an opening paren)
+     *        position to start search from (must be an opening paren)
      * @return either the index of the closing partner or -1 if it does not
      *         exist.
      */
@@ -261,16 +264,16 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         String text = getText();
 
         do {
-            if(OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
-                count ++;
-            else if(CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
-                count --;
+            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
+                count++;
+            else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
+                count--;
 
-            if(count == 0)
+            if (count == 0)
                 return dot;
 
-            dot ++;
-        } while(dot < text.length());
+            dot++;
+        } while (dot < text.length());
         return -1;
     }
 
@@ -281,7 +284,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * other open/close parens in between
      *
      * @param dot
-     *                position to start search from (must be a closing paren)
+     *        position to start search from (must be a closing paren)
      * @return either the index of the opening partner or -1 if it does not
      *         exist.
      */
@@ -290,16 +293,16 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         String text = getText();
 
         do {
-            if(OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
-                count --;
-            else if(CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
-                count ++;
+            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
+                count--;
+            else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
+                count++;
 
-            if(count == 0)
+            if (count == 0)
                 return dot;
 
-            dot --;
-        } while(dot >= 0);
+            dot--;
+        } while (dot >= 0);
         return -1;
     }
 
@@ -315,7 +318,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
     }
 
     /**
-     * The Class BorderPainter is a simple highlight painter that just draws a rectangle around the selection.
+     * The Class BorderPainter is a simple highlight painter that just draws a rectangle around the
+     * selection.
      *
      */
     public static class BorderPainter implements HighlightPainter {
@@ -333,7 +337,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
                 JTextComponent c) {
 
             // dont render if empty
-            if(offs0 == offs1)
+            if (offs0 == offs1)
                 return;
 
             Rectangle alloc = bounds.getBounds();
@@ -348,16 +352,16 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
                 if (p0.y == p1.y) {
                     // same line, render a rectangle
                     Rectangle r = p0.union(p1);
-                    g.drawRect(r.x, r.y, r.width-1, r.height-1);
+                    g.drawRect(r.x, r.y, r.width - 1, r.height - 1);
                 } else {
                     // different lines
                     int p0ToMarginWidth = alloc.x + alloc.width - p0.x;
                     g.drawRect(p0.x, p0.y, p0ToMarginWidth, p0.height);
                     if ((p0.y + p0.height) != p1.y) {
-                        g.drawRect(alloc.x, p0.y + p0.height, alloc.width-1,
-                                   p1.y - (p0.y + p0.height)-1);
+                        g.drawRect(alloc.x, p0.y + p0.height, alloc.width - 1,
+                            p1.y - (p0.y + p0.height) - 1);
                     }
-                    g.drawRect(alloc.x, p1.y, (p1.x - alloc.x)-1, p1.height-1);
+                    g.drawRect(alloc.x, p1.y, (p1.x - alloc.x) - 1, p1.height - 1);
                 }
             } catch (BadLocationException e) {
                 // can't render

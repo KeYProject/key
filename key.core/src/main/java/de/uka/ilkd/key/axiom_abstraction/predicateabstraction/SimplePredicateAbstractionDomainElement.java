@@ -1,9 +1,13 @@
-package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableSet;
+package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * An abstract domain element for a predicate abstraction lattice encapsulating
@@ -18,13 +22,13 @@ public class SimplePredicateAbstractionDomainElement extends
      * The bottom element of any predicate abstraction lattice.
      */
     public static final SimplePredicateAbstractionDomainElement BOTTOM =
-            new SimplePredicateAbstractionDomainElement(false);
+        new SimplePredicateAbstractionDomainElement(false);
 
     /**
      * The top element of any predicate abstraction lattice.
      */
     public static final SimplePredicateAbstractionDomainElement TOP =
-            new SimplePredicateAbstractionDomainElement(true);
+        new SimplePredicateAbstractionDomainElement(true);
 
     /**
      * Constructs a new {@link SimplePredicateAbstractionDomainElement} from a
@@ -47,7 +51,7 @@ public class SimplePredicateAbstractionDomainElement extends
     @Override
     protected Term combinePredicates(Term preds, Term newPred, Services services) {
         throw new RuntimeException(
-                "In the simple predicate abstraction lattice, "
+            "In the simple predicate abstraction lattice, "
                 + "elements should not be combined.");
     }
 
@@ -58,7 +62,7 @@ public class SimplePredicateAbstractionDomainElement extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -67,8 +71,8 @@ public class SimplePredicateAbstractionDomainElement extends
                 && (this != TOP || obj == TOP)
                 && (this != BOTTOM || obj == BOTTOM)
                 && this.getPredicates().equals(
-                        ((SimplePredicateAbstractionDomainElement) obj)
-                                .getPredicates());
+                    ((SimplePredicateAbstractionDomainElement) obj)
+                            .getPredicates());
     }
 
     @Override

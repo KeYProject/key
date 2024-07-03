@@ -1,4 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.*;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
@@ -11,31 +33,13 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
+
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.*;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * A dialog for showing (possibly multiple) issues with a preview window. It can either display
@@ -43,11 +47,11 @@ import java.util.stream.Collectors;
  * <p>
  * This dialog has support to:
  * <ul>
- *     <li>hide listed warnings for the current session</li>
- *     <li>show the issue in a little preview window (with syntax highlighting)</li>
- *     <li>if an URL is in the description, it is possible to open this web page</li>
- *     <li>if a file name is associated with the warning, the user can open its editor</li>
- *     <li>if the message contains a stacktrace, it is optionally displayed</li>
+ * <li>hide listed warnings for the current session</li>
+ * <li>show the issue in a little preview window (with syntax highlighting)</li>
+ * <li>if an URL is in the description, it is possible to open this web page</li>
+ * <li>if a file name is associated with the warning, the user can open its editor</li>
+ * <li>if the message contains a stacktrace, it is optionally displayed</li>
  * </ul>
  *
  * @implNote The given PositionedStrings are assumed to have <b>1-based line and column numbers</b>,
@@ -56,7 +60,7 @@ import java.util.stream.Collectors;
  *
  * @author Alexander Weigl
  * @author Wolfram Pfeifer: adaptations for also showing exceptions, making it the single dialog for
- *                          all parser error messages in KeY
+ *         all parser error messages in KeY
  * @version 1 (6/8/21)
  * @version 2 (11/15/21)
  */
@@ -86,19 +90,24 @@ public final class IssueDialog extends JDialog {
     private final JList<PositionedIssueString> listWarnings;
 
     private final JButton btnEditFile = new JButton();
-    private final JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
+    private final JCheckBox chkIgnoreWarnings =
+        new JCheckBox("Ignore these warnings for the current session");
     private final JCheckBox chkDetails = new JCheckBox("Show Details");
     private final JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
     private final JSplitPane splitBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
     private final JPanel stacktracePanel = new JPanel(new BorderLayout());
 
-    /** flag to switch between dialog for warnings and critical issues where parsing is aborted.
-     * In the latter case only a single exception is show, which can also not be ignored */
+    /**
+     * flag to switch between dialog for warnings and critical issues where parsing is aborted.
+     * In the latter case only a single exception is show, which can also not be ignored
+     */
     private final boolean critical;
 
-    /** Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace).
+    /**
+     * Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace).
      * Performs some calculations to make the dialog only expand/collapse the stacktrace panel, but
-     * keep the rest of the dialog looking the same as before. */
+     * keep the rest of the dialog looking the same as before.
+     */
     private final transient ItemListener detailsBoxListener = e -> {
         int width = getWidth();
         int height = getHeight();
@@ -126,13 +135,14 @@ public final class IssueDialog extends JDialog {
     };
 
     private IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
-                        boolean critical) {
+            boolean critical) {
         this(owner, title, issues, critical, null);
     }
 
     /**
      * Escapes special HTML chars the Strings of the warning messages and decorates weblinks such
      * that they are clickable.
+     *
      * @param warnings the warnings to decorate
      * @return the list of decorated and escaped (otherwise unchanged) warnings
      */
@@ -164,7 +174,7 @@ public final class IssueDialog extends JDialog {
     }
 
     private IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
-                        boolean critical, Throwable throwable) {
+            boolean critical, Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);
 
         this.throwable = throwable;
@@ -178,18 +188,18 @@ public final class IssueDialog extends JDialog {
 
         ///////// component overview (more indention means deeper nested):
         // label
-        //     scrWarnings
-        //       listWarnings
-        //   ----splitCenter
-        //     sourcePanel
-        //       locPanel: fTextField lTextField cTextField
-        //       scrPreview: nowrap: txtSource
-        //       pSouth
-        //         chkIgnoreWarnings
-        //         pButtons: btnOK btnEditFile chkDetails
+        // scrWarnings
+        // listWarnings
+        // ----splitCenter
+        // sourcePanel
+        // locPanel: fTextField lTextField cTextField
+        // scrPreview: nowrap: txtSource
+        // pSouth
+        // chkIgnoreWarnings
+        // pButtons: btnOK btnEditFile chkDetails
         // ----splitBottom
-        //   stacktracePanel
-        //     stTextArea
+        // stacktracePanel
+        // stTextArea
 
         // set descriptive text in top label
         final String head;
@@ -235,8 +245,7 @@ public final class IssueDialog extends JDialog {
                 int newLoc = (int) e.getNewValue();
                 chkDetails.setSelected(newLoc < splitBottom.getMaximumDividerLocation());
                 chkDetails.addItemListener(detailsBoxListener);
-            }
-        );
+            });
 
         // ensures that the buttons fit into a single row
         setMinimumSize(new Dimension(630, 300));
@@ -271,16 +280,19 @@ public final class IssueDialog extends JDialog {
     private JScrollPane createWarningsPane(Font font) {
         // trigger updates of preview and stacktrace
         listWarnings.addListSelectionListener(e -> updatePreview(listWarnings.getSelectedValue()));
-        listWarnings.addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
+        listWarnings
+                .addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
         // enable/disable "open file" and "show details"
-        listWarnings.addListSelectionListener(e ->
-            btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
+        listWarnings.addListSelectionListener(
+            e -> btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
             if (listWarnings.getSelectedValue().additionalInfo.isEmpty()) {
                 chkDetails.setSelected(false);
                 chkDetails.setEnabled(false);
-                /* disable the bottom split and hide the divider (we can not use setEnabled(false)
-                 * on the splitpane because this has side effects on some children!) */
+                /*
+                 * disable the bottom split and hide the divider (we can not use setEnabled(false)
+                 * on the splitpane because this has side effects on some children!)
+                 */
                 splitBottom.setDividerSize(0);
                 stacktracePanel.setVisible(false);
             } else {
@@ -415,6 +427,7 @@ public final class IssueDialog extends JDialog {
     /**
      * Gets the hyper link element (i.e., the anchor tag of the HTMLDocument) the mouse cursor
      * currently points to.
+     *
      * @param event the mouse event, needed to get the position of the cursor
      * @return the corresponding tag element or null if the mouse does not currently point to one
      */
@@ -506,6 +519,7 @@ public final class IssueDialog extends JDialog {
     /**
      * Shows the dialog with a single exception. The stacktrace is extracted and can optionally be
      * shown in the dialog.
+     *
      * @param parent the parent of the dialog (will be blocked)
      * @param exception the exception to display
      */
@@ -518,20 +532,21 @@ public final class IssueDialog extends JDialog {
 
     /**
      * Shows the dialog of a set of (non-critical) parser warnings.
+     *
      * @param parent the parent of the dialog (will be blocked)
      * @param warnings the set of warnings, will be sorted by file when displaying
      */
     public static void showWarningsIfNecessary(Window parent,
-                                               ImmutableSet<PositionedString> warnings) {
+            ImmutableSet<PositionedString> warnings) {
         Set<PositionedString> warn = warnings.toSet();
         warn.removeAll(ignoredWarnings);
         // do not show warnings dialog if all warnings are ignored
         if (!warn.isEmpty()) {
             // ensure that each warning has at least an empty additionalInfo
             Set<PositionedIssueString> issues = warnings.stream()
-                .map(o -> o instanceof PositionedIssueString ? (PositionedIssueString)o
-                    : new PositionedIssueString(o, ""))
-                .collect(Collectors.toSet());
+                    .map(o -> o instanceof PositionedIssueString ? (PositionedIssueString) o
+                            : new PositionedIssueString(o, ""))
+                    .collect(Collectors.toSet());
 
             IssueDialog dialog = new IssueDialog(parent,
                 SLEnvInput.getLanguage() + " warning(s)", issues, false);
@@ -543,12 +558,13 @@ public final class IssueDialog extends JDialog {
     /**
      * Extracts message, position, and stracktrace from the given exception. To be successful, the
      * exception must have a location (see {@link ExceptionTools#getLocation(Throwable)}).
+     *
      * @param exception the exception to extract the data from
      * @return a new PositionedIssueString created from the data
      */
     private static PositionedIssueString extractMessage(Throwable exception) {
         try (StringWriter sw = new StringWriter();
-             PrintWriter pw = new PrintWriter(sw)) {
+                PrintWriter pw = new PrintWriter(sw)) {
             exception.printStackTrace(pw);
             String message = exception.getMessage();
             String info = sw.toString();
@@ -556,8 +572,9 @@ public final class IssueDialog extends JDialog {
             // also add message of the cause to the string if available
             if (exception.getCause() != null) {
                 String causeMessage = exception.getCause().getMessage();
-                message = message == null ? causeMessage :
-                    String.format("%s%n%nCaused by: %s", message, exception.getCause().toString());
+                message = message == null ? causeMessage
+                        : String.format("%s%n%nCaused by: %s", message,
+                            exception.getCause().toString());
             }
 
             String resourceLocation = "";
@@ -568,7 +585,7 @@ public final class IssueDialog extends JDialog {
                 pos = new Position(location.getLine(), location.getColumn());
             }
             return new PositionedIssueString(
-                    message == null ? exception.toString() : message, resourceLocation, pos, info);
+                message == null ? exception.toString() : message, resourceLocation, pos, info);
         } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
             LOGGER.debug("Creating a Location failed for " + exception, e);
@@ -594,7 +611,7 @@ public final class IssueDialog extends JDialog {
         private final @Nonnull String additionalInfo;
 
         public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
-                                     @Nullable Position pos, @Nonnull String additionalInfo) {
+                @Nullable Position pos, @Nonnull String additionalInfo) {
             super(text, fileName, pos);
             this.additionalInfo = additionalInfo;
         }
@@ -744,7 +761,7 @@ public final class IssueDialog extends JDialog {
     }
 
     private static class PositionedStringListRenderer
-        implements ListCellRenderer<PositionedString> {
+            implements ListCellRenderer<PositionedString> {
         private final JTextPane textPane = new JTextPane();
 
         PositionedStringListRenderer() {
@@ -763,8 +780,8 @@ public final class IssueDialog extends JDialog {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends PositionedString> list,
-                                                      PositionedString value,  int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
+                PositionedString value, int index,
+                boolean isSelected, boolean cellHasFocus) {
             textPane.setContentType("text/html");
             textPane.setText(value.text);
             // use a compound border to have both: a bit more space and small lines between the rows

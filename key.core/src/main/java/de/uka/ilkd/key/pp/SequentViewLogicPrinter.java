@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.util.pp.Backend;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for
@@ -21,7 +25,7 @@ import de.uka.ilkd.key.util.pp.Backend;
  */
 public class SequentViewLogicPrinter extends LogicPrinter {
 
-    /* 
+    /*
      * This object is used to determine the TermLabels, which will be printed out.
      */
     private final VisibleTermLabels visibleTermLabels;
@@ -58,11 +62,11 @@ public class SequentViewLogicPrinter extends LogicPrinter {
 
         List<TermLabel> termLabelList = new LinkedList<TermLabel>();
         if (visibleTermLabels != null) {
-           for (TermLabel label : t.getLabels()) {
-              if (label instanceof TermLabelSV || visibleTermLabels.contains(label)) {
-                  termLabelList.add(label);
-              }
-          }
+            for (TermLabel label : t.getLabels()) {
+                if (label instanceof TermLabelSV || visibleTermLabels.contains(label)) {
+                    termLabelList.add(label);
+                }
+            }
         }
 
         return new ImmutableArray<TermLabel>(termLabelList);
@@ -70,7 +74,8 @@ public class SequentViewLogicPrinter extends LogicPrinter {
 
     @Override
     public void printClassName(String className) throws IOException {
-        final boolean hidePP = notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
+        final boolean hidePP =
+            notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
         if (hidePP) {
             className = className.substring(className.lastIndexOf('.') + 1);
         }

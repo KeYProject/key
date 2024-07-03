@@ -1,4 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.smt.settings;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
@@ -13,12 +23,6 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerPropertyVisitor;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices;
 import de.uka.ilkd.key.util.Pair;
-
-import javax.swing.*;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collection;
 
 /**
  * This is the dialog for the new smt translation mechnism (newsmt2) which
@@ -38,13 +42,14 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
     private void makeComponents() {
 
         try {
-            Collection<SMTHandlerProperty<?>> properties = SMTHandlerServices.getInstance().getSMTProperties();
+            Collection<SMTHandlerProperty<?>> properties =
+                SMTHandlerServices.getInstance().getSMTProperties();
             for (SMTHandlerProperty<?> property : properties) {
                 JComponent comp = property.accept(new ComCreationVisitor(), null);
                 comp.putClientProperty("smtProperty", property);
                 components.add(comp);
             }
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -60,7 +65,8 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         SetVisitor visitor = new SetVisitor();
         for (JComponent component : components) {
-            SMTHandlerProperty<?> prop = (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
+            SMTHandlerProperty<?> prop =
+                (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
             String id = prop.getIdentifier();
             String val = newSMTSettings.get(id);
             if (val != null) {
@@ -75,7 +81,8 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         ApplyVisitor visitor = new ApplyVisitor(newSMTSettings);
         for (JComponent component : components) {
-            SMTHandlerProperty<?> prop = (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
+            SMTHandlerProperty<?> prop =
+                (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
             prop.accept(visitor, component);
         }
     }
@@ -84,30 +91,30 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         @Override
         public JComponent visit(EnumProperty<?> eprop, Void unit) {
             return addComboBox(eprop.getLabel(), eprop.getDescription(),
-                    0, null,
-                    eprop.getEnumType().getEnumConstants());
+                0, null,
+                eprop.getEnumType().getEnumConstants());
         }
 
         @Override
         public JComponent visit(IntegerProperty iprop, Void unit) {
             return addNumberField(iprop.getLabel(),
-                    iprop.getMinimum(), iprop.getMaximum(), 1,
-                    iprop.getDescription(),
-                    emptyValidator());
+                iprop.getMinimum(), iprop.getMaximum(), 1,
+                iprop.getDescription(),
+                emptyValidator());
         }
 
         @Override
         public JComponent visit(BooleanProperty bprop, Void unit) {
             return addCheckBox(bprop.getLabel(),
-                    bprop.getDescription(),
-                    false, emptyValidator());
+                bprop.getDescription(),
+                false, emptyValidator());
         }
 
         @Override
         public JComponent visit(StringProperty sprop, Void unit) {
-            return  addTextField(sprop.getLabel(),
-                    sprop.getDescription(),
-                    "", emptyValidator());
+            return addTextField(sprop.getLabel(),
+                sprop.getDescription(),
+                "", emptyValidator());
         }
     }
 
@@ -165,7 +172,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
         @Override
         public Void visit(BooleanProperty booleanProp, JComponent arg) {
-            String val = ((JCheckBox)arg).isSelected() ? "true" : "false";
+            String val = ((JCheckBox) arg).isSelected() ? "true" : "false";
             settings.put(booleanProp.getIdentifier(), val);
             return null;
         }

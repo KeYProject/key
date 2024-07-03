@@ -1,118 +1,130 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java;
 
 /**
-   The position of a source element, given by its line and column
-   number.
-   Depending on the implementation, the valid range of defined line and
-   column numbers may be limited and cut off if superceded.
-*/
+ * The position of a source element, given by its line and column
+ * number.
+ * Depending on the implementation, the valid range of defined line and
+ * column numbers may be limited and cut off if superceded.
+ */
 
 public class Position {
 
     /**
-       The line number.
-    */
+     * The line number.
+     */
 
     private final int line;
 
     /**
-       The column number.
-    */
+     * The column number.
+     */
 
     private final int column;
 
     /**
-       The "undefined position" constant used to compare to undefined 
-       positions or remove positional information.
-    */
-    public static final  Position UNDEFINED = new Position();
+     * The "undefined position" constant used to compare to undefined
+     * positions or remove positional information.
+     */
+    public static final Position UNDEFINED = new Position();
 
     /**
-       Constructs a new invalid source code position object.
-    */
+     * Constructs a new invalid source code position object.
+     */
     Position() {
-	line = column = -1;
+        line = column = -1;
     }
 
     /**
-       Constructs a new source code position object.
-       @param line the line number.
-       @param column the column number.
-    */
+     * Constructs a new source code position object.
+     *
+     * @param line the line number.
+     * @param column the column number.
+     */
 
     public Position(int line, int column) {
-	this.line=line;
-	this.column=column;
+        this.line = line;
+        this.column = column;
     }
 
     /**
-       Returns the line number of this position.
-       @return the line number of this position.
-    */
+     * Returns the line number of this position.
+     *
+     * @return the line number of this position.
+     */
 
     public int getLine() {
-	return line;
+        return line;
     }
 
     /**
-       Returns the column number of this position.
-       @return the column number of this position.
-    */
+     * Returns the column number of this position.
+     *
+     * @return the column number of this position.
+     */
 
     public int getColumn() {
-	return column;
+        return column;
     }
 
     /**
-       Returns the hash code of this position.
-       @return the hash code of this position.
-    */
+     * Returns the hash code of this position.
+     *
+     * @return the hash code of this position.
+     */
 
     public int hashCode() {
-	return column | (line << 8);
+        return column | (line << 8);
     }
 
     /**
-       Compares this position with the given object for equality.
-       @return <CODE>true</CODE>, if the given object is a position
-       equals to this position, <CODE>false</CODE> otherwise.
-    */
+     * Compares this position with the given object for equality.
+     *
+     * @return <CODE>true</CODE>, if the given object is a position
+     *         equals to this position, <CODE>false</CODE> otherwise.
+     */
 
     public boolean equals(Object x) {
-	if (x == this) {
-	    return true;
-	}
-	if (!(x instanceof Position)) {
-	    return false;
-	}
-	Position p = (Position)x;
-	return line == p.line && column == p.column;
+        if (x == this) {
+            return true;
+        }
+        if (!(x instanceof Position)) {
+            return false;
+        }
+        Position p = (Position) x;
+        return line == p.line && column == p.column;
     }
 
     /**
-       Compares this position with the given object for order.
-       An undefined position is less than any defined position.
-       @param x the position object to compare with.
-       @return a negative number, zero, or a positive number, if this
-       position is lower than, equals to, or higher than the given one.
-    */
+     * Compares this position with the given object for order.
+     * An undefined position is less than any defined position.
+     *
+     * @param x the position object to compare with.
+     * @return a negative number, zero, or a positive number, if this
+     *         position is lower than, equals to, or higher than the given one.
+     */
     public int compareTo(Object x) {
-	return compareTo((Position)x);
+        return compareTo((Position) x);
     }
 
     /**
-       Compares this position with the given object for order.
-       An undefined position is less than any defined position.
-       @param p the position to compare with.
-       @return a negative number, zero, or a positive number, if this
-       position is lower than, equals to, or higher than the given one.
-    */
+     * Compares this position with the given object for order.
+     * An undefined position is less than any defined position.
+     *
+     * @param p the position to compare with.
+     * @return a negative number, zero, or a positive number, if this
+     *         position is lower than, equals to, or higher than the given one.
+     */
     public int compareTo(Position p) {
-	return (line == p.line) ? (column - p.column) : (line - p.line);
+        return (line == p.line) ? (column - p.column) : (line - p.line);
     }
 
     /**
      * Helper method for validity checks.
+     *
      * @return true iff either line or column are negative
      */
     public boolean isNegative() {
@@ -120,16 +132,16 @@ public class Position {
     }
 
     /**
-       Returns a string representation of this object.
-    */
+     * Returns a string representation of this object.
+     */
     public String toString() {
-	if (this != UNDEFINED) {
-	    StringBuffer buf = new StringBuffer();
-	    buf.append(line).append('/').append(column - 1);
-	    return buf.toString();
-	} else {
-	    return "??/??";
-	}
+        if (this != UNDEFINED) {
+            StringBuffer buf = new StringBuffer();
+            buf.append(line).append('/').append(column - 1);
+            return buf.toString();
+        } else {
+            return "??/??";
+        }
     }
 
 }

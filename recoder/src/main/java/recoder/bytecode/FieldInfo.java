@@ -1,11 +1,14 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.bytecode;
+
+import java.util.List;
 
 import recoder.abstraction.Field;
 import recoder.abstraction.Type;
 import recoder.convenience.Naming;
-
-import java.util.List;
 
 public class FieldInfo extends MemberInfo implements Field {
 
@@ -15,7 +18,8 @@ public class FieldInfo extends MemberInfo implements Field {
 
     protected List<TypeArgumentInfo> typeArgs;
 
-    public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue, List<TypeArgumentInfo> typeArgs) {
+    public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue,
+            List<TypeArgumentInfo> typeArgs) {
         super(accessFlags, name, cf);
         this.type = type;
         this.constantValue = constantValue;

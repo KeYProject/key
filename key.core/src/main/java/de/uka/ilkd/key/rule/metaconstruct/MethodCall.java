@@ -1,8 +1,8 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -40,9 +40,13 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Symbolically executes a method invocation
@@ -65,7 +69,7 @@ public class MethodCall extends ProgramTransformer {
      * creates the methodcall-MetaConstruct
      *
      * @param body
-     *            the ProgramElement contained by the meta construct
+     *        the ProgramElement contained by the meta construct
      */
     public MethodCall(ProgramElement body) {
         this(null, null, body);
@@ -75,9 +79,9 @@ public class MethodCall extends ProgramTransformer {
      * creates the methodcall-MetaConstruct
      *
      * @param result
-     *            the SchemaVariable that is used to keep the result
+     *        the SchemaVariable that is used to keep the result
      * @param body
-     *            the ProgramElement contained by the meta construct
+     *        the ProgramElement contained by the meta construct
      */
     public MethodCall(SchemaVariable result, ProgramElement body) {
         this(null, result, body);
@@ -87,9 +91,9 @@ public class MethodCall extends ProgramTransformer {
      * creates the methodcall-MetaConstruct
      *
      * @param result
-     *            the SchemaVariable that is used to keep the result
+     *        the SchemaVariable that is used to keep the result
      * @param body
-     *            the ProgramElement contained by the meta construct
+     *        the ProgramElement contained by the meta construct
      */
     public MethodCall(ProgramSV ec, SchemaVariable result,
             ProgramElement body) {
@@ -100,13 +104,13 @@ public class MethodCall extends ProgramTransformer {
      * creates the methodcall-MetaConstruct
      *
      * @param result
-     *            the SchemaVariable that is used to keep the result
+     *        the SchemaVariable that is used to keep the result
      * @param body
-     *            the ProgramElement contained by the meta construct
+     *        the ProgramElement contained by the meta construct
      * @param name
-     *            Method name.
+     *        Method name.
      * @param ec
-     *            The Schema Variable.
+     *        The Schema Variable.
      */
     protected MethodCall(Name name, ProgramSV ec, SchemaVariable result,
             ProgramElement body) {
@@ -118,7 +122,7 @@ public class MethodCall extends ProgramTransformer {
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args,
             Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType> nil();
+        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             Expression argument = args.get(i);
             result = result.prepend(services.getTypeConverter()
@@ -162,11 +166,11 @@ public class MethodCall extends ProgramTransformer {
      * Returns the method.
      *
      * @param prefixType
-     *            TODO
+     *        TODO
      * @param mr
-     *            TODO
+     *        TODO
      * @param services
-     *            TODO
+     *        TODO
      * @return TODO
      */
     protected IProgramMethod getMethod(KeYJavaType prefixType,
@@ -202,10 +206,10 @@ public class MethodCall extends ProgramTransformer {
      * performs the program transformation needed for symbolic program execution
      *
      * @param services
-     *            the Services with all necessary information about the java
-     *            programs
+     *        the Services with all necessary information about the java
+     *        programs
      * @param svInst
-     *            the instantiations esp. of the inner and outer label
+     *        the instantiations esp. of the inner and outer label
      * @return the transformed program
      */
     @Override
@@ -290,7 +294,7 @@ public class MethodCall extends ProgramTransformer {
     private Statement handleSuperReference(Services services) {
         Statement result;
         LOGGER.debug("method-call: super invocation of method detected."
-                + "Requires static resolving.");
+            + "Requires static resolving.");
         IProgramMethod superMethod = getSuperMethod(execContext, methRef,
             services);
         result = KeYJavaASTFactory.methodBody(pvar,
@@ -305,12 +309,12 @@ public class MethodCall extends ProgramTransformer {
             // private methods or constructor invocations are bound
             // statically
             LOGGER.debug("method-call: invocation of private method detected."
-                    + "Requires static resolving.");
+                + "Requires static resolving.");
             result = makeMbs(staticPrefixType, services);
         } else {
             LOGGER.debug("method-call: invocation of non-private"
-                    + " instance method detected."
-                    + "Requires dynamic resolving.");
+                + " instance method detected."
+                + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps = services.getJavaInfo()
                     .getKeYProgModelInfo().findImplementations(staticPrefixType,
                         methRef.getName(), getTypes(arguments, services));
@@ -389,9 +393,9 @@ public class MethodCall extends ProgramTransformer {
      * TODO
      *
      * @param imps
-     *            TODO
+     *        TODO
      * @param services
-     *            The Services object.
+     *        The Services object.
      * @return TODO
      */
     protected Statement makeIfCascade(ImmutableList<KeYJavaType> imps,
@@ -475,7 +479,7 @@ public class MethodCall extends ProgramTransformer {
      *        see examples/java_dl/java5/vararg.key for examples and tests.
      *
      * @param originalSpec
-     *            the original sepcification of the formal paramater
+     *        the original sepcification of the formal paramater
      * @return an Newarray expression conglomerating all remaining arguments may
      *         be zero.
      */
@@ -541,9 +545,9 @@ public class MethodCall extends ProgramTransformer {
      * In the absence of autoboxing this is the case if the type is a subtype.
      *
      * @param exp
-     *            expression to check
+     *        expression to check
      * @param type
-     *            type to check for
+     *        type to check for
      * @return true iff exp is assign compatible with type
      */
     private boolean assignmentCompatible(Expression exp, Type type,

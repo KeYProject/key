@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -13,15 +21,13 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.util.collection.ImmutableList;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableList;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestLocalSymbols {
     private static final File TEST_RESOURCES_DIR_PREFIX =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "localSymbols/");
+        new File(HelperClassForTests.TESTCASE_DIRECTORY, "localSymbols/");
 
 
     static class LocalMacro extends AbstractPropositionalExpansionMacro {
@@ -79,14 +85,15 @@ public class TestLocalSymbols {
     }
 
     @Disabled("de.uka.ilkd.key.logic.TestLocalSymbols > testSkolemization STANDARD_ERROR\n" +
-            "    No file. TacletForTests.parseTerm(((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & ((\\forall s varr; varr=const) | (\\forall s varr; const=varr)))(1, 12): sort\n" +
-            "        s\n" +
-            "    not declared \n")
+        "    No file. TacletForTests.parseTerm(((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & ((\\forall s varr; varr=const) | (\\forall s varr; const=varr)))(1, 12): sort\n"
+        +
+        "        s\n" +
+        "    not declared \n")
     // Skolem names are the same on two branches and are reset if pruned.
     public void xtestSkolemization() throws Exception {
 
         Term target = TacletForTests.parseTerm(
-                  "((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
+            "((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
                 + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 
         Proof proof = new Proof("TestLocalSymbols", target, "n/a", TacletForTests.initConfig());
@@ -128,7 +135,7 @@ public class TestLocalSymbols {
         Proof proof = env.getLoadedProof();
         String script = env.getProofScript().first;
 
-        ProofScriptEngine pse = new ProofScriptEngine(script , new Location((URL) null,1,1));
+        ProofScriptEngine pse = new ProofScriptEngine(script, new Location((URL) null, 1, 1));
         pse.execute(null, proof);
 
         ImmutableList<Goal> openGoals = proof.openGoals();
@@ -141,19 +148,19 @@ public class TestLocalSymbols {
     private void apply(Proof proof, NoPosTacletApp rule, int goalNo, int formulaNo) {
 
         ImmutableList<Goal> goals = proof.openGoals();
-        while(goalNo > 0) {
+        while (goalNo > 0) {
             goals = goals.tail();
-            goalNo --;
+            goalNo--;
         }
 
         Goal goal = goals.head();
 
         TacletApp app;
         PosInOccurrence pio = new PosInOccurrence(goal.node().sequent().getFormulabyNr(formulaNo),
-                PosInTerm.getTopLevel(), false);
+            PosInTerm.getTopLevel(), false);
 
         app = rule.matchFind(pio, services);
-        app = app.setPosInOccurrence(pio , services);
+        app = app.setPosInOccurrence(pio, services);
         app = app.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
 
         goal.apply(app);
@@ -164,20 +171,19 @@ public class TestLocalSymbols {
      * is not null, and fails if the proof could not be loaded.
      *
      * @param proofFileName
-     *            The file name of the proof file to load.
+     *        The file name of the proof file to load.
      * @return The loaded proof.
      */
     private KeYEnvironment<?> loadProof(String proofFileName) {
-        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX,  proofFileName);
+        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX, proofFileName);
         Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
 
-        try{
+        try {
             KeYEnvironment<?> environment = KeYEnvironment.load(
-                    JavaProfile.getDefaultInstance(), proofFile, null, null,
-                    null, true);
+                JavaProfile.getDefaultInstance(), proofFile, null, null,
+                null, true);
             return environment;
-        }
-        catch (ProblemLoaderException e) {
+        } catch (ProblemLoaderException e) {
             Assertions.fail("Proof could not be loaded.");
             return null;
         }

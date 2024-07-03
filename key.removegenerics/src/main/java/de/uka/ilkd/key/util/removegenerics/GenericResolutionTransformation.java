@@ -1,5 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.util.removegenerics;
+
+import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +19,6 @@ import recoder.java.ProgramElement;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeParameterDeclaration;
 import recoder.kit.TwoPassTransformation;
-
-import java.util.Collection;
 
 /**
  * This is the base class to all transformations used in the generics removal
@@ -33,7 +36,8 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
 
     // allow debug output
     public static boolean DEBUG_OUTPUT = Boolean.getBoolean("resolvegen.verbose");
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenericResolutionTransformation.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(GenericResolutionTransformation.class);
 
     public GenericResolutionTransformation() {
         super();
@@ -115,7 +119,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
      *
      * @param msg the message's head
      * @param arg 0 or more objects that will be expanded to a ;-separated list
-     *            after the message
+     *        after the message
      */
 
     public static void debugOut(String msg, Object... arg) {
@@ -137,9 +141,9 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
      * For some classes {@link Object#toString()} is lame, so that the following
      * classes are caught here:
      * <ul>
-     * <li> {@link MethodDeclaration}
-     * <li> {@link NamedModelElement}
-     * <li> {@link Collection} - which handle each element with toString </li>
+     * <li>{@link MethodDeclaration}
+     * <li>{@link NamedModelElement}
+     * <li>{@link Collection} - which handle each element with toString</li>
      * Anything else will be transoformed using {@link Object#toString()}.
      *
      * @param object the object to be transformed, may be null

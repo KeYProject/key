@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -14,56 +18,56 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
 public class HeuristicInstantiation implements TermGenerator {
-	
-    public final static TermGenerator INSTANCE = new HeuristicInstantiation ();
-        
+
+    public final static TermGenerator INSTANCE = new HeuristicInstantiation();
+
     private HeuristicInstantiation() {}
-    
+
     public Iterator<Term> generate(RuleApp app,
-                                   PosInOccurrence pos,
-                                   Goal goal) {
+            PosInOccurrence pos,
+            Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final Term qf = pos.sequentFormula ().formula ();
-        final Instantiation ia = Instantiation.create ( qf, goal.sequent(), 
-                goal.proof().getServices() );
+        final Term qf = pos.sequentFormula().formula();
+        final Instantiation ia = Instantiation.create(qf, goal.sequent(),
+            goal.proof().getServices());
         final QuantifiableVariable var =
-            qf.varsBoundHere ( 0 ).last ();
-        return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
+            qf.varsBoundHere(0).last();
+        return new HIIterator(ia.getSubstitution().iterator(), var, goal.proof().getServices());
     }
 
 
     private class HIIterator implements Iterator<Term> {
-        private final Iterator<Term>       instances;
+        private final Iterator<Term> instances;
 
         private final QuantifiableVariable quantifiedVar;
 
-        private final Sort                 quantifiedVarSort;
-        private final Function             quantifiedVarSortCast;
+        private final Sort quantifiedVarSort;
+        private final Function quantifiedVarSortCast;
 
-        private Term                       nextInst = null;
+        private Term nextInst = null;
         private final TermServices services;
 
-        private HIIterator(Iterator<Term> it, 
-					 QuantifiableVariable var, 
-        	         TermServices services) {
+        private HIIterator(Iterator<Term> it,
+                QuantifiableVariable var,
+                TermServices services) {
             this.instances = it;
             this.quantifiedVar = var;
             this.services = services;
-            quantifiedVarSort = quantifiedVar.sort ();
-            quantifiedVarSortCast = quantifiedVarSort.getCastSymbol (services);
-            findNextInst ();
+            quantifiedVarSort = quantifiedVar.sort();
+            quantifiedVarSortCast = quantifiedVarSort.getCastSymbol(services);
+            findNextInst();
         }
 
         private void findNextInst() {
-            while ( nextInst == null && instances.hasNext () ) {
-                nextInst = instances.next ();
-                if ( !nextInst.sort ().extendsTrans ( quantifiedVarSort ) ) {
-                    if ( !quantifiedVarSort.extendsTrans ( nextInst.sort () ) ) {
+            while (nextInst == null && instances.hasNext()) {
+                nextInst = instances.next();
+                if (!nextInst.sort().extendsTrans(quantifiedVarSort)) {
+                    if (!quantifiedVarSort.extendsTrans(nextInst.sort())) {
                         nextInst = null;
                         continue;
                     }
-                    nextInst = services.getTermBuilder().func ( quantifiedVarSortCast, nextInst );
+                    nextInst = services.getTermBuilder().func(quantifiedVarSortCast, nextInst);
                 }
             }
         }
@@ -75,10 +79,10 @@ public class HeuristicInstantiation implements TermGenerator {
         public Term next() {
             final Term res = nextInst;
             nextInst = null;
-            findNextInst ();
+            findNextInst();
             return res;
         }
-        
+
         public void remove() {
             throw new UnsupportedOperationException();
         }

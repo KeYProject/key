@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -6,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
@@ -86,18 +88,18 @@ public final class MainFrame extends JPanel {
             }
 
             @Override
-            public void ancestorMoved(AncestorEvent event) { }
+            public void ancestorMoved(AncestorEvent event) {}
 
             @Override
-            public void ancestorAdded(AncestorEvent event) { }
+            public void ancestorAdded(AncestorEvent event) {}
         });
 
         // FIXME put this somewhere descent
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(
-                        KeyEvent.VK_C,
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                        "copy");
+            KeyStroke.getKeyStroke(
+                KeyEvent.VK_C,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+            "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
         setLayout(new BorderLayout());
         add(scrollPane);

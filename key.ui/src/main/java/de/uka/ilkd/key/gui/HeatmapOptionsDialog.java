@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
 
@@ -58,7 +61,7 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** The view settings */
     private static final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE
-        .getViewSettings();
+            .getViewSettings();
 
     /** Minimal setting for number of highlighted terms */
     private static final int MIN_AGE = 1;
@@ -104,7 +107,8 @@ public class HeatmapOptionsDialog extends JDialog {
             + " with the most recent term receiving the strongest highlight." };
 
     /** Error message on invalid textfield input */ // Not needed atm
-//    private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
+    // private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and
+    // 1000";
 
     /** number of radioButtons in the group */
     private static final int NUMRADIOBUTTONS = 5;
@@ -144,7 +148,7 @@ public class HeatmapOptionsDialog extends JDialog {
         // Display the current settings
         loadSettings(radioButtons);
 
-        //save current settings in case the user escapes
+        // save current settings in case the user escapes
         boolean isShow = VS.isShowHeatmap();
         boolean isSF = VS.isHeatmapSF();
         boolean isNew = VS.isHeatmapNewest();
@@ -193,7 +197,7 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /**
      * @param radioButtons
-     *            the radio buttons to set
+     *        the radio buttons to set
      */
     private void loadSettings(JRadioButton[] radioButtons) {
         if (VS.isShowHeatmap()) {
@@ -225,7 +229,8 @@ public class HeatmapOptionsDialog extends JDialog {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(), (int) valueSpinner.getValue());
+                VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(),
+                    (int) valueSpinner.getValue());
             }
         });
         JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
@@ -241,9 +246,9 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /**
      * @param okButton
-     *            the ok button on the panel
+     *        the ok button on the panel
      * @param cancelButton
-     *            the cancel button on the panel
+     *        the cancel button on the panel
      * @return a panel with ok and cancel button
      */
     private JPanel setupButtonPanel(JButton okButton, JButton cancelButton) {
@@ -257,7 +262,7 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /**
      * @param spinner
-     *            the spinner shown on the panel
+     *        the spinner shown on the panel
      * @return a panel with spinner and explanation
      */
     private JPanel setupSpinnerPanel(JSpinner spinner, Color bg) {
@@ -279,9 +284,9 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /**
      * @param radioButtons
-     *            the radio buttons shown on the panel
+     *        the radio buttons shown on the panel
      * @param bg
-     *            the background color
+     *        the background color
      * @return a panel with all the radio buttons and explanations
      */
     private JPanel setupRadioPanel(JRadioButton[] radioButtons, Color bg, JDialog parent) {
@@ -333,15 +338,15 @@ public class HeatmapOptionsDialog extends JDialog {
      * Sets up the action that is called on pressing the ok button
      *
      * @param panel
-     *            the main panel
+     *        the main panel
      * @param group
-     *            the radio button group
+     *        the radio button group
      * @param spinner
-     *            the age spinner
+     *        the age spinner
      * @return
      */
     private Action setupOkAction(JPanel panel, final ButtonGroup group,
-        JSpinner spinner) {
+            JSpinner spinner) {
         Action action = new AbstractAction() {
 
             private static final long serialVersionUID = -5840137383763071948L;
@@ -395,11 +400,11 @@ public class HeatmapOptionsDialog extends JDialog {
         /**
          *
          * @param s
-         *            the description
+         *        the description
          * @param title
-         *            title of the dialog
+         *        title of the dialog
          * @param owner
-         *            the parent window
+         *        the parent window
          */
         public InfoDialog(String title, String s, final JDialog owner) {
             super(owner);
@@ -425,13 +430,14 @@ public class HeatmapOptionsDialog extends JDialog {
                 public void windowGainedFocus(WindowEvent e) {
                     // do nothing
                 }
+
                 @Override
                 public void windowLostFocus(WindowEvent e) {
                     InfoDialog.this.dispose();
                 }
             });
 
-            //exit on escape button
+            // exit on escape button
             getRootPane().registerKeyboardAction(e -> {
                 dispose();
             }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);

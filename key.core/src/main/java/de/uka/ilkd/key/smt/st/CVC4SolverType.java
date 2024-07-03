@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.st;
+
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.CVC4Socket;
-
-import javax.annotation.Nonnull;
 
 /**
  * @author Alexander Weigl
@@ -16,9 +20,9 @@ public class CVC4SolverType extends AbstractSolverType {
     // TODO move to AbstractSolverType?
     @Override
     public SMTSolver createSolver(SMTProblem problem,
-                                  SolverListener listener, Services services) {
+            SolverListener listener, Services services) {
         return new SMTSolverImplementation(problem, listener,
-                services, this);
+            services, this);
     }
 
     @Override
@@ -44,13 +48,14 @@ public class CVC4SolverType extends AbstractSolverType {
 
     @Override
     public SMTTranslator createTranslator(Services services) {
-        final AbstractSMTTranslator.Configuration conf = new AbstractSMTTranslator.Configuration(false, true);
+        final AbstractSMTTranslator.Configuration conf =
+            new AbstractSMTTranslator.Configuration(false, true);
         return new SmtLib2Translator(services, conf);
     }
 
     @Override
     public String[] getDelimiters() {
-        return new String[]{"CVC4>"};
+        return new String[] { "CVC4>" };
     }
 
     @Override
@@ -65,7 +70,7 @@ public class CVC4SolverType extends AbstractSolverType {
 
     @Override
     public String[] getSupportedVersions() {
-        return new String[]{"version 1.3"};
+        return new String[] { "version 1.3" };
     }
 
     @Override

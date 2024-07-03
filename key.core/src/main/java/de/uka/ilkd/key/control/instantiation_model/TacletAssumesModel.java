@@ -1,14 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.util.Iterator;
-
 import javax.swing.DefaultComboBoxModel;
 
-import de.uka.ilkd.key.nparser.KeyIO;
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -16,7 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
-import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.MissingInstantiationException;
@@ -26,6 +24,10 @@ import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.key_project.util.collection.ImmutableList;
+
+import org.antlr.runtime.RecognitionException;
 
 public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
 
@@ -106,7 +108,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
 
     /**
      * @param pos int describes position of the if-sequent (only required for error
-     *            message)
+     *        message)
      * @return the selected instantiation of the if sequent
      * @throws SVInstantiationParserException
      * @throws MissingInstantiationException
@@ -119,8 +121,8 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         try {
             if (manualInput == null || "".equals(manualInput)) {
                 throw new MissingInstantiationException(
-                        "'\\assumes'-formula: " + ProofSaver.printAnything(ifFma, services), pos,
-                        -1, true);
+                    "'\\assumes'-formula: " + ProofSaver.printAnything(ifFma, services), pos,
+                    -1, true);
             }
 
             Term term = parseFormula(manualInput);
@@ -128,18 +130,18 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
             if (ProofIndependentSettings.DEFAULT_INSTANCE
                     .getTermLabelSettings().getUseOriginLabels()) {
                 term = services.getTermBuilder().addLabelToAllSubs(term, new OriginTermLabel(
-                        new NodeOrigin(
-                                SpecType.USER_INTERACTION,
-                                app.rule().displayName(),
-                                goal.node().serialNr())));
+                    new NodeOrigin(
+                        SpecType.USER_INTERACTION,
+                        app.rule().displayName(),
+                        goal.node().serialNr())));
             }
 
             return new IfFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {
             throw new SVInstantiationParserException(manualInput, pos, e.charPositionInLine,
-                    "Problem occured parsing a manual input" + " of an '\\assumes'-sequent.\n"
-                            + e.getMessage(),
-                    true).initCause(e);
+                "Problem occured parsing a manual input" + " of an '\\assumes'-sequent.\n"
+                    + e.getMessage(),
+                true).initCause(e);
         }
     }
 

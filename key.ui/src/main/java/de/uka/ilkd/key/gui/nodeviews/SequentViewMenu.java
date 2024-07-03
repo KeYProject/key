@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EnumSet;
 import java.util.List;
-
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -46,14 +49,14 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * Creates an empty menu.
      */
-    public SequentViewMenu() { }
+    public SequentViewMenu() {}
 
     /**
      * Creates a new menu that displays all applicable actions at the given
      * position.
      *
      * @param sequentView the SequentView that is the parent of this menu
-     * @param pos         the PosInSequent
+     * @param pos the PosInSequent
      */
     SequentViewMenu(T sequentView, PosInSequent pos) {
         super();
@@ -85,13 +88,13 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
      *
      * @see KeYSequentViewMenuExtension
      * @see KeYGuiExtensionFacade#getSequentViewMenuActions(
-     *  de.uka.ilkd.key.gui.MainWindow, PosInSequent, EnumSet)
+     *      de.uka.ilkd.key.gui.MainWindow, PosInSequent, EnumSet)
      */
     protected void addExtensionMenu() {
         List<Action> actions = KeYGuiExtensionFacade.getContextMenuItems(
-                DefaultContextMenuKind.SEQUENT_VIEW,
-                getPos(),
-                getSequentView().getMainWindow().getMediator());
+            DefaultContextMenuKind.SEQUENT_VIEW,
+            getPos(),
+            getSequentView().getMainWindow().getMediator());
 
         for (Action action : actions) {
             add(action);
@@ -158,8 +161,8 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
             } else if (((JMenuItem) e.getSource()).getText()
                     .startsWith(COPY_TO_CLIPBOARD)) {
                 GuiUtilities.copyHighlightToClipboard(sequentView, pos);
-            } else if (((JMenuItem) e.getSource()).getText().
-                    startsWith("View name creation info")) {
+            } else if (((JMenuItem) e.getSource()).getText()
+                    .startsWith("View name creation info")) {
                 Term t = pos.getPosInOccurrence().subTerm();
                 ProgramVariable var = (ProgramVariable) t.op();
                 ProgramElementName name = var.getProgramElementName();
@@ -171,9 +174,9 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
                     message = "No information available.";
                 }
                 JOptionPane.showMessageDialog(null,
-                        message,
-                        "Name creation info",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    message,
+                    "Name creation info",
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         }
 

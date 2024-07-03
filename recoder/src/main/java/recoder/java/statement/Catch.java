@@ -1,13 +1,16 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.java.*;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Catch.
@@ -45,7 +48,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     /**
      * Catch.
      *
-     * @param e    a parameter declaration.
+     * @param e a parameter declaration.
      * @param body a statement.
      */
 

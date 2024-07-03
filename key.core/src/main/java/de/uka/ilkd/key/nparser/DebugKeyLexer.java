@@ -1,12 +1,16 @@
-package de.uka.ilkd.key.nparser;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Token;
+package de.uka.ilkd.key.nparser;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.Token;
 
 /**
  * This program is a little for debugging KeY Lexer.
@@ -52,7 +56,7 @@ public class DebugKeyLexer {
     public static void main(String[] args) {
         if (args.length > 0) {
             new DebugKeyLexer(
-                    Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
+                Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
         } else {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
                 String tmp;
@@ -64,8 +68,7 @@ public class DebugKeyLexer {
                     } else {
                         break;
                     }
-                }
-                while (true);
+                } while (true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -77,7 +80,8 @@ public class DebugKeyLexer {
     }
 
     public static void debug(KeYLexer lexer) {
-        DebugKeyLexer dkl = new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
+        DebugKeyLexer dkl =
+            new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
         dkl.run();
     }
 
@@ -91,11 +95,12 @@ public class DebugKeyLexer {
         do {
             t = toks.nextToken();
             stream.format(format,
-                    toks.getLine(),
-                    toks.getVocabulary().getSymbolicName(t.getType()),
-                    toks._mode,
-                    t.getText().replace("\n", "\\n"));
-            if (t.getType() == KeYLexer.ERROR_CHAR) stream.println("!!ERROR!!");
+                toks.getLine(),
+                toks.getVocabulary().getSymbolicName(t.getType()),
+                toks._mode,
+                t.getText().replace("\n", "\\n"));
+            if (t.getType() == KeYLexer.ERROR_CHAR)
+                stream.println("!!ERROR!!");
         } while (t.getType() != CommonToken.EOF);
     }
 }

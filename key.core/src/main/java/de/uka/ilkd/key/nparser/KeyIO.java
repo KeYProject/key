@@ -1,4 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.nparser;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -13,21 +28,11 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 
@@ -74,8 +79,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull
-    Term parseExpression(@Nonnull String expr) {
+    public @Nonnull Term parseExpression(@Nonnull String expr) {
         return parseExpression(CharStreams.fromString(expr));
     }
 
@@ -86,8 +90,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull
-    Term parseExpression(@Nonnull CharStream stream) {
+    public @Nonnull Term parseExpression(@Nonnull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
@@ -106,8 +109,7 @@ public class KeyIO {
      * @return a valid sequent
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull
-    Sequent parseSequence(@Nonnull CharStream stream) {
+    public @Nonnull Sequent parseSequence(@Nonnull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         if (schemaNamespace != null)
@@ -233,7 +235,8 @@ public class KeyIO {
         }
 
         public List<Taclet> loadComplete() throws IOException {
-            if (ctx.isEmpty()) parseFile();
+            if (ctx.isEmpty())
+                parseFile();
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -246,7 +249,8 @@ public class KeyIO {
         }
 
         public ProblemFinder loadCompleteProblem() throws IOException {
-            if (ctx.isEmpty()) parseFile();
+            if (ctx.isEmpty())
+                parseFile();
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -255,7 +259,8 @@ public class KeyIO {
         }
 
         public Loader parseFile() throws IOException {
-            if (!ctx.isEmpty()) return this;
+            if (!ctx.isEmpty())
+                return this;
             long start = System.currentTimeMillis();
             if (resource != null)
                 ctx = parseFiles(resource);
@@ -308,14 +313,16 @@ public class KeyIO {
         }
 
         public ProblemFinder loadProblem() {
-            if (ctx.isEmpty()) throw new IllegalStateException();
+            if (ctx.isEmpty())
+                throw new IllegalStateException();
             ProblemFinder pf = new ProblemFinder(services, nss);
             ctx.get(0).accept(pf);
             return pf;
         }
 
         public List<Taclet> loadTaclets() {
-            if (ctx.isEmpty()) throw new IllegalStateException();
+            if (ctx.isEmpty())
+                throw new IllegalStateException();
             List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
                     .collect(Collectors.toList());
             long start = System.currentTimeMillis();
@@ -336,7 +343,7 @@ public class KeyIO {
         }
 
         public Term getProblem() {
-            //TODO weigl tbd
+            // TODO weigl tbd
             return null;
         }
     }

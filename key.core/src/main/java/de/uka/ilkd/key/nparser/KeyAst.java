@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.nparser;
+
+import java.net.URL;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
@@ -7,16 +15,14 @@ import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.java.StringUtil;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.key_project.util.java.StringUtil;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.net.URL;
 
 /**
  * This is a monad around the parse tree.
@@ -52,8 +58,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public @Nullable
-        ProofSettings findProofSettings() {
+        public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
             if (ctx.decls() != null && ctx.decls().pref != null) {
                 String text = StringUtil.trim(ctx.decls().pref.s.getText(), '"')
@@ -63,13 +68,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return settings;
         }
 
-        public @Nullable
-        Triple<String, Integer, Integer> findProofScript() {
+        public @Nullable Triple<String, Integer, Integer> findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
                 String text = pctx.ps.getText();
                 return new Triple<>(StringUtil.trim(text, '"'),
-                        pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
+                    pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
             }
             return null;
         }

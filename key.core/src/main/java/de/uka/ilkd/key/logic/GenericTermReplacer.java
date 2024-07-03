@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic;
 
 import java.util.function.Function;
@@ -25,7 +29,7 @@ public class GenericTermReplacer {
                 .toArray(new Term[0]);
 
         return services.getTermFactory().createTerm(newTopLevelTerm.op(), newSubs,
-                newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(),
-                newTopLevelTerm.getLabels());
+            newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(),
+            newTopLevelTerm.getLabels());
     }
 }

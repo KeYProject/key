@@ -1,14 +1,17 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
+
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.List;
 
 import recoder.ParserException;
 import recoder.Service;
 import recoder.java.CompilationUnit;
 import recoder.util.ProgressListener;
-
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Retrieval, storage and write back of abstract syntax trees.
@@ -45,7 +48,7 @@ public interface SourceFileRepository extends Service {
      *
      * @param classname the fully qualified classname of the required class.
      * @return the AST for that class, if sources are available, <tt>null</tt>
-     * otherwise.
+     *         otherwise.
      */
     CompilationUnit getCompilationUnit(String classname);
 
@@ -58,7 +61,7 @@ public interface SourceFileRepository extends Service {
      *
      * @param filename the name of the file to look for
      * @return a compilation unit object for that file, or <CODE>null</CODE>
-     * if there was no unit under this name whatoever.
+     *         if there was no unit under this name whatoever.
      * @throws ParserException if something happened while parsing.
      */
     CompilationUnit getCompilationUnitFromFile(String filename) throws ParserException;
@@ -89,9 +92,10 @@ public interface SourceFileRepository extends Service {
      *
      * @param filter a filename filter accepting source files.
      * @return the list of all compilation units obeying the filter and
-     * accessible via the search path.
+     *         accessible via the search path.
      */
-    List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter) throws ParserException;
+    List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter)
+            throws ParserException;
 
     /**
      * Checks if the given compilation unit is up to date or if it has changed
@@ -113,8 +117,8 @@ public interface SourceFileRepository extends Service {
      * print all units, or only those that are not up to date.
      *
      * @param always flag to indicate whether all units should be written back (
-     *               <CODE>true</CODE>), or only these which are not up to date (
-     *               <CODE>false</CODE>).
+     *        <CODE>true</CODE>), or only these which are not up to date (
+     *        <CODE>false</CODE>).
      * @see #print
      * @see #isUpToDate
      */
@@ -144,4 +148,3 @@ public interface SourceFileRepository extends Service {
     void removeProgressListener(ProgressListener l);
 
 }
-

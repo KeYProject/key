@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -19,6 +22,7 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
 
     /**
      * Creates a new EnsureSourceConsistencyToggleAction.
+     *
      * @param mainWindow the main window of the program
      */
     public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
@@ -27,8 +31,8 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
         setTooltip("If ticked, consistency between source and proof is ensured"
             + " (by caching files at first use in a temporary directory).");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
-            .getGeneralSettings()
-            .isEnsureSourceConsistency());
+                .getGeneralSettings()
+                .isEnsureSourceConsistency());
     }
 
     @Override
@@ -41,7 +45,7 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
         }
         boolean selected = isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE
-            .getGeneralSettings()
-            .setEnsureSourceConsistency(selected);
+                .getGeneralSettings()
+                .setEnsureSourceConsistency(selected);
     }
 }

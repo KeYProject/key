@@ -1,19 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import net.miginfocom.layout.CC;
-import net.miginfocom.swing.MigLayout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +16,21 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import net.miginfocom.layout.CC;
+import net.miginfocom.swing.MigLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
@@ -56,11 +61,12 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         @Override
         public void run() {
             try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
-                var watchKey = file.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+                var watchKey =
+                    file.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
                 while (!Thread.interrupted()) {
                     final WatchKey wk = watchService.take();
                     for (WatchEvent<?> event : wk.pollEvents()) {
-                        //final Path changed = (Path) event.context()
+                        // final Path changed = (Path) event.context()
                         if (wk == watchKey) {
                             callback.run();
                         }
@@ -124,8 +130,9 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         private static final SimpleAttributeSet ATTRIB_FILE = new SimpleAttributeSet();
         private static final SimpleAttributeSet ATTRIB_MSG = new SimpleAttributeSet();
         private static final SimpleAttributeSet ATTRIB_EX = new SimpleAttributeSet();
-        private static final AttributeSet[] STYLES = new AttributeSet[]{
-                ATTRIB_TIME, ATTRIB_LEVEL, ATTRIB_THREAD, ATTRIB_CLASS, ATTRIB_FILE, ATTRIB_MSG, ATTRIB_EX
+        private static final AttributeSet[] STYLES = new AttributeSet[] {
+            ATTRIB_TIME, ATTRIB_LEVEL, ATTRIB_THREAD, ATTRIB_CLASS, ATTRIB_FILE, ATTRIB_MSG,
+            ATTRIB_EX
         };
 
         static {
@@ -187,14 +194,14 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             add(pFilter, BorderLayout.NORTH);
             add(pActions, BorderLayout.SOUTH);
             JScrollPane scrPane = new JScrollPane(
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             scrPane.setAutoscrolls(false);
             scrPane.setViewportView(txtView);
             add(scrPane, BorderLayout.CENTER);
 
             FileWatcherService fileWatcherService =
-                    new FileWatcherService(LOG_FILE.getAbsoluteFile().getParentFile().toPath(),
-                            this::refresh);
+                new FileWatcherService(LOG_FILE.getAbsoluteFile().getParentFile().toPath(),
+                    this::refresh);
             fileWatcherServiceThread = new Thread(fileWatcherService);
             refresh();
 
@@ -210,7 +217,8 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
 
         public void refresh() {
-            if (pause) return;
+            if (pause)
+                return;
             txtView.setText("");
 
             String pkgFilter = txtPackageSearch.getText().trim();
@@ -226,7 +234,8 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             try (BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.charAt(0) == '#') continue;
+                    if (line.charAt(0) == '#')
+                        continue;
                     String[] fields = line.split("[|]");
                     boolean skipByMsgFilter = msgFilterApply && !fields[5].contains(msgFilter);
                     boolean skipByPkgFilter = pkgFilterApply && !fields[4].startsWith(pkgFilter);
@@ -235,7 +244,8 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                     boolean skipInfoLevel = !levelInfo && "INFO".equals(fields[1]);
                     boolean skipDebugLevel = !levelDebug && "DEBUG".equals(fields[1]);
                     boolean skipTraceLevel = !levelTrace && "TRACE".equals(fields[1]);
-                    if (!skipErrorLevel && !skipDebugLevel && !skipTraceLevel && !skipInfoLevel && !skipWarnLevel
+                    if (!skipErrorLevel && !skipDebugLevel && !skipTraceLevel && !skipInfoLevel
+                            && !skipWarnLevel
                             && !skipByMsgFilter && !skipByPkgFilter) {
                         appendLine(fields);
                     }

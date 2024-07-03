@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.algo;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.ui.interactionlog.model.InteractionLog;
 import org.key_project.ui.interactionlog.model.NodeIdentifier;
 import org.key_project.ui.interactionlog.model.NodeInteraction;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 /**
  * @author Alexander Weigl

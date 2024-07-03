@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JTextArea;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -27,6 +29,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The methods of class TacletDescriber have been extracted from class
@@ -105,7 +109,7 @@ class TacletDescriber {
             final Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
 
-        for (final NewVarcond nvc: t.varsNew()) {
+        for (final NewVarcond nvc : t.varsNew()) {
             schemaVars = schemaVars.add(nvc.getSchemaVariable());
         }
 
@@ -153,7 +157,8 @@ class TacletDescriber {
         if (app != null) {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
-                SequentViewLogicPrinter logicPrinter = new SequentViewLogicPrinter(new ProgramPrinter(null),
+                SequentViewLogicPrinter logicPrinter =
+                    new SequentViewLogicPrinter(new ProgramPrinter(null),
                         mediator.getNotationInfo(),
                         mediator.getServices(),
                         true,
@@ -166,8 +171,8 @@ class TacletDescriber {
 
             if (app instanceof TacletApp) {
                 TacletApp tapp = (TacletApp) app;
-                if (tapp.instantiations().getGenericSortInstantiations()
-                        != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
+                if (tapp.instantiations()
+                        .getGenericSortInstantiations() != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
                     s = s + "\n\nWith sorts:\n";
                     s = s
                             + tapp.instantiations().getGenericSortInstantiations();
@@ -178,9 +183,9 @@ class TacletDescriber {
                 s = s + sb;
             }
 
-//                  s = s + "\n\nApplication justified by: ";
-//                  s = s + mediator.getSelectedProof().env().getJustifInfo()
-//                                      .getJustification(app, mediator.getServices())+"\n";
+            // s = s + "\n\nApplication justified by: ";
+            // s = s + mediator.getSelectedProof().env().getJustifInfo()
+            // .getJustification(app, mediator.getServices())+"\n";
         } else {
             // Is this case possible?
             s += "No rule was applied on this node.";

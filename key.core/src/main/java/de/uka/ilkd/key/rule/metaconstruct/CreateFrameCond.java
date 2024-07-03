@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedHashMap;
@@ -40,26 +44,26 @@ public final class CreateFrameCond extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term loopFormula = term.sub(0);
         final ProgramVariable heapBeforePV = //
-                (ProgramVariable) term.sub(1).op();
+            (ProgramVariable) term.sub(1).op();
         final ProgramVariable savedHeapBeforePV = //
-                (ProgramVariable) term.sub(2).op();
+            (ProgramVariable) term.sub(2).op();
         final ProgramVariable permissionsHeapBeforePV = //
-                (ProgramVariable) term.sub(3).op();
+            (ProgramVariable) term.sub(3).op();
 
         final Optional<LoopSpecification> loopSpec = //
-                MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
+            MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
         final boolean isTransaction = MiscTools
                 .isTransaction((Modality) loopFormula.op());
         final boolean isPermissions = MiscTools.isPermissions(services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap = //
-                createHeapToBeforeLoopMap(isTransaction, isPermissions,
-                        heapBeforePV, savedHeapBeforePV,
-                        permissionsHeapBeforePV, services);
+            createHeapToBeforeLoopMap(isTransaction, isPermissions,
+                heapBeforePV, savedHeapBeforePV,
+                permissionsHeapBeforePV, services);
 
         final Term frameCondition = createFrameCondition(loopSpec.get(),
-                isTransaction, heapToBeforeLoopMap, services);
+            isTransaction, heapToBeforeLoopMap, services);
 
         return frameCondition;
     }
@@ -68,15 +72,15 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      * Creates the frame condition.
      *
      * @param loopSpec
-     *     The {@link LoopSpecification}, for the modifies clause.
+     *        The {@link LoopSpecification}, for the modifies clause.
      * @param isTransaction
-     *     A flag set to true iff the current modality is a transaction
-     *     modality.
+     *        A flag set to true iff the current modality is a transaction
+     *        modality.
      * @param heapToBeforeLoopMap
-     *     The map from heap variables to a map from original to pre-state
-     *     terms.
+     *        The map from heap variables to a map from original to pre-state
+     *        terms.
      * @param services
-     *     The {@link Services} object.
+     *        The {@link Services} object.
      * @return The frame condition.
      */
     private static Term createFrameCondition(final LoopSpecification loopSpec,
@@ -87,10 +91,10 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
         final List<LocationVariable> heapContext = //
-                HeapContext.getModHeaps(services, isTransaction);
+            HeapContext.getModHeaps(services, isTransaction);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         heapContext.forEach(heap -> mods.put(heap, loopSpec.getModifies(heap,
-                loopSpec.getInternalSelfTerm(), atPres, services)));
+            loopSpec.getInternalSelfTerm(), atPres, services)));
 
         Term frameCondition = null;
         for (LocationVariable heap : heapContext) {
@@ -99,7 +103,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
             if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap),
-                        heapToBeforeLoopMap.get(heap));
+                    heapToBeforeLoopMap.get(heap));
             } else {
                 fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), mod);
             }
@@ -117,42 +121,42 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      * (which should not have occurred before!).
      *
      * @param isTransaction
-     *     Signals that the current modality is a transaction modality.
+     *        Signals that the current modality is a transaction modality.
      * @param isPermissions
-     *     Signals that the current profile is one with permissions.
+     *        Signals that the current profile is one with permissions.
      * @param heapBeforePV
-     *     The fresh PV for saving the standard heap.
+     *        The fresh PV for saving the standard heap.
      * @param savedHeapBeforePV
-     *     The fresh PV for saving the transaction heap.
+     *        The fresh PV for saving the transaction heap.
      * @param permissionsHeapBeforePV
-     *     The fresh PV for saving the permissions heap.
+     *        The fresh PV for saving the permissions heap.
      * @param services
-     *     The {@link Services} object.
+     *        The {@link Services} object.
      *
      * @return A map from heap variables to a map from original terms to the
-     * pre-state terms.
+     *         pre-state terms.
      */
     private Map<LocationVariable, Map<Term, Term>> createHeapToBeforeLoopMap(
             boolean isTransaction, boolean isPermissions,
             ProgramVariable heapBeforePV, ProgramVariable savedHeapBeforePV,
             ProgramVariable permissionsHeapBeforePV, Services services) {
         final Map<LocationVariable, Map<Term, Term>> result = //
-                new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
 
         put(result, heapLDT.getHeap(), tb.var(heapLDT.getHeap()),
-                tb.var(heapBeforePV));
+            tb.var(heapBeforePV));
 
         if (isTransaction) {
             put(result, heapLDT.getSavedHeap(), tb.var(heapLDT.getSavedHeap()),
-                    tb.var(savedHeapBeforePV));
+                tb.var(savedHeapBeforePV));
         }
 
         if (isPermissions) {
             put(result, heapLDT.getPermissionHeap(),
-                    tb.var(heapLDT.getPermissionHeap()),
-                    tb.var(permissionsHeapBeforePV));
+                tb.var(heapLDT.getPermissionHeap()),
+                tb.var(permissionsHeapBeforePV));
         }
 
         return result;

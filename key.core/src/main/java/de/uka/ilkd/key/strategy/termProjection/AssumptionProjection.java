@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -20,21 +24,20 @@ public class AssumptionProjection implements ProjectionToTerm {
     }
 
     public static ProjectionToTerm create(int no) {
-        return new AssumptionProjection ( no );
+        return new AssumptionProjection(no);
     }
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        assert app instanceof TacletApp :
-            "Projection is only applicable to taclet apps," +
+        assert app instanceof TacletApp : "Projection is only applicable to taclet apps," +
             " but got " + app;
-        final TacletApp tapp = (TacletApp)app;
-        
-        assert tapp.ifFormulaInstantiations() != null :
-            "Projection is only applicable to taclet apps with assumptions," +
-            " but got " + app;
-        
+        final TacletApp tapp = (TacletApp) app;
+
+        assert tapp.ifFormulaInstantiations() != null
+                : "Projection is only applicable to taclet apps with assumptions," +
+                    " but got " + app;
+
         return tapp
-            .ifFormulaInstantiations ().take ( no ).head ()
-            .getConstrainedFormula ().formula ();
+                .ifFormulaInstantiations().take(no).head()
+                .getConstrainedFormula().formula();
     }
 }

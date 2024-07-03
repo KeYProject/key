@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.macros;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -9,6 +11,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros
@@ -21,7 +25,9 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
  */
 public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getName()
      */
     @Override
@@ -29,21 +35,23 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         return "Apply macro as long as condition is met, then apply other macro";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getDescription()
      */
     @Override
     public String getDescription() {
         return "Applies specificed macro as long as specified condition is met" +
-                "with no more rule applications than specified. If the" +
-                "macro is not applicable anymore and the maximum steps" +
-                "are not reached yet, then apply other macro once.";
+            "with no more rule applications than specified. If the" +
+            "macro is not applicable anymore and the maximum steps" +
+            "are not reached yet, then apply other macro once.";
     }
 
     @Override
-	public boolean canApplyTo(Proof proof,
-	                          ImmutableList<Goal> goals,
-	                          PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof,
+            ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
         if (getCondition()) {
             return getProofMacro().canApplyTo(proof, goals, posInOcc);
         } else {
@@ -53,18 +61,18 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException, Exception {
+            Proof proof,
+            ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException, Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         int steps = getMaxSteps(proof);
         final ProofMacro macro = getProofMacro();
         while (steps > 0 && getCondition() && macro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
-                    new ProofMacroListener(getName(), listener);
+                new ProofMacroListener(getName(), listener);
             pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
-            synchronized(macro) {
+            synchronized (macro) {
                 // wait for macro to terminate
                 info = macro.applyTo(uic, proof, goals, posInOcc, pml);
             }
@@ -78,10 +86,10 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         final ProofMacro altMacro = getAltProofMacro();
         if (steps > 0 && altMacro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
-                    new ProofMacroListener(getName(), listener);
+                new ProofMacroListener(getName(), listener);
             pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, altMacro.getName(), 0));
             info = altMacro.applyTo(uic, proof, goals, posInOcc, pml);
-            synchronized(altMacro) {
+            synchronized (altMacro) {
                 // wait for macro to terminate
                 info = new ProofMacroFinishedInfo(this, info);
             }

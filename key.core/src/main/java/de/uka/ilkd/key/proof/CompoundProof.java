@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -10,84 +14,84 @@ import de.uka.ilkd.key.proof.mgt.ProofStatus;
 public class CompoundProof extends ProofAggregate {
 
     private final ArrayList<ProofAggregate> proofs;
-    
+
     CompoundProof(String name, ProofAggregate... proofs) {
         super(name);
-        assert proofs!= null && proofs.length>=1;
+        assert proofs != null && proofs.length >= 1;
         this.proofs = new ArrayList<>();
         Collections.addAll(this.proofs, proofs);
     }
 
     private void flatten(ProofAggregate p, List<Proof> l) {
-       Collections.addAll(l, p.getProofs()); 
+        Collections.addAll(l, p.getProofs());
     }
 
     private void flatten(List<Proof> l) {
-       for (ProofAggregate pa : proofs) {
-          flatten(pa, l);
-       }
-   }
-      
-    @Override    
+        for (ProofAggregate pa : proofs) {
+            flatten(pa, l);
+        }
+    }
+
+    @Override
     public Proof[] getProofs() {
         List<Proof> l = new LinkedList<Proof>();
         flatten(l);
         return l.toArray(new Proof[l.size()]);
     }
-        
-    
+
+
     @Override
     public int size() {
         return proofs.size();
     }
-    
-        
+
+
     public ProofAggregate get(int i) {
         return proofs.get(i);
     }
 
-    
-    @Override    
+
+    @Override
     public List<ProofAggregate> getChildren() {
         return Collections.unmodifiableList(proofs);
     }
-    
-	@Override
-	public ProofAggregate getChildrenAt(int i) {
-		return proofs.get(i);
-	}    
-    
+
+    @Override
+    public ProofAggregate getChildrenAt(int i) {
+        return proofs.get(i);
+    }
+
     @Override
     public ProofStatus getStatus() {
-	ProofStatus result = proofs.get(0).getStatus();
-	for(int i = 1; i < proofs.size(); i++) {
-	    result = result.combine(proofs.get(i).getStatus());
-	}
-	return result;
+        ProofStatus result = proofs.get(0).getStatus();
+        for (int i = 1; i < proofs.size(); i++) {
+            result = result.combine(proofs.get(i).getStatus());
+        }
+        return result;
     }
 
 
-    @Override    
+    @Override
     public boolean equals(Object o) {
-       if (!super.equals(o)) {
-          return false;
-       }
-       
-       final CompoundProof other = (CompoundProof) o;     
-       
-       for (int i = 0; i<proofs.size(); i++) {
-          if (!proofs.get(i).equals(other.proofs.get(i))) { 
-             return false;
-          }
-       }
-       return true;
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        final CompoundProof other = (CompoundProof) o;
+
+        for (int i = 0; i < proofs.size(); i++) {
+            if (!proofs.get(i).equals(other.proofs.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
- 
-   
-    @Override    
+
+
+    @Override
     public int hashCode() {
         int result = 17;
-        for (ProofAggregate proof : proofs){
+        for (ProofAggregate proof : proofs) {
             result = 37 * result + proof.hashCode();
         }
         return result;

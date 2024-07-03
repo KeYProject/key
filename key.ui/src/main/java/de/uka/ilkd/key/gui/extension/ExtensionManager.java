@@ -1,4 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.extension;
+
+import java.awt.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.impl.Extension;
@@ -8,14 +19,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import net.miginfocom.layout.CC;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import net.miginfocom.layout.CC;
 
 /**
  * @author Alexander Weigl
@@ -36,8 +41,8 @@ public class ExtensionManager extends SettingsPanel
 
 
         JLabel lblExplainExperimental = new JLabel("<html>The flask marks extensions " +
-                "that are only available, <br>" +
-                "if KeY was started in experimental mode. Restart KeY with `--experimental`.");
+            "that are only available, <br>" +
+            "if KeY was started in experimental mode. Restart KeY with `--experimental`.");
         lblExplainExperimental.setIcon(IconFactory.EXPERIMENTAL_EXTENSION.get());
         pNorth.add(lblExplainExperimental);
 
@@ -58,43 +63,44 @@ public class ExtensionManager extends SettingsPanel
         keywords += lblSubhead.getText();
 
         KeYGuiExtensionFacade.getExtensions().stream()
-                .sorted(Comparator.comparingInt(it ->
-                        it.isDisabledByMaintainer() || !it.isOptional() ? 1 : 0))
+                .sorted(Comparator.comparingInt(
+                    it -> it.isDisabledByMaintainer() || !it.isOptional() ? 1 : 0))
                 .filter(it -> !it.isDisabledByMaintainer()).forEach(it -> {
-            JCheckBox box = new JCheckBox();
-            box.setText(it.getName());
-            box.setSelected(!it.isDisabled());
-            box.setEnabled(it.isOptional());
-            map.put(box, it);
+                    JCheckBox box = new JCheckBox();
+                    box.setText(it.getName());
+                    box.setSelected(!it.isDisabled());
+                    box.setEnabled(it.isOptional());
+                    map.put(box, it);
 
-            keywords += box.getText();
-            pCenter.add(new JLabel(it.isExperimental()
-                    ? IconFactory.EXPERIMENTAL_EXTENSION.get()
-                    : null), new CC().newline());
-            pCenter.add(box);
+                    keywords += box.getText();
+                    pCenter.add(new JLabel(it.isExperimental()
+                            ? IconFactory.EXPERIMENTAL_EXTENSION.get()
+                            : null),
+                        new CC().newline());
+                    pCenter.add(box);
 
-            JLabel lblProvides = new JLabel(getSupportLabel(it));
-            keywords += lblProvides.getText();
-            lblProvides.setFont(lblProvides.getFont().deriveFont(Font.ITALIC));
-            pCenter.add(new JLabel(), new CC().newline());
-            pCenter.add(lblProvides);
+                    JLabel lblProvides = new JLabel(getSupportLabel(it));
+                    keywords += lblProvides.getText();
+                    lblProvides.setFont(lblProvides.getFont().deriveFont(Font.ITALIC));
+                    pCenter.add(new JLabel(), new CC().newline());
+                    pCenter.add(lblProvides);
 
-            if (!it.getDescription().isEmpty()) {
-                pCenter.add(new JLabel(), new CC().newline());
-                pCenter.add(createInfoArea(it.getDescription()));
-                keywords += it.getDescription();
-            }
-        });
+                    if (!it.getDescription().isEmpty()) {
+                        pCenter.add(new JLabel(), new CC().newline());
+                        pCenter.add(createInfoArea(it.getDescription()));
+                        keywords += it.getDescription();
+                    }
+                });
     }
 
     private String getSupportLabel(Extension it) {
         return "Provides: " +
-                (it.supportsContextMenu() ? "ContextMenu " : "") +
-                (it.supportsLeftPanel() ? "LeftPanel " : "") +
-                (it.supportsMainMenu() ? "MainMenu " : "") +
-                (it.supportsSettings() ? "Settings " : "") +
-                (it.supportsStatusLine() ? "StatusLine " : "") +
-                (it.supportsToolbar() ? "Toolbar " : "");
+            (it.supportsContextMenu() ? "ContextMenu " : "") +
+            (it.supportsLeftPanel() ? "LeftPanel " : "") +
+            (it.supportsMainMenu() ? "MainMenu " : "") +
+            (it.supportsSettings() ? "Settings " : "") +
+            (it.supportsStatusLine() ? "StatusLine " : "") +
+            (it.supportsToolbar() ? "Toolbar " : "");
     }
 
     @Override

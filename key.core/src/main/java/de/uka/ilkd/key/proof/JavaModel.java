@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
 
 import java.io.File;
@@ -17,143 +21,143 @@ public final class JavaModel {
     private final String bootClassPath;
     private final String includedFiles;
     private final File initialFile;
-   
+
     public static final JavaModel NO_MODEL = new JavaModel();
-   
-    
-    
+
+
+
     /**
-     * 
+     *
      */
     public static JavaModel createJavaModel(String javaPath,
-                                      List<File> classPath,
-                                      File bootClassPath,
-                                      Includes includes,
-                                      File initialFile) {
+            List<File> classPath,
+            File bootClassPath,
+            Includes includes,
+            File initialFile) {
         JavaModel result;
-        if(javaPath == null) {
+        if (javaPath == null) {
             result = JavaModel.NO_MODEL;
         } else {
             result = new JavaModel(javaPath,
-                                   classPath,
-                                   bootClassPath,
-                                   includes,
-                                   initialFile);
+                classPath,
+                bootClassPath,
+                includes,
+                initialFile);
         }
         return result;
     }
-         
-    
+
+
     private JavaModel() {
-	modelDir = null;
-	modelTag = null;
-	descr = "no model";
-	classPath = null;
-   classPathEntries = null;
-	bootClassPath = null;
-	includedFiles = null;
-	initialFile = null;
+        modelDir = null;
+        modelTag = null;
+        descr = "no model";
+        classPath = null;
+        classPathEntries = null;
+        bootClassPath = null;
+        includedFiles = null;
+        initialFile = null;
     }
 
-    private JavaModel(String modelDir, 
-	    	     List<File> classPathEntries,
-	    	     File bootClassPath,
-	    	     Includes includes,
-	     	     File initialFile) {
-	this.modelDir = (new File(modelDir)).getAbsolutePath();
-	this.modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
-	this.descr = "model "+(new File(modelDir)).getName()+"@"
-	    +DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
-	StringBuffer sb = new StringBuffer();
-	if(classPathEntries != null && !classPathEntries.isEmpty()) {
-	    for(File f : classPathEntries) {
-		sb.append("\"" + f.getAbsolutePath() + "\", ");
-	    }
-	    sb.setLength(sb.length() - 2);
-	}
-	this.classPath = sb.toString();
-	this.classPathEntries = classPathEntries;
-	this.bootClassPath = bootClassPath == null 
-	                     ? null 
-	                     : bootClassPath.getAbsolutePath();
-	StringBuffer sb2 = new StringBuffer();
-	if(includes != null) {
-		List<File> includeList = includes.getFiles();
-		if(!includeList.isEmpty()) {
-		    for(File f : includeList) {
-				sb2.append("\"" + f.getAbsolutePath() + "\", ");
-			    }
-			    sb2.setLength(sb2.length() - 2);
-	    }
-	}
-	includedFiles = sb2.toString();
-	this.initialFile = initialFile;
+    private JavaModel(String modelDir,
+            List<File> classPathEntries,
+            File bootClassPath,
+            Includes includes,
+            File initialFile) {
+        this.modelDir = (new File(modelDir)).getAbsolutePath();
+        this.modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
+        this.descr = "model " + (new File(modelDir)).getName() + "@"
+            + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
+        StringBuffer sb = new StringBuffer();
+        if (classPathEntries != null && !classPathEntries.isEmpty()) {
+            for (File f : classPathEntries) {
+                sb.append("\"" + f.getAbsolutePath() + "\", ");
+            }
+            sb.setLength(sb.length() - 2);
+        }
+        this.classPath = sb.toString();
+        this.classPathEntries = classPathEntries;
+        this.bootClassPath = bootClassPath == null
+                ? null
+                : bootClassPath.getAbsolutePath();
+        StringBuffer sb2 = new StringBuffer();
+        if (includes != null) {
+            List<File> includeList = includes.getFiles();
+            if (!includeList.isEmpty()) {
+                for (File f : includeList) {
+                    sb2.append("\"" + f.getAbsolutePath() + "\", ");
+                }
+                sb2.setLength(sb2.length() - 2);
+            }
+        }
+        includedFiles = sb2.toString();
+        this.initialFile = initialFile;
     }
-   
+
     public String getModelDir() {
-	return modelDir;
+        return modelDir;
     }
-   
+
     public String getModelTag() {
-	return modelTag;
+        return modelTag;
     }
-    
+
     public String getClassPath() {
-	return classPath;
+        return classPath;
     }
-    
+
     public List<File> getClassPathEntries() {
-      return classPathEntries;
+        return classPathEntries;
     }
 
-   public String getBootClassPath() {
-	return bootClassPath;
+    public String getBootClassPath() {
+        return bootClassPath;
     }
 
-   public String getIncludedFiles() {
-	return includedFiles;
+    public String getIncludedFiles() {
+        return includedFiles;
     }
-   
+
     public File getInitialFile() {
-      return initialFile;
+        return initialFile;
     }
 
-   public boolean isEmpty() {
-	return this == NO_MODEL;
+    public boolean isEmpty() {
+        return this == NO_MODEL;
     }
-   
+
     public String description() {
-	return descr;
+        return descr;
     }
 
-    
-    @Override    
+
+    @Override
     public boolean equals(Object o) {
-       if (o == null || o.getClass() != this.getClass()) {
-          return false;
-       }       
-       final JavaModel other = (JavaModel)o;       
-       if(getModelTag() == null) {
-          return other.getModelTag() == null;
-       } else {
-          return getModelTag().equals(other.getModelTag());
-       }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+        final JavaModel other = (JavaModel) o;
+        if (getModelTag() == null) {
+            return other.getModelTag() == null;
+        } else {
+            return getModelTag().equals(other.getModelTag());
+        }
     }
-	
 
-    @Override    
+
+    @Override
     public int hashCode() {
-	if (getModelTag() == null) {
-	    return 42;
-	} else {
-	    return getModelTag().hashCode();
-	}
+        if (getModelTag() == null) {
+            return 42;
+        } else {
+            return getModelTag().hashCode();
+        }
     }
 
-    
+
     @Override
     public String toString() {
-        return "---Program model---\nModel dir: "+modelDir+
-	    "\nModel tag: "+modelTag+"\nDescription: "+descr;
+        return "---Program model---\nModel dir: " + modelDir +
+            "\nModel tag: " + modelTag + "\nDescription: " + descr;
     }
 }

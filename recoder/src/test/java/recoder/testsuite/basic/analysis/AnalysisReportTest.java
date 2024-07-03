@@ -1,4 +1,12 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic.analysis;
+
+import java.io.*;
+import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,10 +28,6 @@ import recoder.util.HashCode;
 import recoder.util.Index;
 import recoder.util.Order;
 import recoder.util.Sorting;
-
-import java.io.*;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
 import static org.junit.Assert.fail;
 
@@ -126,7 +130,8 @@ public class AnalysisReportTest {
 
     protected void createReport(Writer out) throws IOException {
 
-        List<CompilationUnit> units = BasicTestsSuite.getConfig().getSourceFileRepository().getCompilationUnits();
+        List<CompilationUnit> units =
+            BasicTestsSuite.getConfig().getSourceFileRepository().getCompilationUnits();
         // sort by name
         CompilationUnit[] uarray = new CompilationUnit[units.size()];
         for (int i = 0; i < uarray.length; i++) {
@@ -153,8 +158,8 @@ public class AnalysisReportTest {
             Position oldPos = Position.UNDEFINED;
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                //line.append(number);
-                //line.append(' ');
+                // line.append(number);
+                // line.append(' ');
                 Position pos = pe.getFirstElement().getStartPosition();
                 if (!pos.equals(oldPos)) {
                     line.append(pos);
@@ -181,7 +186,8 @@ public class AnalysisReportTest {
                         } else {
                             line.append(Format.toString("%N", t));
                         }
-                        if (BasicTestsSuite.getConfig().getConstantEvaluator().isCompileTimeConstant((Expression) pe, res)) {
+                        if (BasicTestsSuite.getConfig().getConstantEvaluator()
+                                .isCompileTimeConstant((Expression) pe, res)) {
                             line.append(" ==").append(res);
                         }
                     }

@@ -1,12 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
+
+import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are implemented
@@ -21,12 +27,13 @@ import java.util.Map;
  * proof branches, different locations).
  */
 public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTacletAppIndexCache {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PrefixTermTacletAppIndexCacheImpl.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(PrefixTermTacletAppIndexCacheImpl.class);
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
     protected PrefixTermTacletAppIndexCacheImpl(ImmutableList<QuantifiableVariable> prefix,
-                                                Map<CacheKey, TermTacletAppIndex> cache) {
+            Map<CacheKey, TermTacletAppIndex> cache) {
         super(prefix);
         this.cache = cache;
     }
@@ -41,9 +48,11 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     @SuppressWarnings("unused")
     private void countAccess(boolean hit) {
         ++total;
-        if (hit) ++hits;
+        if (hit)
+            ++hits;
         if (total % 1000 == 0 && total != 0) {
-            LOGGER.info("{} {}, size {}: {}", name(), hashCode(), cache.size(), ((double) hits) / (double) total);
+            LOGGER.info("{} {}, size {}: {}", name(), hashCode(), cache.size(),
+                ((double) hits) / (double) total);
         }
     }
 
@@ -58,7 +67,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
 
     /**
      * @return a freshly created key for the term <code>t</code> that can be
-     * stored in the <code>cache</code>
+     *         stored in the <code>cache</code>
      */
     private CacheKey getNewKey(Term t) {
         return new CacheKey(this, t);
@@ -66,9 +75,9 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
 
     /**
      * @return a key for the term <code>t</code> that can be used for cache
-     * queries. Calling this method twice will return the same object
-     * (with different attribute values), i.e., the result is not
-     * supposed to be stored anywhere
+     *         queries. Calling this method twice will return the same object
+     *         (with different attribute values), i.e., the result is not
+     *         supposed to be stored anywhere
      */
     private CacheKey getQueryKey(Term t) {
         queryCacheKey.analysedTerm = t;
@@ -87,7 +96,8 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
 
         public boolean equals(Object obj) {
-            if (!(obj instanceof CacheKey)) return false;
+            if (!(obj instanceof CacheKey))
+                return false;
 
             final CacheKey objKey = (CacheKey) obj;
             return parent == objKey.parent

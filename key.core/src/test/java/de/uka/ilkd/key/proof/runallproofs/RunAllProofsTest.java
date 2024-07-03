@@ -1,17 +1,22 @@
-package de.uka.ilkd.key.proof.runallproofs;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import org.antlr.runtime.*;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Tag;
+package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
+
+import org.antlr.runtime.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
 
 /**
  * <p>
@@ -58,8 +63,8 @@ import java.util.stream.Stream;
  */
 @Tag("slow")
 public abstract class RunAllProofsTest {
-   public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
-   public static final String IGNORE_KEY = "ignore";
+    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
+    public static final String IGNORE_KEY = "ignore";
 
 
     /**
@@ -70,53 +75,52 @@ public abstract class RunAllProofsTest {
      * RunAllProofsTestUnit#toString()} for further information.
      *
      * @param proofCollection
-     *            The file name of the index file which parsed to produce test
-     *            cases
+     *        The file name of the index file which parsed to produce test
+     *        cases
      * @return The parameters. Each row will be one test case.
      * @throws IOException
-     *             If an exceptions occurs while reading and parsing the index
-     *             file
+     *         If an exceptions occurs while reading and parsing the index
+     *         file
      */
 
-   public static Stream<DynamicTest> data(ProofCollection proofCollection) throws IOException {
-      /*
-       * Create list of constructor parameters that will be returned by this
-       * method. Suitable constructor is automatically determined by JUnit.
-       */
-      List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
-      return units.stream().map(it ->
-              DynamicTest.dynamicTest(it.getTestName(),
-                      () -> {
-                         /*
-                          * Tests each file defined by the instance variables. The tests steps are
-                          * described in the constructor of this class.
-                          */
-                         TestResult report = it.runTest();
-                         Assertions.assertTrue(report.success, report.message);
-                      }));
-   }
+    public static Stream<DynamicTest> data(ProofCollection proofCollection) throws IOException {
+        /*
+         * Create list of constructor parameters that will be returned by this
+         * method. Suitable constructor is automatically determined by JUnit.
+         */
+        List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
+        return units.stream().map(it -> DynamicTest.dynamicTest(it.getTestName(),
+            () -> {
+                /*
+                 * Tests each file defined by the instance variables. The tests steps are
+                 * described in the constructor of this class.
+                 */
+                TestResult report = it.runTest();
+                Assertions.assertTrue(report.success, report.message);
+            }));
+    }
 
-   /**
-    * Uses {@link ProofCollectionParser} to parse the given file and returns a
-    * parse result that is received from main parser entry point.
-    */
-   public static ProofCollection parseIndexFile(final String index) throws IOException {
-      return parseIndexFile(index, ProofCollectionParser::new);
-   }
+    /**
+     * Uses {@link ProofCollectionParser} to parse the given file and returns a
+     * parse result that is received from main parser entry point.
+     */
+    public static ProofCollection parseIndexFile(final String index) throws IOException {
+        return parseIndexFile(index, ProofCollectionParser::new);
+    }
 
-   public static ProofCollection parseIndexFile(final String index,
+    public static ProofCollection parseIndexFile(final String index,
             Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
-      File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
-      CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
-      ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
-      TokenStream tokenStream = new CommonTokenStream(lexer);
-      ProofCollectionParser parser = stream2Parser.apply(tokenStream);
-      try {
-         return parser.parserEntryPoint();
-      } catch (RecognitionException e) {
-         String msg = parser.getErrorMessage(e, parser.getTokenNames());
-         throw new IOException("Cannot parse " + automaticJAVADL +
-                               " at line " + e.line + ": " + msg, e);
-      }
-   }
+        File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
+        CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
+        ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
+        TokenStream tokenStream = new CommonTokenStream(lexer);
+        ProofCollectionParser parser = stream2Parser.apply(tokenStream);
+        try {
+            return parser.parserEntryPoint();
+        } catch (RecognitionException e) {
+            String msg = parser.getErrorMessage(e, parser.getTokenNames());
+            throw new IOException("Cannot parse " + automaticJAVADL +
+                " at line " + e.line + ": " + msg, e);
+        }
+    }
 }

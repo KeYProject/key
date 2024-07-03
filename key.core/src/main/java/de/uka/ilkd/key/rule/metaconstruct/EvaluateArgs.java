@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -28,6 +30,8 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.util.collection.ImmutableArray;
+
 /**
  * TODO
  *
@@ -39,7 +43,7 @@ public class EvaluateArgs extends ProgramTransformer {
      * creates a typeof ProgramTransformer
      *
      * @param pe
-     *            the instance of expression contained by the meta construct
+     *        the instance of expression contained by the meta construct
      */
     public EvaluateArgs(ProgramElement pe) {
         super("#evaluate-arguments", pe);
@@ -49,13 +53,13 @@ public class EvaluateArgs extends ProgramTransformer {
      * TODO Comment.
      *
      * @param e
-     *            TODO
+     *        TODO
      * @param l
-     *            TODO
+     *        TODO
      * @param services
-     *            TODO
+     *        TODO
      * @param ec
-     *            TODO
+     *        TODO
      * @return TODO
      */
     public static ProgramVariable evaluate(Expression e,
@@ -80,8 +84,8 @@ public class EvaluateArgs extends ProgramTransformer {
         final ExecutionContext ec = svInst.getExecutionContext();
 
         MethodOrConstructorReference mr = (MethodOrConstructorReference) //
-            (pe instanceof CopyAssignment ? ((CopyAssignment) pe).getChildAt(1)
-                    : pe);
+        (pe instanceof CopyAssignment ? ((CopyAssignment) pe).getChildAt(1)
+                : pe);
 
         List<Statement> evalstat = new LinkedList<Statement>();
 

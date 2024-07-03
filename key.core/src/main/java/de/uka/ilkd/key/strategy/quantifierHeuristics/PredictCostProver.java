@@ -1,11 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +14,9 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * TODO: rewrite, this seems pretty inefficient ...
@@ -49,7 +53,8 @@ public class PredictCostProver {
             return -1;
         } else {
             final PredictCostProver prover = new PredictCostProver(sub
-                    .applyWithoutCasts(matrix, services), assertList, services);
+                    .applyWithoutCasts(matrix, services),
+                assertList, services);
             return prover.cost();
         }
     }
@@ -154,7 +159,7 @@ public class PredictCostProver {
     /**
      * try to prove <code>problem</code> by know <code>assertLits</code>
      *
-     * @param problem    a literal to be proved
+     * @param problem a literal to be proved
      * @param assertLits a set of term assertLiterals in which all literals are true
      * @return return <code>trueT</code> if if formu is proved to true, <code> falseT</code> if
      *         false, and <code>atom</code> if it cann't be proved.

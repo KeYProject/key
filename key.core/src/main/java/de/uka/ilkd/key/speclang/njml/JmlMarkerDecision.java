@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang.njml;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.
@@ -29,7 +33,8 @@ public class JmlMarkerDecision {
     }
 
     /**
-     * Sets the enabled keys for the recognition of active JML comments. Keys are treated case-insensitive.
+     * Sets the enabled keys for the recognition of active JML comments. Keys are treated
+     * case-insensitive.
      *
      * @param markers a collection of keys without prefix ([+-])
      */
@@ -42,23 +47,25 @@ public class JmlMarkerDecision {
     }
 
     /**
-     * Lookahead for determining if we are at the start of comment and not a "JML expectedCommentStart".
+     * Lookahead for determining if we are at the start of comment and not a "JML
+     * expectedCommentStart".
      * <p>
      * This method reads from the input stream to check the annotation markers between the
      * comment start and the "@"
      * This method returns true for expectedCommentStart "//" if we the comment begins with
      * <ul>
-     * <li> "//" + End-of-line
-     * <li> "// "
-     * <li> "// @"
-     * <li> "//+"
-     * <li> "//-"
-     * <li> "//-key+openjml@"  (or similar)
+     * <li>"//" + End-of-line
+     * <li>"// "
+     * <li>"// @"
+     * <li>"//+"
+     * <li>"//-"
+     * <li>"//-key+openjml@" (or similar)
      * </ul>
      * <p>
      * (same for "/*")
      * <p>
-     * It returns true if expectedCommentStart is followed by a sequence of "+", "-" or Java identifier
+     * It returns true if expectedCommentStart is followed by a sequence of "+", "-" or Java
+     * identifier
      * characters, and then "@" and the sequence does not contain "-key".
      * <p>
      * It implements JML Ref Manual 4.4:
@@ -68,11 +75,11 @@ public class JmlMarkerDecision {
      * way to enable a selection of annotation-key identifiers. These identifiers, hereafter called
      * "keys" provide for conditional inclusion of JML annotations as follows:
      * <ul>
-     * <li> a JML annotation with no keys is always included,
-     * <li> a JML annotation with at least one positive-key is only included if at least one of
+     * <li>a JML annotation with no keys is always included,
+     * <li>a JML annotation with at least one positive-key is only included if at least one of
      * these positive keys is enabled and there are no negative-keys in the annotation that have
      * enabled keys, and
-     * <li> a JML annotation with an enabled negative-key is ignored (even if there are enabled
+     * <li>a JML annotation with an enabled negative-key is ignored (even if there are enabled
      * positive-keys).
      * </ul>
      * </quote>
@@ -87,9 +94,10 @@ public class JmlMarkerDecision {
 
         try {
             // matching the expected start of the comment
-            if (consume(expectedCommentStart)) return false;
+            if (consume(expectedCommentStart))
+                return false;
 
-            //consume until '@' is hit, or else it is not a JML comment
+            // consume until '@' is hit, or else it is not a JML comment
             StringBuilder markerBuilder = new StringBuilder();
             while (true) {
                 final char point = (char) lexer._input.LA(1);
@@ -121,24 +129,26 @@ public class JmlMarkerDecision {
 
     public boolean isActiveJmlSpec(String foundKeys) {
         if (foundKeys.isEmpty()) {
-            //a JML annotation with no keys is always included,
+            // a JML annotation with no keys is always included,
             return true;
         }
 
         String[] keys = foundKeys.split("(?=[+-])");
 
-        //a JML annotation with at least one positive-key is only included
+        // a JML annotation with at least one positive-key is only included
         boolean plusKeyFound = false;
-        //if at least one of these positive keys is enabled
+        // if at least one of these positive keys is enabled
         boolean enabledPlusKeyFound = false;
 
-        //a JML annotation with an enabled negative-key is ignored (even if there are enabled positive-keys).
+        // a JML annotation with an enabled negative-key is ignored (even if there are enabled
+        // positive-keys).
         boolean enabledNegativeKeyFound = false;
 
         for (String marker : keys) {
             plusKeyFound = plusKeyFound || isPositive(marker);
             enabledPlusKeyFound = enabledPlusKeyFound || isPositive(marker) && isEnabled(marker);
-            enabledNegativeKeyFound = enabledNegativeKeyFound || isNegative(marker) && isEnabled(marker);
+            enabledNegativeKeyFound =
+                enabledNegativeKeyFound || isNegative(marker) && isEnabled(marker);
             if ("-".equals(marker) || "+".equals(marker)) {
                 return false;
             }

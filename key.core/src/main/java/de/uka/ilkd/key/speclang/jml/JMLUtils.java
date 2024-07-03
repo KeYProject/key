@@ -1,21 +1,25 @@
-package de.uka.ilkd.key.speclang.jml;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import javax.annotation.Nonnull;
+package de.uka.ilkd.key.speclang.jml;
 
 import java.util.Set;
 import java.util.TreeSet;
+import javax.annotation.Nonnull;
 
 @Deprecated
 public abstract class JMLUtils {
     /**
-     * The feature identifier for JML "feature switches" which will be (de-)activate JML comments for KeY.
+     * The feature identifier for JML "feature switches" which will be (de-)activate JML comments
+     * for KeY.
      */
     private static final String KEY_TOOL_IDENTIFIER = "key";
 
     /**
      * Split a given string of JML marker into the single markers.
      * For example, "+key-esc" becomes the the set with "+key" and "-esc".
-     * This method recognises  the end of the marker by an {@code @} sign
+     * This method recognises the end of the marker by an {@code @} sign
      * or by the end of the string. It also is aware of potential
      * comment starters, i.e., "//" or "/*".
      */
@@ -54,7 +58,7 @@ public abstract class JMLUtils {
      * Refer to chapter 4.4. in the jml ref manual.
      *
      * @param jmlMarkers the marker string at the beginning of an JML comment.
-     * @param tool       the marker of the current tool
+     * @param tool the marker of the current tool
      * @return true if the given jml markers represents a KeY-recognisable comment.
      */
     public static boolean isJmlCommentStarter(String jmlMarkers, String tool) {
@@ -62,13 +66,14 @@ public abstract class JMLUtils {
             return false;
         }
 
-        tool = tool.toLowerCase(); //switches are in lower case
+        tool = tool.toLowerCase(); // switches are in lower case
         Set<String> switches = splitJmlMarker(jmlMarkers);
         boolean containsPositive = switches.stream().anyMatch(it -> it.charAt(0) == '+');
         boolean allowsGivenTool = switches.contains("+" + tool);
         boolean forbidsGivenTool = switches.contains("-" + tool);
         boolean disabledCompletely = switches.contains("-") || switches.contains("+");
-        boolean wrongMarkerFormat = switches.stream().anyMatch(it -> it.charAt(0) != '+' && it.charAt(0) != '-');
+        boolean wrongMarkerFormat =
+            switches.stream().anyMatch(it -> it.charAt(0) != '+' && it.charAt(0) != '-');
 
         if (disabledCompletely || forbidsGivenTool || wrongMarkerFormat) {
             return false;

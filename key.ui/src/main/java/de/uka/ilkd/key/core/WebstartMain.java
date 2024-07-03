@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.core;
 
@@ -18,8 +21,8 @@ public class WebstartMain {
 
     public static File setupExamples() {
         try {
-            URL examplesURL = WebstartMain.class.getResource("/examples.zip");	
-            if(examplesURL == null) {
+            URL examplesURL = WebstartMain.class.getResource("/examples.zip");
+            if (examplesURL == null) {
                 throw new IOException("Missing examples.zip in resources");
             }
 
@@ -30,18 +33,17 @@ public class WebstartMain {
             try {
                 byte[] buffer = new byte[BUFFER_SIZE];
 
-                for(ZipEntry zipEntry = zis.getNextEntry(); 
-                        zipEntry != null;
-                        zipEntry = zis.getNextEntry()) {
+                for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry =
+                    zis.getNextEntry()) {
 
 
                     String entryName = zipEntry.getName();
                     File outFile = new File(tempDir, entryName);
 
-                    if(zipEntry.isDirectory()) {
+                    if (zipEntry.isDirectory()) {
 
                         boolean mkdirSuccess = outFile.mkdir();
-                        if(!mkdirSuccess) {
+                        if (!mkdirSuccess) {
                             throw new IOException("Cannot create directory " + outFile);
                         }
 
@@ -64,17 +66,17 @@ public class WebstartMain {
                 zis.close();
             }
             return tempDir;
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
-        } 
+        }
     }
 
 
     private static File createTempDirectory() throws IOException {
         final File tempDir = File.createTempFile("keyheap-examples-", null);
         tempDir.delete();
-        if(!tempDir.mkdir()) {
+        if (!tempDir.mkdir()) {
             return null;
         }
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -89,7 +91,7 @@ public class WebstartMain {
     public static void main(String[] args) {
         File examplesDir = setupExamples();
 
-        if(examplesDir != null) {
+        if (examplesDir != null) {
             String[] newArgs = new String[args.length + 2];
             System.arraycopy(args, 0, newArgs, 0, args.length);
             newArgs[args.length] = "--examples";

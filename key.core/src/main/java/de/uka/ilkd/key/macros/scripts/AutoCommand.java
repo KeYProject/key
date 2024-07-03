@@ -1,10 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -18,6 +19,9 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
@@ -57,7 +61,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // create the rule application engine
         final ProverCore applyStrategy = new ApplyStrategy(
-                profile.getSelectedGoalChooserBuilder().create());
+            profile.getSelectedGoalChooserBuilder().create());
 
         // find the targets
         final ImmutableList<Goal> goals;
@@ -65,7 +69,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             goals = state.getProof().openGoals();
         } else {
             final Goal goal = state.getFirstOpenAutomaticGoal();
-            goals = ImmutableSLList.<Goal> nil().prepend(goal);
+            goals = ImmutableSLList.<Goal>nil().prepend(goal);
 
             final Optional<String> matchesRegEx = Optional
                     .ofNullable(arguments.matches);
@@ -73,8 +77,8 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
                     .ofNullable(arguments.breakpoint);
             if (matchesRegEx.isPresent() || breakpoint.isPresent()) {
                 setupFocussedBreakpointStrategy( //
-                        matchesRegEx, breakpoint, goal, applyStrategy,
-                        services);
+                    matchesRegEx, breakpoint, goal, applyStrategy,
+                    services);
             }
         }
 
@@ -90,7 +94,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         try {
             for (Goal goal : goals) {
                 applyStrategy.start(state.getProof(),
-                        ImmutableSLList.<Goal> nil().prepend(goal));
+                    ImmutableSLList.<Goal>nil().prepend(goal));
 
                 // only now reraise the interruption exception
                 if (applyStrategy.hasBeenInterrupted()) {
@@ -108,17 +112,17 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * matching the matchesRegEx (may not be null).
      *
      * @param maybeMatchesRegEx
-     *            The RegEx which should match on the sequent formula to focus.
+     *        The RegEx which should match on the sequent formula to focus.
      * @param breakpointArg
-     *            An optional breakpoint argument.
+     *        An optional breakpoint argument.
      * @param goal
-     *            The {@link Goal} to apply the strategy on, needed for the rule
-     *            application manager.
+     *        The {@link Goal} to apply the strategy on, needed for the rule
+     *        application manager.
      * @param proverCore
-     *            The {@link ProverCore}, needed for resetting the strategy
-     *            afterward.
+     *        The {@link ProverCore}, needed for resetting the strategy
+     *        afterward.
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @throws ScriptException
      */
     private void setupFocussedBreakpointStrategy(
@@ -128,22 +132,22 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
                 ? Optional.of(
-                        MacroCommand.extractMatchingPio(goal.node().sequent(),
-                                maybeMatchesRegEx.get(), services))
+                    MacroCommand.extractMatchingPio(goal.node().sequent(),
+                        maybeMatchesRegEx.get(), services))
                 : Optional.empty();
 
         final AutomatedRuleApplicationManager realManager = //
-                goal.getRuleAppManager();
+            goal.getRuleAppManager();
         goal.setRuleAppManager(null);
 
         final AutomatedRuleApplicationManager focusManager = //
-                new FocussedBreakpointRuleApplicationManager(realManager, goal,
-                        focus, breakpointArg);
+            new FocussedBreakpointRuleApplicationManager(realManager, goal,
+                focus, breakpointArg);
         goal.setRuleAppManager(focusManager);
 
         proverCore.addProverTaskObserver(
-                new AbstractProofControl.FocussedAutoModeTaskListener(
-                        services.getProof()));
+            new AbstractProofControl.FocussedAutoModeTaskListener(
+                services.getProof()));
     }
 
     public static class Parameters {

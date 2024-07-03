@@ -1,6 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 // This file is taken from the RECODER library, which is protected by the LGPL,
 // and modified.
-/** This class is part of the AST RECODER builds when it parses and resolves Java
+/**
+ * This class is part of the AST RECODER builds when it parses and resolves Java
  * programs with meta constructs and schema variables. It is transformed by Recoder2KeY
  * to a subclass of ...rule.metaconstruct.ProgramMetaConstruct.
  */
@@ -21,33 +26,33 @@ import recoder.java.statement.JavaStatement;
 import recoder.list.generic.ASTList;
 
 
-public class RMethodBodyStatement extends JavaStatement 
-    implements KeYRecoderExtension, TypeReferenceContainer, 
-    ExpressionContainer, NamedProgramElement {
+public class RMethodBodyStatement extends JavaStatement
+        implements KeYRecoderExtension, TypeReferenceContainer,
+        ExpressionContainer, NamedProgramElement {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8427953809480454933L;
-    private TypeReference bodySource; 
+    private TypeReference bodySource;
     private ProgramVariableSVWrapper resultVar;
-    
+
     private ReferencePrefix methodReferencePrefix;
-    private Identifier methodName;    
+    private Identifier methodName;
     private ASTList<Expression> arguments;
 
-    public RMethodBodyStatement(TypeReference typeRef, 
-                                ProgramVariableSVWrapper resVar, 
-                                MethodReference mr) {
+    public RMethodBodyStatement(TypeReference typeRef,
+            ProgramVariableSVWrapper resVar,
+            MethodReference mr) {
         this.bodySource = typeRef;
         this.resultVar = resVar;
         setMethodReference(mr);
         makeParentRoleValid();
     }
 
-    public RMethodBodyStatement(TypeReference typeRef, 
-            ProgramVariableSVWrapper resVar, 
-            ReferencePrefix prefix, Identifier methodName, 
+    public RMethodBodyStatement(TypeReference typeRef,
+            ProgramVariableSVWrapper resVar,
+            ReferencePrefix prefix, Identifier methodName,
             ASTList<Expression> arguments) {
         this.bodySource = typeRef;
         this.resultVar = resVar;
@@ -57,76 +62,86 @@ public class RMethodBodyStatement extends JavaStatement
         makeParentRoleValid();
     }
 
-    
+
 
     public void accept(SourceVisitor visitor) {
     }
 
     public RMethodBodyStatement deepClone() {
-        return new RMethodBodyStatement
-            (bodySource.deepClone(), 
-             (ProgramVariableSVWrapper)resultVar.deepClone(), 
-             (ReferencePrefix)methodReferencePrefix.deepClone(),
-             methodName.deepClone(),
-             arguments.deepClone());
+        return new RMethodBodyStatement(bodySource.deepClone(),
+            (ProgramVariableSVWrapper) resultVar.deepClone(),
+            (ReferencePrefix) methodReferencePrefix.deepClone(),
+            methodName.deepClone(),
+            arguments.deepClone());
     }
-    
+
     /**
-     *      Set the MethodReference that caused this call.
+     * Set the MethodReference that caused this call.
      */
-    public void setMethodReference(MethodReference methRef) {   
+    public void setMethodReference(MethodReference methRef) {
         this.methodName = methRef.getIdentifier();
         this.methodReferencePrefix = methRef.getReferencePrefix();
         this.arguments = methRef.getArguments();
     }
-    
+
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
-    
+
     public int getChildCount() {
         int result = 0;
-        if (bodySource != null) result++;
-        if (resultVar != null) result++;
-        if (methodReferencePrefix != null) result++;
-        if (methodName != null) result++;
-        if (arguments != null) result += arguments.size();
+        if (bodySource != null)
+            result++;
+        if (resultVar != null)
+            result++;
+        if (methodReferencePrefix != null)
+            result++;
+        if (methodName != null)
+            result++;
+        if (arguments != null)
+            result += arguments.size();
         return result;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *            of bounds
      */
-    
+
     public ProgramElement getChildAt(int index) {
         if (bodySource != null) {
-            if (index == 0) return bodySource;
+            if (index == 0)
+                return bodySource;
             index--;
         }
         if (resultVar != null) {
-            if (index == 0) return resultVar;
+            if (index == 0)
+                return resultVar;
             index--;
         }
         if (methodReferencePrefix != null) {
-            if (index == 0) return methodReferencePrefix;
+            if (index == 0)
+                return methodReferencePrefix;
             index--;
         }
         if (methodName != null) {
-            if (index == 0) return methodName;
+            if (index == 0)
+                return methodName;
             index--;
         }
         if (arguments != null) {
-            return arguments.get(index);            
+            return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
-    
+
     public int getChildPositionCode(ProgramElement child) {
         // role 0: bodySource
         // role 1: resultVar
@@ -144,19 +159,19 @@ public class RMethodBodyStatement extends JavaStatement
         if (methodName == child) {
             return 3;
         }
-        
-        for (int i = 0, sz = arguments.size(); i<sz; i++) {                
+
+        for (int i = 0, sz = arguments.size(); i < sz; i++) {
             final Expression e = arguments.get(i);
-            if (e == child) {                
-                return i+4;
-            }                
+            if (e == child) {
+                return i + 4;
+            }
         }
-        return -1;   
+        return -1;
     }
 
-    
+
     /**
-     *      Ensures that each child has "this" as syntactical parent.
+     * Ensures that each child has "this" as syntactical parent.
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
@@ -168,20 +183,20 @@ public class RMethodBodyStatement extends JavaStatement
         if (resultVar != null) {
             resultVar.setParent(this);
         }
-        
+
         if (methodName != null) {
             methodName.setParent(this);
         }
-        
+
         if (arguments != null) {
-            for (int i = 0, sz = arguments.size(); i<sz; i++) {                
-                arguments.get(i).setExpressionContainer(this);                
+            for (int i = 0, sz = arguments.size(); i < sz; i++) {
+                arguments.get(i).setExpressionContainer(this);
             }
         }
     }
 
-    
-    
+
+
     /**
      * Replace a single child in the current node.
      * The child to replace is matched by identity and hence must be known
@@ -189,6 +204,7 @@ public class RMethodBodyStatement extends JavaStatement
      * is effectively removed.
      * The parent role of the new child is validated, while the
      * parent link of the replaced child is left untouched.
+     *
      * @param p the old child.
      * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
@@ -197,46 +213,46 @@ public class RMethodBodyStatement extends JavaStatement
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) throw new NullPointerException();
+        if (p == null)
+            throw new NullPointerException();
         if (bodySource == p) {
-            TypeReference r = (TypeReference)q;
+            TypeReference r = (TypeReference) q;
             bodySource = r;
             if (r != null) {
                 r.setParent(this);
             }
             return true;
-        }
-        else if (resultVar == p) {
-            ProgramVariableSVWrapper r = (ProgramVariableSVWrapper)q;
+        } else if (resultVar == p) {
+            ProgramVariableSVWrapper r = (ProgramVariableSVWrapper) q;
             resultVar = r;
             if (r != null) {
                 r.setParent(this);
             }
             return true;
-        } else if (methodReferencePrefix == p) {            
+        } else if (methodReferencePrefix == p) {
             ReferencePrefix rp = (ReferencePrefix) q;
             methodReferencePrefix = rp;
             return true;
         } else if (methodName == p) {
-            Identifier id = (Identifier)q;
-            methodName = id;            
+            Identifier id = (Identifier) q;
+            methodName = id;
             return true;
-        } else {                    
-            for (int i = 0, sz = arguments.size(); i<sz; i++) {                
+        } else {
+            for (int i = 0, sz = arguments.size(); i < sz; i++) {
                 final Expression e = arguments.get(i);
                 if (e == p) {
                     arguments.set(i, e);
                     e.setExpressionContainer(this);
                     return true;
-                }                
+                }
             }
-            
+
         }
-        
+
         return false;
     }
 
-    public TypeReference getBodySource() {        
+    public TypeReference getBodySource() {
         return bodySource;
     }
 
@@ -247,9 +263,9 @@ public class RMethodBodyStatement extends JavaStatement
     public MethodReference getMethodReference() {
         return new MethodReference(methodReferencePrefix, methodName, arguments);
     }
-    
 
-    public int getTypeReferenceCount() {       
+
+    public int getTypeReferenceCount() {
         return bodySource == null ? 0 : 1;
     }
 
@@ -257,12 +273,12 @@ public class RMethodBodyStatement extends JavaStatement
         if (bodySource != null && index == 0) {
             return bodySource;
         }
-        throw new ArrayIndexOutOfBoundsException();      
+        throw new ArrayIndexOutOfBoundsException();
     }
 
-    public int getExpressionCount() {        
+    public int getExpressionCount() {
         return arguments == null ? 0 : arguments.size();
-        
+
     }
 
     public Expression getExpressionAt(int index) {
@@ -277,11 +293,11 @@ public class RMethodBodyStatement extends JavaStatement
     }
 
     public void setIdentifier(Identifier methodName) {
-        this.methodName = methodName; 
-        
+        this.methodName = methodName;
+
     }
 
-    public String getName() {      
+    public String getName() {
         return methodName.toString();
     }
 }

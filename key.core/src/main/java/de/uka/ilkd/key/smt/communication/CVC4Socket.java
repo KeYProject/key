@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.communication;
+
+import java.io.IOException;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.st.SolverType;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
 
 /**
  * The socket for CVC4.
@@ -17,7 +21,7 @@ public class CVC4Socket extends AbstractSolverSocket {
      * Creates a new CVC4Socket. Should not be called directly, better use the static factory method
      * {@link AbstractSolverSocket#createSocket(SolverType, ModelExtractor)}.
      *
-     * @param name  the name of the solver
+     * @param name the name of the solver
      * @param query the ModelExtractor for CE generation (unused by this socket)
      */
     public CVC4Socket(String name, ModelExtractor query) {
@@ -48,17 +52,17 @@ public class CVC4Socket extends AbstractSolverSocket {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             } else if (msg.contains("\n" + "sat")) {
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             } else if (msg.contains("\n" + "unknown")) {
                 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             }
         }
     }

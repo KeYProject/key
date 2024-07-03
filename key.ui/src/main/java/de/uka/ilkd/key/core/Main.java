@@ -1,5 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.core;
+
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -25,22 +38,14 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
+
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import recoder.ParserException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * The main entry point for KeY
@@ -79,8 +84,8 @@ public final class Main {
     private static final String RIFL = "--rifl";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    //    deprecated
-//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+    // deprecated
+    // public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
     public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
     public static final String JPRINT = JKEY_PREFIX + "print";
@@ -229,7 +234,8 @@ public final class Main {
         LOGGER.debug("Available processors:  " + rt.availableProcessors());
     }
 
-    public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui, List<File> fileArguments) {
+    public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui,
+            List<File> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
@@ -241,7 +247,8 @@ public final class Main {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
         } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined
-                && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowLoadExamplesDialog()) {
+                && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .getShowLoadExamplesDialog()) {
             ui.openExamples();
         }
     }
@@ -262,35 +269,50 @@ public final class Main {
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
         cl.addOption(SHOW_PROPERTIES, null, "list all Java properties and exit");
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
-        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
+        cl.addOption(AUTOSAVE, "<number>",
+            "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addOption(NO_PRUNING_CLOSED, null,
-                "disables pruning and goal back in closed branches (saves memory)");
+            "disables pruning and goal back in closed branches (saves memory)");
         cl.addOption(KEEP_FILEREPOS, null, "disables the automatic deletion of temporary"
-                + "directories of file repos (for debugging)");
+            + "directories of file repos (for debugging)");
         cl.addSection("Batchmode options:");
-        cl.addOption(TACLET_DIR, "<dir>", "load base taclets from a directory, not from internal structures");
+        cl.addOption(TACLET_DIR, "<dir>",
+            "load base taclets from a directory, not from internal structures");
         cl.addOption(DEBUG, null, "start KeY in debug mode");
-        cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
+        cl.addOption(AUTO, null,
+            "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: " + Verbosity.NORMAL + ")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
-        cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
-        cl.addOption(RIFL, "<filename>", "load RIFL specifications from file (requires GUI and startup file)");
+        cl.addOption(EXAMPLES, "<directory>",
+            "load the directory containing the example files on startup");
+        cl.addOption(RIFL, "<filename>",
+            "load RIFL specifications from file (requires GUI and startup file)");
         cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
-        cl.addOption(SAVE_ALL_CONTRACTS, null, "save all selected contracts for automatic execution");
-        cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
+        cl.addOption(SAVE_ALL_CONTRACTS, null,
+            "save all selected contracts for automatic execution");
+        cl.addOption(TIMEOUT, "<timeout>",
+            "timeout for each automatic proof of a problem in ms (default: "
+                + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
-        cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
+        cl.addOption(JUSTIFY_RULES, "<filename>",
+            "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
         cl.addText("\n", true);
-        cl.addText("The '" + JUSTIFY_RULES + "' option has a number of additional parameters you can set.", false);
+        cl.addText(
+            "The '" + JUSTIFY_RULES + "' option has a number of additional parameters you can set.",
+            false);
         cl.addText("The following options only apply if '" + JUSTIFY_RULES + "' is used.", false);
         cl.addText("\n", true);
-        cl.addOption(JMAX_RULES, "<number>", "maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
+        cl.addOption(JMAX_RULES, "<number>",
+            "maximum number of rule application to perform (default: "
+                + LemmataAutoModeOptions.DEFAULT_MAXRULES + ")");
         cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
-        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
+        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: "
+            + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ")");
         cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
-        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by " + JPATH_OF_RESULT + ")");
+        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>",
+            "save or drop proofs (then stored to path given by " + JPATH_OF_RESULT + ")");
         cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
         cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
         return cl;
@@ -473,7 +495,7 @@ public final class Main {
 
         if (cl.isSet(TACLET_DIR)) {
             System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY,
-                    cl.getString(TACLET_DIR, ""));
+                cl.getString(TACLET_DIR, ""));
         }
 
         if (cl.isSet(NO_PRUNING_CLOSED)) {
@@ -490,11 +512,14 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
-        /*String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL : LOGGING_CONFIG_DEFAULT;
-        try (final InputStream in = Main.class.getResourceAsStream(configuration)) {
-        } catch (IOException e) {
-            //LOGGER.log(Level.INFO, e.getMessage(), e);
-        }*/
+        /*
+         * String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL :
+         * LOGGING_CONFIG_DEFAULT;
+         * try (final InputStream in = Main.class.getResourceAsStream(configuration)) {
+         * } catch (IOException e) {
+         * //LOGGER.log(Level.INFO, e.getMessage(), e);
+         * }
+         */
     }
 
     public static boolean isExperimentalMode() {
@@ -517,12 +542,14 @@ public final class Main {
      * {@link UiMode#AUTO} and {@link WindowUserInterfaceControl} otherwise.
      *
      * @return a <code>UserInterfaceControl</code> based on the value of
-     * <code>uiMode</code>
+     *         <code>uiMode</code>
      */
-    private static AbstractMediatorUserInterfaceControl createUserInterface(List<File> fileArguments) {
+    private static AbstractMediatorUserInterfaceControl createUserInterface(
+            List<File> fileArguments) {
 
         if (uiMode == UiMode.AUTO) {
-            // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
+            // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see
+            // bug #1216
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
@@ -547,15 +574,17 @@ public final class Main {
         } else {
             updateSplashScreen();
 
-            /* explicitly enable pruning in closed branches for interactive mode
-             * (if not manually disabled) */
+            /*
+             * explicitly enable pruning in closed branches for interactive mode
+             * (if not manually disabled)
+             */
             GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED);
 
             MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {
                 RecentFileEntry mostRecent =
-                        mainWindow.getRecentFiles().getMostRecent();
+                    mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
                     File mostRecentFile = new File(mostRecent.getAbsolutePath());
@@ -573,9 +602,8 @@ public final class Main {
     }
 
     public static void ensureExamplesAvailable() {
-        File examplesDir = getExamplesDir() == null ?
-                ExampleChooser.lookForExamples() :
-                new File(getExamplesDir());
+        File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
+                : new File(getExamplesDir());
         if (examplesDir.exists()) {
             setExamplesDir(examplesDir.getAbsolutePath());
         } else {
@@ -601,9 +629,9 @@ public final class Main {
         try {
 
             opt = new LemmataAutoModeOptions(options, KeYConstants.INTERNAL_VERSION,
-                    PathConfig.getKeyConfigDir());
+                PathConfig.getKeyConfigDir());
             LemmataHandler handler = new LemmataHandler(opt,
-                    AbstractProfile.getDefaultProfile());
+                AbstractProfile.getDefaultProfile());
             handler.start();
 
         } catch (Exception e) {
@@ -663,14 +691,15 @@ public final class Main {
             }
             // only use one input file
             File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
-//            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
+            // final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
             try {
                 RIFLTransformer transformer = new RIFLTransformer();
                 transformer.doTransform(riflFileName, fileNameOnStartUp,
-                        RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
+                    RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
 
                 if (verbosity > Verbosity.SILENT) {
-                    LOGGER.info("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
+                    LOGGER.info(
+                        "[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
                 }
                 return transformer.getProblemFiles();
             } catch (ParserConfigurationException e) {

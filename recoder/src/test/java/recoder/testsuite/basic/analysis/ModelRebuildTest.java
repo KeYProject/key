@@ -1,4 +1,10 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic.analysis;
+
+import java.util.List;
 
 import junit.framework.Assert;
 import org.junit.Ignore;
@@ -9,8 +15,6 @@ import recoder.kit.ProblemReport;
 import recoder.kit.Transformation;
 import recoder.service.ChangeHistory;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.List;
 
 /**
  * Erases all compilation units, checks if the model is "empty", undoes the
@@ -41,11 +45,13 @@ public class ModelRebuildTest extends AnalysisReportTest {
 
         // model should be cleared now except for byte code and implicitly
         // defined stuff
-        Assert.assertEquals(BasicTestsSuite.getConfig().getSourceFileRepository().getKnownCompilationUnits().size(), 0);
+        Assert.assertEquals(
+            BasicTestsSuite.getConfig().getSourceFileRepository().getKnownCompilationUnits().size(),
+            0);
         List<ClassType> ctl = BasicTestsSuite.getConfig().getNameInfo().getClassTypes();
         for (int i = ctl.size() - 1; i >= 0; i -= 1) {
             Assert.assertTrue("Syntax tree left in an emptied model",
-                    !(ctl.get(i) instanceof recoder.java.declaration.TypeDeclaration));
+                !(ctl.get(i) instanceof recoder.java.declaration.TypeDeclaration));
         }
 
         ch.rollback(clearAll);

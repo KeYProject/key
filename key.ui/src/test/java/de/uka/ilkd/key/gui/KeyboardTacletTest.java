@@ -1,12 +1,15 @@
-package de.uka.ilkd.key.gui;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+package de.uka.ilkd.key.gui;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,7 +26,8 @@ public class KeyboardTacletTest {
         assertEquals(0, KeyboardTacletModel.getPrefixLength("andLeft", "impRight"));
 
 
-        List<String> keywords = Arrays.asList("cut", "cut_direct", "andLeft", "andRight", "impRight");
+        List<String> keywords =
+            Arrays.asList("cut", "cut_direct", "andLeft", "andRight", "impRight");
 
         assertEquals(3, KeyboardTacletModel.getClashFreePrefix("impLeft", keywords));
 

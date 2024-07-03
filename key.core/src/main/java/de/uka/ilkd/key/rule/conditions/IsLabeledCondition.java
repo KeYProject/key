@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.ArrayList;
@@ -38,7 +42,7 @@ public class IsLabeledCondition implements VariableCondition {
 
         final ArrayList<ProgramElement> labels = new ArrayList<>();
         ProgramPrefix prefix = //
-                (ProgramPrefix) svInst.getContextInstantiation().contextProgram();
+            (ProgramPrefix) svInst.getContextInstantiation().contextProgram();
         do {
             if (prefix instanceof LabeledStatement
                     && ((LabeledStatement) prefix).getBody().equals(stmt)) {

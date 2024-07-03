@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.logic.Term;
@@ -5,11 +9,11 @@ import de.uka.ilkd.key.logic.Term;
 /**
  * The general interface for caches for accelerating
  * <code>TermTacletAppIndex</code>.
- * 
+ *
  * @see TermTacletAppIndexCacheSet
  */
 public interface ITermTacletAppIndexCache {
-    
+
     /**
      * @return the taclet app index for the term <code>t</code>, or
      *         <code>null</code> if no index for this term was found in the
@@ -32,5 +36,5 @@ public interface ITermTacletAppIndexCache {
      * for a given term.
      */
     ITermTacletAppIndexCache descend(Term t, int subtermIndex);
-    
+
 }

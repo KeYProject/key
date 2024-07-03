@@ -1,11 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.informationflow.po;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
@@ -29,6 +31,8 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 
+import org.key_project.util.collection.ImmutableList;
+
 
 /**
  *
@@ -48,30 +52,31 @@ public class BlockExecutionPO extends AbstractInfFlowPO
      */
     private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
-    /** To be used only for auxiliary proofs where the services object of
+    /**
+     * To be used only for auxiliary proofs where the services object of
      * the actual proof has to be used instead of the initial services form
      * the InitConfig.
      */
     public BlockExecutionPO(InitConfig initConfig,
-                            BlockContract contract,
-                            ProofObligationVars symbExecVars,
-                            Goal initiatingGoal,
-                            ExecutionContext context,
-                            Services services) {
+            BlockContract contract,
+            ProofObligationVars symbExecVars,
+            Goal initiatingGoal,
+            ExecutionContext context,
+            Services services) {
         this(initConfig, contract, symbExecVars, initiatingGoal, context);
         this.environmentServices = services;
     }
 
     public BlockExecutionPO(InitConfig initConfig,
-                            BlockContract contract,
-                            ProofObligationVars symbExecVars,
-                            Goal initiatingGoal,
-                            ExecutionContext context) {
+            BlockContract contract,
+            ProofObligationVars symbExecVars,
+            Goal initiatingGoal,
+            ExecutionContext context) {
         super(initConfig,
-              ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
-                                                   contract.getTarget(),
-                                                   contract.getTarget().getContainerType(),
-                                                   contract.getBlock().getStartPosition().getLine()));
+            ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
+                contract.getTarget(),
+                contract.getTarget().getContainerType(),
+                contract.getBlock().getStartPosition().getLine()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -84,16 +89,16 @@ public class BlockExecutionPO extends AbstractInfFlowPO
 
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
-                POSnippetFactory.getBasicFactory(contract, symbExecVars,
-                                                 context, environmentServices);
+            POSnippetFactory.getBasicFactory(contract, symbExecVars,
+                context, environmentServices);
 
         // symbolic execution
         final Term symExec =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
+            symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
 
         // final symbolic execution term
         final Term finalTerm = tb.applyElementary(symbExecVars.pre.heap,
-                                                  tb.not(symExec));
+            tb.not(symExec));
 
         // register final term
         assignPOTerms(finalTerm);
@@ -103,7 +108,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO
         if (initiatingProof != null) {
             // proof is not loaded
             final AbstractOperationPO initiatingPO =
-                    (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+                (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -173,9 +178,9 @@ public class BlockExecutionPO extends AbstractInfFlowPO
     }
 
 
-//    public IFProofObligationVars getIFProofObligationVars() {
-//        return if
-//    }
+    // public IFProofObligationVars getIFProofObligationVars() {
+    // return if
+    // }
 
     /**
      * {@inheritDoc}
@@ -224,10 +229,10 @@ public class BlockExecutionPO extends AbstractInfFlowPO
 
     @Override
     protected Term getGlobalDefs(LocationVariable heap,
-                                 Term heapTerm,
-                                 Term selfTerm,
-                                 ImmutableList<Term> paramTerms,
-                                 Services services) {
+            Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Services services) {
         // information flow contracts do not have global defs
         return null;
     }
@@ -239,10 +244,10 @@ public class BlockExecutionPO extends AbstractInfFlowPO
         Proof initiatingProof = getInitiatingGoal().proof();
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =
-                initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
+            initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
         assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary " +
-                "proof started from within non-information flow proof!?!";
-        return (AbstractInfFlowPO)initiatingPO;
+            "proof started from within non-information flow proof!?!";
+        return (AbstractInfFlowPO) initiatingPO;
     }
 
 
@@ -256,59 +261,59 @@ public class BlockExecutionPO extends AbstractInfFlowPO
     @Override
     @Deprecated
     protected ImmutableList<StatementBlock> buildOperationBlocks(
-                                        ImmutableList<LocationVariable> formalParVars,
-                                        ProgramVariable selfVar,
-                                        ProgramVariable resultVar,
-                                        Services services) {
+            ImmutableList<LocationVariable> formalParVars,
+            ProgramVariable selfVar,
+            ProgramVariable resultVar,
+            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+            "Please use the POSnippetFactory instead.");
     }
 
 
     @Override
     @Deprecated
     protected Term getPre(List<LocationVariable> modHeaps,
-                          ProgramVariable selfVar,
-                          ImmutableList<ProgramVariable> paramVars,
-                          Map<LocationVariable, LocationVariable> atPreVars,
-                          Services services) {
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
+            "Please use the POSnippetFactory instead.");
     }
 
 
     @Override
     @Deprecated
     protected Term getPost(List<LocationVariable> modHeaps,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           ProgramVariable resultVar,
-                           ProgramVariable exceptionVar,
-                           Map<LocationVariable, LocationVariable> atPreVars,
-                           Services services) {
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable exceptionVar,
+            Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
+            "Please use the POSnippetFactory instead.");
     }
 
 
     @Override
     @Deprecated
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<Term, Term> heapToAtPre,
-                                    ProgramVariable selfVar,
-                                    ImmutableList<ProgramVariable> paramVars,
-                                    Services services) {
+            Map<Term, Term> heapToAtPre,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
+            "Please use the POSnippetFactory instead.");
     }
 
 
     @Override
     @Deprecated
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                       ImmutableList<ProgramVariable> paramVars,
-                                       Services services) {
+            ImmutableList<ProgramVariable> paramVars,
+            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
+            "Please use the POSnippetFactory instead.");
     }
 }

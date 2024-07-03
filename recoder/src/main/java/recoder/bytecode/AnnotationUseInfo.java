@@ -1,14 +1,13 @@
-/*
- * Created on 27.05.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.bytecode;
+
+import java.util.List;
 
 import recoder.abstraction.AnnotationUse;
 import recoder.abstraction.ElementValuePair;
-
-import java.util.List;
 
 /**
  * @author gutzmann

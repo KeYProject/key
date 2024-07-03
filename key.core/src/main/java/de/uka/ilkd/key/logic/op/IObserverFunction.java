@@ -1,58 +1,62 @@
-package de.uka.ilkd.key.logic.op;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
+import org.key_project.util.collection.ImmutableArray;
+
 public interface IObserverFunction extends SortedOperator {
 
-   /**
-    * Returns the result type of this symbol.
-    */
-   public abstract KeYJavaType getType();
+    /**
+     * Returns the result type of this symbol.
+     */
+    public abstract KeYJavaType getType();
 
-   /**
-    * Returns the container type of this symbol; for non-static observer 
-    * symbols, this corresponds to the sort of its second argument.
-    */
-   public abstract KeYJavaType getContainerType();
+    /**
+     * Returns the container type of this symbol; for non-static observer
+     * symbols, this corresponds to the sort of its second argument.
+     */
+    public abstract KeYJavaType getContainerType();
 
-   /**
-    * Tells whether the observer symbol is static.
-    */
-   public abstract boolean isStatic();
+    /**
+     * Tells whether the observer symbol is static.
+     */
+    public abstract boolean isStatic();
 
-   /**
-    * Check the state count of the declaration (no_state = 0, two_state = 2, 1 otherwise).
-    */
-   public abstract int getStateCount();
+    /**
+     * Check the state count of the declaration (no_state = 0, two_state = 2, 1 otherwise).
+     */
+    public abstract int getStateCount();
 
-   /**
-    * Check the heap count of the declaration, e.g. the base heap and extra heap.
-    */
-   public abstract int getHeapCount(Services services);   
-   
-   /**
-    * Gives the number of parameters of the observer symbol. "Parameters" here
-    * includes only the *explicit* parameters, not the heap and the receiver
-    * object. Thus, for observer symbols representing model fields, this will
-    * always return 0.
-    */
-   public abstract int getNumParams();
+    /**
+     * Check the heap count of the declaration, e.g. the base heap and extra heap.
+     */
+    public abstract int getHeapCount(Services services);
 
-   /**
-    * Gives the type of the i-th parameter of this observer symbol. 
-    * "Parameters" here includes only the *explicit* parameters, not the heap 
-    * and the receiver object. 
-    */
-   public abstract KeYJavaType getParamType(int i);
+    /**
+     * Gives the number of parameters of the observer symbol. "Parameters" here
+     * includes only the *explicit* parameters, not the heap and the receiver
+     * object. Thus, for observer symbols representing model fields, this will
+     * always return 0.
+     */
+    public abstract int getNumParams();
 
-   /**
-    * Returns the parameter types of this observer symbol. "Parameters" here
-    * includes only the *explicit* parameters, not the heap and the receiver
-    * object. 
-    */
-   public abstract ImmutableArray<KeYJavaType> getParamTypes();
+    /**
+     * Gives the type of the i-th parameter of this observer symbol.
+     * "Parameters" here includes only the *explicit* parameters, not the heap
+     * and the receiver object.
+     */
+    public abstract KeYJavaType getParamType(int i);
+
+    /**
+     * Returns the parameter types of this observer symbol. "Parameters" here
+     * includes only the *explicit* parameters, not the heap and the receiver
+     * object.
+     */
+    public abstract ImmutableArray<KeYJavaType> getParamTypes();
 
 }

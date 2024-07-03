@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.strategy.feature;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -9,45 +11,48 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already
  * been performed
  */
 public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
-    public static final Feature INSTANCE = new NonDuplicateAppFeature ();
+    public static final Feature INSTANCE = new NonDuplicateAppFeature();
 
-    protected boolean containsRuleApp (ImmutableList<RuleApp> list,
-                                       TacletApp rapp,
-                                       PosInOccurrence pio) {
+    protected boolean containsRuleApp(ImmutableList<RuleApp> list,
+            TacletApp rapp,
+            PosInOccurrence pio) {
 
         for (RuleApp aList : list) {
-            if (sameApplication(aList, rapp, pio)) return true;
+            if (sameApplication(aList, rapp, pio))
+                return true;
         }
 
         return false;
     }
 
     public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        if ( !app.ifInstsComplete () ) {
+        if (!app.ifInstsComplete()) {
             return true;
         }
 
-        if ( pos == null ) {
-            return !containsRuleApp ( goal.appliedRuleApps (), app, pos );
+        if (pos == null) {
+            return !containsRuleApp(goal.appliedRuleApps(), app, pos);
         }
 
-        return noDuplicateFindTaclet ( app, pos, goal );
+        return noDuplicateFindTaclet(app, pos, goal);
     }
 
     protected boolean comparePio(TacletApp newApp,
-                                 TacletApp oldApp,
-                                 PosInOccurrence newPio, PosInOccurrence oldPio) {
-        return oldPio.equals ( newPio );
+            TacletApp oldApp,
+            PosInOccurrence newPio, PosInOccurrence oldPio) {
+        return oldPio.equals(newPio);
     }
 
     protected boolean semiSequentContains(Semisequent semisequent,
-                                          SequentFormula cfma) {
-        return semisequent.contains ( cfma );
+            SequentFormula cfma) {
+        return semisequent.contains(cfma);
     }
 }

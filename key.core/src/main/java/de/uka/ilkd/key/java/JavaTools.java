@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.java;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
+package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
@@ -11,8 +13,12 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
-/** Miscellaneous static methods related to Java blocks or statements in KeY.
+import org.key_project.util.ExtList;
+
+/**
+ * Miscellaneous static methods related to Java blocks or statements in KeY.
  * Mostly moved from key.util.MiscTools here.
+ *
  * @author bruns
  *
  */
@@ -47,8 +53,7 @@ public final class JavaTools {
             Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
-        Statement newProg = (Statement)
-            (new CreatingASTVisitor(jb.program(), false, services) {
+        Statement newProg = (Statement) (new CreatingASTVisitor(jb.program(), false, services) {
             private boolean done = false;
 
             public ProgramElement go() {
@@ -112,11 +117,11 @@ public final class JavaTools {
     }
 
     public static ExecutionContext getInnermostExecutionContext(
-        						JavaBlock jb, 
+            JavaBlock jb,
             Services services) {
         final MethodFrame frame = getInnermostMethodFrame(jb, services);
-    return frame == null 
-               ? null
+        return frame == null
+                ? null
                 : (ExecutionContext) frame.getExecutionContext();
     }
 

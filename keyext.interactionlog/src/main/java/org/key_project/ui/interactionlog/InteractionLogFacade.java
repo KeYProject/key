@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog;
 
-import org.key_project.ui.interactionlog.api.Interaction;
-import org.key_project.ui.interactionlog.model.*;
-import org.key_project.ui.interactionlog.model.builtin.*;
-
+import java.io.File;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
+
+import org.key_project.ui.interactionlog.api.Interaction;
+import org.key_project.ui.interactionlog.model.*;
+import org.key_project.ui.interactionlog.model.builtin.*;
 
 /**
  * @author Alexander Weigl
@@ -17,23 +21,23 @@ import java.io.File;
 public final class InteractionLogFacade {
     public static JAXBContext createContext() throws JAXBException {
         JAXBContext ctx = JAXBContext.newInstance(
-                InteractionLog.class,
-                AutoModeInteraction.class,
-                NodeInteraction.class,
-                MacroInteraction.class,
-                SettingChangeInteraction.class,
-                UserNoteInteraction.class,
-                BuiltInRuleInteraction.class,
-                ContractBuiltInRuleInteraction.class,
-                LoopContractInternalBuiltInRuleInteraction.class,
-                MergeRuleBuiltInRuleInteraction.class,
-                OSSBuiltInRuleInteraction.class,
-                SMTBuiltInRuleInteraction.class,
-                UseDependencyContractBuiltInRuleInteraction.class,
-                PruneInteraction.class,
-                RuleInteraction.class,
-                NodeIdentifier.class,
-                Interaction.class);
+            InteractionLog.class,
+            AutoModeInteraction.class,
+            NodeInteraction.class,
+            MacroInteraction.class,
+            SettingChangeInteraction.class,
+            UserNoteInteraction.class,
+            BuiltInRuleInteraction.class,
+            ContractBuiltInRuleInteraction.class,
+            LoopContractInternalBuiltInRuleInteraction.class,
+            MergeRuleBuiltInRuleInteraction.class,
+            OSSBuiltInRuleInteraction.class,
+            SMTBuiltInRuleInteraction.class,
+            UseDependencyContractBuiltInRuleInteraction.class,
+            PruneInteraction.class,
+            RuleInteraction.class,
+            NodeIdentifier.class,
+            Interaction.class);
         return ctx;
     }
 

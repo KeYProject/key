@@ -1,12 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -23,6 +24,9 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.MapUtil;
 
 /**
  * This class is only used to generate a proof obligation for an {@link AuxiliaryContract}.
@@ -62,7 +66,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     /**
      *
      * @param contract
-     *            a block contract.
+     *        a block contract.
      */
     FunctionalAuxiliaryContract(T contract) {
         this(contract, Contract.INVALID_ID);
@@ -71,9 +75,9 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     /**
      *
      * @param contract
-     *            a block contract.
+     *        a block contract.
      * @param id
-     *            an ID.
+     *        an ID.
      */
     FunctionalAuxiliaryContract(T contract, int id) {
         this.contract = contract;
@@ -84,7 +88,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
         }
 
         name = generateName(contract.getBaseName(), str -> ContractFactory.generateContractName(str,
-                getKJT(), getTarget(), getKJT(), id));
+            getKJT(), getTarget(), getKJT(), id));
         displayName = generateName(contract.getBaseName(), str -> ContractFactory
                 .generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
         typeName = generateName(contract.getBaseName(), str -> ContractFactory
@@ -94,9 +98,9 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     /**
      *
      * @param baseName
-     *            a base name.
+     *        a base name.
      * @param generator
-     *            a name generator.
+     *        a name generator.
      * @return the generated name.
      */
     private String generateName(String baseName, UnaryOperator<String> generator) {
@@ -173,14 +177,13 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         @SuppressWarnings("unchecked")
-        Map<LocationVariable, ProgramVariable> atPreVars0
-                = (Map<LocationVariable, ProgramVariable>) atPreVars;
+        Map<LocationVariable, ProgramVariable> atPreVars0 =
+            (Map<LocationVariable, ProgramVariable>) atPreVars;
         return contract.getPrecondition(heap, selfVar,
-                atPreVars0.entrySet().stream().collect(
-                        MapUtil.<Map.Entry<LocationVariable, ProgramVariable>,
-                        LocationVariable, LocationVariable>collector(
-                                Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
-                services);
+            atPreVars0.entrySet().stream().collect(
+                MapUtil.<Map.Entry<LocationVariable, ProgramVariable>, LocationVariable, LocationVariable>collector(
+                    Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
+            services);
     }
 
     @Override
@@ -217,8 +220,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
         Term result = null;
 
         for (LocationVariable heap : heapContext) {
-            final Term p
-                    = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+            final Term p =
+                getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
 
             if (result == null) {
                 result = p;
@@ -326,7 +329,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * at all, i.e., iff it is "strictly pure."
      *
      * @param heap
-     *            the heap to use.
+     *        the heap to use.
      * @return <code>true</code> iff this contract is strictly pure.
      * @see AuxiliaryContract#hasModifiesClause(LocationVariable)
      */

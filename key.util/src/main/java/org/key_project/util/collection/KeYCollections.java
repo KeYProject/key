@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.util.collection;
 
 import java.util.Arrays;
@@ -53,7 +57,8 @@ public class KeYCollections {
             res = new java.util.IdentityHashMap<S, U>(size);
         else if (m0 instanceof java.util.WeakHashMap)
             res = new java.util.WeakHashMap<S, U>(size);
-        else res = new HashMap<S, U>(size);
+        else
+            res = new HashMap<S, U>(size);
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {
             final U value = m1.get(e.getValue());
@@ -71,9 +76,9 @@ public class KeYCollections {
      * {@link Object#toString()} is used to turn the objects into strings.
      *
      * @param collection an arbitrary non-null collection
-     * @param delimiter  a non-null string which is put between the elements.
+     * @param delimiter a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the
-     * delimiter
+     *         delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
         return StreamSupport.stream(collection.spliterator(), false)
@@ -88,9 +93,9 @@ public class KeYCollections {
      * {@link Object#toString()} is used to turn the objects into strings.
      *
      * @param collection an arbitrary non-null array of objects
-     * @param delimiter  a non-null string which is put between the elements.
+     * @param delimiter a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the
-     * delimiter
+     *         delimiter
      */
     public static String join(Object[] collection, String delimiter) {
         return Arrays.stream(collection)
@@ -107,10 +112,10 @@ public class KeYCollections {
      *
      * @param string an arbitrary string
      * @return a string which is a sub-structure of the original character
-     * sequence
+     *         sequence
      * @author mattias ulbrich
      */
-    public static /*@ non_null @*/ String filterAlphabetic(/*@ non_null @*/ String string) {
+    public static /* @ non_null @ */ String filterAlphabetic(/* @ non_null @ */ String string) {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);

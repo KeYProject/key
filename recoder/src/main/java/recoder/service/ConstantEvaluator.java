@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import recoder.Service;
@@ -17,7 +20,8 @@ public interface ConstantEvaluator extends Service {
      * Encoding for relevant types - Java has no typeswitch instruction and
      * cannot easily afford to pass wrapper objects.
      */
-    int BOOLEAN_TYPE = 0, BYTE_TYPE = 1, SHORT_TYPE = 2, CHAR_TYPE = 3, INT_TYPE = 4, LONG_TYPE = 5, FLOAT_TYPE = 6,
+    int BOOLEAN_TYPE = 0, BYTE_TYPE = 1, SHORT_TYPE = 2, CHAR_TYPE = 3, INT_TYPE = 4, LONG_TYPE = 5,
+            FLOAT_TYPE = 6,
             DOUBLE_TYPE = 7, STRING_TYPE = 8;
 
     /**
@@ -27,7 +31,7 @@ public interface ConstantEvaluator extends Service {
      *
      * @param expr the expression to evaluate.
      * @return the type of the expression, or <CODE>null</CODE> if the
-     * expression is not constant.
+     *         expression is not constant.
      */
     Type getCompileTimeConstantType(Expression expr);
 
@@ -37,7 +41,7 @@ public interface ConstantEvaluator extends Service {
      *
      * @param expr the expression to evaluate.
      * @return <CODE>true</CODE>, if the expression is a compile-time
-     * constant, <CODE>false</CODE> otherwise.
+     *         constant, <CODE>false</CODE> otherwise.
      */
     boolean isCompileTimeConstant(Expression expr);
 
@@ -46,10 +50,10 @@ public interface ConstantEvaluator extends Service {
      * the Java language specification, and derives the result.
      *
      * @param expr the expression to evaluate.
-     * @param res  the result of the evaluation; contains the type encoding and
-     *             the result value.
+     * @param res the result of the evaluation; contains the type encoding and
+     *        the result value.
      * @return <CODE>true</CODE>, if the expression is a compile-time
-     * constant, <CODE>false</CODE> otherwise.
+     *         constant, <CODE>false</CODE> otherwise.
      */
     boolean isCompileTimeConstant(Expression expr, EvaluationResult res);
 
@@ -180,26 +184,26 @@ public interface ConstantEvaluator extends Service {
 
         public String toString() {
             switch (type) {
-                case BOOLEAN_TYPE:
-                    return String.valueOf(booleanValue);
-                case BYTE_TYPE:
-                    return String.valueOf(byteValue);
-                case SHORT_TYPE:
-                    return String.valueOf(shortValue);
-                case CHAR_TYPE:
-                    return String.valueOf(charValue);
-                case INT_TYPE:
-                    return String.valueOf(intValue);
-                case LONG_TYPE:
-                    return String.valueOf(longValue);
-                case FLOAT_TYPE:
-                    return String.valueOf(floatValue);
-                case DOUBLE_TYPE:
-                    return String.valueOf(doubleValue);
-                case STRING_TYPE:
-                    return "\"" + stringValue + "\"";
-                default:
-                    return "Unknown type";
+            case BOOLEAN_TYPE:
+                return String.valueOf(booleanValue);
+            case BYTE_TYPE:
+                return String.valueOf(byteValue);
+            case SHORT_TYPE:
+                return String.valueOf(shortValue);
+            case CHAR_TYPE:
+                return String.valueOf(charValue);
+            case INT_TYPE:
+                return String.valueOf(intValue);
+            case LONG_TYPE:
+                return String.valueOf(longValue);
+            case FLOAT_TYPE:
+                return String.valueOf(floatValue);
+            case DOUBLE_TYPE:
+                return String.valueOf(doubleValue);
+            case STRING_TYPE:
+                return "\"" + stringValue + "\"";
+            default:
+                return "Unknown type";
             }
         }
     }

@@ -1,25 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.smt.SMTSettings;
-import de.uka.ilkd.key.smt.st.SolverTypes;
-import de.uka.ilkd.key.util.LineProperties;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.key_project.util.Streams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,8 +16,30 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.util.LineProperties;
+
+import org.key_project.util.Streams;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -41,6 +47,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Run this with
+ *
  * <pre>
  *     gradlew :key.core:testStrictSMT
  * </pre>
@@ -61,7 +68,8 @@ public class MasterHandlerTest {
     private static final boolean DUMP_SMT = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandlerTest.class);
 
-    public static List<Arguments> data() throws IOException, URISyntaxException, ProblemLoaderException {
+    public static List<Arguments> data()
+            throws IOException, URISyntaxException, ProblemLoaderException {
         URL url = MasterHandlerTest.class.getResource("cases");
         if (url == null) {
             throw new FileNotFoundException("Cannot find resource 'cases'.");
@@ -129,26 +137,27 @@ public class MasterHandlerTest {
             Files.write(tmpKey, lines);
 
             KeYEnvironment<DefaultUserInterfaceControl> env =
-                    KeYEnvironment.load(tmpKey.toFile());
+                KeYEnvironment.load(tmpKey.toFile());
 
             Proof proof = env.getLoadedProof();
             Sequent sequent = proof.root().sequent();
 
             SMTSettings settings = new DefaultSMTSettings(
-                    proof.getSettings().getSMTSettings(),
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                    proof.getSettings().getNewSMTSettings(),
-                    proof);
+                proof.getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                proof.getSettings().getNewSMTSettings(),
+                proof);
 
-        String updates = props.get("smt-settings");
-        if (updates != null) {
-            Properties map = new Properties();
-            map.load(new StringReader(updates));
-            settings.getNewSettings().readSettings(map);
-        }
+            String updates = props.get("smt-settings");
+            if (updates != null) {
+                Properties map = new Properties();
+                map.load(new StringReader(updates));
+                settings.getNewSettings().readSettings(map);
+            }
 
             ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-            var translation = translator.translateProblem(sequent, env.getServices(), settings).toString();
+            var translation =
+                translator.translateProblem(sequent, env.getServices(), settings).toString();
             return new TestData(name, path, props, translation);
         }
 
@@ -171,8 +180,9 @@ public class MasterHandlerTest {
 
         int i = 1;
         while (data.props.containsKey("contains." + i)) {
-            assertTrue(containsModuloSpaces(data.translation, data.props.get("contains." + i).trim()),
-                    "Occurrence check for contains." + i);
+            assertTrue(
+                containsModuloSpaces(data.translation, data.props.get("contains." + i).trim()),
+                "Occurrence check for contains." + i);
             i++;
         }
 
@@ -190,7 +200,7 @@ public class MasterHandlerTest {
     public void testZ3(TestData data) throws Exception {
         Assumptions.assumeTrue(SolverTypes.Z3_SOLVER != null);
         Assumptions.assumeTrue(SolverTypes.Z3_SOLVER.isInstalled(false),
-                "Z3 is not installed, this testcase is ignored.");
+            "Z3 is not installed, this testcase is ignored.");
 
         String expectation = data.props.get("expected");
         Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");
@@ -209,16 +219,16 @@ public class MasterHandlerTest {
         try {
             String lookFor = null;
             switch (expectation) {
-                case "valid":
-                    lookFor = "unsat";
-                    break;
-                case "fail":
-                    lookFor = "(sat|timeout)";
-                    break;
-                case "irrelevant":
-                    break;
-                default:
-                    fail("Unexpected expectation: " + expectation);
+            case "valid":
+                lookFor = "unsat";
+                break;
+            case "fail":
+                lookFor = "(sat|timeout)";
+                break;
+            case "irrelevant":
+                break;
+            default:
+                fail("Unexpected expectation: " + expectation);
             }
 
             if (lookFor != null) {
@@ -234,7 +244,7 @@ public class MasterHandlerTest {
 
             if (!STRICT_TEST) {
                 assumeFalse("extended".equals(data.props.get("state")),
-                        "This is an extended test (will be run only in strict mode)");
+                    "This is an extended test (will be run only in strict mode)");
             }
 
             if (lookFor != null) {

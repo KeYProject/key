@@ -1,6 +1,13 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.kit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
@@ -10,9 +17,6 @@ import recoder.java.reference.PackageReference;
 import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * this class implements basic functions for package handling.
@@ -55,7 +59,7 @@ public class PackageKit {
      *
      * @param pkg the package to check for non-source types.
      * @return a list of class types of the given package that are no
-     * {@link recoder.java.declaration.TypeDeclaration}s.
+     *         {@link recoder.java.declaration.TypeDeclaration}s.
      */
     public static List<ClassType> getNonSourcePackageTypes(Package pkg) {
         List<ClassType> result = new ArrayList<ClassType>();
@@ -72,16 +76,17 @@ public class PackageKit {
     /**
      * Transformation that renames all known references to a package.
      *
-     * @param ch      the change history (may be <CODE>null</CODE>).
-     * @param xr      the cross referencer service.
-     * @param pkg     the package to be renamed; may not be <CODE>null</CODE>.
+     * @param ch the change history (may be <CODE>null</CODE>).
+     * @param xr the cross referencer service.
+     * @param pkg the package to be renamed; may not be <CODE>null</CODE>.
      * @param newName the new name for the package; may not be <CODE>null</CODE>
-     *                and must denote a valid identifier name.
+     *        and must denote a valid identifier name.
      * @return <CODE>true</CODE>, if a rename has been necessary, <CODE>
      * false</CODE> otherwise.
      * @deprecated replaced by recoder.kit.transformation.RenamePackage
      */
-    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, Package pkg, String newName) {
+    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, Package pkg,
+            String newName) {
         Debug.assertNonnull(xr, pkg, newName);
         Debug.assertNonnull(pkg.getName());
         if (!newName.equals(pkg.getName())) {

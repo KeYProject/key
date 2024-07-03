@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -45,30 +49,30 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         final Term anonPermissionsHeapTerm = term.sub(3);
 
         return createBeforeLoopUpdate(
-                MiscTools.isTransaction((Modality) loopTerm.op()),
-                MiscTools.isPermissions(services), anonHeapTerm,
-                anonSavedHeapTerm, anonPermissionsHeapTerm, services);
+            MiscTools.isTransaction((Modality) loopTerm.op()),
+            MiscTools.isPermissions(services), anonHeapTerm,
+            anonSavedHeapTerm, anonPermissionsHeapTerm, services);
     }
 
     /**
      * Creates the anonymizing update for the given loop specification.
      *
      * @param loopSpec
-     *     The {@link LoopSpecification}.
+     *        The {@link LoopSpecification}.
      * @param isTransaction
-     *     set to true iff we're in a transaction modality (then, there are more
-     *     heaps available).
+     *        set to true iff we're in a transaction modality (then, there are more
+     *        heaps available).
      * @param isPermissions
-     *     set to true if the permissions profile is active (then, the
-     *     permissions heap is available).
+     *        set to true if the permissions profile is active (then, the
+     *        permissions heap is available).
      * @param anonHeapTerm
-     *     The term with the Skolem heap.
+     *        The term with the Skolem heap.
      * @param anonSavedHeapTerm
-     *     The term with the Skolem saved heap.
+     *        The term with the Skolem saved heap.
      * @param anonPermissionsHeapTerm
-     *     The term with the Skolem permissions heap.
+     *        The term with the Skolem permissions heap.
      * @param services
-     *     The {@link Services} object (for the {@link TermBuilder}).
+     *        The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
     private static Term createBeforeLoopUpdate(boolean isTransaction,
@@ -78,20 +82,20 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         Term beforeLoopUpdate = tb.elementary(
-                (UpdateableOperator) anonHeapTerm.op(),
-                tb.var(heapLDT.getHeap()));
+            (UpdateableOperator) anonHeapTerm.op(),
+            tb.var(heapLDT.getHeap()));
 
         if (isTransaction) {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                    tb.elementary((UpdateableOperator) anonSavedHeapTerm.op(),
-                            tb.var(heapLDT.getSavedHeap())));
+                tb.elementary((UpdateableOperator) anonSavedHeapTerm.op(),
+                    tb.var(heapLDT.getSavedHeap())));
         }
 
         if (isPermissions) {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                    tb.elementary(
-                            (UpdateableOperator) anonPermissionsHeapTerm.op(),
-                            tb.var(heapLDT.getPermissionHeap())));
+                tb.elementary(
+                    (UpdateableOperator) anonPermissionsHeapTerm.op(),
+                    tb.var(heapLDT.getPermissionHeap())));
         }
 
         return beforeLoopUpdate;

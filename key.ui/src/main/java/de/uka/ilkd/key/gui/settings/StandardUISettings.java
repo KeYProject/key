@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.settings;
+
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
-
-import javax.swing.*;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -17,9 +21,9 @@ import java.util.List;
 public class StandardUISettings extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = -7484169054465984605L;
     private static final String INFO_CLUTTER_RULESET =
-            "Comma separated list of rule set names, containing clutter rules.";
+        "Comma separated list of rule set names, containing clutter rules.";
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n" +
-            "which are rules with less priority in the taclet menu";
+        "which are rules with less priority in the taclet menu";
 
     private final JSpinner spFontSizeGlobal;
     private final JSpinner txtMaxTooltipLines;
@@ -43,50 +47,52 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         setHeaderText(getDescription());
 
         spFontSizeGlobal = createNumberTextField(new SpinnerNumberModel(1, 0.1, 5, 0.1),
-                emptyValidator());
+            emptyValidator());
         addTitledComponent("Global font factor: ", spFontSizeGlobal, "");
 
         String[] sizes =
-                Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
+            Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
         spFontSizeTreeSequent = this.<String>createSelection(sizes, emptyValidator());
         addTitledComponent("Tree and sequent font factor: ", spFontSizeTreeSequent, "");
 
 
         String info = "Maximum size (line count) of the tooltips of applicable rules\n"
-                + "<br> with schema variable instantiations displayed.\n"
-                + "In case of longer <br>tooltips the instantiation will be suppressed.\n";
+            + "<br> with schema variable instantiations displayed.\n"
+            + "In case of longer <br>tooltips the instantiation will be suppressed.\n";
         txtMaxTooltipLines = addNumberField("Maximum line number for tooltips",
-                1, 100, 5, info, emptyValidator());
+            1, 100, 5, info, emptyValidator());
 
 
         chkShowLoadExamplesDialog =
-                addCheckBox("Show load examples dialog", "Show the load example dialog on startup", true, emptyValidator());
+            addCheckBox("Show load examples dialog", "Show the load example dialog on startup",
+                true, emptyValidator());
 
         chkShowWholeTacletCB =
-                addCheckBox("Show whole taclet", "Pretty-print whole Taclet including \n" +
-                        "'name', 'find', 'varCond' and 'heuristics'", false, emptyValidator());
+            addCheckBox("Show whole taclet", "Pretty-print whole Taclet including \n" +
+                "'name', 'find', 'varCond' and 'heuristics'", false, emptyValidator());
 
         chkShowUninstantiatedTaclet =
-                addCheckBox("Show uninstantiated taclet", "recommended for unexperienced users",
-                        false, emptyValidator());
+            addCheckBox("Show uninstantiated taclet", "recommended for unexperienced users",
+                false, emptyValidator());
 
-            txtClutterRules = addTextArea("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
+        txtClutterRules = addTextArea("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
 
-        txtClutterRuleSets = addTextArea("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
+        txtClutterRuleSets =
+            addTextArea("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
 
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
         chkSyntaxHighlightning =
-                addCheckBox("Use syntax highlighting", "", false, emptyValidator());
+            addCheckBox("Use syntax highlighting", "", false, emptyValidator());
         chkHidePackagePrefix = addCheckBox("Hide package prefix", "", false, emptyValidator());
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
         spAutoSaveProof =
-                addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
+            addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
         chkMinimizeInteraction = addCheckBox("Minimise interactions", "", false, emptyValidator());
         chkEnsureSourceConsistency =
-                addCheckBox("Ensure source consistency", "", true, emptyValidator());
+            addCheckBox("Ensure source consistency", "", true, emptyValidator());
         chkRightClickMacros =
-                addCheckBox("Right click for proof macros", "", false, emptyValidator());
+            addCheckBox("Right click for proof macros", "", false, emptyValidator());
     }
 
 
@@ -98,7 +104,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     @Override
     public JComponent getPanel(MainWindow window) {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        GeneralSettings generalSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        GeneralSettings generalSettings =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
 
         txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
@@ -136,8 +143,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
 
-        vs.clutterRules().set(txtClutterRules.getText().replace('\n',','));
-        vs.clutterRuleSets().set(txtClutterRuleSets.getText().replace('\n',','));
+        vs.clutterRules().set(txtClutterRules.getText().replace('\n', ','));
+        vs.clutterRuleSets().set(txtClutterRuleSets.getText().replace('\n', ','));
 
         vs.setShowLoadExamplesDialog(chkShowLoadExamplesDialog.isSelected());
         vs.setShowWholeTaclet(chkShowWholeTacletCB.isSelected());

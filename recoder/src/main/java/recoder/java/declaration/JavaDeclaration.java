@@ -1,13 +1,16 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.java.Declaration;
 import recoder.java.JavaNonTerminalProgramElement;
 import recoder.java.declaration.modifier.*;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Java declaration.
@@ -59,11 +62,13 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     /**
      * Get modifiers.
      *
-     * @return an list containing all modifiers but no annotations. Changes on the list do not reflect
-     * changes on the AST!
+     * @return an list containing all modifiers but no annotations. Changes on the list do not
+     *         reflect
+     *         changes on the AST!
      */
     public List<Modifier> getModifiers() {
-        if (declarationSpecifiers == null) return new ArrayList<Modifier>(0);
+        if (declarationSpecifiers == null)
+            return new ArrayList<Modifier>(0);
         List<Modifier> mml = new ArrayList<Modifier>();
         for (int i = 0, max = declarationSpecifiers.size(); i < max; i++) {
             DeclarationSpecifier ds = declarationSpecifiers.get(i);
@@ -79,7 +84,8 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     public List<AnnotationUseSpecification> getAnnotations() {
         if (declarationSpecifiers == null)
             return new ArrayList<AnnotationUseSpecification>(0);
-        List<AnnotationUseSpecification> result = new ArrayList<AnnotationUseSpecification>(declarationSpecifiers.size());
+        List<AnnotationUseSpecification> result =
+            new ArrayList<AnnotationUseSpecification>(declarationSpecifiers.size());
         int s = declarationSpecifiers.size();
         for (int i = 0; i < s; i++) {
             DeclarationSpecifier ds = declarationSpecifiers.get(i);

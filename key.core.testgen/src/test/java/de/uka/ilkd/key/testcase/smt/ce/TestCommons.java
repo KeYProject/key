@@ -1,4 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.testcase.smt.ce;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.TermServices;
@@ -12,16 +21,7 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.util.HelperClassForTests;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,7 +31,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * tests.
  */
 public abstract class TestCommons {
-    protected static File folder = new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
+    protected static File folder =
+        new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
     /**
      * The set of taclets
      */
@@ -59,7 +60,8 @@ public abstract class TestCommons {
 
     public abstract boolean toolNotInstalled();
 
-    protected boolean correctResult(String filepath, boolean isValid) throws ProblemLoaderException {
+    protected boolean correctResult(String filepath, boolean isValid)
+            throws ProblemLoaderException {
         if (toolNotInstalled()) {
             return true;
         }
@@ -159,7 +161,7 @@ public abstract class TestCommons {
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
      * @param file problem file.
-     * @param pro  determines the profile that should be used.
+     * @param pro determines the profile that should be used.
      * @return ProofAggregate of the problem file.
      */
     protected ProofAggregate parse(File file, Profile pro) {
@@ -167,7 +169,7 @@ public abstract class TestCommons {
         ProofAggregate result = null;
         try {
             KeYUserProblemFile po = new KeYUserProblemFile(file.getName(),
-                    file, null, pro);
+                file, null, pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }
@@ -181,4 +183,3 @@ public abstract class TestCommons {
         return result;
     }
 }
-

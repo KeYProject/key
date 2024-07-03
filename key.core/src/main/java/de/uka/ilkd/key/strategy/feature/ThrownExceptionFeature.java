@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.ArrayList;
@@ -30,11 +34,11 @@ public class ThrownExceptionFeature extends BinaryFeature {
     /**
      * creates a feature filtering first active throw statements where the
      * thrown exception is of one of the given types (or their subtypes)
-     * 
+     *
      * @param p_filteredExceptions
-     *            the String array with the types of the thrown exceptions
+     *        the String array with the types of the thrown exceptions
      * @param services
-     *            the Services
+     *        the Services
      */
     private ThrownExceptionFeature(String[] p_filteredExceptions,
             Services services) {
@@ -63,8 +67,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
         return app instanceof TacletApp && filter(pos.subTerm(), goal.proof()
-                .getServices(), ((TacletApp) app).instantiations()
-                .getExecutionContext());
+                .getServices(),
+            ((TacletApp) app).instantiations()
+                    .getExecutionContext());
     }
 
     protected boolean filter(Term term, Services services, ExecutionContext ec) {
@@ -80,9 +85,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
     /**
      * returns the first executable statement (often identical with the first
      * active statement)
-     * 
+     *
      * @param term
-     *            the Term with the program at top level
+     *        the Term with the program at top level
      * @return the first executable statement
      */
     private ProgramElement getFirstExecutableStatement(Term term) {

@@ -1,10 +1,10 @@
-/*
- * Created on 31.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
+
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ModelException;
@@ -19,8 +19,6 @@ import recoder.java.reference.FieldReference;
 import recoder.java.statement.*;
 import recoder.kit.*;
 import recoder.list.generic.ASTArrayList;
-
-import java.util.*;
 
 /**
  * untested for enum declarations nested within enum declarations
@@ -48,7 +46,8 @@ public class ReplaceEnums extends TwoPassTransformation {
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
             if (pe instanceof EnumDeclaration) {
-                ReplaceSingleEnum p = new ReplaceSingleEnum(getServiceConfiguration(), (EnumDeclaration) pe);
+                ReplaceSingleEnum p =
+                    new ReplaceSingleEnum(getServiceConfiguration(), (EnumDeclaration) pe);
                 p.analyze();
                 parts.add(p);
             }
@@ -90,10 +89,16 @@ public class ReplaceEnums extends TwoPassTransformation {
                 repl.getDeclarationSpecifiers().add(f.createFinal());
             if (ed.getComments() != null)
                 repl.setComments(ed.getComments().deepClone());
-            ASTArrayList<MemberDeclaration> mlist = new ASTArrayList<MemberDeclaration>(ed.getMembers().size());
+            ASTArrayList<MemberDeclaration> mlist =
+                new ASTArrayList<MemberDeclaration>(ed.getMembers().size());
             repl.setMembers(mlist);
             repl.setIdentifier(ed.getIdentifier().deepClone());
-            ASTArrayList<FieldSpecification> enumSpecRepl = new ASTArrayList<FieldSpecification>(); // needed later for valueOf() and values()
+            ASTArrayList<FieldSpecification> enumSpecRepl = new ASTArrayList<FieldSpecification>(); // needed
+                                                                                                    // later
+                                                                                                    // for
+                                                                                                    // valueOf()
+                                                                                                    // and
+                                                                                                    // values()
             for (int i = 0; i < ed.getMembers().size(); i++) {
                 MemberDeclaration md = ed.getMembers().get(i);
                 if (md instanceof EnumConstantDeclaration) {
@@ -101,7 +106,8 @@ public class ReplaceEnums extends TwoPassTransformation {
                     EnumConstantSpecification ecs = ec.getEnumConstantSpecification();
 
                     // create replacement for current constant
-                    ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<DeclarationSpecifier>();
+                    ASTArrayList<DeclarationSpecifier> dsml =
+                        new ASTArrayList<DeclarationSpecifier>();
                     if (ec.getAnnotations() == null) {
                         for (AnnotationUseSpecification a : ec.getAnnotations()) {
                             dsml.add(a.deepClone());
@@ -111,14 +117,13 @@ public class ReplaceEnums extends TwoPassTransformation {
                     dsml.add(f.createPublic());
                     dsml.add(f.createStatic());
                     FieldDeclaration fd = f.createFieldDeclaration(
-                            dsml,
-                            f.createTypeReference(ed.getIdentifier().deepClone()),
-                            ecs.getIdentifier().deepClone(),
-                            null
-                    );
+                        dsml,
+                        f.createTypeReference(ed.getIdentifier().deepClone()),
+                        ecs.getIdentifier().deepClone(),
+                        null);
                     FieldSpecification fs = fd.getFieldSpecifications().get(0);
 
-//					update references: parent instanceof Switch ?
+                    // update references: parent instanceof Switch ?
                     List<FieldReference> frl = getCrossReferenceSourceInfo().getReferences(ecs);
                     for (int j = 0; j < frl.size(); j++) {
                         FieldReference fr = frl.get(j);
@@ -126,22 +131,21 @@ public class ReplaceEnums extends TwoPassTransformation {
                             Switch sw = (Switch) fr.getASTParent().getASTParent();
                             switchStmnts.add(sw);
                             String fallThroughName = VariableKit.createValidVariableName(
-                                    getSourceInfo(),
-                                    sw,
-                                    "fallThrough"
-                            );
+                                getSourceInfo(),
+                                sw,
+                                "fallThrough");
                             String doneAnyName = VariableKit.createValidVariableName(
-                                    getSourceInfo(),
-                                    sw,
-                                    "doneAny"
-                            );
-                            names.put(sw, new String[]{fallThroughName, doneAnyName});
+                                getSourceInfo(),
+                                sw,
+                                "doneAny");
+                            names.put(sw, new String[] { fallThroughName, doneAnyName });
                         }
                     }
 
                     New e = f.createNew();
                     e.setTypeReference(f.createTypeReference(repl.getIdentifier()));
-                    if (ecs.getConstructorReference().getArguments() != null || ecs.getConstructorReference().getClassDeclaration() != null) {
+                    if (ecs.getConstructorReference().getArguments() != null
+                            || ecs.getConstructorReference().getClassDeclaration() != null) {
                         List<Expression> ecsargs = ecs.getConstructorReference().getArguments();
                         int s = ecsargs == null ? 0 : ecsargs.size();
                         ASTArrayList<Expression> args = new ASTArrayList<Expression>(s);
@@ -149,7 +153,8 @@ public class ReplaceEnums extends TwoPassTransformation {
                         for (int j = 0; j < s; j++)
                             args.add(ecsargs.get(j).deepClone());
                         if (ecs.getConstructorReference().getClassDeclaration() != null) {
-                            e.setClassDeclaration(ecs.getConstructorReference().getClassDeclaration().deepClone());
+                            e.setClassDeclaration(
+                                ecs.getConstructorReference().getClassDeclaration().deepClone());
                         }
                     }
                     fs.setInitializer(e);
@@ -185,12 +190,9 @@ public class ReplaceEnums extends TwoPassTransformation {
             valueOf.setTypeReference(f.createTypeReference(repl.getIdentifier().deepClone()));
             ordinal.setTypeReference(f.createTypeReference(f.createIdentifier("int")));
             valueOf.setParameters(
-                    new ASTArrayList<ParameterDeclaration>(
-                            f.createParameterDeclaration(TypeKit.createTypeReference(f, "String"),
-                                    f.createIdentifier("name")
-                            )
-                    )
-            );
+                new ASTArrayList<ParameterDeclaration>(
+                    f.createParameterDeclaration(TypeKit.createTypeReference(f, "String"),
+                        f.createIdentifier("name"))));
             // now, add functional behaviour
             StatementBlock valuesSt = f.createStatementBlock();
             StatementBlock valueOfSt = f.createStatementBlock();
@@ -200,12 +202,14 @@ public class ReplaceEnums extends TwoPassTransformation {
             ordinal.setBody(ordinalSt);
 
             // ordinal first
-            ordinalSt.setBody(new ASTArrayList<Statement>(f.createReturn(f.createFieldReference(f.createIdentifier("ordinal")))));
+            ordinalSt.setBody(new ASTArrayList<Statement>(
+                f.createReturn(f.createFieldReference(f.createIdentifier("ordinal")))));
 
             // na must be filled for values, ite iteratively extended
             NewArray na = f.createNewArray();
             na.setTypeReference(f.createTypeReference(repl.getIdentifier().deepClone(), 1));
-            na.setArrayInitializer(f.createArrayInitializer(new ASTArrayList<Expression>(enumSpecRepl.size())));
+            na.setArrayInitializer(
+                f.createArrayInitializer(new ASTArrayList<Expression>(enumSpecRepl.size())));
             na.makeParentRoleValid();
             valuesSt.setBody(new ASTArrayList<Statement>(f.createReturn(na)));
             If ite = f.createIf();
@@ -213,18 +217,18 @@ public class ReplaceEnums extends TwoPassTransformation {
             valueOfSt.setBody(new ASTArrayList<Statement>(ite));
             for (int i = 0; i < enumSpecRepl.size(); i++) {
                 FieldSpecification fs = enumSpecRepl.get(i);
-                na.getArrayInitializer().getArguments().add(f.createFieldReference(fs.getIdentifier().deepClone()));
+                na.getArrayInitializer().getArguments()
+                        .add(f.createFieldReference(fs.getIdentifier().deepClone()));
                 ite.setExpression(
-                        f.createMethodReference(
-                                f.createVariableReference(f.createIdentifier("name")),
-                                f.createIdentifier("equals"),
-                                new ASTArrayList<Expression>(
-                                        f.createStringLiteral("\"" + fs.getName() + "\"")
-                                )
+                    f.createMethodReference(
+                        f.createVariableReference(f.createIdentifier("name")),
+                        f.createIdentifier("equals"),
+                        new ASTArrayList<Expression>(
+                            f.createStringLiteral("\"" + fs.getName() + "\""))
 
-                        )
-                );
-                ite.setThen(f.createThen(f.createReturn(f.createFieldReference(fs.getIdentifier().deepClone()))));
+                    ));
+                ite.setThen(f.createThen(
+                    f.createReturn(f.createFieldReference(fs.getIdentifier().deepClone()))));
                 if (i + 1 < enumSpecRepl.size()) {
                     ite.setElse(f.createElse(f.createIf()));
                     ite.makeParentRoleValid();
@@ -234,7 +238,8 @@ public class ReplaceEnums extends TwoPassTransformation {
                 }
             }
             na.getArrayInitializer().makeParentRoleValid();
-            ite.setElse(f.createElse(f.createThrow(f.createNew(null, f.createTypeReference(f.createIdentifier("IllegalArgumentException")), null))));
+            ite.setElse(f.createElse(f.createThrow(f.createNew(null,
+                f.createTypeReference(f.createIdentifier("IllegalArgumentException")), null))));
             ite.makeParentRoleValid();
             valuesSt.makeParentRoleValid();
             valueOfSt.makeParentRoleValid();
@@ -251,18 +256,17 @@ public class ReplaceEnums extends TwoPassTransformation {
             declSpecs.add(f.createPrivate());
             declSpecs.add(f.createStatic());
             mlist.add(f.createFieldDeclaration(declSpecs,
-                    f.createTypeReference(f.createIdentifier("int")),
-                    f.createIdentifier("CURRENT_ORDINAL"),
-                    f.createIntLiteral("0"))
-            );
+                f.createTypeReference(f.createIdentifier("int")),
+                f.createIdentifier("CURRENT_ORDINAL"),
+                f.createIntLiteral("0")));
             declSpecs = new ASTArrayList<DeclarationSpecifier>(2);
             declSpecs.add(f.createPrivate());
             declSpecs.add(f.createFinal());
             mlist.add(f.createFieldDeclaration(declSpecs,
-                    f.createTypeReference(f.createIdentifier("int")),
-                    f.createIdentifier("ordinal"),
-                    f.createPostIncrement(f.createFieldReference(f.createIdentifier("CURRENT_ORDINAL"))))
-            );
+                f.createTypeReference(f.createIdentifier("int")),
+                f.createIdentifier("ordinal"),
+                f.createPostIncrement(
+                    f.createFieldReference(f.createIdentifier("CURRENT_ORDINAL")))));
             // done
             repl.makeParentRoleValid();
             MiscKit.unindent(repl);
@@ -281,10 +285,12 @@ public class ReplaceEnums extends TwoPassTransformation {
                 String fallThroughName = nm[0];
                 String doneAnyName = nm[1];
                 // helper variables
-                sml.add(f.createLocalVariableDeclaration(null, f.createTypeReference(f.createIdentifier("boolean")),
-                        f.createIdentifier(fallThroughName), f.createBooleanLiteral(false)));
-                sml.add(f.createLocalVariableDeclaration(null, f.createTypeReference(f.createIdentifier("boolean")),
-                        f.createIdentifier(doneAnyName), f.createBooleanLiteral(false)));
+                sml.add(f.createLocalVariableDeclaration(null,
+                    f.createTypeReference(f.createIdentifier("boolean")),
+                    f.createIdentifier(fallThroughName), f.createBooleanLiteral(false)));
+                sml.add(f.createLocalVariableDeclaration(null,
+                    f.createTypeReference(f.createIdentifier("boolean")),
+                    f.createIdentifier(doneAnyName), f.createBooleanLiteral(false)));
                 Do repl = f.createDo(f.createBooleanLiteral(false), sb);
                 for (int i = 0; i < sw.getBranchCount(); i++) {
                     Branch b = sw.getBranchAt(i);
@@ -295,9 +301,8 @@ public class ReplaceEnums extends TwoPassTransformation {
                         ASTArrayList<Statement> defaultStmnt = new ASTArrayList<Statement>();
                         StatementBlock sb2 = f.createStatementBlock(defaultStmnt);
                         LogicalOr cond = f.createLogicalOr(
-                                f.createVariableReference(f.createIdentifier(doneAnyName)),
-                                f.createVariableReference(f.createIdentifier(fallThroughName))
-                        );
+                            f.createVariableReference(f.createIdentifier(doneAnyName)),
+                            f.createVariableReference(f.createIdentifier(fallThroughName)));
                         defaultStmnt.addAll(d.getBody().deepClone());
                         sb2.makeParentRoleValid();
                         Then then = f.createThen(sb2);
@@ -305,25 +310,33 @@ public class ReplaceEnums extends TwoPassTransformation {
                         sml.add(newIf);
                     } else {
                         Case c = (Case) b;
-                        LogicalOr cond = f.createLogicalOr(f.createVariableReference(f.createIdentifier(fallThroughName)),
-                                f.createEquals(
-                                        //VariableKit.createVariableReference((FieldDeclaration)((FieldSpecification)getSourceInfo().getField((FieldReference)c.getExpression())).getASTParent()),
-                                        f.createFieldReference(TypeKit.createTypeReference(f, ed.getFullName()), f.createIdentifier(((FieldReference) c.getExpression()).getName())),
-                                        sw.getExpression().deepClone()));
+                        LogicalOr cond = f.createLogicalOr(
+                            f.createVariableReference(f.createIdentifier(fallThroughName)),
+                            f.createEquals(
+                                // VariableKit.createVariableReference((FieldDeclaration)((FieldSpecification)getSourceInfo().getField((FieldReference)c.getExpression())).getASTParent()),
+                                f.createFieldReference(
+                                    TypeKit.createTypeReference(f, ed.getFullName()),
+                                    f.createIdentifier(
+                                        ((FieldReference) c.getExpression()).getName())),
+                                sw.getExpression().deepClone()));
                         ASTArrayList<Statement> thenStmnt = new ASTArrayList<Statement>();
                         StatementBlock sb2 = f.createStatementBlock(thenStmnt);
                         // do not go in default if we entered any other branch:
-                        thenStmnt.add(f.createCopyAssignment(f.createVariableReference(f.createIdentifier(doneAnyName)),
-                                f.createBooleanLiteral(true)));
+                        thenStmnt.add(f.createCopyAssignment(
+                            f.createVariableReference(f.createIdentifier(doneAnyName)),
+                            f.createBooleanLiteral(true)));
                         // reset fall through
-                        thenStmnt.add(f.createCopyAssignment(f.createVariableReference(f.createIdentifier(fallThroughName)),
-                                f.createBooleanLiteral(false)));
+                        thenStmnt.add(f.createCopyAssignment(
+                            f.createVariableReference(f.createIdentifier(fallThroughName)),
+                            f.createBooleanLiteral(false)));
                         // copy original statements:
                         thenStmnt.addAll(c.getBody().deepClone());
                         // if we reach this, fall through:
-                        if (c.getBody().size() == 0 || !(c.getBody().get(c.getBody().size() - 1) instanceof JumpStatement))
-                            thenStmnt.add(f.createCopyAssignment(f.createVariableReference(f.createIdentifier(fallThroughName)),
-                                    f.createBooleanLiteral(true)));
+                        if (c.getBody().size() == 0 || !(c.getBody()
+                                .get(c.getBody().size() - 1) instanceof JumpStatement))
+                            thenStmnt.add(f.createCopyAssignment(
+                                f.createVariableReference(f.createIdentifier(fallThroughName)),
+                                f.createBooleanLiteral(true)));
                         sb2.makeParentRoleValid();
                         Then then = f.createThen(sb2);
                         If newIf = f.createIf(cond, then);

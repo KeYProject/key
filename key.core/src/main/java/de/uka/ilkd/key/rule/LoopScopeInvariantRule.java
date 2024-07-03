@@ -1,10 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -34,6 +35,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * <p>
  * Implementation of the "<strong>loop scope invariant</strong>" rule as
@@ -59,7 +63,7 @@ import de.uka.ilkd.key.util.Pair;
  * old {@link WhileInvariantRule}. In the (near) future, these features should
  * be built in of course..
  * </p>
- * 
+ *
  * <pre>
  * \Gamma ==> {U}Inv, \Delta
  * \Gamma, {U'}Inv ==> \Delta, {U'}[\pi
@@ -113,7 +117,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * doesn't support Java Card transactions and information flow proof
      * obligations.
      * </p>
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -123,13 +127,13 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         }
 
         final Term progPost = splitUpdates(pio.subTerm(),
-                goal.proof().getServices()).second;
+            goal.proof().getServices()).second;
         final Modality modality = (Modality) progPost.op();
 
         return !InfFlowCheckInfo.isInfFlow(goal)
                 && !WellDefinednessCheck.isOn() // TODO: Remove when wd goal is integrated,
-                                                //  otherwise loop invariant rule would be unsound
-                                                //  w.r.t. well-definedness
+                                                // otherwise loop invariant rule would be unsound
+                                                // w.r.t. well-definedness
                 && !(modality == Modality.BOX_TRANSACTION
                         || modality == Modality.DIA_TRANSACTION);
     }
@@ -141,28 +145,28 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
 
         LoopInvariantInformation loopInvInfo = doPreparations(goal, services,
-                ruleApp);
+            ruleApp);
 
         ImmutableList<Goal> goals = loopInvInfo.goals;
         Goal initiallyGoal = goals.tail().head();
         Goal preservesGoal = goals.head();
 
         Pair<Optional<Label>, Statement> labelAndStmtToReplace = findLoopLabel(
-                ruleApp, loopInvInfo.inst.loop);
+            ruleApp, loopInvInfo.inst.loop);
 
         // Create the "Initially" goal
         constructInitiallyGoal(loopInvInfo.services, loopInvInfo.ruleApp,
-                loopInvInfo.termLabelState, initiallyGoal, loopInvInfo.inst,
-                loopInvInfo.invTerm, loopInvInfo.reachableState);
+            loopInvInfo.termLabelState, initiallyGoal, loopInvInfo.inst,
+            loopInvInfo.invTerm, loopInvInfo.reachableState);
 
         // Create the "Invariant Preserved and Use Case" goal
         constructPresrvAndUCGoal(loopInvInfo.services, loopInvInfo.ruleApp,
-                preservesGoal, loopInvInfo.inst, labelAndStmtToReplace.first,
-                labelAndStmtToReplace.second, loopInvInfo.anonUpdate,
-                loopInvInfo.wellFormedAnon, loopInvInfo.uAnonInv,
-                loopInvInfo.frameCondition, loopInvInfo.variantPO,
-                loopInvInfo.termLabelState, loopInvInfo.invTerm,
-                loopInvInfo.uBeforeLoopDefAnonVariant);
+            preservesGoal, loopInvInfo.inst, labelAndStmtToReplace.first,
+            labelAndStmtToReplace.second, loopInvInfo.anonUpdate,
+            loopInvInfo.wellFormedAnon, loopInvInfo.uAnonInv,
+            loopInvInfo.frameCondition, loopInvInfo.variantPO,
+            loopInvInfo.termLabelState, loopInvInfo.invTerm,
+            loopInvInfo.uBeforeLoopDefAnonVariant);
 
         return goals;
     }
@@ -183,23 +187,23 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
     /**
      * Sets the content of the "initially valid" goal.
-     * 
+     *
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @param ruleApp
-     *            The {@link RuleApp} for this {@link LoopScopeInvariantRule}
-     *            application.
+     *        The {@link RuleApp} for this {@link LoopScopeInvariantRule}
+     *        application.
      * @param termLabelState
-     *            The {@link TermLabelState}.
+     *        The {@link TermLabelState}.
      * @param initiallyGoal
-     *            The {@link Goal} containing the "initially valid" PO.
+     *        The {@link Goal} containing the "initially valid" PO.
      * @param inst
-     *            The {@link Instantiation} of parameters for the
-     *            {@link LoopScopeInvariantRule} app.
+     *        The {@link Instantiation} of parameters for the
+     *        {@link LoopScopeInvariantRule} app.
      * @param invTerm
-     *            The loop invariant formula.
+     *        The loop invariant formula.
      * @param reachableState
-     *            The reachable state formula.
+     *        The reachable state formula.
      */
     private void constructInitiallyGoal(Services services, RuleApp ruleApp,
             final TermLabelState termLabelState, Goal initiallyGoal,
@@ -207,50 +211,50 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         initiallyGoal.setBranchLabel("Invariant Initially Valid");
         initiallyGoal
                 .changeFormula(
-                        initFormula(termLabelState, inst, invTerm,
-                                reachableState, services, initiallyGoal),
-                        ruleApp.posInOccurrence());
+                    initFormula(termLabelState, inst, invTerm,
+                        reachableState, services, initiallyGoal),
+                    ruleApp.posInOccurrence());
     }
 
     /**
      * Creates the "Invariant Preserved and Used" goal subsuming the former
      * preserved and use case goals.
-     * 
+     *
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @param ruleApp
-     *            The {@link LoopInvariantBuiltInRuleApp} object for the current
-     *            rule application.
+     *        The {@link LoopInvariantBuiltInRuleApp} object for the current
+     *        rule application.
      * @param presrvAndUCGoal
-     *            The {@link Goal} to serve as container for the new sequent.
+     *        The {@link Goal} to serve as container for the new sequent.
      * @param inst
-     *            The {@link Instantiation} of parameters for the
-     *            {@link LoopScopeInvariantRule} app.
+     *        The {@link Instantiation} of parameters for the
+     *        {@link LoopScopeInvariantRule} app.
      * @param loopLabel
-     *            The {@link Label} before the {@link While} loop.
+     *        The {@link Label} before the {@link While} loop.
      * @param stmtToReplace
-     *            The {@link Statement} to replace (either a {@link While} loop
-     *            or a {@link LabeledStatement} including the {@link While}
-     *            loop).
+     *        The {@link Statement} to replace (either a {@link While} loop
+     *        or a {@link LabeledStatement} including the {@link While}
+     *        loop).
      * @param anonUpdate
-     *            The anonymized update {@link Term}.
+     *        The anonymized update {@link Term}.
      * @param wellFormedAnon
-     *            The wellformed formula.
+     *        The wellformed formula.
      * @param uAnonInv
-     *            A formula containing the anonymized update and the loop
-     *            invariant.
+     *        A formula containing the anonymized update and the loop
+     *        invariant.
      * @param frameCondition
-     *            The frame condition.
+     *        The frame condition.
      * @param variantPO
-     *            The proof obligation for the variant.
+     *        The proof obligation for the variant.
      * @param termLabelState
-     *            The {@link TermLabelState}.
+     *        The {@link TermLabelState}.
      * @param invTerm
-     *            The loop invariant formula.
+     *        The loop invariant formula.
      * @param uBeforeLoopDefAnonVariant
-     *            An array containing the original update, the "before the loop"
-     *            update for reasoning about the variant, the anonymized update,
-     *            and the variant update.
+     *        An array containing the original update, the "before the loop"
+     *        update for reasoning about the variant, the anonymized update,
+     *        and the variant update.
      */
     private void constructPresrvAndUCGoal(Services services, RuleApp ruleApp,
             Goal presrvAndUCGoal, final Instantiation inst,
@@ -261,16 +265,16 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final While loop = inst.loop;
 
         final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
-                loop, loopLabel, stmtToReplace, frameCondition, variantPO,
-                termLabelState, presrvAndUCGoal, uBeforeLoopDefAnonVariant,
-                invTerm);
+            loop, loopLabel, stmtToReplace, frameCondition, variantPO,
+            termLabelState, presrvAndUCGoal, uBeforeLoopDefAnonVariant,
+            invTerm);
 
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
         presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true,
-                false);
+            false);
         presrvAndUCGoal.changeFormula(new SequentFormula(newFormula),
-                ruleApp.posInOccurrence());
+            ruleApp.posInOccurrence());
     }
 
     // -------------------------------------------------------------------------
@@ -279,9 +283,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
     /**
      * Creates the variable used as a loop scope index.
-     * 
+     *
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @return The variable used as a loop scope index.
      */
     private ProgramVariable loopScopeIdxVar(Services services) {
@@ -289,33 +293,33 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 .getKeYJavaType("boolean");
 
         final ProgramVariable loopScopeIdxVar = //
-                KeYJavaASTFactory
-                        .localVariable( //
-                                services.getVariableNamer()
-                                        .getTemporaryNameProposal("x"),
-                                booleanType);
+            KeYJavaASTFactory
+                    .localVariable( //
+                        services.getVariableNamer()
+                                .getTemporaryNameProposal("x"),
+                        booleanType);
 
         return loopScopeIdxVar;
     }
 
     /**
      * Creates the new program with the loop scope.
-     * 
+     *
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @param loop
-     *            The original {@link While} loop that is going to be replaced.
+     *        The original {@link While} loop that is going to be replaced.
      * @param loopLabel
-     *            The {@link Label} before the {@link While} loop.
+     *        The {@link Label} before the {@link While} loop.
      * @param stmtToReplace
-     *            The {@link Statement} to replace (either a {@link While} loop
-     *            or a {@link LabeledStatement} including the {@link While}
-     *            loop).
+     *        The {@link Statement} to replace (either a {@link While} loop
+     *        or a {@link LabeledStatement} including the {@link While}
+     *        loop).
      * @param origProg
-     *            The whole original program, starting with the {@link While}
-     *            loop.
+     *        The whole original program, starting with the {@link While}
+     *        loop.
      * @param loopScopeIdxVar
-     *            The variable used as a loop scope index.
+     *        The variable used as a loop scope index.
      * @return The new program with the loop scope.
      */
     private ProgramElement newProgram(Services services, final While loop,
@@ -329,27 +333,27 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         } else {
             stmnt.add(loop.getBody());
         }
-        
+
         // If this assignment of "false" to the loop scope index is reached, we
         // are in the standard "preserved" case and have to show the invariant.
-        
+
         stmnt.add(KeYJavaASTFactory.assign(loopScopeIdxVar,
-                KeYJavaASTFactory.falseLiteral()));
+            KeYJavaASTFactory.falseLiteral()));
 
         Statement ifBody = new StatementBlock(
-                stmnt.toArray(new Statement[stmnt.size()]));
+            stmnt.toArray(new Statement[stmnt.size()]));
 
         if (loopLabel.isPresent()) {
             final Label label = loopLabel.get();
             ifBody = KeYJavaASTFactory.labeledStatement(label, ifBody,
-                    ifBody.getPositionInfo());
+                ifBody.getPositionInfo());
         }
 
         final Statement newIf = KeYJavaASTFactory
                 .ifThen(loop.getGuardExpression(), ifBody);
 
         final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
-                KeYJavaASTFactory.block(newIf));
+            KeYJavaASTFactory.block(newIf));
 
         // NOTE (important): The assignment of the initial value "true" for the
         // loop scope index variable is crucial here; otherwise, the handling of
@@ -358,32 +362,32 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // differs from Nathan Wasser's thesis and the paper on loop scope
         // invariants, where we instead use an artificial "continue" statement.
         // We wanted to get rid of this.
-        
+
         final StatementBlock newBlock = KeYJavaASTFactory
                 .block(KeYJavaASTFactory.declare(loopScopeIdxVar,
-                        KeYJavaASTFactory.trueLiteral()), loopScope);
+                    KeYJavaASTFactory.trueLiteral()), loopScope);
 
         final ProgramElement result = new ProgramElementReplacer(
-                origProg.program(), services).replace(stmtToReplace, newBlock);
+            origProg.program(), services).replace(stmtToReplace, newBlock);
 
         return result;
     }
 
     /**
      * Creates the {@link SequentFormula} for the "initially valid" goal.
-     * 
+     *
      * @param termLabelState
-     *            The {@link TermLabelState}.
+     *        The {@link TermLabelState}.
      * @param inst
-     *            The {@link Instantiation} for this rule application.
+     *        The {@link Instantiation} for this rule application.
      * @param invTerm
-     *            The invariant formula.
+     *        The invariant formula.
      * @param reachableState
-     *            The reachable state formula.
+     *        The reachable state formula.
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @param initGoal
-     *            The goal containing the "initially valid" PO.
+     *        The goal containing the "initially valid" PO.
      * @return The {@link SequentFormula} for the "initially valid" goal.
      */
     private SequentFormula initFormula(TermLabelState termLabelState,
@@ -393,7 +397,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null,
-                sfTerm, this, initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
+            sfTerm, this, initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
 
         return new SequentFormula(sfTerm);
     }
@@ -401,37 +405,37 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * Creates the actual formula by which the original formula containing the
      * loop is replaced in the "preserves and use case" branch.
-     * 
+     *
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @param inst
-     *            The {@link Instantiation} of parameters for the
-     *            {@link LoopScopeInvariantRule} app.
+     *        The {@link Instantiation} of parameters for the
+     *        {@link LoopScopeInvariantRule} app.
      * @param anonUpdate
-     *            The anonymized update {@link Term}.
+     *        The anonymized update {@link Term}.
      * @param loop
-     *            The original {@link While} loop that is going to be replaced.
+     *        The original {@link While} loop that is going to be replaced.
      * @param loopLabel
-     *            The {@link Label} before the {@link While} loop.
+     *        The {@link Label} before the {@link While} loop.
      * @param stmtToReplace
-     *            The {@link Statement} to replace (either a {@link While} loop
-     *            or a {@link LabeledStatement} including the {@link While}
-     *            loop).
+     *        The {@link Statement} to replace (either a {@link While} loop
+     *        or a {@link LabeledStatement} including the {@link While}
+     *        loop).
      * @param frameCondition
-     *            The frame condition formula.
+     *        The frame condition formula.
      * @param variantPO
-     *            The proof obligation for the variant.
+     *        The proof obligation for the variant.
      * @param termLabelState
-     *            The {@link TermLabelState}.
+     *        The {@link TermLabelState}.
      * @param presrvAndUCGoal
-     *            The {@link Goal} starting the new "preserves and use case"
-     *            branch.
+     *        The {@link Goal} starting the new "preserves and use case"
+     *        branch.
      * @param uBeforeLoopDefAnonVariant
-     *            An array containing the original update, the "before the loop"
-     *            update for reasoning about the variant, the anonymized update,
-     *            and the variant update.
+     *        An array containing the original update, the "before the loop"
+     *        update for reasoning about the variant, the anonymized update,
+     *        and the variant update.
      * @param invTerm
-     *            The loop invariant formula {@link Term}.
+     *        The loop invariant formula {@link Term}.
      * @return The formula by which the original formula containing the loop is
      *         replaced in the "preserves and use case" branch.
      */
@@ -446,8 +450,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
         fullInvariant = TermLabelManager.refactorTerm(termLabelState, services,
-                null, fullInvariant, this, presrvAndUCGoal,
-                FULL_INVARIANT_TERM_HINT, null);
+            null, fullInvariant, this, presrvAndUCGoal,
+            FULL_INVARIANT_TERM_HINT, null);
 
         final Term post = progPost.sub(0);
         final Modality modality = (Modality) progPost.op();
@@ -456,14 +460,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
 
         final ProgramElement newProg = newProgram(services, loop, loopLabel,
-                stmtToReplace, origJavaBlock, loopScopeIdxVar);
+            stmtToReplace, origJavaBlock, loopScopeIdxVar);
 
         final Term labeledIdxVar = tb.label(tb.var(loopScopeIdxVar),
-                ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);
+            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);
 
         final Term newPost = tb.and(
-                tb.imp(tb.equals(labeledIdxVar, tb.TRUE()), post),
-                tb.imp(tb.equals(labeledIdxVar, tb.FALSE()), fullInvariant));
+            tb.imp(tb.equals(labeledIdxVar, tb.TRUE()), post),
+            tb.imp(tb.equals(labeledIdxVar, tb.FALSE()), fullInvariant));
 
         final JavaBlock newJavaBlock = JavaBlock
                 .createJavaBlock((StatementBlock) newProg);
@@ -472,7 +476,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // in general; probably, something involving the TermLabelManager should
         // be used.
         final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
-                tb.prog(modality, newJavaBlock, newPost, progPost.getLabels()));
+            tb.prog(modality, newJavaBlock, newPost, progPost.getLabels()));
         return newFormula;
     }
 
@@ -480,11 +484,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * If the {@link While} loop has a loop label, returns this and the labeled
      * statement. Otherwise, returns an empty {@link Optional} and the given
      * loop statement.
-     * 
+     *
      * @param ruleApp
-     *            The current {@link RuleApp}.
+     *        The current {@link RuleApp}.
      * @param whileLoop
-     *            The {@link While} loop of interest.
+     *        The {@link While} loop of interest.
      * @return All the {@link Label}s before <code>whileLoop</code>.
      */
     private Pair<Optional<Label>, Statement> findLoopLabel(RuleApp ruleApp,

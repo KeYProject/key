@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.reference;
 
 import recoder.java.*;
@@ -12,7 +15,8 @@ import recoder.list.generic.ASTList;
  * @author <TT>AutoDoc</TT>
  */
 
-public class MethodReference extends JavaNonTerminalProgramElement implements MemberReference, ReferencePrefix,
+public class MethodReference extends JavaNonTerminalProgramElement
+        implements MemberReference, ReferencePrefix,
         ReferenceSuffix, ExpressionStatement, TypeReferenceContainer, NameReference {
 
     /**
@@ -84,7 +88,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
      * Method reference.
      *
      * @param accessPath a reference prefix.
-     * @param name       an identifier.
+     * @param name an identifier.
      */
 
     public MethodReference(ReferencePrefix accessPath, Identifier name) {
@@ -110,8 +114,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
      * Method reference.
      *
      * @param accessPath a reference prefix.
-     * @param name       an identifier.
-     * @param args       an expression mutable list.
+     * @param name an identifier.
+     * @param args an expression mutable list.
      */
 
     public MethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args) {
@@ -122,7 +126,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
     }
 
     public MethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args,
-                           ASTList<TypeArgumentDeclaration> typeArgs) {
+            ASTList<TypeArgumentDeclaration> typeArgs) {
         setReferencePrefix(accessPath);
         setIdentifier(name);
         setArguments(args);
@@ -184,7 +188,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
     }
 
     public SourceElement getFirstElement() {
-        return (accessPath == null) ? getChildAt(0).getFirstElement() : accessPath.getFirstElement();
+        return (accessPath == null) ? getChildAt(0).getFirstElement()
+                : accessPath.getFirstElement();
     }
 
     /**

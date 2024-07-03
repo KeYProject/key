@@ -1,11 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.init;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -21,13 +20,19 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 public abstract class AbstractProfile implements Profile {
     /**
-     * The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
+     * The default profile which is used if no profile is defined in custom problem files (loaded
+     * via {@link KeYUserProblemFile}).
      */
     private static Profile defaultProfile = JavaProfile.getDefaultInstance();
 
-    private final RuleCollection       standardRules;
+    private final RuleCollection standardRules;
 
     private final ImmutableSet<StrategyFactory> strategies;
 
@@ -38,14 +43,14 @@ public abstract class AbstractProfile implements Profile {
 
     private TermLabelManager termLabelManager;
 
-    private static
-        ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
+    private static ImmutableSet<String> extractNames(
+            ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
         ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
 
         final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
         while (it.hasNext()) {
-            result  = result.add(it.next().name());
+            result = result.add(it.next().name());
         }
 
         return result;
@@ -54,29 +59,30 @@ public abstract class AbstractProfile implements Profile {
     protected AbstractProfile(String standardRuleFilename) {
         standardRules = new RuleCollection(RuleSourceFactory
                 .fromDefaultLocation(standardRuleFilename),
-                initBuiltInRules());
+            initBuiltInRules());
         strategies = getStrategyFactories();
         this.supportedGCB = computeSupportedGoalChooserBuilder();
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
-        assert( this.prototype!=null );
+        assert (this.prototype != null);
         initTermLabelManager();
     }
-    
+
     protected ImmutableSet<GoalChooserBuilder> computeSupportedGoalChooserBuilder() {
-       return DefaultImmutableSet.<GoalChooserBuilder>nil().add(new DefaultGoalChooserBuilder())
-                                                           .add(new DepthFirstGoalChooserBuilder());
+        return DefaultImmutableSet.<GoalChooserBuilder>nil().add(new DefaultGoalChooserBuilder())
+                .add(new DepthFirstGoalChooserBuilder());
     }
 
     /**
      * Initializes the {@link TermLabelManager}.
      */
     protected void initTermLabelManager() {
-       this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
+        this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
     }
 
     /**
      * Computes the {@link TermLabelConfiguration} to use in this {@link Profile}.
+     *
      * @return The {@link TermLabelConfiguration} to use in this {@link Profile}.
      */
     protected abstract ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration();
@@ -92,17 +98,15 @@ public abstract class AbstractProfile implements Profile {
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
 
-	
-	//Collection<SMTRule> rules = SMTSettings.getInstance().getSMTRules();
-        
-	//for(SMTRule rule : rules){
-	  //  builtInRules = builtInRules.prepend(rule);  
-	//}     
-        
-     
-        
-        
-        
+
+        // Collection<SMTRule> rules = SMTSettings.getInstance().getSMTRules();
+
+        // for(SMTRule rule : rules){
+        // builtInRules = builtInRules.prepend(rule);
+        // }
+
+
+
         return builtInRules;
     }
 
@@ -130,44 +134,46 @@ public abstract class AbstractProfile implements Profile {
      * returns the names of the supported goal chooser
      * builders
      */
-     public ImmutableSet<String> supportedGoalChoosers() {
-         return supportedGC;
-     }
+    public ImmutableSet<String> supportedGoalChoosers() {
+        return supportedGC;
+    }
 
-     /**
-      * returns the default builder for a goal chooser
-      * @return this implementation returns a new instance of
-      * {@link DefaultGoalChooserBuilder}
-      */
-     public GoalChooserBuilder getDefaultGoalChooserBuilder() {
-         return new DefaultGoalChooserBuilder();
-     }
+    /**
+     * returns the default builder for a goal chooser
+     *
+     * @return this implementation returns a new instance of
+     *         {@link DefaultGoalChooserBuilder}
+     */
+    public GoalChooserBuilder getDefaultGoalChooserBuilder() {
+        return new DefaultGoalChooserBuilder();
+    }
 
-     /**
-      * sets the user selected goal chooser builder to be used as prototype
-      * @throws IllegalArgumentException if a goal chooser of the given name is not
-      *  supported
-      */
-     public void setSelectedGoalChooserBuilder(String name) {
+    /**
+     * sets the user selected goal chooser builder to be used as prototype
+     *
+     * @throws IllegalArgumentException if a goal chooser of the given name is not
+     *         supported
+     */
+    public void setSelectedGoalChooserBuilder(String name) {
 
-         this.prototype = lookupGC(name);
+        this.prototype = lookupGC(name);
 
-         if (this.prototype == null) {
-             throw new IllegalArgumentException("Goal chooser:" + name +
-                     " is not supported by this profile.");
-         }
-     }
+        if (this.prototype == null) {
+            throw new IllegalArgumentException("Goal chooser:" + name +
+                " is not supported by this profile.");
+        }
+    }
 
-     /**
-      * looks up the demanded goal chooser is supported and returns a
-      * new instance if possible otherwise <code>null</code> is returned
-      *
-      * @param name the String with the goal choosers name
-      * @return a new instance of the builder or <code>null</code> if the
-      * demanded chooser is not supported
-      */
-     public GoalChooserBuilder lookupGC(String name) {
-        final Iterator<GoalChooserBuilder> it  = supportedGCB.iterator();
+    /**
+     * looks up the demanded goal chooser is supported and returns a
+     * new instance if possible otherwise <code>null</code> is returned
+     *
+     * @param name the String with the goal choosers name
+     * @return a new instance of the builder or <code>null</code> if the
+     *         demanded chooser is not supported
+     */
+    public GoalChooserBuilder lookupGC(String name) {
+        final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
         while (it.hasNext()) {
             final GoalChooserBuilder supprotedGCB = it.next();
             if (supprotedGCB.name().equals(name)) {
@@ -178,58 +184,64 @@ public abstract class AbstractProfile implements Profile {
     }
 
     /**
-      * returns a copy of the selected goal chooser builder
-      */
-     public GoalChooserBuilder getSelectedGoalChooserBuilder(){
+     * returns a copy of the selected goal chooser builder
+     */
+    public GoalChooserBuilder getSelectedGoalChooserBuilder() {
         return prototype.copy();
-     }
+    }
 
-     /**
-      * any standard rule has is by default justified by an axiom rule
-      * justification
-      * @return the justification for the standard rules
-      */
-   @Override
-   public RuleJustification getJustification(Rule r) {
-      if (r instanceof Taclet) {
-         return ((Taclet) r).getRuleJustification();
-      }
-      else {
-         return AxiomJustification.INSTANCE;
-      }
-   }
-     
-     
-     @Override
-     public String getInternalClassDirectory() {
- 	return "";
-     }     
+    /**
+     * any standard rule has is by default justified by an axiom rule
+     * justification
+     *
+     * @return the justification for the standard rules
+     */
+    @Override
+    public RuleJustification getJustification(Rule r) {
+        if (r instanceof Taclet) {
+            return ((Taclet) r).getRuleJustification();
+        } else {
+            return AxiomJustification.INSTANCE;
+        }
+    }
 
 
-     @Override
-     public String getInternalClasslistFilename() {
-	 return "JAVALANG.TXT";
-     }
+    @Override
+    public String getInternalClassDirectory() {
+        return "";
+    }
 
-   /**
-    * Returns the default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
-    * @return The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
-    */
-   public static Profile getDefaultProfile() {
-      return defaultProfile;
-   }
 
-   /**
-    * Sets the default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
-    * @param defaultProfile The default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).
-    */
-   public static void setDefaultProfile(Profile defaultProfile) {
-      assert defaultProfile != null;
-      AbstractProfile.defaultProfile = defaultProfile;
-   }
+    @Override
+    public String getInternalClasslistFilename() {
+        return "JAVALANG.TXT";
+    }
 
-   @Override
-   public TermLabelManager getTermLabelManager() {
-       return termLabelManager;
-   }
+    /**
+     * Returns the default profile which is used if no profile is defined in custom problem files
+     * (loaded via {@link KeYUserProblemFile}).
+     *
+     * @return The default profile which is used if no profile is defined in custom problem files
+     *         (loaded via {@link KeYUserProblemFile}).
+     */
+    public static Profile getDefaultProfile() {
+        return defaultProfile;
+    }
+
+    /**
+     * Sets the default profile which is used if no profile is defined in custom problem files
+     * (loaded via {@link KeYUserProblemFile}).
+     *
+     * @param defaultProfile The default profile which is used if no profile is defined in custom
+     *        problem files (loaded via {@link KeYUserProblemFile}).
+     */
+    public static void setDefaultProfile(Profile defaultProfile) {
+        assert defaultProfile != null;
+        AbstractProfile.defaultProfile = defaultProfile;
+    }
+
+    @Override
+    public TermLabelManager getTermLabelManager() {
+        return termLabelManager;
+    }
 }

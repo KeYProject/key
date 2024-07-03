@@ -1,14 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
-
 import java.util.*;
-
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 
 /**
  * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
@@ -24,13 +25,14 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      */
     public static <T> Collector<T, Set<T>, ImmutableSet<T>> collector() {
         return Collector.of(
-                HashSet<T>::new,
-                (set, el) -> set.add(el),
-                (set1, set2) -> {
-                    set1.addAll(set2);
-                    return set1; },
-                ImmutableSet::<T>fromSet,
-                Characteristics.UNORDERED);
+            HashSet<T>::new,
+            (set, el) -> set.add(el),
+            (set1, set2) -> {
+                set1.addAll(set2);
+                return set1;
+            },
+            ImmutableSet::<T>fromSet,
+            Characteristics.UNORDERED);
     }
 
     /**
@@ -73,6 +75,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     /**
      * Adds an element
+     *
      * @return a set containing all elements of this one and the specified element.
      */
     ImmutableSet<T> add(T element);

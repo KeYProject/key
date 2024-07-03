@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.util.removegenerics;
 
@@ -5,24 +8,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class TestMultipleBounds extends ResolveGenericClass {
-    
+
     @BeforeEach
     protected void setUp() throws Exception {
         registerCU("package java.lang; class Object {}");
-        registerCU("class G<E> { E[][] array; E field; " + "E m() { return null; } " + "E[][] n() { return null; } } " + "class B { void mB() {} int attrB; }" 
-                + "class C { void mC() {} int attrC; }");
+        registerCU("class G<E> { E[][] array; E field; " + "E m() { return null; } "
+            + "E[][] n() { return null; } } " + "class B { void mB() {} int attrB; }"
+            + "class C { void mC() {} int attrC; }");
     }
 
     @Test
     public void testJLS1() throws Exception {
         String before = "interface I1 { void m1(); }\n" +
-            "interface I2 { void m2(); }\n" + 
+            "interface I2 { void m2(); }\n" +
             "class T { <T extends I1 & I2> void test(T t) {" +
             "t.m1(); t.m2(); } }";
         String after = "interface I1 { void m1(); }\n" +
-        "interface I2 { void m2(); }\n" + 
-        "class T { void test(I1 t) {" +
-        "t.m1(); ((I2) t).m2(); } }";
+            "interface I2 { void m2(); }\n" +
+            "class T { void test(I1 t) {" +
+            "t.m1(); ((I2) t).m2(); } }";
         equalCU(before, after);
     }
 
@@ -58,7 +62,7 @@ public class TestMultipleBounds extends ResolveGenericClass {
     public void testAsArguments() throws Exception {
         String before = "class A<E extends B&C> { abstract static void k(C c); E e; { k(e); } }";
         String after = "class A { abstract static void k(C c); B e; { k(((C)e)); }  }";
-        equalCU(before, after); 
+        equalCU(before, after);
     }
-    
+
 }

@@ -1,9 +1,7 @@
-/*
- * Created on 23.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.ModelException;
@@ -21,7 +19,8 @@ import recoder.list.generic.ASTList;
 /**
  * @author Tobias Gutzmann
  */
-public class TypeParameterDeclaration extends TypeDeclaration implements TypeReferenceContainer, TypeParameter {
+public class TypeParameterDeclaration extends TypeDeclaration
+        implements TypeReferenceContainer, TypeParameter {
 
     /**
      * serialization id
@@ -53,14 +52,18 @@ public class TypeParameterDeclaration extends TypeDeclaration implements TypeRef
         makeParentRoleValid();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceCount()
      */
     public int getTypeReferenceCount() {
         return bound == null ? 0 : bound.size();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
      */
     public TypeReference getTypeReferenceAt(int index) {
@@ -69,14 +72,18 @@ public class TypeParameterDeclaration extends TypeDeclaration implements TypeRef
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildCount()
      */
     public int getChildCount() {
         return (name != null ? 1 : 0) + (bound != null ? bound.size() : 0);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildAt(int)
      */
     public ProgramElement getChildAt(int index) {
@@ -91,21 +98,27 @@ public class TypeParameterDeclaration extends TypeDeclaration implements TypeRef
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
      */
     public int getChildPositionCode(ProgramElement child) {
-        // 0      : name
+        // 0 : name
         // 1(idx) : bound
-        if (child == name) return 0;
+        if (child == name)
+            return 0;
         int idx = bound.indexOf(child);
         if (idx != -1)
             return (idx << 4) | 1;
         return -1;
     }
 
-    /* (non-Javadoc)
-     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement, recoder.java.ProgramElement)
+    /*
+     * (non-Javadoc)
+     *
+     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement,
+     * recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null)
@@ -132,14 +145,18 @@ public class TypeParameterDeclaration extends TypeDeclaration implements TypeRef
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
         v.visitTypeParameter(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#deepClone()
      */
     public TypeParameterDeclaration deepClone() {
@@ -232,7 +249,8 @@ public class TypeParameterDeclaration extends TypeDeclaration implements TypeRef
     }
 
     @Override
-    public void addTypeToScope(@SuppressWarnings("unused") ClassType type, @SuppressWarnings("unused") String tname) {
+    public void addTypeToScope(@SuppressWarnings("unused") ClassType type,
+            @SuppressWarnings("unused") String tname) {
         throw new UnsupportedOperationException();
     }
 

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
@@ -17,7 +21,7 @@ public class ConstTermFeature implements TermFeature {
     }
 
     public static TermFeature createConst(RuleAppCost p_val) {
-        return new ConstTermFeature ( p_val );
+        return new ConstTermFeature(p_val);
     }
 
     private final RuleAppCost val;

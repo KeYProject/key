@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.mgt;
 
 
@@ -9,39 +13,38 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 
-public class RuleJustificationByAddRules implements RuleJustification{
+public class RuleJustificationByAddRules implements RuleJustification {
 
     private final Node node;
     private final boolean isAxiom;
 
     public RuleJustificationByAddRules(Node node, boolean isAxiom) {
         assert node != null;
-	this.node = node;
+        this.node = node;
         this.isAxiom = isAxiom;
     }
-    
+
     public boolean isAxiomJustification() {
-	return isAxiom;
+        return isAxiom;
     }
 
     public RuleApp motherTaclet() {
-	return node.getAppliedRuleApp();
+        return node.getAppliedRuleApp();
     }
 
     public String toString() {
-	String mother;
-	if(motherTaclet().rule() instanceof Taclet) {
-            LogicPrinter tacPrinter = new LogicPrinter 
-                (new ProgramPrinter(null),                       
-                 new NotationInfo(),   
-                 node.proof().getServices(),
-                 true);      
-            tacPrinter.printTaclet((Taclet)(motherTaclet().rule()));
+        String mother;
+        if (motherTaclet().rule() instanceof Taclet) {
+            LogicPrinter tacPrinter = new LogicPrinter(new ProgramPrinter(null),
+                new NotationInfo(),
+                node.proof().getServices(),
+                true);
+            tacPrinter.printTaclet((Taclet) (motherTaclet().rule()));
             mother = tacPrinter.toString();
-	} else {
-	    mother = motherTaclet().rule().name().toString();
-	}
-	return "added rule justification \nintroduced at node "
-                + node.serialNr() + " by rule \n" + mother;
+        } else {
+            mother = motherTaclet().rule().name().toString();
+        }
+        return "added rule justification \nintroduced at node "
+            + node.serialNr() + " by rule \n" + mother;
     }
 }

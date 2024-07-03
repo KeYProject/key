@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy;
 
 import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
@@ -13,6 +14,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A rule app manager that ensures that rules are only applied to a certain
@@ -38,9 +42,10 @@ public class FocussedBreakpointRuleApplicationManager
             Optional<String> breakpoint) {
         this(focussedSubterm
                 .map(pio -> new FocussedRuleApplicationManager(delegate, goal,
-                        pio))
+                    pio))
                 .map(AutomatedRuleApplicationManager.class::cast)
-                .orElse(delegate), breakpoint);
+                .orElse(delegate),
+            breakpoint);
 
         clearCache();
     }
@@ -58,7 +63,7 @@ public class FocussedBreakpointRuleApplicationManager
     @Override
     public Object clone() {
         return new FocussedBreakpointRuleApplicationManager(delegate.copy(),
-                breakpoint);
+            breakpoint);
     }
 
     @Override
@@ -88,7 +93,7 @@ public class FocussedBreakpointRuleApplicationManager
     public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
-                ImmutableSLList.<RuleApp> nil();
+            ImmutableSLList.<RuleApp>nil();
         for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
@@ -107,13 +112,13 @@ public class FocussedBreakpointRuleApplicationManager
                 || NodeInfo.isSymbolicExecution((Taclet) rule.rule()))
                 && isJavaPIO(pos)) {
             final SourceElement activeStmt = //
-                    JavaTools.getActiveStatement(pos.subTerm().javaBlock());
+                JavaTools.getActiveStatement(pos.subTerm().javaBlock());
             final String currStmtString = activeStmt.toString();
 
             if (currStmtString != null && //
                     (currStmtString.contains("{")
                             ? currStmtString.substring(0,
-                                    currStmtString.indexOf("{"))
+                                currStmtString.indexOf("{"))
                             : currStmtString).trim().equals(breakpoint.get())) {
                 return false;
             }

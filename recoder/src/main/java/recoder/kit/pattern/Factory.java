@@ -1,14 +1,17 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.pattern;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.DefaultConstructor;
 import recoder.java.declaration.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Factory implements DesignPattern {
 
@@ -100,7 +103,8 @@ public class Factory implements DesignPattern {
      */
     public void validate() throws ModelException {
         if (factoryMethods == null || factoryMethods.size() == 0) {
-            throw new InconsistentPatternException("Factories must contain at least one factory method");
+            throw new InconsistentPatternException(
+                "Factories must contain at least one factory method");
         }
         TypeDeclaration parent = null;
         for (int i = 0, s = factoryMethods.size(); i < s; i += 1) {
@@ -109,7 +113,8 @@ public class Factory implements DesignPattern {
             if (parent == null) {
                 parent = m.getProducer().getMemberParent();
             } else if (parent != m.getProducer().getMemberParent()) {
-                throw new InconsistentPatternException("Factory methods must be members of the same type");
+                throw new InconsistentPatternException(
+                    "Factory methods must be members of the same type");
             }
         }
     }

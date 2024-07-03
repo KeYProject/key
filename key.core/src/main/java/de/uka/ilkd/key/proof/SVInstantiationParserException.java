@@ -1,36 +1,40 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
 
-public class SVInstantiationParserException 
-    extends SVInstantiationExceptionWithPosition {
+public class SVInstantiationParserException
+        extends SVInstantiationExceptionWithPosition {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4411508672178909020L;
     private String instantiation;
     private String detail;
-         
-    public SVInstantiationParserException( String  instantiation, 
-					   int     row, 
-					   int     column,
-					   String  detail,
-					   boolean inIfSequent) {
-	super("Parser Error", row, column, inIfSequent);
-	this.instantiation   = instantiation;
-	this.detail = (detail == null) ? "" : detail;
+
+    public SVInstantiationParserException(String instantiation,
+            int row,
+            int column,
+            String detail,
+            boolean inIfSequent) {
+        super("Parser Error", row, column, inIfSequent);
+        this.instantiation = instantiation;
+        this.detail = (detail == null) ? "" : detail;
     }
-    
+
     private String space(int i) {
-	StringBuffer res=new StringBuffer();
-	for (int j=0; j<i; j++) {
-	    res.append(" ");
-	}
-	return res.toString();
+        StringBuffer res = new StringBuffer();
+        for (int j = 0; j < i; j++) {
+            res.append(" ");
+        }
+        return res.toString();
     }
 
-    public String getMessage () {
+    public String getMessage() {
 
-        int column    = getColumn();
+        int column = getColumn();
 
         String errmsg = super.getMessage();
         // needs non-prop font: errmsg +="\n"+inst;

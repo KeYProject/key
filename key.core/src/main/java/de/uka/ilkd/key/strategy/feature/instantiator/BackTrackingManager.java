@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -27,19 +31,19 @@ public final class BackTrackingManager {
      * the changes that can possibly be applied by <code>ChoicePoint</code>s
      */
     private RuleApp initialApp = null;
-    
+
     /**
      * Stack of <code>Iterator<CPBranch></code>: the branches of
      * <code>ChoicePoint</code>s that have not yet been taken, the branches
      * of later points being further up in the stack
      */
-    private final Stack<Iterator<CPBranch>> choices = new Stack<Iterator<CPBranch>> ();
-    
+    private final Stack<Iterator<CPBranch>> choices = new Stack<Iterator<CPBranch>>();
+
     /**
      * List of <code>CPBranch</code>: the branches that are taken in the
      * current evaluation run
      */
-    private final ArrayList<CPBranch> chosenBranches = new ArrayList<CPBranch> ();
+    private final ArrayList<CPBranch> chosenBranches = new ArrayList<CPBranch>();
 
     /**
      * The position within <code>choices</code> during the current evaluation
@@ -52,123 +56,123 @@ public final class BackTrackingManager {
      * Method that has to be invoked by each feature that represents a choice
      * point, each time the feature is invoked during evaluation of the feature
      * term
-     * 
+     *
      * @param cp
-     *            the <code>ChoicePoint</code> in question (which does not
-     *            have to be the same object as the feature, and which does not
-     *            have to be the same object over different evaluations of the
-     *            feature term)
+     *        the <code>ChoicePoint</code> in question (which does not
+     *        have to be the same object as the feature, and which does not
+     *        have to be the same object over different evaluations of the
+     *        feature term)
      * @param ticket
-     *            a unique object (as unique as possible) that has to be
-     *            provided by the feature in order to ensure that the same
-     *            sequence of choice points occurs during the next evaluation
-     *            run (after backtracking). The <code>ticket</code> must not
-     *            change between two evaluation runs of the feature term
+     *        a unique object (as unique as possible) that has to be
+     *        provided by the feature in order to ensure that the same
+     *        sequence of choice points occurs during the next evaluation
+     *        run (after backtracking). The <code>ticket</code> must not
+     *        change between two evaluation runs of the feature term
      */
     public void passChoicePoint(ChoicePoint cp, Object ticket) {
         assert initialApp != null;
-        assertValidTicket ( ticket );
-        assert chosenBranches.size () == choices.size ();
+        assertValidTicket(ticket);
+        assert chosenBranches.size() == choices.size();
 
-        if ( position == choices.size() ) {
+        if (position == choices.size()) {
             // phase where we have to ask the choice-points for possibilities
-            addChoicePoint ( cp );
+            addChoicePoint(cp);
         } else {
-            assert choices.size () > position;
+            assert choices.size() > position;
             // phase where we have to "replay" choices that have already
             // been made
-            chosenBranches.get ( position ).choose ();
+            chosenBranches.get(position).choose();
         }
-        
+
         ++position;
-        
+
     }
 
     /**
      * Method that has to be called before a sequence of evaluation runs of a
      * feature term.
-     * 
+     *
      * @param initialApp
-     *            the original rule application in question
+     *        the original rule application in question
      */
     public void setup(RuleApp initialApp) {
         this.initialApp = initialApp;
-        choices.clear ();
-        chosenBranches.clear ();
-        tickets.clear ();
+        choices.clear();
+        chosenBranches.clear();
+        tickets.clear();
         position = 0;
     }
-    
+
     /**
      * In the end of an evaluation run of a feature term, this method has to be
      * called for checking whether it is possible to backtrack and whether a
      * further evaluation run is necessary
-     * 
+     *
      * @return <code>true</code> iff there are paths left to explore, i.e., if
      *         evaluation should run a further time
      */
     public boolean backtrack() {
         position = 0;
 
-        while ( !choices.isEmpty () ) {
-            final Iterator<CPBranch> chs = choices.pop ();
-            chosenBranches.remove ( chosenBranches.size () - 1 );
+        while (!choices.isEmpty()) {
+            final Iterator<CPBranch> chs = choices.pop();
+            chosenBranches.remove(chosenBranches.size() - 1);
 
-            if ( chs.hasNext () ) {
-                pushChoices ( chs, chs.next () );
+            if (chs.hasNext()) {
+                pushChoices(chs, chs.next());
                 return true;
             }
 
-            tickets.remove ( tickets.size () - 1 );
+            tickets.remove(tickets.size() - 1);
         }
 
         // make sure that no further choicepoints occur until <code>setup</code>
         // is invoked the next time
-        setup ( null );
-        
+        setup(null);
+
         return false;
     }
-    
+
     /**
      * @return the resulting rule application when all choice points have
      *         applied their modifications
      */
     public RuleApp getResultingapp() {
-        return getOldRuleApp ();
+        return getOldRuleApp();
     }
 
     private void pushChoices(Iterator<CPBranch> remainingChoices,
-                             CPBranch chosen) {
-        choices.push ( remainingChoices );
-        chosenBranches.add ( chosen );
+            CPBranch chosen) {
+        choices.push(remainingChoices);
+        chosenBranches.add(chosen);
     }
 
     private void addChoicePoint(ChoicePoint cp) {
-        final RuleApp oldApp = getOldRuleApp ();
-        if ( oldApp == null ) {
+        final RuleApp oldApp = getOldRuleApp();
+        if (oldApp == null) {
             // This means that an earlier <code>ChoicePoint</code> did not have
             // any branches. It is necessary to backtrack and to choose a
             // different branch for one of the <code>ChoicePoint</code>s before
             // the failing <code>ChoicePoint</code>, but first we have to finish
             // the current evaluation run of the feature term
-            cancelChoicePoint ();
+            cancelChoicePoint();
             return;
         }
 
-        final Iterator<CPBranch> chs = cp.getBranches ( oldApp );
-        if ( !chs.hasNext () ) {
+        final Iterator<CPBranch> chs = cp.getBranches(oldApp);
+        if (!chs.hasNext()) {
             // This <code>ChoicePoint</code> does not have any branches
-            cancelChoicePoint ();
+            cancelChoicePoint();
             return;
         }
 
-        final CPBranch chosen = chs.next ();
-        pushChoices ( chs, chosen );
-        chosen.choose ();
+        final CPBranch chosen = chs.next();
+        pushChoices(chs, chosen);
+        chosen.choose();
     }
 
     private void cancelChoicePoint() {
-        pushChoices ( ImmutableSLList.<CPBranch>nil().iterator (), null );
+        pushChoices(ImmutableSLList.<CPBranch>nil().iterator(), null);
     }
 
 
@@ -178,22 +182,24 @@ public final class BackTrackingManager {
      * a feature term is repeated. This is a simple runtime measure for ensuring
      * that the feature evaluation is deterministic
      */
-    private final ArrayList<Object> tickets = new ArrayList<Object> ();    
+    private final ArrayList<Object> tickets = new ArrayList<Object>();
 
     private void assertValidTicket(Object ticket) {
-        if ( tickets.size () > position ) {
-            assert tickets.get ( position ) == ticket;
+        if (tickets.size() > position) {
+            assert tickets.get(position) == ticket;
         } else {
-            assert tickets.size () == position;
-            tickets.add ( ticket );
+            assert tickets.size() == position;
+            tickets.add(ticket);
         }
     }
-    
+
     private RuleApp getOldRuleApp() {
-        if ( chosenBranches.isEmpty () ) return initialApp;
-        final CPBranch branch = chosenBranches.get ( position - 1 );
-        if ( branch == null ) return null;
-        return branch.getRuleAppForBranch ();
+        if (chosenBranches.isEmpty())
+            return initialApp;
+        final CPBranch branch = chosenBranches.get(position - 1);
+        if (branch == null)
+            return null;
+        return branch.getRuleAppForBranch();
     }
 
 }

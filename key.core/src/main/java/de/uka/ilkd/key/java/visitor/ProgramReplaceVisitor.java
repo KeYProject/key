@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.java.visitor;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -12,6 +13,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to
@@ -27,11 +31,11 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
      * create the ProgramReplaceVisitor
      *
      * @param root
-     *            the ProgramElement where to begin
+     *        the ProgramElement where to begin
      * @param services
-     *            The Services object.
+     *        The Services object.
      * @param svi
-     *            Schema Variable Instantiations
+     *        Schema Variable Instantiations
      */
     public ProgramReplaceVisitor(ProgramElement root, Services services,
             SVInstantiations svi) {
@@ -102,7 +106,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         } else {
             throw new IllegalStateException(
                 "programreplacevisitor: Instantiation missing "
-                        + "for schema variable " + sv);
+                    + "for schema variable " + sv);
         }
         changed();
     }
@@ -121,7 +125,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         assert body != null : "A program transformer without program to transform?";
 
         final ProgramElement[] transformResult = //
-                x.transform(body, services, svinsts);
+            x.transform(body, services, svinsts);
         if (transformResult == null) {
             /*
              * NOTE (DS, 2018-10-19): This is awkward... But there are

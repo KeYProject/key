@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
@@ -17,46 +21,46 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class AllowedCutPositionsGenerator implements TermGenerator {
 
-    private AllowedCutPositionsGenerator () {}
-    
-    public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator ();
-    
+    private AllowedCutPositionsGenerator() {}
+
+    public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator();
+
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return new ACPIterator ( pos.sequentFormula ().formula (),
-                              pos.isInAntec () );
+        return new ACPIterator(pos.sequentFormula().formula(),
+            pos.isInAntec());
     }
 
     private static class ACPIterator implements Iterator<Term> {
-        private final Stack<Object> termStack = new Stack<Object> (); 
+        private final Stack<Object> termStack = new Stack<Object>();
 
         public ACPIterator(Term t, boolean negated) {
-            push ( t, negated );
+            push(t, negated);
         }
 
         private void push(Term t, boolean negated) {
-            termStack.push ( t );
-            termStack.push ( Boolean.valueOf ( negated ) );
+            termStack.push(t);
+            termStack.push(Boolean.valueOf(negated));
         }
 
         public boolean hasNext() {
-            return !termStack.isEmpty ();
+            return !termStack.isEmpty();
         }
 
         public Term next() {
-            final boolean negated = ( (Boolean)termStack.pop () ).booleanValue ();
-            final Term res = (Term)termStack.pop ();
-            final Operator op = res.op ();
-            
-            if ( op == Junctor.NOT ) {
-                push ( res.sub ( 0 ), !negated );
-            } else if ( op == ( negated ? Junctor.OR : Junctor.AND ) ) {
-                push ( res.sub ( 0 ), negated );
-                push ( res.sub ( 1 ), negated );
-            } else if ( negated && op == Junctor.IMP ) {
-                push ( res.sub ( 0 ), !negated );
-                push ( res.sub ( 1 ), negated );
+            final boolean negated = ((Boolean) termStack.pop()).booleanValue();
+            final Term res = (Term) termStack.pop();
+            final Operator op = res.op();
+
+            if (op == Junctor.NOT) {
+                push(res.sub(0), !negated);
+            } else if (op == (negated ? Junctor.OR : Junctor.AND)) {
+                push(res.sub(0), negated);
+                push(res.sub(1), negated);
+            } else if (negated && op == Junctor.IMP) {
+                push(res.sub(0), !negated);
+                push(res.sub(1), negated);
             }
-            
+
             return res;
         }
 

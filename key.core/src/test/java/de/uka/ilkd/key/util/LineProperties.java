@@ -1,8 +1,6 @@
-/*
- * This file is part of DIVE.
- *
- * Copyright (C) 2015-2019 Karlsruhe Institute of Technology
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.util;
 
@@ -46,7 +44,7 @@ public class LineProperties {
 
         while ((line = br.readLine()) != null) {
             if (line.startsWith("###")) {
-                if(lastKey != null) {
+                if (lastKey != null) {
                     String str = sb.toString().trim();
                     if (str.length() > 0) {
                         map.put(lastKey, str);
@@ -55,7 +53,7 @@ public class LineProperties {
                 sb.setLength(0);
 
                 lastKey = line.substring(3).trim();
-                if(lastKey.endsWith(":")) {
+                if (lastKey.endsWith(":")) {
                     lastKey = lastKey.substring(0, lastKey.length() - 1);
                 }
             } else {
@@ -63,7 +61,7 @@ public class LineProperties {
             }
         }
 
-        if(lastKey != null) {
+        if (lastKey != null) {
             String str = sb.toString().trim();
             if (str.length() > 0) {
                 map.put(lastKey, str);

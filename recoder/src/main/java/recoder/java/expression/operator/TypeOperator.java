@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.expression.operator;
 
 import recoder.java.Expression;
@@ -31,7 +34,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * Type operator.
      *
      * @param unaryChild an expression.
-     * @param typeref    a type reference.
+     * @param typeref a type reference.
      */
     public TypeOperator(Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
@@ -41,8 +44,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Type operator.
      *
-     * @param lhs     an expression.
-     * @param rhs     an expression.
+     * @param lhs an expression.
+     * @param rhs an expression.
      * @param typeref a type reference.
      */
     public TypeOperator(Expression lhs, Expression rhs, TypeReference typeref) {

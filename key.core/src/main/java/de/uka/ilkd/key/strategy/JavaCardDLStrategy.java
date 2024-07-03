@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.java.Services;
@@ -83,17 +87,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
     protected JavaCardDLStrategy(Proof proof,
-                                 StrategyProperties strategyProperties) {
+            StrategyProperties strategyProperties) {
 
         super(proof);
         heapLDT = getServices().getTypeConverter().getHeapLDT();
 
         this.strategyProperties =
-                (StrategyProperties) strategyProperties.clone();
+            (StrategyProperties) strategyProperties.clone();
 
         this.tf =
-                new ArithTermFeatures(getServices().getTypeConverter()
-                        .getIntegerLDT());
+            new ArithTermFeatures(getServices().getTypeConverter()
+                    .getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
         this.vf = new ValueTermFeature(op(heapLDT.getNull()));
 
@@ -117,12 +121,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     protected Feature setupGlobalF(Feature dispatcher) {
         final Feature ifMatchedF =
-                ifZero(MatchedIfFeature.INSTANCE, longConst(+1));
+            ifZero(MatchedIfFeature.INSTANCE, longConst(+1));
 
         final Feature methodSpecF;
         final String methProp =
-                strategyProperties
-                        .getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
         if (methProp.equals(StrategyProperties.METHOD_CONTRACT)) {
             methodSpecF = methodSpecFeature(longConst(-20));
         } else if (methProp.equals(StrategyProperties.METHOD_EXPAND)) {
@@ -135,8 +139,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
 
         final String queryProp =
-                strategyProperties
-                        .getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
         if (queryProp.equals(StrategyProperties.QUERY_ON)) {
             queryF = querySpecFeature(new QueryExpandCost(200, 1, 1, false));
@@ -153,18 +157,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Feature depSpecF;
         final String depProp =
-                strategyProperties
-                        .getProperty(StrategyProperties.DEP_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.DEP_OPTIONS_KEY);
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
             depSpecF =
-                    ConditionalFeature.createConditional(depFilter,
-                            longConst(250));
+                ConditionalFeature.createConditional(depFilter,
+                    longConst(250));
         } else {
             depSpecF =
-                    ConditionalFeature.createConditional(depFilter,
-                            inftyConst());
+                ConditionalFeature.createConditional(depFilter,
+                    inftyConst());
         }
 
         // NOTE (DS, 2019-04-10): The new loop-scope based rules are realized
@@ -172,15 +176,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // down in this class.
         Feature loopInvF;
         final String loopProp =
-                strategyProperties
-                        .getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
         if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
             loopInvF = loopInvFeature(longConst(0));
-        /* NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule
-         * since we now have the loop scope taclets which are based on the
-         * same theory, but offer several advantages. */
-        //} else if (loopProp.equals(StrategyProperties.LOOP_SCOPE_INVARIANT)) {
-        //    loopInvF = loopInvFeature(inftyConst(), longConst(0));
+            /*
+             * NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule
+             * since we now have the loop scope taclets which are based on the
+             * same theory, but offer several advantages.
+             */
+            // } else if (loopProp.equals(StrategyProperties.LOOP_SCOPE_INVARIANT)) {
+            // loopInvF = loopInvFeature(inftyConst(), longConst(0));
         } else {
             loopInvF = loopInvFeature(inftyConst());
         }
@@ -189,8 +195,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature loopBlockFeature;
         final Feature loopBlockApplyHeadFeature;
         final String blockProperty =
-                strategyProperties
-                        .getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
         if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_INTERNAL)) {
             blockFeature = blockContractInternalFeature(longConst(Long.MIN_VALUE));
             loopBlockFeature = loopContractInternalFeature(longConst(Long.MIN_VALUE));
@@ -198,8 +204,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_EXTERNAL)) {
             blockFeature = blockContractExternalFeature(longConst(Long.MIN_VALUE));
             loopBlockFeature = SumFeature.createSum(
-                    loopContractExternalFeature(longConst(Long.MIN_VALUE)),
-                    loopContractInternalFeature(longConst(42)));
+                loopContractExternalFeature(longConst(Long.MIN_VALUE)),
+                loopContractInternalFeature(longConst(42)));
             loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
         } else {
             blockFeature = blockContractInternalFeature(inftyConst());
@@ -208,12 +214,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
 
         final Feature oneStepSimplificationF =
-                oneStepSimplificationFeature(longConst(-11000));
+            oneStepSimplificationFeature(longConst(-11000));
 
         final Feature mergeRuleF;
         final String mpsProperty =
-                strategyProperties
-                        .getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.MPS_OPTIONS_KEY);
         if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
             mergeRuleF = mergeRuleFeature(longConst(-4000));
         } else {
@@ -223,15 +229,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // final Feature smtF = smtFeature(inftyConst());
 
         return SumFeature.createSum(
-                AutomatedRuleFeature.INSTANCE,
-                NonDuplicateAppFeature.INSTANCE,
-                // splitF,
-                // strengthenConstraints,
-                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
-                // smtF,
-                methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
-                loopBlockApplyHeadFeature,
-                ifMatchedF, dispatcher);
+            AutomatedRuleFeature.INSTANCE,
+            NonDuplicateAppFeature.INSTANCE,
+            // splitF,
+            // strengthenConstraints,
+            AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
+            // smtF,
+            methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
+            loopBlockApplyHeadFeature,
+            ifMatchedF, dispatcher);
     }
 
     private Feature oneStepSimplificationFeature(Feature cost) {
@@ -251,9 +257,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private RuleSetDispatchFeature setupCostComputationF() {
         final IntegerLDT numbers =
-                getServices().getTypeConverter().getIntegerLDT();
+            getServices().getTypeConverter().getIntegerLDT();
         final LocSetLDT locSetLDT =
-                getServices().getTypeConverter().getLocSetLDT();
+            getServices().getTypeConverter().getLocSetLDT();
 
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
@@ -266,10 +272,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "simplify_boolean", -200);
 
         bindRuleSet(
-                d,
-                "concrete",
-                add(longConst(-11000), ScaleFeature.createScaled(
-                        FindDepthFeature.INSTANCE, 10.0)));
+            d,
+            "concrete",
+            add(longConst(-11000), ScaleFeature.createScaled(
+                FindDepthFeature.INSTANCE, 10.0)));
         bindRuleSet(d, "simplify", -4500);
         bindRuleSet(d, "simplify_enlarging", -2000);
         bindRuleSet(d, "simplify_ENLARGING", -1900);
@@ -278,12 +284,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "simplify_int", inftyConst());
 
         bindRuleSet(
-                d,
-                "javaIntegerSemantics",
-                ifZero(sequentContainsNoPrograms(),
-                        longConst(-5000),
-                        ifZero(leq(CountBranchFeature.INSTANCE, longConst(1)),
-                                longConst(-5000), inftyConst())));
+            d,
+            "javaIntegerSemantics",
+            ifZero(sequentContainsNoPrograms(),
+                longConst(-5000),
+                ifZero(leq(CountBranchFeature.INSTANCE, longConst(1)),
+                    longConst(-5000), inftyConst())));
 
         // always give infinite cost to obsolete rules
         bindRuleSet(d, "obsolete", inftyConst());
@@ -294,28 +300,28 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupSelectSimplification(d);
 
         bindRuleSet(
-                d,
-                "no_self_application",
-                ifZero(MatchedIfFeature.INSTANCE,
-                        NoSelfApplicationFeature.INSTANCE));
+            d,
+            "no_self_application",
+            ifZero(MatchedIfFeature.INSTANCE,
+                NoSelfApplicationFeature.INSTANCE));
 
         bindRuleSet(
-                d,
-                "find_term_not_in_assumes",
-                ifZero(MatchedIfFeature.INSTANCE,
-                        not(contains(AssumptionProjection.create(0),
-                                FocusProjection.INSTANCE))));
+            d,
+            "find_term_not_in_assumes",
+            ifZero(MatchedIfFeature.INSTANCE,
+                not(contains(AssumptionProjection.create(0),
+                    FocusProjection.INSTANCE))));
 
         bindRuleSet(
-                d,
-                "update_elim",
-                add(longConst(-8000), ScaleFeature.createScaled(
-                        FindDepthFeature.INSTANCE, 10.0)));
+            d,
+            "update_elim",
+            add(longConst(-8000), ScaleFeature.createScaled(
+                FindDepthFeature.INSTANCE, 10.0)));
         bindRuleSet(
-                d,
-                "update_apply_on_update",
-                add(longConst(-7000), ScaleFeature.createScaled(
-                        FindDepthFeature.INSTANCE, 10.0)));
+            d,
+            "update_apply_on_update",
+            add(longConst(-7000), ScaleFeature.createScaled(
+                FindDepthFeature.INSTANCE, 10.0)));
         bindRuleSet(d, "update_join", -4600);
         bindRuleSet(d, "update_apply", -4500);
 
@@ -329,106 +335,106 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "test_gen_quan_num", inftyConst());
 
         bindRuleSet(
-                d,
-                "gamma",
-                add(not(isInstantiated("t")),
-                        ifZero(allowQuantifierSplitting(), longConst(0),
-                                longConst(50))));
+            d,
+            "gamma",
+            add(not(isInstantiated("t")),
+                ifZero(allowQuantifierSplitting(), longConst(0),
+                    longConst(50))));
         bindRuleSet(d, "gamma_destructive", inftyConst());
 
         bindRuleSet(d, "triggered",
-                add(not(isTriggerVariableInstantiated()), longConst(500)));
+            add(not(isTriggerVariableInstantiated()), longConst(500)));
 
         bindRuleSet(
-                d,
-                "comprehension_split",
-                add(applyTF(FocusFormulaProjection.INSTANCE,
-                        ff.notContainsExecutable),
-                        ifZero(allowQuantifierSplitting(), longConst(2500),
-                                longConst(5000))));
+            d,
+            "comprehension_split",
+            add(applyTF(FocusFormulaProjection.INSTANCE,
+                ff.notContainsExecutable),
+                ifZero(allowQuantifierSplitting(), longConst(2500),
+                    longConst(5000))));
 
         setupReplaceKnown(d);
 
         bindRuleSet(
-                d,
-                "confluence_restricted",
-                ifZero(MatchedIfFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE));
+            d,
+            "confluence_restricted",
+            ifZero(MatchedIfFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE));
 
         setupApplyEq(d, numbers);
 
         bindRuleSet(
-                d,
-                "insert_eq_nonrigid",
-                applyTF(FocusProjection.create(0),
-                        IsNonRigidTermFeature.INSTANCE));
+            d,
+            "insert_eq_nonrigid",
+            applyTF(FocusProjection.create(0),
+                IsNonRigidTermFeature.INSTANCE));
 
         bindRuleSet(
-                d,
-                "order_terms",
-                add(ifZero(
-                        applyTF("commEqLeft", tf.intF),
-                        add(applyTF("commEqRight", tf.monomial),
-                                applyTF("commEqLeft", tf.polynomial),
-                                monSmallerThan("commEqLeft", "commEqRight",
-                                        numbers)),
-                        termSmallerThan("commEqLeft", "commEqRight")),
-                        longConst(-5000)));
+            d,
+            "order_terms",
+            add(ifZero(
+                applyTF("commEqLeft", tf.intF),
+                add(applyTF("commEqRight", tf.monomial),
+                    applyTF("commEqLeft", tf.polynomial),
+                    monSmallerThan("commEqLeft", "commEqRight",
+                        numbers)),
+                termSmallerThan("commEqLeft", "commEqRight")),
+                longConst(-5000)));
 
         bindRuleSet(d, "simplify_literals",
-        // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
-        // longConst ( 0 ),
-                longConst(-8000));
+            // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
+            // longConst ( 0 ),
+            longConst(-8000));
 
         bindRuleSet(d, "simplify_instanceof_static",
-                add(EqNonDuplicateAppFeature.INSTANCE, longConst(-500)));
+            add(EqNonDuplicateAppFeature.INSTANCE, longConst(-500)));
 
         bindRuleSet(
-                d,
-                "comprehensions",
-                add(NonDuplicateAppModPositionFeature.INSTANCE,
-                        longConst(-50)));
+            d,
+            "comprehensions",
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(-50)));
 
         bindRuleSet(
-                d,
-                "comprehensions_high_costs",
-                add(NonDuplicateAppModPositionFeature.INSTANCE,
-                        longConst(10000)));
+            d,
+            "comprehensions_high_costs",
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(10000)));
 
         bindRuleSet(
-                d,
-                "comprehensions_low_costs",
-                add(NonDuplicateAppModPositionFeature.INSTANCE,
-                        longConst(-5000)));
+            d,
+            "comprehensions_low_costs",
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(-5000)));
 
         bindRuleSet(d, "evaluate_instanceof", longConst(-500));
 
         bindRuleSet(d, "instanceof_to_exists", TopLevelFindFeature.ANTEC);
 
         bindRuleSet(d, "try_apply_subst",
-                add(EqNonDuplicateAppFeature.INSTANCE, longConst(-10000)));
+            add(EqNonDuplicateAppFeature.INSTANCE, longConst(-10000)));
 
         final TermBuffer superFor = new TermBuffer();
         bindRuleSet(
-                d,
-                "split_if",
-                add(sum(superFor,
-                        SuperTermGenerator.upwards(any(), getServices()),
-                        applyTF(superFor, not(ff.program))), longConst(50)));
+            d,
+            "split_if",
+            add(sum(superFor,
+                SuperTermGenerator.upwards(any(), getServices()),
+                applyTF(superFor, not(ff.program))), longConst(50)));
 
         final String[] exceptionsWithPenalty =
-                new String[] {"java.lang.NullPointerException",
-                              "java.lang.ArrayIndexOutOfBoundsException",
-                              "java.lang.ArrayStoreException",
-                              "java.lang.ClassCastException"};
+            new String[] { "java.lang.NullPointerException",
+                "java.lang.ArrayIndexOutOfBoundsException",
+                "java.lang.ArrayStoreException",
+                "java.lang.ClassCastException" };
 
         bindRuleSet(
-                d,
-                "simplify_prog",
-                ifZero(ThrownExceptionFeature.create(exceptionsWithPenalty,
-                        getServices()),
-                        longConst(500),
-                        ifZero(isBelow(add(ff.forF, not(ff.atom))),
-                                longConst(200), longConst(-100))));
+            d,
+            "simplify_prog",
+            ifZero(ThrownExceptionFeature.create(exceptionsWithPenalty,
+                getServices()),
+                longConst(500),
+                ifZero(isBelow(add(ff.forF, not(ff.atom))),
+                    longConst(200), longConst(-100))));
 
         bindRuleSet(d, "simplify_prog_subset", longConst(-4000));
         bindRuleSet(d, "modal_tautology", longConst(-10000));
@@ -436,17 +442,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // features influenced by the strategy options
 
         boolean useLoopExpand =
-                strategyProperties.getProperty(
-                        StrategyProperties.LOOP_OPTIONS_KEY).equals(
-                        StrategyProperties.LOOP_EXPAND);
+            strategyProperties.getProperty(
+                StrategyProperties.LOOP_OPTIONS_KEY).equals(
+                    StrategyProperties.LOOP_EXPAND);
         boolean useLoopInvTaclets =
-                strategyProperties.getProperty(
-                        StrategyProperties.LOOP_OPTIONS_KEY).equals(
-                        StrategyProperties.LOOP_SCOPE_INV_TACLET);
+            strategyProperties.getProperty(
+                StrategyProperties.LOOP_OPTIONS_KEY).equals(
+                    StrategyProperties.LOOP_SCOPE_INV_TACLET);
         boolean useLoopScopeExpand =
-                strategyProperties.getProperty(
-                        StrategyProperties.LOOP_OPTIONS_KEY).equals(
-                        StrategyProperties.LOOP_SCOPE_EXPAND);
+            strategyProperties.getProperty(
+                StrategyProperties.LOOP_OPTIONS_KEY).equals(
+                    StrategyProperties.LOOP_SCOPE_EXPAND);
         /*
          * boolean useBlockExpand = strategyProperties.getProperty(
          * StrategyProperties.BLOCK_OPTIONS_KEY).
@@ -455,8 +461,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean programsToRight = true; // XXX
 
         final String methProp =
-                strategyProperties
-                        .getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
 
         switch (methProp) {
         case StrategyProperties.METHOD_CONTRACT:
@@ -476,12 +482,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             break;
         default:
             throw new RuntimeException("Unexpected strategy property "
-                    + methProp);
+                + methProp);
         }
 
         final String mpsProp =
-                strategyProperties
-                        .getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.MPS_OPTIONS_KEY);
 
         switch (mpsProp) {
         case StrategyProperties.MPS_MERGE:
@@ -499,13 +505,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             break;
         default:
             throw new RuntimeException("Unexpected strategy property "
-                    + methProp);
+                + methProp);
         }
 
 
         final String queryAxProp =
-                strategyProperties
-                        .getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
         switch (queryAxProp) {
         case StrategyProperties.QUERYAXIOM_ON:
             bindRuleSet(d, "query_axiom", longConst(-3000));
@@ -515,7 +521,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             break;
         default:
             throw new RuntimeException("Unexpected strategy property "
-                    + queryAxProp);
+                + queryAxProp);
         }
 
         if (classAxiomApplicationEnabled()) {
@@ -527,9 +533,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "loop_expand", useLoopExpand ? longConst(0)
                 : inftyConst());
         bindRuleSet(d, "loop_scope_inv_taclet",
-                useLoopInvTaclets ? longConst(0) : inftyConst());
+            useLoopInvTaclets ? longConst(0) : inftyConst());
         bindRuleSet(d, "loop_scope_expand",
-                useLoopScopeExpand ? longConst(1000) : inftyConst());
+            useLoopScopeExpand ? longConst(1000) : inftyConst());
 
         /*
          * bindRuleSet ( d, "block_expand", useBlockExpand ? longConst ( 0 ) :
@@ -538,42 +544,40 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         // delete cast
         bindRuleSet(
-                d,
-                "cast_deletion",
-                ifZero(implicitCastNecessary(instOf("castedTerm")),
-                        longConst(-5000), inftyConst()));
+            d,
+            "cast_deletion",
+            ifZero(implicitCastNecessary(instOf("castedTerm")),
+                longConst(-5000), inftyConst()));
 
         bindRuleSet(d, "type_hierarchy_def", -6500);
 
         // partial inv axiom
         bindRuleSet(
-                d,
-                "partialInvAxiom",
-                add(NonDuplicateAppModPositionFeature.INSTANCE,
-                        longConst(10000)));
+            d,
+            "partialInvAxiom",
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(10000)));
 
         // inReachableState
         bindRuleSet(d, "inReachableStateImplication",
-                add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(100)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(100)));
 
         // limit observer (must have better priority than "classAxiom")
         bindRuleSet(
-                d,
-                "limitObserver",
-                add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-200)));
+            d,
+            "limitObserver",
+            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-200)));
 
         if (programsToRight) {
             bindRuleSet(
-                    d,
-                    "boxDiamondConv",
-                    SumFeature
-                            .createSum(
-                                    new FindPrefixRestrictionFeature(
-                                            FindPrefixRestrictionFeature
-                                                .PositionModifier.ALLOW_UPDATE_AS_PARENT,
-                                            FindPrefixRestrictionFeature
-                                                .PrefixChecker.ANTEC_POLARITY),
-                                    longConst(-1000)));
+                d,
+                "boxDiamondConv",
+                SumFeature
+                        .createSum(
+                            new FindPrefixRestrictionFeature(
+                                FindPrefixRestrictionFeature.PositionModifier.ALLOW_UPDATE_AS_PARENT,
+                                FindPrefixRestrictionFeature.PrefixChecker.ANTEC_POLARITY),
+                            longConst(-1000)));
         } else {
             bindRuleSet(d, "boxDiamondConv", inftyConst());
         }
@@ -638,10 +642,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet(d, "induction_var", inftyConst());
         } else {
             bindRuleSet(
-                    d,
-                    "induction_var",
-                    ifZero(applyTF(instOf("uSub"), IsInductionVariable.INSTANCE),
-                            longConst(0), inftyConst()));
+                d,
+                "induction_var",
+                ifZero(applyTF(instOf("uSub"), IsInductionVariable.INSTANCE),
+                    longConst(0), inftyConst()));
         }
 
         return d;
@@ -649,65 +653,66 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
         bindRuleSet(d, "pull_out_select",
-        // pull out select only if it can be simplified
-        // (the heap term may not be the base heap or an anon heap
-        // function symbol)
-                add(applyTF(
-                        "h",
-                        not(or(PrimitiveHeapTermFeature.create(heapLDT),
-                                AnonHeapTermFeature.INSTANCE))),
-                        ifZero(applyTF(FocusFormulaProjection.INSTANCE,
-                                ff.update), longConst(-4200), longConst(-1900)),
-                        NonDuplicateAppModPositionFeature.INSTANCE));
+            // pull out select only if it can be simplified
+            // (the heap term may not be the base heap or an anon heap
+            // function symbol)
+            add(applyTF(
+                "h",
+                not(or(PrimitiveHeapTermFeature.create(heapLDT),
+                    AnonHeapTermFeature.INSTANCE))),
+                ifZero(applyTF(FocusFormulaProjection.INSTANCE,
+                    ff.update), longConst(-4200), longConst(-1900)),
+                NonDuplicateAppModPositionFeature.INSTANCE));
         bindRuleSet(d, "apply_select_eq",
-        // replace non-simplified select by the skolem constant
-        // of the corresponding pull out; at least one select
-        // needs to be not simplified yet; additional restrictions
-        // in isApproved()
-                ifZero(applyTF(
-                        "s",
-                        not(rec(any(),
-                                SimplifiedSelectTermFeature.create(heapLDT)))),
+            // replace non-simplified select by the skolem constant
+            // of the corresponding pull out; at least one select
+            // needs to be not simplified yet; additional restrictions
+            // in isApproved()
+            ifZero(applyTF(
+                "s",
+                not(rec(any(),
+                    SimplifiedSelectTermFeature.create(heapLDT)))),
                 // together with the costs of apply_equations the
                 // resulting costs are about -5700
-                        longConst(-1700)));
+                longConst(-1700)));
         bindRuleSet(d, "simplify_select",
-        // simplify_select term in pulled out equation (right hand
-        // side has to be a skolem constant which has been
-        // introduced by a select pull out; left hand side needs
-        // to be a select term on a non-base- and
-        // non-anon-heap)
-                add(applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
-                        applyTF(sub(FocusProjection.INSTANCE, 0),
-                                not(SimplifiedSelectTermFeature.create(heapLDT))),
-                        longConst(-5600)));
+            // simplify_select term in pulled out equation (right hand
+            // side has to be a skolem constant which has been
+            // introduced by a select pull out; left hand side needs
+            // to be a select term on a non-base- and
+            // non-anon-heap)
+            add(applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
+                applyTF(sub(FocusProjection.INSTANCE, 0),
+                    not(SimplifiedSelectTermFeature.create(heapLDT))),
+                longConst(-5600)));
         bindRuleSet(d,
-                "apply_auxiliary_eq",
-                // replace skolem constant by it's computed value
-                add(applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
-                        longConst(-5500)));
+            "apply_auxiliary_eq",
+            // replace skolem constant by it's computed value
+            add(applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
+                longConst(-5500)));
         bindRuleSet(
-                d,
-                "hide_auxiliary_eq",
-                // hide auxiliary equation after the skolem constants have
-                // been replaced by it's computed value
-                add(applyTF("auxiliarySK",
-                        IsSelectSkolemConstantTermFeature.INSTANCE),
-                        applyTF("result",
-                                rec(any(),
-                                        add(SimplifiedSelectTermFeature
-                                                .create(heapLDT),
-                                                not(ff.ifThenElse)))),
-                        not(ContainsTermFeature.create(instOf("result"),
-                                instOf("auxiliarySK"))), longConst(-5400)));
+            d,
+            "hide_auxiliary_eq",
+            // hide auxiliary equation after the skolem constants have
+            // been replaced by it's computed value
+            add(applyTF("auxiliarySK",
+                IsSelectSkolemConstantTermFeature.INSTANCE),
+                applyTF("result",
+                    rec(any(),
+                        add(SimplifiedSelectTermFeature
+                                .create(heapLDT),
+                            not(ff.ifThenElse)))),
+                not(ContainsTermFeature.create(instOf("result"),
+                    instOf("auxiliarySK"))),
+                longConst(-5400)));
         bindRuleSet(
-                d,
-                "hide_auxiliary_eq_const",
-                // hide auxiliary equation after the skolem constatns have
-                // been replaced by it's computed value
-                add(applyTF("auxiliarySK",
-                        IsSelectSkolemConstantTermFeature.INSTANCE),
-                        longConst(-500)));
+            d,
+            "hide_auxiliary_eq_const",
+            // hide auxiliary equation after the skolem constatns have
+            // been replaced by it's computed value
+            add(applyTF("auxiliarySK",
+                IsSelectSkolemConstantTermFeature.INSTANCE),
+                longConst(-500)));
     }
 
     private void setUpStringNormalisation(RuleSetDispatchFeature d) {
@@ -718,152 +723,154 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // do not convert char to int when inside a string function
         // feature used to recognize if one is inside a string literal
         final SeqLDT seqLDT =
-                getServices().getTypeConverter().getSeqLDT();
+            getServices().getTypeConverter().getSeqLDT();
         final CharListLDT charListLDT =
-                getServices().getTypeConverter().getCharListLDT();
+            getServices().getTypeConverter().getCharListLDT();
         final BooleanLDT booleanLDT =
-                getServices().getTypeConverter().getBooleanLDT();
+            getServices().getTypeConverter().getBooleanLDT();
 
 
         final TermFeature keepChar =
-                or(op(seqLDT.getSeqSingleton()),
-                        or(op(charListLDT.getClIndexOfChar()),
-                            or (op(charListLDT.getClReplace()),
-                                  op(charListLDT.getClLastIndexOfChar()))));
+            or(op(seqLDT.getSeqSingleton()),
+                or(op(charListLDT.getClIndexOfChar()),
+                    or(op(charListLDT.getClReplace()),
+                        op(charListLDT.getClLastIndexOfChar()))));
 
         bindRuleSet(d, "charLiteral_to_intLiteral",
-                ifZero(isBelow(keepChar), inftyConst(), longConst(-100)));
+            ifZero(isBelow(keepChar), inftyConst(), longConst(-100)));
 
         // establish normalform
 
         // tf below only for test
         final TermFeature anyLiteral =
             or(tf.charLiteral,
-               or(tf.literal, op(booleanLDT.getFalseConst()), op(booleanLDT.getTrueConst())));
+                or(tf.literal, op(booleanLDT.getFalseConst()), op(booleanLDT.getTrueConst())));
 
         final TermFeature seqLiteral =
-                rec(anyLiteral,
-                    or(op(seqLDT.getSeqConcat()),
-                       or(op(seqLDT.getSeqSingleton()),
-                          or(anyLiteral, inftyTermConst()))));
+            rec(anyLiteral,
+                or(op(seqLDT.getSeqConcat()),
+                    or(op(seqLDT.getSeqSingleton()),
+                        or(anyLiteral, inftyTermConst()))));
 
         Feature belowModOpPenality =
-                ifZero(isBelow(ff.modalOperator), longConst(500));
+            ifZero(isBelow(ff.modalOperator), longConst(500));
 
         bindRuleSet(
-                d,
-                "defOpsSeqEquality",
-                add(NonDuplicateAppModPositionFeature.INSTANCE,
-                        ifZero(add(applyTF("left", seqLiteral),
-                                   applyTF("right", seqLiteral)),
-                               longConst(1000), inftyConst()),
-                        belowModOpPenality));
+            d,
+            "defOpsSeqEquality",
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                ifZero(add(applyTF("left", seqLiteral),
+                    applyTF("right", seqLiteral)),
+                    longConst(1000), inftyConst()),
+                belowModOpPenality));
 
         bindRuleSet(
-                d,
-                "defOpsConcat",
-                add(NonDuplicateAppModPositionFeature.INSTANCE,
-                        ifZero(or(applyTF("leftStr", not(seqLiteral)),
-                                applyTF("rightStr", not(seqLiteral))),
-                                longConst(1000)
-                        // concat is often introduced for construction purposes,
-                        // we do not want to use its definition right at the
-                        // beginning
-                        ), belowModOpPenality));
+            d,
+            "defOpsConcat",
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                ifZero(or(applyTF("leftStr", not(seqLiteral)),
+                    applyTF("rightStr", not(seqLiteral))),
+                    longConst(1000)
+                // concat is often introduced for construction purposes,
+                // we do not want to use its definition right at the
+                // beginning
+                ), belowModOpPenality));
 
         bindRuleSet(d, "stringsSimplify", longConst(-5000));
 
         final TermFeature charOrIntLiteral =
-                or(tf.charLiteral, tf.literal,
-                   or(add(OperatorClassTF.create(SortDependingFunction.class), // XXX:
-                                                       // was CastFunctionSymbol.class
-                                sub(tf.literal)), inftyTermConst()));
+            or(tf.charLiteral, tf.literal,
+                or(add(OperatorClassTF.create(SortDependingFunction.class), // XXX:
+                    // was CastFunctionSymbol.class
+                    sub(tf.literal)), inftyTermConst()));
 
         bindRuleSet(
-                d,
-                "defOpsReplaceInline",
-                ifZero(add(applyTF("str", seqLiteral),
-                           applyTF("searchChar", charOrIntLiteral),
-                           applyTF("replChar", charOrIntLiteral)), longConst(-2500), inftyConst()));
+            d,
+            "defOpsReplaceInline",
+            ifZero(add(applyTF("str", seqLiteral),
+                applyTF("searchChar", charOrIntLiteral),
+                applyTF("replChar", charOrIntLiteral)), longConst(-2500), inftyConst()));
 
         bindRuleSet(
-                d,
-                "defOpsReplace",
-                add(NonDuplicateAppModPositionFeature.INSTANCE,
-                        ifZero(or(applyTF("str", not(seqLiteral)),
-                                  applyTF("searchChar", not(charOrIntLiteral)),
-                                  applyTF("replChar", not(charOrIntLiteral))),
-                                longConst(500), inftyConst()),
-                        belowModOpPenality));
+            d,
+            "defOpsReplace",
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                ifZero(or(applyTF("str", not(seqLiteral)),
+                    applyTF("searchChar", not(charOrIntLiteral)),
+                    applyTF("replChar", not(charOrIntLiteral))),
+                    longConst(500), inftyConst()),
+                belowModOpPenality));
 
         bindRuleSet(d, "stringsReduceSubstring",
-                add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(100)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(100)));
 
         bindRuleSet(d, "defOpsStartsEndsWith", longConst(250));
 
         bindRuleSet(
-                d,
-                "stringsConcatNotBothLiterals",
-                ifZero(MatchedIfFeature.INSTANCE,
-                        ifZero(add(applyTF(instOf("leftStr"), seqLiteral),
-                                applyTF(instOf("rightStr"), seqLiteral)),
-                                inftyConst()), inftyConst()));
+            d,
+            "stringsConcatNotBothLiterals",
+            ifZero(MatchedIfFeature.INSTANCE,
+                ifZero(add(applyTF(instOf("leftStr"), seqLiteral),
+                    applyTF(instOf("rightStr"), seqLiteral)),
+                    inftyConst()),
+                inftyConst()));
 
         bindRuleSet(d, "stringsReduceConcat", longConst(100));
 
         bindRuleSet(
-                d,
-                "stringsReduceOrMoveOutsideConcat",
-                ifZero(NonDuplicateAppModPositionFeature.INSTANCE,
-                        longConst(800), inftyConst()));
+            d,
+            "stringsReduceOrMoveOutsideConcat",
+            ifZero(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(800), inftyConst()));
 
         bindRuleSet(
-                d,
-                "stringsMoveReplaceInside",
-                ifZero(NonDuplicateAppModPositionFeature.INSTANCE,
-                        longConst(400), inftyConst()));
+            d,
+            "stringsMoveReplaceInside",
+            ifZero(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(400), inftyConst()));
 
 
         bindRuleSet(d, "stringsExpandDefNormalOp", longConst(500));
 
         bindRuleSet(
-                d,
-                "stringsContainsDefInline",
-                SumFeature.createSum(
-                        new Feature[] {EqNonDuplicateAppFeature.INSTANCE,
-                                       longConst(1000)}));
+            d,
+            "stringsContainsDefInline",
+            SumFeature.createSum(
+                new Feature[] { EqNonDuplicateAppFeature.INSTANCE,
+                    longConst(1000) }));
     }
 
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
         final Feature commonF =
-                add(ifZero(MatchedIfFeature.INSTANCE,
-                        DiffFindAndIfFeature.INSTANCE),
-                        longConst(-5000),
-                        add(DiffFindAndReplacewithFeature.INSTANCE,
-                                ScaleFeature.createScaled(
-                                        CountMaxDPathFeature.INSTANCE, 10.0)));
+            add(ifZero(MatchedIfFeature.INSTANCE,
+                DiffFindAndIfFeature.INSTANCE),
+                longConst(-5000),
+                add(DiffFindAndReplacewithFeature.INSTANCE,
+                    ScaleFeature.createScaled(
+                        CountMaxDPathFeature.INSTANCE, 10.0)));
 
         bindRuleSet(d, "replace_known_left", commonF);
         bindRuleSet(
-                d,
-                "replace_known_right",
-                add(commonF,
-                        ifZero(DirectlyBelowSymbolFeature
-                                .create(Junctor.IMP, 1),
-                                longConst(100),
-                                ifZero(DirectlyBelowSymbolFeature
-                                        .create(Equality.EQV), longConst(100)))));
+            d,
+            "replace_known_right",
+            add(commonF,
+                ifZero(DirectlyBelowSymbolFeature
+                        .create(Junctor.IMP, 1),
+                    longConst(100),
+                    ifZero(DirectlyBelowSymbolFeature
+                            .create(Equality.EQV),
+                        longConst(100)))));
     }
 
     private void setupUserTaclets(RuleSetDispatchFeature d) {
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             final String userTacletsProbs =
-                    strategyProperties.getProperty(StrategyProperties
-                            .userTacletsOptionsKey(i));
+                strategyProperties.getProperty(StrategyProperties
+                        .userTacletsOptionsKey(i));
             if (StrategyProperties.USER_TACLETS_LOW.equals(userTacletsProbs)) {
                 bindRuleSet(d, "userTaclets" + i, 10000);
             } else if (StrategyProperties.USER_TACLETS_HIGH
-                        .equals(userTacletsProbs)) {
+                    .equals(userTacletsProbs)) {
                 bindRuleSet(d, "userTaclets" + i, -50);
             } else {
                 bindRuleSet(d, "userTaclets" + i, inftyConst());
@@ -873,11 +880,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupSystemInvariantSimp(RuleSetDispatchFeature d) {
         bindRuleSet(
-                d,
-                "system_invariant",
-                ifZero(MatchedIfFeature.INSTANCE,
-                        add(applyTF("negLit", tf.negLiteral),
-                                applyTFNonStrict("nonNegLit", tf.nonNegLiteral))));
+            d,
+            "system_invariant",
+            ifZero(MatchedIfFeature.INSTANCE,
+                add(applyTF("negLit", tf.negLiteral),
+                    applyTFNonStrict("nonNegLit", tf.nonNegLiteral))));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -939,15 +946,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private boolean classAxiomDelayedApplication() {
         String classAxiomSetting =
-                strategyProperties
-                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomSetting);
     }
 
     private boolean classAxiomApplicationEnabled() {
         String classAxiomSetting =
-                strategyProperties
-                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return !StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomSetting);
     }
 
@@ -959,8 +966,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private boolean autoInductionLemmaEnabled() { // chrisg
         final String prop =
-                strategyProperties
-                        .getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
         return prop.equals(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)
                 || prop.equals(StrategyProperties.AUTO_INDUCTION_RESTRICTED);
         /*
@@ -977,8 +984,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         if (StrategyProperties.SPLITTING_DELAYED.equals(strategyProperties
                 .getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY))) {
             return or(
-                    applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS),
-                    sequentContainsNoPrograms());
+                applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS),
+                sequentContainsNoPrograms());
         }
         // else: SPLITTING_OFF
         return applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS);
@@ -1000,68 +1007,68 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer();
         final Feature noCutsAllowed =
-                sum(subFor, AllowedCutPositionsGenerator.INSTANCE,
-                        not(applyTF(subFor, ff.cutAllowed)));
+            sum(subFor, AllowedCutPositionsGenerator.INSTANCE,
+                not(applyTF(subFor, ff.cutAllowed)));
         bindRuleSet(d, "beta", SumFeature.createSum(noCutsAllowed,
-                ifZero(PurePosDPathFeature.INSTANCE, longConst(-200)),
-                ScaleFeature.createScaled(CountPosDPathFeature.INSTANCE, -3.0),
-                ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0),
-                longConst(20)));
+            ifZero(PurePosDPathFeature.INSTANCE, longConst(-200)),
+            ScaleFeature.createScaled(CountPosDPathFeature.INSTANCE, -3.0),
+            ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0),
+            longConst(20)));
         TermBuffer superF = new TermBuffer();
         final ProjectionToTerm splitCondition = sub(FocusProjection.INSTANCE, 0);
         bindRuleSet(d,
-                    "split_cond",
-                    add(// do not split over formulas containing auxiliary variables
-                        applyTF(FocusProjection.INSTANCE,
-                                rec(any(), not(IsSelectSkolemConstantTermFeature.INSTANCE))),
-                        // prefer splits when condition has quantifiers (less
-                        // likely to be simplified away)
-                        applyTF(splitCondition,
-                                rec(ff.quantifiedFor,
-                                        ifZero(ff.quantifiedFor, longTermConst(-10)))),
-                        FindDepthFeature.INSTANCE, // prefer top level splits
-                        ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
-                        sum(superF, SuperTermGenerator.upwards(any(), getServices()),
-                            applyTF(superF, not(ff.elemUpdate))),
-                        ifZero(applyTF(FocusProjection.INSTANCE,
-                                ContainsExecutableCodeTermFeature.PROGRAMS),
-                                longConst(-100), longConst(25))));
+            "split_cond",
+            add(// do not split over formulas containing auxiliary variables
+                applyTF(FocusProjection.INSTANCE,
+                    rec(any(), not(IsSelectSkolemConstantTermFeature.INSTANCE))),
+                // prefer splits when condition has quantifiers (less
+                // likely to be simplified away)
+                applyTF(splitCondition,
+                    rec(ff.quantifiedFor,
+                        ifZero(ff.quantifiedFor, longTermConst(-10)))),
+                FindDepthFeature.INSTANCE, // prefer top level splits
+                ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
+                sum(superF, SuperTermGenerator.upwards(any(), getServices()),
+                    applyTF(superF, not(ff.elemUpdate))),
+                ifZero(applyTF(FocusProjection.INSTANCE,
+                    ContainsExecutableCodeTermFeature.PROGRAMS),
+                    longConst(-100), longConst(25))));
         ProjectionToTerm cutFormula = instOf("cutFormula");
         Feature countOccurrencesInSeq =
-                ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
+            ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
         bindRuleSet(
             d,
             "cut_direct",
             SumFeature
-                .createSum(
-                    new Feature[] {
-                        not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
-                        AllowedCutPositionFeature.INSTANCE,
-                        ifZero(NotBelowQuantifierFeature.INSTANCE,
-                               add(applyTF(cutFormula,
-                                       add(ff.cutAllowed,
-                                           // do not cut over formulas containing
-                                           // auxiliary variables
-                                           rec(any(),
-                                               not(IsSelectSkolemConstantTermFeature.INSTANCE)))),
-                                   // prefer cuts over "something = null"
-                                   ifZero(applyTF(FocusProjection.INSTANCE,
-                                              opSub(tf.eq, any(), vf.nullTerm)),
-                                          longConst(-5), longConst(0)),
-                                   // punish cuts over formulas containing anon heap functions
-                                   ifZero(applyTF(cutFormula,
-                                              rec(any(), not(AnonHeapTermFeature.INSTANCE))),
-                                          longConst(0), longConst(1000)),
-                                   countOccurrencesInSeq, // standard costs
-                                   longConst(100)),
-                               SumFeature // check for cuts below quantifiers
-                                   .createSum(
-                                       new Feature[] {
-                                           applyTF(cutFormula, ff.cutAllowedBelowQuantifier),
-                                           applyTF(FocusFormulaProjection.INSTANCE,
-                                               ff.quantifiedClauseSet),
-                                           ifZero(allowQuantifierSplitting(),
-                                                  longConst(0), longConst(100))}))}));
+                    .createSum(
+                        new Feature[] {
+                            not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
+                            AllowedCutPositionFeature.INSTANCE,
+                            ifZero(NotBelowQuantifierFeature.INSTANCE,
+                                add(applyTF(cutFormula,
+                                    add(ff.cutAllowed,
+                                        // do not cut over formulas containing
+                                        // auxiliary variables
+                                        rec(any(),
+                                            not(IsSelectSkolemConstantTermFeature.INSTANCE)))),
+                                    // prefer cuts over "something = null"
+                                    ifZero(applyTF(FocusProjection.INSTANCE,
+                                        opSub(tf.eq, any(), vf.nullTerm)),
+                                        longConst(-5), longConst(0)),
+                                    // punish cuts over formulas containing anon heap functions
+                                    ifZero(applyTF(cutFormula,
+                                        rec(any(), not(AnonHeapTermFeature.INSTANCE))),
+                                        longConst(0), longConst(1000)),
+                                    countOccurrencesInSeq, // standard costs
+                                    longConst(100)),
+                                SumFeature // check for cuts below quantifiers
+                                        .createSum(
+                                            new Feature[] {
+                                                applyTF(cutFormula, ff.cutAllowedBelowQuantifier),
+                                                applyTF(FocusFormulaProjection.INSTANCE,
+                                                    ff.quantifiedClauseSet),
+                                                ifZero(allowQuantifierSplitting(),
+                                                    longConst(0), longConst(100)) })) }));
     }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
@@ -1071,19 +1078,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final TermBuffer subFor = new TermBuffer();
         final Feature compareCutAllowed =
-                ifZero(applyTF(subFor, ff.cutAllowed),
-                        leq(applyTF("cutFormula", ff.cutPriority),
-                                applyTF(subFor, ff.cutPriority)));
+            ifZero(applyTF(subFor, ff.cutAllowed),
+                leq(applyTF("cutFormula", ff.cutPriority),
+                    applyTF(subFor, ff.cutPriority)));
 
         final Feature noBetterCut =
-                sum(subFor, AllowedCutPositionsGenerator.INSTANCE,
-                        compareCutAllowed);
+            sum(subFor, AllowedCutPositionsGenerator.INSTANCE,
+                compareCutAllowed);
 
         bindRuleSet(
-                d,
-                "cut_direct",
-                add(allowSplitting(FocusFormulaProjection.INSTANCE),
-                        ifZero(NotBelowQuantifierFeature.INSTANCE, noBetterCut)));
+            d,
+            "cut_direct",
+            add(allowSplitting(FocusFormulaProjection.INSTANCE),
+                ifZero(NotBelowQuantifierFeature.INSTANCE, noBetterCut)));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -1109,36 +1116,36 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             SumFeature.createSum(
                 new Feature[] {
                     ifZero(applyTF(FocusProjection.create(0), tf.intF),
-                           add(applyTF(FocusProjection.create(0), tf.monomial),
-                               ScaleFeature.createScaled(
-                                   FindRightishFeature.create(numbers), 5.0))),
+                        add(applyTF(FocusProjection.create(0), tf.monomial),
+                            ScaleFeature.createScaled(
+                                FindRightishFeature.create(numbers), 5.0))),
                     ifZero(MatchedIfFeature.INSTANCE,
-                           add(CheckApplyEqFeature.INSTANCE,
-                               let(equation,
-                                   AssumptionProjection.create(0),
-                                   add(not(applyTF(equation, ff.update)),
-                                       // there might be updates in
-                                       // front of the assumption
-                                       // formula; in this case we wait
-                                       // until the updates have
-                                       // been applied
-                                       let(left,
-                                           sub(equation, 0),
-                                           let(right,
-                                               sub(equation, 1),
-                                               ifZero(applyTF(left,
-                                                          tf.intF),
-                                                      add(applyTF(left,
-                                                              tf.nonNegOrNonCoeffMonomial),
-                                                          applyTF(right,
-                                                              tf.polynomial),
-                                                          MonomialsSmallerThanFeature
-                                                              .create(right,
-                                                                      left,
-                                                                      numbers)),
-                                                      TermSmallerThanFeature
-                                                          .create(right, left)))))))),
-                    longConst(-4000)}));
+                        add(CheckApplyEqFeature.INSTANCE,
+                            let(equation,
+                                AssumptionProjection.create(0),
+                                add(not(applyTF(equation, ff.update)),
+                                    // there might be updates in
+                                    // front of the assumption
+                                    // formula; in this case we wait
+                                    // until the updates have
+                                    // been applied
+                                    let(left,
+                                        sub(equation, 0),
+                                        let(right,
+                                            sub(equation, 1),
+                                            ifZero(applyTF(left,
+                                                tf.intF),
+                                                add(applyTF(left,
+                                                    tf.nonNegOrNonCoeffMonomial),
+                                                    applyTF(right,
+                                                        tf.polynomial),
+                                                    MonomialsSmallerThanFeature
+                                                            .create(right,
+                                                                left,
+                                                                numbers)),
+                                                TermSmallerThanFeature
+                                                        .create(right, left)))))))),
+                    longConst(-4000) }));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -1154,37 +1161,40 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             IntegerLDT numbers, LocSetLDT locSetLDT) {
 
         bindRuleSet(
-                d,
-                "negationNormalForm",
-                add(not(NotBelowBinderFeature.INSTANCE), longConst(-500),
-                        ScaleFeature.createScaled(FindDepthFeature.INSTANCE,
-                                10.0)));
+            d,
+            "negationNormalForm",
+            add(not(NotBelowBinderFeature.INSTANCE), longConst(-500),
+                ScaleFeature.createScaled(FindDepthFeature.INSTANCE,
+                    10.0)));
 
         bindRuleSet(
-                d,
-                "moveQuantToLeft",
-                add(quantifiersMightSplit() ? longConst(0) : applyTF(
+            d,
+            "moveQuantToLeft",
+            add(quantifiersMightSplit() ? longConst(0)
+                    : applyTF(
                         FocusFormulaProjection.INSTANCE,
-                        ff.quantifiedPureLitConjDisj), longConst(-550)));
+                        ff.quantifiedPureLitConjDisj),
+                longConst(-550)));
 
         bindRuleSet(
-                d,
-                "conjNormalForm",
-                ifZero(add(
-                        or(FocusInAntecFeature.INSTANCE,
-                                NotBelowQuantifierFeature.INSTANCE),
-                        NotInScopeOfModalityFeature.INSTANCE),
-                        add(longConst(-150), ScaleFeature.createScaled(
-                                FindDepthFeature.INSTANCE, 20)), inftyConst()));
+            d,
+            "conjNormalForm",
+            ifZero(add(
+                or(FocusInAntecFeature.INSTANCE,
+                    NotBelowQuantifierFeature.INSTANCE),
+                NotInScopeOfModalityFeature.INSTANCE),
+                add(longConst(-150), ScaleFeature.createScaled(
+                    FindDepthFeature.INSTANCE, 20)),
+                inftyConst()));
 
         bindRuleSet(d, "setEqualityBlastingRight", longConst(-100));
 
         bindRuleSet(
-                d,
-                "cnf_setComm",
-                add(SetsSmallerThanFeature.create(instOf("commRight"),
-                        instOf("commLeft"), locSetLDT),
-                        NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
+            d,
+            "cnf_setComm",
+            add(SetsSmallerThanFeature.create(instOf("commRight"),
+                instOf("commLeft"), locSetLDT),
+                NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
 
         bindRuleSet(d, "elimQuantifier", -1000);
         bindRuleSet(d, "elimQuantifierWithCast", 50);
@@ -1192,143 +1202,147 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer left = new TermBuffer();
         final TermBuffer right = new TermBuffer();
         bindRuleSet(
-                d,
-                "apply_equations_andOr",
-                add(let(left,
-                        instOf("applyEqLeft"),
-                        let(right,
-                                instOf("applyEqRight"),
-                                ifZero(applyTF(left, tf.intF),
-                                        add(applyTF(left,
-                                                tf.nonNegOrNonCoeffMonomial),
-                                                applyTF(right, tf.polynomial),
-                                                MonomialsSmallerThanFeature
-                                                .create(right, left,
-                                                        numbers)),
-                                        TermSmallerThanFeature.create(right,
-                                                left)))), longConst(-150)));
+            d,
+            "apply_equations_andOr",
+            add(let(left,
+                instOf("applyEqLeft"),
+                let(right,
+                    instOf("applyEqRight"),
+                    ifZero(applyTF(left, tf.intF),
+                        add(applyTF(left,
+                            tf.nonNegOrNonCoeffMonomial),
+                            applyTF(right, tf.polynomial),
+                            MonomialsSmallerThanFeature
+                                    .create(right, left,
+                                        numbers)),
+                        TermSmallerThanFeature.create(right,
+                            left)))),
+                longConst(-150)));
 
         bindRuleSet(
-                d,
-                "distrQuantifier",
-                add(or(applyTF(
-                        FocusProjection.create(0),
-                        add(ff.quantifiedClauseSet,
-                                not(opSub(Quantifier.ALL, ff.orF)),
-                                EliminableQuantifierTF.INSTANCE)), SumFeature
+            d,
+            "distrQuantifier",
+            add(or(applyTF(
+                FocusProjection.create(0),
+                add(ff.quantifiedClauseSet,
+                    not(opSub(Quantifier.ALL, ff.orF)),
+                    EliminableQuantifierTF.INSTANCE)),
+                SumFeature
                         .createSum(
-                                OnlyInScopeOfQuantifiersFeature.INSTANCE,
-                                SplittableQuantifiedFormulaFeature.INSTANCE,
-                                ifZero(FocusInAntecFeature.INSTANCE,
-                                        applyTF(FocusProjection.create(0),
-                                                sub(ff.andF)),
-                                        applyTF(FocusProjection.create(0),
-                                                sub(ff.orF))))),
-                        longConst(-300)));
+                            OnlyInScopeOfQuantifiersFeature.INSTANCE,
+                            SplittableQuantifiedFormulaFeature.INSTANCE,
+                            ifZero(FocusInAntecFeature.INSTANCE,
+                                applyTF(FocusProjection.create(0),
+                                    sub(ff.andF)),
+                                applyTF(FocusProjection.create(0),
+                                    sub(ff.orF))))),
+                longConst(-300)));
 
         bindRuleSet(
-                d,
-                "swapQuantifiers",
-                add(applyTF(
-                        FocusProjection.create(0),
-                        add(ff.quantifiedClauseSet,
-                                EliminableQuantifierTF.INSTANCE,
-                                sub(not(EliminableQuantifierTF.INSTANCE)))),
-                        longConst(-300)));
+            d,
+            "swapQuantifiers",
+            add(applyTF(
+                FocusProjection.create(0),
+                add(ff.quantifiedClauseSet,
+                    EliminableQuantifierTF.INSTANCE,
+                    sub(not(EliminableQuantifierTF.INSTANCE)))),
+                longConst(-300)));
 
         // category "conjunctive normal form"
 
         bindRuleSet(d, "cnf_orComm", SumFeature.createSum(new Feature[] {
-                applyTF("commRight", ff.clause),
-                applyTFNonStrict("commResidue", ff.clauseSet),
-                or(applyTF("commLeft", ff.andF),
-                        add(applyTF("commLeft", ff.literal),
-                                literalsSmallerThan("commRight", "commLeft",
-                                        numbers))), longConst(-100) }));
+            applyTF("commRight", ff.clause),
+            applyTFNonStrict("commResidue", ff.clauseSet),
+            or(applyTF("commLeft", ff.andF),
+                add(applyTF("commLeft", ff.literal),
+                    literalsSmallerThan("commRight", "commLeft",
+                        numbers))),
+            longConst(-100) }));
 
         bindRuleSet(
-                d,
-                "cnf_orAssoc",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("assoc0", ff.clause),
-                        applyTF("assoc1", ff.clause),
-                        applyTF("assoc2", ff.literal), longConst(-80) }));
+            d,
+            "cnf_orAssoc",
+            SumFeature.createSum(new Feature[] {
+                applyTF("assoc0", ff.clause),
+                applyTF("assoc1", ff.clause),
+                applyTF("assoc2", ff.literal), longConst(-80) }));
 
         bindRuleSet(d, "cnf_andComm", SumFeature.createSum(new Feature[] {
-                applyTF("commLeft", ff.clause),
-                applyTF("commRight", ff.clauseSet),
-                applyTFNonStrict("commResidue", ff.clauseSet),
-                // at least one of the subformulas has to be a literal;
-                // otherwise,
-                // sorting is not likely to have any big effect
-                ifZero(add(applyTF("commLeft", not(ff.literal)),
-                        applyTF("commRight", rec(ff.andF, not(ff.literal)))),
-                        longConst(100), longConst(-60)),
-                clausesSmallerThan("commRight", "commLeft", numbers) }));
+            applyTF("commLeft", ff.clause),
+            applyTF("commRight", ff.clauseSet),
+            applyTFNonStrict("commResidue", ff.clauseSet),
+            // at least one of the subformulas has to be a literal;
+            // otherwise,
+            // sorting is not likely to have any big effect
+            ifZero(add(applyTF("commLeft", not(ff.literal)),
+                applyTF("commRight", rec(ff.andF, not(ff.literal)))),
+                longConst(100), longConst(-60)),
+            clausesSmallerThan("commRight", "commLeft", numbers) }));
 
         bindRuleSet(
-                d,
-                "cnf_andAssoc",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("assoc0", ff.clauseSet),
-                        applyTF("assoc1", ff.clauseSet),
-                        applyTF("assoc2", ff.clause), longConst(-10) }));
+            d,
+            "cnf_andAssoc",
+            SumFeature.createSum(new Feature[] {
+                applyTF("assoc0", ff.clauseSet),
+                applyTF("assoc1", ff.clauseSet),
+                applyTF("assoc2", ff.clause), longConst(-10) }));
 
         bindRuleSet(d, "cnf_dist", SumFeature.createSum(new Feature[] {
-                applyTF("distRight0", ff.clauseSet),
-                applyTF("distRight1", ff.clauseSet),
-                ifZero(applyTF("distLeft", ff.clause), longConst(-15),
-                        applyTF("distLeft", ff.clauseSet)), longConst(-35) }));
+            applyTF("distRight0", ff.clauseSet),
+            applyTF("distRight1", ff.clauseSet),
+            ifZero(applyTF("distLeft", ff.clause), longConst(-15),
+                applyTF("distLeft", ff.clauseSet)),
+            longConst(-35) }));
 
         final TermBuffer superFor = new TermBuffer();
         final Feature onlyBelowQuanAndOr =
-                sum(superFor,
-                        SuperTermGenerator.upwards(any(), getServices()),
-                        applyTF(superFor, or(ff.quantifiedFor, ff.andF, ff.orF)));
+            sum(superFor,
+                SuperTermGenerator.upwards(any(), getServices()),
+                applyTF(superFor, or(ff.quantifiedFor, ff.andF, ff.orF)));
 
         final Feature belowUnskolemisableQuantifier =
-                ifZero(FocusInAntecFeature.INSTANCE,
-                        not(sum(superFor, SuperTermGenerator.upwards(any(),
-                                getServices()),
-                                not(applyTF(superFor, op(Quantifier.ALL))))),
-                        not(sum(superFor, SuperTermGenerator.upwards(any(),
-                                getServices()),
-                                not(applyTF(superFor, op(Quantifier.EX))))));
+            ifZero(FocusInAntecFeature.INSTANCE,
+                not(sum(superFor, SuperTermGenerator.upwards(any(),
+                    getServices()),
+                    not(applyTF(superFor, op(Quantifier.ALL))))),
+                not(sum(superFor, SuperTermGenerator.upwards(any(),
+                    getServices()),
+                    not(applyTF(superFor, op(Quantifier.EX))))));
 
         bindRuleSet(
-                d,
-                "cnf_expandIfThenElse",
-                add(not(NotBelowQuantifierFeature.INSTANCE),
-                        onlyBelowQuanAndOr, belowUnskolemisableQuantifier));
+            d,
+            "cnf_expandIfThenElse",
+            add(not(NotBelowQuantifierFeature.INSTANCE),
+                onlyBelowQuanAndOr, belowUnskolemisableQuantifier));
 
         final Feature pullOutQuantifierAllowed =
-                add(not(NotBelowQuantifierFeature.INSTANCE),
-                        onlyBelowQuanAndOr,
-                        applyTF(FocusProjection.create(0),
-                                sub(ff.quantifiedClauseSet,
-                                        ff.quantifiedClauseSet)));
+            add(not(NotBelowQuantifierFeature.INSTANCE),
+                onlyBelowQuanAndOr,
+                applyTF(FocusProjection.create(0),
+                    sub(ff.quantifiedClauseSet,
+                        ff.quantifiedClauseSet)));
 
         bindRuleSet(d, "pullOutQuantifierUnifying", -20);
 
         bindRuleSet(
-                d,
-                "pullOutQuantifierAll",
-                add(pullOutQuantifierAllowed,
-                        ifZero(FocusInAntecFeature.INSTANCE, longConst(-20),
-                                longConst(-40))));
+            d,
+            "pullOutQuantifierAll",
+            add(pullOutQuantifierAllowed,
+                ifZero(FocusInAntecFeature.INSTANCE, longConst(-20),
+                    longConst(-40))));
 
         bindRuleSet(
-                d,
-                "pullOutQuantifierEx",
-                add(pullOutQuantifierAllowed,
-                        ifZero(FocusInAntecFeature.INSTANCE, longConst(-40),
-                                longConst(-20))));
+            d,
+            "pullOutQuantifierEx",
+            add(pullOutQuantifierAllowed,
+                ifZero(FocusInAntecFeature.INSTANCE, longConst(-40),
+                    longConst(-20))));
     }
 
     private Feature clausesSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
         return ClausesSmallerThanFeature.create(instOf(smaller),
-                instOf(bigger), numbers);
+            instOf(bigger), numbers);
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -1343,9 +1357,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer varInst = new TermBuffer();
             final Feature branchPrediction =
-                    InstantiationCostScalerFeature.create(
-                            InstantiationCost.create(varInst),
-                            allowQuantifierSplitting());
+                InstantiationCostScalerFeature.create(
+                    InstantiationCost.create(varInst),
+                    allowQuantifierSplitting());
 
             bindRuleSet(
                 d,
@@ -1355,14 +1369,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         FocusInAntecFeature.INSTANCE,
                         applyTF(FocusProjection.create(0),
                             add(ff.quantifiedClauseSet,
-                                instQuantifiersWithQueries() ?
-                                    longTermConst(0)
-                                    : ff.notContainsExecutable)),
+                                instQuantifiersWithQueries() ? longTermConst(0)
+                                        : ff.notContainsExecutable)),
                         forEach(varInst,
                             HeuristicInstantiation.INSTANCE,
                             add(instantiate("t", varInst),
                                 branchPrediction,
-                                longConst(10)))}));
+                                longConst(10))) }));
             final TermBuffer splitInst = new TermBuffer();
 
             bindRuleSet(
@@ -1374,7 +1387,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             TriggeredInstantiations.create(true),
                             add(instantiateTriggeredVariable(splitInst),
                                 longConst(500))),
-                        longConst(1500)}));
+                        longConst(1500) }));
 
         } else {
             bindRuleSet(d, "gamma", inftyConst());
@@ -1387,23 +1400,23 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             final TermBuffer varInst = new TermBuffer();
 
             bindRuleSet(
-                    d,
-                    "gamma",
-                    add(isInstantiated("t"),
-                            not(sum(varInst, HeuristicInstantiation.INSTANCE,
-                                    not(eq(instOf("t"), varInst)))),
-                            InstantiationCostScalerFeature.create(
-                                    InstantiationCost.create(instOf("t")),
-                                    longConst(0))));
+                d,
+                "gamma",
+                add(isInstantiated("t"),
+                    not(sum(varInst, HeuristicInstantiation.INSTANCE,
+                        not(eq(instOf("t"), varInst)))),
+                    InstantiationCostScalerFeature.create(
+                        InstantiationCost.create(instOf("t")),
+                        longConst(0))));
 
             final TermBuffer splitInst = new TermBuffer();
             bindRuleSet(
-                    d,
-                    "triggered",
-                    add(isTriggerVariableInstantiated(),
-                            not(sum(splitInst,
-                                    TriggeredInstantiations.create(false),
-                                    not(eq(instOfTriggerVariable(), splitInst))))));
+                d,
+                "triggered",
+                add(isTriggerVariableInstantiated(),
+                    not(sum(splitInst,
+                        TriggeredInstantiations.create(false),
+                        not(eq(instOfTriggerVariable(), splitInst))))));
         } else {
             bindRuleSet(d, "gamma", inftyConst());
             bindRuleSet(d, "triggered", inftyConst());
@@ -1458,87 +1471,89 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "polySimp_elimSubNeg", longConst(-120));
 
         bindRuleSet(
-                d,
-                "polySimp_homo",
-                add(applyTF("homoRight",
-                        add(not(tf.zeroLiteral), tf.polynomial)),
-                        or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
-                                not(monSmallerThan("homoRight", "homoLeft",
-                                        numbers))), longConst(-120)));
+            d,
+            "polySimp_homo",
+            add(applyTF("homoRight",
+                add(not(tf.zeroLiteral), tf.polynomial)),
+                or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
+                    not(monSmallerThan("homoRight", "homoLeft",
+                        numbers))),
+                longConst(-120)));
 
         bindRuleSet(
-                d,
-                "polySimp_pullOutFactor",
-                add(applyTFNonStrict("pullOutLeft", tf.literal),
-                        applyTFNonStrict("pullOutRight", tf.literal),
-                        longConst(-120)));
+            d,
+            "polySimp_pullOutFactor",
+            add(applyTFNonStrict("pullOutLeft", tf.literal),
+                applyTFNonStrict("pullOutRight", tf.literal),
+                longConst(-120)));
 
         bindRuleSet(d, "polySimp_elimOneLeft", -120);
 
         bindRuleSet(d, "polySimp_elimOneRight", -120);
 
         bindRuleSet(
-                d,
-                "polySimp_mulOrder",
-                add(applyTF("commRight", tf.monomial),
-                        or(applyTF("commLeft", tf.addF),
-                                add(applyTF("commLeft", tf.atom),
-                                        atomSmallerThan("commLeft",
-                                                "commRight", numbers))),
-                        longConst(-100)));
+            d,
+            "polySimp_mulOrder",
+            add(applyTF("commRight", tf.monomial),
+                or(applyTF("commLeft", tf.addF),
+                    add(applyTF("commLeft", tf.atom),
+                        atomSmallerThan("commLeft",
+                            "commRight", numbers))),
+                longConst(-100)));
 
         bindRuleSet(
-                d,
-                "polySimp_mulAssoc",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("mulAssocMono0", tf.monomial),
-                        applyTF("mulAssocMono1", tf.monomial),
-                        applyTF("mulAssocAtom", tf.atom), longConst(-80) }));
+            d,
+            "polySimp_mulAssoc",
+            SumFeature.createSum(new Feature[] {
+                applyTF("mulAssocMono0", tf.monomial),
+                applyTF("mulAssocMono1", tf.monomial),
+                applyTF("mulAssocAtom", tf.atom), longConst(-80) }));
 
         bindRuleSet(
-                d,
-                "polySimp_addOrder",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("commLeft", tf.monomial),
-                        applyTF("commRight", tf.polynomial),
-                        monSmallerThan("commRight", "commLeft", numbers),
-                        longConst(-60) }));
+            d,
+            "polySimp_addOrder",
+            SumFeature.createSum(new Feature[] {
+                applyTF("commLeft", tf.monomial),
+                applyTF("commRight", tf.polynomial),
+                monSmallerThan("commRight", "commLeft", numbers),
+                longConst(-60) }));
 
         bindRuleSet(
-                d,
-                "polySimp_addAssoc",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("addAssocPoly0", tf.polynomial),
-                        applyTF("addAssocPoly1", tf.polynomial),
-                        applyTF("addAssocMono", tf.monomial), longConst(-10) }));
+            d,
+            "polySimp_addAssoc",
+            SumFeature.createSum(new Feature[] {
+                applyTF("addAssocPoly0", tf.polynomial),
+                applyTF("addAssocPoly1", tf.polynomial),
+                applyTF("addAssocMono", tf.monomial), longConst(-10) }));
 
         bindRuleSet(d, "polySimp_dist", SumFeature.createSum(new Feature[] {
-                applyTF("distSummand0", tf.polynomial),
-                applyTF("distSummand1", tf.polynomial),
-                ifZero(applyTF("distCoeff", tf.monomial), longConst(-15),
-                        applyTF("distCoeff", tf.polynomial)),
-                applyTF("distSummand0", tf.polynomial),
+            applyTF("distSummand0", tf.polynomial),
+            applyTF("distSummand1", tf.polynomial),
+            ifZero(applyTF("distCoeff", tf.monomial), longConst(-15),
+                applyTF("distCoeff", tf.polynomial)),
+            applyTF("distSummand0", tf.polynomial),
 
-                applyTF("distSummand1", tf.polynomial), longConst(-35) }));
+            applyTF("distSummand1", tf.polynomial), longConst(-35) }));
 
         // category "direct equations"
 
         bindRuleSet(d, "polySimp_balance", SumFeature.createSum(new Feature[] {
-                applyTF("sepResidue", tf.polynomial),
-                ifZero(isInstantiated("sepPosMono"),
-                        add(applyTF("sepPosMono", tf.nonNegMonomial),
-                                monSmallerThan("sepResidue", "sepPosMono",
-                                        numbers))),
-                ifZero(isInstantiated("sepNegMono"),
-                        add(applyTF("sepNegMono", tf.negMonomial),
-                                monSmallerThan("sepResidue", "sepNegMono",
-                                        numbers))), longConst(-30) }));
+            applyTF("sepResidue", tf.polynomial),
+            ifZero(isInstantiated("sepPosMono"),
+                add(applyTF("sepPosMono", tf.nonNegMonomial),
+                    monSmallerThan("sepResidue", "sepPosMono",
+                        numbers))),
+            ifZero(isInstantiated("sepNegMono"),
+                add(applyTF("sepNegMono", tf.negMonomial),
+                    monSmallerThan("sepResidue", "sepNegMono",
+                        numbers))),
+            longConst(-30) }));
 
         bindRuleSet(
-                d,
-                "polySimp_normalise",
-                add(applyTF("invertRight", tf.zeroLiteral),
-                        applyTF("invertLeft", tf.negMonomial), longConst(-30)));
+            d,
+            "polySimp_normalise",
+            add(applyTF("invertRight", tf.zeroLiteral),
+                applyTF("invertLeft", tf.negMonomial), longConst(-30)));
 
         // application of equations: some specialised rules that handle
         // monomials and their coefficients properly
@@ -1547,50 +1562,51 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer focus = new TermBuffer();
 
         final TermFeature atLeastTwoLCEquation =
-                opSub(Equality.EQUALS,
-                        opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.intF);
+            opSub(Equality.EQUALS,
+                opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.intF);
 
         final Feature validEqApplication =
-                add(not(eq(eqLeft, focus)),
-                        // otherwise, the normal equation rules can and should
-                        // be used
-                        ifZero(applyTF(AssumptionProjection.create(0),
-                                atLeastTwoLCEquation),
-                                add(FocusInAntecFeature.INSTANCE,
-                                        applyTF(FocusFormulaProjection.INSTANCE,
-                                                atLeastTwoLCEquation))),
-                        ReducibleMonomialsFeature
+            add(not(eq(eqLeft, focus)),
+                // otherwise, the normal equation rules can and should
+                // be used
+                ifZero(applyTF(AssumptionProjection.create(0),
+                    atLeastTwoLCEquation),
+                    add(FocusInAntecFeature.INSTANCE,
+                        applyTF(FocusFormulaProjection.INSTANCE,
+                            atLeastTwoLCEquation))),
+                ReducibleMonomialsFeature
                         .createReducible(focus, eqLeft));
 
         final Feature eqMonomialFeature =
-                add(not(DirectlyBelowSymbolFeature.create(tf.mul)),
-                        ifZero(MatchedIfFeature.INSTANCE,
-                                let(focus,
-                                        FocusProjection.create(0),
-                                        let(eqLeft,
-                                                sub(AssumptionProjection
-                                                        .create(0), 0),
-                                                validEqApplication))));
+            add(not(DirectlyBelowSymbolFeature.create(tf.mul)),
+                ifZero(MatchedIfFeature.INSTANCE,
+                    let(focus,
+                        FocusProjection.create(0),
+                        let(eqLeft,
+                            sub(AssumptionProjection
+                                    .create(0),
+                                0),
+                            validEqApplication))));
 
         bindRuleSet(d, "polySimp_applyEq",
-                add(eqMonomialFeature, longConst(1)));
+            add(eqMonomialFeature, longConst(1)));
 
         bindRuleSet(d, "polySimp_applyEqRigid",
-                add(eqMonomialFeature, longConst(2)));
+            add(eqMonomialFeature, longConst(2)));
 
         //
         bindRuleSet(d, "defOps_expandModulo", add(NonDuplicateAppModPositionFeature.INSTANCE,
-                longConst(-600)));
+            longConst(-600)));
 
         // category "saturate"
 
         bindRuleSet(
-                d,
-                "polySimp_critPair",
-                ifZero(MatchedIfFeature.INSTANCE,
-                        add(monSmallerThan("cpLeft1", "cpLeft2", numbers),
-                                not(TrivialMonomialLCRFeature.create(
-                                        instOf("cpLeft1"), instOf("cpLeft2"))))));
+            d,
+            "polySimp_critPair",
+            ifZero(MatchedIfFeature.INSTANCE,
+                add(monSmallerThan("cpLeft1", "cpLeft2", numbers),
+                    not(TrivialMonomialLCRFeature.create(
+                        instOf("cpLeft1"), instOf("cpLeft2"))))));
     }
 
     // For taclets that need instantiation, but where the instantiation is
@@ -1602,7 +1618,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // the queue and do not have to be considered again).
     private void setupPolySimpInstantiationWithoutRetry(RuleSetDispatchFeature d) {
         final IntegerLDT numbers =
-                getServices().getTypeConverter().getIntegerLDT();
+            getServices().getTypeConverter().getIntegerLDT();
 
         // category "direct equations"
 
@@ -1616,73 +1632,74 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // left-hand side"
 
         bindRuleSet(
-                d,
-                "polySimp_newSym",
-                ifZero(not(isInstantiated("newSymDef")), SumFeature.createSum(
-                        applyTF("newSymLeft", tf.atom),
-                        applyTF("newSymLeftCoeff", tf.atLeastTwoLiteral),
-                        applyTF("newSymRight", tf.polynomial),
-                        instantiate("newSymDef", MonomialColumnOp.create(
-                                instOf("newSymLeftCoeff"),
-                                instOf("newSymRight"))))));
+            d,
+            "polySimp_newSym",
+            ifZero(not(isInstantiated("newSymDef")), SumFeature.createSum(
+                applyTF("newSymLeft", tf.atom),
+                applyTF("newSymLeftCoeff", tf.atLeastTwoLiteral),
+                applyTF("newSymRight", tf.polynomial),
+                instantiate("newSymDef", MonomialColumnOp.create(
+                    instOf("newSymLeftCoeff"),
+                    instOf("newSymRight"))))));
 
         final TermBuffer divisor = new TermBuffer();
         final TermBuffer dividend = new TermBuffer();
 
         bindRuleSet(
-                d,
-                "polySimp_applyEqPseudo",
-                add(applyTF("aePseudoTargetLeft", tf.monomial),
-                        applyTF("aePseudoTargetRight", tf.polynomial),
-                        ifZero(MatchedIfFeature.INSTANCE,
-                                SumFeature
-                                .createSum(
-                                        DiffFindAndIfFeature.INSTANCE,
-                                        applyTF("aePseudoLeft",
-                                                add(tf.nonCoeffMonomial,
-                                                        not(tf.atom))),
-                                        applyTF("aePseudoLeftCoeff",
-                                                tf.atLeastTwoLiteral),
-                                        applyTF("aePseudoRight",
-                                                tf.polynomial),
-                                        MonomialsSmallerThanFeature
+            d,
+            "polySimp_applyEqPseudo",
+            add(applyTF("aePseudoTargetLeft", tf.monomial),
+                applyTF("aePseudoTargetRight", tf.polynomial),
+                ifZero(MatchedIfFeature.INSTANCE,
+                    SumFeature
+                            .createSum(
+                                DiffFindAndIfFeature.INSTANCE,
+                                applyTF("aePseudoLeft",
+                                    add(tf.nonCoeffMonomial,
+                                        not(tf.atom))),
+                                applyTF("aePseudoLeftCoeff",
+                                    tf.atLeastTwoLiteral),
+                                applyTF("aePseudoRight",
+                                    tf.polynomial),
+                                MonomialsSmallerThanFeature
                                         .create(instOf("aePseudoRight"),
-                                                instOf("aePseudoLeft"),
-                                                numbers),
-                                        let(divisor,
-                                                instOf("aePseudoLeft"),
-                                                let(dividend,
-                                                        instOf("aePseudoTargetLeft"),
-                                                        add(ReducibleMonomialsFeature
-                                                                .createReducible(
-                                                                        dividend,
-                                                                        divisor),
-                                                                instantiate(
-                                                                        "aePseudoTargetFactor",
-                                                                        ReduceMonomialsProjection
-                                                                        .create(dividend,
-                                                                                divisor)))))))));
+                                            instOf("aePseudoLeft"),
+                                            numbers),
+                                let(divisor,
+                                    instOf("aePseudoLeft"),
+                                    let(dividend,
+                                        instOf("aePseudoTargetLeft"),
+                                        add(ReducibleMonomialsFeature
+                                                .createReducible(
+                                                    dividend,
+                                                    divisor),
+                                            instantiate(
+                                                "aePseudoTargetFactor",
+                                                ReduceMonomialsProjection
+                                                        .create(dividend,
+                                                            divisor)))))))));
     }
 
     private void setupNewSymApproval(RuleSetDispatchFeature d,
             IntegerLDT numbers) {
         final TermBuffer antecFor = new TermBuffer();
         final Feature columnOpEq =
-                applyTF(antecFor,
-                        opSub(tf.eq,
-                                opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral),
-                                tf.polynomial));
+            applyTF(antecFor,
+                opSub(tf.eq,
+                    opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral),
+                    tf.polynomial));
         final Feature biggerLeftSide =
-                MonomialsSmallerThanFeature
-                .create(instOf("newSymLeft"),
+            MonomialsSmallerThanFeature
+                    .create(instOf("newSymLeft"),
                         subAt(antecFor, PosInTerm.getTopLevel().down(0)
-                                .down(0)), numbers);
+                                .down(0)),
+                        numbers);
         bindRuleSet(
-                d,
-                "polySimp_newSym",
-                add(isInstantiated("newSymDef"),
-                        sum(antecFor, SequentFormulasGenerator.antecedent(),
-                                not(add(columnOpEq, biggerLeftSide)))));
+            d,
+            "polySimp_newSym",
+            add(isInstantiated("newSymDef"),
+                sum(antecFor, SequentFormulasGenerator.antecedent(),
+                    not(add(columnOpEq, biggerLeftSide)))));
     }
 
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet,
@@ -1692,35 +1709,35 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature instantiateDivs;
         if (roundingUp) {
             instantiateDivs =
-            add(instantiate("elimGcdLeftDiv",
+                add(instantiate("elimGcdLeftDiv",
                     DividePolynomialsProjection.createRoundingUp(gcd,
-                            instOf("elimGcdLeft"))),
+                        instOf("elimGcdLeft"))),
                     instantiate("elimGcdRightDiv",
-                            DividePolynomialsProjection
-                            .createRoundingUp(gcd,
+                        DividePolynomialsProjection
+                                .createRoundingUp(gcd,
                                     instOf("elimGcdRight"))));
         } else {
             instantiateDivs =
-            add(instantiate("elimGcdLeftDiv",
+                add(instantiate("elimGcdLeftDiv",
                     DividePolynomialsProjection.createRoundingDown(gcd,
-                            instOf("elimGcdLeft"))),
+                        instOf("elimGcdLeft"))),
                     instantiate("elimGcdRightDiv",
-                            DividePolynomialsProjection
-                            .createRoundingDown(gcd,
+                        DividePolynomialsProjection
+                                .createRoundingDown(gcd,
                                     instOf("elimGcdRight"))));
         }
         bindRuleSet(
-                d,
-                ruleSet,
-                add(applyTF("elimGcdLeft", tf.nonNegMonomial),
-                        applyTF("elimGcdRight", tf.polynomial),
-                        let(gcd,
-                                CoeffGcdProjection.create(
-                                        instOf("elimGcdLeft"),
-                                        instOf("elimGcdRight")),
-                                add(applyTF(gcd, tf.atLeastTwoLiteral),
-                                        instantiate("elimGcd", gcd),
-                                        instantiateDivs))));
+            d,
+            ruleSet,
+            add(applyTF("elimGcdLeft", tf.nonNegMonomial),
+                applyTF("elimGcdRight", tf.polynomial),
+                let(gcd,
+                    CoeffGcdProjection.create(
+                        instOf("elimGcdLeft"),
+                        instOf("elimGcdRight")),
+                    add(applyTF(gcd, tf.atLeastTwoLiteral),
+                        instantiate("elimGcd", gcd),
+                        instantiateDivs))));
     }
 
     private void setupInEqSimp(RuleSetDispatchFeature d, IntegerLDT numbers) {
@@ -1732,118 +1749,118 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "inEqSimp_makeNonStrict", -80);
 
         bindRuleSet(d, "inEqSimp_commute", SumFeature.createSum(
-                applyTF("commRight", tf.monomial),
-                applyTF("commLeft", tf.polynomial),
-                monSmallerThan("commLeft", "commRight", numbers),
-                longConst(-40)));
+            applyTF("commRight", tf.monomial),
+            applyTF("commLeft", tf.polynomial),
+            monSmallerThan("commLeft", "commRight", numbers),
+            longConst(-40)));
 
         // this is copied from "polySimp_homo"
         bindRuleSet(
-                d,
-                "inEqSimp_homo",
-                add(applyTF("homoRight",
-                        add(not(tf.zeroLiteral), tf.polynomial)),
-                        or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
-                                not(monSmallerThan("homoRight", "homoLeft",
-                                        numbers)))));
+            d,
+            "inEqSimp_homo",
+            add(applyTF("homoRight",
+                add(not(tf.zeroLiteral), tf.polynomial)),
+                or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
+                    not(monSmallerThan("homoRight", "homoLeft",
+                        numbers)))));
 
         // category "direct inequations"
 
         // this is copied from "polySimp_balance"
         bindRuleSet(
-                d,
-                "inEqSimp_balance",
-                add(applyTF("sepResidue", tf.polynomial),
-                        ifZero(isInstantiated("sepPosMono"),
-                                add(applyTF("sepPosMono", tf.nonNegMonomial),
-                                        monSmallerThan("sepResidue",
-                                                "sepPosMono", numbers))),
-                        ifZero(isInstantiated("sepNegMono"),
-                                add(applyTF("sepNegMono", tf.negMonomial),
-                                        monSmallerThan("sepResidue",
-                                                "sepNegMono", numbers)))));
+            d,
+            "inEqSimp_balance",
+            add(applyTF("sepResidue", tf.polynomial),
+                ifZero(isInstantiated("sepPosMono"),
+                    add(applyTF("sepPosMono", tf.nonNegMonomial),
+                        monSmallerThan("sepResidue",
+                            "sepPosMono", numbers))),
+                ifZero(isInstantiated("sepNegMono"),
+                    add(applyTF("sepNegMono", tf.negMonomial),
+                        monSmallerThan("sepResidue",
+                            "sepNegMono", numbers)))));
 
         // this is copied from "polySimp_normalise"
         bindRuleSet(
-                d,
-                "inEqSimp_normalise",
-                add(applyTF("invertRight", tf.zeroLiteral),
-                        applyTF("invertLeft", tf.negMonomial)));
+            d,
+            "inEqSimp_normalise",
+            add(applyTF("invertRight", tf.zeroLiteral),
+                applyTF("invertLeft", tf.negMonomial)));
 
         // category "saturate"
 
         bindRuleSet(d, "inEqSimp_antiSymm", longConst(-20));
 
         bindRuleSet(d, "inEqSimp_exactShadow",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("esLeft", tf.nonCoeffMonomial),
-                        applyTFNonStrict("esCoeff2", tf.nonNegLiteral),
-                        applyTF("esRight2", tf.polynomial),
-                        ifZero(MatchedIfFeature.INSTANCE, SumFeature.createSum(
-                                applyTFNonStrict("esCoeff1", tf.nonNegLiteral),
-                                applyTF("esRight1", tf.polynomial),
-                                not(PolynomialValuesCmpFeature.leq(
-                                        instOf("esRight2"), instOf("esRight1"),
-                                        instOfNonStrict("esCoeff1"),
-                                        instOfNonStrict("esCoeff2"))))) }));
+            SumFeature.createSum(new Feature[] {
+                applyTF("esLeft", tf.nonCoeffMonomial),
+                applyTFNonStrict("esCoeff2", tf.nonNegLiteral),
+                applyTF("esRight2", tf.polynomial),
+                ifZero(MatchedIfFeature.INSTANCE, SumFeature.createSum(
+                    applyTFNonStrict("esCoeff1", tf.nonNegLiteral),
+                    applyTF("esRight1", tf.polynomial),
+                    not(PolynomialValuesCmpFeature.leq(
+                        instOf("esRight2"), instOf("esRight1"),
+                        instOfNonStrict("esCoeff1"),
+                        instOfNonStrict("esCoeff2"))))) }));
 
         // category "propagation"
 
         bindRuleSet(
-                d,
-                "inEqSimp_contradInEqs",
-                add(applyTF("contradLeft", tf.monomial),
-                        ifZero(MatchedIfFeature.INSTANCE,
-                                SumFeature
-                                .createSum(
-                                        DiffFindAndIfFeature.INSTANCE,
-                                        applyTF("contradRightSmaller",
-                                                tf.polynomial),
-                                        applyTF("contradRightBigger",
-                                                tf.polynomial),
-                                        applyTFNonStrict(
-                                                "contradCoeffSmaller",
-                                                tf.posLiteral),
-                                        applyTFNonStrict(
-                                                "contradCoeffBigger",
-                                                tf.posLiteral),
-                                        PolynomialValuesCmpFeature
+            d,
+            "inEqSimp_contradInEqs",
+            add(applyTF("contradLeft", tf.monomial),
+                ifZero(MatchedIfFeature.INSTANCE,
+                    SumFeature
+                            .createSum(
+                                DiffFindAndIfFeature.INSTANCE,
+                                applyTF("contradRightSmaller",
+                                    tf.polynomial),
+                                applyTF("contradRightBigger",
+                                    tf.polynomial),
+                                applyTFNonStrict(
+                                    "contradCoeffSmaller",
+                                    tf.posLiteral),
+                                applyTFNonStrict(
+                                    "contradCoeffBigger",
+                                    tf.posLiteral),
+                                PolynomialValuesCmpFeature
                                         .lt(instOf("contradRightSmaller"),
-                                                instOf("contradRightBigger"),
-                                                instOfNonStrict("contradCoeffBigger"),
-                                                instOfNonStrict("contradCoeffSmaller"))))));
+                                            instOf("contradRightBigger"),
+                                            instOfNonStrict("contradCoeffBigger"),
+                                            instOfNonStrict("contradCoeffSmaller"))))));
 
         bindRuleSet(
-                d,
-                "inEqSimp_contradEqs",
-                add(applyTF("contradLeft", tf.monomial),
-                        ifZero(MatchedIfFeature.INSTANCE, SumFeature.createSum(
-                                applyTF("contradRightSmaller", tf.polynomial),
-                                applyTF("contradRightBigger", tf.polynomial),
-                                PolynomialValuesCmpFeature.lt(
-                                        instOf("contradRightSmaller"),
-                                        instOf("contradRightBigger")))),
-                        longConst(-60)));
+            d,
+            "inEqSimp_contradEqs",
+            add(applyTF("contradLeft", tf.monomial),
+                ifZero(MatchedIfFeature.INSTANCE, SumFeature.createSum(
+                    applyTF("contradRightSmaller", tf.polynomial),
+                    applyTF("contradRightBigger", tf.polynomial),
+                    PolynomialValuesCmpFeature.lt(
+                        instOf("contradRightSmaller"),
+                        instOf("contradRightBigger")))),
+                longConst(-60)));
 
         bindRuleSet(d, "inEqSimp_strengthen", longConst(-30));
 
         bindRuleSet(
-                d,
-                "inEqSimp_subsumption",
-                add(applyTF("subsumLeft", tf.monomial),
-                        ifZero(MatchedIfFeature.INSTANCE, SumFeature.createSum(
-                                DiffFindAndIfFeature.INSTANCE,
-                                applyTF("subsumRightSmaller", tf.polynomial),
-                                applyTF("subsumRightBigger", tf.polynomial),
-                                applyTFNonStrict("subsumCoeffSmaller",
-                                        tf.posLiteral),
-                                applyTFNonStrict("subsumCoeffBigger",
-                                        tf.posLiteral),
-                                PolynomialValuesCmpFeature.leq(
-                                        instOf("subsumRightSmaller"),
-                                        instOf("subsumRightBigger"),
-                                        instOfNonStrict("subsumCoeffBigger"),
-                                        instOfNonStrict("subsumCoeffSmaller"))))));
+            d,
+            "inEqSimp_subsumption",
+            add(applyTF("subsumLeft", tf.monomial),
+                ifZero(MatchedIfFeature.INSTANCE, SumFeature.createSum(
+                    DiffFindAndIfFeature.INSTANCE,
+                    applyTF("subsumRightSmaller", tf.polynomial),
+                    applyTF("subsumRightBigger", tf.polynomial),
+                    applyTFNonStrict("subsumCoeffSmaller",
+                        tf.posLiteral),
+                    applyTFNonStrict("subsumCoeffBigger",
+                        tf.posLiteral),
+                    PolynomialValuesCmpFeature.leq(
+                        instOf("subsumRightSmaller"),
+                        instOf("subsumRightBigger"),
+                        instOfNonStrict("subsumCoeffBigger"),
+                        instOfNonStrict("subsumCoeffSmaller"))))));
 
         // category "handling of non-linear inequations"
 
@@ -1851,10 +1868,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             setupMultiplyInequations(d, longConst(100));
 
             bindRuleSet(d, "inEqSimp_split_eq",
-                    add(TopLevelFindFeature.SUCC, longConst(-100)));
+                add(TopLevelFindFeature.SUCC, longConst(-100)));
 
             bindRuleSet(d, "inEqSimp_signCases",
-                    not(isInstantiated("signCasesLeft")));
+                not(isInstantiated("signCasesLeft")));
         }
 
         // category "normalisation of formulas"
@@ -1862,31 +1879,31 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // does not do any normalisation)
 
         bindRuleSet(d, "inEqSimp_and_contradInEqs",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("contradLeft", tf.monomial),
-                        applyTF("contradRightSmaller", tf.polynomial),
-                        applyTF("contradRightBigger", tf.polynomial),
-                        PolynomialValuesCmpFeature.lt(
-                                instOf("contradRightSmaller"),
-                                instOf("contradRightBigger")) }));
+            SumFeature.createSum(new Feature[] {
+                applyTF("contradLeft", tf.monomial),
+                applyTF("contradRightSmaller", tf.polynomial),
+                applyTF("contradRightBigger", tf.polynomial),
+                PolynomialValuesCmpFeature.lt(
+                    instOf("contradRightSmaller"),
+                    instOf("contradRightBigger")) }));
 
         bindRuleSet(d, "inEqSimp_andOr_subsumption",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("subsumLeft", tf.monomial),
-                        applyTF("subsumRightSmaller", tf.polynomial),
-                        applyTF("subsumRightBigger", tf.polynomial),
-                        PolynomialValuesCmpFeature.leq(
-                                instOf("subsumRightSmaller"),
-                                instOf("subsumRightBigger")) }));
+            SumFeature.createSum(new Feature[] {
+                applyTF("subsumLeft", tf.monomial),
+                applyTF("subsumRightSmaller", tf.polynomial),
+                applyTF("subsumRightBigger", tf.polynomial),
+                PolynomialValuesCmpFeature.leq(
+                    instOf("subsumRightSmaller"),
+                    instOf("subsumRightBigger")) }));
 
         bindRuleSet(d, "inEqSimp_and_subsumptionEq",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("subsumLeft", tf.monomial),
-                        applyTF("subsumRightSmaller", tf.polynomial),
-                        applyTF("subsumRightBigger", tf.polynomial),
-                        PolynomialValuesCmpFeature.lt(
-                                instOf("subsumRightSmaller"),
-                                instOf("subsumRightBigger")) }));
+            SumFeature.createSum(new Feature[] {
+                applyTF("subsumLeft", tf.monomial),
+                applyTF("subsumRightSmaller", tf.polynomial),
+                applyTF("subsumRightBigger", tf.polynomial),
+                PolynomialValuesCmpFeature.lt(
+                    instOf("subsumRightSmaller"),
+                    instOf("subsumRightBigger")) }));
 
         final TermBuffer one = new TermBuffer();
         one.setContent(getServices().getTermBuilder().zTerm("1"));
@@ -1894,34 +1911,34 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         two.setContent(getServices().getTermBuilder().zTerm("2"));
 
         bindRuleSet(d, "inEqSimp_or_tautInEqs",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("tautLeft", tf.monomial),
-                        applyTF("tautRightSmaller", tf.polynomial),
-                        applyTF("tautRightBigger", tf.polynomial),
-                        PolynomialValuesCmpFeature.leq(
-                                instOf("tautRightSmaller"),
-                                opTerm(numbers.getAdd(), one,
-                                        instOf("tautRightBigger"))) }));
+            SumFeature.createSum(new Feature[] {
+                applyTF("tautLeft", tf.monomial),
+                applyTF("tautRightSmaller", tf.polynomial),
+                applyTF("tautRightBigger", tf.polynomial),
+                PolynomialValuesCmpFeature.leq(
+                    instOf("tautRightSmaller"),
+                    opTerm(numbers.getAdd(), one,
+                        instOf("tautRightBigger"))) }));
 
         bindRuleSet(d, "inEqSimp_or_weaken",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("weakenLeft", tf.monomial),
-                        applyTF("weakenRightSmaller", tf.polynomial),
-                        applyTF("weakenRightBigger", tf.polynomial),
-                        PolynomialValuesCmpFeature.eq(
-                                opTerm(numbers.getAdd(), one,
-                                        instOf("weakenRightSmaller")),
-                                instOf("weakenRightBigger")) }));
+            SumFeature.createSum(new Feature[] {
+                applyTF("weakenLeft", tf.monomial),
+                applyTF("weakenRightSmaller", tf.polynomial),
+                applyTF("weakenRightBigger", tf.polynomial),
+                PolynomialValuesCmpFeature.eq(
+                    opTerm(numbers.getAdd(), one,
+                        instOf("weakenRightSmaller")),
+                    instOf("weakenRightBigger")) }));
 
         bindRuleSet(d, "inEqSimp_or_antiSymm",
-                SumFeature.createSum(new Feature[] {
-                        applyTF("antiSymmLeft", tf.monomial),
-                        applyTF("antiSymmRightSmaller", tf.polynomial),
-                        applyTF("antiSymmRightBigger", tf.polynomial),
-                        PolynomialValuesCmpFeature.eq(
-                                opTerm(numbers.getAdd(), two,
-                                        instOf("antiSymmRightSmaller")),
-                                instOf("antiSymmRightBigger")) }));
+            SumFeature.createSum(new Feature[] {
+                applyTF("antiSymmLeft", tf.monomial),
+                applyTF("antiSymmRightSmaller", tf.polynomial),
+                applyTF("antiSymmRightBigger", tf.polynomial),
+                PolynomialValuesCmpFeature.eq(
+                    opTerm(numbers.getAdd(), two,
+                        instOf("antiSymmRightSmaller")),
+                    instOf("antiSymmRightBigger")) }));
 
     }
 
@@ -1937,20 +1954,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
          */
 
         final Feature totallyBounded =
-                not(sum(intRel,
-                        SequentFormulasGenerator.sequent(),
-                        not(add(applyTF(intRel, tf.intRelation),
-                                InEquationMultFeature.totallyBounded(
-                                        instOf("multLeft"),
-                                        instOf("multFacLeft"), sub(intRel, 0))))));
+            not(sum(intRel,
+                SequentFormulasGenerator.sequent(),
+                not(add(applyTF(intRel, tf.intRelation),
+                    InEquationMultFeature.totallyBounded(
+                        instOf("multLeft"),
+                        instOf("multFacLeft"), sub(intRel, 0))))));
 
         final Feature exactlyBounded =
-                not(sum(intRel,
-                        SequentFormulasGenerator.sequent(),
-                        not(add(applyTF(intRel, tf.intRelation),
-                                InEquationMultFeature.exactlyBounded(
-                                        instOf("multLeft"),
-                                        instOf("multFacLeft"), sub(intRel, 0))))));
+            not(sum(intRel,
+                SequentFormulasGenerator.sequent(),
+                not(add(applyTF(intRel, tf.intRelation),
+                    InEquationMultFeature.exactlyBounded(
+                        instOf("multLeft"),
+                        instOf("multFacLeft"), sub(intRel, 0))))));
 
         // this is a bit hackish
         //
@@ -1964,59 +1981,59 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // perfect, because it is not possible to distinguish between the
         // re-cost-computation delay and the normal costs for a rule application
         bindRuleSet(
-                d,
-                "inEqSimp_nonLin_multiply",
-                add(applyTF("multLeft", tf.nonNegMonomial),
-                        applyTF("multRight", tf.polynomial),
-                        ifZero(MatchedIfFeature.INSTANCE,
-                                SumFeature
-                                .createSum(
-                                        applyTF("multFacLeft",
-                                                tf.nonNegMonomial),
-                                        ifZero(applyTF("multRight",
-                                                tf.literal),
-                                                longConst(-100)),
-                                        ifZero(applyTF("multFacRight",
-                                                tf.literal),
-                                                longConst(-100),
-                                                applyTF("multFacRight",
-                                                        tf.polynomial)),
-                                        /*
-                                         * ifZero ( applyTF (
-                                         * "multRight", tf.literal ),
-                                         * longConst ( -100 ), applyTF (
-                                         * "multRight", tf.polynomial )
-                                         * ), ifZero ( applyTF (
-                                         * "multFacRight", tf.literal ),
-                                         * longConst ( -100 ), applyTF (
-                                         * "multFacRight", tf.polynomial
-                                         * ) ),
-                                         */
-                                        not(TermSmallerThanFeature.create(
-                                                FocusProjection
-                                                .create(0),
-                                                AssumptionProjection
-                                                .create(0))),
-                                        ifZero(exactlyBounded,
-                                                longConst(0),
-                                                ifZero(totallyBounded,
-                                                        longConst(100),
-                                                        notAllowedF))
-                                        /*
-                                         * ifZero ( partiallyBounded, longConst
-                                         * ( 400 ), notAllowedF ) ) ),
-                                         */
-                                        /*
-                                         * applyTF ( "multLeft", rec ( tf.mulF,
-                                         * longTermConst ( 20 ) ) ), applyTF (
-                                         * "multFacLeft", rec ( tf.mulF,
-                                         * longTermConst ( 20 ) ) ), applyTF (
-                                         * "multRight", rec ( tf.addF,
-                                         * longTermConst ( 4 ) ) ), applyTF (
-                                         * "multFacRight", rec ( tf.addF,
-                                         * longTermConst ( 4 ) ) ),
-                                         */
-                                        ), notAllowedF)));
+            d,
+            "inEqSimp_nonLin_multiply",
+            add(applyTF("multLeft", tf.nonNegMonomial),
+                applyTF("multRight", tf.polynomial),
+                ifZero(MatchedIfFeature.INSTANCE,
+                    SumFeature
+                            .createSum(
+                                applyTF("multFacLeft",
+                                    tf.nonNegMonomial),
+                                ifZero(applyTF("multRight",
+                                    tf.literal),
+                                    longConst(-100)),
+                                ifZero(applyTF("multFacRight",
+                                    tf.literal),
+                                    longConst(-100),
+                                    applyTF("multFacRight",
+                                        tf.polynomial)),
+                                /*
+                                 * ifZero ( applyTF (
+                                 * "multRight", tf.literal ),
+                                 * longConst ( -100 ), applyTF (
+                                 * "multRight", tf.polynomial )
+                                 * ), ifZero ( applyTF (
+                                 * "multFacRight", tf.literal ),
+                                 * longConst ( -100 ), applyTF (
+                                 * "multFacRight", tf.polynomial
+                                 * ) ),
+                                 */
+                                not(TermSmallerThanFeature.create(
+                                    FocusProjection
+                                            .create(0),
+                                    AssumptionProjection
+                                            .create(0))),
+                                ifZero(exactlyBounded,
+                                    longConst(0),
+                                    ifZero(totallyBounded,
+                                        longConst(100),
+                                        notAllowedF))
+                            /*
+                             * ifZero ( partiallyBounded, longConst
+                             * ( 400 ), notAllowedF ) ) ),
+                             */
+                            /*
+                             * applyTF ( "multLeft", rec ( tf.mulF,
+                             * longTermConst ( 20 ) ) ), applyTF (
+                             * "multFacLeft", rec ( tf.mulF,
+                             * longTermConst ( 20 ) ) ), applyTF (
+                             * "multRight", rec ( tf.addF,
+                             * longTermConst ( 4 ) ) ), applyTF (
+                             * "multFacRight", rec ( tf.addF,
+                             * longTermConst ( 4 ) ) ),
+                             */
+                            ), notAllowedF)));
     }
 
     private void setupInEqSimpInstantiation(RuleSetDispatchFeature d) {
@@ -2051,41 +2068,41 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer dividend = new TermBuffer();
 
         bindRuleSet(
-                d,
-                "inEqSimp_nonLin_divide",
-                SumFeature
-                .createSum(new Feature[] {
+            d,
+            "inEqSimp_nonLin_divide",
+            SumFeature
+                    .createSum(new Feature[] {
                         applyTF("divProd", tf.nonCoeffMonomial),
                         applyTFNonStrict("divProdBoundNonPos",
-                                tf.nonPosLiteral),
+                            tf.nonPosLiteral),
                         applyTFNonStrict("divProdBoundNonNeg",
-                                tf.nonNegLiteral),
+                            tf.nonNegLiteral),
                         ifZero(MatchedIfFeature.INSTANCE,
-                                let(divisor,
-                                        instOf("divX"),
-                                        let(dividend,
-                                                instOf("divProd"),
-                                                SumFeature
-                                                .createSum(
-                                                        applyTF(divisor,
-                                                                tf.nonCoeffMonomial),
-                                                        not(eq(dividend,
-                                                                divisor)),
-                                                        applyTFNonStrict(
-                                                                "divXBoundPos",
-                                                                tf.posLiteral),
-                                                        applyTFNonStrict(
-                                                                "divXBoundNeg",
-                                                                tf.negLiteral),
-                                                        ReducibleMonomialsFeature
+                            let(divisor,
+                                instOf("divX"),
+                                let(dividend,
+                                    instOf("divProd"),
+                                    SumFeature
+                                            .createSum(
+                                                applyTF(divisor,
+                                                    tf.nonCoeffMonomial),
+                                                not(eq(dividend,
+                                                    divisor)),
+                                                applyTFNonStrict(
+                                                    "divXBoundPos",
+                                                    tf.posLiteral),
+                                                applyTFNonStrict(
+                                                    "divXBoundNeg",
+                                                    tf.negLiteral),
+                                                ReducibleMonomialsFeature
                                                         .createReducible(
-                                                                dividend,
-                                                                divisor),
-                                                        instantiate(
-                                                                "divY",
-                                                                ReduceMonomialsProjection
-                                                                .create(dividend,
-                                                                        divisor)))))) }));
+                                                            dividend,
+                                                            divisor),
+                                                instantiate(
+                                                    "divY",
+                                                    ReduceMonomialsProjection
+                                                            .create(dividend,
+                                                                divisor)))))) }));
 
         setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_pos", true);
         setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_neg", false);
@@ -2102,47 +2119,47 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             d,
             ruleSet,
             SumFeature
-                .createSum(
-                    new Feature[] {
-                        applyTF("divProd", tf.nonCoeffMonomial),
-                        applyTFNonStrict("divProdBoundPos",
-                            tf.posLiteral),
-                        applyTFNonStrict("divProdBoundNeg",
-                            tf.negLiteral),
-                        ifZero(MatchedIfFeature.INSTANCE,
-                            let(divisor,
-                                instOf("divX"),
-                                let(dividend,
-                                    instOf("divProd"),
-                                    SumFeature
-                                        .createSum(
-                                            applyTF(divisor,
-                                                tf.nonCoeffMonomial),
-                                            not(applyTF(dividend,
-                                                    eq(divisor))),
-                                    applyTFNonStrict("divXBoundNonPos",
-                                        tf.nonPosLiteral),
-                                    applyTFNonStrict("divXBoundNonNeg",
-                                        tf.nonNegLiteral),
-                                    ReducibleMonomialsFeature
-                                        .createReducible(dividend,
-                                                         divisor),
-                                    let(quotient,
-                                        ReduceMonomialsProjection
-                                            .create(dividend,
-                                                    divisor),
-                                        add(sum(antecFor,
-                                                SequentFormulasGenerator
-                                                    .antecedent(),
-                                                not(applyTF(antecFor,
-                                                        pos ? opSub(tf.geq,
-                                                                  eq(quotient),
-                                                                  tf.posLiteral)
-                                                            : opSub(tf.leq,
-                                                                  eq(quotient),
-                                                                  tf.negLiteral)))),
-                                                instantiate("divY",
-                                                    quotient)))))))}));
+                    .createSum(
+                        new Feature[] {
+                            applyTF("divProd", tf.nonCoeffMonomial),
+                            applyTFNonStrict("divProdBoundPos",
+                                tf.posLiteral),
+                            applyTFNonStrict("divProdBoundNeg",
+                                tf.negLiteral),
+                            ifZero(MatchedIfFeature.INSTANCE,
+                                let(divisor,
+                                    instOf("divX"),
+                                    let(dividend,
+                                        instOf("divProd"),
+                                        SumFeature
+                                                .createSum(
+                                                    applyTF(divisor,
+                                                        tf.nonCoeffMonomial),
+                                                    not(applyTF(dividend,
+                                                        eq(divisor))),
+                                                    applyTFNonStrict("divXBoundNonPos",
+                                                        tf.nonPosLiteral),
+                                                    applyTFNonStrict("divXBoundNonNeg",
+                                                        tf.nonNegLiteral),
+                                                    ReducibleMonomialsFeature
+                                                            .createReducible(dividend,
+                                                                divisor),
+                                                    let(quotient,
+                                                        ReduceMonomialsProjection
+                                                                .create(dividend,
+                                                                    divisor),
+                                                        add(sum(antecFor,
+                                                            SequentFormulasGenerator
+                                                                    .antecedent(),
+                                                            not(applyTF(antecFor,
+                                                                pos ? opSub(tf.geq,
+                                                                    eq(quotient),
+                                                                    tf.posLiteral)
+                                                                        : opSub(tf.leq,
+                                                                            eq(quotient),
+                                                                            tf.negLiteral)))),
+                                                            instantiate("divY",
+                                                                quotient))))))) }));
     }
 
     private void setupSquaresAreNonNegative(RuleSetDispatchFeature d) {
@@ -2151,27 +2168,27 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer factor = new TermBuffer();
 
         final Feature productContainsSquare =
-                applyTF(sub(product, 0),
-                        or(eq(factor), opSub(tf.mul, any(), eq(factor))));
+            applyTF(sub(product, 0),
+                or(eq(factor), opSub(tf.mul, any(), eq(factor))));
         final Feature productIsProduct =
-                applyTF(product, opSub(tf.mul, any(), not(tf.mulF)));
+            applyTF(product, opSub(tf.mul, any(), not(tf.mulF)));
 
         bindRuleSet(
-                d,
-                "inEqSimp_nonNegSquares",
-                forEach(intRel,
-                        SequentFormulasGenerator.sequent(),
-                        ifZero(applyTF(intRel, tf.intRelation),
-                                forEach(product,
-                                        SubtermGenerator.leftTraverse(
-                                                sub(intRel, 0), tf.mulF),
-                                        ifZero(productIsProduct,
-                                                let(factor,
-                                                        sub(product, 1),
-                                                        ifZero(productContainsSquare,
-                                                                instantiate(
-                                                                        "squareFac",
-                                                                        factor))))))));
+            d,
+            "inEqSimp_nonNegSquares",
+            forEach(intRel,
+                SequentFormulasGenerator.sequent(),
+                ifZero(applyTF(intRel, tf.intRelation),
+                    forEach(product,
+                        SubtermGenerator.leftTraverse(
+                            sub(intRel, 0), tf.mulF),
+                        ifZero(productIsProduct,
+                            let(factor,
+                                sub(product, 1),
+                                ifZero(productContainsSquare,
+                                    instantiate(
+                                        "squareFac",
+                                        factor))))))));
     }
 
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d) {
@@ -2182,72 +2199,72 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer rootInf = new TermBuffer();
 
         final Feature posNegSplitting =
-                forEach(intRel,
-                        SequentFormulasGenerator.antecedent(),
-                        add(applyTF(intRel, tf.intRelation),
-                                forEach(atom,
-                                        SubtermGenerator.leftTraverse(
-                                                sub(intRel, 0), tf.mulF),
-                                        SumFeature
-                                        .createSum(
-                                                applyTF(atom,
-                                                        add(tf.atom,
-                                                                not(tf.literal))),
-                                                allowPosNegCaseDistinction(atom),
-                                                instantiate(
-                                                        "signCasesLeft",
-                                                        atom),
-                                                longConst(IN_EQ_SIMP_NON_LIN_COST + 200)
-                                                // ,
-                                                // applyTF ( atom, rec ( any (),
-                                                // longTermConst ( 5 ) ) )
-                                                ))));
+            forEach(intRel,
+                SequentFormulasGenerator.antecedent(),
+                add(applyTF(intRel, tf.intRelation),
+                    forEach(atom,
+                        SubtermGenerator.leftTraverse(
+                            sub(intRel, 0), tf.mulF),
+                        SumFeature
+                                .createSum(
+                                    applyTF(atom,
+                                        add(tf.atom,
+                                            not(tf.literal))),
+                                    allowPosNegCaseDistinction(atom),
+                                    instantiate(
+                                        "signCasesLeft",
+                                        atom),
+                                    longConst(IN_EQ_SIMP_NON_LIN_COST + 200)
+                                // ,
+                                // applyTF ( atom, rec ( any (),
+                                // longTermConst ( 5 ) ) )
+                                ))));
 
         bindRuleSet(d, "inEqSimp_signCases", posNegSplitting);
 
         final Feature strengthening =
-                forEach(intRel, SequentFormulasGenerator.antecedent(),
-                        SumFeature.createSum(
-                                applyTF(intRel,
-                                        add(or(tf.geqF, tf.leqF),
-                                                sub(tf.atom, tf.literal))),
-                                instantiate(
-                                        "cutFormula",
-                                        opTerm(tf.eq, sub(intRel, 0),
-                                                sub(intRel, 1))),
-                                longConst(IN_EQ_SIMP_NON_LIN_COST + 300)
-                                // ,
-                                // applyTF ( sub ( intRel, 0 ),
-                                // rec ( any (), longTermConst ( 5 ) ) )
-                                ));
+            forEach(intRel, SequentFormulasGenerator.antecedent(),
+                SumFeature.createSum(
+                    applyTF(intRel,
+                        add(or(tf.geqF, tf.leqF),
+                            sub(tf.atom, tf.literal))),
+                    instantiate(
+                        "cutFormula",
+                        opTerm(tf.eq, sub(intRel, 0),
+                            sub(intRel, 1))),
+                    longConst(IN_EQ_SIMP_NON_LIN_COST + 300)
+                // ,
+                // applyTF ( sub ( intRel, 0 ),
+                // rec ( any (), longTermConst ( 5 ) ) )
+                ));
 
         final Feature rootInferences =
-                forEach(intRel,
-                        SequentFormulasGenerator.antecedent(),
-                        add(isRootInferenceProducer(intRel),
-                                forEach(rootInf,
-                                        RootsGenerator.create(intRel,
-                                                getServices()),
-                                        add(instantiate("cutFormula", rootInf),
-                                                ifZero(applyTF(rootInf,
-                                                        op(Junctor.OR)),
-                                                        longConst(50)),
-                                                ifZero(applyTF(rootInf,
-                                                        op(Junctor.AND)),
-                                                        longConst(20)))),
-                                longConst(IN_EQ_SIMP_NON_LIN_COST)));
+            forEach(intRel,
+                SequentFormulasGenerator.antecedent(),
+                add(isRootInferenceProducer(intRel),
+                    forEach(rootInf,
+                        RootsGenerator.create(intRel,
+                            getServices()),
+                        add(instantiate("cutFormula", rootInf),
+                            ifZero(applyTF(rootInf,
+                                op(Junctor.OR)),
+                                longConst(50)),
+                            ifZero(applyTF(rootInf,
+                                op(Junctor.AND)),
+                                longConst(20)))),
+                    longConst(IN_EQ_SIMP_NON_LIN_COST)));
 
         bindRuleSet(
             d,
             "cut",
             oneOf(
-                new Feature[] {strengthening,
-                               rootInferences}));
+                new Feature[] { strengthening,
+                    rootInferences }));
     }
 
     private Feature isRootInferenceProducer(TermBuffer intRel) {
         return applyTF(intRel,
-                add(tf.intRelation, sub(tf.nonCoeffMonomial, tf.literal)));
+            add(tf.intRelation, sub(tf.nonCoeffMonomial, tf.literal)));
     }
 
     private Feature allowPosNegCaseDistinction(TermBuffer atom) {
@@ -2255,34 +2272,34 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature eqAtom = eq(atom);
 
         return add(
-                not(succIntEquationExists()),
-                sum(antecFor,
-                        SequentFormulasGenerator.antecedent(),
-                        not(applyTF(
-                                antecFor,
-                                or(opSub(tf.eq, eqAtom, any()),
-                                        opSub(tf.leq, eqAtom, tf.negLiteral),
-                                        opSub(tf.geq, eqAtom, tf.posLiteral))))));
+            not(succIntEquationExists()),
+            sum(antecFor,
+                SequentFormulasGenerator.antecedent(),
+                not(applyTF(
+                    antecFor,
+                    or(opSub(tf.eq, eqAtom, any()),
+                        opSub(tf.leq, eqAtom, tf.negLiteral),
+                        opSub(tf.geq, eqAtom, tf.posLiteral))))));
     }
 
     private Feature allowInEqStrengthening(TermBuffer atom, TermBuffer literal) {
         final TermBuffer antecFor = new TermBuffer();
 
         return add(
-                not(succIntEquationExists()),
-                not(sum(antecFor,
-                        SequentFormulasGenerator.antecedent(),
-                        not(applyTF(
-                                antecFor,
-                                add(or(tf.leqF, tf.geqF),
-                                        sub(eq(atom), eq(literal))))))));
+            not(succIntEquationExists()),
+            not(sum(antecFor,
+                SequentFormulasGenerator.antecedent(),
+                not(applyTF(
+                    antecFor,
+                    add(or(tf.leqF, tf.geqF),
+                        sub(eq(atom), eq(literal))))))));
     }
 
     private Feature succIntEquationExists() {
         final TermBuffer succFor = new TermBuffer();
 
         return not(sum(succFor, SequentFormulasGenerator.succedent(),
-                not(applyTF(succFor, tf.intEquation))));
+            not(applyTF(succFor, tf.intEquation))));
     }
 
     protected final Services getServices() {
@@ -2296,36 +2313,36 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer rootInf = new TermBuffer();
 
         bindRuleSet(
-                d,
-                "inEqSimp_signCases",
-                add(isInstantiated("signCasesLeft"),
-                        let(atom, instOf("signCasesLeft"),
-                                allowPosNegCaseDistinction(atom))));
+            d,
+            "inEqSimp_signCases",
+            add(isInstantiated("signCasesLeft"),
+                let(atom, instOf("signCasesLeft"),
+                    allowPosNegCaseDistinction(atom))));
 
         // this is somewhat ugly. we should introduce some concept of "tagging"
         // rule application so that they can be recognised again later
         bindRuleSet(
-                d,
-                "cut",
-                add(isInstantiated("cutFormula"),
-                        or(not(sum(
-                                intRel,
-                                SequentFormulasGenerator.antecedent(),
-                                ifZero(isRootInferenceProducer(intRel),
-                                        sum(rootInf,
-                                                RootsGenerator.create(intRel,
-                                                        getServices()),
-                                                not(eq(instOf("cutFormula"),
-                                                        rootInf)))))),
-                                ifZero(applyTF("cutFormula",
-                                        opSub(tf.eq, tf.atom, tf.literal)),
-                                        let(atom,
-                                                sub(instOf("cutFormula"), 0),
-                                                let(literal,
-                                                        sub(instOf("cutFormula"),
-                                                                1),
-                                                        allowInEqStrengthening(
-                                                                atom, literal)))))));
+            d,
+            "cut",
+            add(isInstantiated("cutFormula"),
+                or(not(sum(
+                    intRel,
+                    SequentFormulasGenerator.antecedent(),
+                    ifZero(isRootInferenceProducer(intRel),
+                        sum(rootInf,
+                            RootsGenerator.create(intRel,
+                                getServices()),
+                            not(eq(instOf("cutFormula"),
+                                rootInf)))))),
+                    ifZero(applyTF("cutFormula",
+                        opSub(tf.eq, tf.atom, tf.literal)),
+                        let(atom,
+                            sub(instOf("cutFormula"), 0),
+                            let(literal,
+                                sub(instOf("cutFormula"),
+                                    1),
+                                allowInEqStrengthening(
+                                    atom, literal)))))));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -2346,32 +2363,32 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 d,
                 "defOps_div",
                 SumFeature.createSum(
-                    new Feature[] {NonDuplicateAppModPositionFeature.INSTANCE,
-                                   applyTF("divNum", tf.polynomial),
-                                   applyTF("divDenom", tf.polynomial),
-                                   applyTF("divNum", tf.notContainsDivMod),
-                                   applyTF("divDenom", tf.notContainsDivMod),
-                                   ifZero(isBelow(ff.modalOperator),
-                                   longConst(200))}));
+                    new Feature[] { NonDuplicateAppModPositionFeature.INSTANCE,
+                        applyTF("divNum", tf.polynomial),
+                        applyTF("divDenom", tf.polynomial),
+                        applyTF("divNum", tf.notContainsDivMod),
+                        applyTF("divDenom", tf.notContainsDivMod),
+                        ifZero(isBelow(ff.modalOperator),
+                            longConst(200)) }));
 
             bindRuleSet(
                 d,
                 "defOps_jdiv",
                 SumFeature.createSum(
-                    new Feature[] {NonDuplicateAppModPositionFeature.INSTANCE,
-                                   applyTF("divNum", tf.polynomial),
-                                   applyTF("divDenom", tf.polynomial),
-                                   applyTF("divNum", tf.notContainsDivMod),
-                                   applyTF("divDenom", tf.notContainsDivMod),
-                                   ifZero(isBelow(ff.modalOperator),
-                                   longConst(200))}));
+                    new Feature[] { NonDuplicateAppModPositionFeature.INSTANCE,
+                        applyTF("divNum", tf.polynomial),
+                        applyTF("divDenom", tf.polynomial),
+                        applyTF("divNum", tf.notContainsDivMod),
+                        applyTF("divDenom", tf.notContainsDivMod),
+                        ifZero(isBelow(ff.modalOperator),
+                            longConst(200)) }));
 
             bindRuleSet(
-                    d,
-                    "defOps_jdiv_inline",
-                    add(applyTF("divNum", tf.literal),
-                        applyTF("divDenom", tf.polynomial),
-                        longConst(-5000)));
+                d,
+                "defOps_jdiv_inline",
+                add(applyTF("divNum", tf.literal),
+                    applyTF("divDenom", tf.polynomial),
+                    longConst(-5000)));
 
             setupDefOpsExpandMod(d);
 
@@ -2383,16 +2400,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet(d, "defOps_jdiv", inftyConst());
 
             bindRuleSet(
-                    d,
-                    "defOps_jdiv_inline",
-                    add(applyTF("divNum", tf.literal),
-                            applyTF("divDenom", tf.literal), longConst(-4000)));
+                d,
+                "defOps_jdiv_inline",
+                add(applyTF("divNum", tf.literal),
+                    applyTF("divDenom", tf.literal), longConst(-4000)));
 
             bindRuleSet(
-                    d,
-                    "defOps_mod",
-                    add(applyTF("divNum", tf.literal),
-                            applyTF("divDenom", tf.literal), longConst(-4000)));
+                d,
+                "defOps_mod",
+                add(applyTF("divNum", tf.literal),
+                    applyTF("divDenom", tf.literal), longConst(-4000)));
 
             bindRuleSet(d, "defOps_expandRanges", inftyConst());
             bindRuleSet(d, "defOps_expandJNumericOp", inftyConst());
@@ -2405,41 +2422,42 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer superTerm = new TermBuffer();
 
         final Feature subsumedModulus =
-                add(applyTF(superTerm,
-                        sub(opSub(tf.mod, any(), tf.literal), tf.zeroLiteral)),
-                        PolynomialValuesCmpFeature.divides(instOf("divDenom"),
-                                sub(sub(superTerm, 0), 1)));
+            add(applyTF(superTerm,
+                sub(opSub(tf.mod, any(), tf.literal), tf.zeroLiteral)),
+                PolynomialValuesCmpFeature.divides(instOf("divDenom"),
+                    sub(sub(superTerm, 0), 1)));
 
         final Feature exSubsumedModulus =
-                add(applyTF("divDenom", tf.literal),
-                        not(sum(superTerm, SuperTermGenerator
-                                .upwardsWithIndex(
-                                        sub(or(tf.addF, tf.mulF), any()),
-                                        getServices()), not(subsumedModulus))));
+            add(applyTF("divDenom", tf.literal),
+                not(sum(superTerm, SuperTermGenerator
+                        .upwardsWithIndex(
+                            sub(or(tf.addF, tf.mulF), any()),
+                            getServices()),
+                    not(subsumedModulus))));
 
         bindRuleSet(
-                d,
-                "defOps_mod",
-                ifZero(add(applyTF("divNum", tf.literal),
-                        applyTF("divDenom", tf.literal)), longConst(-4000),
-                        SumFeature.createSum(
-                                applyTF("divNum", tf.polynomial),
-                                applyTF("divDenom", tf.polynomial),
-                                ifZero(isBelow(ff.modalOperator),
-                                        exSubsumedModulus,
-                                        or(add(applyTF("divNum",
-                                                tf.notContainsDivMod),
-                                                applyTF("divDenom",
-                                                        tf.notContainsDivMod)),
-                                                exSubsumedModulus)),
-                                longConst(-3500))));
+            d,
+            "defOps_mod",
+            ifZero(add(applyTF("divNum", tf.literal),
+                applyTF("divDenom", tf.literal)), longConst(-4000),
+                SumFeature.createSum(
+                    applyTF("divNum", tf.polynomial),
+                    applyTF("divDenom", tf.polynomial),
+                    ifZero(isBelow(ff.modalOperator),
+                        exSubsumedModulus,
+                        or(add(applyTF("divNum",
+                            tf.notContainsDivMod),
+                            applyTF("divDenom",
+                                tf.notContainsDivMod)),
+                            exSubsumedModulus)),
+                    longConst(-3500))));
     }
 
     private Feature isBelow(TermFeature t) {
         final TermBuffer superTerm = new TermBuffer();
         return not(sum(superTerm,
-                SuperTermGenerator.upwards(any(), getServices()),
-                not(applyTF(superTerm, t))));
+            SuperTermGenerator.upwards(any(), getServices()),
+            not(applyTF(superTerm, t))));
     }
 
     private void setupDivModDivision(RuleSetDispatchFeature d) {
@@ -2451,59 +2469,61 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // exact polynomial division
 
         final Feature checkNumTerm =
-                ifZero(add(not(applyTF(numTerm, tf.addF)),
-                        ReducibleMonomialsFeature.createReducible(numTerm,
-                                denomLC)),
-                        add(instantiate("polyDivCoeff",
-                                ReduceMonomialsProjection.create(numTerm,
-                                        denomLC)), inftyConst()));
+            ifZero(add(not(applyTF(numTerm, tf.addF)),
+                ReducibleMonomialsFeature.createReducible(numTerm,
+                    denomLC)),
+                add(instantiate("polyDivCoeff",
+                    ReduceMonomialsProjection.create(numTerm,
+                        denomLC)),
+                    inftyConst()));
 
         final Feature isReduciblePoly =
-                sum(numTerm, SubtermGenerator.rightTraverse(instOf("divNum"),
-                        tf.addF), checkNumTerm);
+            sum(numTerm, SubtermGenerator.rightTraverse(instOf("divNum"),
+                tf.addF), checkNumTerm);
 
         // polynomial division modulo equations of the antecedent
 
         final Feature checkCoeffE =
-                ifZero(contains(divCoeff, FocusProjection.create(0)),
-                        // do not apply if the result contains the original term
-                        longConst(0),
-                        add(instantiate("polyDivCoeff", divCoeff), inftyConst()));
+            ifZero(contains(divCoeff, FocusProjection.create(0)),
+                // do not apply if the result contains the original term
+                longConst(0),
+                add(instantiate("polyDivCoeff", divCoeff), inftyConst()));
 
         final Feature isReduciblePolyE =
-                sum(numTerm,
-                        SubtermGenerator.rightTraverse(instOf("divNum"),
-                                tf.addF),
-                        ifZero(applyTF(numTerm, tf.addF),
-                                longConst(0),
-                                sum(divCoeff, MultiplesModEquationsGenerator
-                                        .create(numTerm, denomLC), checkCoeffE)));
+            sum(numTerm,
+                SubtermGenerator.rightTraverse(instOf("divNum"),
+                    tf.addF),
+                ifZero(applyTF(numTerm, tf.addF),
+                    longConst(0),
+                    sum(divCoeff, MultiplesModEquationsGenerator
+                            .create(numTerm, denomLC),
+                        checkCoeffE)));
 
         bindRuleSet(
             d,
             "defOps_divModPullOut",
             SumFeature
-                .createSum(
-                    new Feature[] {
-                        not(add(applyTF("divNum", tf.literal),
+                    .createSum(
+                        new Feature[] {
+                            not(add(applyTF("divNum", tf.literal),
                                 applyTF("divDenom", tf.literal))),
-                        applyTF("divNum", tf.polynomial),
-                        applyTF("divDenom", tf.polynomial),
-                        ifZero(applyTF("divDenom", tf.addF),
-                               let(denomLC,
-                                   sub(instOf("divDenom"), 1),
-                                   not(isReduciblePoly)),
-                               let(denomLC,
-                                   instOf("divDenom"),
-                                   ifZero(isReduciblePoly,
-                                          // no possible division
-                                          // has been found so far
-                                          add(NotInScopeOfModalityFeature.INSTANCE,
-                                              ifZero(isReduciblePolyE,
-                                                     // try again
-                                                     // later
-                                                     longConst(-POLY_DIVISION_COST)))))),
-                        longConst(100)}));
+                            applyTF("divNum", tf.polynomial),
+                            applyTF("divDenom", tf.polynomial),
+                            ifZero(applyTF("divDenom", tf.addF),
+                                let(denomLC,
+                                    sub(instOf("divDenom"), 1),
+                                    not(isReduciblePoly)),
+                                let(denomLC,
+                                    instOf("divDenom"),
+                                    ifZero(isReduciblePoly,
+                                        // no possible division
+                                        // has been found so far
+                                        add(NotInScopeOfModalityFeature.INSTANCE,
+                                            ifZero(isReduciblePolyE,
+                                                // try again
+                                                // later
+                                                longConst(-POLY_DIVISION_COST)))))),
+                            longConst(100) }));
 
     }
 
@@ -2518,20 +2538,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     protected Feature setupApprovalF() {
         final Feature depSpecF;
         final String depProp =
-                strategyProperties
-                .getProperty(StrategyProperties.DEP_OPTIONS_KEY);
+            strategyProperties
+                    .getProperty(StrategyProperties.DEP_OPTIONS_KEY);
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
             depSpecF =
-                    ConditionalFeature.createConditional(
-                            depFilter,
-                            ifZero(new DependencyContractFeature(),
-                                    longConst(250), inftyConst()));
+                ConditionalFeature.createConditional(
+                    depFilter,
+                    ifZero(new DependencyContractFeature(),
+                        longConst(250), inftyConst()));
         } else {
             depSpecF =
-                    ConditionalFeature.createConditional(depFilter,
-                            inftyConst());
+                ConditionalFeature.createConditional(depFilter,
+                    inftyConst());
         }
 
         return add(NonDuplicateAppFeature.INSTANCE, depSpecF);
@@ -2574,39 +2594,39 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
 
         bindRuleSet(d, "inReachableStateImplication",
-                NonDuplicateAppModPositionFeature.INSTANCE);
+            NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver",
-                NonDuplicateAppModPositionFeature.INSTANCE);
+            NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "partialInvAxiom",
-                NonDuplicateAppModPositionFeature.INSTANCE);
+            NonDuplicateAppModPositionFeature.INSTANCE);
 
         setupClassAxiomApproval(d);
         setupQuantifierInstantiationApproval(d);
         setupSplittingApproval(d);
 
         bindRuleSet(
-                d,
-                "apply_select_eq",
-                add(isInstantiated("s"),
-                        isInstantiated("t1"),
-                        or(applyTF(
-                                "s",
-                                rec(any(), SimplifiedSelectTermFeature
-                                        .create(heapLDT))),
-                                add(NoSelfApplicationFeature.INSTANCE,
-                                        applyTF("t1",
-                                                IsSelectSkolemConstantTermFeature.INSTANCE)))));
+            d,
+            "apply_select_eq",
+            add(isInstantiated("s"),
+                isInstantiated("t1"),
+                or(applyTF(
+                    "s",
+                    rec(any(), SimplifiedSelectTermFeature
+                            .create(heapLDT))),
+                    add(NoSelfApplicationFeature.INSTANCE,
+                        applyTF("t1",
+                            IsSelectSkolemConstantTermFeature.INSTANCE)))));
         bindRuleSet(
-                d,
-                "apply_auxiliary_eq",
-                add(NoSelfApplicationFeature.INSTANCE,
-                        isInstantiated("s"),
-                        applyTF("s",
-                                rec(any(),
-                                        add(SimplifiedSelectTermFeature
-                                                .create(heapLDT),
-                                                not(ff.ifThenElse)))),
-                        not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
+            d,
+            "apply_auxiliary_eq",
+            add(NoSelfApplicationFeature.INSTANCE,
+                isInstantiated("s"),
+                applyTF("s",
+                    rec(any(),
+                        add(SimplifiedSelectTermFeature
+                                .create(heapLDT),
+                            not(ff.ifThenElse)))),
+                not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
 
         // Without EqNonDuplicateAppFeature.INSTANCE
         // rule 'applyEq' might be applied on the same term
@@ -2622,7 +2642,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         if (classAxiomApplicationEnabled()) {
             TermBuffer tb = new TermBuffer();
             final Feature needsInstantiation =
-                    SVNeedsInstantiation.create("sv_heap");
+                SVNeedsInstantiation.create("sv_heap");
             /*
              * if 'sv_heap' is present and instantiated, allow application only
              * if the heap used to instantiate 'sv_heap' still occurs in the
@@ -2631,38 +2651,38 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              * most likely useless applications.
              */
             final Feature approveInst =
-                    ifZero(isInstantiated("sv_heap"),
-                            /*
-                             * the sum expression is 0 if the heap does not
-                             * occur and infinite if it does occur, the outer
-                             * 'not' then ensures that the costs are infinite in
-                             * the first and 0 in the latter case
-                             */
-                            not(sum(tb, HeapGenerator.INSTANCE,
-                                    not(eq(instOf("sv_heap"), tb)))));
+                ifZero(isInstantiated("sv_heap"),
+                    /*
+                     * the sum expression is 0 if the heap does not
+                     * occur and infinite if it does occur, the outer
+                     * 'not' then ensures that the costs are infinite in
+                     * the first and 0 in the latter case
+                     */
+                    not(sum(tb, HeapGenerator.INSTANCE,
+                        not(eq(instOf("sv_heap"), tb)))));
 
             if (classAxiomDelayedApplication()) {
                 bindRuleSet(
-                        d,
-                        "classAxiom",
-                        add(sequentContainsNoPrograms(),
-                                /*
-                                 * can be applied if sv_heap is instantiated or not
-                                 * present
-                                 */
-                                not(needsInstantiation), approveInst,
-                                NonDuplicateAppFeature.INSTANCE));
+                    d,
+                    "classAxiom",
+                    add(sequentContainsNoPrograms(),
+                        /*
+                         * can be applied if sv_heap is instantiated or not
+                         * present
+                         */
+                        not(needsInstantiation), approveInst,
+                        NonDuplicateAppFeature.INSTANCE));
             } else {
                 bindRuleSet(
-                        d,
-                        "classAxiom",
-                        add(
-                                /*
-                                 * can be applied if sv_heap is instantiated or not
-                                 * present
-                                 */
-                                not(needsInstantiation), approveInst,
-                                NonDuplicateAppFeature.INSTANCE));
+                    d,
+                    "classAxiom",
+                    add(
+                        /*
+                         * can be applied if sv_heap is instantiated or not
+                         * present
+                         */
+                        not(needsInstantiation), approveInst,
+                        NonDuplicateAppFeature.INSTANCE));
             }
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
@@ -2702,19 +2722,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // class axioms
         final TermBuffer heapVar = new TermBuffer();
         final Feature needsInstantiation =
-                SVNeedsInstantiation.create("sv_heap");
+            SVNeedsInstantiation.create("sv_heap");
 
         final Feature heapInstantiator =
-                ifZero(needsInstantiation,
-                        forEach(heapVar,
-                                HeapGenerator.INSTANCE_EXCLUDE_UPDATES,
-                                add(instantiate("sv_heap", heapVar),
-                                        // prefer simpler heap terms before more
-                                        // complicated ones
-                                        applyTF(heapVar,
-                                                rec(not(tf.atom),
-                                                        longTermConst(10))))),
-                        longConst(0));
+            ifZero(needsInstantiation,
+                forEach(heapVar,
+                    HeapGenerator.INSTANCE_EXCLUDE_UPDATES,
+                    add(instantiate("sv_heap", heapVar),
+                        // prefer simpler heap terms before more
+                        // complicated ones
+                        applyTF(heapVar,
+                            rec(not(tf.atom),
+                                longTermConst(10))))),
+                longConst(0));
 
         bindRuleSet(d, "classAxiom", heapInstantiator);
     }
@@ -2741,6 +2761,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
+     *
      * @param app rule application
      * @param pio corresponding {@link PosInOccurrence}
      * @param goal corresponding goal
@@ -2758,6 +2779,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     /**
      * Re-Evaluate a <code>RuleApp</code>. This method is called immediately
      * before a rule is really applied
+     *
      * @param app the rule application
      * @param pio the position in occurrence
      * @param goal the goal
@@ -2786,7 +2808,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {
         return strategyProperties.getProperty(
-                StrategyProperties.STOPMODE_OPTIONS_KEY).equals(
-                        StrategyProperties.STOPMODE_NONCLOSE);
+            StrategyProperties.STOPMODE_OPTIONS_KEY).equals(
+                StrategyProperties.STOPMODE_NONCLOSE);
     }
 }

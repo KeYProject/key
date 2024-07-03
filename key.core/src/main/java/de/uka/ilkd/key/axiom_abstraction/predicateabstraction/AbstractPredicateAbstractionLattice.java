@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -5,12 +9,12 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A super class for predicates abstraction lattices. Implements basic join
@@ -24,17 +28,17 @@ public abstract class AbstractPredicateAbstractionLattice extends
 
     /**
      * Joins to abstract elements in the lattice.
-     * 
+     *
      * @param a
-     *            First domain element for the join.
+     *        First domain element for the join.
      * @param b
-     *            Second domain element for the join.
+     *        Second domain element for the join.
      * @param combiner
-     *            The combination function (e.g., "AND") for the respective
-     *            predicates of the inputs..
+     *        The combination function (e.g., "AND") for the respective
+     *        predicates of the inputs..
      * @param abstrElemConstructor
-     *            A function constructing abstract domain elements from
-     *            predicates.
+     *        A function constructing abstract domain elements from
+     *        predicates.
      * @return The joined abstract domain element.
      */
     protected AbstractPredicateAbstractionDomainElement join(
@@ -52,9 +56,9 @@ public abstract class AbstractPredicateAbstractionLattice extends
         assert b instanceof AbstractPredicateAbstractionDomainElement;
 
         AbstractPredicateAbstractionDomainElement pade1 =
-                (AbstractPredicateAbstractionDomainElement) a;
+            (AbstractPredicateAbstractionDomainElement) a;
         AbstractPredicateAbstractionDomainElement pade2 =
-                (AbstractPredicateAbstractionDomainElement) b;
+            (AbstractPredicateAbstractionDomainElement) b;
 
         if (pade1.isTopElem() || pade2.isTopElem()) {
             return getTopElem();
@@ -72,12 +76,11 @@ public abstract class AbstractPredicateAbstractionLattice extends
         ImmutableSet<AbstractionPredicate> preds2 = pade2.getPredicates();
 
         ImmutableSet<AbstractionPredicate> combination =
-                combiner.apply(preds1, preds2);
+            combiner.apply(preds1, preds2);
 
         if (combination.size() == 0) {
             return getTopElem();
-        }
-        else {
+        } else {
             return abstrElemConstructor.apply(combination);
         }
     }
@@ -109,14 +112,14 @@ public abstract class AbstractPredicateAbstractionLattice extends
             Iterator<AbstractDomainElement> {
 
         private final ArrayList<ArrayList<ImmutableFixedLengthBitSet>> bitSetsByNumZeroes =
-                new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
+            new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
 
         /**
          * Constructs a new {@link AbstractPredicateLatticeIterator};
          * initializes the bit sets for the iteration.
-         * 
+         *
          * @param numApplPreds
-         *            The number of applicable predicates for the lattice.
+         *        The number of applicable predicates for the lattice.
          */
         public AbstractPredicateLatticeIterator(int numApplPreds) {
             // We work with bit sets of length n (where n is the number of
@@ -132,7 +135,7 @@ public abstract class AbstractPredicateAbstractionLattice extends
 
             // bitSet initially represents the number 0.
             ImmutableFixedLengthBitSet bitSet =
-                    new ImmutableFixedLengthBitSet(numApplPreds);
+                new ImmutableFixedLengthBitSet(numApplPreds);
 
             for (int i = 0; i < MergeRuleUtils.intPow(2, numApplPreds); i++) {
                 int numZeroes = bitSet.getNumOfZeroBits();
@@ -154,7 +157,7 @@ public abstract class AbstractPredicateAbstractionLattice extends
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.util.Iterator#remove()
          */
         @Override

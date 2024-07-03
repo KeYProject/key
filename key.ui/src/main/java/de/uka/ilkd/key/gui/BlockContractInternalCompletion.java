@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
 
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -16,6 +17,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * Interactive completion of {@link BlockContractInternalBuiltInRuleApp}.
  */
@@ -23,14 +26,15 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
 
     private final MainWindow mainWindow;
 
-    BlockContractInternalCompletion(MainWindow mainWindow){
+    BlockContractInternalCompletion(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
     }
 
     @Override
     public IBuiltInRuleApp complete(final IBuiltInRuleApp application,
             final Goal goal, final boolean force) {
-        BlockContractInternalBuiltInRuleApp result = (BlockContractInternalBuiltInRuleApp) application;
+        BlockContractInternalBuiltInRuleApp result =
+            (BlockContractInternalBuiltInRuleApp) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }
@@ -42,19 +46,20 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation =
-                BlockContractInternalRule.INSTANCE.instantiate(application.posInOccurrence().subTerm(), goal, services);
+            BlockContractInternalRule.INSTANCE.instantiate(application.posInOccurrence().subTerm(),
+                goal, services);
         final ImmutableSet<BlockContract> contracts =
-                BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
-        final AuxiliaryContractConfigurator<BlockContract> configurator
-            = new AuxiliaryContractConfigurator<>("Block Contract Configurator",
+            BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
+        final AuxiliaryContractConfigurator<BlockContract> configurator =
+            new AuxiliaryContractConfigurator<>("Block Contract Configurator",
                 new BlockContractSelectionPanel(services, true),
                 mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
                 "Contracts for Block: " + instantiation.statement);
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
-                    HeapContext.getModHeaps(services, instantiation.isTransactional());
+                HeapContext.getModHeaps(services, instantiation.isTransactional());
             result.update(
-                    (StatementBlock) instantiation.statement, configurator.getContract(), heaps);
+                (StatementBlock) instantiation.statement, configurator.getContract(), heaps);
         }
         return result;
     }
@@ -69,6 +74,6 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
      * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
-       return app.rule() instanceof BlockContractInternalRule;
-   }
+        return app.rule() instanceof BlockContractInternalRule;
+    }
 }

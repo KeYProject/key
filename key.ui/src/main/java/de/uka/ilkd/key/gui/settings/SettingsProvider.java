@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-
-import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * A settings provider is an entry in an {@link SettingsUi}.
@@ -57,12 +61,14 @@ public interface SettingsProvider {
      * If the user clicks on apply or accept, the {@link SettingsDialog} calls this method
      * for every registered {@link SettingsProvider}.
      * <p>
-     * You should read your values from the input components and update the settings within the main window.
-     * If a field is not in the appropiate format, you should throw an {@link InvalidSettingsInputException}
+     * You should read your values from the input components and update the settings within the main
+     * window.
+     * If a field is not in the appropiate format, you should throw an
+     * {@link InvalidSettingsInputException}
      * with the reference to the panel and component.
      *
      * @throws InvalidSettingsInputException if an input component is not properly fill.
-     *                                       Prevent the settings dialog from closing.
+     *         Prevent the settings dialog from closing.
      */
     void applySettings(MainWindow window) throws InvalidSettingsInputException;
 

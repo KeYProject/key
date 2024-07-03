@@ -1,4 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -18,13 +27,9 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial
@@ -90,12 +95,12 @@ public final class Goal {
      * creates a new goal referencing the given node.
      */
     private Goal(Node node,
-                 RuleAppIndex ruleAppIndex,
-                 ImmutableList<RuleApp> appliedRuleApps,
-                 FormulaTagManager tagManager,
-                 AutomatedRuleApplicationManager ruleAppManager,
-                 Properties strategyInfos,
-                 NamespaceSet localNamespace) {
+            RuleAppIndex ruleAppIndex,
+            ImmutableList<RuleApp> appliedRuleApps,
+            FormulaTagManager tagManager,
+            AutomatedRuleApplicationManager ruleAppManager,
+            Properties strategyInfos,
+            NamespaceSet localNamespace) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex;
         this.appliedRuleApps = appliedRuleApps;
@@ -108,11 +113,11 @@ public final class Goal {
     }
 
     private Goal(Node node,
-                 RuleAppIndex ruleAppIndex,
-                 ImmutableList<RuleApp> appliedRuleApps,
-                 AutomatedRuleApplicationManager ruleAppManager,
-                 Properties strategyInfos,
-                 NamespaceSet localNamespace) {
+            RuleAppIndex ruleAppIndex,
+            ImmutableList<RuleApp> appliedRuleApps,
+            AutomatedRuleApplicationManager ruleAppManager,
+            Properties strategyInfos,
+            NamespaceSet localNamespace) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex;
         this.appliedRuleApps = appliedRuleApps;
@@ -131,12 +136,12 @@ public final class Goal {
      */
     public Goal(Node node, RuleAppIndex ruleAppIndex) {
         this(node,
-                ruleAppIndex,
-                ImmutableSLList.<RuleApp>nil(),
-                null,
-                new QueueRuleApplicationManager(),
-                new MapProperties(),
-                node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
+            ruleAppIndex,
+            ImmutableSLList.<RuleApp>nil(),
+            null,
+            new QueueRuleApplicationManager(),
+            new MapProperties(),
+            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
         tagManager = new FormulaTagManager(this);
     }
 
@@ -159,7 +164,7 @@ public final class Goal {
 
     /**
      * @return the strategy that determines automated rule applications for this
-     * goal
+     *         goal
      */
     public Strategy getGoalStrategy() {
         if (goalStrategy == null)
@@ -242,8 +247,8 @@ public final class Goal {
     }
 
     protected void fireGoalReplaced(Goal goal,
-                                    Node parent,
-                                    ImmutableList<Goal> newGoals) {
+            Node parent,
+            ImmutableList<Goal> newGoals) {
         for (GoalListener listener : listeners) {
             listener.goalReplaced(goal, parent, newGoals);
         }
@@ -259,7 +264,7 @@ public final class Goal {
      * set the node the goal is related to
      *
      * @param p_node the Node in the proof tree to which this goal
-     *               refers to
+     *        refers to
      */
     private void setNode(Node p_node) {
         if (node().sequent() != p_node.sequent()) {
@@ -299,7 +304,7 @@ public final class Goal {
 
     /**
      * @return the current time of this goal (which is just the number of
-     * applied rules)
+     *         applied rules)
      */
     public long getTime() {
         return appliedRuleApps().size();
@@ -381,12 +386,12 @@ public final class Goal {
      * sets the sequent of the node
      *
      * @param sci SequentChangeInfo containing the sequent to be set and
-     *            desribing the applied changes to the sequent of the parent node
+     *        desribing the applied changes to the sequent of the parent node
      */
     public void setSequent(SequentChangeInfo sci) {
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
-        //VK reminder: now update the index
+        // VK reminder: now update the index
         fireSequentChanged(sci);
     }
 
@@ -395,7 +400,7 @@ public final class Goal {
      * and informs the rule application index about this change
      *
      * @param cf the SequentFormula to be added
-     * @param p  PosInOccurrence encodes the position
+     * @param p PosInOccurrence encodes the position
      */
     public void addFormula(SequentFormula cf, PosInOccurrence p) {
         setSequent(sequent().addFormula(cf, p));
@@ -406,14 +411,14 @@ public final class Goal {
      * sequent. Either at its front or back
      * and informs the rule application index about this change
      *
-     * @param cf      the SequentFormula to be added
+     * @param cf the SequentFormula to be added
      * @param inAntec boolean true(false) if SequentFormula has to be
-     *                added to antecedent (succedent)
-     * @param first   boolean true if at the front, if false then cf is
-     *                added at the back
+     *        added to antecedent (succedent)
+     * @param first boolean true if at the front, if false then cf is
+     *        added at the back
      */
     public void addFormula(SequentFormula cf, boolean inAntec,
-                           boolean first) {
+            boolean first) {
         setSequent(sequent().addFormula(cf, inAntec, first));
     }
 
@@ -422,7 +427,7 @@ public final class Goal {
      * and informs the rule application index about this change
      *
      * @param cf the SequentFormula replacing the old one
-     * @param p  the PosInOccurrence encoding the position
+     * @param p the PosInOccurrence encoding the position
      */
     public void changeFormula(SequentFormula cf, PosInOccurrence p) {
         setSequent(sequent().changeFormula(cf, p));
@@ -453,24 +458,24 @@ public final class Goal {
      * creates a new TacletApp and puts it to the set of TacletApps at the node
      * of the goal and to the current RuleAppIndex.
      *
-     * @param rule  the Taclet of the TacletApp to create
+     * @param rule the Taclet of the TacletApp to create
      * @param insts the given instantiations of the TacletApp to be created
      */
     public void addTaclet(Taclet rule,
-                          SVInstantiations insts,
-                          boolean isAxiom) {
+            SVInstantiations insts,
+            boolean isAxiom) {
         NoPosTacletApp tacletApp =
-                NoPosTacletApp.createFixedNoPosTacletApp(rule,
-                        insts,
-                        proof().getServices());
+            NoPosTacletApp.createFixedNoPosTacletApp(rule,
+                insts,
+                proof().getServices());
         if (tacletApp != null) {
             addNoPosTacletApp(tacletApp);
             if (proof().getInitConfig() != null) { // do not break everything
                 // because of ProofMgt
                 proof().getInitConfig().registerRuleIntroducedAtNode(
-                        tacletApp,
-                        node.parent() != null ? node.parent() : node,
-                        isAxiom);
+                    tacletApp,
+                    node.parent() != null ? node.parent() : node,
+                    isAxiom);
             }
         }
     }
@@ -491,17 +496,17 @@ public final class Goal {
         ruleAppIndex.clearAndDetachCache();
     }
 
-//    @Deprecated
-//    public void setProgramVariables(Namespace ns) {
-//        //        final Iterator<Named> it=ns.elements().iterator();
-//        //        ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
-//        //        while (it.hasNext()) {
-//        //            s = s.add((ProgramVariable)it.next());
-//        //        }
-//        //        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-//        //        proof().getNamespaces().programVariables().set(s);
-//        //        setGlobalProgVars(s);
-//        }
+    // @Deprecated
+    // public void setProgramVariables(Namespace ns) {
+    // // final Iterator<Named> it=ns.elements().iterator();
+    // // ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
+    // // while (it.hasNext()) {
+    // // s = s.add((ProgramVariable)it.next());
+    // // }
+    // // node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
+    // // proof().getNamespaces().programVariables().set(s);
+    // // setGlobalProgVars(s);
+    // }
 
     public void addProgramVariable(ProgramVariable pv) {
         localNamespaces.programVariables().addSafely(pv);
@@ -520,22 +525,21 @@ public final class Goal {
         Goal clone;
         if (node.sequent() != this.node.sequent()) {
             clone = new Goal(node,
-                    ruleAppIndex.copy(),
-                    appliedRuleApps,
-                    ruleAppManager.copy(),
-                    strategyInfos.clone(),
-                    localNamespaces);
+                ruleAppIndex.copy(),
+                appliedRuleApps,
+                ruleAppManager.copy(),
+                strategyInfos.clone(),
+                localNamespaces);
         } else {
             clone = new Goal(node,
-                    ruleAppIndex.copy(),
-                    appliedRuleApps,
-                    getFormulaTagManager().copy(),
-                    ruleAppManager.copy(),
-                    strategyInfos.clone(),
-                    localNamespaces);
+                ruleAppIndex.copy(),
+                appliedRuleApps,
+                getFormulaTagManager().copy(),
+                ruleAppManager.copy(),
+                strategyInfos.clone(),
+                localNamespaces);
         }
-        clone.listeners = (List<GoalListener>)
-                ((ArrayList<GoalListener>) listeners).clone();
+        clone.listeners = (List<GoalListener>) ((ArrayList<GoalListener>) listeners).clone();
         clone.automatic = this.automatic;
         return clone;
     }
@@ -567,7 +571,7 @@ public final class Goal {
      */
     public void removeLastAppliedRuleApp() {
         appliedRuleApps = appliedRuleApps.tail();
-        //node ().setAppliedRuleApp ( null );
+        // node ().setAppliedRuleApp ( null );
     }
 
     /**
@@ -585,20 +589,21 @@ public final class Goal {
 
         if (n == 1) {
             Node newNode = new Node(parent.proof(),
-                    parent.sequent(),
-                    parent);
+                parent.sequent(),
+                parent);
 
             parent.add(newNode);
             this.setNode(newNode);
             goalList = goalList.prepend(this);
-        } else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary creation of arrays
+        } else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary
+                            // creation of arrays
             Node[] newNode = new Node[n];
 
             for (int i = 0; i < n; i++) {
                 // create new node and add to tree
                 newNode[i] = new Node(parent.proof(),
-                        parent.sequent(),
-                        parent);
+                    parent.sequent(),
+                    parent);
             }
 
             parent.addAll(newNode);
@@ -717,10 +722,10 @@ public final class Goal {
     }
 
     public String toString() {
-        de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
-                (new de.uka.ilkd.key.pp.ProgramPrinter(null),
-                        new NotationInfo(),
-                        proof().getServices()));
+        de.uka.ilkd.key.pp.LogicPrinter lp =
+            (new de.uka.ilkd.key.pp.LogicPrinter(new de.uka.ilkd.key.pp.ProgramPrinter(null),
+                new NotationInfo(),
+                proof().getServices()));
         lp.printSequent(node.sequent());
         return lp.toString();
     }
@@ -730,8 +735,8 @@ public final class Goal {
     }
 
     public <T> void addStrategyInfo(Property<T> property,
-                                    T info,
-                                    StrategyInfoUndoMethod undoMethod) {
+            T info,
+            StrategyInfoUndoMethod undoMethod) {
         strategyInfos.put(property, info);
         node.addStrategyInfoUndoMethod(undoMethod);
     }
@@ -758,12 +763,13 @@ public final class Goal {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
         LinkedList<RuleApp> ruleApps = new LinkedList<>();
         for (SequentFormula sf : node().sequent().antecedent()) {
-            ImmutableList<IBuiltInRuleApp> t = index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
+            ImmutableList<IBuiltInRuleApp> t =
+                index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             t.forEach(ruleApps::add);
         }
         for (SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<IBuiltInRuleApp> t = index.getBuiltInRule(this,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
             t.forEach(ruleApps::add);
         }
         return ruleApps;
@@ -781,13 +787,13 @@ public final class Goal {
         };
         for (SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
 
         for (SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
         return allApps;

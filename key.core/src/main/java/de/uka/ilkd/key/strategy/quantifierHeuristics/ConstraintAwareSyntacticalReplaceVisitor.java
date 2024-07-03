@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
@@ -12,9 +16,9 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 
 
 /**
- * In KeY 1.x we supported a free variable calculus based on meta variables. 
- * This feature has been abandoned in KeY 2.0. Until the strategy for 
- * quantifier instantiations is adapted, we cannot get rid of them 
+ * In KeY 1.x we supported a free variable calculus based on meta variables.
+ * This feature has been abandoned in KeY 2.0. Until the strategy for
+ * quantifier instantiations is adapted, we cannot get rid of them
  * completely (they are used to determine triggers).
  */
 public class ConstraintAwareSyntacticalReplaceVisitor extends
@@ -29,20 +33,21 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, labelHint,
-                applicationPosInOccurrence, goal, rule, ruleApp, 
-                services, services.getTermBuilder(false));
+            applicationPosInOccurrence, goal, rule, ruleApp,
+            services, services.getTermBuilder(false));
         this.metavariableInst = metavariableInst;
     }
-    
+
     protected Term toTerm(Term t) {
-        if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
+        if (EqualityConstraint.metaVars(t).size() != 0 && !metavariableInst.isBottom()) {
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =
-                    new ConstraintAwareSyntacticalReplaceVisitor (termLabelState, services, metavariableInst, 
-                            applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
-            t.execPostOrder ( srv );
-            return srv.getTerm ();
+                new ConstraintAwareSyntacticalReplaceVisitor(termLabelState, services,
+                    metavariableInst,
+                    applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
+            t.execPostOrder(srv);
+            return srv.getTerm();
         } else {
             return t;
         }
@@ -55,7 +60,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             pushNew(metavariableInst.getInstantiation((Metavariable) visited.op(), services));
         } else {
             super.visit(visited);
-        }        
+        }
     }
-    
+
 }

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -5,7 +9,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.naming.NameAlreadyBoundException;
 
 import de.uka.ilkd.key.java.Services;
@@ -66,7 +69,7 @@ public abstract class AbstractionPredicate
      * {@link #create(String, Function)}.
      *
      * @param argSort
-     *            The expected sort for the arguments of the predicate.
+     *        The expected sort for the arguments of the predicate.
      */
     private AbstractionPredicate(Sort argSort) {
         this.argSort = argSort;
@@ -78,7 +81,7 @@ public abstract class AbstractionPredicate
      */
     public Pair<LocationVariable, Term> getPredicateFormWithPlaceholder() {
         return new Pair<LocationVariable, Term>(placeholderVariable,
-                predicateFormWithPlaceholder);
+            predicateFormWithPlaceholder);
     }
 
     /**
@@ -90,13 +93,13 @@ public abstract class AbstractionPredicate
      * {@link #create(Term, LocationVariable, Services)} instead.
      *
      * @param argSort
-     *            The expected sort for the arguments of the predicate.
+     *        The expected sort for the arguments of the predicate.
      * @param mapping
-     *            The mapping from input terms of the adequate type to formulae,
-     *            e.g. "(Term input) -> (tb.gt(input, tb.zero()))" where tb is a
-     *            {@link TermBuilder}.
+     *        The mapping from input terms of the adequate type to formulae,
+     *        e.g. "(Term input) -> (tb.gt(input, tb.zero()))" where tb is a
+     *        {@link TermBuilder}.
      * @param services
-     *            The services object.
+     *        The services object.
      * @return An abstraction predicate encapsulating the given mapping.
      */
     public static AbstractionPredicate create(final Sort argSort,
@@ -105,7 +108,7 @@ public abstract class AbstractionPredicate
                 .getFreshLocVariableForPrefix("_ph", argSort, services);
 
         return create(mapping.apply(services.getTermBuilder().var(placeholder)),
-                placeholder, services);
+            placeholder, services);
     }
 
     /**
@@ -114,11 +117,11 @@ public abstract class AbstractionPredicate
      * substituted by the argument supplied to the generated mapping.
      *
      * @param predicate
-     *            The predicate formula containing the placeholder.
+     *        The predicate formula containing the placeholder.
      * @param placeholder
-     *            The placeholder to replace in the generated mapping.
+     *        The placeholder to replace in the generated mapping.
      * @param services
-     *            The services object.
+     *        The services object.
      * @return An abstraction predicate mapping terms to the predicate with the
      *         placeholder substituted by the respective term.
      */
@@ -130,7 +133,7 @@ public abstract class AbstractionPredicate
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
             private final Name name = new Name(
-                    "abstrPred_" + predicate.op().toString());
+                "abstrPred_" + predicate.op().toString());
             private Function<Term, Term> mapping = null;
 
             @Override
@@ -139,13 +142,13 @@ public abstract class AbstractionPredicate
                     mapping = (Term param) -> {
                         if (param.sort() != fInputSort) {
                             throw new IllegalArgumentException(
-                                    "Input must be of sort \"" + fInputSort
-                                            + "\", given: \"" + param.sort()
-                                            + "\".");
+                                "Input must be of sort \"" + fInputSort
+                                    + "\", given: \"" + param.sort()
+                                    + "\".");
                         }
 
                         return OpReplacer.replace(tb.var(placeholder), param,
-                                predicate, tf, services.getProof());
+                            predicate, tf, services.getProof());
                     };
                 }
 
@@ -194,12 +197,13 @@ public abstract class AbstractionPredicate
      * of the form "('[[TYPE]] [[PLACEHOLDER]]', '[[PREDICATE]]')".
      *
      * @param services
-     *            The services object.
+     *        The services object.
      * @return A parseable String representation of this predicate.
      */
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
-        Pair<LocationVariable, Term> predicateFormWithPlaceholder = getPredicateFormWithPlaceholder();
+        Pair<LocationVariable, Term> predicateFormWithPlaceholder =
+            getPredicateFormWithPlaceholder();
 
         sb.append("(").append("'")
                 .append(predicateFormWithPlaceholder.first.sort()).append(" ")
@@ -207,8 +211,8 @@ public abstract class AbstractionPredicate
                 .append(OutputStreamProofSaver
                         .escapeCharacters(OutputStreamProofSaver
                                 .printAnything(
-                                        predicateFormWithPlaceholder.second,
-                                        services, false)
+                                    predicateFormWithPlaceholder.second,
+                                    services, false)
                                 .toString().trim()
                                 .replaceAll("(\\r|\\n|\\r\\n)+", "")))
                 .append("')");
@@ -220,18 +224,18 @@ public abstract class AbstractionPredicate
      * Parses the String representation of an abstraction predicates.
      *
      * @param s
-     *            {@link String} to parse.
+     *        {@link String} to parse.
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @param localNamespaces
-     *            The local {@link NamespaceSet}.
+     *        The local {@link NamespaceSet}.
      * @return The parsed {@link String}.
      * @throws ParserException
-     *             If there is a syntax error.
+     *         If there is a syntax error.
      * @throws NameAlreadyBoundException
-     *             If the given placeholder is already known to the system.
+     *         If the given placeholder is already known to the system.
      * @throws SortNotKnownException
-     *             If the given sort is not known to the system.
+     *         If the given sort is not known to the system.
      */
     public static List<AbstractionPredicate> fromString(final String s,
             final Services services, NamespaceSet localNamespaces)
@@ -248,7 +252,7 @@ public abstract class AbstractionPredicate
             for (int i = 1; i < m.groupCount(); i += 2) {
                 assert i + 1 <= m
                         .groupCount() : "Wrong format of join abstraction predicates: "
-                                + "There should always be pairs of placeholders and predicate terms.";
+                            + "There should always be pairs of placeholders and predicate terms.";
 
                 final String phStr = m.group(i);
                 final String predStr = m.group(i + 1);
@@ -262,20 +266,20 @@ public abstract class AbstractionPredicate
                         .programVariables();
                 if (variables.lookup(ph.second) == null) {
                     variables.add(new LocationVariable(
-                            new ProgramElementName(ph.second.toString()),
-                            ph.first));
+                        new ProgramElementName(ph.second.toString()),
+                        ph.first));
                 }
 
                 // Parse the predicate
                 result.add(MergeRuleUtils.parsePredicate(predStr,
-                        MergeRuleUtils.singletonArrayList(ph), localNamespaces,
-                        services));
+                    MergeRuleUtils.singletonArrayList(ph), localNamespaces,
+                    services));
             }
         }
 
         if (!matched) {
             throw new ParserException(
-                    "Wrong format of join abstraction predicates", null);
+                "Wrong format of join abstraction predicates", null);
         }
 
         return result;

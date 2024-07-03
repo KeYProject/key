@@ -1,17 +1,21 @@
-package de.uka.ilkd.key.nparser;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+package de.uka.ilkd.key.nparser;
 
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * This POJO represents the static information of a KeY problem.
  * It can be extracted directly via {@link FindProblemInformation},
  * without any previous interpretation of the AST.
  * <p>
- * This class contains rather the <i>raw</i> information, e.g. classpaths are not completed with current working dir.
+ * This class contains rather the <i>raw</i> information, e.g. classpaths are not completed with
+ * current working dir.
  * Rather the values are provided as in the {@link KeyAst.File}.
  * Further work may require, like in {@link KeYFile#readJavaPath()}.
  * </p>

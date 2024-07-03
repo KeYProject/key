@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
 
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
 
 /**
  * Represents an exception with position information. The row position is
@@ -13,59 +17,59 @@ import java.net.MalformedURLException;
  * position is relative to the text and does not describe the column of the
  * table. (has to be changed)
  */
-public abstract class SVInstantiationExceptionWithPosition 
-    extends SVInstantiationException implements HasLocation {
+public abstract class SVInstantiationExceptionWithPosition
+        extends SVInstantiationException implements HasLocation {
 
     private final int row;
     private final int column;
     private final boolean inIfSequent;
-         
-    public SVInstantiationExceptionWithPosition( String description, 
-						 int    row, 
-						 int    column,
-						 boolean inIfSequent ) {
-	super(description);
-	this.row    = row;
-	this.column = column;
-	this.inIfSequent = inIfSequent;
+
+    public SVInstantiationExceptionWithPosition(String description,
+            int row,
+            int column,
+            boolean inIfSequent) {
+        super(description);
+        this.row = row;
+        this.column = column;
+        this.inIfSequent = inIfSequent;
 
     }
-    
+
     public boolean inIfSequent() {
-	return inIfSequent;
+        return inIfSequent;
     }
 
     public int getRow() {
-	return row;
+        return row;
     }
 
     public int getColumn() {
-	return column;
+        return column;
     }
 
-    public String getMessage () {
-	String errmsg = super.getMessage() + ":";
-	if ( inIfSequent() ) {
-	    errmsg += row <= 0 ? "" : ("\nAssumption number:" + row);
-	} else {
-	    errmsg += row    <= 0 ? "" : ("\nRow: " + getRow());
-	    errmsg += column <= 0 ? "" : ("\nColumn: " + getColumn());	
-	}
-	return errmsg;
-    }    
+    public String getMessage() {
+        String errmsg = super.getMessage() + ":";
+        if (inIfSequent()) {
+            errmsg += row <= 0 ? "" : ("\nAssumption number:" + row);
+        } else {
+            errmsg += row <= 0 ? "" : ("\nRow: " + getRow());
+            errmsg += column <= 0 ? "" : ("\nColumn: " + getColumn());
+        }
+        return errmsg;
+    }
 
     /**
      * Returns a string representation of this exception.
      */
     public String toString() {
-	return getMessage();
+        return getMessage();
     }
 
-	@Nullable
-	@Override
-	public Location getLocation() throws MalformedURLException {
-		Location location;
-		location = new Location((String) null, getRow(), getColumn());
-		return location;
-	}
+    @Nullable
+    @Override
+    public Location getLocation() throws MalformedURLException {
+        Location location;
+        location = new Location((String) null, getRow(), getColumn());
+        return location;
+    }
 }

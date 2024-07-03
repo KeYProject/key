@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -8,12 +16,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.proof.OpReplacer;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.UnaryOperator;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 
 /**
@@ -54,29 +58,29 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     private final LabeledParserRuleContext originalSpec;
 
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
 
     /**
      * Creates a class invariant.
      *
-     * @param name         the unique internal name of the invariant
-     * @param displayName  the displayed name of the invariant
-     * @param kjt          the KeYJavaType to which the invariant belongs
-     * @param visibility   the visibility of the invariant
-     *                     (null for default visibility)
-     * @param inv          the invariant formula itself
-     * @param selfVar      the variable used for the receiver object
+     * @param name the unique internal name of the invariant
+     * @param displayName the displayed name of the invariant
+     * @param kjt the KeYJavaType to which the invariant belongs
+     * @param visibility the visibility of the invariant
+     *        (null for default visibility)
+     * @param inv the invariant formula itself
+     * @param selfVar the variable used for the receiver object
      * @param originalSpec
      */
     public InitiallyClauseImpl(String name,
-                               String displayName,
-                               KeYJavaType kjt,
-                               VisibilityModifier visibility,
-                               Term inv,
-                               ParsableVariable selfVar,
-                               LabeledParserRuleContext originalSpec) {
+            String displayName,
+            KeYJavaType kjt,
+            VisibilityModifier visibility,
+            Term inv,
+            ParsableVariable selfVar,
+            LabeledParserRuleContext originalSpec) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
         assert kjt != null;
@@ -93,9 +97,9 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
 
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
 
     private Map<Operator, Operator> getReplaceMap(
             ParsableVariable selfVar,
@@ -111,16 +115,16 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
 
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
     @Override
     public InitiallyClause map(UnaryOperator<Term> op, Services services) {
         return new InitiallyClauseImpl(
-                name, displayName, kjt, visibility,
-                op.apply(originalInv),
-                originalSelfVar, originalSpec);
+            name, displayName, kjt, visibility,
+            op.apply(originalInv),
+            originalSelfVar, originalSpec);
     }
 
     @Override
@@ -141,8 +145,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
 
     @Override
     public Term getClause(ParsableVariable selfVar, TermServices services) {
-        final Map<Operator, Operator> replaceMap
-                = getReplaceMap(selfVar, services);
+        final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
@@ -167,11 +170,11 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     @Override
     public InitiallyClause setKJT(KeYJavaType newKjt) {
         return new InitiallyClauseImpl(name,
-                displayName,
-                newKjt,
-                visibility,
-                originalInv,
-                originalSelfVar,
-                originalSpec);
+            displayName,
+            newKjt,
+            visibility,
+            originalInv,
+            originalSelfVar,
+            originalSpec);
     }
 }

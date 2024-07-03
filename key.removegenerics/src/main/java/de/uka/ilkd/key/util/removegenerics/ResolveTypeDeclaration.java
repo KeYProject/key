@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.util.removegenerics;
 
@@ -39,12 +42,14 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
     private final List<MethodDeclaration> methodsToAdd = new ArrayList<>();
     private final List<List<Type>> signaturesToAdd = new ArrayList<>();
 
-    public ResolveTypeDeclaration(ClassDeclaration declaration, CrossReferenceServiceConfiguration sc) {
+    public ResolveTypeDeclaration(ClassDeclaration declaration,
+            CrossReferenceServiceConfiguration sc) {
         super(sc);
         this.declaration = declaration;
     }
 
-    public ResolveTypeDeclaration(InterfaceDeclaration declaration, CrossReferenceServiceConfiguration sc) {
+    public ResolveTypeDeclaration(InterfaceDeclaration declaration,
+            CrossReferenceServiceConfiguration sc) {
         super(sc);
         this.declaration = declaration;
     }
@@ -76,18 +81,20 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
             if (method.isStatic())
                 continue;
 
-             debugOut("---");
-             debugOut("Method", method);
-             debugOut("Type", signature);
-             debugOut("ungeneric Type", ungenericSignature);
-             debugOut("superMethods", superMethods);
+            debugOut("---");
+            debugOut("Method", method);
+            debugOut("Type", signature);
+            debugOut("ungeneric Type", ungenericSignature);
+            debugOut("superMethods", superMethods);
 
             for (Method superMethod : superMethods) {
-                List<Type> ungenericSuperSignature = getUngenericSignature(superMethod.getSignature());
+                List<Type> ungenericSuperSignature =
+                    getUngenericSignature(superMethod.getSignature());
 
                 boolean isStatic = superMethod.isStatic();
                 boolean differentSigs = !ungenericSuperSignature.equals(ungenericSignature);
-                boolean alreadyPresent = methodAlreadyPresent(method.getName(), ungenericSuperSignature);
+                boolean alreadyPresent =
+                    methodAlreadyPresent(method.getName(), ungenericSuperSignature);
                 if (!isStatic && differentSigs && !alreadyPresent) {
                     setProblemReport(EQUIVALENCE);
                     addMethod(method, ungenericSignature, ungenericSuperSignature);
@@ -101,62 +108,68 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
     /**
      * check if this new method has already been added to the class or has been
      * present in the first place!
-     * 
+     *
      * @return a boolean true if the method with the given name and signature existed already
      */
     private boolean methodAlreadyPresent(String name, List<Type> signature) {
-        
+
         //
         // has always been there
         for (Method m : getSourceInfo().getAllMethods(declaration)) {
             List<Type> mdSig = m.getSignature();
-            if(m.getName().equals(name) && signature.equals(mdSig))
+            if (m.getName().equals(name) && signature.equals(mdSig))
                 return true;
         }
-        
+
         //
         // the signatures are stored
         int i = 0;
         for (MethodDeclaration md : methodsToAdd) {
-            List<Type> mdSig = signaturesToAdd.get(i++); 
-            if(md.getName().equals(name) && signature.equals(mdSig))
+            List<Type> mdSig = signaturesToAdd.get(i++);
+            if (md.getName().equals(name) && signature.equals(mdSig))
                 return true;
         }
-        
+
         return false;
     }
 
     /**
      * create a wrapping method for a method with incompatible signatures.
-     * 
+     *
      * If a class overrides a method in a generic context, this method may be
      * more specific than inheritance allows. To mimic this behaviour under
      * java4 new methods have to be introduced. Example:
-     * 
+     *
      * <pre>
-     * interface A<E,F> { void m(E e, F f); }
-     * class B<E> implements A<E, Integer> { void m(E e, Integer f) {} } 
+     * interface A<E, F> {
+     *     void m(E e, F f);
+     * }
+     *
+     *
+     * class B<E> implements A<E, Integer> {
+     *     void m(E e, Integer f) {}
+     * }
      * </pre>
-     * 
+     *
      * The method in class B does not override the one in A. Instead, a method
-     * 
+     *
      * <pre>
-     * void m(Object arg1, Object arg2) { m((Object)arg1, (Integer)arg2); }
+     * void m(Object arg1, Object arg2) { m((Object) arg1, (Integer) arg2); }
      * </pre>
-     * 
+     *
      * has to be introduced.
-     * 
+     *
      * TODO What if a method is static, yet in a subclass not static
-     * 
+     *
      * TODO What if a method is static in a subclass
-     * 
+     *
      * @param origMethod
-     *            some onformation (visibility, return type, ...) is taken from
-     *            here
+     *        some onformation (visibility, return type, ...) is taken from
+     *        here
      * @param localSign
-     *            this is the signature of the method after removal of TV
+     *        this is the signature of the method after removal of TV
      * @param superSig
-     *            this is the target signature of the supertype.
+     *        this is the target signature of the supertype.
      */
     private void addMethod(Method origMethod, List<Type> localSign, List<Type> superSig) {
         ProgramFactory programFactory = getProgramFactory();
@@ -193,7 +206,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         //
         // actually create the declaration
         MethodDeclaration methodDecl = programFactory.createMethodDeclaration(
-                prefix, returnTypeRef, methodName, parameters, aThrows);
+            prefix, returnTypeRef, methodName, parameters, aThrows);
 
         //
         // the method arguments
@@ -211,7 +224,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         //
         // create the methodCall
         MethodReference methodCall = programFactory.createMethodReference(
-                programFactory.createThisReference(), methodName.deepClone(), args);
+            programFactory.createThisReference(), methodName.deepClone(), args);
 
         // if there is a return type, make a return
         ASTList<Statement> stm = new ASTArrayList<>(1);
@@ -227,13 +240,14 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         // add a comment
         methodDecl.setComments(new ASTArrayList<>());
         SingleLineComment slc = getProgramFactory().createSingleLineComment(
-                "//--- This method has been created due to generics removal");
+            "//--- This method has been created due to generics removal");
 
-        // sould be done elsewhere methodDecl.getFirstElement().setRelativePosition(new SourceElement.Position(1, 0))
+        // sould be done elsewhere methodDecl.getFirstElement().setRelativePosition(new
+        // SourceElement.Position(1, 0))
         slc.setPrefixed(true);
         methodDecl.getComments().add(slc);
         methodDecl.makeAllParentRolesValid();
-        
+
         //
         // copy the new method to the list of methodsToAdd
         methodsToAdd.add(methodDecl);
@@ -264,9 +278,9 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
     /**
      * given a list of classtypes create throws clause out of them
-     * 
+     *
      * @param exceptions
-     *            a list of exception
+     *        a list of exception
      * @return a newly created throws-clause, or null if either null exceptions
      *         or empty list
      */
@@ -305,7 +319,8 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         List<Method> superMethods = new LinkedList<>();
 
         for (ClassType superType : sourceInfo.getSupertypes(classType)) {
-            List<Method> matchingMethods = sourceInfo.getMethods(superType, name, signature, null, classType);
+            List<Method> matchingMethods =
+                sourceInfo.getMethods(superType, name, signature, null, classType);
             if (matchingMethods.size() == 1) {
                 Method match = matchingMethods.get(0);
                 superMethods.add(match);

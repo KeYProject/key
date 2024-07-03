@@ -1,9 +1,7 @@
-/*
- * Created on 17.12.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.expression;
 
 import recoder.java.*;
@@ -12,7 +10,8 @@ import recoder.list.generic.ASTList;
 /**
  * @author Tobias Gutzmann
  */
-public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement implements Expression,
+public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
+        implements Expression,
         ExpressionContainer {
     /**
      * serialization id
@@ -38,49 +37,63 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement 
             this.elementValues = proto.elementValues.deepClone();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.Expression#getExpressionContainer()
      */
     public ExpressionContainer getExpressionContainer() {
         return parent;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.Expression#setExpressionContainer(recoder.java.ExpressionContainer)
      */
     public void setExpressionContainer(ExpressionContainer c) {
         parent = c;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.Expression#deepClone()
      */
     public ElementValueArrayInitializer deepClone() {
         return new ElementValueArrayInitializer(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ProgramElement#getASTParent()
      */
     public NonTerminalProgramElement getASTParent() {
         return parent;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
         v.visitElementValueArrayInitializer(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ExpressionContainer#getExpressionCount()
      */
     public int getExpressionCount() {
         return elementValues == null ? 0 : elementValues.size();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ExpressionContainer#getExpressionAt(int)
      */
     public Expression getExpressionAt(int index) {
@@ -89,21 +102,27 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement 
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildCount()
      */
     public int getChildCount() {
         return getExpressionCount();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildAt(int)
      */
     public ProgramElement getChildAt(int index) {
         return getExpressionAt(index);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
      */
     public int getChildPositionCode(ProgramElement child) {
@@ -116,8 +135,11 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement 
         return -1;
     }
 
-    /* (non-Javadoc)
-     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement, recoder.java.ProgramElement)
+    /*
+     * (non-Javadoc)
+     *
+     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement,
+     * recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null) {

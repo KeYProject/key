@@ -1,8 +1,8 @@
-package de.uka.ilkd.key.proof.mgt;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.DependencyContractImpl;
-import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+package de.uka.ilkd.key.proof.mgt;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,12 +10,18 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContractImpl;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+
 public class ContractOrderManager {
     public static final String KEY_CONTRACT_ORDER = "key.contractOrder";
     public static final String FILENAME = System.getProperty(KEY_CONTRACT_ORDER);
     private static ContractOrderManager theInstance;
 
-    public enum ContractMode { WITH_MEASURED_BY, UNRESTRICTED, FORBIDDEN }
+    public enum ContractMode {
+        WITH_MEASURED_BY, UNRESTRICTED, FORBIDDEN
+    }
 
     private final Map<String, Integer> map;
     private final int defaultLevel;
@@ -26,7 +32,7 @@ public class ContractOrderManager {
 
     public static ContractOrderManager getInstance() {
         assert isEnabled();
-        if(theInstance == null) {
+        if (theInstance == null) {
             try {
                 theInstance = new ContractOrderManager();
             } catch (IOException e) {
@@ -57,7 +63,7 @@ public class ContractOrderManager {
         // Could be replaced by getOrDefault, keeping the debug output for now
         Integer level = map.get(contract);
         if (level == null) {
-//            System.out.println("Contract " + contract + " w/o level, using highest level");
+            // System.out.println("Contract " + contract + " w/o level, using highest level");
             level = this.defaultLevel;
         }
         return level;
@@ -93,7 +99,8 @@ public class ContractOrderManager {
         }
 
         if (contract instanceof FunctionalOperationContractImpl) {
-            FunctionalOperationContractImpl operationContract = (FunctionalOperationContractImpl) contract;
+            FunctionalOperationContractImpl operationContract =
+                (FunctionalOperationContractImpl) contract;
             return operationContract.getName();
         }
 

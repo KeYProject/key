@@ -1,16 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.parser;
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
 
 public class KeYSemanticException extends RecognitionException implements HasLocation {
     private final String cat;
     private final String filename;
-    
+
     public KeYSemanticException(String message) {
         this.cat = message;
         this.filename = "<unknown>";
@@ -30,38 +35,38 @@ public class KeYSemanticException extends RecognitionException implements HasLoc
     public String getFilename() {
         return filename;
     }
-    
+
     public int getLine() {
-        return line;        
+        return line;
     }
-    
+
     public int getColumn() {
         return charPositionInLine;
-    }   
+    }
 
     /**
      * Returns a clean error message (no line number/column information)
+     *
      * @deprecated
      */
     @Deprecated
-    public String getErrorMessage ()
-    {
-	return getMessage();
+    public String getErrorMessage() {
+        return getMessage();
     }
 
     /**
      * Returns a clean error message (no line number/column information)
      */
-    public String getMessage ()
-    {
-	return cat;
+    public String getMessage() {
+        return cat;
     }
-    
+
     /**
      * Returns a string representation of this exception.
      */
     public String toString() {
-	return String.format("%s(%d, %d): %s", filename, this.getLine(), this.getColumn(), getMessage());
+        return String.format("%s(%d, %d): %s", filename, this.getLine(), this.getColumn(),
+            getMessage());
     }
 
     @Nullable

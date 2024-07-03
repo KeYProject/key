@@ -1,10 +1,11 @@
-/*
- * Created on 15.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
@@ -17,9 +18,6 @@ import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Deals with annotations. Removes all annotation use specification and
@@ -42,7 +40,8 @@ public class RemoveAnnotations extends TwoPassTransformation {
     /**
      * @param sc
      */
-    public RemoveAnnotations(CrossReferenceServiceConfiguration sc, NonTerminalProgramElement root) {
+    public RemoveAnnotations(CrossReferenceServiceConfiguration sc,
+            NonTerminalProgramElement root) {
         super(sc);
         this.root = root;
     }
@@ -59,7 +58,8 @@ public class RemoveAnnotations extends TwoPassTransformation {
                 toRemove.add((AnnotationUseSpecification) pe);
             } else if (pe instanceof AnnotationDeclaration) {
                 AnnotationDeclaration ad = (AnnotationDeclaration) pe;
-                List<TypeReference> trl = getServiceConfiguration().getCrossReferenceSourceInfo().getReferences(ad);
+                List<TypeReference> trl =
+                    getServiceConfiguration().getCrossReferenceSourceInfo().getReferences(ad);
                 boolean remove = true;
                 for (int i = 0; i < trl.size(); i++) {
                     if (!(trl.get(i).getASTParent() instanceof AnnotationUseSpecification)) {
@@ -75,8 +75,10 @@ public class RemoveAnnotations extends TwoPassTransformation {
                         break;
                     }
                 }
-                if (remove) unusedAnnotationTypes.add(ad);
-                else usedAnnotationTypes.add(ad);
+                if (remove)
+                    unusedAnnotationTypes.add(ad);
+                else
+                    usedAnnotationTypes.add(ad);
             }
         }
         return super.analyze();

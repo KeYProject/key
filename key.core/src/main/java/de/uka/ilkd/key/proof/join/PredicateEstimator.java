@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.join;
 
 import java.util.Comparator;
@@ -20,9 +24,9 @@ public interface PredicateEstimator {
 
     /**
      * @param partner
-     *            Structure comprising the partners of a join.
+     *        Structure comprising the partners of a join.
      * @param proof
-     *            The underlying proof.
+     *        The underlying proof.
      * @return A decision predicate for the two nodes in partner. The predicate
      *         should be true in the sequent of the first node and false in the
      *         sequent of the second node.
@@ -39,6 +43,7 @@ public interface PredicateEstimator {
         Node getCommonParent();
     }
 }
+
 
 /**
  * Tries to determine the decision predicate. The information about the
@@ -107,7 +112,7 @@ class StdPredicateEstimator implements PredicateEstimator {
 
         };
     }
-    
+
     /**
      * Goes up to the common node of partner.getNode(0) and partner.getNode(1)
      * and returns the next node on the path to partner.getNode(0).
@@ -157,9 +162,9 @@ class StdPredicateEstimator implements PredicateEstimator {
      * to a term.
      *
      * @param estimation
-     *            The branch label without prefix.
+     *        The branch label without prefix.
      * @param services
-     *            The services object.
+     *        The services object.
      * @return A term corresponding to the branch label.
      */
     private Term translate(String estimation, Services services) {

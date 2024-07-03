@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
@@ -17,10 +21,10 @@ public class OperatorClassTF extends BinaryTermFeature {
     }
 
     public static TermFeature create(Class<? extends Operator> op) {
-        return new OperatorClassTF ( op );
+        return new OperatorClassTF(op);
     }
 
     protected boolean filter(Term term, Services services) {
-        return opClass.isInstance ( term.op () );
+        return opClass.isInstance(term.op());
     }
 }

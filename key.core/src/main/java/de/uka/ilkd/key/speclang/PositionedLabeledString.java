@@ -1,9 +1,13 @@
-package de.uka.ilkd.key.speclang;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableArray;
+package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A positionedString with labels, which can then be passed over to the translated term.
@@ -19,12 +23,12 @@ public class PositionedLabeledString extends PositionedString {
     public final ImmutableArray<TermLabel> labels;
 
     public PositionedLabeledString(String text, String fileName, Position pos,
-                                   ImmutableArray<TermLabel> labels) {
-        super(text, fileName, pos);        
+            ImmutableArray<TermLabel> labels) {
+        super(text, fileName, pos);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
-        
+
     }
 
     public PositionedLabeledString(String text, String fileName, Position pos, TermLabel label) {
@@ -52,7 +56,7 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public boolean hasLabels() {
-            return true;
+        return true;
     }
 
     /**
@@ -60,23 +64,24 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public ImmutableArray<TermLabel> getLabels() {
-            return labels;
+        return labels;
     }
 
     /**
      * returns true if the given label is attached
+     *
      * @param label the ITermLabel for which to look (must not be null)
      * @return true iff. the label is attached to this positioned string
      */
     @Override
     public boolean containsLabel(TermLabel label) {
-            assert label != null : "Label must not be null";
-            for (TermLabel l : labels) {
-                    if (label.equals(l)) {
-                            return true;
-                    }
+        assert label != null : "Label must not be null";
+        for (TermLabel l : labels) {
+            if (label.equals(l)) {
+                return true;
             }
-            return false;
+        }
+        return false;
     }
 
     /**
@@ -84,22 +89,23 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public boolean equals(Object o) {
-            if (!(o instanceof PositionedLabeledString)) {
-                    return false;
-            }
-            final PositionedLabeledString cmp = (PositionedLabeledString) o;
-            if (labels.size() == cmp.labels.size()) {
-                    if (!super.equals(o)) {
-                            return false;
-                    }
-                    for (TermLabel l : labels) { // this is not optimal, but as long as number of labels limited ok
-                            if (!cmp.labels.contains(l)) {
-                                    return false;
-                            }
-                    }
-                    return true;
-            }
+        if (!(o instanceof PositionedLabeledString)) {
             return false;
+        }
+        final PositionedLabeledString cmp = (PositionedLabeledString) o;
+        if (labels.size() == cmp.labels.size()) {
+            if (!super.equals(o)) {
+                return false;
+            }
+            for (TermLabel l : labels) { // this is not optimal, but as long as number of labels
+                                         // limited ok
+                if (!cmp.labels.contains(l)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -107,7 +113,7 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public int hashCode() {
-            return super.hashCode() * 17 + labels.hashCode();
+        return super.hashCode() * 17 + labels.hashCode();
     }
 
     /**
@@ -115,16 +121,16 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public String toString() {
-            StringBuilder result = new StringBuilder(super.toString());
-            result.append("<<");
-            // as labels must not be empty at least one element exists
-            result.append(labels.get(0).toString()); 
-            for (int i = 1; i<labels.size();i++) {
-                    result.append(", \"");
-                    result.append(labels.get(i).toString());                        
-                    result.append("\"");
-            }
-            result.append(">>");
-            return result.toString();
+        StringBuilder result = new StringBuilder(super.toString());
+        result.append("<<");
+        // as labels must not be empty at least one element exists
+        result.append(labels.get(0).toString());
+        for (int i = 1; i < labels.size(); i++) {
+            result.append(", \"");
+            result.append(labels.get(i).toString());
+            result.append("\"");
+        }
+        result.append(">>");
+        return result.toString();
     }
 }

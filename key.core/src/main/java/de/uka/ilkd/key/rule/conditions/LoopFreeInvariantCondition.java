@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Optional;
@@ -62,7 +66,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
                         .getContextInstantiation().contextProgram());
 
         final MethodFrame mf = //
-                JavaTools.getInnermostMethodFrame(javaBlock, services);
+            JavaTools.getInnermostMethodFrame(javaBlock, services);
         final Term selfTerm = Optional.ofNullable(mf).map(
             methodFrame -> MiscTools.getSelfTerm(methodFrame, services))
                 .orElse(null);
@@ -77,7 +81,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
 
             final Optional<Term> maybeFreeInvInst = Optional
                     .ofNullable(loopSpec.getFreeInvariant(heap, selfTerm,
-                            loopSpec.getInternalAtPres(), services));
+                        loopSpec.getInternalAtPres(), services));
 
             freeInvInst = maybeFreeInvInst
                     .map(inv -> tb.and(currentFreeInvInst, inv))
@@ -85,12 +89,12 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         }
 
         return matchCond.setInstantiations( //
-                svInst.add(invSV, freeInvInst, services));
+            svInst.add(invSV, freeInvInst, services));
     }
 
     @Override
     public String toString() {
         return "\\getFreeInvariant(" + loopStmtSV + ", " + modalitySV + ", "
-                + invSV + ")";
+            + invSV + ")";
     }
 }

@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof;
 
 import java.util.List;
@@ -7,84 +11,85 @@ import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
 public abstract class ProofAggregate {
 
-   private String name;
+    private String name;
 
-   protected ProofAggregate(String name) {
-      this.name = name;
-   }
+    protected ProofAggregate(String name) {
+        this.name = name;
+    }
 
-   public static ProofAggregate createProofAggregate(ProofAggregate[] proofs, String name) {
-      if (proofs.length>1) {            
-         return new CompoundProof(name, proofs);
-      } else {
-         return proofs[0];
-      }
-   }
+    public static ProofAggregate createProofAggregate(ProofAggregate[] proofs, String name) {
+        if (proofs.length > 1) {
+            return new CompoundProof(name, proofs);
+        } else {
+            return proofs[0];
+        }
+    }
 
-   public static ProofAggregate createProofAggregate(Proof[] proofs, String name) {
-      if (proofs.length==0) return null; // needed for tests
-      if (proofs.length>1) {
-         SingleProof singles[] = new SingleProof[proofs.length];
-         for (int i=0; i<proofs.length; i++) {
-            singles[i] = new SingleProof(proofs[i], name);
-         }
-         return new CompoundProof(name, singles);
-      } else {
-         return new SingleProof(proofs[0], name);
-      }
-   }
+    public static ProofAggregate createProofAggregate(Proof[] proofs, String name) {
+        if (proofs.length == 0)
+            return null; // needed for tests
+        if (proofs.length > 1) {
+            SingleProof singles[] = new SingleProof[proofs.length];
+            for (int i = 0; i < proofs.length; i++) {
+                singles[i] = new SingleProof(proofs[i], name);
+            }
+            return new CompoundProof(name, singles);
+        } else {
+            return new SingleProof(proofs[0], name);
+        }
+    }
 
-   public static ProofAggregate createProofAggregate(Proof proof, String name) {
-      return new SingleProof(proof, name);
-   }
+    public static ProofAggregate createProofAggregate(Proof proof, String name) {
+        return new SingleProof(proof, name);
+    }
 
-   public abstract Proof[] getProofs();
+    public abstract Proof[] getProofs();
 
-   public Proof getFirstProof() {
-      return getProofs() != null && getProofs().length >= 1 ? getProofs()[0] : null;
-   }
+    public Proof getFirstProof() {
+        return getProofs() != null && getProofs().length >= 1 ? getProofs()[0] : null;
+    }
 
-   public void setProofEnv(ProofEnvironment env) {
-      Proof[] proofs = getProofs();
-      for (Proof proof : proofs) {
-         proof.setEnv(env);
-      }
-   }
+    public void setProofEnv(ProofEnvironment env) {
+        Proof[] proofs = getProofs();
+        for (Proof proof : proofs) {
+            proof.setEnv(env);
+        }
+    }
 
-   public abstract int size();
+    public abstract int size();
 
-   public String description() {
-      return name;
-   }
-   
-   @Override
-   public boolean equals(Object o) {
-      if (o == null || o.getClass() != this.getClass()) {
-         return false;
-      }
-      final ProofAggregate other = (ProofAggregate) o;
-      
-      return size() == other.size() && name.equals(other.name);
-   }
+    public String description() {
+        return name;
+    }
 
-   @Override
-   public int hashCode() {
-      return 7*size() + 17*name.hashCode();
-   }
-   
-   public String toString() {	
-      return name;
-   }   
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+        final ProofAggregate other = (ProofAggregate) o;
 
-   public abstract ProofStatus getStatus();
+        return size() == other.size() && name.equals(other.name);
+    }
 
-   public abstract List<ProofAggregate> getChildren();
+    @Override
+    public int hashCode() {
+        return 7 * size() + 17 * name.hashCode();
+    }
 
-   public abstract ProofAggregate getChildrenAt(int i);
+    public String toString() {
+        return name;
+    }
 
-   public Proof getProof(int proofNum) {
-      return getProofs()[proofNum];
-   }
+    public abstract ProofStatus getStatus();
 
-   
+    public abstract List<ProofAggregate> getChildren();
+
+    public abstract ProofAggregate getChildrenAt(int i);
+
+    public Proof getProof(int proofNum) {
+        return getProofs()[proofNum];
+    }
+
+
 }

@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 import java.util.function.UnaryOperator;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -12,6 +14,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -29,16 +33,16 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 public interface BlockContract extends AuxiliaryContract {
 
     /**
-    *
-    * @param newBlock the new block.
-    * @param newPreconditions the new preconditions.
-    * @param newPostconditions the new postconditions.
-    * @param newModifiesClauses the new modifies clauses.
-    * @param newInfFlowSpecs the new information flow specifications.
-    * @param newVariables the new variables.
-    * @param newMeasuredBy the new measured-by clause.
-    * @return a new block contract with the specified attributes.
-    */
+     *
+     * @param newBlock the new block.
+     * @param newPreconditions the new preconditions.
+     * @param newPostconditions the new postconditions.
+     * @param newModifiesClauses the new modifies clauses.
+     * @param newInfFlowSpecs the new information flow specifications.
+     * @param newVariables the new variables.
+     * @param newMeasuredBy the new measured-by clause.
+     * @return a new block contract with the specified attributes.
+     */
     public BlockContract update(StatementBlock newBlock,
             Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newFreePreconditions,
@@ -50,9 +54,9 @@ public interface BlockContract extends AuxiliaryContract {
 
     /**
      * @param newKJT
-     *            the type containing the new target method.
+     *        the type containing the new target method.
      * @param newPM
-     *            the new target method.
+     *        the new target method.
      * @return a new block contract equal to this one except that it belongs to a different target.
      */
     @Override
@@ -60,7 +64,7 @@ public interface BlockContract extends AuxiliaryContract {
 
     /**
      * @param newBlock
-     *            the new block.
+     *        the new block.
      * @return a new block contract equal to this one except that it belongs to a different block.
      */
     @Override

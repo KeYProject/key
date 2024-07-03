@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.nparser.builder;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -14,10 +22,6 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
-import javax.annotation.Nonnull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This visitor finds all contracts and invariant clauses in {@link KeyAst}.
@@ -61,7 +65,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitOne_contract(KeYParser.One_contractContext ctx) {
         String contractName = visitSimple_ident(ctx.contractName);
-        //for program variable declarations
+        // for program variable declarations
         Namespace<IProgramVariable> oldProgVars = namespaces().programVariables();
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
@@ -70,12 +74,12 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             FunctionalOperationContract dlOperationContract =
-                    dsf.createDLOperationContract(contractName, fma, modifiesClause);
+                dsf.createDLOperationContract(contractName, fma, modifiesClause);
             contracts.add(dlOperationContract);
         } catch (ProofInputException e) {
             semanticError(ctx, e.getMessage());
         }
-        //dump local program variable declarations
+        // dump local program variable declarations
         namespaces().setProgramVariables(oldProgVars);
         return null;
     }

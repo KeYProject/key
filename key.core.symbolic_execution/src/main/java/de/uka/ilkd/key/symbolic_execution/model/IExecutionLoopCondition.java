@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
@@ -16,20 +19,23 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
  * The default implementation is {@link ExecutionLoopCondition} which
  * is instantiated via a {@link SymbolicExecutionTreeBuilder} instance.
  * </p>
+ *
  * @author Martin Hentschel
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionLoopCondition
  */
 public interface IExecutionLoopCondition extends IExecutionBlockStartNode<JavaStatement> {
-   /**
-    * Returns the loop expression which is executed.
-    * @return The executed loop expression.
-    */
-   public Expression getGuardExpression();
+    /**
+     * Returns the loop expression which is executed.
+     *
+     * @return The executed loop expression.
+     */
+    public Expression getGuardExpression();
 
-   /**
-    * Returns the code position of the executed loop expression ({@link #getGuardExpression()}).
-    * @return The code of the executed loop expression.
-    */
-   public PositionInfo getGuardExpressionPositionInfo();
+    /**
+     * Returns the code position of the executed loop expression ({@link #getGuardExpression()}).
+     *
+     * @return The code of the executed loop expression.
+     */
+    public PositionInfo getGuardExpressionPositionInfo();
 }

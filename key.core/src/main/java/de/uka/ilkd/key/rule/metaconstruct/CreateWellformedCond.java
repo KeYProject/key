@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -34,25 +38,25 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
         assert op instanceof Modality;
 
         return createWellformedCond(MiscTools.isTransaction((Modality) op),
-                MiscTools.isPermissions(services), anonHeapTerm,
-                anonSavedHeapTerm, anonPermissionsHeapTerm, services);
+            MiscTools.isPermissions(services), anonHeapTerm,
+            anonSavedHeapTerm, anonPermissionsHeapTerm, services);
     }
 
     /**
      * Creates a wellformedness condition containing the applicable heaps.
      *
      * @param isTransaction
-     *            Signals a transaction modality.
+     *        Signals a transaction modality.
      * @param isPermissions
-     *            Signals the permission profile.
+     *        Signals the permission profile.
      * @param anonHeapTerm
-     *            The Skolem term for the standard heap.
+     *        The Skolem term for the standard heap.
      * @param anonSavedHeapTerm
-     *            The Skolem term for the saved (transaction) heap.
+     *        The Skolem term for the saved (transaction) heap.
      * @param anonPermissionsHeapTerm
-     *            The Skolem term for the permissions heap.
+     *        The Skolem term for the permissions heap.
      * @param services
-     *            The {@link Services} object.
+     *        The {@link Services} object.
      * @return The wellformedness condition.
      */
     private Term createWellformedCond(boolean isTransaction,
@@ -61,7 +65,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
         final TermBuilder tb = services.getTermBuilder();
 
         Term result = tb.label(tb.wellFormed(anonHeapTerm),
-                ParameterlessTermLabel.ANON_HEAP_LABEL);
+            ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         if (isTransaction) {
             result = tb.and(result, tb.wellFormed(anonSavedHeapTerm));

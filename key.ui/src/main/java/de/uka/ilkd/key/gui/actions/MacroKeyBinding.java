@@ -1,16 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -41,23 +43,25 @@ public class MacroKeyBinding extends AbstractAction {
         PosInOccurrence posInOcc = null;
         boolean isGoal = mediator.getSelectedGoal() != null;
 
-        if(isGoal) {
+        if (isGoal) {
             PosInSequent mousePos = sequentView.getLastPosInSequent();
             if (mousePos != null) {
                 posInOcc = mousePos.getPosInOccurrence();
             }
         }
 
-        if(macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
-            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
+        if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
+            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
+                posInOcc);
         }
     }
 
-    public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView, JComponent comp) {
+    public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView,
+            JComponent comp) {
 
         for (final ProofMacro macro : ProofMacroMenu.REGISTERED_MACROS) {
             KeyStroke ks = KeyStrokeManager.get(macro);
-            if(ks != null) {
+            if (ks != null) {
                 String command = "invoke macro " + macro.getClass();
                 comp.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ks, command);
                 comp.getActionMap().put(command, new MacroKeyBinding(mediator, sequentView, macro));

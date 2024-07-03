@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -20,9 +27,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class is used to perform program transformations needed for the symbolic
  * execution of a switch-case statement.
@@ -35,7 +39,7 @@ public class SwitchToIf extends ProgramTransformer {
      * creates a switch-to-if ProgramTransformer
      *
      * @param _switch
-     *            the Statement contained by the meta construct
+     *        the Statement contained by the meta construct
      */
     public SwitchToIf(SchemaVariable _switch) {
         super("switch-to-if", (ProgramSV) _switch);
@@ -69,18 +73,18 @@ public class SwitchToIf extends ProgramTransformer {
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
             if (sw.getBranchAt(i) instanceof Case) {
                 Equals guard = KeYJavaASTFactory.equalsOperator(exV,
-                        ((Case) sw.getBranchAt(i)).getExpression());
+                    ((Case) sw.getBranchAt(i)).getExpression());
                 StatementBlock caseBlock = collectStatements(sw, i);
                 // Avoid creating a Else(null) block
                 if (currentBlock != null) {
                     currentBlock = KeYJavaASTFactory.ifElse(
-                            guard,
-                            caseBlock,
-                            currentBlock);
+                        guard,
+                        caseBlock,
+                        currentBlock);
                 } else {
                     currentBlock = KeYJavaASTFactory.ifThen(
-                            guard,
-                            caseBlock);
+                        guard,
+                        caseBlock);
                 }
             }
         }
@@ -93,8 +97,8 @@ public class SwitchToIf extends ProgramTransformer {
         StatementBlock result;
         if (currentBlock != null) {
             result = KeYJavaASTFactory.block(s,
-                    KeYJavaASTFactory.assign(exV, sw.getExpression()),
-                    currentBlock);
+                KeYJavaASTFactory.assign(exV, sw.getExpression()),
+                currentBlock);
         } else {
             // empty switch of primitive type, the expression can still have side-effects
             result = KeYJavaASTFactory.block(s, KeYJavaASTFactory.assign(exV, sw.getExpression()));
@@ -210,9 +214,9 @@ public class SwitchToIf extends ProgramTransformer {
      * <code>count</code> downward.
      *
      * @param s
-     *            the switch statement.
+     *        the switch statement.
      * @param count
-     *            the branch where the collecting of statements starts.
+     *        the branch where the collecting of statements starts.
      */
     private StatementBlock collectStatements(Switch s, int count) {
         List<Statement> stats = new ArrayList<>();
@@ -221,7 +225,7 @@ public class SwitchToIf extends ProgramTransformer {
                 Statement statement = s.getBranchAt(i).getStatementAt(j);
                 stats.add(statement);
                 if (statement instanceof JumpStatement) {
-                    //unconditional jump to outside the case (?)
+                    // unconditional jump to outside the case (?)
                     break outer;
                 }
             }

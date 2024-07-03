@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.*;
@@ -18,19 +22,19 @@ public class SimpleFileRepo extends AbstractFileRepo {
     protected Path getSaveName(Path path) {
         // we have to return paths that are relative!
 
-        Path norm = path.normalize();   // TODO: is this necessary?
+        Path norm = path.normalize(); // TODO: is this necessary?
 
-        if (JAVA_MATCHER.matches(norm)) {                                    // .java
+        if (JAVA_MATCHER.matches(norm)) { // .java
             // copy to src/classpath/bootclasspath (depending on path)
             return getJavaFilePath(norm);
-        } else if (KEY_MATCHER.matches(norm)) {                              // .key/.proof
+        } else if (KEY_MATCHER.matches(norm)) { // .key/.proof
             // copy to top level
             // adapt file references
             return getKeyFilePath(norm);
-        } else if (ZIP_MATCHER.matches(norm)) {                              // .zip/.jar
+        } else if (ZIP_MATCHER.matches(norm)) { // .zip/.jar
             // extract to classpath folder (new folder with archive name)
             return getZipFilePath(norm);
-        } else if (CLASS_MATCHER.matches(norm)) {                            // .class
+        } else if (CLASS_MATCHER.matches(norm)) { // .class
             // copy to classpath
             return getClassFilePath(norm);
         }
@@ -42,17 +46,17 @@ public class SimpleFileRepo extends AbstractFileRepo {
         // return value: the path of the file relative to its proof bundle root
 
         // Where is the file located (src, classpath, bootclasspath)?
-        if (isInJavaPath(javaFile)) {                                              // src
+        if (isInJavaPath(javaFile)) { // src
 
             Path rel = getJavaPath().relativize(javaFile);
             return Paths.get("src").resolve(rel);
-        } else if (isInBootClassPath(javaFile)) {                                  // bootclasspath
+        } else if (isInBootClassPath(javaFile)) { // bootclasspath
             Path rel = getBootclasspath().relativize(javaFile);
             return Paths.get("bootclasspath").resolve(rel);
-        } else if (getClasspath() != null) {                                       // classpath
+        } else if (getClasspath() != null) { // classpath
             // search for matching classpath in the list
             for (Path cp : getClasspath()) {
-                if (javaFile.startsWith(cp)) {         // only consider directories in classpath
+                if (javaFile.startsWith(cp)) { // only consider directories in classpath
                     // cp is always a directory
                     Path parent = cp.getParent();
 
@@ -87,7 +91,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         // class file may be in subdirectories
         // search for matching classpath in the list
         for (Path cp : getClasspath()) {
-            if (classFile.startsWith(cp)) {         // only consider directories in classpath
+            if (classFile.startsWith(cp)) { // only consider directories in classpath
                 // cp is always a directory
                 // -> we put the file into the corresponding subdir in our classpath folder
                 Path parent = cp.getParent();
@@ -104,9 +108,9 @@ public class SimpleFileRepo extends AbstractFileRepo {
     @Override
     protected InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         Path concrete;
-        if (p.isAbsolute()) {                   // p is absolute -> directly read
+        if (p.isAbsolute()) { // p is absolute -> directly read
             concrete = p.normalize();
-        } else {                                // p is relative -> interpret as relative to baseDir
+        } else { // p is relative -> interpret as relative to baseDir
             concrete = getBaseDir().resolve(p.normalize());
         }
 
@@ -125,7 +129,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         // currently, we support only two protocols: file and zip/jar
         if (protocol.equals("file")) {
             // url.getPath() may contain escaped characters -> we have to decode it
-            //String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
+            // String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
 
             try {
                 Path path = Paths.get(url.toURI());

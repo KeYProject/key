@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.util.removegenerics;
 
@@ -21,13 +24,14 @@ import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 
 /**
- * 
+ *
  * A recoder transformation that removes all traces of Java5 generics from a
  * file.
- * 
+ *
  * It makes use of several sub-classes:
+ *
  * @author MU
- * 
+ *
  */
 
 public class ResolveGenerics extends TwoPassTransformation {
@@ -38,11 +42,11 @@ public class ResolveGenerics extends TwoPassTransformation {
 
     /**
      * make a new generic resolver for a single compilation unit
-     * 
+     *
      * @param sc
-     *            Services to use (cross references!)
+     *        Services to use (cross references!)
      * @param cu
-     *            the unit under test
+     *        the unit under test
      */
     public ResolveGenerics(CrossReferenceServiceConfiguration sc, CompilationUnit cu) {
         super(sc);
@@ -51,14 +55,14 @@ public class ResolveGenerics extends TwoPassTransformation {
 
     /**
      * Analyse a compilation unit to remove all traces of generic entities.
-     * 
+     *
      * The problem is delegated to sub-classes for the following entities:
      * <ul>
      * <li>Class-/Interface-Declarations
      * <li>MethodDeclarations
      * <li>FieldDeclarations
      * </ul>
-     * 
+     *
      * @see recoder.kit.TwoPassTransformation#analyze()
      */
     @Override
@@ -71,31 +75,38 @@ public class ResolveGenerics extends TwoPassTransformation {
             ProgramElement pe = tw.getProgramElement();
 
             if (pe instanceof ClassDeclaration) {
-                transformations.add(new ResolveTypeDeclaration((ClassDeclaration) pe, getServiceConfiguration()));
+                transformations.add(
+                    new ResolveTypeDeclaration((ClassDeclaration) pe, getServiceConfiguration()));
             } else
 
             if (pe instanceof InterfaceDeclaration) {
-                transformations.add(new ResolveTypeDeclaration((InterfaceDeclaration) pe, getServiceConfiguration()));
+                transformations.add(new ResolveTypeDeclaration((InterfaceDeclaration) pe,
+                    getServiceConfiguration()));
             } else
 
             if (pe instanceof MethodDeclaration) {
-                transformations.add(new ResolveMethodDeclaration((MethodDeclaration) pe, getServiceConfiguration()));
+                transformations.add(new ResolveMethodDeclaration((MethodDeclaration) pe,
+                    getServiceConfiguration()));
             } else
 
             if (pe instanceof MethodReference) {
-                transformations.add(new ResolveMemberReference((MethodReference) pe, getServiceConfiguration()));
+                transformations.add(
+                    new ResolveMemberReference((MethodReference) pe, getServiceConfiguration()));
             } else
 
             if (pe instanceof FieldReference) {
-                transformations.add(new ResolveMemberReference((FieldReference) pe, getServiceConfiguration()));
+                transformations.add(
+                    new ResolveMemberReference((FieldReference) pe, getServiceConfiguration()));
             } else
 
             if (pe instanceof VariableReference) {
-                transformations.add(new ResolveMemberReference((VariableReference) pe, getServiceConfiguration()));
+                transformations.add(
+                    new ResolveMemberReference((VariableReference) pe, getServiceConfiguration()));
             } else
 
             if (pe instanceof TypeReference) {
-                transformations.add(new ResolveTypeReference((TypeReference) pe, getServiceConfiguration()));
+                transformations.add(
+                    new ResolveTypeReference((TypeReference) pe, getServiceConfiguration()));
             }
         }
 

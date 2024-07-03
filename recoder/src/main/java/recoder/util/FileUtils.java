@@ -1,3 +1,7 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.util;
@@ -124,7 +128,8 @@ public class FileUtils {
             }
         }
         if (result == null) {
-            classpath = System.getProperty("java.home") + File.separator + LIB_SUBDIR + File.separator + ARCHIVE_NAME;
+            classpath = System.getProperty("java.home") + File.separator + LIB_SUBDIR
+                    + File.separator + ARCHIVE_NAME;
             result = new File(classpath);
         }
         if (!result.exists()) {
@@ -142,7 +147,8 @@ public class FileUtils {
     public static File getPathOfExtensionClassesDir() {
         File result = null;
         // <java.home>/lib/ext on Mac OS !
-        String classpath = System.getProperty("java.home") + File.separator + "lib" + File.separator + "ext";
+        String classpath =
+            System.getProperty("java.home") + File.separator + "lib" + File.separator + "ext";
 
         result = new File(classpath);
         if (!result.exists()) {

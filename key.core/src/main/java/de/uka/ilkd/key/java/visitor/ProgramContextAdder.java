@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.visitor;
 
 import java.rmi.UnexpectedException;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -18,6 +20,8 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A context given as {@link ContextStatementBlockInstantiation} is wrapped
@@ -44,7 +48,7 @@ public class ProgramContextAdder {
             ContextStatementBlockInstantiation ct) {
 
         return wrap(context, putIn, ct.prefix().iterator(), ct.prefix().depth(),
-                ct.prefix(), ct.suffix());
+            ct.prefix(), ct.suffix());
     }
 
     protected JavaNonTerminalProgramElement wrap(
@@ -55,7 +59,8 @@ public class ProgramContextAdder {
         JavaNonTerminalProgramElement body = null;
 
         ProgramElement next = prefixPos.hasNext()
-                ? context.getChildAt(prefixPos.next()) : null;
+                ? context.getChildAt(prefixPos.next())
+                : null;
 
         if (!prefixPos.hasNext()) {
             body = createWrapperBody(context, putIn, suffix);
@@ -63,36 +68,36 @@ public class ProgramContextAdder {
             // succeeded by a statement block
             if (context instanceof LabeledStatement) {
                 body = createLabeledStatementWrapper((LabeledStatement) context,
-                        body);
+                    body);
             }
             return body;
         } else {
             body = wrap((JavaNonTerminalProgramElement) next, putIn, prefixPos,
-                    prefixDepth, prefix, suffix);
+                prefixDepth, prefix, suffix);
             if (context instanceof StatementBlock) {
                 return createStatementBlockWrapper((StatementBlock) context,
-                        body);
+                    body);
             } else if (context instanceof Try) {
                 return createTryStatementWrapper((StatementBlock) body,
-                        (Try) context);
+                    (Try) context);
             } else if (context instanceof MethodFrame) {
                 return createMethodFrameWrapper((MethodFrame) context,
-                        (StatementBlock) body);
+                    (StatementBlock) body);
             } else if (context instanceof LabeledStatement) {
                 return createLabeledStatementWrapper((LabeledStatement) context,
-                        body);
+                    body);
             } else if (context instanceof LoopScopeBlock) {
                 return createLoopScopeBlockWrapper((LoopScopeBlock) context,
-                        (StatementBlock) body);
+                    (StatementBlock) body);
             } else if (context instanceof SynchronizedBlock) {
                 return createSynchronizedBlockWrapper(
-                        (SynchronizedBlock) context, (StatementBlock) body);
+                    (SynchronizedBlock) context, (StatementBlock) body);
             } else if (context instanceof Exec) {
                 return createExecStatementWrapper((StatementBlock) body,
                     (Exec) context);
             } else {
                 throw new RuntimeException(new UnexpectedException(
-                        "Unexpected block type: " + context.getClass()));
+                    "Unexpected block type: " + context.getClass()));
             }
         }
     }
@@ -103,14 +108,14 @@ public class ProgramContextAdder {
      * statement block) in the context.
      *
      * @param wrapper
-     *            the JavaNonTerminalProgramElement with the context that has to
-     *            be wrapped around the content of <code>putIn</code>
+     *        the JavaNonTerminalProgramElement with the context that has to
+     *        be wrapped around the content of <code>putIn</code>
      * @param putIn
-     *            the StatementBlock with content that has to be wrapped by the
-     *            elements hidden in the context
+     *        the StatementBlock with content that has to be wrapped by the
+     *        elements hidden in the context
      * @param suffix
-     *            the PosInProgram describing the position of the first element
-     *            before the suffix of the context
+     *        the PosInProgram describing the position of the first element
+     *        before the suffix of the context
      * @return the StatementBlock which encloses the content of
      *         <code>putIn</code> together with the succeeding context elements
      *         of the innermost context statement block (attention: in a case
@@ -165,10 +170,10 @@ public class ProgramContextAdder {
      * statementblock too.
      *
      * @param wrapper
-     *            the StatementBlock where to replace the first statement
+     *        the StatementBlock where to replace the first statement
      * @param replacement
-     *            the StatementBlock that replaces the first statement of the
-     *            block
+     *        the StatementBlock that replaces the first statement of the
+     *        block
      * @return the resulting statement block
      */
     protected StatementBlock createStatementBlockWrapper(StatementBlock wrapper,
@@ -199,18 +204,18 @@ public class ProgramContextAdder {
     protected MethodFrame createMethodFrameWrapper(MethodFrame old,
             StatementBlock body) {
         return new MethodFrame(old.getProgramVariable(),
-                old.getExecutionContext(), body, old.getPositionInfo());
+            old.getExecutionContext(), body, old.getPositionInfo());
     }
 
     protected LabeledStatement createLabeledStatementWrapper(
             LabeledStatement old, JavaNonTerminalProgramElement body) {
         return new LabeledStatement(old.getLabel(),
-                body instanceof StatementBlock && body.getChildCount() == 1
-                        && !(body.getChildAt(
-                                0) instanceof LocalVariableDeclaration)
-                                        ? (Statement) body.getChildAt(0)
-                                        : (Statement) body,
-                old.getPositionInfo());
+            body instanceof StatementBlock && body.getChildCount() == 1
+                    && !(body.getChildAt(
+                        0) instanceof LocalVariableDeclaration)
+                                ? (Statement) body.getChildAt(0)
+                                : (Statement) body,
+            old.getPositionInfo());
     }
 
     protected LoopScopeBlock createLoopScopeBlockWrapper(

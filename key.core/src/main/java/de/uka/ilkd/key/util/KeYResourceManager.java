@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.util;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package de.uka.ilkd.key.util;
 
 import java.io.*;
 import java.net.URL;
@@ -11,6 +12,9 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * KeYResourceManager controls the access to the properties
@@ -22,7 +26,7 @@ public class KeYResourceManager {
 
     private static final String DEFAULT_VERSION = "x.z.y";
     private static final Set<String> INVISIBLE_BRANCHES =
-            Collections.unmodifiableSet(new HashSet<>(Collections.singletonList("master")));
+        Collections.unmodifiableSet(new HashSet<>(Collections.singletonList("master")));
 
     /**
      * the unique instance
@@ -77,7 +81,7 @@ public class KeYResourceManager {
             return sha1;
         }
         sha1 =
-                readVersionString(getResourceFile(this, "sha1"));
+            readVersionString(getResourceFile(this, "sha1"));
 
         return sha1;
     }
@@ -115,7 +119,7 @@ public class KeYResourceManager {
             return version;
         }
         version =
-                readVersionString(getResourceFile(this, "version"));
+            readVersionString(getResourceFile(this, "version"));
 
         return version;
     }
@@ -125,34 +129,34 @@ public class KeYResourceManager {
      * does not exist yet.
      * The created file is removed automatically after finishing JAVA.
      *
-     * @param o              an Object the directory from where <code>resourcename</code>
-     *                       is copied is determined by looking on the package where <code>o.getClass()</code>
-     *                       is declared
-     * @param resourcename   String the name of the file to search  (only relative
-     *                       pathname to the path of the calling class)
+     * @param o an Object the directory from where <code>resourcename</code>
+     *        is copied is determined by looking on the package where <code>o.getClass()</code>
+     *        is declared
+     * @param resourcename String the name of the file to search (only relative
+     *        pathname to the path of the calling class)
      * @param targetLocation target for copying
      * @return true if resource was copied
      */
     public boolean copyIfNotExists(Object o, String resourcename,
-                                   String targetLocation) {
+            String targetLocation) {
         return copyIfNotExists(o.getClass(), resourcename, targetLocation);
     }
 
     public boolean copyIfNotExists(Class<?> cl, String resourcename,
-                                   String targetLocation) {
+            String targetLocation) {
         return copy(cl, resourcename, targetLocation, false);
     }
 
     public boolean copy(Class<?> cl, String resourcename,
-                        String targetLocation, boolean overwrite) {
+            String targetLocation, boolean overwrite) {
         URL resourceURL = cl.getResource(resourcename);
 
         LOGGER.debug("Load Resource:" + resourcename + " of class " + cl);
 
         if (resourceURL == null && cl.getSuperclass() != null) {
             return copy(cl.getSuperclass(),
-                    resourcename,
-                    targetLocation, overwrite);
+                resourcename,
+                targetLocation, overwrite);
         } else if (resourceURL == null) {
             // error message Resource not found
             LOGGER.warn("No resource " + resourcename + " found");
@@ -176,9 +180,11 @@ public class KeYResourceManager {
 
 
                 long actualTransferredByte;
-                try (final ReadableByteChannel sourceStream = Channels.newChannel(resourceURL.openStream());
-                     FileChannel targetStream = new FileOutputStream(targetFile).getChannel()) {
-                    actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+                try (final ReadableByteChannel sourceStream =
+                    Channels.newChannel(resourceURL.openStream());
+                        FileChannel targetStream = new FileOutputStream(targetFile).getChannel()) {
+                    actualTransferredByte =
+                        targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
                 }
                 if (actualTransferredByte < 0 || actualTransferredByte == Long.MAX_VALUE) {
                     throw new RuntimeException("File " + resourcename + " too big.");
@@ -196,7 +202,7 @@ public class KeYResourceManager {
     /**
      * loads a resource and returns its URL
      *
-     * @param cl           the Class used to determine the resource
+     * @param cl the Class used to determine the resource
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
@@ -213,7 +219,7 @@ public class KeYResourceManager {
     /**
      * loads a resource and returns its URL
      *
-     * @param o            the Object used to determine the resource
+     * @param o the Object used to determine the resource
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
@@ -227,9 +233,10 @@ public class KeYResourceManager {
      * bar.
      *
      * @return the title string to be used by the KeY
-     * <code>UserInterfaces</code>
+     *         <code>UserInterfaces</code>
      */
     public String getUserInterfaceTitle() {
-        return String.format("KeY %s%s", this.getVersion(), visibleBranch() ? " [" + getBranch() + "]" : "");
+        return String.format("KeY %s%s", this.getVersion(),
+            visibleBranch() ? " [" + getBranch() + "]" : "");
     }
 }

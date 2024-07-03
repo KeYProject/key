@@ -1,4 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.proof.io;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
@@ -8,28 +22,18 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -66,9 +70,9 @@ public class KeYFile implements EnvInput {
      * and a RuleSource representing the physical source of the .key file.
      */
     public KeYFile(String name,
-                   RuleSource file,
-                   ProgressMonitor monitor,
-                   Profile profile) {
+            RuleSource file,
+            ProgressMonitor monitor,
+            Profile profile) {
         this.name = Objects.requireNonNull(name);
         this.file = Objects.requireNonNull(file);
         this.monitor = monitor;
@@ -80,17 +84,17 @@ public class KeYFile implements EnvInput {
      * creates a new representation for a given file by indicating a name
      * and a RuleSource representing the physical source of the .key file.
      *
-     * @param name     the name of the file
-     * @param file     the physical rule source of the .key file
-     * @param monitor  monitor for reporting progress
-     * @param profile  the profile
+     * @param name the name of the file
+     * @param file the physical rule source of the .key file
+     * @param monitor monitor for reporting progress
+     * @param profile the profile
      * @param fileRepo the FileRepo which will store the file
      */
     public KeYFile(String name,
-                   RuleSource file,
-                   ProgressMonitor monitor,
-                   Profile profile,
-                   FileRepo fileRepo) {
+            RuleSource file,
+            ProgressMonitor monitor,
+            Profile profile,
+            FileRepo fileRepo) {
         this(name, file, monitor, profile);
         this.fileRepo = fileRepo;
     }
@@ -100,9 +104,9 @@ public class KeYFile implements EnvInput {
      * and a file representing the physical source of the .key file.
      */
     public KeYFile(String name,
-                   File file,
-                   ProgressMonitor monitor,
-                   Profile profile) {
+            File file,
+            ProgressMonitor monitor,
+            Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -110,18 +114,18 @@ public class KeYFile implements EnvInput {
      * Creates a new representation for a given file by indicating a name and a
      * file representing the physical source of the .key file.
      *
-     * @param name       the name of the resource
-     * @param file       the file to find it
-     * @param monitor    a possibly null reference to a monitor for the loading
-     *                   progress
-     * @param profile    the KeY profile under which the file is to be load
+     * @param name the name of the resource
+     * @param file the file to find it
+     * @param monitor a possibly null reference to a monitor for the loading
+     *        progress
+     * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
     public KeYFile(String name,
-                   File file,
-                   ProgressMonitor monitor,
-                   Profile profile,
-                   boolean compressed) {
+            File file,
+            ProgressMonitor monitor,
+            Profile profile,
+            boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
     }
 
@@ -130,23 +134,23 @@ public class KeYFile implements EnvInput {
      * Creates a new representation for a given file by indicating a name and a
      * file representing the physical source of the .key file.
      *
-     * @param name       the name of the resource
-     * @param file       the file to find it
-     * @param fileRepo   the FileRepo which will store the file
-     * @param monitor    a possibly null reference to a monitor for the loading
-     *                   progress
-     * @param profile    the KeY profile under which the file is to be load
+     * @param name the name of the resource
+     * @param file the file to find it
+     * @param fileRepo the FileRepo which will store the file
+     * @param monitor a possibly null reference to a monitor for the loading
+     *        progress
+     * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
     public KeYFile(String name,
-                   File file,
-                   FileRepo fileRepo,
-                   ProgressMonitor monitor,
-                   Profile profile,
-                   boolean compressed) {
+            File file,
+            FileRepo fileRepo,
+            ProgressMonitor monitor,
+            Profile profile,
+            boolean compressed) {
         this(name,
-                RuleSourceFactory.initRuleFile(file, compressed),
-                monitor, profile);
+            RuleSourceFactory.initRuleFile(file, compressed),
+            monitor, profile);
         this.fileRepo = fileRepo;
     }
 
@@ -222,8 +226,9 @@ public class KeYFile implements EnvInput {
     public Includes readIncludes() throws ProofInputException {
         if (includes == null) {
             try {
-                KeyAst.File  ctx = getParseContext();
-                includes = ctx.getIncludes(file.file().getAbsoluteFile().getParentFile().toURI().toURL());
+                KeyAst.File ctx = getParseContext();
+                includes =
+                    ctx.getIncludes(file.file().getAbsoluteFile().getParentFile().toURI().toURL());
             } catch (Exception e) {
                 throw new ProofInputException(e);
             }
@@ -234,9 +239,11 @@ public class KeYFile implements EnvInput {
 
     @Override
     public File readBootClassPath() {
-        @Nonnull ProblemInformation pi = getProblemInformation();
+        @Nonnull
+        ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
-        if (bootClassPath == null) return null;
+        if (bootClassPath == null)
+            return null;
         File bootClassPathFile = new File(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
@@ -259,7 +266,8 @@ public class KeYFile implements EnvInput {
     @Nonnull
     @Override
     public List<File> readClassPath() {
-        @Nonnull ProblemInformation pi = getProblemInformation();
+        @Nonnull
+        ProblemInformation pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<>();
         for (String cp : pi.getClasspath()) {
@@ -278,7 +286,8 @@ public class KeYFile implements EnvInput {
 
     @Override
     public String readJavaPath() throws ProofInputException {
-        @Nonnull ProblemInformation pi = getProblemInformation();
+        @Nonnull
+        ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
             File absFile = new File(javaPath);
@@ -288,7 +297,8 @@ public class KeYFile implements EnvInput {
                 absFile = new File(parent, javaPath);
             }
             if (!absFile.exists()) {
-                throw new ProofInputException(String.format("Declared Java source %s not found.", javaPath));
+                throw new ProofInputException(
+                    String.format("Declared Java source %s not found.", javaPath));
             }
             return absFile.getAbsolutePath();
         }
@@ -303,7 +313,7 @@ public class KeYFile implements EnvInput {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
 
-        //read .key file
+        // read .key file
         LOGGER.debug("Reading KeY file {}", file);
         ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
@@ -311,10 +321,9 @@ public class KeYFile implements EnvInput {
         readSorts();
         readFuncAndPred();
         readRules();
-        SpecificationRepository specRepos
-                = initConfig.getServices().getSpecificationRepository();
+        SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
-                new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
+            new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
         specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
         specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
@@ -342,7 +351,7 @@ public class KeYFile implements EnvInput {
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
         ChoiceInformation choice = getParseContext().getChoices();
-        //we ignore the namespace of choice finder.
+        // we ignore the namespace of choice finder.
         initConfig.addCategory2DefaultChoices(choice.getDefaultOptions());
     }
 
@@ -352,7 +361,8 @@ public class KeYFile implements EnvInput {
      * modifying the function namespaces of the respective taclet options.
      */
     public void readFuncAndPred() {
-        if (file == null) return;
+        if (file == null)
+            return;
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);
@@ -366,7 +376,8 @@ public class KeYFile implements EnvInput {
      */
     public void readRules() {
         KeyAst.File ctx = getParseContext();
-        TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(), initConfig.namespaces(),
+        TacletPBuilder visitor =
+            new TacletPBuilder(initConfig.getServices(), initConfig.namespaces(),
                 initConfig.getTaclet2Builder());
         ctx.accept(visitor);
         List<Taclet> taclets = visitor.getTopLevelTaclets();

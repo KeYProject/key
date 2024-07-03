@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.rule;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -11,6 +12,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
@@ -25,8 +29,8 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
-                                      ImmutableList<PosInOccurrence> ifInsts,
-                                      Contract contract) {
+            ImmutableList<PosInOccurrence> ifInsts,
+            Contract contract) {
         super(rule, pio, ifInsts);
         this.instantiation = contract;
     }
@@ -37,18 +41,19 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
     public AbstractContractRuleApp check(Services services) {
         if (instantiation != null && posInOccurrence() != null) {
-            IObserverFunction target = instantiation.getTarget();            
-            IObserverFunction observerFunctionAtPos = getObserverFunction(services);                       
+            IObserverFunction target = instantiation.getTarget();
+            IObserverFunction observerFunctionAtPos = getObserverFunction(services);
             final SpecificationRepository specRepo = services.getSpecificationRepository();
-            
+
             target = specRepo.unlimitObs(target);
             observerFunctionAtPos = specRepo.unlimitObs(observerFunctionAtPos);
-            
+
             if (!target.equals(observerFunctionAtPos)) {
-                
-                if (!specRepo.
-                        getOverridingTargets(observerFunctionAtPos.getContainerType(), observerFunctionAtPos).
-                            contains(new Pair<KeYJavaType, IObserverFunction>(target.getContainerType(), target))){
+
+                if (!specRepo.getOverridingTargets(observerFunctionAtPos.getContainerType(),
+                    observerFunctionAtPos).contains(
+                        new Pair<KeYJavaType, IObserverFunction>(target.getContainerType(),
+                            target))) {
                     return null;
                 }
             }

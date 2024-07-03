@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
 
@@ -9,7 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -37,29 +39,29 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract>
     private boolean successful = false;
 
     public AuxiliaryContractConfigurator(final String name,
-                                     final AuxiliaryContractSelectionPanel<T> contractPanel,
-                                     final JDialog owner,
-                                     final Services services,
-                                     final T[] contracts,
-                                     final String title) {
+            final AuxiliaryContractSelectionPanel<T> contractPanel,
+            final JDialog owner,
+            final Services services,
+            final T[] contracts,
+            final String title) {
         super(owner, name, true);
         init(services, contractPanel, contracts, title);
     }
 
     public AuxiliaryContractConfigurator(final String name,
-                                     final AuxiliaryContractSelectionPanel<T> contractPanel,
-                                     final Frame owner,
-                                     final Services services,
-                                     final T[] contracts,
-                                     final String title) {
+            final AuxiliaryContractSelectionPanel<T> contractPanel,
+            final Frame owner,
+            final Services services,
+            final T[] contracts,
+            final String title) {
         super(owner, name, true);
         init(services, contractPanel, contracts, title);
     }
 
     private void init(final Services services,
             final AuxiliaryContractSelectionPanel<T> contractPanel,
-                      final T[] contracts,
-                      final String title) {
+            final T[] contracts,
+            final String title) {
         initContractPanel(services, contractPanel, contracts, title);
         initButtonPanelAndOkAndCancelButtons();
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -69,14 +71,14 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract>
     }
 
     private void initContractPanel(final Services services,
-                                   final AuxiliaryContractSelectionPanel<T> contractPanel,
-                                   final T[] contracts,
-                                   final String title) {
+            final AuxiliaryContractSelectionPanel<T> contractPanel,
+            final T[] contracts,
+            final String title) {
         this.contractPanel = contractPanel;
         contractPanel.setContracts(contracts, title);
         contractPanel.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e){
-                if(e.getClickCount() == 2){
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
                     okButton.doClick();
                 }
             }
@@ -89,7 +91,8 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract>
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
         Dimension buttonDim = new Dimension(100, 27);
-        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) buttonDim.getHeight() + 10));
+        buttonPanel
+                .setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) buttonDim.getHeight() + 10));
         getContentPane().add(buttonPanel);
         initOkButton(buttonDim, buttonPanel);
         initCancelButton(buttonDim, buttonPanel);
@@ -133,8 +136,7 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract>
             escapeListener,
             "ESC",
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_IN_FOCUSED_WINDOW
-        );
+            JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**

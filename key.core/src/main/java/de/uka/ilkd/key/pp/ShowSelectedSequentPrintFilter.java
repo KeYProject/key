@@ -1,10 +1,14 @@
-package de.uka.ilkd.key.pp;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This filter takes a {@link PosInOccurrence} and only shows the sub-formula at that position.
@@ -28,7 +32,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     }
 
     @Override
-    protected void filterSequent() { }
+    protected void filterSequent() {}
 
     @Override
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {

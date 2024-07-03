@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package org.key_project.util.collection;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,6 +11,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nullable;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications
@@ -58,23 +61,23 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         this.elementList = elementList;
     }
 
-//    private static HashSet<String> previousComplains = new HashSet<>();
+    // private static HashSet<String> previousComplains = new HashSet<>();
     private void complainAboutSize() {
-//        // Immutable linear sets are very expensive with O(n) addition
-//        // and O(n) lookup.
-//        // To create a list with N entries O(N^2) comparisons need to be made
-//        // Better restrict this class to very small instances.
-//        // The following helps detecting "bad" usages. (MU 2016)
-//        if(elementList.size() > 20) {
-//            StackTraceElement[] st = new Throwable().getStackTrace();
-//            String complain = "TOO LARGE: " + st[2];
-//            if(previousComplains.add(complain)) {
-//                LOGGER.error(complain);
-////                for (int i = 2; i < 6; i++) {
-////                    LOGGER.error(st[i]);
-////                }
-//            }
-//        }
+        // // Immutable linear sets are very expensive with O(n) addition
+        // // and O(n) lookup.
+        // // To create a list with N entries O(N^2) comparisons need to be made
+        // // Better restrict this class to very small instances.
+        // // The following helps detecting "bad" usages. (MU 2016)
+        // if(elementList.size() > 20) {
+        // StackTraceElement[] st = new Throwable().getStackTrace();
+        // String complain = "TOO LARGE: " + st[2];
+        // if(previousComplains.add(complain)) {
+        // LOGGER.error(complain);
+        //// for (int i = 2; i < 6; i++) {
+        //// LOGGER.error(st[i]);
+        //// }
+        // }
+        // }
     }
 
     /**
@@ -297,7 +300,8 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @return a fresh immutable set with all the elements in set
      */
     public static <T> ImmutableSet<T> fromSet(@Nullable Set<T> set) {
-        if(set == null) return null;
+        if (set == null)
+            return null;
         if (set.isEmpty()) {
             return nil();
         } else {
@@ -311,7 +315,8 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
 
     public static <T> ImmutableSet<T> fromCollection(@Nullable Collection<T> seq) {
-        if(seq == null) return null;
+        if (seq == null)
+            return null;
         return fromSet(new HashSet<>(seq));
     }
 

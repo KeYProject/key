@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.model;
+
+import java.util.Optional;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Optional;
 
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -29,8 +33,8 @@ public class PruneInteraction extends NodeInteraction {
     @Override
     public String getMarkdown() {
         return String.format("## Prune%n%n"
-                + "**Date**: %s%n"
-                + "prune to node %s%n", getCreated(), getNodeId());
+            + "**Date**: %s%n"
+            + "prune to node %s%n", getCreated(), getNodeId());
     }
 
     @Override

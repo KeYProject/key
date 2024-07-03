@@ -1,23 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
-import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
 /**
  * This handler is a fallback handler that introduces a new uninterpreted
@@ -49,7 +47,7 @@ public class FloatRemainderHandler implements SMTHandler {
 
     @Override
     public Capability canHandle(Term term) {
-        if(term.sort() == floatSort || term.sort() == doubleSort) {
+        if (term.sort() == floatSort || term.sort() == doubleSort) {
             return Capability.YES_THIS_INSTANCE;
         }
         return Capability.UNABLE;
@@ -70,13 +68,13 @@ public class FloatRemainderHandler implements SMTHandler {
         }
 
         SExpr alreadySeen = map.get(term);
-        if(alreadySeen != null) {
+        if (alreadySeen != null) {
             return alreadySeen;
         }
 
         Type type;
         String smtType;
-        if(term.sort() == floatSort) {
+        if (term.sort() == floatSort) {
             type = FloatHandler.FLOAT;
             smtType = "Float32";
         } else {

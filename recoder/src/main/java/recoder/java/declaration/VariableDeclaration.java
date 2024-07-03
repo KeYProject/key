@@ -1,12 +1,15 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
+
+import java.util.List;
 
 import recoder.java.SourceElement;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTList;
-
-import java.util.List;
 
 /**
  * Variable declaration.
@@ -14,7 +17,8 @@ import java.util.List;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class VariableDeclaration extends JavaDeclaration implements TypeReferenceContainer {
+public abstract class VariableDeclaration extends JavaDeclaration
+        implements TypeReferenceContainer {
 
     /**
      * Type reference.
@@ -33,9 +37,9 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
     /**
      * Variable declaration.
      *
-     * @param mods    a modifier mutable list.
+     * @param mods a modifier mutable list.
      * @param typeRef a type reference.
-     * @param vars    a variable specification mutable list.
+     * @param vars a variable specification mutable list.
      */
 
     public VariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef) {

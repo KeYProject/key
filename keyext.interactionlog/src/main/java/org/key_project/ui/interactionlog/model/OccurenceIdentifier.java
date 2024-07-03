@@ -1,17 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.model;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -99,7 +103,8 @@ public class OccurenceIdentifier {
             return " @toplevel";
         }
         if (path.length != 0) {
-            return getTerm() + " under " + getToplevelTerm() + "(Path: " + Arrays.toString(path) + ")";
+            return getTerm() + " under " + getToplevelTerm() + "(Path: " + Arrays.toString(path)
+                + ")";
         } else {
             return getTerm() + " @toplevel";
         }
@@ -111,7 +116,7 @@ public class OccurenceIdentifier {
     }
 
     private PosInOccurrence rebuildOn(Sequent seq) {
-        //TODO
+        // TODO
         return null;
     }
 }

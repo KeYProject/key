@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -26,6 +27,9 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 /**
  * instantiate var=a occ=2 with="a_8" hide
  * <p>
@@ -40,12 +44,14 @@ public class InstantiateCommand
         super(Parameters.class);
     }
 
-    @Override public Parameters evaluateArguments(EngineState state,
+    @Override
+    public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
-    @Override public void execute(AbstractUserInterfaceControl uiControl,
+    @Override
+    public void execute(AbstractUserInterfaceControl uiControl,
             Parameters params, EngineState state)
             throws ScriptException, InterruptedException {
 
@@ -53,7 +59,7 @@ public class InstantiateCommand
 
         if ((params.var == null) == (params.formula == null)) {
             throw new ScriptException(
-                    "One of 'var' or 'formula' must be specified");
+                "One of 'var' or 'formula' must be specified");
         }
 
         if (params.var != null) {
@@ -69,8 +75,8 @@ public class InstantiateCommand
 
         SchemaVariable sv = theApp.uninstantiatedVars().iterator().next();
 
-        theApp = theApp.addInstantiation(sv, params.with, true /*???*/,
-                state.getProof().getServices());
+        theApp = theApp.addInstantiation(sv, params.with, true /* ??? */,
+            state.getProof().getServices());
 
         theApp = theApp.tryToInstantiate(state.getProof().getServices());
 
@@ -98,8 +104,7 @@ public class InstantiateCommand
         String rulename;
         if (p.formula.op() == Quantifier.ALL) {
             rulename = "allLeft" + (hide ? "Hide" : "");
-        }
-        else {
+        } else {
             rulename = "exRight" + (hide ? "Hide" : "");
         }
 
@@ -116,8 +121,8 @@ public class InstantiateCommand
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
-                    services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
@@ -125,8 +130,8 @@ public class InstantiateCommand
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                    services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                services));
         }
 
         return allApps;
@@ -183,8 +188,8 @@ public class InstantiateCommand
         }
 
         throw new ScriptException(
-                "Variable '" + params.var + "' has no occurrence no. '"
-                        + params.occ + "'.");
+            "Variable '" + params.var + "' has no occurrence no. '"
+                + params.occ + "'.");
     }
 
     private Term stripUpdates(Term term) {
@@ -195,62 +200,63 @@ public class InstantiateCommand
     }
 
     /*
-    public Parameters createArguments(EngineState state,
-            Map<String, String> args) throws ScriptException {
-        Parameters params = new Parameters();
-
-        //
-        // var="a"
-        params.var = args.get("var");
-
-        //
-        // formula="toplevel formula in which it appears"
-        // formula="\forall int a; phi(a)"
-        String formStr = args.get("formula");
-        if (formStr != null) {
-            try {
-                params.formula = toTerm(proof, state, formStr, Sort.FORMULA);
-            }
-            catch (Exception e) {
-                throw new ScriptException(e);
-            }
-        }
-
-        //
-        // occurrence number;
-        String occStr = args.get("occ");
-        if (occStr != null) {
-            try {
-                params.occ = Integer.parseInt(occStr);
-            }
-            catch (NumberFormatException e) {
-                throw new ScriptException(e);
-            }
-        }
-
-        //
-        // instantiation
-        String withStr = args.get("with");
-        if (withStr != null) {
-            try {
-                params.with = toTerm(proof, state, withStr, null);
-            }
-            catch (ParserException e) {
-                throw new ScriptException(e);
-            }
-        }
-        else {
-            throw new ScriptException("'with' must be specified");
-        }
-
-        //
-        // hide
-        params.hide = args.containsKey("#2") && args.get("#2").equals("hide");
-
-        return params;
-    }
-*/
-    @Override public String getName() {
+     * public Parameters createArguments(EngineState state,
+     * Map<String, String> args) throws ScriptException {
+     * Parameters params = new Parameters();
+     *
+     * //
+     * // var="a"
+     * params.var = args.get("var");
+     *
+     * //
+     * // formula="toplevel formula in which it appears"
+     * // formula="\forall int a; phi(a)"
+     * String formStr = args.get("formula");
+     * if (formStr != null) {
+     * try {
+     * params.formula = toTerm(proof, state, formStr, Sort.FORMULA);
+     * }
+     * catch (Exception e) {
+     * throw new ScriptException(e);
+     * }
+     * }
+     *
+     * //
+     * // occurrence number;
+     * String occStr = args.get("occ");
+     * if (occStr != null) {
+     * try {
+     * params.occ = Integer.parseInt(occStr);
+     * }
+     * catch (NumberFormatException e) {
+     * throw new ScriptException(e);
+     * }
+     * }
+     *
+     * //
+     * // instantiation
+     * String withStr = args.get("with");
+     * if (withStr != null) {
+     * try {
+     * params.with = toTerm(proof, state, withStr, null);
+     * }
+     * catch (ParserException e) {
+     * throw new ScriptException(e);
+     * }
+     * }
+     * else {
+     * throw new ScriptException("'with' must be specified");
+     * }
+     *
+     * //
+     * // hide
+     * params.hide = args.containsKey("#2") && args.get("#2").equals("hide");
+     *
+     * return params;
+     * }
+     */
+    @Override
+    public String getName() {
         return "instantiate";
     }
 

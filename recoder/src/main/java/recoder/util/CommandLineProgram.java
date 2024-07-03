@@ -1,3 +1,7 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.util;
@@ -104,55 +108,65 @@ public abstract class CommandLineProgram {
         }
     }
 
-    protected final void registerSimpleOpt(String varName, String shortOpt, String longOpt, String descr) {
+    protected final void registerSimpleOpt(String varName, String shortOpt, String longOpt,
+            String descr) {
         registerSimpleOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE);
     }
 
-    protected final void registerSimpleOpt(String varName, String shortOpt, String longOpt, String descr,
-                                           int multiplicity) {
+    protected final void registerSimpleOpt(String varName, String shortOpt, String longOpt,
+            String descr,
+            int multiplicity) {
         registerVar(varName, shortOpt, Boolean.FALSE);
         om.addOption(OptionManager.SIMPLE, multiplicity, shortOpt, longOpt, descr);
     }
 
-    protected final void registerSwitchOpt(String varName, String shortOpt, String longOpt, String descr,
-                                           boolean defaultVal) {
+    protected final void registerSwitchOpt(String varName, String shortOpt, String longOpt,
+            String descr,
+            boolean defaultVal) {
         registerSwitchOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE, defaultVal);
     }
 
-    protected final void registerSwitchOpt(String varName, String shortOpt, String longOpt, String descr,
-                                           int multiplicity, boolean defaultVal) {
+    protected final void registerSwitchOpt(String varName, String shortOpt, String longOpt,
+            String descr,
+            int multiplicity, boolean defaultVal) {
         registerVar(varName, shortOpt, new Boolean(defaultVal));
         om.addOption(OptionManager.SWITCH, multiplicity, shortOpt, longOpt, descr);
     }
 
-    protected final void registerBooleanOpt(String varName, String shortOpt, String longOpt, String descr,
-                                            boolean defaultVal) {
+    protected final void registerBooleanOpt(String varName, String shortOpt, String longOpt,
+            String descr,
+            boolean defaultVal) {
         registerBooleanOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE, defaultVal);
     }
 
-    protected final void registerBooleanOpt(String varName, String shortOpt, String longOpt, String descr,
-                                            int multiplicity, boolean defaultVal) {
+    protected final void registerBooleanOpt(String varName, String shortOpt, String longOpt,
+            String descr,
+            int multiplicity, boolean defaultVal) {
         registerVar(varName, shortOpt, new Boolean(defaultVal));
         om.addOption(OptionManager.BOOL, multiplicity, shortOpt, longOpt, descr);
     }
 
-    protected final void registerNumberOpt(String varName, String shortOpt, String longOpt, String descr, int defaultVal) {
+    protected final void registerNumberOpt(String varName, String shortOpt, String longOpt,
+            String descr, int defaultVal) {
         registerNumberOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE, defaultVal);
     }
 
-    protected final void registerNumberOpt(String varName, String shortOpt, String longOpt, String descr,
-                                           int multiplicity, int defaultVal) {
+    protected final void registerNumberOpt(String varName, String shortOpt, String longOpt,
+            String descr,
+            int multiplicity, int defaultVal) {
         registerVar(varName, shortOpt, new Integer(defaultVal));
         om.addOption(OptionManager.NUM, multiplicity, shortOpt, longOpt, descr);
     }
 
-    protected final void registerStringOpt(String varName, String shortOpt, String longOpt, String descr,
-                                           String defaultVal) {
+    protected final void registerStringOpt(String varName, String shortOpt, String longOpt,
+            String descr,
+            String defaultVal) {
         registerStringOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE, defaultVal);
     }
 
-    protected final void registerStringOpt(String varName, String shortOpt, String longOpt, String descr,
-                                           int multiplicity, String defaultVal) {
+    protected final void registerStringOpt(String varName, String shortOpt, String longOpt,
+            String descr,
+            int multiplicity, String defaultVal) {
         registerVar(varName, shortOpt, defaultVal);
         om.addOption(OptionManager.STRING, multiplicity, shortOpt, longOpt, descr);
     }

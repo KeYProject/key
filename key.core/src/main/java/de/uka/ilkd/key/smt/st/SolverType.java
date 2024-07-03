@@ -1,14 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.st;
+
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 
-import javax.annotation.Nonnull;
-
 
 /**
- * This interface is used for modeling different solvers. It provides methods that encode information
+ * This interface is used for modeling different solvers. It provides methods that encode
+ * information
  * about the concrete solver:
  * - name
  * - command for starting the solver
@@ -21,7 +26,7 @@ public interface SolverType {
      * Creates an instance of SMTSolver representing a concrete instance of that solver.
      */
     SMTSolver createSolver(SMTProblem problem,
-						   SolverListener listener, Services services);
+            SolverListener listener, Services services);
 
     /**
      * Returns the name of the solver.
@@ -36,7 +41,8 @@ public interface SolverType {
     boolean isInstalled(boolean recheck);
 
     /**
-     * Some specific information about the solver which can be presented. <code>null</code> means no information.
+     * Some specific information about the solver which can be presented. <code>null</code> means no
+     * information.
      */
     String getInfo();
 
@@ -54,7 +60,8 @@ public interface SolverType {
 
 
     /**
-     * the command for starting the solver. For example "z3" if it is registered in the PATH variable,
+     * the command for starting the solver. For example "z3" if it is registered in the PATH
+     * variable,
      * otherwise "ABSOLUTE_PATH/z3"
      */
     String getSolverCommand();
@@ -70,7 +77,8 @@ public interface SolverType {
     SMTTranslator createTranslator(Services services);
 
     /**
-     * The delimiters of the messages that are sent from the solver to KeY. For example, it could be "\n"
+     * The delimiters of the messages that are sent from the solver to KeY. For example, it could be
+     * "\n"
      */
     String[] getDelimiters();
 
@@ -80,7 +88,8 @@ public interface SolverType {
     boolean supportsIfThenElse();
 
     /**
-     * Directly before the problem description is sent to the solver one can modify the problem string by using
+     * Directly before the problem description is sent to the solver one can modify the problem
+     * string by using
      * this method.
      */
     String modifyProblem(String problem);
@@ -97,7 +106,8 @@ public interface SolverType {
     String[] getSupportedVersions();
 
     /**
-     * Returns the current version that is installed, if it has already been checked, otherwise null.
+     * Returns the current version that is installed, if it has already been checked, otherwise
+     * null.
      */
     String getVersion();
 
@@ -124,10 +134,11 @@ public interface SolverType {
 
     /**
      * Creates a new solver socket that can handle the communication for the given solver type.
+     *
      * @param query the ModelExtractor that can be used to extract a counterexample (for non-CE
-     *              solvers this can be null)
+     *        solvers this can be null)
      * @return the newly created socket
      */
-    @Nonnull AbstractSolverSocket getSocket(ModelExtractor query);
+    @Nonnull
+    AbstractSolverSocket getSocket(ModelExtractor query);
 }
-

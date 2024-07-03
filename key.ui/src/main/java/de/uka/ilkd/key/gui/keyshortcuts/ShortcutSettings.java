@@ -1,18 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.keyshortcuts;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
 /**
  * UI for configuring the {@link KeyStroke}s inside KeY.
@@ -29,7 +33,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         super();
         setHeaderText("Keyboard Shortcuts");
         setSubHeaderText("These settings are stored in " +
-                KeyStrokeSettings.SETTINGS_FILE.getAbsolutePath());
+            KeyStrokeSettings.SETTINGS_FILE.getAbsolutePath());
         add(new JScrollPane(tblShortcuts));
     }
 
@@ -73,8 +77,8 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         txtCaptureShortcut.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                //KeyStroke ks = KeyStroke.getKeyStrokeForEvent(e);
-                //txtCaptureShortcut.setText(ks.toString());
+                // KeyStroke ks = KeyStroke.getKeyStrokeForEvent(e);
+                // txtCaptureShortcut.setText(ks.toString());
             }
 
             @Override
@@ -88,11 +92,11 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
                 txtCaptureShortcut.setText(ks.toString());
 
                 boolean shortcutComplete =
-                        ks.getModifiers() > 0
-                                && ks.getKeyCode() != KeyEvent.VK_UNDEFINED
-                                && ks.getKeyCode() != KeyEvent.VK_CONTROL
-                                && ks.getKeyCode() != KeyEvent.VK_SHIFT
-                                && ks.getKeyCode() != KeyEvent.VK_ALT;
+                    ks.getModifiers() > 0
+                            && ks.getKeyCode() != KeyEvent.VK_UNDEFINED
+                            && ks.getKeyCode() != KeyEvent.VK_CONTROL
+                            && ks.getKeyCode() != KeyEvent.VK_SHIFT
+                            && ks.getKeyCode() != KeyEvent.VK_ALT;
 
                 if (shortcutComplete)
                     cellEditor.stopCellEditing();
@@ -100,8 +104,8 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
 
             @Override
             public void keyReleased(KeyEvent e) {
-                //KeyStroke ks = KeyStroke.getKeyStrokeForEvent(e);
-                //txtCaptureShortcut.setText(ks.toString());
+                // KeyStroke ks = KeyStroke.getKeyStrokeForEvent(e);
+                // txtCaptureShortcut.setText(ks.toString());
             }
         });
         tblShortcuts.getColumnModel()
@@ -114,38 +118,39 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     public void applySettings(MainWindow window) {
         List<String> s = modelShortcuts.shortcut;
 
-        /*weigl: disable duplicate check, because we have many in the default config
-        for (int i = 0; i < s.size() - 1; i++) {
-            for (int j = i + 1; j < s.size(); j++) {
-                String a = s.get(i);
-                String b = s.get(j);
-
-                if (a == null || b == null || a.isEmpty() || b.isEmpty())
-                    continue;
-
-                if (a.equals(b)) {
-                    //found duplicate
-                    throw new InvalidSettingsInputException(
-                            String.format("Clash of key bindings: %s<br>For keys: %s and %s",
-                                    s.get(i),
-                                    modelShortcuts.actionName.get(i),
-                                    modelShortcuts.actionName.get(j)),
-                            this, tblShortcuts);
-                }
-            }
-        }
-        */
+        /*
+         * weigl: disable duplicate check, because we have many in the default config
+         * for (int i = 0; i < s.size() - 1; i++) {
+         * for (int j = i + 1; j < s.size(); j++) {
+         * String a = s.get(i);
+         * String b = s.get(j);
+         *
+         * if (a == null || b == null || a.isEmpty() || b.isEmpty())
+         * continue;
+         *
+         * if (a.equals(b)) {
+         * //found duplicate
+         * throw new InvalidSettingsInputException(
+         * String.format("Clash of key bindings: %s<br>For keys: %s and %s",
+         * s.get(i),
+         * modelShortcuts.actionName.get(i),
+         * modelShortcuts.actionName.get(j)),
+         * this, tblShortcuts);
+         * }
+         * }
+         * }
+         */
 
         List<KeyStroke> keystrokes =
-                s.stream().map(KeyStroke::getKeyStroke)
-                        .collect(Collectors.toList());
+            s.stream().map(KeyStroke::getKeyStroke)
+                    .collect(Collectors.toList());
         /*
-        if (keystrokes.contains(null)) {
-            throw new InvalidSettingsInputException(
-                    "Invalid keystroke specified",
-                    this, tblShortcuts);
-        }
-        */
+         * if (keystrokes.contains(null)) {
+         * throw new InvalidSettingsInputException(
+         * "Invalid keystroke specified",
+         * this, tblShortcuts);
+         * }
+         */
 
         for (int i = 0; i < modelShortcuts.shortcut.size(); i++) {
             String key = modelShortcuts.actionName.get(i);
@@ -160,12 +165,13 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
 
     private static class ShortcutsTableModel extends AbstractTableModel {
         private static final long serialVersionUID = -2854179933936417703L;
-        private static final String[] COLUMNS = new String[]{"Name", "Description", "Shortcut"};
+        private static final String[] COLUMNS = new String[] { "Name", "Description", "Shortcut" };
         private final List<String> actionName;
         private final List<String> shortcut;
         private final List<Action> actions;
 
-        private ShortcutsTableModel(List<String> actionName, List<String> shortcut, List<Action> actions) {
+        private ShortcutsTableModel(List<String> actionName, List<String> shortcut,
+                List<Action> actions) {
             this.actionName = actionName;
             this.shortcut = shortcut;
             this.actions = actions;
@@ -189,17 +195,18 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
-                case 0:
-                    return actionName.get(rowIndex)
-                            //remove common package prefixes
-                            .replaceAll("([a-z]\\w*\\.)*", "");
-                case 1:
-                    Action a = actions.get(rowIndex);
-                    if (a == null) return "";
-                    Object val = a.getValue(Action.SHORT_DESCRIPTION);
-                    return val != null ? val.toString() : "";
-                case 2:
-                    return shortcut.get(rowIndex);
+            case 0:
+                return actionName.get(rowIndex)
+                        // remove common package prefixes
+                        .replaceAll("([a-z]\\w*\\.)*", "");
+            case 1:
+                Action a = actions.get(rowIndex);
+                if (a == null)
+                    return "";
+                Object val = a.getValue(Action.SHORT_DESCRIPTION);
+                return val != null ? val.toString() : "";
+            case 2:
+                return shortcut.get(rowIndex);
             }
             return "";
         }

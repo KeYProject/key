@@ -1,14 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.prooftree;
 
 
 /*
-http://www.chka.de/swing/tree/expansion/ExpansionState.java
-This code is provided by Christian Kaufhold <ch-kaufhold@gmx.de> under LGPL
-*/
+ * http://www.chka.de/swing/tree/expansion/ExpansionState.java
+ * This code is provided by Christian Kaufhold <ch-kaufhold@gmx.de> under LGPL
+ */
 
 import java.util.*;
-
 import javax.annotation.Nonnull;
 import javax.swing.JTree;
 import javax.swing.event.*;
@@ -16,93 +18,99 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 
-/** Cache/Access JTree's expansion state. The interface of JTree to access
-    the expanded paths is rather incomplete, since expanded paths under
-    collapsed ancestors cannot be accessed at all (without modifying the
-    expansion states, which doesn't work with vetos of TreeWillExpand-
-    Listeners). By listening to TreeExpansionEvents, this class mirrors
-    the expansion state for each path individually, independent from that
-    of its ancestors. It also listens to the TreeModel to remove paths
-    that have become invalid.
-    ExpansionStates are serializable if the TreePaths themselves are,
-    which they are if their components are. Typically you will want to
-    only serialize the state(), which doesn't also serialize the JTree
-    (If you wanted to serialize the JTree, you wouldn't need to the state
-    for serialization purposes at all.)
-
-    There are two ways to use this class:
-
-    a) always have a ExpansionState around. Then the results will always be
-       completely right (and always accessible without a lot of overhead).
-
-       Serializing/exporting:
-
-           Collection state = cache.state(new HashSet());
-
-           out.writeObject(state);
-
-       When reading the state and creating the JTree, a new ExpansionState
-       is created:
-
-           Set state = (Set)in.readObject();
-
-           JTree tree = new JTree(data);
-
-           ExpansionState cache = new ExpansionState(tree, state);
-
-       Actually I don't like the side-effect of the constructor.
-
-       .<Collections>nil() can of course be used if there is no state yet.
-
-    b) Only request the state on demand, and also restore it. This has less overhead
-       during execution, but a) has to modify the expansion structure while
-       trying to build the state, b) may actually confuse it
-       due to vetoes of TreeWillExpandListeners, and c) may give wrong results for
-       the same reason.
-
-       Serializing/exporting:
-
-           out.writeObject(ExpansionState.paths(tree, new HashSet()));
-
-       Reading the state:
-
-           Set state = (Set)in.readObject();
-
-           JTree tree = new JTree(data);
-
-           ExpansionState.setPaths(tree, state);
-
-    Note the example code uses HashSet because setPaths() does (and very probably
-    always will) make use of contains(), which should thus be fast.
+/**
+ * Cache/Access JTree's expansion state. The interface of JTree to access
+ * the expanded paths is rather incomplete, since expanded paths under
+ * collapsed ancestors cannot be accessed at all (without modifying the
+ * expansion states, which doesn't work with vetos of TreeWillExpand-
+ * Listeners). By listening to TreeExpansionEvents, this class mirrors
+ * the expansion state for each path individually, independent from that
+ * of its ancestors. It also listens to the TreeModel to remove paths
+ * that have become invalid.
+ * ExpansionStates are serializable if the TreePaths themselves are,
+ * which they are if their components are. Typically you will want to
+ * only serialize the state(), which doesn't also serialize the JTree
+ * (If you wanted to serialize the JTree, you wouldn't need to the state
+ * for serialization purposes at all.)
+ *
+ * There are two ways to use this class:
+ *
+ * a) always have a ExpansionState around. Then the results will always be
+ * completely right (and always accessible without a lot of overhead).
+ *
+ * Serializing/exporting:
+ *
+ * Collection state = cache.state(new HashSet());
+ *
+ * out.writeObject(state);
+ *
+ * When reading the state and creating the JTree, a new ExpansionState
+ * is created:
+ *
+ * Set state = (Set)in.readObject();
+ *
+ * JTree tree = new JTree(data);
+ *
+ * ExpansionState cache = new ExpansionState(tree, state);
+ *
+ * Actually I don't like the side-effect of the constructor.
+ *
+ * .<Collections>nil() can of course be used if there is no state yet.
+ *
+ * b) Only request the state on demand, and also restore it. This has less overhead
+ * during execution, but a) has to modify the expansion structure while
+ * trying to build the state, b) may actually confuse it
+ * due to vetoes of TreeWillExpandListeners, and c) may give wrong results for
+ * the same reason.
+ *
+ * Serializing/exporting:
+ *
+ * out.writeObject(ExpansionState.paths(tree, new HashSet()));
+ *
+ * Reading the state:
+ *
+ * Set state = (Set)in.readObject();
+ *
+ * JTree tree = new JTree(data);
+ *
+ * ExpansionState.setPaths(tree, state);
+ *
+ * Note the example code uses HashSet because setPaths() does (and very probably
+ * always will) make use of contains(), which should thus be fast.
  *
  * <p>
  * Note: For optimization purposes, this class is now tailored to ProofTreeView. In particular, the
- *       method {@link #expandAllBelow(JTree, TreePath)} temporarily removes most
- *       TreeExpansionListeners to avoid flooding them with events. This massively increases
- *       performance on large trees.
+ * method {@link #expandAllBelow(JTree, TreePath)} temporarily removes most
+ * TreeExpansionListeners to avoid flooding them with events. This massively increases
+ * performance on large trees.
  * <p>
  * Note: The current implementation probably does not work correctly with TreeWillExpandListeners.
  *
  * @author Wolfram Pfeifer: optimized, migrated from older Java version, renamed, and tailored
- *                         to ProofTreeView, removed unnecessary serialization stuff and unused code
+ *         to ProofTreeView, removed unnecessary serialization stuff and unused code
  */
 class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     /** the JTree of the ProofTreeView */
     private final @Nonnull JTree tree;
 
-    /** Stores all paths that are currently expanded. This includes those which are hidden because
+    /**
+     * Stores all paths that are currently expanded. This includes those which are hidden because
      * some of their parents are collapsed. All paths not in this set are collapsed.
+     *
      * @implNote We always use a LinkedHashSet now since this makes the path traversal order
-     * predictable. */
+     *           predictable.
+     */
     private final @Nonnull Set<TreePath> paths = new LinkedHashSet<>();
 
     /** Listens for changes in the proof tree as well as for expansion/collapse of GUI nodes. */
     private final @Nonnull Listener listener = new Listener();
 
-    /** For the given JTree. Assumes only the root is expanded, if at all
+    /**
+     * For the given JTree. Assumes only the root is expanded, if at all
      * (for example, a freshly created JTree, or one for which the model has
      * just been set)
+     *
      * @param t the JTree of the ProofTreeView
      */
     public ProofTreeExpansionState(@Nonnull JTree t) {
@@ -114,15 +122,17 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         if (data != null) {
             data.addTreeModelListener(listener);
 
-            //readFromTree();
+            // readFromTree();
             // could be tuned even further by avoiding copying the set, however, even the largest
             // proofs have only a couple of hundreds entries in paths, so this is negligible ...
             paths.addAll(paths(tree));
         }
     }
 
-    /** Creates a new ProofExpansionState for the given JTree, where the given paths are expanded
+    /**
+     * Creates a new ProofExpansionState for the given JTree, where the given paths are expanded
      * initially.
+     *
      * @param tree the JTree this ProofExpansionState refers to
      * @param state the collection of paths to expand initially
      */
@@ -140,8 +150,9 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      *       paths.addAll(paths(tree));</code>
      *
      * @deprecated Since paths() has been made much more efficient while it is also more precise in
-     *   some cases, it should be used instead. However, we still keep this method around in case
-     *   performance problems with paths() occur in the future.
+     *             some cases, it should be used instead. However, we still keep this method around
+     *             in case
+     *             performance problems with paths() occur in the future.
      */
     @Deprecated
     private void readFromTree() {
@@ -159,16 +170,17 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
             // from below.
 
             if (tree.isExpanded(rootPath)) {
-                for (Enumeration<TreePath> e = tree.getExpandedDescendants(rootPath);
-                     e.hasMoreElements(); ) {
+                for (Enumeration<TreePath> e = tree.getExpandedDescendants(rootPath); e
+                        .hasMoreElements();) {
                     paths.add(e.nextElement());
                 }
             }
         }
     }
 
-    /** Disconnects the ProofTreeExpansionState from the associated JTree. This means that it no
-     *  longer listens for tree expansions.
+    /**
+     * Disconnects the ProofTreeExpansionState from the associated JTree. This means that it no
+     * longer listens for tree expansions.
      */
     public void disconnect() {
         tree.removeTreeExpansionListener(listener);
@@ -222,6 +234,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     /**
      * Copies the currently stored expansion state of the associated tree.
+     *
      * @return a shallow copy of the collection of expanded paths
      */
     public @Nonnull Collection<TreePath> copyState() {
@@ -229,9 +242,11 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         return new LinkedHashSet<>(paths);
     }
 
-    /** Collapses all paths of the tree. However, it re-expands the root if it was expanded before
+    /**
+     * Collapses all paths of the tree. However, it re-expands the root if it was expanded before
      * and the tree has an invisible root, since otherwise the tree will appear empty, and there
-     *   is no easy way for the user to change that.
+     * is no easy way for the user to change that.
+     *
      * @param tree the JTree to collapse
      */
     public static void collapseAll(JTree tree) {
@@ -258,9 +273,11 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         }
     }
 
-    /** Collapses all nodes that are below the given path.
-     *  Requires that the given path is not a leaf. That implies that the tree's model is
-     *   not null and does have a root.
+    /**
+     * Collapses all nodes that are below the given path.
+     * Requires that the given path is not a leaf. That implies that the tree's model is
+     * not null and does have a root.
+     *
      * @param tree the JTree to collapse
      * @param path the path which will be collapsed afterwards (including all children recursively)
      */
@@ -286,6 +303,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     /**
      * Expands the given JTree completely.
+     *
      * @param tree the JTree to expand
      */
     public static void expandAll(JTree tree) {
@@ -304,8 +322,10 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         expandAllBelow(tree, new TreePath(root));
     }
 
-    /** Completely expands all nodes of the given JTree that are below the given path.
-     *  Requires that path is not a leaf. That implies the tree has a model, and that has a root.
+    /**
+     * Completely expands all nodes of the given JTree that are below the given path.
+     * Requires that path is not a leaf. That implies the tree has a model, and that has a root.
+     *
      * @param tree the JTree to expand
      * @param path the root path under which everything should be expanded afterwards
      */
@@ -331,16 +351,17 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     }
 
 
-    /** The "extremal paths" of the tree model's subtree starting at
-        path. The extremal paths are those paths that a) are non-leaves
-        and b) have only leaf children, if any. It suffices to know
-        these to know all non-leaf paths in the subtree, and those are
-        the ones that matter for expansion (since the concept of expan-
-        sion only applies to non-leaves).
-        The extremal paths collection of a leave is empty.
-        The extremal paths are stored in the order in which they appear
-        in pre-order in the tree model.
-    */
+    /**
+     * The "extremal paths" of the tree model's subtree starting at
+     * path. The extremal paths are those paths that a) are non-leaves
+     * and b) have only leaf children, if any. It suffices to know
+     * these to know all non-leaf paths in the subtree, and those are
+     * the ones that matter for expansion (since the concept of expan-
+     * sion only applies to non-leaves).
+     * The extremal paths collection of a leave is empty.
+     * The extremal paths are stored in the order in which they appear
+     * in pre-order in the tree model.
+     */
     private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path) {
         LinkedHashSet<TreePath> result = new LinkedHashSet<>();
 
@@ -353,7 +374,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     }
 
     private static void extremalPathsImpl(TreeModel data, TreePath path,
-                                          Collection<TreePath> result) {
+            Collection<TreePath> result) {
         Object node = path.getLastPathComponent();
 
         boolean hasNonLeafChildren = false;
@@ -379,13 +400,15 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         }
     }
 
-    /** All paths in the JTree that are expanded, including those
-        under hidden parents. The result is the same as if attaching
-        a ProofTreeExpansionState to the JTree (in creation state) and then
-        calling getState() on it.
-        To return the proper result, this method must temporarily
-        expand paths. If any TreeWillExpandListeners veto that, the
-        result is undefined.
+    /**
+     * All paths in the JTree that are expanded, including those
+     * under hidden parents. The result is the same as if attaching
+     * a ProofTreeExpansionState to the JTree (in creation state) and then
+     * calling getState() on it.
+     * To return the proper result, this method must temporarily
+     * expand paths. If any TreeWillExpandListeners veto that, the
+     * result is undefined.
+     *
      * @param tree the JTree the expanded paths are read from
      * @return the TreePaths that are currently expanded in the given tree, even if any of their
      *         parents are collapsed
@@ -405,8 +428,10 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
             return result;
         }
 
-        /* To avoid unnecessary events caused by temporary expansion, we disable the listeners.
-         * This makes the method an order of a magnitude faster for large proofs. */
+        /*
+         * To avoid unnecessary events caused by temporary expansion, we disable the listeners.
+         * This makes the method an order of a magnitude faster for large proofs.
+         */
         TreeExpansionListener[] treeExpansionListeners = tree.getTreeExpansionListeners();
         for (TreeExpansionListener tel : treeExpansionListeners) {
             tree.removeTreeExpansionListener(tel);
@@ -423,7 +448,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     }
 
     private static void pathsImpl(JTree tree, TreeModel data, TreePath path,
-                                  Collection<TreePath> result) {
+            Collection<TreePath> result) {
         boolean expanded = tree.isExpanded(path);
 
         if (expanded) {
@@ -448,11 +473,13 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     }
 
 
-    /** Try to expand exactly the given paths given in paths (assumes them to be valid in the
+    /**
+     * Try to expand exactly the given paths given in paths (assumes them to be valid in the
      * current TreeModel). Will give undefined results if any TreeWillExpandListeners veto.
+     *
      * @param tree the JTree where exactly the paths should be expanded
      * @param paths the paths to expand. All other paths will be collapsed. Note that collapsed
-     *              parent paths may hide their children, even if those are expanded.
+     *        parent paths may hide their children, even if those are expanded.
      */
     public static void setPaths(@Nonnull JTree tree, @Nonnull Collection<TreePath> paths) {
         TreeModel data = tree.getModel();
@@ -489,8 +516,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     }
 
     private static void setPathsImpl(@Nonnull JTree tree, @Nonnull TreeModel data,
-                                     @Nonnull TreePath start, int maxLevel,
-                                     @Nonnull Collection<TreePath> paths) {
+            @Nonnull TreePath start, int maxLevel,
+            @Nonnull Collection<TreePath> paths) {
         // only expand up to depth maxLevel starting from the given start path
         if (maxLevel > 0) {
             Object node = start.getLastPathComponent();
@@ -541,7 +568,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         @Override
         public void treeNodesRemoved(TreeModelEvent e) {
             // TODO: this code seems to be never called, since GUIProofTreeModel only
-            //  fires treeStructureChanged events
+            // fires treeStructureChanged events
             TreePath parent = e.getTreePath();
 
             Object[] children = e.getChildren();
@@ -564,7 +591,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
             // new root, or root changed. JTree will maybe expand the root.
             if (path.getParentPath() == null) {
-                //readFromTree();
+                // readFromTree();
                 paths.clear();
                 paths.addAll(paths(tree));
             } else {

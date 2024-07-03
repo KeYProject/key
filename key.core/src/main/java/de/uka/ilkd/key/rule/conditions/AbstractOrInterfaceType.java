@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -21,32 +25,32 @@ public final class AbstractOrInterfaceType extends VariableConditionAdapter {
         this.resolver = tr;
         this.negated = negation;
     }
-    
-    public boolean isNegated(){
-	return negated;
+
+    public boolean isNegated() {
+        return negated;
     }
-    
-    public TypeResolver getTypeResolver(){
-	return resolver;
+
+    public TypeResolver getTypeResolver() {
+        return resolver;
     }
-    
+
     @Override
-    public boolean check(SchemaVariable var, 
-	    		 SVSubstitute instCandidate,
-	    		 SVInstantiations instMap, 
-	    		 Services services) {
-        final Sort sort = 
+    public boolean check(SchemaVariable var,
+            SVSubstitute instCandidate,
+            SVInstantiations instMap,
+            Services services) {
+        final Sort sort =
             resolver.resolveSort(var, instCandidate, instMap, services);
-                        
+
         final boolean isAbstractOrInterface = sort.isAbstract();
-        
+
         return negated ? !isAbstractOrInterface : isAbstractOrInterface;
     }
-    
-    
+
+
     @Override
-    public String toString() {      
+    public String toString() {
         String prefix = negated ? "\\not" : "";
-        return prefix+"\\isAbstractOrInterface (" + resolver + ")";
+        return prefix + "\\isAbstractOrInterface (" + resolver + ")";
     }
 }

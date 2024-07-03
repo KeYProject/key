@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.actions;
 
@@ -22,18 +25,17 @@ public class SearchModeChangeAction extends MainWindowAction {
         setName(mode.toString());
 
         setIcon(
-            mode.icon
-        );
+            mode.icon);
         setTooltip("Find the next occurence of current search term in sequent.");
         getMediator().enableWhenProofLoaded(this);
-	    if(mode == SequentViewSearchBar.SearchMode.HIGHLIGHT) {
+        if (mode == SequentViewSearchBar.SearchMode.HIGHLIGHT) {
             setAcceleratorLetter(KeyEvent.VK_H);
         } else if (mode == SequentViewSearchBar.SearchMode.HIDE) {
             setAcceleratorLetter(KeyEvent.VK_ESCAPE);
         } else if (mode == SequentViewSearchBar.SearchMode.REGROUP) {
             setAcceleratorLetter(KeyEvent.VK_I);
         }
-        
+
         this.mode = mode;
     }
 

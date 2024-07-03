@@ -1,6 +1,7 @@
-/**
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -48,14 +49,15 @@ public final class EnhancedFor2For extends TwoPassTransformation {
      * Note that if neither specifying iteratorName and arrayReferenceName,
      * this transformation will always work.
      *
-     * @param sc                 cross reference source configuration
-     * @param enhancedFor        the EnhancedFor to be replaced
-     * @param iteratorName       name for the iterator/int. if <code>null</code>,
-     *                           will find one automatically.
+     * @param sc cross reference source configuration
+     * @param enhancedFor the EnhancedFor to be replaced
+     * @param iteratorName name for the iterator/int. if <code>null</code>,
+     *        will find one automatically.
      * @param arrayReferenceName name for the array reference (if neccessary).
-     *                           if <code>null</code>, will find one automatically.
+     *        if <code>null</code>, will find one automatically.
      */
-    public EnhancedFor2For(CrossReferenceServiceConfiguration sc, EnhancedFor enhancedFor, String iteratorName, String arrayReferenceName) {
+    public EnhancedFor2For(CrossReferenceServiceConfiguration sc, EnhancedFor enhancedFor,
+            String iteratorName, String arrayReferenceName) {
         super(sc);
         this.sc = sc;
         this.enhancedFor = enhancedFor;
@@ -81,32 +83,35 @@ public final class EnhancedFor2For extends TwoPassTransformation {
                 return setProblemReport(new NameConflict(v));
             }
         } else {
-//			iteratorName = "i";
-//			int i = 0;
-//			while( sc.getSourceInfo().getVariable(iteratorName, enhancedFor) != null) {
-//				iteratorName = "i" + ++i;
-//			}
-            iteratorName = VariableKit.createValidVariableName(sc.getSourceInfo(), enhancedFor.getASTParent(), "i");
+            // iteratorName = "i";
+            // int i = 0;
+            // while( sc.getSourceInfo().getVariable(iteratorName, enhancedFor) != null) {
+            // iteratorName = "i" + ++i;
+            // }
+            iteratorName = VariableKit.createValidVariableName(sc.getSourceInfo(),
+                enhancedFor.getASTParent(), "i");
         }
         if (arrayReferenceName != null) {
-            Variable v = sc.getSourceInfo().getVariable(arrayReferenceName, enhancedFor.getASTParent());
+            Variable v =
+                sc.getSourceInfo().getVariable(arrayReferenceName, enhancedFor.getASTParent());
             if (v != null) {
                 return setProblemReport(new NameConflict(v));
             }
         } else {
-            arrayReferenceName = VariableKit.createValidVariableName(sc.getSourceInfo(), enhancedFor.getASTParent(), "a");
+            arrayReferenceName = VariableKit.createValidVariableName(sc.getSourceInfo(),
+                enhancedFor.getASTParent(), "a");
         }
         guardType = sc.getSourceInfo().getType(enhancedFor.getGuard());
         if (guardType instanceof ClassType) {
             MethodReference mr = getProgramFactory().createMethodReference(
-                    (ReferencePrefix) enhancedFor.getGuard(),
-                    getProgramFactory().createIdentifier("iterator")
-            );
+                (ReferencePrefix) enhancedFor.getGuard(),
+                getProgramFactory().createIdentifier("iterator"));
             mr.setExpressionContainer(enhancedFor);
             iteratorType = sc.getSourceInfo().getType(mr);
         } else if (guardType instanceof ArrayType) {
             iteratorType = null;
-        } else throw new IllegalStateException("Broken Model");
+        } else
+            throw new IllegalStateException("Broken Model");
         return setProblemReport(EQUIVALENCE);
     }
 
@@ -120,54 +125,45 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         ASTList<Expression> update;
         LocalVariableDeclaration firstStmnt;
         // common part, initializer is set independently afterwards:
-        firstStmnt = (((LocalVariableDeclaration) enhancedFor.getInitializers().get(0)).deepClone());
+        firstStmnt =
+            (((LocalVariableDeclaration) enhancedFor.getInitializers().get(0)).deepClone());
 
         if (iteratorType == null) {
             // array type
             init = pf.createLocalVariableDeclaration(
-                    null,
-                    TypeKit.createTypeReference(pf, "int"),
-                    pf.createIdentifier(iteratorName),
-                    pf.createIntLiteral(0)
-            );
+                null,
+                TypeKit.createTypeReference(pf, "int"),
+                pf.createIdentifier(iteratorName),
+                pf.createIntLiteral(0));
             guard = pf.createLessThan(
-                    pf.createVariableReference(pf.createIdentifier(iteratorName)),
-                    pf.createArrayLengthReference(
-                            pf.createVariableReference(pf.createIdentifier(arrayReferenceName))
-                    )
-            );
+                pf.createVariableReference(pf.createIdentifier(iteratorName)),
+                pf.createArrayLengthReference(
+                    pf.createVariableReference(pf.createIdentifier(arrayReferenceName))));
             update = new ASTArrayList<Expression>(pf.createPostIncrement(
-                    pf.createVariableReference(
-                            pf.createIdentifier(iteratorName)
-                    )
-            ));
+                pf.createVariableReference(
+                    pf.createIdentifier(iteratorName))));
             firstStmnt.getVariableSpecifications().get(0).setInitializer(
-                    pf.createArrayReference(
-                            pf.createVariableReference(pf.createIdentifier(arrayReferenceName)),
-                            new ASTArrayList<Expression>(
-                                    pf.createVariableReference(pf.createIdentifier(iteratorName))
-                            )
-                    )
-            );
+                pf.createArrayReference(
+                    pf.createVariableReference(pf.createIdentifier(arrayReferenceName)),
+                    new ASTArrayList<Expression>(
+                        pf.createVariableReference(pf.createIdentifier(iteratorName)))));
         } else {
             // Iterable
             init = pf.createLocalVariableDeclaration(
-                    null,
-                    TypeKit.createTypeReference(pf, iteratorType, true),
-                    pf.createIdentifier(iteratorName),
-                    pf.createMethodReference(
-                            (ReferencePrefix) enhancedFor.getExpressionAt(0).deepClone(),
-                            pf.createIdentifier("iterator")
-                    )
-            );
+                null,
+                TypeKit.createTypeReference(pf, iteratorType, true),
+                pf.createIdentifier(iteratorName),
+                pf.createMethodReference(
+                    (ReferencePrefix) enhancedFor.getExpressionAt(0).deepClone(),
+                    pf.createIdentifier("iterator")));
             guard = pf.createMethodReference(
-                    pf.createVariableReference(pf.createIdentifier(iteratorName)),
-                    pf.createIdentifier("hasNext")
-            );
+                pf.createVariableReference(pf.createIdentifier(iteratorName)),
+                pf.createIdentifier("hasNext"));
             update = null;
             firstStmnt.getVariableSpecifications().get(0).setInitializer(
-                    pf.createMethodReference(pf.createVariableReference(pf.createIdentifier(iteratorName)), pf.createIdentifier("next"))
-            );
+                pf.createMethodReference(
+                    pf.createVariableReference(pf.createIdentifier(iteratorName)),
+                    pf.createIdentifier("next")));
         }
 
         ASTList<Statement> statements = new ASTArrayList<Statement>(2);
@@ -186,7 +182,8 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             }
         }
 
-        For newFor = new For(new ASTArrayList<LoopInitializer>(init), guard, update, new StatementBlock(statements));
+        For newFor = new For(new ASTArrayList<LoopInitializer>(init), guard, update,
+            new StatementBlock(statements));
         newFor.makeAllParentRolesValid();
 
         Statement replacement;
@@ -196,11 +193,10 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             ASTArrayList<Statement> sml = new ASTArrayList<Statement>(2);
             // create array name reference
             LocalVariableDeclaration lvd = pf.createLocalVariableDeclaration(
-                    null,
-                    TypeKit.createTypeReference(pf, guardType),
-                    pf.createIdentifier(arrayReferenceName),
-                    enhancedFor.getGuard().deepClone()
-            );
+                null,
+                TypeKit.createTypeReference(pf, guardType),
+                pf.createIdentifier(arrayReferenceName),
+                enhancedFor.getGuard().deepClone());
             sml.add(lvd);
 
             // clone labels
@@ -209,7 +205,8 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             replacee = enhancedFor;
             while (replacee.getASTParent() instanceof LabeledStatement) {
                 replacee = (LabeledStatement) replacee.getASTParent();
-                s = new LabeledStatement(((LabeledStatement) replacee).getIdentifier().deepClone(), s);
+                s = new LabeledStatement(((LabeledStatement) replacee).getIdentifier().deepClone(),
+                    s);
             }
             sml.add(s);
             replacement = pf.createStatementBlock(sml);

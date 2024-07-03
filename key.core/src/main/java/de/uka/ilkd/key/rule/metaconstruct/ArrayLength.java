@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -12,7 +16,7 @@ public class ArrayLength extends ProgramTransformer {
      * creates a typeof ProgramTransformer
      *
      * @param expr
-     *            the instance of expression contained by the meta construct
+     *        the instance of expression contained by the meta construct
      */
     public ArrayLength(Expression expr) {
         super("#length-reference", expr);

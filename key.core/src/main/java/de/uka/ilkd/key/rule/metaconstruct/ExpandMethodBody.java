@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -24,6 +26,8 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Replaces the MethodBodyStatement shortcut with the full body, performs prefix

@@ -8,4 +8,3 @@
  * @see "https://dzone.com/articles/closer-look-junit-categories"
  */
 package org.key_project.util.testcategories;
-

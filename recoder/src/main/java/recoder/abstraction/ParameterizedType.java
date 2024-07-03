@@ -1,15 +1,13 @@
-/*
- * Created on 23.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.abstraction;
+
+import java.util.List;
 
 import recoder.ModelException;
 import recoder.service.ProgramModelInfo;
-
-import java.util.List;
 
 /**
  * A parameterized type, meaning a generic type plus actual type arguments.
@@ -27,8 +25,10 @@ public class ParameterizedType implements ClassType {
      */
     public ParameterizedType(ClassType genericType, List<? extends TypeArgument> typeArgs) {
         super();
-        if (genericType == null) throw new NullPointerException();
-        if (typeArgs == null) throw new NullPointerException();
+        if (genericType == null)
+            throw new NullPointerException();
+        if (typeArgs == null)
+            throw new NullPointerException();
         this.genericType = genericType;
         this.typeArgs = typeArgs;
     }
@@ -41,35 +41,47 @@ public class ParameterizedType implements ClassType {
         return typeArgs;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getFullName()
      */
     public String getFullName() {
         return genericType.getFullName();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getProgramModelInfo()
      */
     public ProgramModelInfo getProgramModelInfo() {
         return genericType.getProgramModelInfo();
     }
 
-    /* (non-Javadoc)
-     * @see recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
      */
     public void setProgramModelInfo(ProgramModelInfo pmi) {
-        throw new UnsupportedOperationException(pmi.getClass().getName() + " should not be set for Parameterized Types!");
+        throw new UnsupportedOperationException(
+            pmi.getClass().getName() + " should not be set for Parameterized Types!");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.NamedModelElement#getName()
      */
     public String getName() {
         return genericType.getName();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.ModelElement#validate()
      */
     public void validate() throws ModelException {

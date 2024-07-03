@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.Name;
@@ -11,7 +15,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 
 /**
  * Apply a single proof step.
- * 
+ *
  * @author Simon Greiner
  */
 public class OneStepProofMacro extends StrategyProofMacro {
@@ -32,7 +36,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    public String getDescription() {	        
+    public String getDescription() {
         return "One single proof step is applied";
     }
 
@@ -43,8 +47,8 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
 
     /**
-     * Strategy with counter, s.t. only one rule is applied 
-     * 
+     * Strategy with counter, s.t. only one rule is applied
+     *
      *
      */
 
@@ -53,6 +57,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
         private static final Name NAME = new Name(OneStepStrategy.class.getSimpleName());
         private int counter;
         public Strategy delegate;
+
         public OneStepStrategy(Strategy delegate) {
             this.delegate = delegate;
             this.counter = 0;
@@ -62,15 +67,17 @@ public class OneStepProofMacro extends StrategyProofMacro {
         public Name name() {
             return NAME;
         }
+
         /**
-         * If no rule was applied yet, apply the first rule and increase counter, s.t. no more rules can be applied.
+         * If no rule was applied yet, apply the first rule and increase counter, s.t. no more rules
+         * can be applied.
          */
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(counter == 0 && delegate.isApprovedApp(app, pio, goal)){
+            if (counter == 0 && delegate.isApprovedApp(app, pio, goal)) {
                 counter++;
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
@@ -91,7 +98,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
-           return false;
+            return false;
         }
 
     }

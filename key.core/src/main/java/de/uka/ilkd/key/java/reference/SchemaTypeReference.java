@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.reference;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -12,33 +16,34 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 
 public class SchemaTypeReference extends TypeReferenceImp
-    implements AbstractProgramElement {
+        implements AbstractProgramElement {
 
     private final String fullName;
 
-    public SchemaTypeReference(ProgramElementName name, 
-			       int dimension,
-			       ReferencePrefix prefix) {
-	super(name, dimension, prefix);
-	final StringBuffer sb = new StringBuffer("");
+    public SchemaTypeReference(ProgramElementName name,
+            int dimension,
+            ReferencePrefix prefix) {
+        super(name, dimension, prefix);
+        final StringBuffer sb = new StringBuffer("");
 
-	// as no inner classes prefix must be package reference
-	PackageReference rp = (PackageReference)prefix;
-	while (rp != null) {	    
-	    sb.insert(0, rp.getName() + ".");	    
-	    rp = (PackageReference) rp.getReferencePrefix();
-	}
-	sb.append(name.toString());
-	fullName = sb.toString();
+        // as no inner classes prefix must be package reference
+        PackageReference rp = (PackageReference) prefix;
+        while (rp != null) {
+            sb.insert(0, rp.getName() + ".");
+            rp = (PackageReference) rp.getReferencePrefix();
+        }
+        sb.append(name.toString());
+        fullName = sb.toString();
     }
 
     public KeYJavaType getKeYJavaType() {
-	return null;
+        return null;
     }
 
     public KeYJavaType getKeYJavaType(Services services) {
-	KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fullName);
-	assert kjt != null : "KeYJavaType is null for SchemaTypeReference " + this + " - " + fullName; 
+        KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fullName);
+        assert kjt != null
+                : "KeYJavaType is null for SchemaTypeReference " + this + " - " + fullName;
         return kjt;
     }
 
@@ -49,21 +54,23 @@ public class SchemaTypeReference extends TypeReferenceImp
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         ProgramElement t = source.getSource();
         if (t instanceof TypeReference) {
-	    if (getName().equals(((TypeReference)t).getName()) &&
-		((TypeReference)t).getDimensions() == getDimensions()) {
-	        source.next();
+            if (getName().equals(((TypeReference) t).getName()) &&
+                    ((TypeReference) t).getDimensions() == getDimensions()) {
+                source.next();
                 return matchCond;
-            }		
-	}
+            }
+        }
         return null;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnAbstractProgramElement(this);
+        v.performActionOnAbstractProgramElement(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

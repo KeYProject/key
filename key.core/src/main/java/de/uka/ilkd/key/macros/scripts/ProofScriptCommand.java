@@ -1,17 +1,22 @@
-package de.uka.ilkd.key.macros.scripts;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
+package de.uka.ilkd.key.macros.scripts;
 
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 
 /**
  * A {@link ProofScriptCommand} is an executable mutation on the given proof.
  * It abstracts complex operations, and made them accessible for an API.
  * <p>
  * {@link ProofScriptCommand} are supported by the java.util.{@link java.util.ServiceLoader}.
- * You can add new proof script commands by add a new entry to <code>META-INF/service/de.uka.ilkd.key.macros.scripts.ProofScriptCommand</code>.
+ * You can add new proof script commands by add a new entry to
+ * <code>META-INF/service/de.uka.ilkd.key.macros.scripts.ProofScriptCommand</code>.
  * <p>
  * <b>Version 2 (2017-03-28):</b> change of the interface support for structured arguments.
  * </p>
@@ -36,14 +41,14 @@ public interface ProofScriptCommand<T> {
 
     /**
      * @param uiControl the current ui controller
-     * @param args      the script arguments
-     * @param stateMap  the current state
-     * @throws ScriptException      if something bad happens
+     * @param args the script arguments
+     * @param stateMap the current state
+     * @throws ScriptException if something bad happens
      * @throws InterruptedException if something bad happens
      */
-    //TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
+    // TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
     void execute(AbstractUserInterfaceControl uiControl, T args,
-                 EngineState stateMap) throws ScriptException, InterruptedException;
+            EngineState stateMap) throws ScriptException, InterruptedException;
 
     /**
      * Returns the name of this proof command.

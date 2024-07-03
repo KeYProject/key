@@ -1,9 +1,7 @@
-/*
- * Created on 27.10.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.ModelException;
@@ -76,7 +74,8 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (ref != null) ref.setParent(this);
+        if (ref != null)
+            ref.setParent(this);
     }
 
     @Override
@@ -103,7 +102,8 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
     @Override
     public void validate() throws ModelException {
         super.validate();
-        if (ref == null) throw new ModelException("EnumConstructorReference not set in " + getFullName());
+        if (ref == null)
+            throw new ModelException("EnumConstructorReference not set in " + getFullName());
     }
 
     @Override

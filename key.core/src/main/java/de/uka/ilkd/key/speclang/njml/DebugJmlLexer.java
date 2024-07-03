@@ -1,12 +1,16 @@
-package de.uka.ilkd.key.speclang.njml;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Token;
+package de.uka.ilkd.key.speclang.njml;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.Token;
 
 /**
  * This program is a little for debugging KeY Lexer.
@@ -52,7 +56,7 @@ public class DebugJmlLexer {
     public static void main(String[] args) {
         if (args.length > 0) {
             new DebugJmlLexer(
-                    Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
+                Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
         } else {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
                 String tmp;
@@ -64,8 +68,7 @@ public class DebugJmlLexer {
                     } else {
                         break;
                     }
-                }
-                while (true);
+                } while (true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -77,7 +80,8 @@ public class DebugJmlLexer {
     }
 
     public static void debug(JmlLexer lexer) {
-        DebugJmlLexer dkl = new DebugJmlLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
+        DebugJmlLexer dkl =
+            new DebugJmlLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
         dkl.run();
     }
 
@@ -92,12 +96,12 @@ public class DebugJmlLexer {
             int modeBefore = toks._mode;
             t = toks.nextToken();
             stream.format(format,
-                    t.getLine(),
-                    t.getCharPositionInLine(),
-                    toks.getVocabulary().getSymbolicName(t.getType()),
-                    t.getText().replace("\n", "\\n"),
-                    modeBefore, toks._mode, t.getChannel());
-            //if (t.getType() == JmlLexer.ERROR_CHAR) stream.println("!!ERROR!!");
+                t.getLine(),
+                t.getCharPositionInLine(),
+                toks.getVocabulary().getSymbolicName(t.getType()),
+                t.getText().replace("\n", "\\n"),
+                modeBefore, toks._mode, t.getChannel());
+            // if (t.getType() == JmlLexer.ERROR_CHAR) stream.println("!!ERROR!!");
         } while (t.getType() != CommonToken.EOF);
     }
 }

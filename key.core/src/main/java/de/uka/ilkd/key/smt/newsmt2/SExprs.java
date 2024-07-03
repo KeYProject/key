@@ -1,15 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This class is a collection of static functions to construct SExpr objects.
@@ -54,12 +57,12 @@ public class SExprs {
      */
     public static SExpr and(List<SExpr> clauses) {
         switch (clauses.size()) {
-            case 0:
-                return TRUE;
-            case 1:
-                return clauses.get(0);
-            default:
-                return new SExpr("and", Type.BOOL, clauses);
+        case 0:
+            return TRUE;
+        case 1:
+            return clauses.get(0);
+        default:
+            return new SExpr("and", Type.BOOL, clauses);
         }
     }
 
@@ -78,7 +81,7 @@ public class SExprs {
      * @return a boolean expression equivalent to the implication {@code (=> ante concl)}
      */
     public static SExpr imp(SExpr ante, SExpr cons) {
-        if(ante.equals(TRUE)) {
+        if (ante.equals(TRUE)) {
             return cons;
         }
         if (cons.equals(FALSE)) {
@@ -92,6 +95,7 @@ public class SExprs {
 
     /**
      * Produce a logical negation
+     *
      * @param se a boolean expression
      * @return a boolean expresion
      */
@@ -110,7 +114,7 @@ public class SExprs {
      * @param matrix a boolean expression
      * @return
      */
-    public static SExpr forall(List<SExpr> vars, SExpr matrix)  throws SMTTranslationException {
+    public static SExpr forall(List<SExpr> vars, SExpr matrix) throws SMTTranslationException {
         if (vars.isEmpty()) {
             if (matrix.getName().equals("!")) {
                 return matrix.getChildren().get(0);
@@ -123,6 +127,7 @@ public class SExprs {
 
     /**
      * Takes an SExpression and converts it to the given type, if possible.
+     *
      * @param exp the SExpression to convert
      * @param type the desired type
      * @return The same SExpr, but with the desired type
@@ -142,7 +147,8 @@ public class SExprs {
         if (type == Type.UNIVERSE) {
             // Use the injection to go to universe
             if (orgType.injection == null) {
-                throw new SMTTranslationException("Cannot inject from " + orgType + " into U: " + exp);
+                throw new SMTTranslationException(
+                    "Cannot inject from " + orgType + " into U: " + exp);
             }
             return new SExpr(orgType.injection, type, exp);
         }
@@ -156,12 +162,13 @@ public class SExprs {
         }
 
         throw new SMTTranslationException("Cannot coerce from " + orgType +
-                " to " + type + ": " + exp);
+            " to " + type + ": " + exp);
     }
 
     /**
      * Takes a list of {@link SExpr}s and converts it to a list of the given
      * type, if possible.
+     *
      * @param exprs the list to convert
      * @param type the desired target type
      * @return A fresh list with the same SExpr, but with the desired type
@@ -185,7 +192,7 @@ public class SExprs {
      * @return the expanded pattern with the same type as e
      */
     public static SExpr patternSExpr(SExpr e, SExpr... patterns) {
-       return patternSExpr(e, Arrays.asList(patterns));
+        return patternSExpr(e, Arrays.asList(patterns));
     }
 
     /**
@@ -222,6 +229,7 @@ public class SExprs {
 
     /**
      * Produce a cast expression
+     *
      * @param sortExp the sort as an SExpr
      * @param exp the expression to cast
      * @return a cast of type exp to sort sortExp
@@ -249,17 +257,20 @@ public class SExprs {
      * brings it to toplevel.
      *
      * Example:
+     *
      * <pre>
      *     (and (! (.A.) :pattern ((p1))) (! (.B.) :pattern ((p2))) )
      * </pre>
+     *
      * yields
+     *
      * <pre>
      *     (! (and (.A.) (.B:)) :pattern ((p1)(p2)))
      * </pre>
      *
      * @param matrix the SExpr to pull the patterns from
      * @return either matrix (if no patterns present) or a
-     * term (!... :pattern ...)
+     *         term (!... :pattern ...)
      */
     public static SExpr pullOutPatterns(SExpr matrix) {
         Set<SExpr> collected = new HashSet<>();
@@ -273,7 +284,7 @@ public class SExprs {
 
     private static SExpr filterAndCollectPatterns(SExpr matrix, Set<SExpr> collected) {
         List<SExpr> orgChildren = matrix.getChildren();
-        if(matrix.getName().equals("!")) {
+        if (matrix.getName().equals("!")) {
             collected.addAll(orgChildren.get(2).getChildren());
             return filterAndCollectPatterns(orgChildren.get(0), collected);
         }
@@ -287,7 +298,7 @@ public class SExprs {
                 children.set(i, repl);
             }
         }
-        if(children == null) {
+        if (children == null) {
             return matrix;
         }
         return new SExpr(matrix.getName(), matrix.getType(), children);
@@ -301,17 +312,17 @@ public class SExprs {
 
     public static SExpr greaterEqual(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr(">=", Type.BOOL,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+            SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessEqual(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr("<=", Type.BOOL,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+            SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessThan(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr("<", Type.BOOL,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+            SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr eq(SExpr a, SExpr b) throws SMTTranslationException {
@@ -320,19 +331,19 @@ public class SExprs {
 
     public static SExpr minus(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr("-", IntegerOpHandler.INT,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+            SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr plus(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr("+", IntegerOpHandler.INT,
-                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
+            SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr ite(SExpr cond, SExpr _then, SExpr _else) throws SMTTranslationException {
         return new SExpr("ite", Type.UNIVERSE,
-                SExprs.coerce(cond, Type.BOOL),
-                SExprs.coerce(_then, Type.UNIVERSE),
-                SExprs.coerce(_else, Type.UNIVERSE));
+            SExprs.coerce(cond, Type.BOOL),
+            SExprs.coerce(_then, Type.UNIVERSE),
+            SExprs.coerce(_else, Type.UNIVERSE));
     }
 
     public static SExpr let(String var, SExpr val, SExpr in) {

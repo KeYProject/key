@@ -1,24 +1,16 @@
-/*******************************************************************************
- * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
- *                    Technical University Darmstadt, Germany
- *                    Chalmers University of Technology, Sweden
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Technical University Darmstadt - initial API and implementation and/or initial documentation
- *******************************************************************************/
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
+import java.util.*;
+
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IFilterWithException;
 
-import java.util.*;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,7 +44,8 @@ public class CollectionUtilTest {
         found = CollectionUtil.searchAll(null, "E"::equals);
         assertList(found);
         // Test multible values
-        found = CollectionUtil.searchAll(collection, element -> "A".equals(element) || "C".equals(element));
+        found = CollectionUtil.searchAll(collection,
+            element -> "A".equals(element) || "C".equals(element));
         assertList(found, "A", "C");
         found = CollectionUtil.searchAll(collection, element -> true);
         assertList(found, collection.toArray(new String[collection.size()]));
@@ -88,7 +81,7 @@ public class CollectionUtilTest {
     /**
      * Ensures that the given {@link List} contains the expected elements.
      *
-     * @param actual   The actual {@link List}.
+     * @param actual The actual {@link List}.
      * @param expected The expected elements.
      */
     protected static <T> void assertList(List<T> actual, String... expected) {
@@ -119,7 +112,8 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests for {@link CollectionUtil#searchAndRemoveWithException(Iterable, org.key_project.util.java.IFilterWithException)}.
+     * Tests for
+     * {@link CollectionUtil#searchAndRemoveWithException(Iterable, org.key_project.util.java.IFilterWithException)}.
      */
     @Test
     public void testSearchAndRemoveWithException() throws Throwable {
@@ -133,26 +127,36 @@ public class CollectionUtilTest {
             assertEquals("Exception in select.", e.getMessage());
         }
         assertEquals(collection, CollectionUtil.toList("A", "B", "C", "D"));
-        assertEquals("A", CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "A"::equals));
+        assertEquals("A", CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList("B", "C", "D"));
-        assertNull(CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "A"::equals));
+        assertNull(CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList("B", "C", "D"));
-        assertEquals("B", CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "B"::equals));
+        assertEquals("B", CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "B"::equals));
         assertEquals(collection, CollectionUtil.toList("C", "D"));
-        assertNull(CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "A"::equals));
+        assertNull(CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList("C", "D"));
-        assertEquals("C", CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "C"::equals));
+        assertEquals("C", CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "C"::equals));
         assertEquals(collection, CollectionUtil.toList("D"));
-        assertNull(CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "A"::equals));
+        assertNull(CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList("D"));
-        assertEquals("D", CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "D"::equals));
+        assertEquals("D", CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "D"::equals));
         assertEquals(collection, CollectionUtil.toList());
-        assertNull(CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "A"::equals));
+        assertNull(CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList());
-        assertNull(CollectionUtil.searchAndRemoveWithException(collection, (IFilterWithException<String, Exception>) "E"::equals));
+        assertNull(CollectionUtil.searchAndRemoveWithException(collection,
+            (IFilterWithException<String, Exception>) "E"::equals));
         assertEquals(collection, CollectionUtil.toList());
         assertNull(CollectionUtil.searchAndRemoveWithException(collection, null));
-        assertNull(CollectionUtil.searchAndRemoveWithException(null, (IFilterWithException<String, Exception>) "E"::equals));
+        assertNull(CollectionUtil.searchAndRemoveWithException(null,
+            (IFilterWithException<String, Exception>) "E"::equals));
         assertEquals(collection, CollectionUtil.toList());
     }
 
@@ -646,7 +650,7 @@ public class CollectionUtilTest {
     /**
      * Makes sure that the collection contains the given items.
      *
-     * @param collection    The {@link Collections} to test.
+     * @param collection The {@link Collections} to test.
      * @param expectedItems The expected items.
      */
     protected <T> void assertCollectionItems(Collection<T> collection, T... expectedItems) {
@@ -760,8 +764,10 @@ public class CollectionUtilTest {
         collection.add("B");
         assertEquals("A" + CollectionUtil.SEPARATOR + "B", CollectionUtil.toString(collection));
         collection.add("C");
-        assertEquals("A" + CollectionUtil.SEPARATOR + "B" + CollectionUtil.SEPARATOR + "C", CollectionUtil.toString(collection));
+        assertEquals("A" + CollectionUtil.SEPARATOR + "B" + CollectionUtil.SEPARATOR + "C",
+            CollectionUtil.toString(collection));
         collection.add("D");
-        assertEquals("A" + CollectionUtil.SEPARATOR + "B" + CollectionUtil.SEPARATOR + "C" + CollectionUtil.SEPARATOR + "D", CollectionUtil.toString(collection));
+        assertEquals("A" + CollectionUtil.SEPARATOR + "B" + CollectionUtil.SEPARATOR + "C"
+            + CollectionUtil.SEPARATOR + "D", CollectionUtil.toString(collection));
     }
 }

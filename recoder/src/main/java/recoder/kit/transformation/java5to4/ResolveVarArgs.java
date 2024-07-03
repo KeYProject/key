@@ -1,10 +1,11 @@
-/*
- * Created on 25.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
@@ -25,9 +26,6 @@ import recoder.kit.TwoPassTransformation;
 import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Replaces references to var arg methods and var arg methods itself to make it
@@ -64,16 +62,20 @@ public class ResolveVarArgs extends TwoPassTransformation {
                 MethodDeclaration md = (MethodDeclaration) pe;
                 if (md.isVarArgMethod()) {
                     varArgMeths.add(md);
-                    lastParamTypes.add(getSourceInfo().getType(md.getParameterDeclarationAt(md.getParameterDeclarationCount() - 1).getTypeReference()));
+                    lastParamTypes.add(getSourceInfo().getType(
+                        md.getParameterDeclarationAt(md.getParameterDeclarationCount() - 1)
+                                .getTypeReference()));
                     List<MemberReference> rl = getCrossReferenceSourceInfo().getReferences(md);
                     for (int i = 0, s = rl.size(); i < s; i++) {
                         // if dimensions already match, don't add!!
                         MethodReference toAdd = (MethodReference) rl.get(i);
-                        if (toAdd.getArguments() != null && toAdd.getArguments().size() == md.getParameterDeclarationCount()) {
+                        if (toAdd.getArguments() != null && toAdd.getArguments().size() == md
+                                .getParameterDeclarationCount()) {
                             int idx = toAdd.getArguments().size() - 1;
                             Type tt = getSourceInfo().getType(toAdd.getExpressionAt(idx));
                             if (tt instanceof ArrayType && tt.equals(
-                                    getSourceInfo().getType(md.getParameterDeclarationAt(idx).getVariableSpecification())))
+                                getSourceInfo().getType(
+                                    md.getParameterDeclarationAt(idx).getVariableSpecification())))
                                 continue;
                         }
                         refs.add(toAdd);
@@ -101,9 +103,9 @@ public class ResolveVarArgs extends TwoPassTransformation {
             }
             ArrayInitializer ai = f.createArrayInitializer(eml);
             NewArray na = f.createNewArray(
-                    TypeKit.createTypeReference(f,
-                            sig.get(sig.size() - 1)), 0, ai
-            );
+                TypeKit.createTypeReference(f,
+                    sig.get(sig.size() - 1)),
+                0, ai);
             MethodReference repl = mr.deepClone();
             while (cnt-- > 0)
                 repl.getArguments().remove(repl.getArguments().size() - 1);
@@ -119,10 +121,9 @@ public class ResolveVarArgs extends TwoPassTransformation {
             List<ParameterDeclaration> pds = md.getParameters();
             ParameterDeclaration pd = pds.get(pds.size() - 1);
             ParameterDeclaration newpd = f.createParameterDeclaration(
-                    TypeKit.createTypeReference(f,
-                            getNameInfo().createArrayType(lastParamTypes.get(idx++))),
-                    pd.getVariableSpecification().getIdentifier().deepClone()
-            );
+                TypeKit.createTypeReference(f,
+                    getNameInfo().createArrayType(lastParamTypes.get(idx++))),
+                pd.getVariableSpecification().getIdentifier().deepClone());
             newpd.setVarArg(false);
             replace(repl.getParameterDeclarationAt(repl.getParameterDeclarationCount() - 1), newpd);
             repl.makeParentRoleValid();

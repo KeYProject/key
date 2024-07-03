@@ -1,5 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
+
+import java.io.File;
+import java.util.HashMap;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -14,13 +20,11 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-
-import java.io.File;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,8 +41,8 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     @Test
     public void test1ImproveReadability() throws ProblemLoaderException {
         File location = new File(testCaseDirectory,
-                "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
-                .getAbsoluteFile();
+            "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
+                    .getAbsoluteFile();
         assertTrue(location.exists(), "Could not find required resource: " + location);
 
         KeYEnvironment<?> environment = KeYEnvironment.load(location, null, null, null);
@@ -63,7 +67,8 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
         Term altBPlusOne = TB.lt(a, bPlusOne);
         Term ageqOnePlusB = TB.geq(a, onePlusB);
         Term ageqBPlusOne = TB.geq(a, bPlusOne);
-        Term minusOne = services.getTypeConverter().getIntegerLDT().translateLiteral(new IntLiteral(-1), services);
+        Term minusOne = services.getTypeConverter().getIntegerLDT()
+                .translateLiteral(new IntLiteral(-1), services);
         Term minusOnePlusB = TB.add(minusOne, b);
         Term bPlusMinusOne = TB.add(b, minusOne);
         Term bMinusOne = TB.func(integerLDT.getSub(), b, TB.one());
@@ -98,13 +103,14 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
         // Test combined
         assertTerm(agtb, SymbolicExecutionUtil.improveReadability(TB.not(altOnePlusB), services));
         assertTerm(aleqb, SymbolicExecutionUtil.improveReadability(TB.not(ageqOnePlusB), services));
-        assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(TB.not(aleqBPlusMinusOne), services));
+        assertTerm(ageqb,
+            SymbolicExecutionUtil.improveReadability(TB.not(aleqBPlusMinusOne), services));
         assertTerm(altb, SymbolicExecutionUtil.improveReadability(TB.not(agtBMinusOne), services));
         // Test complex term
         Term complex = TB.and(altOnePlusB,
-                TB.or(ageqBPlusOne, agtMinusOnePlusB));
+            TB.or(ageqBPlusOne, agtMinusOnePlusB));
         Term expectedComplex = TB.and(aleqb,
-                TB.or(agtb, ageqb));
+            TB.or(agtb, ageqb));
         assertTerm(expectedComplex, SymbolicExecutionUtil.improveReadability(complex, services));
         environment.dispose();
     }
@@ -114,29 +120,42 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
      * {@link SymbolicExecutionUtil#setChoiceSetting(String, String)} and
      * {@link SymbolicExecutionUtil#isChoiceSettingInitialised()}.
      */
-    @Test public void test2GetAndSetChoiceSetting() {
+    @Test
+    public void test2GetAndSetChoiceSetting() {
         String originalValue = null;
         try {
-            //weigl: disable, no clue why the choice settings should be initialised
+            // weigl: disable, no clue why the choice settings should be initialised
             // assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
             // Store default choice settings
-            HashMap<String, String> defaultSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-            //weigl: disable, no clue why the choice settings should be initialised
-            //assertFalse(defaultSettings.isEmpty());
+            HashMap<String, String> defaultSettings =
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            // weigl: disable, no clue why the choice settings should be initialised
+            // assertFalse(defaultSettings.isEmpty());
             // Test initial value
-            originalValue = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-            assertTrue(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW.equals(originalValue) || SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN.equals(originalValue));
+            originalValue = SymbolicExecutionUtil
+                    .getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+            assertTrue(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW
+                    .equals(originalValue)
+                    || SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN
+                            .equals(originalValue));
             // Change value and make sure that it has changed
-            String newValue = SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW.equals(originalValue) ? SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN : SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW;
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
-            Assertions.assertEquals(newValue, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
+            String newValue = SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW
+                    .equals(originalValue)
+                            ? SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN
+                            : SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW;
+            SymbolicExecutionUtil.setChoiceSetting(
+                SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
+            Assertions.assertEquals(newValue, SymbolicExecutionUtil
+                    .getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
             // Make sure that all other settings are unchanged.
-            HashMap<String, String> changedSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            HashMap<String, String> changedSettings =
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             defaultSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
             Assertions.assertEquals(defaultSettings, changedSettings);
         } finally {
             if (originalValue != null) {
-                SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalValue);
+                SymbolicExecutionUtil.setChoiceSetting(
+                    SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalValue);
             }
         }
     }

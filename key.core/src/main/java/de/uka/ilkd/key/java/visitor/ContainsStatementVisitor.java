@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.java.visitor;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.java.ObjectUtil;
+package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -9,10 +11,12 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 
+import org.key_project.util.java.ObjectUtil;
+
 /**
  * Utilits class used by
  * {@link SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services)}.
- * 
+ *
  * @author Martin Hentschel
  */
 public class ContainsStatementVisitor extends JavaASTVisitor {
@@ -28,13 +32,13 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
 
     /**
      * Constructor.
-     * 
+     *
      * @param root
-     *            The {@link ProgramElement} to start search in.
+     *        The {@link ProgramElement} to start search in.
      * @param toSearch
-     *            The {@link SourceElement} to search.
+     *        The {@link SourceElement} to search.
      * @param services
-     *            The {@link Services} to use.
+     *        The {@link Services} to use.
      */
     public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch,
             Services services) {
@@ -55,7 +59,7 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
 
     /**
      * Returns the result.
-     * 
+     *
      * @return {@code true} contained, {@code false} not contained.
      */
     public boolean isContained() {
@@ -70,11 +74,11 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
      * SymbolicExecutionUtil#equalsWithPosition(SourceElement, SourceElement)
      * which has been copied here since it's not possible to create a dependency
      * to its original container project.
-     * 
+     *
      * @param first
-     *            The first {@link SourceElement}.
+     *        The first {@link SourceElement}.
      * @param second
-     *            The second {@link SourceElement}.
+     *        The second {@link SourceElement}.
      * @return {@code true} both are equal and at the same {@link PositionInfo},
      *         {@code false} otherwise.
      */
@@ -87,14 +91,14 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
                     // lost during prove, but maintained in its guard.
                     return first.equals(second)
                             && equalsWithPosition(((While) first).getGuard(),
-                                    ((While) second).getGuard());
+                                ((While) second).getGuard());
                 } else {
                     return false;
                 }
             } else {
                 // Compare all source elements including ints position info
                 return first.equals(second) && ObjectUtil.equals(
-                        first.getPositionInfo(), second.getPositionInfo());
+                    first.getPositionInfo(), second.getPositionInfo());
             }
         } else {
             return first == null && second == null;

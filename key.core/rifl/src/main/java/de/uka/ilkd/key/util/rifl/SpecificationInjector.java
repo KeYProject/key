@@ -1,16 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.util.rifl;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
+
 import recoder.abstraction.ClassType;
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.SourceInfo;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * Writes JML* translation of RIFL specifications to Java files. This is a
@@ -23,7 +28,7 @@ public class SpecificationInjector extends SourceVisitor {
 
     private static final String LINE_BREAK = "\n";
     private static final String DEFAULT_SPEC_COMMENT =
-            LINE_BREAK + "// JML* comment created by KeY RIFL Transformer." + LINE_BREAK;
+        LINE_BREAK + "// JML* comment created by KeY RIFL Transformer." + LINE_BREAK;
 
     /**
      * Produces JML* respects clauses. Clauses are internally labeled with keys
@@ -46,7 +51,7 @@ public class SpecificationInjector extends SourceVisitor {
 
         private final String indentation;
         private final Map<String, Set<Entry<String, Type>>> respects =
-                new HashMap<>();
+            new HashMap<>();
         private SpecificationContainer sc;
 
         JMLFactory(SpecificationContainer sc) {
@@ -204,7 +209,7 @@ public class SpecificationInjector extends SourceVisitor {
     }
 
     private void addComment(JavaProgramElement se, String comment) {
-        //remember which methods were specified and generate po files only for them
+        // remember which methods were specified and generate po files only for them
         if (se instanceof MethodDeclaration) {
             specifiedMethodDeclarations.add((MethodDeclaration) se);
         }
@@ -289,7 +294,7 @@ public class SpecificationInjector extends SourceVisitor {
                 factory.addToDetermines(fName, Type.SINK, fieldSnk);
             }
         }
-        //only add comment for methods for which we generated a specification
+        // only add comment for methods for which we generated a specification
         String comment = factory.getSpecification();
         if (comment != null) {
             addComment(md, factory.getSpecification());

@@ -1,22 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.sourceview.JavaDocument;
-import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.ExceptionTools;
-import org.key_project.util.java.IOUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.SimpleAttributeSet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +17,25 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.sourceview.JavaDocument;
+import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.ExceptionTools;
+
+import org.key_project.util.java.IOUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used by {@link de.uka.ilkd.key.gui.IssueDialog} to open the source file containing an error
@@ -47,12 +53,14 @@ public class EditSourceFileAction extends KeyAction {
      * (e.g. inside a zip archive)
      */
     private static final String READONLY_TOOLTIP = "The resource is readonly, " +
-            "probably the URL points into a zip/jar archive!";
+        "probably the URL points into a zip/jar archive!";
 
-    /** The interval in milliseconds for refreshing the syntax highlighting of the shown file:
-     * If after a change in the text field  no other char is pressed for this period, the document
+    /**
+     * The interval in milliseconds for refreshing the syntax highlighting of the shown file:
+     * If after a change in the text field no other char is pressed for this period, the document
      * is completely re-highlighted.
-     * If desired, this could be set much lower (also seems to work with ~50). */
+     * If desired, this could be set much lower (also seems to work with ~50).
+     */
     private static final int SYNTAX_HIGHLIGHTING_REFRESH_INTERVAL = 800;
 
     /**
@@ -67,7 +75,7 @@ public class EditSourceFileAction extends KeyAction {
     /**
      * Instantiates a new edits the source file action.
      *
-     * @param parent    the parent
+     * @param parent the parent
      * @param exception the exception
      */
     public EditSourceFileAction(final Window parent, final Throwable exception) {
@@ -99,7 +107,7 @@ public class EditSourceFileAction extends KeyAction {
     }
 
     private static JScrollPane createParserMessageScrollPane(final Throwable exception,
-                                                             final int columnNumber) {
+            final int columnNumber) {
         JTextArea parserMessage = new JTextArea();
         String message = exception.getMessage();
         message = message == null ? "" : message;
@@ -196,8 +204,7 @@ public class EditSourceFileAction extends KeyAction {
         return textPane;
     }
 
-    private static @Nullable
-    File tryGetFile(@Nullable URL sourceURL) {
+    private static @Nullable File tryGetFile(@Nullable URL sourceURL) {
         File sourceFile = null;
         if (sourceURL != null && sourceURL.getProtocol().equals("file")) {
             try {
@@ -210,8 +217,8 @@ public class EditSourceFileAction extends KeyAction {
     }
 
     private JPanel createButtonPanel(final URL sourceURL,
-                                     final JTextPane textPane,
-                                     final JDialog dialog) {
+            final JTextPane textPane,
+            final JDialog dialog) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         JButton saveButton = new JButton("Save");
@@ -263,9 +270,9 @@ public class EditSourceFileAction extends KeyAction {
     public void actionPerformed(ActionEvent arg0) {
         if (exception == null) {
             JOptionPane.showMessageDialog(
-                    SwingUtilities.windowForComponent((Component) arg0.getSource()),
-                    "The given exception does not carry any positional information.",
-                    "Position not available", JOptionPane.ERROR_MESSAGE);
+                SwingUtilities.windowForComponent((Component) arg0.getSource()),
+                "The given exception does not carry any positional information.",
+                "Position not available", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -283,13 +290,13 @@ public class EditSourceFileAction extends KeyAction {
                 prefix = "[Readonly] ";
             }
             final JDialog dialog = new JDialog(parent, prefix + location.getFileURL(),
-                    Dialog.ModalityType.DOCUMENT_MODAL);
+                Dialog.ModalityType.DOCUMENT_MODAL);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
             final int columnNumber = 75;
 
             final JScrollPane parserMessageScrollPane =
-                    createParserMessageScrollPane(exception, columnNumber);
+                createParserMessageScrollPane(exception, columnNumber);
 
             final JTextPane txtSource = createSrcTextPane(location);
 
@@ -306,9 +313,9 @@ public class EditSourceFileAction extends KeyAction {
             sourceScrollPane.setRowHeaderView(lineNumbers);
 
             sourceScrollPane.setVerticalScrollBarPolicy(
-                    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
             sourceScrollPane.setHorizontalScrollBarPolicy(
-                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
             JPanel buttonPanel = createButtonPanel(location.getFileURL(), txtSource, dialog);
 

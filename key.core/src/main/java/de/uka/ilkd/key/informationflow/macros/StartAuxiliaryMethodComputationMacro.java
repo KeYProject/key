@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.informationflow.macros;
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
-import org.key_project.util.collection.ImmutableList;
+package de.uka.ilkd.key.informationflow.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
@@ -19,11 +21,14 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  *
  * @author christoph
  */
-public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro implements StartSideProofMacro {
+public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
+        implements StartSideProofMacro {
 
     @Override
     public String getName() {
@@ -38,16 +43,16 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro imp
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition " +
-               "proofs, this macro starts a side calculation which does " +
-               "the symbolic execution only once. The result is " +
-               "instantiated twice with the variable to be used in the " +
-               "two executions of the self-composition.";
+            "proofs, this macro starts a side calculation which does " +
+            "the symbolic execution only once. The result is " +
+            "instantiated twice with the variable to be used in the " +
+            "two executions of the self-composition.";
     }
 
     @Override
     public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+            ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
         if (goals == null || goals.head() == null) {
             return false;
         }
@@ -57,44 +62,45 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro imp
         }
         Services services = proof.getServices();
         ProofOblInput poForProof =
-                services.getSpecificationRepository().getProofOblInput(proof);
+            services.getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
             return false;
         }
         final InfFlowContractPO po = (InfFlowContractPO) poForProof;
 
         final InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(po.getContract(),
-                                                   po.getIFVars().c1,
-                                                   po.getIFVars().c2, services);
+            POSnippetFactory.getInfFlowFactory(po.getContract(),
+                po.getIFVars().c1,
+                po.getIFVars().c2, services);
         final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+            f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
     }
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws Exception {
+            Proof proof,
+            ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws Exception {
         final Services services = proof.getServices();
-        final InfFlowContractPO po = (InfFlowContractPO) services.getSpecificationRepository().getProofOblInput(proof);
+        final InfFlowContractPO po =
+            (InfFlowContractPO) services.getSpecificationRepository().getProofOblInput(proof);
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
         final SymbolicExecutionPO symbExecPO =
-                new SymbolicExecutionPO(initConfig, po.getContract(),
-                                        po.getIFVars().symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
-                                        goals.head(), proof.getServices());
-        
+            new SymbolicExecutionPO(initConfig, po.getContract(),
+                po.getIFVars().symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
+                goals.head(), proof.getServices());
+
         final InfFlowProof p;
         synchronized (symbExecPO) {
             p = (InfFlowProof) uic.createProof(initConfig, symbExecPO);
         }
         p.unionIFSymbols(((InfFlowProof) proof).getIFSymbols());
-        
+
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, p);
         info.addInfo(PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF, proof);
         return info;

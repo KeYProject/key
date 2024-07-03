@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.LinkedHashSet;
@@ -21,7 +25,8 @@ public class RewriteTacletBuilderSchemaVarCollector {
     private final RewriteTacletBuilder<? extends RewriteTaclet> rtb;
 
 
-    public RewriteTacletBuilderSchemaVarCollector(RewriteTacletBuilder<? extends RewriteTaclet>  rtb) {
+    public RewriteTacletBuilderSchemaVarCollector(
+            RewriteTacletBuilder<? extends RewriteTaclet> rtb) {
         this.rtb = rtb;
     }
 
@@ -95,10 +100,12 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
         result.addAll(collectSchemaVariables(templ.sequent()));
         if (templ instanceof RewriteTacletGoalTemplate) {
-            result.addAll(collectSchemaVariables(((RewriteTacletGoalTemplate) templ).replaceWith()));
+            result.addAll(
+                collectSchemaVariables(((RewriteTacletGoalTemplate) templ).replaceWith()));
         }
         if (templ instanceof AntecSuccTacletGoalTemplate) {
-            result.addAll(collectSchemaVariables(((AntecSuccTacletGoalTemplate) templ).replaceWith()));
+            result.addAll(
+                collectSchemaVariables(((AntecSuccTacletGoalTemplate) templ).replaceWith()));
         }
 
         return result;

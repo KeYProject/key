@@ -1,18 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.rule.label;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -23,6 +23,9 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
@@ -55,10 +58,10 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-                               PosInOccurrence applicationPosInOccurrence,
-                               Term applicationTerm, Rule rule, Goal goal,
-                               Object hint, Term tacletTerm, Term term,
-                               List<TermLabel> labels) {
+            PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm, Term term,
+            List<TermLabel> labels) {
         if (services.getProof() == null) {
             return;
         }

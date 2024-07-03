@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -87,9 +90,13 @@ public class SourceViewFrame extends JSplitPane {
     }
 
     /**
-     * <p> Selects the tab containing the specified component. </p>
+     * <p>
+     * Selects the tab containing the specified component.
+     * </p>
      *
-     * <p> If this frame does not contain the specified component, this method has no effect. </p>
+     * <p>
+     * If this frame does not contain the specified component, this method has no effect.
+     * </p>
      *
      * @param component the component to select.
      *
@@ -109,8 +116,8 @@ public class SourceViewFrame extends JSplitPane {
     public void addComponent(JComponent component, String toolTipText, Action closeAction) {
         tabbedPane.add(component);
         tabbedPane.setTabComponentAt(
-                tabbedPane.indexOfComponent(component),
-                new ClosableTabComponent(component.getName(), closeAction));
+            tabbedPane.indexOfComponent(component),
+            new ClosableTabComponent(component.getName(), closeAction));
 
         tabbedPane.setToolTipTextAt(tabbedPane.indexOfComponent(component), toolTipText);
 
@@ -122,16 +129,20 @@ public class SourceViewFrame extends JSplitPane {
     }
 
     /**
-     * <p> Removes a component from below the source view. </p>
+     * <p>
+     * Removes a component from below the source view.
+     * </p>
      *
-     * <p> If this frame does not contain the specified component, this method has no effect. </p>
+     * <p>
+     * If this frame does not contain the specified component, this method has no effect.
+     * </p>
      *
      * @param component the component to be removed.
      */
     public void removeComponent(JComponent component) {
         tabbedPane.remove(component);
 
-        synchronized(tabbedPane.getTreeLock()) {
+        synchronized (tabbedPane.getTreeLock()) {
             if (tabbedPaneShown && tabbedPane.getComponentCount() == 1) {
                 hideTabbedPane();
             }

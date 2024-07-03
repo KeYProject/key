@@ -6,4 +6,4 @@
  * It further defines a deepClone() method.
  * ASTArrayList is currently the only implementor.
  */
-package recoder.list.generic; 
+package recoder.list.generic;

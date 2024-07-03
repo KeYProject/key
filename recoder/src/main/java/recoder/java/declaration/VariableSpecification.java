@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.abstraction.Type;
@@ -18,7 +21,8 @@ import recoder.service.ProgramModelInfo;
  * @author AL
  */
 
-public class VariableSpecification extends JavaNonTerminalProgramElement implements Declaration, NamedProgramElement,
+public class VariableSpecification extends JavaNonTerminalProgramElement
+        implements Declaration, NamedProgramElement,
         ExpressionContainer, Variable {
 
     /**
@@ -92,9 +96,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     /**
      * Variable specification.
      *
-     * @param name       an identifier.
+     * @param name an identifier.
      * @param dimensions an int value.
-     * @param init       an expression.
+     * @param init an expression.
      */
 
     public VariableSpecification(Identifier name, int dimensions, Expression init) {

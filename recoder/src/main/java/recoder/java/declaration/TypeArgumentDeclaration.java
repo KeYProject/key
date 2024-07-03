@@ -1,9 +1,7 @@
-/*
- * Created on 15.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.abstraction.TypeArgument;
@@ -20,7 +18,8 @@ import recoder.list.generic.ASTList;
  *
  * @author Tobias Gutzmann
  */
-public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement implements TypeReferenceContainer, TypeArgument {
+public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement
+        implements TypeReferenceContainer, TypeArgument {
     /**
      * serialization id
      */
@@ -62,14 +61,18 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement imple
         makeParentRoleValid();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceCount()
      */
     public int getTypeReferenceCount() {
         return typeReference == null ? 0 : 1;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
      */
     public TypeReference getTypeReferenceAt(int index) {
@@ -78,21 +81,27 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement imple
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildCount()
      */
     public int getChildCount() {
         return getTypeReferenceCount();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildAt(int)
      */
     public ProgramElement getChildAt(int index) {
         return getTypeReferenceAt(index);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
      */
     public int getChildPositionCode(ProgramElement child) {
@@ -102,8 +111,11 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement imple
         return -1;
     }
 
-    /* (non-Javadoc)
-     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement, recoder.java.ProgramElement)
+    /*
+     * (non-Javadoc)
+     *
+     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement,
+     * recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null)
@@ -117,7 +129,9 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement imple
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.ProgramElement#getASTParent()
      */
     public NonTerminalProgramElement getASTParent() {
@@ -131,7 +145,7 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement imple
     /**
      * @param tr either a TypeReference, a URQ, or an MethodReference
      * @throws IllegalArgumentException if <code>tr</code> isn't of type
-     *                                  TypeReference, URQ, or MethodReference
+     *         TypeReference, URQ, or MethodReference
      */
     public void setParent(Reference tr) {
         parent = tr;
@@ -140,14 +154,18 @@ public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement imple
             throw new IllegalArgumentException();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
      */
     public void accept(SourceVisitor v) {
         v.visitTypeArgument(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.java.SourceElement#deepClone()
      */
     public TypeArgumentDeclaration deepClone() {

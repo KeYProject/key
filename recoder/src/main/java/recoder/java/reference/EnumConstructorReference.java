@@ -1,9 +1,7 @@
-/*
- * Created on 17.08.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.reference;
 
 import recoder.java.*;
@@ -13,7 +11,8 @@ import recoder.list.generic.ASTList;
 /**
  * @author Tobias Gutzmann
  */
-public class EnumConstructorReference extends JavaNonTerminalProgramElement implements ConstructorReference,
+public class EnumConstructorReference extends JavaNonTerminalProgramElement
+        implements ConstructorReference,
         TypeDeclarationContainer {
 
     /**
@@ -115,7 +114,8 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement impl
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) throw new NullPointerException();
+        if (p == null)
+            throw new NullPointerException();
         if (p == classDeclaration) {
             classDeclaration = (ClassDeclaration) q;
             if (q != null)
@@ -137,8 +137,8 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement impl
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        // role 0 		: classDeclaration
-        // role 1(idx)  : arg
+        // role 0 : classDeclaration
+        // role 1(idx) : arg
         if (child == classDeclaration)
             return 0;
         if (args != null) {
@@ -184,7 +184,8 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement impl
     }
 
     public Expression getExpressionAt(int index) {
-        if (args == null) throw new ArrayIndexOutOfBoundsException(index);
+        if (args == null)
+            throw new ArrayIndexOutOfBoundsException(index);
         return args.get(index);
     }
 

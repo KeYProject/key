@@ -1,5 +1,14 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import recoder.io.PropertyNames;
 import recoder.java.SourceElement.Position;
@@ -11,12 +20,6 @@ import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.util.StringUtils;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * A configurable pretty printer for Java source elements. The settings of the
@@ -49,7 +52,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      * Worklist of single line comments that must be delayed till the next
      * linefeed.
      */
-    private final List<SingleLineComment> singleLineCommentWorkList = new ArrayList<SingleLineComment>();
+    private final List<SingleLineComment> singleLineCommentWorkList =
+        new ArrayList<SingleLineComment>();
     /**
      * Shared and reused position object.
      */
@@ -297,9 +301,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     /**
      * Write a source element.
      *
-     * @param lf     an int value.
+     * @param lf an int value.
      * @param blanks an int value.
-     * @param elem   a source element.
+     * @param elem a source element.
      */
     protected void printElement(int lf, int blanks, SourceElement elem) {
         setElementIndentation(lf, blanks, findFirstElementInclComment(elem));
@@ -310,7 +314,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      * Write source element.
      *
      * @param blanks an int value.
-     * @param elem   a source element.
+     * @param elem a source element.
      */
     protected void printElement(int blanks, SourceElement elem) {
         setElementIndentation(0, blanks, findFirstElementInclComment(elem));
@@ -330,8 +334,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     /**
      * Write a complete ProgramElementList.
      */
-    protected void printProgramElementList(int firstLF, int levelChange, int firstBlanks, String separationSymbol,
-                                           int separationLF, int separationBlanks, List<? extends ProgramElement> list) {
+    protected void printProgramElementList(int firstLF, int levelChange, int firstBlanks,
+            String separationSymbol,
+            int separationLF, int separationBlanks, List<? extends ProgramElement> list) {
         int s = list.size();
         if (s == 0) {
             return;
@@ -352,7 +357,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printProgramElementList(0, 0, 0, "", 0, 1, list);
     }
 
-    protected void printCommaList(int firstLF, int levelChange, int firstBlanks, List<? extends ProgramElement> list) {
+    protected void printCommaList(int firstLF, int levelChange, int firstBlanks,
+            List<? extends ProgramElement> list) {
         printProgramElementList(firstLF, levelChange, firstBlanks, ",", 0, 1, list);
     }
 
@@ -377,14 +383,16 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     /**
      * Write a complete ProgramElementList using "Line" style.
      */
-    protected void printLineList(int firstLF, int levelChange, List<? extends ProgramElement> list) {
+    protected void printLineList(int firstLF, int levelChange,
+            List<? extends ProgramElement> list) {
         printProgramElementList(firstLF, levelChange, 0, "", 1, 0, list);
     }
 
     /**
      * Write a complete ProgramElementList using "Block" style.
      */
-    protected void printBlockList(int firstLF, int levelChange, List<? extends ProgramElement> list) {
+    protected void printBlockList(int firstLF, int levelChange,
+            List<? extends ProgramElement> list) {
         printProgramElementList(firstLF, levelChange, 0, "", 2, 0, list);
     }
 
@@ -431,8 +439,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      * Write a sequence of characters.
      *
      * @param cbuf an array of char.
-     * @param off  an int value.
-     * @param len  an int value.
+     * @param off an int value.
+     * @param len an int value.
      */
     protected void print(char[] cbuf, int off, int len) {
         boolean col = false;
@@ -451,9 +459,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         }
         if (!col) {
             column += len;
-            //int i;
-            //  for (i = off + len - 1; (i >= off && cbuf[i] != '\n'); i -= 1) ;
-            //  column = (i >= off) ? (off + len - 1 - i) : (column + len);
+            // int i;
+            // for (i = off + len - 1; (i >= off && cbuf[i] != '\n'); i -= 1) ;
+            // column = (i >= off) ? (off + len - 1 - i) : (column + len);
         }
         try {
             out.write(cbuf, off, len);
@@ -537,9 +545,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     /**
      * Print program element header.
      *
-     * @param lf     an int value.
+     * @param lf an int value.
      * @param blanks an int value.
-     * @param elem   a program element.
+     * @param elem a program element.
      */
     protected void printHeader(int lf, int blanks, ProgramElement elem) {
         printHeader(lf, 0, blanks, elem);
@@ -549,7 +557,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      * Print program element header.
      *
      * @param blanks an int value.
-     * @param elem   a program element.
+     * @param elem a program element.
      */
     protected void printHeader(int blanks, ProgramElement elem) {
         printHeader(0, 0, blanks, elem);
@@ -581,10 +589,10 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     /**
      * Print program element header.
      *
-     * @param lf          number of line feeds.
+     * @param lf number of line feeds.
      * @param levelChange the level change.
-     * @param blanks      number of white spaces.
-     * @param x           the program element.
+     * @param blanks number of white spaces.
+     * @param x the program element.
      */
     protected void printHeader(int lf, int levelChange, int blanks, ProgramElement x) {
         level += levelChange;
@@ -597,16 +605,16 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         /*
          * Position indent = first.getRelativePosition();
          * if (indent == Position.UNDEFINED) {
-         *      indent = new Position(lf, blanks);
+         * indent = new Position(lf, blanks);
          * } else if (overwriteIndentation) {
-         *      indent.setPosition(lf, blanks);
+         * indent.setPosition(lf, blanks);
          * } else {
-         *      if (lf > indent.getLine()) {
-         *          indent.setLine(lf);
-         *      }
-         *      if (blanks > indent.getColumn()) {
-         *          indent.setColumn(blanks);
-         *      }
+         * if (lf > indent.getLine()) {
+         * indent.setLine(lf);
+         * }
+         * if (blanks > indent.getColumn()) {
+         * indent.setColumn(blanks);
+         * }
          * }
          * first.setRelativePosition(indent);
          */
@@ -673,42 +681,42 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
                 print('(');
             }
             switch (x.getArity()) {
-                case 2:
+            case 2:
+                printElement(0, children.get(0));
+                if (getBooleanProperty(GLUE_INFIX_OPERATORS)) {
+                    printElementIndentation(0, x);
+                    print(symbol);
+                    printElement(children.get(1));
+                } else {
+                    printElementIndentation(1, x);
+                    print(symbol);
+                    printElement(1, children.get(1));
+                }
+                break;
+            case 1:
+                switch (x.getNotation()) {
+                case Operator.PREFIX:
+                    printElementIndentation(x);
+                    print(symbol);
+                    if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
+                        printElement(0, children.get(0));
+                    } else {
+                        printElement(1, children.get(0));
+                    }
+                    break;
+                case Operator.POSTFIX:
                     printElement(0, children.get(0));
-                    if (getBooleanProperty(GLUE_INFIX_OPERATORS)) {
-                        printElementIndentation(0, x);
+                    if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
+                        printElementIndentation(x);
                         print(symbol);
-                        printElement(children.get(1));
                     } else {
                         printElementIndentation(1, x);
                         print(symbol);
-                        printElement(1, children.get(1));
                     }
                     break;
-                case 1:
-                    switch (x.getNotation()) {
-                        case Operator.PREFIX:
-                            printElementIndentation(x);
-                            print(symbol);
-                            if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
-                                printElement(0, children.get(0));
-                            } else {
-                                printElement(1, children.get(0));
-                            }
-                            break;
-                        case Operator.POSTFIX:
-                            printElement(0, children.get(0));
-                            if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
-                                printElementIndentation(x);
-                                print(symbol);
-                            } else {
-                                printElementIndentation(1, x);
-                                print(symbol);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+                default:
+                    break;
+                }
             }
             if (addParentheses) {
                 print(')');
@@ -852,7 +860,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getArguments() != null) {
             printCommaList(0, 0, 1, x.getArguments());
         }
-        if (x.getArguments() != null && x.getArguments().size() > 0 && x.getRelativePosition().getLine() > 0) {
+        if (x.getArguments() != null && x.getArguments().size() > 0
+                && x.getRelativePosition().getLine() > 0) {
             printIndentation(1, getTotalIndentation());
             print('}');
         } else {
@@ -868,7 +877,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getElementValues() != null) {
             printCommaList(0, 0, 1, x.getElementValues());
         }
-        if (x.getElementValues() != null && x.getElementValues().size() > 0 && x.getRelativePosition().getLine() > 0) {
+        if (x.getElementValues() != null && x.getElementValues().size() > 0
+                && x.getRelativePosition().getLine() > 0) {
             printIndentation(1, getTotalIndentation());
             print('}');
         } else {
@@ -1029,7 +1039,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printElement((m > 0) ? 1 : 0, x.getTypeReference());
         if (spec) {
             print(" ...");
-            //printElement(spec);
+            // printElement(spec);
         }
         List<? extends VariableSpecification> varSpecs = x.getVariables();
         if (varSpecs != null) {
@@ -1126,7 +1136,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
                     || firstStatementEndPosition.getLine() < blockEndPosition.getLine())
                 printIndentation(1, getTotalIndentation());
             else
-                printIndentation(0, blockEndPosition.getColumn() - firstStatementEndPosition.getColumn() - 1);
+                printIndentation(0,
+                    blockEndPosition.getColumn() - firstStatementEndPosition.getColumn() - 1);
         } else if (!doNotPossiblyPrintIndentation) {
             // keep old indentation
             int lf = x.getEndPosition().getLine() - x.getStartPosition().getLine();
@@ -1187,7 +1198,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         print("do");
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
             print(';');
-            //w.printElement(1, body);
+            // w.printElement(1, body);
         } else {
             if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
                 printElement(1, x.getBody());
@@ -2297,18 +2308,18 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printElementIndentation(m, x);
         print("enum");
         printElement(1, x.getIdentifier());
-//        if (x.getImplementedTypes() != null) {
-//        	// actually, this is not allowed
-//            printElement(1, x.getImplementedTypes());
-//        }
+        // if (x.getImplementedTypes() != null) {
+        // // actually, this is not allowed
+        // printElement(1, x.getImplementedTypes());
+        // }
         print(' ');
         print('{');
         printContainerComments(x);
-//        if (x.getMembers() != null && !x.getMembers().isEmpty()) {
-//            //printBlockList(2, 1, x.getMembers());
-//            printCommaList(2, 1, 1, x.getMembers())
-//            changeLevel(-1);
-//        }
+        // if (x.getMembers() != null && !x.getMembers().isEmpty()) {
+        // //printBlockList(2, 1, x.getMembers());
+        // printCommaList(2, 1, 1, x.getMembers())
+        // changeLevel(-1);
+        // }
         printCommaList(2, 1, 1, x.getConstants());
         print(";");
         changeLevel(-1);
@@ -2324,17 +2335,17 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     public void visitTypeArgument(TypeArgumentDeclaration x) {
         printHeader(x);
         switch (x.getWildcardMode()) {
-            case None:
-                break;
-            case Any:
-                print("?");
-                break;
-            case Extends:
-                print("? extends ");
-                break;
-            case Super:
-                print("? super ");
-                break;
+        case None:
+            break;
+        case Any:
+            print("?");
+            break;
+        case Extends:
+            print("? extends ");
+            break;
+        case Super:
+            print("? super ");
+            break;
         }
         if (x.getTypeReferenceCount() == 1)
             printElement(x.getTypeReferenceAt(0));

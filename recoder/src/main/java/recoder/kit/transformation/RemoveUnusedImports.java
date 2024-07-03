@@ -1,4 +1,11 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
@@ -9,9 +16,6 @@ import recoder.kit.UnitKit;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that removes all superfluous import statements from a
@@ -58,7 +62,7 @@ public class RemoveUnusedImports extends TwoPassTransformation {
      * Creates a new transformation object that removes unused import
      * statements.
      *
-     * @param sc   the service configuration to use.
+     * @param sc the service configuration to use.
      * @param list the compilation units that shall be stripped of imports.
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, List<CompilationUnit> list) {

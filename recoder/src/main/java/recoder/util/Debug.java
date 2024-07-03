@@ -1,4 +1,7 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.io.*;
@@ -16,7 +19,8 @@ public class Debug {
      * Strings that are regarded as having a somewhat negative touch. Options
      * with these values (or uppercase versions thereof) are considered unset.
      */
-    protected final static String[] NEGATIVE_VALUES = new String[]{"", "0", "false", "off", "no", "none"};
+    protected final static String[] NEGATIVE_VALUES =
+        new String[] { "", "0", "false", "off", "no", "none" };
     protected final static String DEBUGGING_OPTION_FILE = "debug.properties";
     final static String ESC_PREFIX = "\033[3;31m";
     final static String ESC_SUFFIX = "\033[0m";
@@ -177,7 +181,7 @@ public class Debug {
      * Assertion method for general conditions.
      *
      * @param expression predicate that must hold.
-     * @param message    detail message.
+     * @param message detail message.
      * @throws IllegalStateException if the expression evaluates to false.
      */
     public final static void assertBoolean(boolean expression, String message) {
@@ -243,7 +247,8 @@ public class Debug {
      * @param nonnull4 object that may not be null.
      * @throws NullPointerException if the object is null.
      */
-    public final static void assertNonnull(Object nonnull1, Object nonnull2, Object nonnull3, Object nonnull4) {
+    public final static void assertNonnull(Object nonnull1, Object nonnull2, Object nonnull3,
+            Object nonnull4) {
         if (nonnull1 == null) {
             throw new NullPointerException(ASSERTION_MESSAGE + "(Null object 1)" + "\n");
         }

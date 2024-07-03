@@ -1,28 +1,33 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui.settings;
 
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import java.awt.*;
+import java.text.Format;
 import javax.annotation.Nullable;
-import org.key_project.util.java.StringUtil;
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.text.Format;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+
+import org.key_project.util.java.StringUtil;
 
 /**
  * A simple panel for using inside of the {@link SettingsUi}.
  * <p>
  * This panel provides a header and center pane.
  * <p>
- * The header already contains a two labels {@link #lblHead} and {@link #lblSubhead} with appropriate fonts.
+ * The header already contains a two labels {@link #lblHead} and {@link #lblSubhead} with
+ * appropriate fonts.
  * <p>
  * The {@link #pCenter} can be used to add create a settings dialog.
  * <p>
@@ -31,7 +36,8 @@ import java.text.Format;
  * @author weigl
  */
 public class SimpleSettingsPanel extends JPanel {
-    private static final ColorSettings.ColorProperty COLOR_ERROR = ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
+    private static final ColorSettings.ColorProperty COLOR_ERROR =
+        ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
             "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
 
     protected Box pNorth = new Box(BoxLayout.Y_AXIS);
@@ -78,7 +84,8 @@ public class SimpleSettingsPanel extends JPanel {
         component.setToolTipText(error);
     }
 
-    protected JCheckBox createCheckBox(String title, boolean value, final @Nullable Validator<Boolean> validator) {
+    protected JCheckBox createCheckBox(String title, boolean value,
+            final @Nullable Validator<Boolean> validator) {
         JCheckBox checkBox = new JCheckBox(title, value);
         checkBox.addActionListener(e -> {
             try {
@@ -108,18 +115,21 @@ public class SimpleSettingsPanel extends JPanel {
         return field;
     }
 
-    protected JFormattedTextField createNumberFormattedTextField(Format format, final @Nullable Validator<String> validator) {
+    protected JFormattedTextField createNumberFormattedTextField(Format format,
+            final @Nullable Validator<String> validator) {
         JFormattedTextField field = new JFormattedTextField(format);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
     }
 
-    protected JSpinner createNumberTextField(int min, int max, int step, final @Nullable Validator<Integer> validator) {
+    protected JSpinner createNumberTextField(int min, int max, int step,
+            final @Nullable Validator<Integer> validator) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
         return createNumberTextField(spinnerModel, validator);
     }
 
-    protected <T> JSpinner createNumberTextField(SpinnerModel model, final @Nullable Validator<T> validator) {
+    protected <T> JSpinner createNumberTextField(SpinnerModel model,
+            final @Nullable Validator<T> validator) {
         JSpinner field = new JSpinner(model);
         field.addChangeListener(new ValidatorSpinnerAdapter<>(field, validator));
         return field;
@@ -131,13 +141,11 @@ public class SimpleSettingsPanel extends JPanel {
         else {
             String brokenLines = StringUtil.wrapLines(s);
             s = "<html>" +
-                brokenLines.replace("<", "&lt;").
-                            replace(">", "&gt;").
-                            replace("\n", "<br>");
+                brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
         }
 
         JLabel infoButton = new JLabel(
-                IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+            IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
         infoButton.setToolTipText(s);
         return infoButton;
     }
@@ -170,7 +178,8 @@ public class SimpleSettingsPanel extends JPanel {
         private final JTextComponent field;
         private final @Nullable Validator<String> validator;
 
-        private DocumentValidatorAdapter(JTextComponent field, @Nullable Validator<String> validator) {
+        private DocumentValidatorAdapter(JTextComponent field,
+                @Nullable Validator<String> validator) {
             this.field = field;
             this.validator = validator;
         }

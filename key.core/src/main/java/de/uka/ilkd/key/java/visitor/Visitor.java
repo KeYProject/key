@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.*;
@@ -27,7 +31,7 @@ import de.uka.ilkd.key.speclang.MergeContract;
 /**
  * This class is implemented by visitors/walkers.
  * Each AST node implements a visit(Visitor) method that
- * calls the  doActionAt<NodeType> method. Similar to the pretty print
+ * calls the doActionAt<NodeType> method. Similar to the pretty print
  * mechanism.
  */
 public interface Visitor {
@@ -170,8 +174,7 @@ public interface Visitor {
 
     void performActionOnFieldSpecification(FieldSpecification x);
 
-    void performActionOnImplicitFieldSpecification
-        (ImplicitFieldSpecification x);
+    void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x);
 
     void performActionOnBinaryAnd(BinaryAnd x);
 
@@ -206,7 +209,7 @@ public interface Visitor {
     void performActionOnTimesAssignment(TimesAssignment x);
 
     void performActionOnUnsignedShiftRightAssignment(
-        UnsignedShiftRightAssignment x);
+            UnsignedShiftRightAssignment x);
 
     void performActionOnBinaryNot(BinaryNot x);
 
@@ -342,7 +345,7 @@ public interface Visitor {
      * @param newBlock the new block
      */
     void performActionOnBlockContract(final StatementBlock oldBlock,
-                                      final StatementBlock newBlock);
+            final StatementBlock newBlock);
 
     /**
      * Adds block contract for new statement block to block contract
@@ -352,7 +355,7 @@ public interface Visitor {
      * @param newBlock the new block
      */
     void performActionOnLoopContract(final StatementBlock oldBlock,
-                                     final StatementBlock newBlock);
+            final StatementBlock newBlock);
 
     /**
      * Adds loop contract for new loop statement to loop contract
@@ -362,7 +365,7 @@ public interface Visitor {
      * @param newLoop the new loop statement
      */
     void performActionOnLoopContract(final LoopStatement oldLoop,
-                                     final LoopStatement newLoop);
+            final LoopStatement newLoop);
 
     void performActionOnMergeContract(MergeContract x);
 

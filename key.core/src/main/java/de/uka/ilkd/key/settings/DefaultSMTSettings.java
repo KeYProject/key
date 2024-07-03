@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.settings;
 
+
+import java.io.File;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.st.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * The default implementation of {@link SMTSettings}.
@@ -23,9 +27,9 @@ public class DefaultSMTSettings implements SMTSettings {
 
 
     public DefaultSMTSettings(ProofDependentSMTSettings pdSettings,
-                              ProofIndependentSMTSettings piSettings,
-                              NewSMTTranslationSettings newTransSettings,
-                              Proof proof) {
+            ProofIndependentSMTSettings piSettings,
+            NewSMTTranslationSettings newTransSettings,
+            Proof proof) {
         super();
         this.pdSettings = pdSettings;
         this.piSettings = piSettings;
@@ -69,7 +73,7 @@ public class DefaultSMTSettings implements SMTSettings {
     @Override
     public String getSMTTemporaryFolder() {
         return PathConfig.getKeyConfigDir()
-                + File.separator + "smt_formula";
+            + File.separator + "smt_formula";
     }
 
     @Override

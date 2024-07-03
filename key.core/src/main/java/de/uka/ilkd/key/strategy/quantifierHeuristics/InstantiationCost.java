@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -14,26 +18,26 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
  */
 public class InstantiationCost implements Feature {
 
-	final private ProjectionToTerm varInst;
-	
-	private InstantiationCost(ProjectionToTerm var) {
-		varInst = var;
-	}
+    final private ProjectionToTerm varInst;
 
-	public static Feature create(ProjectionToTerm varInst) {
-	    return new InstantiationCost(varInst);
-	}
-    
-	/**
-	 * Compute the cost of a RuleApp.
-	 */
-	public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    private InstantiationCost(ProjectionToTerm var) {
+        varInst = var;
+    }
+
+    public static Feature create(ProjectionToTerm varInst) {
+        return new InstantiationCost(varInst);
+    }
+
+    /**
+     * Compute the cost of a RuleApp.
+     */
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
 
-        final Term formula = pos.sequentFormula ().formula ();
-        final Term instance = varInst.toTerm ( app, pos, goal );
+        final Term formula = pos.sequentFormula().formula();
+        final Term instance = varInst.toTerm(app, pos, goal);
 
-        return Instantiation.computeCost ( instance, formula, goal.sequent (), 
-                goal.proof().getServices() );
-	}
+        return Instantiation.computeCost(instance, formula, goal.sequent(),
+            goal.proof().getServices());
+    }
 }

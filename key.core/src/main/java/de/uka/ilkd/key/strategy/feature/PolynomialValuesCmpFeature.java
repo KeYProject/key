@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.strategy.feature;
 
 import java.math.BigInteger;
@@ -20,11 +24,11 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
 
     private final ProjectionToTerm left, right, leftCoeff, rightCoeff;
-    
+
     protected PolynomialValuesCmpFeature(ProjectionToTerm left,
-                                         ProjectionToTerm right,
-                                         ProjectionToTerm leftCoeff,
-                                         ProjectionToTerm rightCoeff) {
+            ProjectionToTerm right,
+            ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff) {
         this.left = left;
         this.right = right;
         this.leftCoeff = leftCoeff;
@@ -32,107 +36,110 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     }
 
     public static Feature lt(ProjectionToTerm left, ProjectionToTerm right) {
-        return lt ( left, right, null, null );
+        return lt(left, right, null, null);
     }
-    
+
     public static Feature lt(ProjectionToTerm left,
-                             ProjectionToTerm right,
-                             ProjectionToTerm leftCoeff,
-                             ProjectionToTerm rightCoeff) {
-        return new PolynomialValuesCmpFeature ( left,
-                                                right,
-                                                leftCoeff,
-                                                rightCoeff ) {
+            ProjectionToTerm right,
+            ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff) {
+        return new PolynomialValuesCmpFeature(left,
+            right,
+            leftCoeff,
+            rightCoeff) {
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
-                return leftPoly.valueLess ( rightPoly );                
+                return leftPoly.valueLess(rightPoly);
             }
         };
     }
-    
+
     public static Feature leq(ProjectionToTerm left, ProjectionToTerm right) {
-        return leq ( left, right, null, null );
+        return leq(left, right, null, null);
     }
-    
+
     public static Feature leq(ProjectionToTerm left,
-                              ProjectionToTerm right,
-                              ProjectionToTerm leftCoeff,
-                              ProjectionToTerm rightCoeff) {
-        return new PolynomialValuesCmpFeature ( left,
-                                                right,
-                                                leftCoeff,
-                                                rightCoeff ) {
+            ProjectionToTerm right,
+            ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff) {
+        return new PolynomialValuesCmpFeature(left,
+            right,
+            leftCoeff,
+            rightCoeff) {
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
-                return leftPoly.valueLeq ( rightPoly );
+                return leftPoly.valueLeq(rightPoly);
             }
         };
     }
-    
+
     public static Feature eq(ProjectionToTerm left, ProjectionToTerm right) {
-        return eq ( left, right, null, null );
+        return eq(left, right, null, null);
     }
-    
+
     public static Feature eq(ProjectionToTerm left,
-                             ProjectionToTerm right,
-                             ProjectionToTerm leftCoeff,
-                             ProjectionToTerm rightCoeff) {
-        return new PolynomialValuesCmpFeature ( left,
-                                                right,
-                                                leftCoeff,
-                                                rightCoeff ) {
+            ProjectionToTerm right,
+            ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff) {
+        return new PolynomialValuesCmpFeature(left,
+            right,
+            leftCoeff,
+            rightCoeff) {
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
-                return leftPoly.valueEq ( rightPoly );
+                return leftPoly.valueEq(rightPoly);
             }
         };
     }
-    
+
     public static Feature divides(ProjectionToTerm left, ProjectionToTerm right) {
-        return divides ( left, right, null, null );
+        return divides(left, right, null, null);
     }
-    
+
     public static Feature divides(ProjectionToTerm left,
-                                  ProjectionToTerm right,
-                                  ProjectionToTerm leftCoeff,
-                                  ProjectionToTerm rightCoeff) {
-        return new PolynomialValuesCmpFeature ( left,
-                                                right,
-                                                leftCoeff,
-                                                rightCoeff ) {
+            ProjectionToTerm right,
+            ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff) {
+        return new PolynomialValuesCmpFeature(left,
+            right,
+            leftCoeff,
+            rightCoeff) {
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 // we currently only support constant polynomials
-                assert leftPoly.getParts ().isEmpty ();
-                assert rightPoly.getParts ().isEmpty ();
-                if ( leftPoly.getConstantTerm ().signum() == 0 ) return true;
-                if ( rightPoly.getConstantTerm ().signum() == 0 ) return false;
-                return
-                    leftPoly.getConstantTerm ()
-                    .mod ( rightPoly.getConstantTerm ().abs () ).signum () == 0;
+                assert leftPoly.getParts().isEmpty();
+                assert rightPoly.getParts().isEmpty();
+                if (leftPoly.getConstantTerm().signum() == 0)
+                    return true;
+                if (rightPoly.getConstantTerm().signum() == 0)
+                    return false;
+                return leftPoly.getConstantTerm()
+                        .mod(rightPoly.getConstantTerm().abs()).signum() == 0;
             }
         };
     }
-    
+
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        return compare ( getPolynomial ( left, leftCoeff, app, pos, goal ),
-                         getPolynomial ( right, rightCoeff, app, pos, goal ) );
+        return compare(getPolynomial(left, leftCoeff, app, pos, goal),
+            getPolynomial(right, rightCoeff, app, pos, goal));
     }
 
     protected abstract boolean compare(Polynomial leftPoly, Polynomial rightPoly);
-    
-    private Polynomial getPolynomial(ProjectionToTerm polyProj,
-                                     ProjectionToTerm coeffProj,
-                                     TacletApp app,
-                                     PosInOccurrence pos,
-                                     Goal goal) {
-        final Services services = goal.proof ().getServices ();
-        final Polynomial poly =
-            Polynomial.create ( polyProj.toTerm ( app, pos, goal ), services );
 
-        if (coeffProj == null) return poly;
-        final Term coeffT = coeffProj.toTerm ( app, pos, goal );
-        if ( coeffT == null ) return poly;
-        
+    private Polynomial getPolynomial(ProjectionToTerm polyProj,
+            ProjectionToTerm coeffProj,
+            TacletApp app,
+            PosInOccurrence pos,
+            Goal goal) {
+        final Services services = goal.proof().getServices();
+        final Polynomial poly =
+            Polynomial.create(polyProj.toTerm(app, pos, goal), services);
+
+        if (coeffProj == null)
+            return poly;
+        final Term coeffT = coeffProj.toTerm(app, pos, goal);
+        if (coeffT == null)
+            return poly;
+
         final BigInteger coeff =
-            new BigInteger ( AbstractTermTransformer
-                             .convertToDecimalString ( coeffT, services ) );
-        return poly.multiply ( coeff );
+            new BigInteger(AbstractTermTransformer
+                    .convertToDecimalString(coeffT, services));
+        return poly.multiply(coeff);
     }
 }

@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package org.key_project.ui.interactionlog.model;
 
-import org.key_project.ui.interactionlog.api.Interaction;
-
+import java.awt.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.awt.*;
+
+import org.key_project.ui.interactionlog.api.Interaction;
 
 /**
  * @author Alexander Weigl
@@ -21,7 +25,7 @@ public class UserNoteInteraction extends Interaction {
 
     public UserNoteInteraction() {
         graphicalStyle.setBackgroundColor(Color.red.brighter().brighter().brighter());
-        //TODO graphicalStyle.setIcon();
+        // TODO graphicalStyle.setIcon();
     }
 
     public UserNoteInteraction(String note) {
@@ -45,7 +49,7 @@ public class UserNoteInteraction extends Interaction {
     @Override
     public String getMarkdown() {
         return String.format("## Note%n" +
-                "**Date**: %s%n" +
-                "```%n%s%n```", getCreated(), getNote());
+            "**Date**: %s%n" +
+            "```%n%s%n```", getCreated(), getNote());
     }
 }

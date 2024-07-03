@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.informationflow.po;
 
 import de.uka.ilkd.key.logic.Named;
@@ -11,6 +15,7 @@ public interface InfFlowPO extends ProofOblInput {
      * proof obligation variables necessary for information flow proofs) for
      * the "leaf" (i.e., child of child of ..) information flow proof
      * obligation.
+     *
      * @return the information flow proof obligation variables.
      */
     public IFProofObligationVars getLeafIFVars();
@@ -26,5 +31,5 @@ public interface InfFlowPO extends ProofOblInput {
     public void addLabeledIFSymbol(Named n);
 
     public void unionLabeledIFSymbols(InfFlowProofSymbols symbols);
-    
+
 }

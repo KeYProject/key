@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.pp;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -25,7 +29,7 @@ public abstract class SequentPrintFilter {
      */
     ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 
-     /**
+    /**
      * the antecedent of the filtered formula
      */
     ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
@@ -44,6 +48,7 @@ public abstract class SequentPrintFilter {
 
     /**
      * sets the (original) sequent of this filter
+     *
      * @param s the sequent s is set to
      */
     public void setSequent(Sequent s) {
@@ -56,6 +61,7 @@ public abstract class SequentPrintFilter {
     /**
      * Get the formulas of the filtered antecedent and the constraints to use for
      * instantiating metavariables when printing
+     *
      * @return the filtered antecedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
@@ -65,6 +71,7 @@ public abstract class SequentPrintFilter {
     /**
      * Get the formulas of the filtered succcedent and the constraints to use for
      * instantiating metavariables when printing
+     *
      * @return the filtered succcedent
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {

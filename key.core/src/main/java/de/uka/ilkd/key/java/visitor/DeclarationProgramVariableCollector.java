@@ -1,3 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.java.visitor;
 
 
@@ -14,14 +18,14 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 
-/** 
+/**
  * The DeclarationProgramVariableCollector collects all top level
  * declared program variables relative to the given block to be
  * visited, for example starting with <code>
  *  { int j; { int i; } { int h; } for (int k; ...) {} int h; }
  * </code>
- *  the collector will return a set containg <code>j, h</code> the
- *  <code>h</code> because of the second occurrence of <code>h</code>
+ * the collector will return a set containg <code>j, h</code> the
+ * <code>h</code> because of the second occurrence of <code>h</code>
  */
 public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
@@ -29,54 +33,54 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
 
     /** creates a new declaration visitor */
-    public DeclarationProgramVariableCollector(ProgramElement root, 
-                                               Services services) {
-	super(root, services);
+    public DeclarationProgramVariableCollector(ProgramElement root,
+            Services services) {
+        super(root, services);
     }
-    
-    /** starts the walker*/
-    public void start() {	
-	walk(root());	
+
+    /** starts the walker */
+    public void start() {
+        walk(root());
     }
 
     public Set<IProgramVariable> result() {
-	return result;
-    }    
+        return result;
+    }
 
     public String toString() {
-	return result.toString();
+        return result.toString();
     }
-    
+
     /**
      * adds the given variable if we are currently at top level
      */
     protected void addVariable(IProgramVariable var) {
-	if (depth() == 1) {
-	    result.add(var);
-	}
+        if (depth() == 1) {
+            result.add(var);
+        }
     }
 
     protected void doDefaultAction(SourceElement x) {
     }
 
     public void performActionOnVariableSpecification(VariableSpecification x) {
-	addVariable(x.getProgramVariable());
+        addVariable(x.getProgramVariable());
     }
- 
+
     public void performActionOnFieldSpecification(FieldSpecification x) {
-	addVariable(x.getProgramVariable());
+        addVariable(x.getProgramVariable());
     }
 
     public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
-	addVariable(x.getProgramVariable());
+        addVariable(x.getProgramVariable());
     }
 
     public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);        
+        performActionOnProgramVariable(x);
     }
 
     public void performActionOnProgramConstant(ProgramConstant x) {
         performActionOnProgramVariable(x);
     }
-    
+
 }

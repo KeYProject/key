@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
 package de.uka.ilkd.key.logic.sort;
 
 import java.lang.ref.WeakReference;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -21,105 +25,103 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
  * the NullSort object itself has to be created; and immutability prevents us
  * from filling in this information later.
  */
-public final class NullSort implements Sort  {
-    
+public final class NullSort implements Sort {
+
     public static final Name NAME = new Name("Null");
-    
+
     private final Sort objectSort;
-    
-    private WeakReference<Services> lastServices 
-    	= new WeakReference<Services>(null);
-    private WeakReference<ImmutableSet<Sort>> extCache
-        = new WeakReference<ImmutableSet<Sort>>(null);
-    
-    
+
+    private WeakReference<Services> lastServices = new WeakReference<Services>(null);
+    private WeakReference<ImmutableSet<Sort>> extCache =
+        new WeakReference<ImmutableSet<Sort>>(null);
+
+
     public NullSort(Sort objectSort) {
-	assert objectSort != null;
-	this.objectSort = objectSort;
+        assert objectSort != null;
+        this.objectSort = objectSort;
     }
-        
-    
+
+
     @Override
     public Name name() {
-	return NAME;
+        return NAME;
     }
-    
-    
+
+
     @Override
     public ImmutableSet<Sort> extendsSorts() {
-	throw new UnsupportedOperationException(
-		  "NullSort.extendsSorts() cannot be supported");
+        throw new UnsupportedOperationException(
+            "NullSort.extendsSorts() cannot be supported");
     }
-    
-    
+
+
     @Override
     public ImmutableSet<Sort> extendsSorts(Services services) {
-	assert services != null;
-	assert objectSort == services.getJavaInfo().objectSort();
-	
-	ImmutableSet<Sort> result = extCache.get();
-	if(result == null || lastServices.get() != services) {
-	    result = DefaultImmutableSet.<Sort>nil();
+        assert services != null;
+        assert objectSort == services.getJavaInfo().objectSort();
 
-	    for(Named n : services.getNamespaces().sorts().allElements()) {
-		Sort s = (Sort)n;
-		if(s != this && s.extendsTrans(objectSort)) {
-		    result = result.add(s);
-		}
-	    }
-	    
-	    lastServices = new WeakReference<Services>(services);
-	    extCache = new WeakReference<ImmutableSet<Sort>>(result);
-	}
-	
-	return result;
+        ImmutableSet<Sort> result = extCache.get();
+        if (result == null || lastServices.get() != services) {
+            result = DefaultImmutableSet.<Sort>nil();
+
+            for (Named n : services.getNamespaces().sorts().allElements()) {
+                Sort s = (Sort) n;
+                if (s != this && s.extendsTrans(objectSort)) {
+                    result = result.add(s);
+                }
+            }
+
+            lastServices = new WeakReference<Services>(services);
+            extCache = new WeakReference<ImmutableSet<Sort>>(result);
+        }
+
+        return result;
     }
-    
-    
+
+
     @Override
     public boolean extendsTrans(Sort sort) {
-	return sort == this
-	       || sort == Sort.ANY
-	       || sort.extendsTrans(objectSort);
+        return sort == this
+                || sort == Sort.ANY
+                || sort.extendsTrans(objectSort);
     }
-    
-    
+
+
     @Override
     public boolean isAbstract() {
-	return false;
+        return false;
     }
-    
-    
+
+
     @Override
     public final SortDependingFunction getCastSymbol(TermServices services) {
-        SortDependingFunction result
-            = SortDependingFunction.getFirstInstance(CAST_NAME, services)
-        			   .getInstanceFor(this, services);
+        SortDependingFunction result = SortDependingFunction.getFirstInstance(CAST_NAME, services)
+                .getInstanceFor(this, services);
         assert result.getSortDependingOn() == this && result.sort() == this;
         return result;
     }
-    
-    
-    @Override    
+
+
+    @Override
     public final SortDependingFunction getInstanceofSymbol(TermServices services) {
-	SortDependingFunction result
-	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
-                                   .getInstanceFor(this, services);
-	assert result.getSortDependingOn() == this; 
-	return result;
-    }    
-    
-    
+        SortDependingFunction result =
+            SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
+                    .getInstanceFor(this, services);
+        assert result.getSortDependingOn() == this;
+        return result;
+    }
+
+
     @Override
     public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
-	SortDependingFunction result
-            = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
-                                   .getInstanceFor(this, services);
-	assert result.getSortDependingOn() == this;
-	return result;
+        SortDependingFunction result =
+            SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
+                    .getInstanceFor(this, services);
+        assert result.getSortDependingOn() == this;
+        return result;
     }
-    
-    
+
+
     @Override
     public final String toString() {
         return NAME.toString();

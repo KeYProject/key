@@ -1,13 +1,16 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.ModelException;
 import recoder.abstraction.Field;
 import recoder.abstraction.Variable;
 import recoder.java.Import;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Exception indicating that two static imports find fields with the same name.
@@ -33,10 +36,11 @@ public class AmbiguousStaticFieldImportException extends ModelException {
      *
      * @param importStatement1 the first import found to be ambiguous.
      * @param importStatement2 the second import found to be ambiguous.
-     * @param version1         the first possible field.
-     * @param version2         the second possible field.
+     * @param version1 the first possible field.
+     * @param version2 the second possible field.
      */
-    public AmbiguousStaticFieldImportException(Import importStatement1, Import importStatement2, Variable version1, Variable version2) {
+    public AmbiguousStaticFieldImportException(Import importStatement1, Import importStatement2,
+            Variable version1, Variable version2) {
         this.importStatement1 = importStatement1;
         this.importStatement2 = importStatement2;
         this.version1 = version1;
@@ -46,12 +50,13 @@ public class AmbiguousStaticFieldImportException extends ModelException {
     /**
      * Constructor with an explanation text.
      *
-     * @param s               an explanation.
+     * @param s an explanation.
      * @param importStatement the import found to be ambiguous.
-     * @param version1        the first possible type.
-     * @param version2        the second possible type.
+     * @param version1 the first possible type.
+     * @param version2 the second possible type.
      */
-    public AmbiguousStaticFieldImportException(String s, Import importStatement1, Import importStatement2, Field version1, Field version2) {
+    public AmbiguousStaticFieldImportException(String s, Import importStatement1,
+            Import importStatement2, Field version1, Field version2) {
         super(s);
         this.importStatement1 = importStatement1;
         this.importStatement2 = importStatement2;

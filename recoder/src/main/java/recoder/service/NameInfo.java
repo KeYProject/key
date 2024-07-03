@@ -1,11 +1,14 @@
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
-import recoder.Service;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-
 import java.util.List;
+
+import recoder.Service;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
 
 /**
  * Manages the global name mapping.
@@ -97,7 +100,7 @@ public interface NameInfo extends Service {
      * Returns the array type for the given base type with the given dimensions.
      * This method will create one if needed.
      *
-     * @param basetype   the base type to find an array type for.
+     * @param basetype the base type to find an array type for.
      * @param dimensions
      * @return the array type for the given base type.
      */
@@ -296,7 +299,7 @@ public interface NameInfo extends Service {
      *
      * @param a fully qualified field name, e.g. "System.out".
      * @return the field with that name, or <tt>null</tt> if no such field is
-     * known.
+     *         known.
      */
     Field getField(String name);
 
@@ -426,4 +429,3 @@ public interface NameInfo extends Service {
      */
     AnnotationProperty getUnknownAnnotationProperty();
 }
-

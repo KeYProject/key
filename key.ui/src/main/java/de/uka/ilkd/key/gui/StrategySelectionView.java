@@ -1,5 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 
 package de.uka.ilkd.key.gui;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -18,21 +33,11 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
 import de.uka.ilkd.key.util.Triple;
+
 import org.key_project.util.java.ObjectUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * <p>
@@ -103,14 +108,14 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * Observe changes on {@link #mediator}.
      */
     private final KeYSelectionListener mediatorListener =
-            new KeYSelectionListener() {
-                public void selectedNodeChanged(KeYSelectionEvent e) {
-                }
+        new KeYSelectionListener() {
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+            }
 
-                public void selectedProofChanged(KeYSelectionEvent e) {
-                    refresh(e.getSource().getSelectedProof());
-                }
-            };
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                refresh(e.getSource().getSelectedProof());
+            }
+        };
     private JButton btnGo;
 
     public StrategySelectionView() {
@@ -123,7 +128,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             }
         });
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
-                KeYGuiExtension.KeyboardShortcuts.STRATEGY_SELECTION_VIEW);
+            KeYGuiExtension.KeyboardShortcuts.STRATEGY_SELECTION_VIEW);
     }
 
     public StrategySelectionView(MainWindow window, KeYMediator mediator) {
@@ -142,9 +147,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         JPanel javaDLOptionsPanel = new JPanel();
 
         JScrollPane javaDLOptionsScrollPane =
-                new JScrollPane(javaDLOptionsPanel,
-                        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            new JScrollPane(javaDLOptionsPanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         javaDLOptionsPanel.setEnabled(true);
 
@@ -210,8 +215,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
         if (DEFINITION.isShowMaxRuleApplications()) {
             MaxRuleAppSlider maxSlider =
-                    new MaxRuleAppSlider(mediator,
-                            DEFINITION.getMaxRuleApplicationsLabel());
+                new MaxRuleAppSlider(mediator,
+                    DEFINITION.getMaxRuleApplicationsLabel());
             components.setMaxRuleAppSlider(maxSlider);
             maxSlider.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
@@ -242,9 +247,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             for (AbstractStrategyPropertyDefinition definition : DEFINITION
                     .getProperties()) {
                 yCoord =
-                        createStrategyProperty(components, FACTORY,
-                                javaDLOptionsPanel, javaDLOptionsLayout,
-                                yCoord, true, definition);
+                    createStrategyProperty(components, FACTORY,
+                        javaDLOptionsPanel, javaDLOptionsLayout,
+                        yCoord, true, definition);
             }
 
             fixVerticalSpace(javaDLOptionsScrollPane);
@@ -256,14 +261,14 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     protected int createStrategyProperty(StrategySelectionComponents data,
-                                         StrategyFactory factory, JPanel javaDLOptionsPanel,
-                                         GridBagLayout javaDLOptionsLayout, int yCoord, boolean topLevel,
-                                         AbstractStrategyPropertyDefinition definition) {
+            StrategyFactory factory, JPanel javaDLOptionsPanel,
+            GridBagLayout javaDLOptionsLayout, int yCoord, boolean topLevel,
+            AbstractStrategyPropertyDefinition definition) {
 
         // Individual options
         if (definition instanceof OneOfStrategyPropertyDefinition) {
             OneOfStrategyPropertyDefinition oneOfDefinition =
-                    (OneOfStrategyPropertyDefinition) definition;
+                (OneOfStrategyPropertyDefinition) definition;
             ButtonGroup buttonGroup = new ButtonGroup();
             if (!oneOfDefinition.getValues().isEmpty()) {
                 data.addPropertyGroup(oneOfDefinition.getApiKey(), buttonGroup);
@@ -274,7 +279,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             label.setToolTipText(oneOfDefinition.getTooltip());
             if (topLevel) {
                 addJavaDLOption(javaDLOptionsPanel, label, javaDLOptionsLayout,
-                        1, yCoord, 7);
+                    1, yCoord, 7);
 
                 ++yCoord;
 
@@ -284,23 +289,23 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                         .getValues()) {
                     gridx += 2;
                     JRadioButton radioButton =
-                            newButton(valueDefinition.getValue(),
-                                    oneOfDefinition.getApiKey(),
-                                    valueDefinition.getApiValue(), true, false,
-                                    factory);
+                        newButton(valueDefinition.getValue(),
+                            oneOfDefinition.getApiKey(),
+                            valueDefinition.getApiValue(), true, false,
+                            factory);
                     data.addPropertyButton(radioButton,
-                            oneOfDefinition.getApiKey());
+                        oneOfDefinition.getApiKey());
                     radioButton.setToolTipText(valueDefinition.getTooltip());
                     buttonGroup.add(radioButton);
                     addJavaDLOption(
-                            javaDLOptionsPanel,
-                            radioButton,
-                            javaDLOptionsLayout,
-                            valueDefinition.getSwingGridx() >= 0 ? valueDefinition
-                                    .getSwingGridx() : gridx,
-                            yCoord,
-                            valueDefinition.getSwingWidth() >= 0 ? valueDefinition
-                                    .getSwingWidth() : 2);
+                        javaDLOptionsPanel,
+                        radioButton,
+                        javaDLOptionsLayout,
+                        valueDefinition.getSwingGridx() >= 0 ? valueDefinition
+                                .getSwingGridx() : gridx,
+                        yCoord,
+                        valueDefinition.getSwingWidth() >= 0 ? valueDefinition
+                                .getSwingWidth() : 2);
                     column++;
                     if (oneOfDefinition.getColumnsPerRow() >= 0
                             && column % oneOfDefinition.getColumnsPerRow() == 0) {
@@ -311,7 +316,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             } else {
                 if (oneOfDefinition.getValues().get(0).getSwingGridx() >= 0) {
                     addJavaDLOption(javaDLOptionsPanel, label,
-                            javaDLOptionsLayout, 2, yCoord, 1);
+                        javaDLOptionsLayout, 2, yCoord, 1);
 
                     int gridx = 0;
                     int column = 0;
@@ -319,24 +324,24 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                             .getValues()) {
                         gridx += 2;
                         JRadioButton radioButton =
-                                newButton(valueDefinition.getValue(),
-                                        oneOfDefinition.getApiKey(),
-                                        valueDefinition.getApiValue(), true,
-                                        false, factory);
+                            newButton(valueDefinition.getValue(),
+                                oneOfDefinition.getApiKey(),
+                                valueDefinition.getApiValue(), true,
+                                false, factory);
                         data.addPropertyButton(radioButton,
-                                oneOfDefinition.getApiKey());
+                            oneOfDefinition.getApiKey());
                         radioButton
                                 .setToolTipText(valueDefinition.getTooltip());
                         buttonGroup.add(radioButton);
                         addJavaDLOption(
-                                javaDLOptionsPanel,
-                                radioButton,
-                                javaDLOptionsLayout,
-                                valueDefinition.getSwingGridx() >= 0 ? valueDefinition
-                                        .getSwingGridx() : gridx,
-                                yCoord,
-                                valueDefinition.getSwingWidth() >= 0 ? valueDefinition
-                                        .getSwingWidth() : 2);
+                            javaDLOptionsPanel,
+                            radioButton,
+                            javaDLOptionsLayout,
+                            valueDefinition.getSwingGridx() >= 0 ? valueDefinition
+                                    .getSwingGridx() : gridx,
+                            yCoord,
+                            valueDefinition.getSwingWidth() >= 0 ? valueDefinition
+                                    .getSwingWidth() : 2);
                         column++;
                         if (oneOfDefinition.getColumnsPerRow() >= 0
                                 && column % oneOfDefinition.getColumnsPerRow() == 0) {
@@ -350,12 +355,12 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                     for (StrategyPropertyValueDefinition valueDefinition : oneOfDefinition
                             .getValues()) {
                         JRadioButton radioButton =
-                                newButton(valueDefinition.getValue(),
-                                        oneOfDefinition.getApiKey(),
-                                        valueDefinition.getApiValue(), true,
-                                        false, factory);
+                            newButton(valueDefinition.getValue(),
+                                oneOfDefinition.getApiKey(),
+                                valueDefinition.getApiValue(), true,
+                                false, factory);
                         data.addPropertyButton(radioButton,
-                                oneOfDefinition.getApiKey());
+                            oneOfDefinition.getApiKey());
                         radioButton
                                 .setToolTipText(valueDefinition.getTooltip());
                         buttonGroup.add(radioButton);
@@ -363,31 +368,31 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                     }
 
                     addJavaDLOption(javaDLOptionsPanel, queryAxiomPanel,
-                            javaDLOptionsLayout, 2, yCoord, 7);
+                        javaDLOptionsLayout, 2, yCoord, 7);
                 }
             }
 
             ++yCoord;
 
             addJavaDLOptionSpace(javaDLOptionsPanel, javaDLOptionsLayout,
-                    yCoord);
+                yCoord);
         } else {
             throw new RuntimeException("Unsupported property definition \""
-                    + definition + "\".");
+                + definition + "\".");
         }
         // Create sub properties
         for (AbstractStrategyPropertyDefinition subProperty : definition
                 .getSubProperties()) {
             yCoord =
-                    createStrategyProperty(data, factory, javaDLOptionsPanel,
-                            javaDLOptionsLayout, yCoord, false, subProperty);
+                createStrategyProperty(data, factory, javaDLOptionsPanel,
+                    javaDLOptionsLayout, yCoord, false, subProperty);
         }
         return yCoord;
     }
 
     private JRadioButton newButton(String text, final String key,
-                                   final String command, boolean selected, boolean enabled,
-                                   final StrategyFactory factory) {
+            final String command, boolean selected, boolean enabled,
+            final StrategyFactory factory) {
         JRadioButton result = new JRadioButton(text);
         result.addActionListener(new ActionListener() {
             @Override
@@ -395,7 +400,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 predefChanged = true;
                 StrategyProperties props = getProperties();
                 updateStrategySettings(mediator.getSelectedProof()
-                        .getActiveStrategy().name().toString(), props);
+                        .getActiveStrategy().name().toString(),
+                    props);
             }
         });
         result.setEnabled(enabled);
@@ -404,7 +410,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     private void addJavaDLOptionSpace(JPanel javaDLOptionsPanel,
-                                      GridBagLayout javaDLOptionsLayout, int yCoord) {
+            GridBagLayout javaDLOptionsLayout, int yCoord) {
         final GridBagConstraints con = new GridBagConstraints();
         con.gridx = 0;
         con.gridy = yCoord;
@@ -418,15 +424,15 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         javaDLOptionsLayout.setConstraints(sep, con);
         javaDLOptionsPanel.add(sep);
         addJavaDLOption(javaDLOptionsPanel,
-                Box.createRigidArea(new Dimension(4, 4)), javaDLOptionsLayout,
-                0, yCoord, 1);
+            Box.createRigidArea(new Dimension(4, 4)), javaDLOptionsLayout,
+            0, yCoord, 1);
         addJavaDLOption(javaDLOptionsPanel,
-                Box.createRigidArea(new Dimension(4, 4)), javaDLOptionsLayout,
-                1, yCoord, 1);
+            Box.createRigidArea(new Dimension(4, 4)), javaDLOptionsLayout,
+            1, yCoord, 1);
     }
 
     private void addJavaDLOption(JPanel javaDLOptionsPanel, Component widget,
-                                 GridBagLayout javaDLOptionsLayout, int gridx, int gridy, int width) {
+            GridBagLayout javaDLOptionsLayout, int gridx, int gridy, int width) {
         final GridBagConstraints con = new GridBagConstraints();
         con.gridx = gridx;
         con.gridy = gridy;
@@ -452,7 +458,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         components.setDefaultButton(defaultButton);
 
         final String[] existingPredefs =
-                new String[1 + DEFINITION.getFurtherDefaults().size()];
+            new String[1 + DEFINITION.getFurtherDefaults().size()];
 
         existingPredefs[0] = "Defaults";
 
@@ -464,7 +470,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         }
 
         final JComboBox<String> strategyPredefSettingsCmb =
-                new JComboBox<String>(existingPredefs);
+            new JComboBox<String>(existingPredefs);
         strategyPredefSettingsCmb.setSelectedIndex(0);
         components.setPredefsChoiceCmb(strategyPredefSettingsCmb);
 
@@ -474,19 +480,19 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 StrategyProperties newProps = null;
 
                 final int selIndex =
-                        strategyPredefSettingsCmb.getSelectedIndex();
+                    strategyPredefSettingsCmb.getSelectedIndex();
                 if (selIndex == 0) {
                     newMaxSteps = DEFINITION.getDefaultMaxRuleApplications();
                     newProps =
-                            DEFINITION.getDefaultPropertiesFactory()
-                                    .createDefaultStrategyProperties();
+                        DEFINITION.getDefaultPropertiesFactory()
+                                .createDefaultStrategyProperties();
                 } else {
                     Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
-                            DEFINITION.getFurtherDefaults().get(selIndex - 1);
+                        DEFINITION.getFurtherDefaults().get(selIndex - 1);
                     newMaxSteps = chosenDefault.second;
                     newProps =
-                            chosenDefault.third
-                                    .createDefaultStrategyProperties();
+                        chosenDefault.third
+                                .createDefaultStrategyProperties();
                 }
 
                 mediator.getSelectedProof().getSettings().getStrategySettings()
@@ -536,14 +542,14 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 components.getMaxRuleAppSlider().refresh();
             }
             StrategyProperties sp =
-                    proof.getSettings().getStrategySettings()
-                            .getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings()
+                        .getActiveStrategyProperties();
             for (Entry<String, List<JRadioButton>> entry : components
                     .getPropertyButtons().entrySet()) {
                 String value = sp.getProperty(entry.getKey());
                 for (JRadioButton button : entry.getValue()) {
                     button.setSelected(ObjectUtil.equals(
-                            button.getActionCommand(), value));
+                        button.getActionCommand(), value));
                 }
             }
             enableAll(true);
@@ -565,7 +571,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * enables or disables all components
      *
      * @param enable boolean saying whether to activate or deactivate the
-     *               components
+     *        components
      */
     private void enableAll(boolean enable) {
         if (components.getMaxRuleAppSlider() != null) {
@@ -582,10 +588,10 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     public Strategy getStrategy(String strategyName, Proof proof,
-                                StrategyProperties properties) {
+            StrategyProperties properties) {
         if (mediator != null) {
             Iterator<StrategyFactory> supportedStrategies =
-                    mediator.getProfile().supportedStrategies().iterator();
+                mediator.getProfile().supportedStrategies().iterator();
             while (supportedStrategies.hasNext()) {
                 final StrategyFactory s = supportedStrategies.next();
                 if (strategyName.equals(s.name().toString())) {
@@ -593,12 +599,13 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 }
             }
             LOGGER.info("Selected Strategy '{}' not found falling back to {}",
-                    strategyName, mediator.getProfile().getDefaultStrategyFactory().name());
+                strategyName, mediator.getProfile().getDefaultStrategyFactory().name());
         }
         return mediator != null ? mediator.getProfile()
-                .getDefaultStrategyFactory().create(proof, properties) : proof
-                .getServices().getProfile().getDefaultStrategyFactory()
-                .create(proof, properties);
+                .getDefaultStrategyFactory().create(proof, properties)
+                : proof
+                        .getServices().getProfile().getDefaultStrategyFactory()
+                        .create(proof, properties);
     }
 
     /**
@@ -614,10 +621,10 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 p.setProperty(entry.getKey(), selected.getActionCommand());
             } else {
                 p.setProperty(
-                        entry.getKey(),
-                        DEFINITION.getDefaultPropertiesFactory()
-                                .createDefaultStrategyProperties()
-                                .getProperty(entry.getKey()));
+                    entry.getKey(),
+                    DEFINITION.getDefaultPropertiesFactory()
+                            .createDefaultStrategyProperties()
+                            .getProperty(entry.getKey()));
             }
         }
 
@@ -625,12 +632,12 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     private void updateStrategySettings(String strategyName,
-                                        StrategyProperties p) {
+            StrategyProperties p) {
         final Proof proof = mediator.getSelectedProof();
         final Strategy strategy = getStrategy(strategyName, proof, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(
-                strategy.name());
+            strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
                 .setActiveStrategyProperties(p);
 
@@ -672,12 +679,12 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * values.
          */
         private final Map<String, List<JRadioButton>> propertyButtons =
-                new HashMap<String, List<JRadioButton>>();
+            new HashMap<String, List<JRadioButton>>();
         /**
          * Maps a property to the used {@link ButtonGroup}.
          */
         private final Map<String, ButtonGroup> propertyGroups =
-                new HashMap<String, ButtonGroup>();
+            new HashMap<String, ButtonGroup>();
         /**
          * The {@link MaxRuleAppSlider} in which the maximal number of steps is
          * edited.
@@ -698,7 +705,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * steps is edited.
          *
          * @return The {@link MaxRuleAppSlider} in which the maximal number of
-         * steps is edited.
+         *         steps is edited.
          */
         public MaxRuleAppSlider getMaxRuleAppSlider() {
             return maxRuleAppSlider;
@@ -709,7 +716,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * steps is edited.
          *
          * @param maxRuleAppSlider The {@link MaxRuleAppSlider} in which the maximal number
-         *                         of steps is edited.
+         *        of steps is edited.
          */
         public void setMaxRuleAppSlider(MaxRuleAppSlider maxRuleAppSlider) {
             this.maxRuleAppSlider = maxRuleAppSlider;
@@ -719,7 +726,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * Registers the given {@link JRadioButton} for the given key.
          *
          * @param button The {@link JRadioButton}.
-         * @param key    The key.
+         * @param key The key.
          */
         public void addPropertyButton(JRadioButton button, String key) {
             List<JRadioButton> buttons = propertyButtons.get(key);
@@ -735,7 +742,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * which defines the values.
          *
          * @return The mapping of property keys to the {@link JRadioButton}s
-         * which defines the values.
+         *         which defines the values.
          */
         public Map<String, List<JRadioButton>> getPropertyButtons() {
             return propertyButtons;
@@ -769,7 +776,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * Sets the {@link JComboBox} for choosing a predefined value set.
          *
-         * @param strategyPredefSettingsCmb The {@link JComboBox} for choosing a predefined value set.
+         * @param strategyPredefSettingsCmb The {@link JComboBox} for choosing a predefined value
+         *        set.
          */
         public void setPredefsChoiceCmb(
                 JComboBox<String> strategyPredefSettingsCmb) {
@@ -789,7 +797,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * Adds the property group.
          *
          * @param property The property.
-         * @param group    The {@link ButtonGroup}.
+         * @param group The {@link ButtonGroup}.
          */
         public void addPropertyGroup(String property, ButtonGroup group) {
             propertyGroups.put(property, group);
