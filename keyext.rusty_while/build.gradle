@@ -23,5 +23,5 @@ test {
 }
 
 generateGrammarSource {
-    arguments += ["-visitor"]
+    arguments += ["-visitor", "-lib" , "../key.ncore/src/main/antlr/"]
 }
