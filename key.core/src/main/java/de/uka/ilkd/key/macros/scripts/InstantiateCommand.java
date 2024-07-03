@@ -274,7 +274,7 @@ public class InstantiateCommand
         @Option(value = "#2", required = false)
         public String hide = "";
 
-        @Option(value = "with", required = false)
+        @Option(value = "with")
         public Term with;
     }
 

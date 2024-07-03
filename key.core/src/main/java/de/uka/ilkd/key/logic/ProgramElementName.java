@@ -152,8 +152,8 @@ public class ProgramElementName extends Name
      *
      * @return the relative position of the primary token.
      */
-    public Position getRelativePosition() {
-        return Position.UNDEFINED;
+    public recoder.java.SourceElement.Position getRelativePosition() {
+        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
 

@@ -8,17 +8,15 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -129,6 +127,7 @@ public final class JmlAssertRule implements BuiltInRule {
         final Term self = MiscTools.getSelfTerm(frame, services);
 
         final Term condition = jmlAssert.getCond(self, services);
+        final String label = jmlAssert.getOptLabel();
 
         final ImmutableList<Goal> result;
         if (kind == Kind.ASSERT) {
@@ -140,7 +139,7 @@ public final class JmlAssertRule implements BuiltInRule {
             throw new RuleAbortException(
                 String.format("Unknown assertion type %s", jmlAssert.getKind()));
         }
-        setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
+        setUpUsageGoal(result.head(), label, occurrence, update, target, condition, tb, services);
 
         return result;
     }
@@ -151,7 +150,7 @@ public final class JmlAssertRule implements BuiltInRule {
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence, Term update, Term target,
+    private void setUpUsageGoal(Goal goal, String label, PosInOccurrence occurrence, Term update, Term target,
                                 Term condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
@@ -159,6 +158,13 @@ public final class JmlAssertRule implements BuiltInRule {
             tb.imp(condition, tb.prog((Modality) target.op(), javaBlock, target.sub(0), null)));
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
+        if (label != null) {
+            NoFindTacletBuilder bld = new NoFindTacletBuilder();
+            Semisequent ante = new Semisequent(new SequentFormula(tb.apply(update, condition)));
+            bld.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(Sequent.createAnteSequent(ante), ImmutableList.of(), Sequent.EMPTY_SEQUENT));
+            bld.setName(new Name("recall_" + label));
+            goal.addTaclet(bld.getNoFindTaclet(), SVInstantiations.EMPTY_SVINSTANTIATIONS, false);
+        }
     }
 
     @Override

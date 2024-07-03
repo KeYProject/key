@@ -9,6 +9,11 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
+/**
+ * <scriptDoc command="let">
+ * This command allows you to assign a term to an abbreviation variable.
+ * </scriptDoc>
+ */
 public class LetCommand extends AbstractCommand<Map<String, String>> {
 
     public LetCommand() {

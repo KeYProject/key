@@ -18,7 +18,7 @@ dependencies {
     api 'com.miglayout:miglayout-swing:11.0'
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.2.10'
+    implementation 'ch.qos.logback:logback-classic:1.4.8'
 
     api 'org.dockingframes:docking-frames-common:1.1.3p1'
     api 'org.dockingframes:docking-frames-core:1.1.3p1'
@@ -27,6 +27,20 @@ dependencies {
 
     runtimeOnly project(":keyext.interactionlog")
     runtimeOnly project(":keyext.exploration")
+    runtimeOnly project(":keyext.cacheproofs")
+    runtimeOnly project(":keyext.slicing")
+
+
+    runtimeOnly "io.github.wadoon:key-interactionlog:0.9-SNAPSHOT"
+}
+
+repositories {
+    maven {
+        mavenContent {
+            snapshotsOnly()
+        }
+        url("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    }
 }
 
 task createExamplesZip(type: Zip) {
@@ -57,7 +71,7 @@ run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     systemProperties["key.contractOrder"] = "$projectDir/contract-order.txt"
     //systemProperties["KeyDebugFlag"] = "on"
-    //args "--experimental"
+    args "--experimental"
 
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)

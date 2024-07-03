@@ -438,9 +438,10 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
-            TextualJMLAssertStatement.Kind.ASSERT,
-            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSERT));
+        TextualJMLAssertStatement b =
+            new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
+                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSERT),
+                ctx.assertionProof(), ctx.label == null ? null : ctx.label.getText());
         constructs = constructs.append(b);
         return null;
     }

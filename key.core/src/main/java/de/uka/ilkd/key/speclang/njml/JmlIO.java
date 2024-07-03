@@ -259,6 +259,23 @@ public class JmlIO {
     }
 
     /**
+     * Interpret the given parse tree as a boolean JML expression in the current context. This is
+     * for cases where {@link #translateTerm(LabeledParserRuleContext)} would in some cases give a
+     * Term of sort formula and in some cases of sort boolean. Label is attached.
+     *
+     * @param condition a parse tree of a boolean JML expression
+     * @return a formula of the given parse tree
+     * @see #translateTerm(LabeledParserRuleContext)
+     */
+    public Term translateTermAsFormula(final LabeledParserRuleContext condition) {
+        Term term = services.getTermBuilder().convertToFormula(translateTerm(condition.first));
+        if (condition.second != null) {
+            return services.getTermBuilder().addLabel(term, condition.second);
+        }
+        return term;
+    }
+
+    /**
      * Parses and interpret the given input as an JML expression in the current context.
      */
     public Term parseExpression(String input) {

@@ -5,12 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -108,29 +103,29 @@ public class RewriteTaclet extends FindTaclet {
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs,
-            Term find,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            int p_applicationRestriction,
-            ImmutableSet<Choice> choices,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                         ImmutableList<TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
+                         TacletAttributes attrs,
+                         Term find,
+                         ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                         int p_applicationRestriction,
+                         ChoiceExpr choices,
+                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
             p_applicationRestriction, choices, false,
             tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs,
-            Term find,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            int p_applicationRestriction,
-            ImmutableSet<Choice> choices,
-            boolean surviveSymbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                         ImmutableList<TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
+                         TacletAttributes attrs,
+                         Term find,
+                         ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                         int p_applicationRestriction,
+                         ChoiceExpr choices,
+                         boolean surviveSymbExec,
+                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs,
             find, prefixMap, choices, surviveSymbExec, tacletAnnotations);
         applicationRestriction = p_applicationRestriction;

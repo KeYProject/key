@@ -250,8 +250,17 @@ public abstract class SequentView extends JEditorPane {
 
     @Override
     protected void finalize() {
+        dispose();
+    }
+
+    /**
+     * Dispose this SequentView.
+     * Before calling this method, the view should be removed from the UI.
+     */
+    public void dispose() {
         try {
             unregisterListener();
+            printer = null;
         } catch (Throwable e) {
             mainWindow.notify(new GeneralFailureEvent(e.getMessage()));
         } finally {
@@ -967,12 +976,32 @@ public abstract class SequentView extends JEditorPane {
 
     public abstract void printSequent();
 
+    /*
+    protected void updateSequent(Node node) {
+        var start = System.nanoTime();
+        getLogicPrinter().update(getFilter(), getLineWidth());
+        String printed = getLogicPrinter().result();
+        boolean html =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseSyntaxHighlighting();
+        var args = new HTMLSyntaxHighlighter.Args(node, printed, html);
+        var print = System.nanoTime();
+        String highlighted = mainWindow.getHighlightCache().get(args);
+        var highlight = System.nanoTime();
+        setTextCache.get(highlighted);
+        var setText = System.nanoTime();
+        LOGGER.trace("updateSequent " + (node != null ? node.serialNr() : -1) + ": print "
+            + (print - start) / 1e6
+            + "ms, highlight " + (highlight - print) / 1e6 + "ms, setText "
+            + (setText - highlight) / 1e6 + "ms");
+    }*/
+
     public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
         this.filter = sequentPrintFilter;
-        Node selectedNode = getMainWindow().getMediator().getSelectedNode();
-        if (selectedNode != null) {
+        Sequent selectedSequent =
+            getMainWindow().getMediator().getSelectionModel().getSelectedSequent();
+        if (selectedSequent != null) {
             // bugfix #1458 (gitlab). The selected node may be null if no proof.
-            this.filter.setSequent(selectedNode.sequent());
+            this.filter.setSequent(selectedSequent);
         }
         if (forceUpdate) {
             printSequent();

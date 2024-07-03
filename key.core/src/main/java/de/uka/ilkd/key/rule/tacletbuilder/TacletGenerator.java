@@ -19,17 +19,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -216,14 +206,14 @@ public class TacletGenerator {
                 findTerm);
 
         // choices, rule set
-        Choice choice =
-            new Choice(satisfiabilityGuard ? "showSatisfiability" : "treatAsAxiom", "modelFields");
+        var choice = ChoiceExpr.variable("modelFields",
+            satisfiabilityGuard ? "showSatisfiability" : "treatAsAxiom");
         final RuleSet ruleSet = new RuleSet(new Name(
             satisfiabilityGuard ? "inReachableStateImplication" : "classAxiom"));
 
         // create taclet
         tacletBuilder.setName(tacletName);
-        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(choice));
+        tacletBuilder.setChoices(choice);
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, selfSV);
@@ -386,9 +376,9 @@ public class TacletGenerator {
                 tacletBuilder.addVarsNotFreeIn(boundSV, paramSV);
             }
         }
-        Choice c = new Choice(satisfiability ? "showSatisfiability" : "treatAsAxiom",
-            "modelFields");
-        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(c));
+        var c = ChoiceExpr.variable("modelFields", satisfiability ? "showSatisfiability"
+            : "treatAsAxiom");
+        tacletBuilder.setChoices(c);
 
         if (satisfiability)
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs,

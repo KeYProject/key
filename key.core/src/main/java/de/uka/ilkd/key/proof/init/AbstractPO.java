@@ -5,10 +5,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -160,20 +157,6 @@ public abstract class AbstractPO implements IPersistablePO {
     protected void collectClassAxioms(KeYJavaType selfKJT, InitConfig proofConfig) {
         registerClassAxiomTaclets(selfKJT, proofConfig);
     }
-
-    /**
-     * Check whether a taclet conforms with the currently active choices.
-     * I.e., whether the taclet's given choices is a subset of <code>choices</code>.
-     */
-    private boolean choicesApply(Taclet taclet, ImmutableSet<Choice> choices) {
-        for (Choice tacletChoices : taclet.getChoices()) {
-            if (!choices.contains(tacletChoices)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
     private void register(Taclet t, InitConfig proofConfig) {
         assert t != null;
@@ -362,6 +345,7 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     private void registerClassAxiomTaclets(KeYJavaType selfKJT, InitConfig proofConfig) {
         final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
+        var choices = Collections.unmodifiableSet(proofConfig.getActivatedChoices().toSet());
         for (ClassAxiom axiom : axioms) {
             final Vertex node = getVertexFor(axiom.getKJT().getSort(), axiom.getTarget(), axiom);
             if (node.index == -1) {
@@ -375,7 +359,7 @@ public abstract class AbstractPO implements IPersistablePO {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
                     + axiom.getName();
                 // only include if choices are appropriate
-                if (choicesApply(axiomTaclet, proofConfig.getActivatedChoices())) {
+                if (axiomTaclet.getChoices().eval(choices)) {
                     register(axiomTaclet, proofConfig);
                 }
             }

@@ -4,6 +4,8 @@
 
 package de.uka.ilkd.key.java;
 
+import recoder.java.SourceElement;
+
 import java.net.URI;
 import java.nio.file.Paths;
 
@@ -23,7 +25,7 @@ public class PositionInfo {
     /**
      * TODO: What is the purpose of this? To which position is this one relative?
      */
-    private final Position relPos;
+    private final SourceElement.Position relPos;
 
     /** The start position. */
     private final Position startPos;
@@ -44,7 +46,7 @@ public class PositionInfo {
     private URI parentClassURI;
 
     private PositionInfo() {
-        this.relPos = Position.UNDEFINED;
+        this.relPos = SourceElement.Position.UNDEFINED;
         this.startPos = Position.UNDEFINED;
         this.endPos = Position.UNDEFINED;
         fileURI = UNKNOWN_URI;
@@ -57,7 +59,7 @@ public class PositionInfo {
      * @param startPos the start position
      * @param endPos the end position
      */
-    public PositionInfo(Position relPos, Position startPos, Position endPos) {
+    public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos) {
         this.relPos = relPos;
         this.startPos = startPos;
         this.endPos = endPos;
@@ -72,7 +74,7 @@ public class PositionInfo {
      * @param endPos the end position
      * @param fileURI the resource the PositionInfo refers to
      */
-    public PositionInfo(Position relPos, Position startPos, Position endPos, URI fileURI) {
+    public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos, URI fileURI) {
         this.relPos = relPos;
         this.startPos = startPos;
         this.endPos = endPos;
@@ -132,7 +134,7 @@ public class PositionInfo {
         return fileURI;
     }
 
-    public Position getRelativePosition() {
+    public SourceElement.Position getRelativePosition() {
         return relPos;
     }
 
@@ -185,7 +187,7 @@ public class PositionInfo {
             end = p2.endPos;
         }
         // TODO: join relative position as well
-        return new PositionInfo(Position.UNDEFINED, start, end, p1.getURI());
+        return new PositionInfo(SourceElement.Position.UNDEFINED, start, end, p1.getURI());
     }
 
     /**

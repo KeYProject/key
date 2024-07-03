@@ -11,7 +11,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * A special kind of gui proof tree node to show intermediate intermediate steps of the
+ * A special kind of gui proof tree node to show intermediate steps of the
  * {@link de.uka.ilkd.key.rule.OneStepSimplifier}.
  *
  * These nodes are leaves.
@@ -19,13 +19,15 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     private final RuleApp app;
+    private final int formulaNr;
     private final GUIAbstractTreeNode parent;
 
     public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent,
-            RuleApp app) {
+            RuleApp app, int formulaNr) {
         super(tree, parent.getNode());
         this.parent = parent;
         this.app = app;
+        this.formulaNr = formulaNr;
     }
 
     @Override
@@ -56,6 +58,14 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     public String appliedOn() {
         Services services = parent.getNode().proof().getServices();
         return LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
+    }
+
+    public RuleApp getRuleApp() {
+        return app;
+    }
+
+    public int getFormulaNr() {
+        return formulaNr;
     }
 
     @Override

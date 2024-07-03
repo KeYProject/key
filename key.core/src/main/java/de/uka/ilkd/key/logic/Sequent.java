@@ -200,6 +200,27 @@ public class Sequent implements Iterable<SequentFormula> {
             composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
+    /**
+     * Replace a formula at the specified index.
+     *
+     * @param formulaNr where to replace the formula
+     * @param replacement the new sequent formula
+     * @return a SequentChangeInfo which contains the new sequent and information which formulas
+     *         have been added or removed
+     */
+    public SequentChangeInfo replaceFormula(int formulaNr, SequentFormula replacement) {
+        formulaNr--;
+        boolean inAntec = formulaNr < antecedent.size();
+
+        Semisequent seq = inAntec ? antecedent : succedent;
+        int idx = inAntec ? formulaNr : formulaNr - antecedent.size();
+
+        final SemisequentChangeInfo semiCI = seq.replace(idx, replacement);
+
+        return SequentChangeInfo.createSequentChangeInfo(inAntec, semiCI,
+            composeSequent(inAntec, semiCI.semisequent()), this);
+    }
+
     /** returns semisequent of the antecedent to work with */
     public Semisequent antecedent() {
         return antecedent;
@@ -321,6 +342,26 @@ public class Sequent implements Iterable<SequentFormula> {
             "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
     }
 
+    /**
+     * Computes the position of the given {@link PosInOccurrence} on the proof sequent.
+     *
+     * @param pio the position
+     * @return an integer strictly greater than zero for the position of the given sequent formula
+     *         on the proof sequent.
+     */
+    public int formulaNumberInSequent(PosInOccurrence pio) {
+        var inAntec = pio.isInAntec();
+        var formula = pio.sequentFormula();
+        return formulaNumberInSequent(inAntec, formula);
+    }
+
+    /**
+     * Get a sequent formula by its position in the sequent.
+     * The first formula has number 1.
+     *
+     * @param formulaNumber formula number
+     * @return the sequent formula at that position
+     */
     public SequentFormula getFormulabyNr(int formulaNumber) {
         if (formulaNumber <= 0 || formulaNumber > size()) {
             throw new RuntimeException("No formula nr. " + formulaNumber + " in seq. " + this);

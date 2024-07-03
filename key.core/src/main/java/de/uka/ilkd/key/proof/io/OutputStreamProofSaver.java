@@ -521,12 +521,18 @@ public class OutputStreamProofSaver {
                 .getJustifInfo()
                 .getJustification(appliedRuleApp, proof.getServices());
 
-        assert ruleJusti instanceof RuleJustificationBySpec
-                : "Please consult bug #1111 if this fails.";
+        String name;
+        if(ruleJusti instanceof RuleJustificationBySpec) {
+            final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
+            name = ruleJustiBySpec.getSpec().getName();
+        } else {
+            LOGGER.error("Unexpexted rule justification type " + ruleJusti.getClass() +
+                    ". Please consult bug MT-1111 #806 if this fails.");
+            name = ">> this proof cannot be loaded. see issue #806 <<";
+        }
 
-        final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
-        output.append(ruleJustiBySpec.getSpec().getName());
+        output.append(name);
         output.append("\")");
     }
 

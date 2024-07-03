@@ -14,8 +14,10 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.TermReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.ExtList;
@@ -31,6 +33,12 @@ public class JmlAssert extends JavaStatement {
      * the kind of the statement, assert or assume
      */
     private final TextualJMLAssertStatement.Kind kind;
+
+    /*
+     * Temporary until jml labels are there ...
+     */
+    private final String optLabel;
+
     /**
      * the condition in parse tree form
      */
@@ -43,23 +51,27 @@ public class JmlAssert extends JavaStatement {
      * the program variables used to create the Term form of the condition
      */
     private ProgramVariableCollection vars;
+    private final AssertionProofContext assertionProof;
     /**
      * services (needed for pretty printing)
      */
     private final Services services;
 
     /**
-     *
      * @param kind assert or assume
      * @param condition the condition of this statement
+     * @param assertionProof the optional proof attached to the assertion
      * @param positionInfo the position information for this statement
      * @param services needed for pretty printing (not pretty when null)
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition,
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, String label,
+                     LabeledParserRuleContext condition, AssertionProofContext assertionProof,
                      PositionInfo positionInfo, Services services) {
         super(positionInfo);
         this.kind = kind;
+        this.optLabel = label;
         this.condition = condition;
+        this.assertionProof = assertionProof;
         this.services = services;
     }
 
@@ -71,7 +83,9 @@ public class JmlAssert extends JavaStatement {
     public JmlAssert(ExtList children, Services services) {
         super(children);
         this.kind = children.get(TextualJMLAssertStatement.Kind.class);
+        this.optLabel = children.get(String.class);
         this.condition = children.get(LabeledParserRuleContext.class);
+        this.assertionProof = children.get(AssertionProofContext.class);
         this.cond = children.get(Term.class);
         this.vars = children.get(ProgramVariableCollection.class);
         this.services = services;
@@ -172,6 +186,10 @@ public class JmlAssert extends JavaStatement {
         return Objects.hash(super.computeHashCode(), kind, condition, cond);
     }
 
+    public AssertionProofContext getAssertionProof() {
+        return assertionProof;
+    }
+
     @Override
     public int getChildCount() {
         return 0;
@@ -206,5 +224,9 @@ public class JmlAssert extends JavaStatement {
         cond = replacer.replace(cond);
         vars.atPres = atPres;
 
+    }
+
+    public String getOptLabel() {
+        return optLabel;
     }
 }

@@ -4,6 +4,8 @@
 
 package de.uka.ilkd.key.java;
 
+import recoder.java.SourceElement;
+
 /**
  * The position of a source element, given by its line and column
  * number.
@@ -44,10 +46,40 @@ public class Position {
      * @param line the line number.
      * @param column the column number.
      */
-
     public Position(int line, int column) {
+        if (line < 1 || column < 1) {
+            throw new IllegalArgumentException(line + "," + column);
+        }
         this.line = line;
         this.column = column;
+    }
+
+    /**
+     * Creates a new Location with 1-based line and 1-based column numbers.
+     *
+     * @param line_1 1-based line of the Location
+     * @param column_0 1-based column of the Location
+     */
+    public static Position newOneBased(int line_1, int column_0) {
+        return new Position(line_1, column_0);
+    }
+
+    /**
+     * Creates a new location from a SourceElement position.
+     *
+     * @param pos the position
+     */
+    public static Position fromSEPosition(recoder.java.SourceElement.Position pos) {
+        if (pos == SourceElement.Position.UNDEFINED) {
+            return UNDEFINED;
+        } else if (pos.getColumn() == 0) {
+            // This is a hack, some recoder positions have column 0 (not set)
+            // even though the column is 0-based *and* -1 is the unset value
+            // return new Position(pos.getLine(), 1);
+            throw new IllegalArgumentException("ProofJava produced column 0");
+        } else {
+            return new Position(pos.getLine(), pos.getColumn());
+        }
     }
 
     /**
@@ -55,7 +87,6 @@ public class Position {
      *
      * @return the line number of this position.
      */
-
     public int getLine() {
         return line;
     }

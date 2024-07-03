@@ -7,6 +7,7 @@ package org.key_project.util.java;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.swing.JFileChooser;
 
@@ -17,6 +18,8 @@ import javax.swing.JFileChooser;
  * @author Martin Hentschel
  */
 public final class StringUtil {
+    /** Pattern for newlines */
+    private static final Pattern NEWLINE_PATTERN = Pattern.compile("(\\r\\n|\\r|\\n)");
     /**
      * Constant for an empty string.
      */
@@ -433,5 +436,31 @@ public final class StringUtil {
     @Nonnull
     public static String trim(String text, String chars) {
         return trim(text, it -> chars.indexOf(it) >= 0);
+    }
+
+    /**
+     * Replaces newlines.
+     *
+     * @param text the text
+     * @param with with
+     * @return the normalized text.
+     */
+    public static String replaceNewlines(String text, String with) {
+        return NEWLINE_PATTERN.matcher(text).replaceAll(with);
+    }
+
+    /**
+     * Count occurences of character x in text, starting at beginIndex and ending at endIndex
+     * (exclusive).
+     *
+     * @param text text
+     * @param beginIndex start index (inclusive)
+     * @param endIndex end index (exclusive)
+     * @param x character to search for
+     * @return number of times x is present
+     */
+    public static int count(String text, int beginIndex, int endIndex, char x) {
+        return (int) text.chars().skip(beginIndex).limit(endIndex - beginIndex)
+                .filter(ch -> ch == x).count();
     }
 }

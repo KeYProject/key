@@ -267,13 +267,14 @@ public class InitConfig {
         if (activatedTacletCache != null) {
             return;
         }
-        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<>();
+        var choices = Collections.unmodifiableSet(activatedChoices.toSet());
         for (Taclet t : taclets) {
             TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
 
-            if (t.getChoices().subset(activatedChoices)) {
+            if (t.getChoices().eval(choices)) {
                 if (b != null && b.getGoal2Choices() != null) {
-                    t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
+                    t = b.getTacletWithoutInactiveGoalTemplates(choices);
                 }
 
                 if (t != null) {

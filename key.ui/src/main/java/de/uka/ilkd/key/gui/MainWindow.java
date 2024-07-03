@@ -5,11 +5,9 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -27,6 +25,58 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
+import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
+import de.uka.ilkd.key.gui.actions.AboutAction;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.AutoSave;
+import de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction;
+import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.EnsureSourceConsistencyToggleAction;
+import de.uka.ilkd.key.gui.actions.ExitMainAction;
+import de.uka.ilkd.key.gui.actions.GoalBackAction;
+import de.uka.ilkd.key.gui.actions.GoalSelectAboveAction;
+import de.uka.ilkd.key.gui.actions.GoalSelectBelowAction;
+import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
+import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
+import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
+import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
+import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
+import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
+import de.uka.ilkd.key.gui.actions.OpenExampleAction;
+import de.uka.ilkd.key.gui.actions.OpenFileAction;
+import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.OpenSingleJavaFileAction;
+import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
+import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.PruneProofAction;
+import de.uka.ilkd.key.gui.actions.QuickLoadAction;
+import de.uka.ilkd.key.gui.actions.QuickSaveAction;
+import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
+import de.uka.ilkd.key.gui.actions.RunAllProofsAction;
+import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
+import de.uka.ilkd.key.gui.actions.SaveBundleAction;
+import de.uka.ilkd.key.gui.actions.SaveFileAction;
+import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
+import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
+import de.uka.ilkd.key.gui.actions.SearchModeChangeAction;
+import de.uka.ilkd.key.gui.actions.SearchNextAction;
+import de.uka.ilkd.key.gui.actions.SearchPreviousAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
+import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
+import de.uka.ilkd.key.gui.actions.TermLabelMenu;
+import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
+import de.uka.ilkd.key.gui.actions.ToggleSequentViewTooltipAction;
+import de.uka.ilkd.key.gui.actions.ToggleSourceViewTooltipAction;
+import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
+import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -35,7 +85,12 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.gui.help.HelpInfo;
-import de.uka.ilkd.key.gui.nodeviews.*;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
+import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
+import de.uka.ilkd.key.gui.nodeviews.MainFrame;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -47,10 +102,12 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -58,7 +115,6 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.*;
 
 import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
@@ -67,6 +123,22 @@ import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.ThreadUtilities;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.util.Collection;
+import java.util.EventObject;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -1070,7 +1142,10 @@ public final class MainWindow extends JFrame {
                 }
                 newSequentView = currentGoalView;
             } else {
-                newSequentView = new InnerNodeView(getMediator().getSelectedNode(), this);
+                Sequent seq = getMediator().getSelectionModel().getSelectedSequent();
+                RuleApp ruleApp = getMediator().getSelectionModel().getSelectedRuleApp();
+                newSequentView = new InnerNodeView(getMediator().getSelectedProof(),
+                    getMediator().getSelectedNode(), ruleApp, this);
                 if (!isPrintRunImmediately) {
                     newSequentView.printSequent();
                 }
@@ -1092,6 +1167,15 @@ public final class MainWindow extends JFrame {
             SwingUtilities.invokeLater(sequentUpdater);
         }
 
+    }
+
+    /**
+     * Scroll the sequent view to the specified y coordinate.
+     *
+     * @param y coordinate in pixels
+     */
+    public void scrollTo(int y) {
+        mainFrame.scrollTo(y);
     }
 
     void displayResults(String message) {

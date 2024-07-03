@@ -4,14 +4,16 @@
 
 package de.uka.ilkd.key.parser;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.runtime.RecognitionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 /**
@@ -67,6 +69,17 @@ public final class Location {
         this.fileUrl = url;
         this.line = line;
         this.column = column;
+    }
+
+    public static Location fromPositionInfo(PositionInfo info) {
+        URL url;
+        try {
+            url = info.getURI().toURL();
+        } catch (MalformedURLException e) {
+            url = null;
+        }
+        Position pos = info.getStartPosition();
+        return new Location(url, pos.getLine(), pos.getColumn());
     }
 
     /**

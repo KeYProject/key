@@ -4,7 +4,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.ChoiceExpr;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -39,11 +39,11 @@ public class NoFindTaclet extends Taclet {
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<Choice> choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                        ImmutableList<TacletGoalTemplate> goalTemplates,
+                        ImmutableList<RuleSet> ruleSets,
+                        TacletAttributes attrs,
+                        ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                        ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
             choices, tacletAnnotations);
         createTacletServices();

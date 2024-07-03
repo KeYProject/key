@@ -4,8 +4,16 @@
 
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+
+
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -17,6 +25,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
@@ -49,6 +58,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        args.originalArgs = arguments;
         return args;
     }
 
@@ -65,7 +75,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // find the targets
         final ImmutableList<Goal> goals;
-        if (arguments.isOnAllOpenGoals()) {
+        if (arguments.onAllOpenGoals) {
             goals = state.getProof().openGoals();
         } else {
             final Goal goal = state.getFirstOpenAutomaticGoal();
@@ -87,6 +97,22 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         if (arguments.getSteps() > 0)
             state.setMaxAutomaticSteps(arguments.getSteps());
 
+        // set model search if given
+        StrategyProperties activeStrategyProperties =
+            state.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
+
+        Map<String, OriginalValue> orgValues = prepareOriginalValues();
+        for (Entry<String, String> entry : arguments.originalArgs.entrySet()) {
+            OriginalValue ov = orgValues.get(entry.getKey());
+            if(ov != null) {
+                ov.oldValue = activeStrategyProperties.getProperty(ov.settingName);
+                activeStrategyProperties.setProperty(ov.settingName,
+                        "true".equals(entry.getValue()) ? ov.trueValue : ov.falseValue);
+            }
+        }
+
+        SetCommand.updateStrategySettings(state, activeStrategyProperties);
+
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);
 
@@ -104,7 +130,23 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             }
         } finally {
             state.setMaxAutomaticSteps(oldNumberOfSteps);
+            for (OriginalValue ov : orgValues.values()) {
+                if (ov.oldValue != null) {
+                    activeStrategyProperties.setProperty(ov.settingName, ov.oldValue);
+                }
+            }
+            SetCommand.updateStrategySettings(state, activeStrategyProperties);
         }
+    }
+
+    private Map<String, OriginalValue> prepareOriginalValues() {
+        var res = new HashMap<String, OriginalValue>();
+        res.put("modelSearch", new OriginalValue(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_COMPLETION, StrategyProperties.NON_LIN_ARITH_DEF_OPS));
+        res.put("expandQueries", new OriginalValue(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON, StrategyProperties.QUERYAXIOM_OFF));
+        res.put("classAxioms", new OriginalValue(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, StrategyProperties.CLASS_AXIOM_FREE, StrategyProperties.CLASS_AXIOM_OFF));
+        res.put("dependencies", new OriginalValue(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON, StrategyProperties.DEP_OFF));
+        res.put("proofSplitting", new OriginalValue(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL, StrategyProperties.SPLITTING_OFF));
+        return res;
     }
 
     /**
@@ -165,17 +207,49 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         @Option(value = "breakpoint", required = false)
         public String breakpoint = null;
 
-        public boolean isOnAllOpenGoals() {
-            return onAllOpenGoals;
-        }
+        @Option(value = "modelsearch", required = false)
+        public Boolean modelSearch;
 
-        public void setOnAllOpenGoals(boolean onAllOpenGoals) {
-            this.onAllOpenGoals = onAllOpenGoals;
-        }
+        @Option(value = "expandQueries", required = false)
+        public Boolean expandQueries;
+
+        @Option(value = "classAxioms", required = false)
+        public Boolean classAxioms;
+
+        @Option(value = "dependencies", required = false)
+        public Boolean dependencies;
+
+        @Option(value = "proofSplitting", required = false)
+        public Boolean proofSplitting;
 
         public int getSteps() {
             return maxSteps;
         }
 
+        public Map<String, String> originalArgs;
+
+    }
+
+    private static final class OriginalValue {
+        private final String settingName;
+        private final String trueValue;
+        private final String falseValue;
+        private String oldValue;
+
+        private OriginalValue( String settingName, String trueValue, String falseValue) {
+            this.settingName = settingName;
+            this.trueValue = trueValue;
+            this.falseValue = falseValue;
+        }
+
+        @Override
+        public String toString() {
+            return "OriginalValue{" +
+                    "settingName='" + settingName + '\'' +
+                    ", trueValue='" + trueValue + '\'' +
+                    ", falseValue='" + falseValue + '\'' +
+                    ", oldValue='" + oldValue + '\'' +
+                    '}';
+        }
     }
 }

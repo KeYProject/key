@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
@@ -32,7 +33,7 @@ public class ValueInjector {
      * T --> StringConverter<T>
      * </pre>
      */
-    private Map<Class, StringConverter> converters = new HashMap<>();
+    private final Map<Class, StringConverter> converters = new HashMap<>();
 
     /**
      * Injects the given {@code arguments} in the {@code obj}.
@@ -49,11 +50,9 @@ public class ValueInjector {
      * @throws ConversionException an converter could not translate the given value in
      *         arguments
      */
-    public static <T> T injection(ProofScriptCommand<?> command,
-            T obj,
-            Map<String, String> arguments)
-            throws ArgumentRequiredException, InjectionReflectionException,
-            NoSpecifiedConverterException, ConversionException {
+    public static <T> T injection(ProofScriptCommand<T> command, T obj,
+            Map<String, String> arguments) throws ArgumentRequiredException,
+            InjectionReflectionException, NoSpecifiedConverterException, ConversionException, UnknownArgumentException {
         return getInstance().inject(command, obj, arguments);
     }
 
@@ -111,16 +110,16 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand<?> command, T obj, Map<String, String> arguments)
+    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, String> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
-            ArgumentRequiredException {
-        List<ProofScriptArgument> meta = ArgumentsLifter
-                .inferScriptArguments(obj.getClass(), command);
-        List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
+            ArgumentRequiredException, UnknownArgumentException {
+        List<ProofScriptArgument<T>> meta =
+            ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
+        List<ProofScriptArgument<T>> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();
 
-        for (ProofScriptArgument<?> arg : meta) {
+        for (ProofScriptArgument<T> arg : meta) {
             if (arg.hasVariableArguments()) {
                 varArgs.add(arg);
             } else {
@@ -140,6 +139,14 @@ public class ValueInjector {
                     usedKeys.add(k);
                 }
             }
+        }
+
+        Optional<String> unused = arguments.keySet().stream()
+                .filter(it -> !usedKeys.contains(it) && !"#literal".equals(it))
+                .findAny();
+        if (unused.isPresent()) {
+//            throw new UnknownArgumentException("Unknown argument '" + unused.get() +
+//                    "' for command of class " + command.getClass().getSimpleName());
         }
 
         return obj;
@@ -167,12 +174,10 @@ public class ValueInjector {
         final String val = args.get(meta.getName());
         if (val == null) {
             if (meta.isRequired()) {
-                throw new ArgumentRequiredException(
-                    String.format("Argument %s:%s is required, but %s was given. " +
-                        "For comamnd class: '%s'",
-                        meta.getName(), meta.getField().getType(), val,
-                        meta.getCommand().getClass()),
-                    meta);
+                throw new ArgumentRequiredException(String.format(
+                    "Argument %s:%s is required, but %s was given. " + "For command class: '%s'",
+                    meta.getName(), meta.getField().getType().getSimpleName(), val,
+                    meta.getCommand().getClass()), meta);
             }
         } else {
             Object value = convert(meta, val);

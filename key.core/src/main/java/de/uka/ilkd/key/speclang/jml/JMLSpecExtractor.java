@@ -85,7 +85,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         StringBuilder sb = new StringBuilder(comments[0].getText());
 
         for (int i = 1; i < comments.length; i++) {
-            Position relativePos = comments[i].getRelativePosition();
+            var relativePos = comments[i].getRelativePosition();
             for (int j = 0; j < relativePos.getLine(); j++) {
                 sb.append("\n");
             }

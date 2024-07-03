@@ -426,6 +426,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
             ctx.start.getLine(),
             ctx.start.getCharPositionInLine());
 
+        final Kind kind = stat.getKind();
+        JmlAssert jmlAssert = new JmlAssert(kind, stat.getContext(), stat.getAssertionProof(), stat.getOptLabel());
         try {
             String comment = String.format(
                 "/*@ normal_behavior\n"

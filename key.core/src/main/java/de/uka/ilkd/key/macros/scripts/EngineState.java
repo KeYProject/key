@@ -7,6 +7,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.File;
 import java.io.StringReader;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observer;
 import java.util.Optional;
@@ -43,6 +44,8 @@ public class EngineState {
     private ValueInjector valueInjector = ValueInjector.createDefault();
     private Goal goal;
     private Node lastSetGoalNode;
+
+    private final HashMap<String, Object> userData = new HashMap<>();
 
     /**
      * If set to true, outputs all commands to observers and console. Otherwise,
@@ -290,5 +293,13 @@ public class EngineState {
 
     public void setFailOnClosedOn(boolean failOnClosedOn) {
         this.failOnClosedOn = failOnClosedOn;
+    }
+
+    public void putUserData(String key, Object val) {
+        userData.put(key, val);
+    }
+
+    public Object getUserData(String key) {
+        return userData.get(key);
     }
 }

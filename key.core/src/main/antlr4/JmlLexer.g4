@@ -11,6 +11,10 @@ import java.util.stream.Collectors;
    // needed for double literals and ".."
    private int _lex_pos;
 
+   // by is used by assertions and for information flow.
+   // Only in the latter case it triggers a mode change...
+   private boolean assertionEncountered;
+
    private int parenthesisLevel = 0;
    private void incrParen() { parenthesisLevel++;}
    private void decrParen() { parenthesisLevel--;}
@@ -78,7 +82,7 @@ fragment Pred: '_redundantly'?; //suffix
 fragment Pfree: '_free'?;       //suffix
 
 ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
-ASSERT: 'assert' Pred  -> pushMode(expr);
+ASSERT: 'assert' Pred { assertionEncountered = true; } -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
 ASSIGNABLE: 'assignable' Pred -> pushMode(expr);
 ASSIGNS: 'assigns' Pred -> pushMode(expr);
@@ -163,9 +167,13 @@ mode expr;
 /* Java keywords */
 BOOLEAN: 'boolean';
 BYTE: 'byte';
+CASE: 'case';
+DEFAULT: 'default';
+ELSE: 'else';
 FALSE: 'false';
 INSTANCEOF: 'instanceof';
 INT: 'int';
+IF: 'if';
 LONG: 'long';
 NEW: 'new';
 NULL: 'null';
@@ -210,7 +218,7 @@ BACKUP: '\\backup';  //KeY extension, not official JML
 BEFORE: '\\before';  //KeY extension, not official JML
 BIGINT: '\\bigint';
 BSUM: '\\bsum';  //KeY extension, not official JML
-BY: '\\by';  //KeY extension, not official JML
+BY: '\\by' { if(assertionEncountered) { popMode(); pushMode(script); } assertionEncountered = false; };  //KeY extension, not official JML
 DECLASSIFIES: '\\declassifies';  //KeY extension, not official JML
 DISJOINT: '\\disjoint';  //KeY extension, not official JML
 DOMAIN_IMPLIES_CREATED: '\\domain_implies_created';  //KeY extension, not official JML
@@ -485,3 +493,20 @@ mode string;
 S_ESC: '\\"' -> more;
 S_END: '"' -> type(STRING_LITERAL), popMode;
 S_ANY: . -> more;
+
+mode script;
+
+SC_LBRACE: '{' { incrBrace(); };
+SC_RBRACE: '}' { decrBrace(); if(bracesLevel == 0) popMode(); };
+SC_SEMI: ';' { if(bracesLevel == 0) popMode(); };
+SC_BY: '\\by';
+SC_ASSERT: 'assert';
+SC_STRING: '"' -> pushMode(string), more;
+SC_CASE: 'case';
+SC_DEFAULT: 'default';
+SC_COLON: ':';
+SC_EQUAL_SINGLE: '=';
+SC_IDENT: LETTER (LETTERORDIGIT)*;
+SC_DECLITERAL: DECDIGIT+;
+SC_LINE_COMMENT: '//' ~('\n'|'\r')* -> channel(HIDDEN);
+SC_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN);

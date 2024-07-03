@@ -90,17 +90,22 @@ public final class ProofManagementDialog extends JDialog {
         classTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    final ClassTree.Entry entry = classTree.getSelectedEntry();
-                    if (entry.kjt != null && entry.target != null) {
-                        final ImmutableSet<Contract> contracts =
-                            initConfig.getServices().getSpecificationRepository()
-                                    .getContracts(entry.kjt, entry.target);
-                        final Contract c = contracts.iterator().next();
-                        if (contracts.size() == 1
-                                && c == contractPanelByMethod.getContract()) {
-                            startButton.doClick();
-                        }
+                // Check that it is a double click on an item, not a folder or the background
+                if (e.getClickCount() != 2) {
+                    return;
+                }
+                // row is -1 when the user does not click on an entry but on the background
+                int row = classTree.getRowForLocation(e.getX(), e.getY());
+                if (row == -1) {
+                    return;
+                }
+                final ClassTree.Entry entry = classTree.getSelectedEntry();
+                if (entry.kjt != null && entry.target != null) {
+                    final ImmutableSet<Contract> contracts = initConfig.getServices()
+                            .getSpecificationRepository().getContracts(entry.kjt, entry.target);
+                    final Contract c = contracts.iterator().next();
+                    if (contracts.size() == 1 && c == contractPanelByMethod.getContract()) {
+                        startButton.doClick();
                     }
                 }
             }

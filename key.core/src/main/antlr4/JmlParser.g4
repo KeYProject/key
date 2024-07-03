@@ -187,11 +187,26 @@ block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
+assert_statement: (ASSERT (label=IDENT COLON)? expression | UNREACHABLE) (assertionProof SEMI? | SEMI_TOPLEVEL);
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
 
+// --- proofs in JML -- could be file on its own.
+
+assertionProof: BY ((SC_LBRACE ( proofCmd )+ SC_RBRACE SEMI_TOPLEVEL?) | proofCmd);
+proofCmd:
+    cmd=SC_IDENT ( proofArg )* SC_SEMI
+  | SC_ASSERT assertion=STRING_LITERAL (SC_SEMI | SC_BY (proofCmd | SC_LBRACE ( proofCmd )+ SC_RBRACE) )?
+  | SC_LBRACE proofCmdCase+ SC_RBRACE
+  ;
+proofCmdCase:
+    SC_CASE ( STRING_LITERAL )? SC_COLON ( proofCmd )*
+  | SC_DEFAULT SC_COLON ( proofCmd )*
+  ;
+proofArg: (argLabel=SC_IDENT SC_EQUAL_SINGLE)? token=( SC_DECLITERAL | /*NATIVE?*/ STRING_LITERAL | SC_IDENT);
+
+// ---
 
 mergeparamsspec:
     MERGE_PARAMS

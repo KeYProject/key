@@ -74,7 +74,7 @@ public interface SourceElement extends SVSubstitute {
      *
      * @return the relative position of the primary token.
      */
-    Position getRelativePosition();
+    recoder.java.SourceElement.Position getRelativePosition();
 
     /** complete position information */
     PositionInfo getPositionInfo();

@@ -339,8 +339,8 @@ public class Recoder2KeYConverter {
         // convert all comments for pe
         ASTList<recoder.java.Comment> l = pe.getComments();
         if (l != null) {
-            for (int i = 0, sz = l.size(); i < sz; i++) {
-                children.add(convert(l.get(i)));
+            for (recoder.java.Comment comment : l) {
+                children.add(convert(comment));
             }
         }
 
@@ -413,12 +413,9 @@ public class Recoder2KeYConverter {
      * @return the newly created PositionInfo
      */
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
-        Position relPos = new Position(se.getRelativePosition().getLine(), se
-                .getRelativePosition().getColumn());
-        Position startPos = new Position(se.getStartPosition().getLine(),
-            se.getStartPosition().getColumn());
-        Position endPos = new Position(se.getEndPosition().getLine(), se
-                .getEndPosition().getColumn());
+        var relPos = se.getRelativePosition();
+        var startPos = Position.fromSEPosition(se.getStartPosition());
+        var endPos = Position.fromSEPosition(se.getEndPosition());
         if ((!inLoopInit))
             return new PositionInfo(relPos, startPos, endPos, currentClassURI);
         else
@@ -1006,6 +1003,17 @@ public class Recoder2KeYConverter {
             de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
         return new CatchAllStatement((StatementBlock) callConvert(cas.getStatementAt(0)),
             (LocationVariable) callConvert(cas.getVariable()));
+    }
+
+    /**
+     * convert a recorder JML assert statment into a KeY JML assert statement.
+     *
+     * @param ja the statement to convert
+     * @return the converted statement
+     */
+    public JmlAssert convert(de.uka.ilkd.key.java.recoderext.JmlAssert ja) {
+        return new JmlAssert(ja.getKind(), ja.getOptLabel(), ja.getCondition(), ja.getAssertionProof(),
+            positionInfo(ja), services);
     }
 
     // ------------------- declaration ---------------------

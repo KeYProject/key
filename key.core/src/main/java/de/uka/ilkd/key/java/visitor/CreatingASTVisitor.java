@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -1511,6 +1512,28 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             }
         };
         def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnJmlAssert(JmlAssert x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                changeList.add(x.getKind());
+                changeList.add(x.getVars());
+                changeList.add(x.getAssertionProof());
+                changeList.add(x.getOptLabel());
+                return new JmlAssert(changeList, services);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnJmlAssertCondition(final Term cond) {
+        // should only be called by walk(), which puts an ExtList on the stack
+        assert stack.peek() != null;
+        stack.peek().add(cond);
     }
 
     /**

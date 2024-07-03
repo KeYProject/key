@@ -7,13 +7,10 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -59,8 +56,8 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     protected ImmutableList<VariableCondition> variableConditions =
         ImmutableSLList.<VariableCondition>nil();
-    protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices = null;
-    protected ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();
+    protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
+    protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
         DefaultImmutableSet.<TacletAnnotation>nil();
     protected String origin;
@@ -152,22 +149,22 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a mapping from GoalTemplate <code>gt</code> to SetOf<Choice>
      * <code>soc</code>
      */
-    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ImmutableSet<Choice> soc) {
+    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ChoiceExpr soc) {
         if (goal2Choices == null) {
             goal2Choices = new LinkedHashMap<>();
         }
         goal2Choices.put(gt, soc);
     }
 
-    public HashMap<TacletGoalTemplate, ImmutableSet<Choice>> getGoal2Choices() {
+    public HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
         return goal2Choices;
     }
 
-    public void setChoices(ImmutableSet<Choice> choices) {
+    public void setChoices(ChoiceExpr choices) {
         this.choices = choices;
     }
 
-    public ImmutableSet<Choice> getChoices() {
+    public ChoiceExpr getChoices() {
         return choices;
     }
 
@@ -324,7 +321,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     public abstract T getTaclet();
 
-    public T getTacletWithoutInactiveGoalTemplates(ImmutableSet<Choice> active) {
+    public T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
         if (goal2Choices == null || goals.isEmpty()) {
             return getTaclet();
         } else {
@@ -333,8 +330,7 @@ public abstract class TacletBuilder<T extends Taclet> {
             T result;
             while (it.hasNext()) {
                 TacletGoalTemplate goal = it.next();
-                if (goal2Choices.get(goal) != null &&
-                        !goal2Choices.get(goal).subset(active)) {
+                if (goal2Choices.get(goal) != null && !goal2Choices.get(goal).eval(active)) {
                     goals = goals.removeAll(goal);
                 }
             }

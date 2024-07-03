@@ -23,22 +23,18 @@ public class ScriptException extends Exception implements HasLocation {
 
     public ScriptException(String message, URL url, int line, int col, Throwable cause) {
         super(message, cause);
-        if (url != null) {
-            this.location = new Location(url, line, col);
-        } else {
-            this.location = null;
-        }
+        this.location = new Location(url, line, col);
     }
 
     public ScriptException(String message, URL url, int line, int col) {
         super(message);
-        if (url != null) {
-            this.location = new Location(url, line, col);
-        } else {
-            this.location = null;
-        }
+        this.location = new Location(url, line, col);
     }
 
+    public ScriptException(String message, Location location, Throwable cause) {
+        super(message, cause);
+        this.location = location;
+    }
 
     public ScriptException(String message) {
         super(message);

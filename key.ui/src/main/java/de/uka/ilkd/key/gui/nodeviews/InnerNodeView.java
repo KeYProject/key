@@ -7,6 +7,9 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.Color;
 import java.awt.Insets;
 import javax.swing.JTextArea;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
@@ -29,6 +32,13 @@ import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.rule.*;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -61,9 +71,14 @@ public final class InnerNodeView extends SequentView {
 
     public final JTextArea tacletInfo;
 
-    Node node;
+    private final Node node;
+    private final RuleApp ruleApp;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
+        this(node.proof(), node, node.getAppliedRuleApp(), mainWindow);
+    }
+
+    public InnerNodeView(Proof proof, Node node, RuleApp ruleApp, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
         this.listener = new InnerNodeViewListener(this);
@@ -74,18 +89,23 @@ public final class InnerNodeView extends SequentView {
             mainWindow.getMediator().getNotationInfo(),
             mainWindow.getMediator().getServices(),
             getVisibleTermLabels()));
+        this.ruleApp = ruleApp;
+        //proof.addProofDisposedListener(this);
+        this.listener = new InnerNodeViewListener(this);
+
+        filter = new IdentitySequentPrintFilter();
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(
-            TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
+            TacletDescriber.getTacletDescription(mainWindow.getMediator(),
+                node != null ? node.getAppliedRuleApp() : ruleApp,
+                SequentView.getLineWidth()));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(
             new MatteBorder(3, 0, 0, 0, Color.black),
             new EmptyBorder(new Insets(4, 0, 0, 0))));
         tacletInfo.setEditable(false);
-
-        // updateUI();
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER =
@@ -167,6 +187,38 @@ public final class InnerNodeView extends SequentView {
             // something concerning highlighting does not work in the future, here could
             // be a starting place to find the mistake.
             getHighlighter().addHighlight(r.start() + 1, r.end() + 1, light);
+
+            // scroll the active formula into view
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    ImmutableList<Integer> pathTop =
+                        posTable.pathForPosition(pos.topLevel(), getFilter());
+                    if (pathTop == null) {
+                        return;
+                    }
+                    Range rFormula = posTable.rangeForPath(pathTop);
+                    Rectangle2D rect = modelToView2D(rFormula.start() + 1);
+                    Rectangle2D rectTerm = modelToView2D(r.start() + 1);
+
+                    Rectangle visible = getVisibleRect();
+                    if (rect != null && visible != null
+                            && !visible.contains(rectTerm.getMinX(), rectTerm.getMinY())) {
+                        // scroll into view: first check if the sub-term is visible if we would
+                        // scroll to the top of the sequent formula
+                        if (rectTerm.getMinY() - rect.getMinY() > visible.getHeight()) {
+                            // it isn't: center the sub-term in view
+                            int y = (int) (rectTerm.getMinY() - visible.getHeight() / 2.0);
+                            MainWindow.getInstance().scrollTo(y);
+                        } else {
+                            // it is: scroll to the sequent formula
+                            MainWindow.getInstance().scrollTo((int) rect.getMinY());
+                        }
+                    }
+                } catch (BadLocationException e) {
+                    LOGGER.warn("could not scroll active formula into view ", e);
+                }
+            });
+
             return r;
         } else {
             return null;
@@ -177,7 +229,7 @@ public final class InnerNodeView extends SequentView {
     @Override
     public String getTitle() {
         // If a leaf becomes an inner node, it is already closed.
-        if (node.leaf()) {
+        if (node != null && node.leaf()) {
             return "Closed Goal";
         }
         return "Inner Node";
@@ -188,13 +240,14 @@ public final class InnerNodeView extends SequentView {
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
+        //updateSequent(node);
+
         getLogicPrinter().update(getFilter(), getLineWidth());
         setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
-        RuleApp app = node.getAppliedRuleApp();
 
-        if (app != null) {
-            highlightRuleAppPosition(app);
+        if (ruleApp != null) {
+            highlightRuleAppPosition(ruleApp);
         }
 
         updateHidingProperty();

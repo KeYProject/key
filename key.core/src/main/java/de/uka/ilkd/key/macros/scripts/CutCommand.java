@@ -11,9 +11,13 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import static de.uka.ilkd.key.macros.scripts.EngineState.getGoal;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut"
@@ -55,9 +59,14 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, args.formula,
-            state.getProof().getServices(), true);
-        state.getFirstOpenAutomaticGoal().apply(app);
+        app = app.addCheckedInstantiation(sv, args.formula, state.getProof().getServices(), true);
+        Goal goal = state.getFirstOpenAutomaticGoal();
+        Node node = goal.node();
+        goal.apply(app);
+
+        // TODO HACK! Renaming the goals to "show" and "use" to allow for references from scripts
+        getGoal(goal.proof().openGoals(), node.child(0)).setBranchLabel("use");
+        getGoal(goal.proof().openGoals(), node.child(1)).setBranchLabel("show");
     }
 
     public static class Parameters {

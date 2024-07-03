@@ -4,6 +4,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableSLList;
@@ -15,13 +16,22 @@ import org.antlr.v4.runtime.RuleContext;
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
-    private LabeledParserRuleContext context;
-    private Kind kind;
+    private final LabeledParserRuleContext context;
+    private final AssertionProofContext assertionProof;
+    private final String optLabel;
+    private final Kind kind;
 
     public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause) {
+        this(kind, clause, null, null);
+    }
+
+    public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause,
+            AssertionProofContext assertionProof, String optLabel) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
+        this.assertionProof = assertionProof;
+        this.optLabel = optLabel;
     }
 
     public LabeledParserRuleContext getContext() {
@@ -63,13 +73,16 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         return kind;
     }
 
-    public static enum Kind {
-        ASSERT("assert"),
-        ASSUME("assume");
+    public String getOptLabel() {
+        return optLabel;
+    }
 
-        private String name;
+    public enum Kind {
+        ASSERT("assert"), ASSUME("assume");
 
-        private Kind(String name) {
+        private final String name;
+
+        Kind(String name) {
             this.name = name;
         }
 
@@ -78,4 +91,8 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
             return name;
         }
     };
+
+    public AssertionProofContext getAssertionProof() {
+        return assertionProof;
+    }
 }

@@ -9,15 +9,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -106,7 +98,7 @@ public abstract class Taclet implements Rule, Named {
     private final String displayName;
 
     /** the set of taclet options for this taclet */
-    protected final ImmutableSet<Choice> choices;
+    protected final ChoiceExpr choices;
 
     /**
      * the <tt>if</tt> sequent of the taclet
@@ -211,14 +203,14 @@ public abstract class Taclet implements Rule, Named {
      *        indicating a noninteractive or recursive use of the Taclet.
      */
     protected Taclet(Name name,
-            TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<Choice> choices,
-            boolean surviveSmbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                     TacletApplPart applPart,
+                     ImmutableList<TacletGoalTemplate> goalTemplates,
+                     ImmutableList<RuleSet> ruleSets,
+                     TacletAttributes attrs,
+                     ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                     ChoiceExpr choices,
+                     boolean surviveSmbExec,
+                     ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
         this.name = name;
         ifSequent = applPart.ifSequent();
@@ -263,13 +255,13 @@ public abstract class Taclet implements Rule, Named {
      *        indicating a noninteractive or recursive use of the Taclet.
      */
     protected Taclet(Name name,
-            TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<Choice> choices,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                     TacletApplPart applPart,
+                     ImmutableList<TacletGoalTemplate> goalTemplates,
+                     ImmutableList<RuleSet> ruleSets,
+                     TacletAttributes attrs,
+                     ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                     ChoiceExpr choices,
+                     ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
     }
@@ -410,7 +402,7 @@ public abstract class Taclet implements Rule, Named {
         return goalTemplates;
     }
 
-    public ImmutableSet<Choice> getChoices() {
+    public ChoiceExpr getChoices() {
         return choices;
     }
 

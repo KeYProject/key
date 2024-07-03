@@ -436,6 +436,10 @@ public class Semisequent implements Iterable<SequentFormula> {
         return seqList.head();
     }
 
+    public SequentFormula getLast() {
+        return seqList.take(seqList.size() - 1).head();
+    }
+
     /**
      * checks if the {@link SequentFormula} occurs in this
      * Semisequent (identity check)
@@ -503,6 +507,7 @@ public class Semisequent implements Iterable<SequentFormula> {
     public boolean hasModality() {
         return hasModality;
     }
+
 
 
     // inner class used to represent an empty semisequent

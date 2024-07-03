@@ -4,7 +4,9 @@
 
 package org.key_project.util.collection;
 
+import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -44,6 +46,70 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
             result = result.append(el);
         }
 
+        return result;
+    }
+
+    /**
+     * Return an empty immutable list.
+     *
+     * @return empty immutable list.
+     * @param <T> the entry type of the list.
+     */
+    static <T> ImmutableList<T> of() {
+        return ImmutableSLList.nil();
+    }
+
+    /**
+     * Return a singleton immutable list.
+     *
+     * @param e1 the element to put into the list
+     * @return singleton immutable list.
+     * @param <T> the entry type of the list.
+     */
+    static <T> ImmutableList<T> of(T e1) {
+        return ImmutableSLList.singleton(e1);
+    }
+
+    /**
+     * Return an immutable list with two elements.
+     * The iteration order is: e1 then e2
+     *
+     * @param e1 the element to put into the list
+     * @param e2 the element to put into the list
+     * @return (e1, e2) as immutable list
+     * @param <T> the entry type of the list.
+     */
+    static <T> ImmutableList<T> of(T e1, T e2) {
+        return ImmutableSLList.singleton(e2).prepend(e1);
+    }
+
+    /**
+     * Return an immutable list with three elements.
+     * The iteration order is: e1 then e2 then e3
+     *
+     * @param e1 the element to put into the list
+     * @param e2 the element to put into the list
+     * @param e3 the element to put into the list
+     * @return (e1, e2, e3) as immutable list
+     * @param <T> the entry type of the list.
+     */
+    static <T> ImmutableList<T> of(T e1, T e2, T e3) {
+        return ImmutableSLList.singleton(e3).prepend(e2).prepend(e1);
+    }
+
+    /**
+     * Return an immutable list with the iterated elements.
+     * The iteration order is the order of the arguments
+     *
+     * @param es the elements to put into the list
+     * @return (e1, e2, e3, ...) as immutable list
+     * @param <T> the entry type of the list.
+     */
+    static <T> ImmutableList<T> of(T... es) {
+        ImmutableList<T> result = ImmutableSLList.nil();
+        for (int i = es.length - 1; i >= 0; i--) {
+            result = result.prepend(es[i]);
+        }
         return result;
     }
 
@@ -216,4 +282,98 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         }
         return result;
     }
+
+    /*
+     * Returns an immutable list consisting of the elements of this list that match
+     * the given predicate.
+     *
+     * @param predicate a non-interfering, stateless
+     *                  predicate to apply to each element to determine if it
+     *                  should be included
+     * @returns the filtered list
+     */
+    default @Nonnull ImmutableList<T> filter(@Nonnull Predicate<T> predicate) {
+        return Immutables.filter(this, predicate);
+    }
+
+    /**
+     * Returns an immutable list consisting of the results of applying the given
+     * function to the elements of this list.
+     *
+     * @param <R> The element type of the result list
+     * @param function a non-interfering, stateless function to apply to each element
+     * @return the mapped list of the same length as this
+     */
+    default <R> ImmutableList<R> map(Function<T, R> function) {
+        return Immutables.map(this, function);
+    }
+
+    /**
+     * Returns the element at the specified position in this list.
+     *
+     * @param index 0-based index of the element to return
+     * @return the element at the specified position in this list
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         ({@code index < 0 || index >= size()})
+     */
+    default T get(int index) {
+        if(index < 0 || index >= size()) {
+            throw new IndexOutOfBoundsException();
+        } else {
+            return take(index).head();
+        }
+    }
+
+    /**
+     * @param other prefix to check for
+     * @return whether this list starts with the elements of the provided prefix
+     */
+    default boolean hasPrefix(ImmutableList<T> other) {
+        if (other.size() > this.size()) {
+            return false;
+        }
+        if (other.size() == 0) {
+            return true;
+        }
+        if (Objects.equals(head(), other.head())) {
+            return tail().hasPrefix(other.tail());
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Remove a prefix from this list.
+     *
+     * @param prefix prefix to remove
+     * @return new list with the prefix removed
+     * @throws IllegalArgumentException if the provided prefix is not a prefix of this list
+     */
+    default ImmutableList<T> stripPrefix(ImmutableList<T> prefix) {
+        if (prefix.isEmpty()) {
+            return this;
+        }
+        if (!Objects.equals(head(), prefix.head())) {
+            throw new IllegalArgumentException("not a prefix of this list");
+        }
+        return this.tail().stripPrefix(prefix.tail());
+    }
+
+    /**
+     * Get the last element of this list.
+     * Time complexity: O(n).
+     *
+     * @return last element of this list
+     */
+    default T last() {
+        if (isEmpty()) {
+            throw new IllegalStateException("last() called on empty list");
+        }
+        ImmutableList<T> remainder = this;
+        while (!remainder.tail().isEmpty()) {
+            remainder = remainder.tail();
+        }
+        return remainder.head();
+    }
+
 }

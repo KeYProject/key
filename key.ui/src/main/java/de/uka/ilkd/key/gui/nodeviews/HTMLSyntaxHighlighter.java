@@ -4,8 +4,10 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JEditorPane;
@@ -181,7 +183,7 @@ public class HTMLSyntaxHighlighter {
      * @return A HTML version of the input String with added syntax
      *         highlighting.
      */
-    public String process(String plainTextString, Node displayedNode) {
+    public static String process(String plainTextString, Node displayedNode) {
 
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .isUseSyntaxHighlighting()) {
@@ -242,7 +244,7 @@ public class HTMLSyntaxHighlighter {
      *        The program variables to highlight.
      * @return The input String augmented by syntax highlighting tags.
      */
-    private String addSyntaxHighlighting(String htmlString,
+    private static String addSyntaxHighlighting(String htmlString,
             Iterable<? extends IProgramVariable> programVariables) {
 
         htmlString =
@@ -374,5 +376,48 @@ public class HTMLSyntaxHighlighter {
     private static interface StringTransformer {
         public String transform(Object input);
     }
+    /**
+     * Set of args to the highlighter that produce the same output
+     */
+    public static final class Args {
+        /** The node */
+        public final WeakReference<Node> node;
+        /** The printed node */
+        public final String text;
+        /** whether to use html highlighting */
+        public final boolean useHtml;
 
+        public Args(Node node, String text, boolean useHtml) {
+            this.node = new WeakReference<>(node);
+            this.text = text;
+            this.useHtml = useHtml;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Args that = (Args) o;
+            return useHtml == that.useHtml && Objects.equals(node.get(), that.node.get())
+                && text.equals(that.text);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(node.get(), text, useHtml);
+        }
+
+        public String run() {
+            var ref = node.get();
+            if (useHtml && ref != null) {
+                return HTMLSyntaxHighlighter.process(text, ref);
+            } else {
+                return HTMLSyntaxHighlighter.toHTML(text);
+            }
+        }
+    }
 }

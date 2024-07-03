@@ -203,7 +203,7 @@ public final class ProgramMethod extends ObserverFunction
      * @return the relative position of the primary token.
      */
     @Override
-    public Position getRelativePosition() {
+    public recoder.java.SourceElement.Position getRelativePosition() {
         return pi.getRelativePosition();
     }
 

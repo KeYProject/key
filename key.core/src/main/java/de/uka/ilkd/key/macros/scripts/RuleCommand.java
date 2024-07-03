@@ -53,6 +53,26 @@ import org.key_project.util.collection.ImmutableSLList;
  * <li>occ = occurrence number</li>
  * <li>inst_= instantiation</li>
  * </ol>
+ *
+ * [scriptDoc "rule"]
+ * This command can be used to apply a single calculus rule to the currently active
+ * open goal.
+ *
+ * ### Parameters:
+ *
+ * [parameter "<1st>" "String"] The name of the rule to be applied
+ * [parameter "on" "Term [optional]"] The term to be used as the "find" term in
+ * a taclet with "find".
+ * [parameter "occ" "int [optional]"] The number of the occurrence of *on* in case there
+ * are several applicable rule apps
+ * [parameter "formula" "Term [optional]"] The toplevel formula in which the
+ * find clause is to be searched.
+ * [parameter "matches" "String [optional]"] Instead of giving the toplevl formula
+ * completely, a regular expression can be specified to match the toplevel formula.
+ * [parameter "inst_SCHEMA" "Term [optional]"] If there are further schema variables
+ * to be instantiated parameters prefixed with "inst_" can be added, e.g.
+ * <tt>inst_b="true"</tt> if schema variable b is to be set to the formula true.
+ * [/scriptDoc]
  */
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
@@ -151,7 +171,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
 
-        if (assumesCandidates.size() != 1) {
+        if (assumesCandidates.size() == 0) {
+            throw new ScriptException("No \\assumes instantiation");
+        } else if (assumesCandidates.size() != 1) {
             throw new ScriptException("Not a unique \\assumes instantiation");
         }
 
@@ -244,9 +266,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
-                throw new ScriptException("Occurence " + p.occ
-                    + " has been specified, but there are only "
-                    + matchingApps.size() + " hits.");
+                throw new ScriptException("Occurrence " + p.occ
+                    + " has been specified, but there are only " + matchingApps.size() + " hits.");
+
             }
 
             return matchingApps.get(p.occ);
@@ -290,7 +312,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -299,7 +321,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -321,7 +343,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -331,7 +353,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -355,10 +377,10 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      *        The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
-    private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf,
-            Services services) throws ScriptException {
-        final boolean satisfiesFormulaParameter = p.formula != null
-                && sf.formula().equalsModRenaming(p.formula);
+    private boolean isSequentFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
+            throws ScriptException {
+        final boolean satisfiesFormulaParameter =
+            p.formula != null && sf.formula().equalsModRenaming(p.formula);
 
         final boolean satisfiesMatchesParameter = p.matches != null
                 && formatTermString(
@@ -387,7 +409,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      */
     private List<TacletApp> filterList(Parameters p,
             ImmutableList<TacletApp> list) {
-        List<TacletApp> matchingApps = new ArrayList<TacletApp>();
+        List<TacletApp> matchingApps = new ArrayList<>();
+
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;

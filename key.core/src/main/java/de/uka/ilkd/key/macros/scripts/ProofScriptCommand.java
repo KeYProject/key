@@ -30,7 +30,7 @@ public interface ProofScriptCommand<T> {
     /**
      *
      */
-    List<ProofScriptArgument> getArguments();
+    List<ProofScriptArgument<T>> getArguments();
 
     /**
      * @param arguments
