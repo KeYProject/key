@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ldt;
 
 import org.key_project.logic.Name;
@@ -25,7 +28,7 @@ public abstract class LDT implements Named {
         sort = services.getNamespaces().sorts().lookup(name);
         if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         this.name = name;
     }
@@ -35,7 +38,7 @@ public abstract class LDT implements Named {
         sort = targetSort;
         if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         this.name = name;
     }
@@ -65,7 +68,7 @@ public abstract class LDT implements Named {
         final Function f = funcNS.lookup(new Name(funcName));
         if (f == null) {
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         return addFunction(f);
     }

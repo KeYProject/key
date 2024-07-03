@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
@@ -9,8 +14,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO: Basically everything here can be moved tpo ncore.
 class TermImpl implements Term {
@@ -23,7 +26,7 @@ class TermImpl implements Term {
      * A static empty list of quantifiable variables used for memory reasons.
      */
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
-            new ImmutableArray<>();
+        new ImmutableArray<>();
 
     private static final AtomicInteger serialNumberCounter = new AtomicInteger();
     private final int serialNumber = serialNumberCounter.incrementAndGet();
@@ -35,12 +38,14 @@ class TermImpl implements Term {
 
     private Sort sort;
     private int depth = -1;
+
     private enum ThreeValuedTruth {
         TRUE, FALSE, UNKNOWN
     }
+
     /**
-            * A cached value for computing the term's rigidness.
-            */
+     * A cached value for computing the term's rigidness.
+     */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ThreeValuedTruth containsCodeBlockRecursive = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
@@ -55,8 +60,7 @@ class TermImpl implements Term {
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
-                    ImmutableArray<QuantifiableVariable> boundVars
-                    ) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
         assert op != null;
         assert subs != null;
         this.op = op;
@@ -66,13 +70,14 @@ class TermImpl implements Term {
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
         ImmutableSet<QuantifiableVariable> localFreeVars =
-                DefaultImmutableSet.nil();
+            DefaultImmutableSet.nil();
 
         if (op instanceof QuantifiableVariable) {
             localFreeVars = localFreeVars.add((QuantifiableVariable) op);
         }
         for (int i = 0, ar = arity(); i < ar; i++) {
-            ImmutableSet<QuantifiableVariable> subFreeVars = (ImmutableSet<QuantifiableVariable>) sub(i).freeVars();
+            ImmutableSet<QuantifiableVariable> subFreeVars =
+                (ImmutableSet<QuantifiableVariable>) sub(i).freeVars();
             for (int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
                 subFreeVars = subFreeVars.remove(varsBoundHere(i).get(j));
             }
@@ -91,7 +96,7 @@ class TermImpl implements Term {
     public <T> T op(Class<T> opClass) throws IllegalArgumentException {
         if (!opClass.isInstance(op)) {
             throw new IllegalArgumentException("Operator does not match the expected type:\n"
-                    + "Operator type was: " + op.getClass() + "\n" + "Expected type was: " + opClass);
+                + "Operator type was: " + op.getClass() + "\n" + "Expected type was: " + opClass);
         }
         return opClass.cast(op);
     }

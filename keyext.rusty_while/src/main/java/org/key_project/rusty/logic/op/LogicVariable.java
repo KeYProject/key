@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op;
 
+import java.util.Objects;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
@@ -13,8 +15,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
-import java.util.Objects;
-
 
 /**
  * The objects of this class represent logical variables, used e.g. for quantification.
@@ -23,10 +23,10 @@ import java.util.Objects;
 public final class LogicVariable extends AbstractSortedOperator
         implements QuantifiableVariable, ParsableVariable, EqualsModProofIrrelevancy {
 
-    private final int index ;
+    private final int index;
 
     public LogicVariable(int index, Sort sort) {
-        super(new Name("@"+index), sort, Modifier.RIGID);
+        super(new Name("@" + index), sort, Modifier.RIGID);
         assert sort != RustyDLTheory.FORMULA;
         assert sort != RustyDLTheory.UPDATE;
         this.index = index;

@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
-import org.jspecify.annotations.NonNull;
+import java.util.Map;
+
 import org.key_project.logic.Term;
-import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
-import java.util.Map;
+import org.jspecify.annotations.NonNull;
 
 public class TermFactory {
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<>();
@@ -36,8 +39,8 @@ public class TermFactory {
      * entire system.
      */
     public Term createTerm(@NonNull Operator op, ImmutableArray<Term> subs,
-                           ImmutableArray<QuantifiableVariable> boundVars) {
-       if (subs == null || subs.isEmpty()) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
+        if (subs == null || subs.isEmpty()) {
             subs = NO_SUBTERMS;
         }
 
@@ -48,7 +51,8 @@ public class TermFactory {
         return createTerm(op, createSubtermArray(subs), null);
     }
 
-    public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars) {
+    public Term createTerm(Operator op, Term[] subs,
+            ImmutableArray<QuantifiableVariable> boundVars) {
         return createTerm(op, createSubtermArray(subs), boundVars);
     }
 
@@ -69,10 +73,10 @@ public class TermFactory {
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
-                              ImmutableArray<QuantifiableVariable> boundVars) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
 
         final TermImpl newTerm =
-               new TermImpl(op, subs, boundVars);
+            new TermImpl(op, subs, boundVars);
 
         // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos

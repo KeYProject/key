@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.Reader;
 
 import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 
 import org.antlr.v4.runtime.CharStreams;
