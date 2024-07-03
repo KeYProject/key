@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import org.key_project.logic.Namespace;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.parser.schemajava.ParseException;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;

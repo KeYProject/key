@@ -9,11 +9,12 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.RuleSet;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 public class NamespaceSet {
 
@@ -30,7 +31,8 @@ public class NamespaceSet {
 
     public NamespaceSet(Namespace<@NonNull QuantifiableVariable> varNS,
             Namespace<@NonNull JFunction> funcNS,
-            Namespace<@NonNull Sort> sortNS, Namespace<@NonNull RuleSet> ruleSetNS, Namespace<@NonNull Choice> choiceNS,
+            Namespace<@NonNull Sort> sortNS, Namespace<@NonNull RuleSet> ruleSetNS,
+            Namespace<@NonNull Choice> choiceNS,
             Namespace<@NonNull IProgramVariable> programVarNS) {
         this.varNS = varNS;
         this.progVarNS = programVarNS;

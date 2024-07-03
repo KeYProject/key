@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import org.key_project.logic.Namespace;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import org.key_project.logic.Namespace;
 
 public interface SchemaJavaReader extends JavaReader {
 
