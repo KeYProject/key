@@ -1,0 +1,15 @@
+de.uka.ilkd.key.gui.isabelletranslation.DefinedSymbolsHandler
+de.uka.ilkd.key.gui.isabelletranslation.InstanceOperatorHandler
+de.uka.ilkd.key.gui.isabelletranslation.BooleanOpHandler
+de.uka.ilkd.key.gui.isabelletranslation.PolymorphicHandler
+de.uka.ilkd.key.gui.isabelletranslation.QuantifierHandler
+de.uka.ilkd.key.gui.isabelletranslation.LogicalVariableHandler
+de.uka.ilkd.key.gui.isabelletranslation.NumberConstantsHandler
+de.uka.ilkd.key.gui.isabelletranslation.IntegerOpHandler
+de.uka.ilkd.key.gui.isabelletranslation.InfiniteUnionHandler
+de.uka.ilkd.key.gui.isabelletranslation.BSumHandler
+de.uka.ilkd.key.gui.isabelletranslation.SeqDefHandler
+de.uka.ilkd.key.gui.isabelletranslation.SortDependingFunctionHandler
+de.uka.ilkd.key.gui.isabelletranslation.FieldHandler
+de.uka.ilkd.key.gui.isabelletranslation.ObserverFunctionHandler
+de.uka.ilkd.key.gui.isabelletranslation.UninterpretedSymbolsHandler
