@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
 
 import org.key_project.logic.sort.Sort;
 
@@ -19,7 +18,9 @@ import org.key_project.logic.sort.Sort;
  * in case of exceptional termination.
  * </p>
  * <p>
- * The default implementation is {@link ExecutionTermination} which is instantiated via a
+ * The default implementation is
+ * {@link de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination}
+ * which is instantiated via a
  * {@link SymbolicExecutionTreeBuilder} instance.
  * </p>
  *

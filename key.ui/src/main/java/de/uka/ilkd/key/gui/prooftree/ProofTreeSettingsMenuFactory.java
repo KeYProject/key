@@ -11,10 +11,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import bibliothek.gui.dock.common.action.CCheckBox;
-import bibliothek.gui.dock.common.action.CMenu;
+import org.key_project.dockingframes.common.common.action.*;
 
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 

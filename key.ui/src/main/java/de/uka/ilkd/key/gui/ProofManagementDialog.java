@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
@@ -38,6 +37,7 @@ import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
