@@ -19,7 +19,7 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.3.2
+        uses: gradle/actions/setup-gradle@v3.4.2
       - name: Build Documentation with Gradle
         run: ./gradlew alldoc
 
