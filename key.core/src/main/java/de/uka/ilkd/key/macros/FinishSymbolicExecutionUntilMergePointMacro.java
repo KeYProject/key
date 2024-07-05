@@ -22,10 +22,11 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
+
 import org.jspecify.annotations.Nullable;
 
 /**

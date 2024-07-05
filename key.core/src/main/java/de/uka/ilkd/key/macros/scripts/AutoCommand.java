@@ -19,9 +19,10 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
@@ -140,11 +141,13 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         public int maxSteps = -1;
 
         /** Run on formula matching the given regex */
-        @Option(value = "matches", required = false) @Nullable
+        @Option(value = "matches", required = false)
+        @Nullable
         public String matches = null;
 
         /** Run on formula matching the given regex */
-        @Option(value = "breakpoint", required = false) @Nullable
+        @Option(value = "breakpoint", required = false)
+        @Nullable
         public String breakpoint = null;
 
         public boolean isOnAllOpenGoals() {
