@@ -15,10 +15,15 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * All proof irrelevant attributes are ignored in this equality check.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY}.
+ *
+ * @author Tobias Reinhold
  */
-public class ProofIrrelevancyProperty implements TermProperty {
+public class ProofIrrelevancyProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
@@ -27,17 +32,15 @@ public class ProofIrrelevancyProperty implements TermProperty {
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY} and is used as a
-     * parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
+     * can be accessed through {@link ProofIrrelevancyProperty#PROOF_IRRELEVANCY_PROPERTY} and is
+     * used as a parameter for
+     * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private ProofIrrelevancyProperty() {}
 
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for attributes
-     * that
-     * are not relevant for the purpose of these terms in the proof.
+     * that are not relevant for the purpose of these terms in the proof.
      * <p>
      * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
@@ -45,11 +48,13 @@ public class ProofIrrelevancyProperty implements TermProperty {
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
+     * @param v should not be used for this equality check
      * @return true iff {@code term2} is a term syntactically equal to {@code term1}, except for
      *         proof-irrelevant attributes.
+     * @param <V> is not needed for this equality check
      */
     @Override
-    public Boolean equalsModThisProperty(Term term1, Term term2) {
+    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
         }
@@ -117,7 +122,7 @@ public class ProofIrrelevancyProperty implements TermProperty {
 
     /**
      * Compute the hashcode mod proof irrelevancy of an iterable of terms using the elements'
-     * {@link TermEqualsModProperty} implementation.
+     * {@link EqualsModProperty} implementation.
      *
      * @param iter iterable of terms
      * @return combined hashcode

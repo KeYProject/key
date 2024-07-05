@@ -12,35 +12,43 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * Renaming of variables is ignored in this equality check.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}.
+ *
+ * @author Tobias Reinhold
  */
-public class RenamingProperty implements TermProperty {
+public class RenamingTermProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
-    public static final RenamingProperty RENAMING_PROPERTY = new RenamingProperty();
+    public static final RenamingTermProperty RENAMING_TERM_PROPERTY = new RenamingTermProperty();
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link RenamingProperty#RENAMING_PROPERTY} and is used as a parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
+     * can be accessed through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY} and is used as a
+     * parameter for {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
-    private RenamingProperty() {}
+    private RenamingTermProperty() {}
 
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1} modulo bound renaming.
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
-     * @return true iff {@code term2} has the same values in operator, sort, arity, varsBoundHere
-     *         and javaBlock as {@code term1} modulo bound renaming
+     * @param v should not be used for this equality check
+     * @return {@code true} iff {@code term2} has the same values in operator, sort, arity,
+     *         varsBoundHere and javaBlock as {@code term1} modulo bound renaming
+     * @param <V> is not needed for this equality check
      */
     @Override
-    public Boolean equalsModThisProperty(Term term1, Term term2) {
+    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
         }
@@ -141,7 +149,7 @@ public class RenamingProperty implements TermProperty {
         if (!(op0 instanceof SchemaVariable) && op0 instanceof ProgramVariable pv0) {
             if (op1 instanceof ProgramVariable pv1) {
                 nat = checkNat(nat);
-                if (!pv0.equalsModRenaming(pv1, nat)) {
+                if (!pv0.equalsModProperty(pv1, RENAMING_SOURCE_ELEMENT_PROPERTY, nat)) {
                     return false;
                 }
             } else {
@@ -182,9 +190,9 @@ public class RenamingProperty implements TermProperty {
      * <p>
      * Moved here from {@link JavaBlock} while refactoring equalsModRenaming in {@link Term}.
      * As the implementation of equalsModRenaming in {@link JavaBlock} was only used in
-     * {@link RenamingProperty#handleJava(JavaBlock, JavaBlock, NameAbstractionTable)}
+     * {@link RenamingTermProperty#handleJava(JavaBlock, JavaBlock, NameAbstractionTable)}
      * and the deprecated class de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint,
-     * it is now only a helper method in {@link RenamingProperty}.
+     * it is now only a helper method in {@link RenamingTermProperty}.
      *
      * @param jb1 the first {@link JavaBlock}
      * @param jb2 the second {@link JavaBlock}
@@ -198,7 +206,7 @@ public class RenamingProperty implements TermProperty {
         if (pe1 == null && pe2 == null) {
             return false;
         } else if (pe1 != null && pe2 != null) {
-            return !pe1.equalsModRenaming(pe2, nat);
+            return !pe1.equalsModProperty(pe2, RENAMING_SOURCE_ELEMENT_PROPERTY, nat);
         }
         return true;
     }

@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * Term feature for testing equality of two terms. The feature returns zero iff it is invoked on a
@@ -31,6 +31,6 @@ public class EqTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term term, MutableState mState, Services services) {
-        return term.equalsModProperty(pattern.getContent(mState), RENAMING_PROPERTY);
+        return term.equalsModProperty(pattern.getContent(mState), RENAMING_TERM_PROPERTY);
     }
 }

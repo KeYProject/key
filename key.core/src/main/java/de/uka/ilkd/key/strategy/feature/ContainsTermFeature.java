@@ -14,7 +14,7 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Visitor;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 /**
@@ -84,7 +84,7 @@ public class ContainsTermFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            found = found || visited.equalsModProperty(term, RENAMING_PROPERTY);
+            found = found || visited.equalsModProperty(term, RENAMING_TERM_PROPERTY);
         }
 
         @Override

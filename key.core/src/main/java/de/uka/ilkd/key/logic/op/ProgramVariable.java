@@ -206,18 +206,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         return null;
     }
 
-
-    /**
-     * equals modulo renaming is described in the corresponding comment in class SourceElement. In
-     * this case two programvariables are considered to be equal if they are assigned to the same
-     * abstract name or if they are the same object.
-     */
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return nat.sameAbstractName(this, se);
-    }
-
-
     @Override
     public Expression convertToProgram(Term t, ExtList l) {
         if (isStatic()) {
