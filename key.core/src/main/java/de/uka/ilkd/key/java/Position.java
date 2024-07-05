@@ -47,9 +47,10 @@ public class Position {
      * @param column the column number.
      */
     public Position(int line, int column) {
-        if (line < 1 || column < 1) {
+
+        /*if (line < 1 || column < 1) {
             throw new IllegalArgumentException(line + "," + column);
-        }
+        }*/
         this.line = line;
         this.column = column;
     }
@@ -71,12 +72,12 @@ public class Position {
      */
     public static Position fromSEPosition(recoder.java.SourceElement.Position pos) {
         if (pos == SourceElement.Position.UNDEFINED) {
-            return UNDEFINED;
+            return UNDEFINED;/*
         } else if (pos.getColumn() == 0) {
             // This is a hack, some recoder positions have column 0 (not set)
             // even though the column is 0-based *and* -1 is the unset value
             // return new Position(pos.getLine(), 1);
-            throw new IllegalArgumentException("ProofJava produced column 0");
+            throw new IllegalArgumentException("ProofJava produced column 0");*/
         } else {
             return new Position(pos.getLine(), pos.getColumn());
         }
