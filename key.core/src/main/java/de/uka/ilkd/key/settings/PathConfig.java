@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import org.key_project.util.java.IOUtil;
-
 import java.io.File;
+
+import org.key_project.util.java.IOUtil;
 
 /**
  * Keeps some central paths to files and directories.
@@ -30,18 +30,21 @@ public final class PathConfig {
     /**
      * directory where to find the KeY configuration files
      */
-    private static String keyConfigDir = IOUtil.getHomeDirectory() + File.separator + KEY_DIRECTORY_NAME;
+    private static String keyConfigDir =
+        IOUtil.getHomeDirectory() + File.separator + KEY_DIRECTORY_NAME;
 
 
     /**
      * In which file to store the recent files.
      */
-    private static String recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.json";
+    private static String recentFileStorage =
+        getKeyConfigDir() + File.separator + "recentFiles.json";
 
     /**
      * In which file to store the proof-independent settings.
      */
-    private static String proofIndependentSettings = getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
+    private static String proofIndependentSettings =
+        getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
 
 
     /**

@@ -9,7 +9,7 @@ import java.util.Iterator;
 /**
  * This interface has to be implemented by a Class providing a persistent Map.
  */
-@SuppressWarnings({"nullness", "type.argument.type.incompatible"})
+@SuppressWarnings({ "nullness", "type.argument.type.incompatible" })
 public interface ImmutableMap<S, T>
         extends Iterable<ImmutableMapEntry<S, T>> {
 

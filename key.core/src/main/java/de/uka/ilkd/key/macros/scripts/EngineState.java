@@ -7,7 +7,6 @@ import java.io.File;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
