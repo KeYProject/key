@@ -15,6 +15,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * The BenchmarkRunner is in charge of obtaining strategies according to a benchmark, exploring the implicit search tree and filling a Benchmark with its results.
+ * @param <TFunc> User data for TaskSpecifyFunction
+ * @param <TSub> User data for TaskSpecifySubcontract
+ * @param <TLoop> User data for TaskSpecifyLoopInvariant
+ */
 public class BenchmarkRunner<TFunc, TSub, TLoop> {
     StrategyProvider<TaskSpecifyFunction, TFunc> funcStrategyProvider;
     StrategyProvider<TaskSpecifySubcontract, TSub> subStrategyProvider;
@@ -22,71 +28,73 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
     Function<LLMChoice, BiFunction<PromptReason, Prompt, PromptAnswer> > selectOracle;
     BiFunction<LLMChoice, ControlParameters, Predicate<PromptResult> > selectResultAcceptor;
 
-    OracleGpt3_5_Turbo oracle;
-
-
-
+    /**
+     *
+     * @param funcStrategyProvider A strategy provider for instances of TaskSpecifyFunction
+     * @param subStrategyProvider A strategy provider for instances of TaskSpecifySubcontract
+     * @param loopStrategyProvider A strategy provider for instances of TaskSpecifyLoopInvariant
+     * @param selectOracle A factory method for creating an oracle. The oracle is expected to keep history of their send messages.
+     * @param selectResultAcceptor A function that has a final say on whether a verified result should be actually accepted. Will be run on all verified results.
+     */
     public BenchmarkRunner(
             StrategyProvider<TaskSpecifyFunction, TFunc> funcStrategyProvider,
             StrategyProvider<TaskSpecifySubcontract, TSub> subStrategyProvider,
             StrategyProvider<TaskSpecifyLoopInvariant, TLoop> loopStrategyProvider,
             Function<LLMChoice, BiFunction<PromptReason, Prompt, PromptAnswer>> selectOracle,
-            BiFunction<LLMChoice, ControlParameters, Predicate<PromptResult>> selectResultAcceptor,
-            OracleGpt3_5_Turbo oracle
+            BiFunction<LLMChoice, ControlParameters, Predicate<PromptResult>> selectResultAcceptor
     ) {
         this.funcStrategyProvider = funcStrategyProvider;
         this.subStrategyProvider = subStrategyProvider;
         this.loopStrategyProvider = loopStrategyProvider;
         this.selectOracle = selectOracle;
         this.selectResultAcceptor = selectResultAcceptor;
-        this.oracle = oracle;
     }
 
+    /**
+     * If the given benchmark is not completed, the BenchmarkRunner will try to solve it and store appropriate data denominating it.
+     * @param benchmark The benchmark to be completed
+     */
     public void run(Benchmark benchmark) {
-        try {
-            if (benchmark.isFinished()) return;
-            // this method is essentially only here to select the correct strategies and types
-            // todo: this can be made fully independent of Type by yet another indirection, which may be added later
-            // todo: it should be typesafe after making it independent
+        if (benchmark.isFinished()) return;
+        // this method is essentially only here to select the correct strategies and types
+        // todo: this can be made fully independent of Type by yet another indirection, which may be added later
+        // todo: it should be typesafe after making it independent
 
-            BenchmarkParameters param = benchmark.params;
-            ControlParameters ctl = param.controlParameters;
+        BenchmarkParameters param = benchmark.params;
+        ControlParameters ctl = param.controlParameters;
 
-            BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle = selectOracle.apply(param.oracle);
-            Predicate<PromptResult> acceptResult = selectResultAcceptor.apply(param.oracle, param.controlParameters);
+        BiFunction<PromptReason, Prompt, PromptAnswer> llm_oracle = selectOracle.apply(param.oracle);
+        Predicate<PromptResult> acceptResult = selectResultAcceptor.apply(param.oracle, param.controlParameters);
 
-            switch (param.task.tag) {
-                // todo: refactor into parameterized subfuncitoncall
-                case SPECIFY_FUNCTION: {
-                    var task = (TaskSpecifyFunction) param.task;
-                    IPromptStrategy<TFunc> strategy = funcStrategyProvider.selectStrategy(param.oracle, task);
-                    TFunc data = funcStrategyProvider.createUserData();
-                    Function<PromptAnswer, PromptResult> defaultVerificator = funcStrategyProvider.createDefaultVerificator(param.oracle, task);
+        switch (param.task.tag) {
+            // todo: refactor into parameterized subfuncitoncall
+            case SPECIFY_FUNCTION: {
+                var task = (TaskSpecifyFunction) param.task;
+                IPromptStrategy<TFunc> strategy = funcStrategyProvider.selectStrategy(param.oracle, task);
+                TFunc data = funcStrategyProvider.createUserData();
+                Function<PromptAnswer, PromptResult> defaultVerificator = funcStrategyProvider.createDefaultVerificator(param.oracle, task);
 
-                    run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
-                    break;
-                }
-                case SPECIFY_SUBCONTRACT: {
-                    var task = (TaskSpecifySubcontract) param.task;
-                    IPromptStrategy<TSub> strategy = subStrategyProvider.selectStrategy(param.oracle, task);
-                    TSub data = subStrategyProvider.createUserData();
-                    Function<PromptAnswer, PromptResult> defaultVerificator = subStrategyProvider.createDefaultVerificator(param.oracle, task);
-
-                    run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
-                    break;
-                }
-                case SPECIFY_LOOP_INVARIANT: {
-                    var task = (TaskSpecifyLoopInvariant) param.task;
-                    IPromptStrategy<TLoop> strategy = loopStrategyProvider.selectStrategy(param.oracle, task);
-                    TLoop data = loopStrategyProvider.createUserData();
-                    Function<PromptAnswer, PromptResult> defaultVerificator = loopStrategyProvider.createDefaultVerificator(param.oracle, task);
-
-                    run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
-                    break;
-                }
+                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                break;
             }
-        } finally {
-            oracle.shutdown();
+            case SPECIFY_SUBCONTRACT: {
+                var task = (TaskSpecifySubcontract) param.task;
+                IPromptStrategy<TSub> strategy = subStrategyProvider.selectStrategy(param.oracle, task);
+                TSub data = subStrategyProvider.createUserData();
+                Function<PromptAnswer, PromptResult> defaultVerificator = subStrategyProvider.createDefaultVerificator(param.oracle, task);
+
+                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                break;
+            }
+            case SPECIFY_LOOP_INVARIANT: {
+                var task = (TaskSpecifyLoopInvariant) param.task;
+                IPromptStrategy<TLoop> strategy = loopStrategyProvider.selectStrategy(param.oracle, task);
+                TLoop data = loopStrategyProvider.createUserData();
+                Function<PromptAnswer, PromptResult> defaultVerificator = loopStrategyProvider.createDefaultVerificator(param.oracle, task);
+
+                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                break;
+            }
         }
     }
 
@@ -169,6 +177,17 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
         // todo: collect the results into the benchmark
     }
 
+    /**
+     * Factory method for simple instantiation of a BenchmarkRunner
+     * @param token An access token for OpenAI
+     * @param funcStrategyProvider Provider for TaskSpecifyFunction
+     * @param subStrategyProvider Provider for TaskSpecifySubcontract
+     * @param loopStrategyProvider Provider for TaskSpecifyLoopInvariant
+     * @return A BenchmarkRunner that uses OpenAI's Gpt3.5-turbo as oracle
+     * @param <TFunc> User data for TaskSpecifyFunction
+     * @param <TSub> User data for TaskSpecifySubcontract
+     * @param <TLoop> User data for TaskSpecifyLoopInvariant
+     */
     public static <TFunc, TSub, TLoop> BenchmarkRunner<TFunc, TSub, TLoop> create(
             String token,
             StrategyProvider<TaskSpecifyFunction, TFunc> funcStrategyProvider,
@@ -178,6 +197,6 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
         var oracle = new OracleGpt3_5_Turbo(token);
         return new BenchmarkRunner<>(funcStrategyProvider, subStrategyProvider, loopStrategyProvider,
                 choice -> oracle::answerPrompt,
-                (llmChoice, controlParameters) -> (r -> true), oracle);
+                (llmChoice, controlParameters) -> (r -> true));
     }
 }

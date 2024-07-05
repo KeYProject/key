@@ -1,5 +1,8 @@
 package org.key_project.llmsynth.benchmarks;
 
+/**
+ *
+ */
 public class Benchmark {
     public final BenchmarkParameters params;
     public int n; // this benchmark is the n-th benchmark with the same params ; TODO: should this really be used?
@@ -9,10 +12,18 @@ public class Benchmark {
         params = bp;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isFinished() {
         return result != null;
     }
 
+    /**
+     *
+     * @return
+     */
     public BenchmarkResult getResult() {
         return result;
     }

@@ -6,6 +6,10 @@ import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 
 import java.util.function.Supplier;
 
+/**
+ * Override methods with the name 'reason' to change behaviour for processing according PromptReasons
+ * @param <T>
+ */
 public class DecorateLegacy<T> implements IPromptStrategy<T>, LegacyVisitor<T> {
     protected IPromptStrategy<T> fallback;
 

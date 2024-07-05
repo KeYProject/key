@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * A utility class for creating prompts
+ */
 public class PromptBuilder
 {
     final String DEFAULT_DELIM = "======================================================";

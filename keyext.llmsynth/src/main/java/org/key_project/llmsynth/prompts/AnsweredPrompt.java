@@ -2,6 +2,10 @@ package org.key_project.llmsynth.prompts;
 
 import java.util.List;
 
+/**
+ * A prompt for which an answer has already been set.
+ * The BenchmarkRunner will not send it to the oracle.
+ */
 public class AnsweredPrompt extends Prompt {
     PromptAnswer answer;
 
@@ -20,6 +24,10 @@ public class AnsweredPrompt extends Prompt {
         return List.of(new AnsweredPrompt(prompt, answer.getContent()));
     }
 
+    /**
+     *
+     * @return The predetermined answer
+     */
     public PromptAnswer getAnswer() {
         return answer;
     }

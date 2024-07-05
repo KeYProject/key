@@ -5,6 +5,9 @@ import org.key_project.llmsynth.prompts.PromptBuilder;
 
 import java.util.function.Supplier;
 
+/**
+ * There was no JML found, as the region it should looked for also didn't exist.
+ */
 public class NoJMLInRegion extends LegacyReasons {
     @Override
     public <T> Iterable<Prompt> dispatch(LegacyVisitor<T> visitor, T o, Supplier<PromptBuilder> newBuilder) {

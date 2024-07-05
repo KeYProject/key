@@ -100,6 +100,9 @@ class CustomProvider implements  StrategyProvider<TaskSpecifyFunction, UserData>
     }
 }
 
+/**
+ * An example of how to customize/provide your own PromptStrategy
+ */
 public class CustomPromptExample {
     public static void run(String token, Path tmpfile, Benchmark benchmark) {
         var myProvider = new CustomProvider(token, tmpfile);

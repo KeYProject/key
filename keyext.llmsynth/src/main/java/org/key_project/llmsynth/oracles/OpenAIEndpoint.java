@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The OracleEndpoint implementation for OpenAI
+ */
 public class OpenAIEndpoint implements OracleEndpoint {
     public static final String MODEL_3_5_TURBO = "gpt-3.5-turbo";
 

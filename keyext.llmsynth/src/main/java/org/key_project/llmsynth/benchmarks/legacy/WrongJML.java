@@ -6,6 +6,9 @@ import org.key_project.llmsynth.prompts.PromptBuilder;
 
 import java.util.function.Supplier;
 
+/**
+ * The JML code was incorrect or failed to verify
+ */
 public class WrongJML extends LegacyReasons {
     private Exception exception;
     private String jml;

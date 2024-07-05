@@ -2,7 +2,11 @@ package org.key_project.llmsynth.prompts;
 
 import java.util.function.Supplier;
 
-
+/**
+ * The main interface used to complete a benchmark.
+ * Given A reason to prompt an oracle it shall provide possible prompts that may yield a solution to the problem described in the benchmark.
+ * @param <TUserData> user data
+ */
 public interface IPromptStrategy<TUserData> {
     // TODO: think about having LLM specific PromptRequestBuilders (if PRB is right type then apply else fallback - with the 'last' fallback just throwing an error)
     Iterable<Prompt> apply(PromptReason reason, TUserData data, Supplier<PromptBuilder> newBuilder);
@@ -17,10 +21,20 @@ public interface IPromptStrategy<TUserData> {
 //        };
 //    }
 
+    /**
+     * Syntactic sugar
+     * @param other the alternative
+     * @return PromptStrategy.registerAlternativeWhenEmpty(self, other)
+     */
     default IPromptStrategy<TUserData> orElse(IPromptStrategy<TUserData> other) {
         return PromptStrategy.registerAlternativeWhenEmpty(this, other);
     }
 
+    /**
+     * Syntactic sugar
+     * @param other the strategy to be used after
+     * @return PromptStrategy.combine(self, other)
+     */
     default IPromptStrategy<TUserData> combine(IPromptStrategy<TUserData> other) {
         return PromptStrategy.combine(this, other);
     }

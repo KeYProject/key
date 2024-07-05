@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * TODO
+ */
 public class Prompt implements PromptMessage {
     protected final List<PromptElement> elements; // = new ArrayList<>();
     protected String promptString; // = null;
@@ -23,6 +26,10 @@ public class Prompt implements PromptMessage {
         this.removeHistory = removeHistory;
     }
 
+    /**
+     * Write the prompt content out via the given PrintWriter
+     * @param pw Where to write the content
+     */
     public void print(PrintWriter pw) {
         for (var e : elements) {
             e.print(pw);
@@ -31,10 +38,21 @@ public class Prompt implements PromptMessage {
 
     // TODO: the verificator shouldn't really be here, however for now it will stay
     // on the flip side: if the same prompt is run through the oracle multiple times, it is fine here, i think
+
+    /**
+     * Verifies the answer of an oracle
+     * @param answer The answer to this prompt
+     * @return The Verification result
+     */
     public PromptResult verifyAnswer(PromptAnswer answer) {
+        assert answer.getPrompt().equals(this);
         return verificator.apply(answer);
     }
 
+    /**
+     *
+     * @return True, if previous Prompts should not be included in the history sent to an oracle
+     */
     public boolean hasRemoveHistoryFlag() {
         return removeHistory;
     }
@@ -60,6 +78,12 @@ public class Prompt implements PromptMessage {
         return promptType;
     }
 
+    /**
+     * Creates a prompt from a string
+     * @param typ The purpose
+     * @param s The messsage content
+     * @return A new prompt
+     */
     public static Prompt from(PromptType typ, String s) {
         return new Prompt(List.of(p -> p.println(s)), a -> PromptResult.reject(a, new DirectPrompt()), typ, false);
     }

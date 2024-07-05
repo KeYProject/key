@@ -6,6 +6,9 @@ import org.key_project.llmsynth.prompts.PromptBuilder;
 
 import java.util.function.Supplier;
 
+/**
+ * The reason of failure coulnd't be described further
+ */
 public class UnknownReason extends LegacyReasons {
     private Exception exception;
 

@@ -5,6 +5,9 @@ import org.key_project.llmsynth.prompts.PromptBuilder;
 
 import java.util.function.Supplier;
 
+/**
+ * The given code was not valid Java
+ */
 public class InvalidJava extends LegacyReasons {
     private Exception exception;
     public InvalidJava(Exception failureException) {

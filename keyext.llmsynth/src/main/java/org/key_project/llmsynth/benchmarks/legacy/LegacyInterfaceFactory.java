@@ -17,6 +17,9 @@ import java.nio.file.Path;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * A Factory of StrategyProviders for the old quick-n-dirty benchmarking method
+ */
 public final class LegacyInterfaceFactory {
     public final class SP<TTask extends LLMTask> implements StrategyProvider<TTask, Nothing> {
         BiFunction<LLMChoice, TTask, IPromptStrategy<Nothing>>  mkstrategy;

@@ -10,6 +10,11 @@ import org.key_project.llmsynth.prompts.PromptReason;
 import java.util.function.Supplier;
 
 //todo: create FirstPrompt instances for each Tag
+
+/**
+ * The first prompt in history.
+ * There were no previous prompts, and thus there can't be an answer.
+ */
 public class FirstPrompt extends LegacyReasons {
     private final int trialNumber;
 
