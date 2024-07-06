@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -83,9 +82,6 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     public FunctionalOperationContractPO(InitConfig initConfig,
             FunctionalOperationContract contract) {
         super(initConfig, contract.getName());
-        if (FinalHeapResolver.isFinalEnabled(initConfig)) {
-            contract = new FinalHeapResolver(initConfig.getServices()).resolve(contract);
-        }
         this.contract = contract;
     }
 
