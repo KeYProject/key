@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -364,6 +365,20 @@ public abstract class Notation {
         @Override
         public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) {
             sp.printSelect(t, heapTerm);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for select.
+     */
+    public static final class FinalNotation extends Notation {
+        public FinalNotation() {
+            super(140);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp)  {
+            sp.printFinal(t);
         }
     }
 
