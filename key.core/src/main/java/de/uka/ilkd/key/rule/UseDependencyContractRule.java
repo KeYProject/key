@@ -10,7 +10,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
@@ -403,15 +402,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
         assert contract != null;
 
-        if (FinalHeapResolver.isFinalEnabled(goal.proof().getSettings())) {
-            contract = new FinalHeapResolver(services).resolve(contract);
-        }
-
         // get step
         final PosInOccurrence step =
             ((UseDependencyContractApp) ruleApp).step(goal.sequent(), services);
-        // get step
-        final PosInOccurrence step = ((UseDependencyContractApp) ruleApp).step();
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);
