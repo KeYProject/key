@@ -34,6 +34,7 @@ import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -561,9 +562,14 @@ public final class UseOperationContractRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         // configure contract
-        final FunctionalOperationContract contract =
+        FunctionalOperationContract contract =
             (FunctionalOperationContract) ((AbstractContractRuleApp) ruleApp).getInstantiation();
+
         assert contract.getTarget().equals(inst.pm);
+
+        if (FinalHeapResolver.isFinalEnabled(goal.proof().getSettings())) {
+            contract = new FinalHeapResolver(services).resolve(contract);
+        }
 
         final List<LocationVariable> heapContext =
             HeapContext.getModifiableHeaps(goal.proof().getServices(), inst.transaction);
