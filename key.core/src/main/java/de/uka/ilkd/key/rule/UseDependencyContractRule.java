@@ -404,7 +404,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
         // get step
         final PosInOccurrence step =
-            ((UseDependencyContractApp) ruleApp).step(goal.sequent(), services);
+            ((UseDependencyContractApp) ruleApp).step();
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);
