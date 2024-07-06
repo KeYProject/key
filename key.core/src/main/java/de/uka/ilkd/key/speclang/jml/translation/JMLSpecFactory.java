@@ -1552,6 +1552,7 @@ public class JMLSpecFactory {
                 .resultVariable(pv.resultVar).exceptionVariable(pv.excVar).atPres(pv.atPres)
                 .atBefore(pv.atBefores);
         Term assignee = io.translateTerm(setStatementContext.getAssignee());
+        assignee = resolveFinalAssignee(assignee);
         Term value = io.translateTerm(setStatementContext.getValue());
         if (value.sort() == JavaDLTheory.FORMULA) {
             value = tb.convertToBoolean(value);
@@ -1566,6 +1567,19 @@ public class JMLSpecFactory {
         services.getSpecificationRepository().addStatementSpec(
             statement,
             new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value)));
+    }
+
+    private Term resolveFinalAssignee(Term assignee) {
+        if (services.getTypeConverter().getHeapLDT().isFinalOp(assignee.op())) {
+            SortDependingFunction finalOp = assignee.op(SortDependingFunction.class);
+            return tb.select(
+                    finalOp.sort(),
+                    tb.getBaseHeap(),
+                    assignee.sub(0),
+                    assignee.sub(1));
+        } else {
+            return assignee;
+        }
     }
 
     /**
