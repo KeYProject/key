@@ -12,6 +12,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -270,4 +271,26 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         result.addAll(collector.result());
     }
 
+    @Override
+    public void performActionOnJmlAssertCondition(final Term x) {
+        if (x == null) {
+            throw new IllegalStateException("JML assert is incomplete");
+        }
+        TermProgramVariableCollector tpvc = services.getFactory().create(services);
+        x.execPostOrder(tpvc);
+        result.addAll(tpvc.result());
+    }
+
+    @Override
+    public void performActionOnJmlAssert(final JmlAssert x) {
+        TermProgramVariableCollector tpvc = services.getFactory().create(services);
+        for (Term v : x.getVars().atPres.values()) {
+            v.execPostOrder(tpvc);
+        }
+        for (Term v : x.getVars().atBefores.values()) {
+            v.execPostOrder(tpvc);
+        }
+        result.addAll(tpvc.result());
+
+    }
 }

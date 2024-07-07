@@ -410,14 +410,13 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
     private void transformAssertStatement(TextualJMLAssertStatement stat,
             Comment[] originalComments) throws SLTranslationException {
-        if (originalComments.length <= 0)
+        if (originalComments.length <= 0) {
             throw new IllegalArgumentException();
+        }
 
         // determine parent, child index
-        StatementBlock astParent = (StatementBlock) originalComments[0]
-                .getParent().getASTParent();
-        int childIndex = astParent
-                .getIndexOfChild(originalComments[0].getParent());
+        StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
+        int childIndex = astParent.getIndexOfChild(originalComments[0].getParent());
 
         ParserRuleContext ctx = stat.getContext().first;
 
@@ -429,18 +428,19 @@ public final class JMLTransformer extends RecoderModelTransformer {
         final Kind kind = stat.getKind();
         JmlAssert jmlAssert = new JmlAssert(kind, stat.getContext(), stat.getAssertionProof(), stat.getOptLabel());
         try {
-            String comment = String.format(
-                "/*@ normal_behavior\n"
-                    + "  @ %s %s\n"
-                    + "  @ assignable \\strictly_nothing;\n"
-                    + "  @*/",
-                stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
 
-            StatementBlock block = services.getProgramFactory().parseStatementBlock(
-                new StringReader(String.format("{\n%s\n{;;}}", comment)));
+//            String comment = String.format(
+//                "/*@ normal_behavior\n"
+//                    + "  @ %s %s\n"
+//                    + "  @ assignable \\strictly_nothing;\n"
+//                    + "  @*/",
+//                stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
+//
+//            StatementBlock block = services.getProgramFactory().parseStatementBlock(
+//                new StringReader(String.format("{\n%s\n{;;}}", comment)));
 
-            updatePositionInformation(block, pos);
-            doAttach(block, astParent, childIndex);
+            updatePositionInformation(jmlAssert, pos);
+            doAttach(jmlAssert, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(
                 String.format("%s (%s)", e.getMessage(), e.getClass().getName()),

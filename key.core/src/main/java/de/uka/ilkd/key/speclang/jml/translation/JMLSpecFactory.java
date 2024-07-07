@@ -1471,6 +1471,38 @@ public class JMLSpecFactory {
     }
 
     /**
+     * Translates the condition Term of a JmlAssert statement.
+     *
+     * @param jmlAssert the statement to create the condition for
+     * @param pm the enclosing method
+     */
+    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+        final Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            atPreVars.put(heap, tb.atPreVar(heap.toString(), heap.sort(), true));
+        }
+        final ImmutableList<LocationVariable> parameters = pm.collectParameters();
+        for (LocationVariable parameter : parameters) {
+            atPreVars.put(parameter,
+                tb.atPreVar(parameter.toString(), parameter.getKeYJavaType(), true));
+        }
+        final ImmutableList<ProgramVariable> paramVars =
+            append(collectLocalVariablesVisibleTo(jmlAssert, pm), parameters);
+        final ProgramVariableCollection pv = new ProgramVariableCollection(
+            tb.selfVar(pm, pm.getContainerType(), false), paramVars, tb.resultVar(pm, false),
+            tb.excVar(pm, false), atPreVars, termify(atPreVars), Collections.emptyMap(), // should
+            // be the
+            // pre-state
+            // of the
+            // enclosing
+            // contract
+            Collections.emptyMap() // ignore for now
+        );
+        var io = new JmlIO(services).context(Context.inMethodWithSelfVar(pm, pv.selfVar));
+        jmlAssert.translateCondition(io, pv);
+    }
+
+    /**
      * Creates a program variable collection for a specified block. This collection contains all
      * program variables that occur freely in the block as parameters (i.e., in
      * {@link ProgramVariableCollection#paramVars}).

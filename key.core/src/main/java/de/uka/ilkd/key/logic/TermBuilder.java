@@ -327,6 +327,62 @@ public class TermBuilder {
     }
 
     /**
+     * Creates a location variable for prestate variables. Take care to register it in the
+     * namespaces.
+     *
+     * @param baseName the base name to use
+     * @param sort the sort of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable atPreVar(String baseName, Sort sort, boolean makeNameUnique) {
+        return atPreVar(baseName, new KeYJavaType(sort), makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for prestate variables. Take care to register it in the
+     * namespaces.
+     *
+     * @param baseName the base name to use
+     * @param kjt the type of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable atPreVar(String baseName, KeYJavaType kjt, boolean makeNameUnique) {
+        return locationVariable(baseName + "AtPre", kjt, makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for example for prestate variables. Take care to register it in
+     * the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param sort the sort of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable locationVariable(String baseName, Sort sort, boolean makeNameUnique) {
+        return locationVariable(baseName, new KeYJavaType(sort), makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for example for prestate variables. Take care to register it in
+     * the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param kjt the type of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable locationVariable(String baseName, KeYJavaType kjt,
+                                             boolean makeNameUnique) {
+        if (makeNameUnique) {
+            baseName = newName(baseName);
+        }
+        return new LocationVariable(new ProgramElementName(baseName), kjt);
+    }
+
+    /**
      * Creates a program variable for the atPre heap. Take care to register it
      * in the namespaces.
      */

@@ -57,6 +57,9 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     @Override
     protected void walk(ProgramElement node) {
+        if (node instanceof JmlAssert) {
+            performActionOnJmlAssertCondition(((JmlAssert) node).getCond());
+        }
         super.walk(node);
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li = services.getSpecificationRepository()
