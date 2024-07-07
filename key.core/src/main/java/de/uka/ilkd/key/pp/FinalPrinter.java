@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -12,6 +11,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
@@ -149,7 +149,7 @@ class FinalPrinter extends FieldPrinter {
      */
     private void printAnySelect(
             LogicPrinter lp, final Term objectTerm,
-            final Term fieldTerm)  {
+            final Term fieldTerm) {
         lp.layouter.startTerm(2);
         lp.layouter.markStartSub(0);
         lp.printTerm(objectTerm);

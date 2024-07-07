@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 

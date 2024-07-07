@@ -1573,10 +1573,10 @@ public class JMLSpecFactory {
         if (services.getTypeConverter().getHeapLDT().isFinalOp(assignee.op())) {
             SortDependingFunction finalOp = assignee.op(SortDependingFunction.class);
             return tb.select(
-                    finalOp.sort(),
-                    tb.getBaseHeap(),
-                    assignee.sub(0),
-                    assignee.sub(1));
+                finalOp.sort(),
+                tb.getBaseHeap(),
+                assignee.sub(0),
+                assignee.sub(1));
         } else {
             return assignee;
         }
