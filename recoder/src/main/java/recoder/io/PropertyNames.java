@@ -129,7 +129,12 @@ public interface PropertyNames {
      *
      * <PRE>
      * {@code
-     * while (i < n) { if (a[i] == x) { return i; } i += 1; }
+     * while (i < n) {
+     *     if (a[i] == x) {
+     *         return i;
+     *     }
+     *     i += 1;
+     * }
      * }
      * </PRE>
      *
@@ -138,7 +143,12 @@ public interface PropertyNames {
      *
      * <PRE>
      * {@code
-     * while (i < n) { if (a[i] == x) { return i; } i += 1; }
+     * while (i < n) {
+     *     if (a[i] == x) {
+     *         return i;
+     *     }
+     *     i += 1;
+     * }
      * }
      * </PRE>
      *
@@ -147,7 +157,12 @@ public interface PropertyNames {
      *
      * <PRE>
      * {@code
-     * while (i < n) { if (a[i] == x) { return i; } i += 1; }
+     * while (i < n) {
+     *     if (a[i] == x) {
+     *         return i;
+     *     }
+     *     i += 1;
+     * }
      * }
      * </PRE>
      *

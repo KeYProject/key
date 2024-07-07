@@ -118,7 +118,7 @@ public class SendFeedbackAction extends AbstractAction {
                 zipEntryFileName += ".exception";
                 data = (e.getClass().getSimpleName() + " occured while trying to read data.\n"
                     + e.getMessage() + "\n" + serializeStackTrace(e))
-                            .getBytes(StandardCharsets.UTF_8);
+                        .getBytes(StandardCharsets.UTF_8);
             }
             stream.putNextEntry(new ZipEntry(zipEntryFileName));
             stream.write(data);

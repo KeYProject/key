@@ -297,8 +297,8 @@ public class NoPosTacletApp extends TacletApp {
      *
      * <pre>
      *  {@code
-     * ifFormulaInstantiations () == null &&
-     *   ( pos == null || termConstraint.isSatisfiable () )
+     * ifFormulaInstantiations() == null &&
+     *         (pos == null || termConstraint.isSatisfiable())
      * }
      * </pre>
      *
