@@ -7,12 +7,18 @@ import org.key_project.rusty.Services;
 
 public class LDTs {
     private final BoolLDT boolLDT;
+    private final IntLDT intLDT;
 
     public LDTs(Services services) {
         boolLDT = new BoolLDT(services);
+        intLDT = new IntLDT(services);
     }
 
     public BoolLDT getBoolLDT() {
         return boolLDT;
+    }
+
+    public IntLDT getIntLDT() {
+        return intLDT;
     }
 }

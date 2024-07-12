@@ -4,13 +4,18 @@
 package org.key_project.rusty.logic;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.op.Equality;
-import org.key_project.rusty.logic.op.Junctor;
-import org.key_project.rusty.logic.op.Quantifier;
+import org.key_project.rusty.ldt.IntLDT;
+import org.key_project.rusty.logic.op.*;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.Iterator;
 
 public class TermBuilder {
     private final TermFactory tf;
@@ -173,6 +178,147 @@ public class TermBuilder {
     }
 
     // -------------------------------------------------------------------------
+    // updates
+    // -------------------------------------------------------------------------
+
+    public Term elementary(UpdateableOperator lhs, Term rhs) {
+        ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
+        return tf.createTerm(eu, rhs);
+    }
+
+    public Term elementary(Term lhs, Term rhs) {
+        if (lhs.op() instanceof UpdateableOperator) {
+            assert lhs.arity() == 0 : "uh oh: " + lhs;
+            return elementary((UpdateableOperator) lhs.op(), rhs);
+        } else if (lhs.op() == UpdateApplication.UPDATE_APPLICATION) {
+            // #1536 A nested updates like
+            // { {a:=1} b :=a}
+            // should be parsed as (see KeY-Book, Sec. 3.4.1, Def. 3.8)
+            // { {a:=1} (b :=a)}
+            // but is parsed as:
+            // { ({a:=1} b) :=a}
+            // The latter is (currently) not supported, hence the exception.
+            throw new TermCreationException("lhs cannot have a nested update. "
+                    + "If you have a nested update like '{{a:=1} b:=a}', "
+                    + "replace it with the bracketed version '{{a:=1} (b:=a)}'.");
+        } else {
+            throw new TermCreationException("Not a legal lhs: " + lhs);
+        }
+    }
+
+    public Term skip() {
+        return tf.createTerm(UpdateJunctor.SKIP);
+    }
+
+    public Term parallel(Term u1, Term u2) {
+        if (u1.sort() != RustyDLTheory.UPDATE) {
+            throw new TermCreationException("Not an update: " + u1);
+        } else if (u2.sort() != RustyDLTheory.UPDATE) {
+            throw new TermCreationException("Not an update: " + u2);
+        }
+        if (u1.op() == UpdateJunctor.SKIP) {
+            return u2;
+        } else if (u2.op() == UpdateJunctor.SKIP) {
+            return u1;
+        }
+        return tf.createTerm(UpdateJunctor.PARALLEL_UPDATE, u1, u2);
+    }
+
+    public Term parallel(Term... updates) {
+        Term result = skip();
+        for (Term update : updates) {
+            result = parallel(result, update);
+        }
+        return result;
+    }
+
+    public Term parallel(ImmutableList<Term> updates) {
+        return parallel(updates.toArray(new Term[updates.size()]));
+    }
+
+    public Term parallel(Term[] lhss, Term[] values) {
+        if (lhss.length != values.length) {
+            throw new TermCreationException("Tried to create parallel update with " + lhss.length
+                    + " locs and " + values.length + " values");
+        }
+        Term[] updates = new Term[lhss.length];
+        for (int i = 0; i < updates.length; i++) {
+            updates[i] = elementary(lhss[i], values[i]);
+        }
+        return parallel(updates);
+    }
+
+    public Term parallel(Iterable<Term> lhss, Iterable<Term> values) {
+        ImmutableList<Term> updates = ImmutableSLList.nil();
+        Iterator<Term> lhssIt = lhss.iterator();
+        Iterator<Term> rhssIt = values.iterator();
+        while (lhssIt.hasNext()) {
+            assert rhssIt.hasNext();
+            updates = updates.append(elementary(lhssIt.next(), rhssIt.next()));
+        }
+        return parallel(updates);
+    }
+
+    public Term sequential(Term u1, Term u2) {
+        return parallel(u1, apply(u1, u2));
+    }
+
+    public Term sequential(ImmutableList<Term> updates) {
+        if (updates.isEmpty()) {
+            return skip();
+        } else if (updates.size() == 1) {
+            return updates.head();
+        } else {
+            return sequential(updates.head(), sequential(updates.tail()));
+        }
+    }
+
+    public ImmutableList<Term> apply(Term update, ImmutableList<Term> targets) {
+        ImmutableList<Term> result = ImmutableSLList.nil();
+        for (Term target : targets) {
+            result = result.append(apply(update, target));
+        }
+        return result;
+    }
+
+    public Term apply(Term update, Term target) {
+        if (update.sort() != RustyDLTheory.UPDATE) {
+            throw new TermCreationException("Not an update: " + update);
+        } else if (update.op() == UpdateJunctor.SKIP) {
+            return target;
+        } else if (target.equals(tt())) {
+            return tt();
+        } else {
+            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target);
+        }
+    }
+
+    public Term applyParallel(ImmutableList<Term> updates, Term target) {
+        return apply(parallel(updates), target);
+    }
+
+    public Term applyParallel(Term[] lhss, Term[] values, Term target) {
+        return apply(parallel(lhss, values), target);
+    }
+
+    public Term applySequential(Term[] updates, Term target) {
+        if (updates.length == 0) {
+            return target;
+        } else {
+            ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().append(updates).tail();
+            return apply(updates[0], applySequential(updateList, target));
+        }
+    }
+
+    public Term applySequential(ImmutableList<Term> updates, Term target) {
+        if (updates.isEmpty()) {
+            return target;
+        } else {
+            return apply(updates.head(), applySequential(updates.tail(), target));
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // boolean operators
     // -------------------------------------------------------------------------
 
@@ -182,5 +328,114 @@ public class TermBuilder {
 
     public Term FALSE() {
         return services.getLDTs().getBoolLDT().getFalseTerm();
+    }
+
+    // -------------------------------------------------------------------------
+    // integer operators
+    // -------------------------------------------------------------------------
+
+    public Term geq(Term t1, Term t2) {
+        final IntLDT integerLDT = services.getLDTs().getIntLDT();
+        return func(integerLDT.getGreaterOrEquals(), t1, t2);
+    }
+
+    public Term gt(Term t1, Term t2) {
+        final IntLDT integerLDT = services.getLDTs().getIntLDT();
+        return func(integerLDT.getGreaterThan(), t1, t2);
+    }
+
+    public Term lt(Term t1, Term t2) {
+        final IntLDT integerLDT = services.getLDTs().getIntLDT();
+        return func(integerLDT.getLessThan(), t1, t2);
+    }
+
+    public Term leq(Term t1, Term t2) {
+        final IntLDT integerLDT =services.getLDTs().getIntLDT();
+        return func(integerLDT.getLessOrEquals(), t1, t2);
+    }
+
+    public Term zero() {
+        return services.getLDTs().getIntLDT().zero();
+    }
+
+    public Term one() {
+        return services.getLDTs().getIntLDT().one();
+    }
+
+    /**
+     * Creates terms to be used in Z/C/FP/DFP/R notations. The result does not have such a
+     * constructor applied yet.
+     *
+     * @param numberString a string containing the number in a decimal representation
+     * @return Term in "number" notation representing the given number
+     * @throws NumberFormatException if <code>numberString</code> is not a number
+     */
+    private Term numberTerm(String numberString) {
+        if (numberString == null || numberString.isEmpty()) {
+            throw new NumberFormatException(numberString + " is not a number.");
+        }
+
+        Term numberLiteralTerm;
+        boolean negate = false;
+        int j = 0;
+
+        final IntLDT intLDT = services.getLDTs().getIntLDT();
+
+        if (numberString.charAt(0) == '-') {
+            negate = true;
+            j = 1;
+        }
+        numberLiteralTerm = func(intLDT.getNumberTerminator());
+
+        int digit;
+        for (int i = j, sz = numberString.length(); i < sz; i++) {
+            char c = numberString.charAt(i);
+            if ('0' <= c && c <= '9') {
+                digit = c - '0';
+            } else {
+                throw new NumberFormatException(numberString + " is not a number.");
+            }
+            numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit), numberLiteralTerm);
+        }
+        if (negate) {
+            numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
+        }
+
+        // return the raw number literal term ('C', 'Z' or 'R' must still be added)
+        return numberLiteralTerm;
+    }
+
+    /**
+     * Get term for an integer literal.
+     *
+     * @param numberString String representing an integer with radix 10, may be negative
+     * @return Term in Z-Notation representing the given number
+     * @throws NumberFormatException if <code>numberString</code> is not a number
+     */
+    public Term zTerm(String numberString) {
+        return func(services.getLDTs().getIntLDT().getNumberSymbol(),
+                numberTerm(numberString));
+    }
+
+    /**
+     * Get term for an integer literal.
+     *
+     * @param number an integer
+     * @return Term in Z-Notation representing the given number
+     */
+    public Term zTerm(long number) {
+        return zTerm(Long.toString(number));
+    }
+
+    public Term add(Term t1, Term t2) {
+        final IntLDT integerLDT = services.getLDTs().getIntLDT();
+        final Term zero = integerLDT.zero();
+        if (t1.equals(zero)) {
+            return t2;
+        } else if (t2.equals(zero)) {
+            return t1;
+        } else {
+            return func(integerLDT.getAdd(), t1, t2);
+        }
     }
 }
