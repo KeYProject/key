@@ -12,17 +12,17 @@ jobs:
   checkerFramework:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: 'corretto'
           cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.4.2
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: -DENABLE_NULLNESS=true compileTest
+        run: ./gradlew -DENABLE_NULLNESS=true compileTest
 
 
   qodana:
@@ -32,7 +32,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2023.3.2
+        uses: JetBrains/qodana-action@v2024.1.5
 
       - uses: github/codeql-action/upload-sarif@v3
         if: success() || failure()
@@ -48,10 +48,10 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: --continue spotlessCheck
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.4.2
+      - name: SpotlessCheck
+        run: ./gradlew --continue spotlessCheck
 
   # checkstyle:
   #   runs-on: ubuntu-latest
@@ -80,11 +80,10 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
-
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: --continue checkstyleMainChanged
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.4.2
+      - name: Checkstyle
+        run: ./gradlew --continue checkstyleMainChanged
       - run: |
           npx violations-command-line -sarif sarif-report.json \
           -v "CHECKSTYLE" "." ".*/build/reports/checkstyle/main_diff.xml$" "Checkstyle"
@@ -108,10 +107,10 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: --continue pmdMainChanged
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.4.2
+      - name: PMD checks
+        run: ./gradlew --continue pmdMainChanged
 
       # - run: python3 ./.github/printAnnotations.py */build/reports/pmd/main.xml
 

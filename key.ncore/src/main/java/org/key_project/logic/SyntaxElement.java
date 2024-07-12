@@ -22,4 +22,8 @@ public interface SyntaxElement {
      * @return the number of children of this syntax element.
      */
     int getChildCount();
+
+    default SyntaxElementCursor getCursor() {
+        return new SyntaxElementCursor(this);
+    }
 }

@@ -8,7 +8,7 @@ package passwordfile;
 
 class SecurePasswordFile {
 
-    /*@ public final model \locset footprint; 
+    /*@ public final model \locset footprint;
       @ represents footprint =
       @     \locset(names, passwords), names[*], passwords[*];
       @*/
@@ -42,7 +42,7 @@ class SecurePasswordFile {
 //      @                     names[i] == user && passwords[i] == password
 //      @                 );
 //      @     accessible  footprint;
-//      @     modifies    \nothing;
+//      @     assignable  \nothing;
 //      @     separates    names[userIndex];
 //      @     separates    names[userIndex], passwords[userIndex];
 //      @     separates    user, password, result;

@@ -57,14 +57,6 @@ public final class ProgramSV extends OperatorSV
     }
 
     /**
-     * this method tests on object identity
-     */
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return se == this;
-    }
-
-    /**
      * @return comments if the schemavariable stands for programm construct and has comments
      *         attached to it (not supported yet)
      */
@@ -409,7 +401,7 @@ public final class ProgramSV extends OperatorSV
 
     @Override
     public int getHeapCount(Services services) {
-        return HeapContext.getModHeaps(services, false).size();
+        return HeapContext.getModifiableHeaps(services, false).size();
     }
 
     @Override
