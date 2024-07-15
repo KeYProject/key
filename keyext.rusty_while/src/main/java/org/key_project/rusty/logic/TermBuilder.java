@@ -34,6 +34,34 @@ public class TermBuilder {
         return tf;
     }
 
+    // -------------------------------------------------------------------------
+    // constructors for special classes of term operators
+    // -------------------------------------------------------------------------
+
+    public Term var(LogicVariable v) {
+        return tf.createTerm(v);
+    }
+
+    public Term var(ProgramVariable v) {
+        return tf.createTerm(v);
+    }
+
+    public ImmutableList<Term> var(ProgramVariable... vs) {
+        ImmutableList<Term> result = ImmutableSLList.nil();
+        for (ProgramVariable v : vs) {
+            result = result.append(var(v));
+        }
+        return result;
+    }
+
+    public ImmutableList<Term> var(Iterable<? extends ProgramVariable> vs) {
+        ImmutableList<Term> result = ImmutableSLList.nil();
+        for (ProgramVariable v : vs) {
+            result = result.append(var(v));
+        }
+        return result;
+    }
+
     public Term tt() {
         return tt;
     }
@@ -173,8 +201,36 @@ public class TermBuilder {
         }
     }
 
+    public Term func(Function f) {
+        return tf.createTerm(f);
+    }
+
     public Term func(Function f, Term... subs) {
         return tf.createTerm(f, subs);
+    }
+
+    public Term func(Function f, Term s) {
+        return tf.createTerm(f, s);
+    }
+
+    public Term func(Function f, Term[] s, ImmutableArray<QuantifiableVariable> boundVars) {
+        return tf.createTerm(f, s, boundVars);
+    }
+
+    public Term prog(Modality.RustyModalityKind modKind, RustyBlock jb, Term t) {
+        return tf.createTerm(Modality.getModality(modKind, jb), new Term[] { t }, null);
+    }
+
+    public Term box(RustyBlock jb, Term t) {
+        return prog(Modality.RustyModalityKind.BOX, jb, t);
+    }
+
+    public Term dia(RustyBlock jb, Term t) {
+        return prog(Modality.RustyModalityKind.DIA, jb, t);
+    }
+
+    public Term ife(Term cond, Term _then, Term _else) {
+        return tf.createTerm(IfThenElse.IF_THEN_ELSE, cond, _then, _else);
     }
 
     // -------------------------------------------------------------------------

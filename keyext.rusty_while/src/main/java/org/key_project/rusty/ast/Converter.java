@@ -19,8 +19,7 @@ import org.key_project.rusty.ast.ty.PrimitiveType;
 import org.key_project.rusty.ast.ty.Type;
 import org.key_project.util.collection.ImmutableList;
 
-public class Converter
-        extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<SyntaxElement> {
+public class Converter {
     private static final CrateConverter crateConverter = new CrateConverter();
     private static final ItemConverter itemConverter = new ItemConverter();
     private static final ExprConverter exprConverter = new ExprConverter();
@@ -35,58 +34,50 @@ public class Converter
         return ctx.accept(crateConverter);
     }
 
-    @Override
-    public Expr visitAssignmentExpression(
+    public static Expr visitAssignmentExpression(
             org.key_project.rusty.parsing.RustyWhileParser.AssignmentExpressionContext ctx) {
         return exprConverter.visitAssignmentExpression(ctx);
     }
 
-    @Override
-    public Expr visitBlockExpr(
+    public static Expr visitBlockExpr(
             org.key_project.rusty.parsing.RustyWhileParser.BlockExprContext ctx) {
         return exprConverter.visitBlockExpr(ctx);
     }
 
-    @Override
-    public Expr visitLiteralExpr(
+    public static Expr visitLiteralExpr(
             org.key_project.rusty.parsing.RustyWhileParser.LiteralExprContext ctx) {
         return exprConverter.visitLiteralExpr(ctx);
     }
 
-    @Override
-    public Expr visitPathExpr(org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
+    public static Expr visitPathExpr(org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
         return exprConverter.visitPathExpr(ctx);
     }
 
-    @Override
-    public Statement visitExprStmt(
+    public static Statement visitExprStmt(
             org.key_project.rusty.parsing.RustyWhileParser.ExprStmtContext ctx) {
         return stmtConverter.visitExprStmt(ctx);
     }
 
-    @Override
-    public Statement visitLetStmt(
+    public static Statement visitLetStmt(
             org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
         return stmtConverter.visitLetStmt(ctx);
     }
 
-    @Override
-    public Identifier visitIdentifier(
+    public static Identifier visitIdentifier(
             org.key_project.rusty.parsing.RustyWhileParser.IdentifierContext ctx) {
         return identifierConverter.visitIdentifier(ctx);
     }
 
-    @Override
-    public Pattern visitPattern(org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
+    public static Pattern visitPattern(org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
         return patternConverter.visitPattern(ctx);
     }
 
-    public Type convertParenthesizedType(
+    public static Type convertParenthesizedType(
             org.key_project.rusty.parsing.RustyWhileParser.ParenthesizedTypeContext ctx) {
         return typeConverter.visitParenthesizedType(ctx);
     }
 
-    public Type convertTypePath(
+    public static Type convertTypePath(
             org.key_project.rusty.parsing.RustyWhileParser.TypePathContext ctx) {
         return typeConverter.visitTypePath(ctx);
     }

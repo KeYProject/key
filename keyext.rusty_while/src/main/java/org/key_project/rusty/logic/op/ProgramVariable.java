@@ -11,7 +11,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.ast.expr.Expr;
 
 public class ProgramVariable extends AbstractSortedOperator implements Expr {
-    protected ProgramVariable(Name name, Sort s) {
+    public ProgramVariable(Name name, Sort s) {
         super(name, s, Modifier.NONE);
     }
 

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ldt;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
@@ -18,7 +19,7 @@ public abstract class LDT implements Named {
     private final Sort sort;
 
     /** the namespace of functions this LDT feels responsible for */
-    private final Namespace<Operator> functions = new Namespace<>();
+    private final Namespace<@NonNull Operator> functions = new Namespace<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -64,7 +65,7 @@ public abstract class LDT implements Named {
      * @return the added function (for convenience reasons)
      */
     protected final Function addFunction(Services services, String funcName) {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
+        final Namespace<@NonNull Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name(funcName));
         if (f == null) {
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
