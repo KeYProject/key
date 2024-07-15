@@ -18,8 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
  * Example application which proves all proof obligations of the source folder 'example' using KeY.
- *
- * @author Martin Hentschel
  */
 public class MainBenchmarking {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainBenchmarking.class);
