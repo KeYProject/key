@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op;
+
+import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -8,19 +14,16 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 
-import java.lang.ref.WeakReference;
-import java.util.WeakHashMap;
-
 public class ElementaryUpdate extends AbstractSortedOperator {
 
     private static final WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>> instances =
-            new WeakHashMap<>();
+        new WeakHashMap<>();
 
     private final UpdateableOperator lhs;
 
     private ElementaryUpdate(UpdateableOperator lhs) {
         super(new Name("elem-update(" + lhs + ")"), new Sort[] { lhs.sort() }, RustyDLTheory.UPDATE,
-                Modifier.NONE);
+            Modifier.NONE);
         this.lhs = lhs;
         assert lhs.arity() == 0;
     }

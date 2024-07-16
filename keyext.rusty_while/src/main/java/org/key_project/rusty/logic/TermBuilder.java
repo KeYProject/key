@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
+import java.util.Iterator;
+
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
@@ -14,8 +16,6 @@ import org.key_project.rusty.logic.op.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.Iterator;
 
 public class TermBuilder {
     private final TermFactory tf;
@@ -255,8 +255,8 @@ public class TermBuilder {
             // { ({a:=1} b) :=a}
             // The latter is (currently) not supported, hence the exception.
             throw new TermCreationException("lhs cannot have a nested update. "
-                    + "If you have a nested update like '{{a:=1} b:=a}', "
-                    + "replace it with the bracketed version '{{a:=1} (b:=a)}'.");
+                + "If you have a nested update like '{{a:=1} b:=a}', "
+                + "replace it with the bracketed version '{{a:=1} (b:=a)}'.");
         } else {
             throw new TermCreationException("Not a legal lhs: " + lhs);
         }
@@ -295,7 +295,7 @@ public class TermBuilder {
     public Term parallel(Term[] lhss, Term[] values) {
         if (lhss.length != values.length) {
             throw new TermCreationException("Tried to create parallel update with " + lhss.length
-                    + " locs and " + values.length + " values");
+                + " locs and " + values.length + " values");
         }
         Term[] updates = new Term[lhss.length];
         for (int i = 0; i < updates.length; i++) {
@@ -406,7 +406,7 @@ public class TermBuilder {
     }
 
     public Term leq(Term t1, Term t2) {
-        final IntLDT integerLDT =services.getLDTs().getIntLDT();
+        final IntLDT integerLDT = services.getLDTs().getIntLDT();
         return func(integerLDT.getLessOrEquals(), t1, t2);
     }
 
@@ -470,7 +470,7 @@ public class TermBuilder {
      */
     public Term zTerm(String numberString) {
         return func(services.getLDTs().getIntLDT().getNumberSymbol(),
-                numberTerm(numberString));
+            numberTerm(numberString));
     }
 
     /**

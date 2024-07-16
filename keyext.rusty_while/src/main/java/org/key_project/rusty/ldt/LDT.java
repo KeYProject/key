@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ldt;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
@@ -11,6 +10,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+
+import org.jspecify.annotations.NonNull;
 
 public abstract class LDT implements Named {
     private final Name name;

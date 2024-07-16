@@ -6,7 +6,6 @@ package org.key_project.rusty.ast;
 import java.math.BigInteger;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.Param;
@@ -49,7 +48,8 @@ public class Converter {
         return exprConverter.visitLiteralExpr(ctx);
     }
 
-    public static Expr visitPathExpr(org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
+    public static Expr visitPathExpr(
+            org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
         return exprConverter.visitPathExpr(ctx);
     }
 
@@ -68,7 +68,8 @@ public class Converter {
         return identifierConverter.visitIdentifier(ctx);
     }
 
-    public static Pattern visitPattern(org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
+    public static Pattern visitPattern(
+            org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
         return patternConverter.visitPattern(ctx);
     }
 

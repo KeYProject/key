@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ldt;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.TermBuilder;
+
+import org.jspecify.annotations.NonNull;
 
 public class IntLDT extends LDT {
     public static final Name NAME = new Name("int");
@@ -38,7 +41,7 @@ public class IntLDT extends LDT {
     public IntLDT(Services services) {
         super(NAME, services);
 
-// initialise caches for function symbols from integerHeader.key
+        // initialise caches for function symbols from integerHeader.key
         sharp = addFunction(services, "#");
         for (int i = 0; i < 10; i++) {
             numberSymbol[i] = addFunction(services, String.valueOf(i));
@@ -79,7 +82,7 @@ public class IntLDT extends LDT {
 
     private Term makeDigit(int digit, TermBuilder tb) {
         return tb.func(getNumberSymbol(),
-                tb.func(getNumberLiteralFor(digit), tb.func(getNumberTerminator())));
+            tb.func(getNumberLiteralFor(digit), tb.func(getNumberTerminator())));
     }
 
     @Override
@@ -103,7 +106,7 @@ public class IntLDT extends LDT {
     public Function getNumberLiteralFor(int number) {
         if (number < 0 || number > 9) {
             throw new IllegalArgumentException(
-                    "Number literal symbols range from 0 to 9. Requested was:" + number);
+                "Number literal symbols range from 0 to 9. Requested was:" + number);
         }
 
         return numberSymbol[number];
