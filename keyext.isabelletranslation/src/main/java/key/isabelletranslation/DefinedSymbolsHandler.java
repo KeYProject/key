@@ -2,12 +2,13 @@ package key.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.JFunction;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
+import org.key_project.logic.op.SortedOperator;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) throws IOException {
-        Namespace<Function> functionNamespace = services.getNamespaces().functions();
+        Namespace<JFunction> functionNamespace = services.getNamespaces().functions();
         Map<String, String> definedFunctions = new HashMap<>();
         definedFunctions.put("null", "null");
         definedFunctions.put("length", "obj_length");

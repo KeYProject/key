@@ -4,10 +4,10 @@
 package key.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import org.key_project.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Operator;
+import org.key_project.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.util.List;

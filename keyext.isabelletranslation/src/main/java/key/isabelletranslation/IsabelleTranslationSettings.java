@@ -130,9 +130,9 @@ public class IsabelleTranslationSettings extends AbstractSettings {
             isabellePath = DEFAULT_ISABELLE_PATH;
             translationPath = DEFAULT_TRANSLATION_PATH;
         }
-        isabellePath = Path.of(props.get(isabellePathKey, isabellePath.toString()));
+        isabellePath = Path.of(props.getString(isabellePathKey, isabellePath.toString()));
 
-        Path newTranslationPath = Path.of(props.get(translationPathKey, translationPath.toString()));
+        Path newTranslationPath = Path.of(props.getString(translationPathKey, translationPath.toString()));
         if (newTranslationPath != translationPath) {
             translationPath = newTranslationPath;
             sessionFilesPresent = createSessionFiles();

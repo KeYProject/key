@@ -1,13 +1,15 @@
 package key.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
+import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
 import java.util.*;
@@ -51,8 +53,8 @@ public class IsabelleMasterHandler {
                                  String[] handlerOptions) throws IOException {
         this.services = services;
         List<IsabelleHandler> handlers = IsabelleHandlerServices.getInstance().getFreshHandlers(services, handlerNames, handlerOptions, this);
-        predefinedSorts.put(Sort.ANY, new StringBuilder("any"));
-        predefinedSorts.put(Sort.FORMULA, new StringBuilder("bool"));
+        predefinedSorts.put(JavaDLTheory.ANY, new StringBuilder("any"));
+        predefinedSorts.put(JavaDLTheory.FORMULA, new StringBuilder("bool"));
         this.handlers = handlers;
     }
 
@@ -86,7 +88,7 @@ public class IsabelleMasterHandler {
         }
     }
 
-    public List<StringBuilder> translate(Iterable<Term> terms) {
+    public List<StringBuilder> translate(ImmutableArray<? extends Term> terms) {
         List<StringBuilder> result = new LinkedList<>();
         for (Term term : terms) {
             result.add(translate(term));

@@ -1,8 +1,8 @@
 package key.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;

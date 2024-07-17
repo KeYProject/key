@@ -1,11 +1,12 @@
 package key.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 
 import java.io.IOException;
@@ -133,13 +134,13 @@ public class IsabelleTranslator {
 
         while (!sortsCheckQueue.isEmpty()) {
             Sort s = sortsCheckQueue.remove();
-            if (s == Sort.ANY || s == Sort.FORMULA) {
+            if (s == JavaDLTheory.ANY || s == JavaDLTheory.FORMULA) {
                 continue;
             }
             String sType = masterHandler.translateSortName(s) + "_type";
             String sVal = "(" + masterHandler.translateSortName(s) + "\\<^sub>v\\<^sub>a\\<^sub>l::" + masterHandler.translateSortName(s) + ")";
             for (Sort s2 : sortsCheckQueue) {
-                if (s2 == Sort.ANY || s2 == Sort.FORMULA) {
+                if (s2 == JavaDLTheory.ANY || s2 == JavaDLTheory.FORMULA) {
                     continue;
                 }
                 if (!s.extendsTrans(s2) && !s2.extendsTrans(s)) {
@@ -231,7 +232,7 @@ public class IsabelleTranslator {
         sequentTranslation.append(LINE_ENDING).append(LINE_ENDING);
 
         for (Sort parentSort : sortParentsMap.get(sort)) {
-            if (parentSort == Sort.ANY) {
+            if (parentSort == JavaDLTheory.ANY) {
                 continue;
             }
             String parentSortName = masterHandler.translateSortName(parentSort);

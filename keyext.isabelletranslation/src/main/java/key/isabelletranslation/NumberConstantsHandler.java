@@ -4,10 +4,10 @@
 package key.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import org.key_project.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 
 import java.util.Properties;
 
@@ -35,7 +35,10 @@ public class NumberConstantsHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        String string = AbstractTermTransformer.convertToDecimalString(term, services);
+        //TODO This needs an updated AbstractTermTransformer to comply with the new ncore package of KeY
+        assert (term instanceof de.uka.ilkd.key.logic.Term);
+
+        String string = AbstractTermTransformer.convertToDecimalString((de.uka.ilkd.key.logic.Term) term, services);
         return new StringBuilder("(").append(string).append("::int)");
     }
 
