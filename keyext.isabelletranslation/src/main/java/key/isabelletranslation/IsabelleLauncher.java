@@ -1,6 +1,6 @@
 package key.isabelletranslation;
 
-import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.Pair;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.java.JIsabelle;
 import de.unruh.isabelle.mlvalue.ListConverter;

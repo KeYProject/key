@@ -5,16 +5,17 @@ package key.isabelletranslation;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
                      String[] handlerOptions) {
         masterHandler.addPreamblesLocales(handlerSnippets);
-        masterHandler.addPredefinedSort(Sort.ANY, "any");
+        masterHandler.addPredefinedSort(JavaDLTheory.ANY, "any");
 
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();

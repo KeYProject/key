@@ -15,7 +15,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@KeYGuiExtension.Info(name = "Translation", optional = true,
+@KeYGuiExtension.Info(name = "Isabelle Translation", optional = true,
         experimental = true)
 public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExtension.Settings, KeYGuiExtension.ContextMenu, KeYGuiExtension.Startup {
 
