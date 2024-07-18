@@ -82,6 +82,13 @@ public class PosInTerm {
                 : new PosInTerm(positions, (char) positions.length, true);
     }
 
+    public static PosInTerm of(char index, PosInTerm subPos) {
+        var newPositions = new char[subPos.size + 1];
+        System.arraycopy(subPos.positions, 0, newPositions, 1, subPos.size);
+        newPositions[0] = index;
+        return new PosInTerm(newPositions, (char) (subPos.size + 1), true);
+    }
+
     /// returns the instance representing the top level position
     ///
     /// @return the top level position

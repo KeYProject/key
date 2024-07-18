@@ -371,8 +371,7 @@ public class RuleCommand extends AbstractCommand {
         TermComparisonWithHoles matcher = p.on == null ? null : p.on.getMatcher();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                JTerm term = (JTerm) pta.posInOccurrence().subTerm();
-                boolean add = p.on == null || p.on.matches(term);
+                boolean add = matcher == null || matcher.matches(pta.posInOccurrence());
 
                 for (var entry : pta.instantiations().getInstantiationMap()) {
                     final SchemaVariable sv = entry.key();
