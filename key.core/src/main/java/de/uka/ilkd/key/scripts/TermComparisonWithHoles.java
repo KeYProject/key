@@ -17,7 +17,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static de.uka.ilkd.key.scripts.TermWithHoles.*;
 
@@ -117,6 +119,13 @@ public class TermComparisonWithHoles {
         } else if(op.name().equals(FOCUS_NAME)) {
             // ignore the "focus" annotation
             return unifyHelp(t0.sub(0), t1, ownBoundVars, cmpBoundVars, nat);
+        } else if(op.name().equals(ELLIPSIS_NAME)) {
+            // return true if it hits one subterm ...
+            Set<JTerm> deepAllSubs = new HashSet<>();
+            computeSubterms(t1, deepAllSubs);
+            var lookfor = t0.sub(0);
+            var finalNat = nat;
+            return deepAllSubs.stream().anyMatch(t -> unifyHelp(lookfor, t, ownBoundVars, cmpBoundVars, finalNat));
         }
 
 
@@ -143,6 +152,11 @@ public class TermComparisonWithHoles {
 //        }
 
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
+    }
+
+    private static void computeSubterms(JTerm t, Set<JTerm> deepAllSubs) {
+        deepAllSubs.add(t);
+        t.subs().stream().forEach(sub -> computeSubterms(sub, deepAllSubs));
     }
 
     private static boolean handleQuantifiableVariable(JTerm t0, JTerm t1,
