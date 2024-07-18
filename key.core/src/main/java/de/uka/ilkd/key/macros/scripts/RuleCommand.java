@@ -169,7 +169,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 .findIfFormulaInstantiations(
                     state.getFirstOpenAutomaticGoal().sequent(), services);
 
-        assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
+        assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates, services));
 
         if (assumesCandidates.size() == 0) {
             throw new ScriptException("No \\assumes instantiation");
@@ -279,7 +279,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             throws ScriptException {
 
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
-        List<TacletApp> matchingApps = filterList(p, allApps);
+        List<TacletApp> matchingApps = filterList(p, allApps, state.getProof().getServices());
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -408,14 +408,15 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      * Filter those apps from a list that are according to the parameters.
      */
     private List<TacletApp> filterList(Parameters p,
-            ImmutableList<TacletApp> list) {
+                                       ImmutableList<TacletApp> list, Services services) {
         List<TacletApp> matchingApps = new ArrayList<>();
+        TermComparisonWithHoles tc = new TermComparisonWithHoles(services);
 
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
                 boolean add = p.on == null
-                        || TermComparisonWithHoles.compareModHoles(p.on, pta.posInOccurrence().subTerm());
+                        || tc.compareModHoles(p.on, pta.posInOccurrence());
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {

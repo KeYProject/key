@@ -1,28 +1,79 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.List;
 
 /** This is more a temporary hack for scripts ... */
 public class TermComparisonWithHoles {
 
     private static final Name HOLE_NAME = new Name("_");
     private static final Name HOLE_PREDICATE_NAME = new Name("__");
+    private static final Name FOCUS_NAME = new Name("FOCUS");
 
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
+    private final Services services;
 
-    public static boolean compareModHoles(Term t1, Term t2) {
-        if (t1 == t2) {
+    public TermComparisonWithHoles(Services services) {
+        this.services = services;
+    }
+
+    public boolean compareModHoles(Term pattern, PosInOccurrence pio) {
+        Term t2 = pio.subTerm();
+        if (pattern == t2) {
             return true;
         }
-        return unifyHelp(t1, t2,
+
+        PosInTerm focus = findFocus(pattern);
+        if(focus != null) {
+            for(int i = 0; i < focus.depth(); i++) {
+                pio = pio.up();
+            }
+            t2 = pio.subTerm();
+            // pattern = removeFocus(focus, 0, pattern);
+        }
+
+        return unifyHelp(pattern, t2,
                 ImmutableSLList.<QuantifiableVariable>nil(),
                 ImmutableSLList.<QuantifiableVariable>nil(),
                 null);
+    }
+
+    private Term removeFocus(PosInTerm focus, int pos, Term pattern) {
+        if(pos == focus.depth()) {
+            return pattern.sub(0);
+        }
+        int idx = focus.getIndexAt(pos);
+        List<Term> subs = pattern.subs().toList();
+        Term sub = pattern.sub(idx);
+        Term newSub = removeFocus(focus, pos+1, sub);
+        subs.set(idx, newSub);
+        ImmutableArray<Term> subsAsArray = new ImmutableArray<>(subs);
+        return services.getTermFactory().createTerm(pattern.op(), subsAsArray, pattern.boundVars(), pattern.javaBlock(), pattern.getLabels());
+    }
+
+    private static PosInTerm findFocus(Term pattern) {
+        var op = pattern.op();
+        if (op instanceof SortDependingFunction) {
+            SortDependingFunction sodf = (SortDependingFunction) op;
+            if(sodf.getKind().equals(FOCUS_NAME)) {
+                return PosInTerm.getTopLevel();
+            }
+        }
+        for (int i = 0; i < pattern.arity(); i++) {
+            Term sub = pattern.sub(i);
+            PosInTerm subFocus = findFocus(sub);
+            if(subFocus != null) {
+                return PosInTerm.of((char)i, subFocus);
+            }
+        }
+        return null;
     }
 
 
@@ -50,6 +101,10 @@ public class TermComparisonWithHoles {
             var sdop = (SortDependingFunction) op;
             if(sdop.getKind().equals(HOLE_NAME)) {
                 return true;
+            }
+            if(sdop.getKind().equals(FOCUS_NAME)) {
+                // just ignore the FOCUS application ...
+                return unifyHelp(t0.sub(0), t1, ownBoundVars, cmpBoundVars, nat);
             }
         } else if(op.name().equals(HOLE_PREDICATE_NAME)) {
             return true;
