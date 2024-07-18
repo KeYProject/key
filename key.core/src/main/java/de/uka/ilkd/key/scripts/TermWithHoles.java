@@ -33,6 +33,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -70,19 +72,24 @@ rule plus_zero on: ?????
 public class TermWithHoles {
 
     private final JTerm term;
-
     public TermWithHoles(JTerm term) {
         this.term = term;
     }
 
+
     public static final Name HOLE_NAME = new Name("?");
     public static final Name HOLE_PREDICATE_NAME = new Name("?fml");
     public static final Name HOLE_SORT_DEP_NAME = new Name("?");
+    public static final Name FOCUS_NAME = new Name("?focus");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TermWithHoles.class);
 
-    public boolean matches(JTerm other) {
-        return getMatcher().matches(other);
+    public boolean matches(PosInOccurrence posInOccurrence) {
+        return getMatcher().matches(posInOccurrence);
+    }
+
+    public boolean matchesToplevel(SequentFormula sf) {
+        return getMatcher().matchesToplevel(sf);
     }
 
     public TermComparisonWithHoles getMatcher() {
@@ -133,6 +140,7 @@ public class TermWithHoles {
 
         ns.functions().addSafely(new JFunction(HOLE_NAME, nothing));
         ns.functions().addSafely(new JFunction(HOLE_PREDICATE_NAME, JavaDLTheory.FORMULA));
+        ns.functions().addSafely(new JFunction(FOCUS_NAME, nothing, JavaDLTheory.ANY));
         GenericSort g = new GenericSort(new Name("G"));
         ns.functions().addSafely(SortDependingFunction.createFirstInstance(g, HOLE_SORT_DEP_NAME, g,
                         new Sort[0], false));

@@ -2,10 +2,14 @@ package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.*;
 import org.jspecify.annotations.Nullable;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -22,9 +26,6 @@ import static de.uka.ilkd.key.scripts.TermWithHoles.*;
  * All term labels are ignored in this equality check. Additionally, holes (represented by the
  * SortDependingFunction with name "_" and the Predicate with name "__") are treated as wildcards that
  * match any subterm.
- * <p>
- * The single instance of this property can be accessed through
- * {@link TermComparisonWithHoles#INSTANCE}.
  *
  * @author Mattias Ulbrich
  */
@@ -37,15 +38,55 @@ public class TermComparisonWithHoles {
         this.referenceTerm = referenceTerm;
     }
 
-    public final boolean matches(JTerm t) {
-        if (referenceTerm == t) {
+    public final boolean matches(PosInOccurrence pio) {
+        JTerm term = (JTerm) pio.subTerm();
+        if (term.equalsModProperty(referenceTerm, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
             return true;
         }
-        return unifyHelp(referenceTerm, t,
+
+        PosInTerm focus = findFocus(referenceTerm);
+        if(focus != null) {
+            for(int i = focus.depth() -1; i >= 0; i--) {
+                int focusIdx = focus.getIndexAt(i);
+                int termIdx = pio.posInTerm().getIndexAt(pio.depth() - 1);
+                if(focusIdx != termIdx) {
+                    // the focus is not at the same position as the current term
+                    return false;
+                }
+                pio = pio.up();
+            }
+            term = (JTerm) pio.subTerm();
+        }
+
+        return unifyHelp(referenceTerm, term,
                 ImmutableSLList.<QuantifiableVariable>nil(),
                 ImmutableSLList.<QuantifiableVariable>nil(),
                 null);
+
     }
+
+    public final boolean matchesToplevel(SequentFormula sf) {
+        // we use antecedent here since it does not matter and is never read ...
+        return matches(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
+    }
+
+    private static @Nullable PosInTerm findFocus(Term pattern) {
+        var op = pattern.op();
+        if (op instanceof JFunction) {
+            if(op.name().equals(TermWithHoles.FOCUS_NAME)) {
+                return PosInTerm.getTopLevel();
+            }
+        }
+        for (int i = 0; i < pattern.arity(); i++) {
+            Term sub = pattern.sub(i);
+            PosInTerm subFocus = findFocus(sub);
+            if(subFocus != null) {
+                return PosInTerm.of((char)i, subFocus);
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Compares two terms modulo bound renaming
@@ -73,6 +114,9 @@ public class TermComparisonWithHoles {
             }
         } else if(op.name().equals(HOLE_PREDICATE_NAME) || op.name().equals(HOLE_NAME)) {
             return true;
+        } else if(op.name().equals(FOCUS_NAME)) {
+            // ignore the "focus" annotation
+            return unifyHelp(t0.sub(0), t1, ownBoundVars, cmpBoundVars, nat);
         }
 
 
@@ -219,15 +263,15 @@ public class TermComparisonWithHoles {
         return true;
     }
 
-    public List<Pair<Boolean, SequentFormula>> findMatchesInSequent(Sequent sequent) {
+    public List<Pair<Boolean, SequentFormula>> findTopLevelMatchesInSequent(Sequent sequent) {
         List<Pair<Boolean, SequentFormula>> matches = new ArrayList<>();
         for (SequentFormula sf : sequent.antecedent()) {
-            if (matches((JTerm) sf.formula())) {
+            if (matchesToplevel(sf)) {
                 matches.add(new Pair<>(true, sf));
             }
         }
         for (SequentFormula sf : sequent.succedent()) {
-            if (matches((JTerm) sf.formula())) {
+            if (matchesToplevel(sf)) {
                 matches.add(new Pair<>(false, sf));
             }
         }
@@ -235,8 +279,8 @@ public class TermComparisonWithHoles {
     }
 
 
-    public @Nullable Pair<Boolean, SequentFormula> findUniqueMatchInSequent(Sequent sequent) {
-        List<Pair<Boolean, SequentFormula>> matches = findMatchesInSequent(sequent);
+    public @Nullable Pair<Boolean, SequentFormula> findUniqueToplevelMatchInSequent(Sequent sequent) {
+        List<Pair<Boolean, SequentFormula>> matches = findTopLevelMatchesInSequent(sequent);
         if (matches.size() != 1) {
             return null;
         } else {

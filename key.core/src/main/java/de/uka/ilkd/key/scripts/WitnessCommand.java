@@ -62,7 +62,7 @@ public class WitnessCommand extends AbstractCommand {
         TermComparisonWithHoles comp = params.formula.getMatcher();
 
         // First component: true for antecedent, false for succedent
-        Pair<Boolean, SequentFormula> match = comp.findUniqueMatchInSequent(goal.node().sequent());
+        Pair<Boolean, SequentFormula> match = comp.findUniqueToplevelMatchInSequent(goal.node().sequent());
         if (match == null) {
             throw new ScriptException("Cannot unique match the formula argument");
         }
