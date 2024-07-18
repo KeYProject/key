@@ -371,8 +371,8 @@ public class RuleCommand extends AbstractCommand {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 JTerm term = (JTerm) pta.posInOccurrence().subTerm();
-                boolean add =
-                    p.on == null || RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.on);
+                boolean add = p.on == null
+                        || TermComparisonWithHoles.compareModHoles(p.on, term);
 
                 for (var entry : pta.instantiations().getInstantiationMap()) {
                     final SchemaVariable sv = entry.key();
