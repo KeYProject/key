@@ -7,6 +7,7 @@ import org.key_project.rusty.ldt.LDTs;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.TermFactory;
+import org.key_project.rusty.proof.Proof;
 
 public class Services {
     /**
@@ -17,6 +18,8 @@ public class Services {
 
     private final TermFactory tf;
     private final TermBuilder tb;
+
+    private Proof proof;
 
     public Services() {
         this.tf = new TermFactory();
@@ -38,5 +41,13 @@ public class Services {
 
     public LDTs getLDTs() {
         return ldts;
+    }
+
+    public Proof getProof() {
+        return proof;
+    }
+
+    public void setProof(Proof proof) {
+        this.proof = proof;
     }
 }

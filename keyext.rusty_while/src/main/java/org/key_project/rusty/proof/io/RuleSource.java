@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.CharStream;
 
 public abstract class RuleSource {
     // key-file containing ldt declarations
-    public static final String ldtFile = "ldt.key";
+    public static final String LDT_FILE = "ldt.key";
 
     public abstract File file();
 
