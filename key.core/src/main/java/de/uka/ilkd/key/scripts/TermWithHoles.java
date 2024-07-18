@@ -81,6 +81,7 @@ public class TermWithHoles {
     public static final Name HOLE_PREDICATE_NAME = new Name("?fml");
     public static final Name HOLE_SORT_DEP_NAME = new Name("?");
     public static final Name FOCUS_NAME = new Name("?focus");
+    public static final Name ELLIPSIS_NAME = new Name("?find");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TermWithHoles.class);
 
@@ -141,6 +142,7 @@ public class TermWithHoles {
         ns.functions().addSafely(new JFunction(HOLE_NAME, nothing));
         ns.functions().addSafely(new JFunction(HOLE_PREDICATE_NAME, JavaDLTheory.FORMULA));
         ns.functions().addSafely(new JFunction(FOCUS_NAME, nothing, JavaDLTheory.ANY));
+        ns.functions().addSafely(new JFunction(ELLIPSIS_NAME, nothing, JavaDLTheory.ANY));
         GenericSort g = new GenericSort(new Name("G"));
         ns.functions().addSafely(SortDependingFunction.createFirstInstance(g, HOLE_SORT_DEP_NAME, g,
                         new Sort[0], false));
