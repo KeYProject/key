@@ -415,7 +415,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
                 boolean add = p.on == null
-                        || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
+                        || TermComparisonWithHoles.compareModHoles(p.on, pta.posInOccurrence().subTerm());
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
