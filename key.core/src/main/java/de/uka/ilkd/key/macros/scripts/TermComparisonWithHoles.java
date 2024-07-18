@@ -8,7 +8,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /** This is more a temporary hack for scripts ... */
 public class TermComparisonWithHoles {
@@ -16,6 +18,7 @@ public class TermComparisonWithHoles {
     private static final Name HOLE_NAME = new Name("_");
     private static final Name HOLE_PREDICATE_NAME = new Name("__");
     private static final Name FOCUS_NAME = new Name("FOCUS");
+    private static final Name ELLIPSIS_NAME = new Name("ELLIP");
 
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
     private final Services services;
@@ -106,6 +109,14 @@ public class TermComparisonWithHoles {
                 // just ignore the FOCUS application ...
                 return unifyHelp(t0.sub(0), t1, ownBoundVars, cmpBoundVars, nat);
             }
+            if(sdop.getKind().equals(ELLIPSIS_NAME)) {
+                // return true if it hits one subterm ...
+                Set<Term> deepAllSubs = new HashSet<>();
+                computeSubterms(t1, deepAllSubs);
+                var lookfor = t0.sub(0);
+                var finalNat = nat;
+                return deepAllSubs.stream().anyMatch(t -> unifyHelp(lookfor, t, ownBoundVars, cmpBoundVars, finalNat));
+            }
         } else if(op.name().equals(HOLE_PREDICATE_NAME)) {
             return true;
         }
@@ -134,6 +145,11 @@ public class TermComparisonWithHoles {
         }
 
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
+    }
+
+    private static void computeSubterms(Term t, Set<Term> deepAllSubs) {
+        deepAllSubs.add(t);
+        t.subs().stream().forEach(sub -> computeSubterms(sub, deepAllSubs));
     }
 
     private static boolean handleQuantifiableVariable(Term t0, Term t1,
