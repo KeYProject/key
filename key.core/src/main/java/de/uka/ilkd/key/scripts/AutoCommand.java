@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.scripts.meta.*;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.engine.ProverCore;
@@ -92,6 +93,11 @@ public class AutoCommand extends AbstractCommand {
 
         SetCommand.updateStrategySettings(state(), activeStrategyProperties);
 
+        final Strategy originalStrategy = state.getProof().getActiveStrategy();
+        if (arguments.additionalRules != null) {
+            state.getProof().setActiveStrategy(new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules));
+        }
+
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);
 
@@ -113,6 +119,7 @@ public class AutoCommand extends AbstractCommand {
                     activeStrategyProperties.setProperty(ov.settingName, ov.oldValue);
                 }
             }
+            state.getProof().setActiveStrategy(originalStrategy);
             SetCommand.updateStrategySettings(state(), activeStrategyProperties);
         }
     }
@@ -215,6 +222,14 @@ public class AutoCommand extends AbstractCommand {
                 Enable dependency reasoning. In modular reasoning, the value of symbols may stay the same, \
                 without that its definition is known. May be an enabler, may be a showstopper.""")
         public boolean dependencies;
+
+        @Option(value = "add")
+        @Documentation("""
+               Additional rules to be used by the auto strategy. The rules have to be given as a
+               comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
+               (high, low, medium or a natural number) using an equals sign.
+               """)
+        public @Nullable String additionalRules;
     }
 
     private static final class OriginalValue {
