@@ -11,6 +11,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.macros.scripts.meta.Varargs;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -113,6 +116,11 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         SetCommand.updateStrategySettings(state, activeStrategyProperties);
 
+        final Strategy originalStrategy = state.getProof().getActiveStrategy();
+        if (arguments.additionalRules != null) {
+            state.getProof().setActiveStrategy(new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules));
+        }
+
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);
 
@@ -135,6 +143,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
                     activeStrategyProperties.setProperty(ov.settingName, ov.oldValue);
                 }
             }
+            state.getProof().setActiveStrategy(originalStrategy);
             SetCommand.updateStrategySettings(state, activeStrategyProperties);
         }
     }
@@ -221,6 +230,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         @Option(value = "proofSplitting", required = false)
         public Boolean proofSplitting;
+
+        @Varargs(prefix = "add_")
+        public Map<String, String> additionalRules;
 
         public int getSteps() {
             return maxSteps;
