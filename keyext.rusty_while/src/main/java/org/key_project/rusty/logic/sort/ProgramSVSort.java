@@ -9,8 +9,13 @@ import java.util.Map;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.expr.Expr;
+import org.key_project.rusty.ast.expr.IntegerLiteralExpression;
+import org.key_project.rusty.ast.expr.LiteralExpression;
+import org.key_project.rusty.ast.expr.NegationExpression;
+import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.rust.ProgramElement;
 import org.key_project.util.collection.DefaultImmutableSet;
 
 public abstract class ProgramSVSort extends SortImpl {
@@ -37,7 +42,7 @@ public abstract class ProgramSVSort extends SortImpl {
         return true;
     }
 
-    protected abstract boolean canStandFor(ProgramElement check, Services services);
+    protected abstract boolean canStandFor(RustyProgramElement check, Services services);
 
     /**
      * TODO: <a href=
@@ -60,7 +65,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(ProgramElement pe, Services services) {
+        protected boolean canStandFor(RustyProgramElement pe, Services services) {
             return pe instanceof ProgramVariable;
         }
     }
@@ -70,7 +75,6 @@ public abstract class ProgramSVSort extends SortImpl {
      * program variables
      */
     private static class ProgramVariableSort extends LeftHandSideSort {
-
         public ProgramVariableSort() {
             super(new Name("Variable"));
         }
@@ -94,8 +98,15 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(ProgramElement pe, Services services) {
-            // TODO
+        protected boolean canStandFor(RustyProgramElement pe, Services services) {
+            if (pe instanceof NegationExpression ne
+                    && ne.getChild(0) instanceof IntegerLiteralExpression) {
+                return true;
+            }
+
+            if (pe instanceof LiteralExpression)
+                return true;
+
             return VARIABLE.canStandFor(pe, services);
         }
     }
@@ -115,8 +126,9 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(ProgramElement check, Services services) {
-            // TODO
+        protected boolean canStandFor(RustyProgramElement check, Services services) {
+            if (!(check instanceof Expr))
+                return false;
             return !SIMPLEEXPRESSION.canStandFor(check, services);
         }
     }
@@ -135,9 +147,8 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(ProgramElement pe, Services services) {
-            // TODO
-            return false;
+        protected boolean canStandFor(RustyProgramElement pe, Services services) {
+            return pe instanceof Expr;
         }
     }
 
@@ -150,9 +161,8 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(ProgramElement pe, Services services) {
-            // TODO
-            return false;
+        protected boolean canStandFor(RustyProgramElement pe, Services services) {
+            return pe instanceof Statement;
         }
     }
 
@@ -165,7 +175,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(ProgramElement check, Services services) {
+        protected boolean canStandFor(RustyProgramElement check, Services services) {
             // TODO
             return false;
         }
@@ -181,7 +191,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(ProgramElement check, Services services) {
+        protected boolean canStandFor(RustyProgramElement check, Services services) {
             // TODO
             return false;
         }
