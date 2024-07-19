@@ -25,6 +25,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -370,8 +371,9 @@ public class RuleCommand extends AbstractCommand {
         List<TacletApp> matchingApps = new ArrayList<>();
         TermComparisonWithHoles matcher = p.on == null ? null : p.on.getMatcher();
         for (TacletApp tacletApp : list) {
+            boolean add = true;
             if (tacletApp instanceof PosTacletApp pta) {
-                boolean add = matcher == null || matcher.matches(pta.posInOccurrence());
+                add = matcher == null || matcher.matches(pta.posInOccurrence());
 
                 for (var entry : pta.instantiations().getInstantiationMap()) {
                     final SchemaVariable sv = entry.key();
@@ -383,6 +385,10 @@ public class RuleCommand extends AbstractCommand {
                             || userInst.equalsModProperty(ptaInst, IRRELEVANT_TERM_LABELS_PROPERTY);
                 }
 
+                if(tacletApp.assumesFormulaInstantiations() != null) {
+                    add &= checkAssumes(p, tacletApp.assumesFormulaInstantiations(), services);
+                }
+
                 if (add) {
                     matchingApps.add(pta);
                 }
@@ -390,6 +396,16 @@ public class RuleCommand extends AbstractCommand {
         }
         return matchingApps;
     }
+
+    private boolean checkAssumes(Parameters p, ImmutableList<AssumesFormulaInstantiation> ifFormulaInstantiations, Services services) {
+        if(p.assumes == null) {
+            // no "assumes" restrictions specified.
+            return true;
+        }
+
+        return p.assumes.matches(ifFormulaInstantiations);
+    }
+
 
     @Documentation(category = "Fundamental", value = """
         This command can be used to apply a calculus rule to the currently active open goal.
@@ -428,6 +444,12 @@ public class RuleCommand extends AbstractCommand {
                 "specified to match the toplevel formula.")
         @Option(value = "matches")
         public @Nullable String matches = null;
+ 
+        @Option(value = "assumes")
+        @Documentation("""
+            If the rule has an `\\assumes` clause, this can be used to restrict the instantiations
+            """)
+        public @Nullable SequentWithHoles assumes;
 
         @OptionalVarargs(as = JTerm.class, prefix = "inst_")
         @Documentation("Instantiations for term schema variables used in the rule.")

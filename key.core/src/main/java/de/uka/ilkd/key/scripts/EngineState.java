@@ -94,6 +94,11 @@ public class EngineState {
         v.addConverter(TermWithHoles.class, String.class,
                 (str) -> TermWithHoles.fromString(this, str));
 
+        v.addConverter(SequentWithHoles.class, ProofScriptExpressionContext.class,
+                (ctx) -> SequentWithHoles.fromParserContext(this, ctx));
+        v.addConverter(SequentWithHoles.class, String.class,
+                (str) -> SequentWithHoles.fromString(this, str));
+
         addContextTranslator(v, String.class);
         addContextTranslator(v, JTerm.class);
         addContextTranslator(v, Integer.class);

@@ -43,30 +43,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static de.uka.ilkd.key.strategy.StrategyProperties.*;
-
-/*
-
-y < (x+0) + y + (x+0),
-a -> y < (x+0) + y + (x+0)
-
-
-rule plus_zero on: ?????
-
---->   a -> y < (x+0) + y + FOCUS(x+0)
-
---->  _ -> (... _ + (_+0) ...)
-
----> _ -> _find(_ + _focus(_ + 0))
-
----> ? -> ?find(? + ?focus(? + 0))
-
----> ?_ -> ?find(?_ + ?focus(_ + 0))
- */
 
 @NullMarked
 public class TermWithHoles {
