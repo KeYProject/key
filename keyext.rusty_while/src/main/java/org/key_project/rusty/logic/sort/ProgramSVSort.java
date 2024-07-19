@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.sort;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -6,9 +12,6 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rust.ProgramElement;
 import org.key_project.util.collection.DefaultImmutableSet;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public abstract class ProgramSVSort extends SortImpl {
     private static final Map<Name, ProgramSVSort> NAME2SORT = new LinkedHashMap<>(60);
@@ -37,7 +40,9 @@ public abstract class ProgramSVSort extends SortImpl {
     protected abstract boolean canStandFor(ProgramElement check, Services services);
 
     /**
-     * TODO: <a href="https://doc.rust-lang.org/reference/expressions.html#place-expressions-and-value-expressions">Follow this</a>
+     * TODO: <a href=
+     * "https://doc.rust-lang.org/reference/expressions.html#place-expressions-and-value-expressions">Follow
+     * this</a>
      */
     private static class LeftHandSideSort extends ProgramSVSort {
 

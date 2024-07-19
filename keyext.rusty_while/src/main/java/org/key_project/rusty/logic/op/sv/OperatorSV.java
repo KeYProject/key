@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op.sv;
 
 import org.key_project.logic.Name;
@@ -13,7 +16,7 @@ public abstract class OperatorSV extends AbstractSortedOperator implements Schem
 
 
     protected OperatorSV(Name name, ImmutableArray<Sort> argSorts, Sort sort, boolean isRigid,
-                         boolean isStrict) {
+            boolean isStrict) {
         super(name, argSorts, sort, isRigid ? Modifier.RIGID : Modifier.NONE);
         this.isStrict = isStrict;
     }

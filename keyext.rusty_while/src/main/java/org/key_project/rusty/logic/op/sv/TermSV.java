@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op.sv;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
+
+import org.jspecify.annotations.NonNull;
 
 public class TermSV extends OperatorSV implements TerminalSyntaxElement {
     /**
@@ -21,7 +25,7 @@ public class TermSV extends OperatorSV implements TerminalSyntaxElement {
     }
 
     @Override
-    public  @NonNull String toString() {
+    public @NonNull String toString() {
         return toString(sort().toString() + " term");
     }
 }
