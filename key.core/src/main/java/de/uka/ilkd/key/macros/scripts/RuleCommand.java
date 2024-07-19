@@ -14,11 +14,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
@@ -28,16 +24,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -413,9 +400,10 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         TermComparisonWithHoles tc = new TermComparisonWithHoles(services);
 
         for (TacletApp tacletApp : list) {
+            boolean add = true;
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                boolean add = p.on == null
+                add = p.on == null
                         || tc.compareModHoles(p.on, pta.posInOccurrence());
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
@@ -427,13 +415,31 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
                     add &= userInst == null || userInst.equalsModIrrelevantTermLabels(ptaInst);
                 }
-
-                if (add) {
-                    matchingApps.add(pta);
-                }
             }
+
+            if(tacletApp.ifFormulaInstantiations() != null)
+                add &= checkAssumes(p, tacletApp.ifFormulaInstantiations(), services);
+
+            if (add) {
+                matchingApps.add(tacletApp);
+            }
+
         }
         return matchingApps;
+    }
+
+    private boolean checkAssumes(Parameters p, ImmutableList<IfFormulaInstantiation> ifFormulaInstantiations, Services services) {
+        if(p.assumes == null) {
+            // no "assumes" restrictions specified.
+            return true;
+        }
+
+        TermComparisonWithHoles tc = new TermComparisonWithHoles(services);
+        if(!tc.containsModHoles(p.assumes, ifFormulaInstantiations)) {
+            return false;
+        }
+
+        return true;
     }
 
     public static class Parameters {
@@ -452,6 +458,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
          */
         @Option(value = "matches", required = false)
         public String matches = null;
+        @Option(value = "assumes", required = false)
+        public Sequent assumes = null;
         @Varargs(as = Term.class, prefix = "inst_")
         public Map<String, Term> instantiations = new HashMap<>();
     }

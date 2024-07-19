@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -19,6 +20,7 @@ public class TermComparisonWithHoles {
     private static final Name HOLE_PREDICATE_NAME = new Name("__");
     private static final Name FOCUS_NAME = new Name("FOCUS");
     private static final Name ELLIPSIS_NAME = new Name("ELLIP");
+    private static final Name ELLIPSIS_PREDICATE_NAME = new Name("PELLIP");
 
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
     private final Services services;
@@ -119,6 +121,13 @@ public class TermComparisonWithHoles {
             }
         } else if(op.name().equals(HOLE_PREDICATE_NAME)) {
             return true;
+        } else if(op.name().equals(ELLIPSIS_PREDICATE_NAME)) {
+            // return true if it hits one subterm ...
+            Set<Term> deepAllSubs = new HashSet<>();
+            computeSubterms(t1, deepAllSubs);
+            var lookfor = t0.sub(0);
+            var finalNat = nat;
+            return deepAllSubs.stream().anyMatch(t -> unifyHelp(lookfor, t, ownBoundVars, cmpBoundVars, finalNat));
         }
 
 
@@ -263,6 +272,23 @@ public class TermComparisonWithHoles {
                     subOwnBoundVars, subCmpBoundVars, nat);
 
             if (!newConstraint) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // TODO currently this does not check if the instantiation is on the correct side ...
+    public boolean containsModHoles(Sequent sequentWithHoles, ImmutableList<IfFormulaInstantiation> seqFormula) {
+        var allFormulas = new HashSet<Term>();
+        sequentWithHoles.antecedent().asList().forEach(x -> allFormulas.add(x.formula()));
+        sequentWithHoles.succedent().asList().forEach(x -> allFormulas.add(x.formula()));
+
+        for (IfFormulaInstantiation ifF : seqFormula) {
+            var form = ifF.getConstrainedFormula();
+            var sform = new PosInOccurrence(form, PosInTerm.getTopLevel(), true);
+            if (allFormulas.stream().noneMatch(f -> compareModHoles(f, sform))) {
                 return false;
             }
         }
