@@ -37,6 +37,26 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
 
     /**
+     * gets the element at a specific index
+     *
+     * @param idx int representing the index of the element we want to have
+     * @return {@link SequentFormula} found at index idx
+     * @throws IndexOutOfBoundsException if idx is negative or greater or equal to
+     *         {@link Sequent#size()}
+     */
+    public SequentFormula get(int idx) {
+        if (idx < 0 || idx >= seqList.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        return seqList.take(idx).head();
+    }
+
+    /** @return the first {@link SequentFormula} of this Semisequent */
+    public SequentFormula getFirst() {
+        return seqList.head();
+    }
+
+    /**
      * returns iterator about the elements of the sequent
      *
      * @return Iterator<SequentFormula>

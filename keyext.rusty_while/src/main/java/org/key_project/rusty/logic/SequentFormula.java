@@ -20,7 +20,8 @@ public class SequentFormula {
         this.term = term;
     }
 
-    public Term getTerm() {
+    /** @return the stored Term */
+    public Term formula() {
         return term;
     }
 }

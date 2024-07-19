@@ -100,12 +100,36 @@ public class Sequent implements Iterable<SequentFormula> {
     }
 
     /**
+     * @param formulaNumber formula number (1-based)
+     * @return whether that formula is in the antecedent
+     */
+    public boolean numberInAntec(int formulaNumber) {
+        checkFormulaIndex(formulaNumber);
+        return formulaNumber <= antecedent.size();
+    }
+
+    /**
      * determines if the sequent is empty.
      *
      * @return true iff the sequent consists of two instances of Semisequent.EMPTY_SEMISEQUENT
      */
     public boolean isEmpty() {
         return antecedent.isEmpty() && succedent.isEmpty();
+    }
+
+    /**
+     * Get a sequent formula by its position in the sequent.
+     * The first formula has number 1.
+     *
+     * @param formulaNumber formula number
+     * @return the sequent formula at that position
+     */
+    public SequentFormula getFormulaByNr(int formulaNumber) {
+        checkFormulaIndex(formulaNumber);
+        if (formulaNumber <= antecedent.size()) {
+            return antecedent.get(formulaNumber - 1);
+        }
+        return succedent.get((formulaNumber - 1) - antecedent.size());
     }
 
     private static final class NILSequent extends Sequent {
@@ -166,6 +190,19 @@ public class Sequent implements Iterable<SequentFormula> {
         @Override
         public void remove() {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * Check that the provided formula number is a 1-based index and in bounds.
+     * Throws an {@link IllegalArgumentException} otherwise.
+     *
+     * @param formulaNumber the formula number
+     */
+    private void checkFormulaIndex(int formulaNumber) {
+        if (formulaNumber <= 0 || formulaNumber > size()) {
+            throw new IllegalArgumentException(
+                "No formula nr. " + formulaNumber + " in seq. " + this);
         }
     }
 }
