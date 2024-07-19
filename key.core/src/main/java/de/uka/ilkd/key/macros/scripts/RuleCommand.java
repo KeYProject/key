@@ -75,6 +75,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     @Override
     public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
+        // TODO Is this not equivalent to the implementation in the superclass?
         return state.getValueInjector().inject(this, new Parameters(),
             arguments);
     }

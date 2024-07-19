@@ -50,17 +50,15 @@ public class TermComparisonWithHoles {
                 null);
     }
 
-    private Term removeFocus(PosInTerm focus, int pos, Term pattern) {
-        if(pos == focus.depth()) {
-            return pattern.sub(0);
+    public boolean compareModHoles(Term pattern, Term term) {
+        if (pattern == term) {
+            return true;
         }
-        int idx = focus.getIndexAt(pos);
-        List<Term> subs = pattern.subs().toList();
-        Term sub = pattern.sub(idx);
-        Term newSub = removeFocus(focus, pos+1, sub);
-        subs.set(idx, newSub);
-        ImmutableArray<Term> subsAsArray = new ImmutableArray<>(subs);
-        return services.getTermFactory().createTerm(pattern.op(), subsAsArray, pattern.boundVars(), pattern.javaBlock(), pattern.getLabels());
+
+        return unifyHelp(pattern, term,
+                ImmutableSLList.<QuantifiableVariable>nil(),
+                ImmutableSLList.<QuantifiableVariable>nil(),
+                null);
     }
 
     private static PosInTerm findFocus(Term pattern) {
