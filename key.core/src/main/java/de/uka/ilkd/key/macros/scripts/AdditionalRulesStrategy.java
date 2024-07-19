@@ -11,6 +11,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ class AdditionalRulesStrategy extends FilterStrategy {
     private static final Map<String, String> TRANSLATIONS =
             Map.of("high", "-50", "medium", "1000", "low", "10000");
 
-    private final Map<String, Integer> additionalRules;
+    private final Map<String, RuleAppCost> additionalRules;
 
     public AdditionalRulesStrategy(Strategy delegate,
                                    Map<String, String> additionalRules) {
@@ -31,14 +32,19 @@ class AdditionalRulesStrategy extends FilterStrategy {
         this.additionalRules = parseAddRules(additionalRules);
     }
 
-    private Map<String, Integer> parseAddRules(Map<String, String> additionalRules) {
-        Map<String, Integer> result = new HashMap<>();
+    private Map<String, RuleAppCost> parseAddRules(Map<String, String> additionalRules) {
+        Map<String, RuleAppCost> result = new HashMap<>();
         for (Map.Entry<String, String> entry : additionalRules.entrySet()) {
             String value = TRANSLATIONS.getOrDefault(entry.getValue(), entry.getValue());
             try {
-                result.put(entry.getKey(), Integer.parseInt(value));
+                if(value.equals("off")) {
+                    result.put(entry.getKey(), TopRuleAppCost.INSTANCE);
+                } else {
+                    int parsed = Integer.parseInt(value);
+                    result.put(entry.getKey(), NumberRuleAppCost.create(parsed));
+                }
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid value for additional rule: " + entry.getKey());
+                throw new IllegalArgumentException("Invalid value for rule cost: " + value);
             }
         }
         return result;
@@ -62,25 +68,25 @@ class AdditionalRulesStrategy extends FilterStrategy {
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         RuleAppCost localCost = computeLocalCost(app.rule());
         if (localCost != null) {
-            return true;
+            return localCost != TopRuleAppCost.INSTANCE;
         }
         return super.isApprovedApp(app, pio, goal);
     }
 
     private RuleAppCost computeLocalCost(Rule rule) {
         String name = rule.name().toString();
-        Integer cost = additionalRules.get(name);
+        RuleAppCost cost = additionalRules.get(name);
         if(cost != null) {
-            return NumberRuleAppCost.create(cost);
+            return cost;
         }
 
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
             for (RuleSet rs : taclet.getRuleSets()) {
                 String rname = rs.name().toString();
-                Integer rcost = additionalRules.get(rname);
+                RuleAppCost rcost = additionalRules.get(rname);
                 if(rcost != null) {
-                    return NumberRuleAppCost.create(rcost);
+                    return rcost;
                 }
             }
         }
