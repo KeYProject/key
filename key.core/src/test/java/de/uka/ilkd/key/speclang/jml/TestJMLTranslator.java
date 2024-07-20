@@ -187,6 +187,9 @@ public class TestJMLTranslator {
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
         assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
 
@@ -203,6 +206,9 @@ public class TestJMLTranslator {
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
         assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
 
@@ -219,6 +225,9 @@ public class TestJMLTranslator {
         Assertions.assertSame(q, result.sub(0).op());
         assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
 
@@ -233,6 +242,9 @@ public class TestJMLTranslator {
         Assertions.assertSame(q, result.op());
         assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
     @Test
@@ -250,6 +262,9 @@ public class TestJMLTranslator {
             TB.ife(guard, TB.empty(), TB.empty()));
         assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
     @Test
@@ -268,6 +283,9 @@ public class TestJMLTranslator {
             TB.ife(guard, TB.empty(), TB.empty()));
         assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
 
