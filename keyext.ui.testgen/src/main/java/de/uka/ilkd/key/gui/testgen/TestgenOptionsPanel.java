@@ -8,7 +8,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.TestGenerationSettings;
 
 public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = -2170118134719823425L;
@@ -59,7 +59,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     private final JSpinner maxProcesses;
     private final JSpinner maxUnwinds;
     private final JCheckBox symbolicEx;
-    private final JCheckBox useJUnit;
+    private final JComboBox<JUnitFormat> useJUnit;
     private final JCheckBox invariantForAll;
     private final JCheckBox includePostCondition;
     private final JCheckBox removeDuplicates;
@@ -105,20 +105,20 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
 
     private JTextField getOpenJMLPanel() {
         return addFileChooserPanel("Location of openjml:", "", INFO_OPEN_JML_PATH, false, e -> {
-            settings.setOpenjmlPath(openJMLPanel.getText());
+            // settings.setOpenjmlPath(openJMLPanel.getText());
         });
     }
 
     private JTextField getObjenesisPanel() {
         return addFileChooserPanel("Location of objenesis:", "", INFO_OBJENESIS_PATH, false, e -> {
-            settings.setObjenesisPath(objenesisPanel.getText());
+            // settings.setObjenesisPath(objenesisPanel.getText());
         });
     }
 
-    private JCheckBox getJUnitPanel() {
-        return addCheckBox("Generate JUnit and test oracle", INFO_USE_JUNIT, false, val -> {
-            settings.setUseJunit(val);
-        });
+    private JComboBox<JUnitFormat> getJUnitPanel() {
+        return addComboBox("Set the format", INFO_USE_JUNIT, 0, val -> {
+            settings.setFormat(val);
+        }, JUnitFormat.values());
     }
 
     private JCheckBox getRemoveDuplicatesPanel() {
@@ -129,7 +129,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
 
     private JCheckBox getRFLSelectionPanel() {
         return addCheckBox("Use reflection framework", INFO_RFL_SELECTION, false, val -> {
-            settings.setRFL(val);
+            settings.setUseRFL(val);
         });
     }
 
@@ -162,12 +162,12 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
         settings = new TestGenerationSettings(TestGenerationSettings.getInstance());
         includePostCondition.setSelected(settings.includePostCondition());
         invariantForAll.setSelected(settings.invariantForAll());
-        useJUnit.setSelected(settings.useJunit());
+        useJUnit.setSelectedItem(settings.getFormat());
         symbolicEx.setSelected(settings.getApplySymbolicExecution());
         removeDuplicates.setSelected(settings.removeDuplicates());
-        checkboxRFL.setSelected(settings.useRFL());
-        objenesisPanel.setText(settings.getObjenesisPath());
-        openJMLPanel.setText(settings.getOpenjmlPath());
+        checkboxRFL.setSelected(settings.isUseRFL());
+        // objenesisPanel.setText(settings.getObjenesisPath());
+        // openJMLPanel.setText(settings.getOpenjmlPath());
         saveToFilePanel.setText(settings.getOutputFolderPath());
         return this;
     }

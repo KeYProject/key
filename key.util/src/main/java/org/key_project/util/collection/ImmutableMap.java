@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+
 import java.util.Iterator;
 
 
 /**
  * This interface has to be implemented by a Class providing a persistent Map.
  */
+@SuppressWarnings("type.argument.type.incompatible")
 public interface ImmutableMap<S, T>
         extends Iterable<ImmutableMapEntry<S, T>> {
 

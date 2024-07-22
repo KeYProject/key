@@ -25,6 +25,8 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
@@ -82,7 +84,8 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
             (LoopInvariantBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();

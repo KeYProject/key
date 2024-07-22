@@ -1,4 +1,5 @@
 dependencies {
     implementation project(":key.core")
     implementation project(":key.ui")
+    implementation("info.picocli:picocli:4.7.6")
 }
