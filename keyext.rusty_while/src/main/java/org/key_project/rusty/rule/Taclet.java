@@ -360,6 +360,11 @@ public abstract class Taclet implements Rule {
         return false;
     }
 
+    /**
+     * @return set of schemavariables of the if and the (optional) find part
+     */
+    public abstract ImmutableSet<SchemaVariable> getIfFindVariables();
+
     StringBuffer toStringIf(StringBuffer sb) {
         if (!ifSequent.isEmpty()) {
             sb = sb.append("\\assumes (").append(ifSequent).append(") ");
