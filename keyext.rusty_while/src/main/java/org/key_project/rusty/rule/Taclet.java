@@ -7,15 +7,19 @@ import java.util.Iterator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 import static org.key_project.util.Strings.formatAsList;
 
@@ -317,7 +321,7 @@ public abstract class Taclet implements Rule {
     /**
      * returns the set of schemavariables of the taclet's if-part
      *
-     * @return Set of schemavariables of the if part
+     * @return Set of schemavariables of the {@code if} part
      */
     protected ImmutableSet<SchemaVariable> getIfVariables() {
         // should be synchronized
@@ -416,4 +420,45 @@ public abstract class Taclet implements Rule {
         }
         return sb;
     }
+
+    /**
+     * returns a representation of the Taclet as String
+     *
+     * @return string representation
+     */
+    @Override
+    public String toString() {
+        if (tacletAsString == null) {
+            // FIXME this essentially reimplements PrettyPrinter::printTaclet
+            StringBuffer sb = new StringBuffer();
+            sb = sb.append(name()).append(" {\n");
+            sb = toStringIf(sb);
+            sb = toStringVarCond(sb);
+            sb = toStringGoalTemplates(sb);
+            sb = toStringTriggers(sb);
+            tacletAsString = sb.append("}").toString();
+        }
+        return tacletAsString;
+    }
+
+    /**
+     * applies the given rule application to the specified goal
+     *
+     * @param goal the goal that the rule application should refer to.
+     * @param services the Services encapsulating all java information
+     * @param tacletApp the rule application that is executed.
+     * @return List of the goals created by the rule which have to be proved. If this is a
+     *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
+     *         goal that should be closed (with the constraint this taclet is applied under).
+     */
+    @Override
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
+        return getExecutor().apply(goal, services, tacletApp);
+    }
+
+    public TacletExecutor<? extends Taclet> getExecutor() {
+        return executor;
+    }
+
+    public abstract Taclet setName(String s);
 }
