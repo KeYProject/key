@@ -23,6 +23,7 @@ public class BasicTest {
         var example = "{a = a + b;\n" +
             "b = a - b;\n" +
             "a = a - b;\n" +
+            "1u32\n" +
             "}";
         var lexer =
             new org.key_project.rusty.parsing.RustyWhileLexer(CharStreams.fromString(example));

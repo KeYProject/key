@@ -168,26 +168,14 @@ public class Converter {
             var intLit = ctx.INTEGER_LITERAL();
             if (intLit != null) {
                 var text = intLit.getText();
-                var split = text.split("_");
-                var suffix = switch (split[split.length - 1]) {
-                case "u8" -> IntegerLiteralExpression.IntegerSuffix.u8;
-                case "u16" -> IntegerLiteralExpression.IntegerSuffix.u16;
-                case "u32" -> IntegerLiteralExpression.IntegerSuffix.u32;
-                case "u64" -> IntegerLiteralExpression.IntegerSuffix.u64;
-                case "u128" -> IntegerLiteralExpression.IntegerSuffix.u128;
-                case "usize" -> IntegerLiteralExpression.IntegerSuffix.usize;
-                case "i8" -> IntegerLiteralExpression.IntegerSuffix.i8;
-                case "i16" -> IntegerLiteralExpression.IntegerSuffix.i16;
-                case "i32" -> IntegerLiteralExpression.IntegerSuffix.i32;
-                case "i64" -> IntegerLiteralExpression.IntegerSuffix.i64;
-                case "i128" -> IntegerLiteralExpression.IntegerSuffix.i128;
-                case "isize" -> IntegerLiteralExpression.IntegerSuffix.isize;
-                default -> throw new IllegalArgumentException(
-                    "Right now we require a suffix on all literals");
-                };
+                var signed = text.contains("i");
+                var split = text.split("[ui]");
+                var size = split[split.length - 1];
+                var suffix = IntegerLiteralExpression.IntegerSuffix.get(signed, size);
+                var lit = split[0];
 
                 var value = new BigInteger(
-                    text.substring(0, text.length() - split[split.length - 1].length()));
+                    lit);
                 return new IntegerLiteralExpression(value, suffix);
             }
 

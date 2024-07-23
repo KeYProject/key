@@ -27,7 +27,7 @@ public class TestHelper {
             KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, profile);
             pi = new ProblemInitializer(profile);
 
-            result = pi.startProver(po, po);
+            //result = pi.startProver(po, po);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

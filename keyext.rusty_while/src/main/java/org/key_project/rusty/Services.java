@@ -14,7 +14,7 @@ public class Services {
      * proof specific namespaces (functions, predicates, sorts, variables)
      */
     private final NamespaceSet namespaces = new NamespaceSet();
-    private final LDTs ldts;
+    private LDTs ldts;
 
     private final TermFactory tf;
     private final TermBuilder tb;
@@ -24,7 +24,6 @@ public class Services {
     public Services() {
         this.tf = new TermFactory();
         this.tb = new TermBuilder(tf, this);
-        this.ldts = new LDTs(this);
     }
 
     public NamespaceSet getNamespaces() {
@@ -37,6 +36,10 @@ public class Services {
 
     public TermFactory getTermFactory() {
         return tf;
+    }
+
+    public void initLDTs() {
+        ldts = new LDTs(this);
     }
 
     public LDTs getLDTs() {

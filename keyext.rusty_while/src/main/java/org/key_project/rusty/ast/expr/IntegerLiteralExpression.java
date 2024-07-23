@@ -20,7 +20,27 @@ public class IntegerLiteralExpression extends LiteralExpression {
         i32,
         i64,
         i128,
-        isize,
+        isize;
+
+        public static IntegerSuffix get(boolean signed, String size) {
+            if (signed) {
+                return getIntegerSuffix(size, i8, i16, i32, i64, i128, isize);
+            } else {
+                return getIntegerSuffix(size, u8, u16, u32, u64, u128, usize);
+            }
+        }
+
+        private static IntegerSuffix getIntegerSuffix(String size, IntegerSuffix integerSuffix, IntegerSuffix integerSuffix2, IntegerSuffix integerSuffix3, IntegerSuffix integerSuffix4, IntegerSuffix integerSuffix5, IntegerSuffix integerSuffix6) {
+            return switch (size) {
+                case "8" -> integerSuffix;
+                case "16" -> integerSuffix2;
+                case "32" -> integerSuffix3;
+                case "64" -> integerSuffix4;
+                case "128" -> integerSuffix5;
+                case "size" -> integerSuffix6;
+                default -> throw new IllegalArgumentException("Unknown size: " + size);
+            };
+        }
     }
 
     private final BigInteger value;
