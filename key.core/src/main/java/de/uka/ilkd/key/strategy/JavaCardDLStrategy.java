@@ -527,9 +527,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private void setupTracingStrategy(RuleSetDispatchFeature d) {
-        bindRuleSet(d, "tracing", longConst(-200));
-        bindRuleSet(d, "traceIndexDelete", longConst(-50000));
+        bindRuleSet(d, "retrace", longConst(-200));
         bindRuleSet(d, "traceIndexInc", longConst(-500));
+        bindRuleSet(d, "traceIndexDelete", longConst(-50000));
+        bindRuleSet(d, "traceIndexReplace", longConst(-55000));
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
