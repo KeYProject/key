@@ -56,34 +56,36 @@ class Quicksort {
       @
       @ //-- Below is the recorded control flow trace
       @ //-- (rules for predicates trace_O() & I(), traceIndex() are included in this KeY-version)
-      @ requires \dl_traceIndex(0);
-      @ requires \dl_trace_I(0);
-      @ requires \dl_trace_I(1);
-      @ requires \dl_trace_I(2);
-      @ requires \dl_trace_O(3);
-      @ requires \dl_trace_I(4);
-      @ requires \dl_trace_O(5);
-      @ requires \dl_trace_I(6);
-      @ requires \dl_trace_O(7);
-      @ requires \dl_trace_I(8);
-      @ requires \dl_trace_O(9);
-      @ requires \dl_trace_O(10);
-      @ requires \dl_trace_O(11);
-      @ requires \dl_trace_I(12);
-      @ requires \dl_trace_I(13);
-      @ requires \dl_trace_O(14);
-      @ requires \dl_trace_I(15);
-      @ requires \dl_trace_I(16);
-      @ requires \dl_trace_I(17);
-      @ requires \dl_trace_O(18);
-      @ requires \dl_trace_O(19);
-      @ requires \dl_trace_O(20);
-      @ requires \dl_trace_I(21);
-      @ requires \dl_trace_I(22);
-      @ requires \dl_trace_O(23);
-      @ requires \dl_trace_O(24);
-      @ requires \dl_trace_O(25);
-      @ requires \dl_trace_O(26);
+      @ requires tracer.Trace.index == 0;
+      @ requires \dl_traceIf(0);
+      @ requires \dl_traceIf(1);
+      @ requires \dl_traceIf(2);
+      @ requires ! \dl_traceIf(3);
+      @ requires \dl_traceIf(4);
+      @ requires ! \dl_traceIf(5);
+      @ requires \dl_traceIf(6);
+      @ requires ! \dl_traceIf(7);
+      @ requires \dl_traceIf(8);
+      @ requires ! \dl_traceIf(9);
+      @ requires ! \dl_traceIf(10);
+      @ requires ! \dl_traceIf(11);
+      @ requires \dl_traceIf(12);
+      @ requires \dl_traceIf(13);
+      @ requires ! \dl_traceIf(14);
+      @ requires \dl_traceIf(15);
+      @ requires \dl_traceIf(16);
+      @ requires \dl_traceIf(17);
+      @ requires ! \dl_traceIf(18);
+      @ requires ! \dl_traceIf(19);
+      @ requires ! \dl_traceIf(20);
+      @ requires \dl_traceIf(21);
+      @ requires \dl_traceIf(22);
+      @ requires ! \dl_traceIf(23);
+      @ requires ! \dl_traceIf(24);
+      @ requires ! \dl_traceIf(25);
+      @ requires ! \dl_traceIf(26);
+      @
+      @  ensures tracer.Trace.index == 27;
       @
       @  //-- the following ensures with seqPerm cannot be shown in auto mode with default options:
       @  //ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
@@ -95,7 +97,8 @@ class Quicksort {
       @
       @  ensures (\forall int i; 0<=i && i<array.length-1; array[i] <= array[i+1]);
       @
-      @  assignable array[*];
+      @
+      @  assignable array[*], tracer.Trace.index;
       @*/
     public static void sort(int[] array) {
         if(array.length > 0) { // 0
