@@ -52,7 +52,7 @@ public final class ProblemInitializer {
     // --------------------------------------------------------------------------
 
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
-        InitConfig currentBaseConfig = baseConfig != null ? baseConfig : null;
+        InitConfig currentBaseConfig = baseConfig != null ? baseConfig.copy() : null;
 
         alreadyParsed.clear();
 
@@ -80,7 +80,7 @@ public final class ProblemInitializer {
             throws ProofInputException {
         // create initConfig
         //InitConfig initConfig = referenceConfig.copy();
-        InitConfig initConfig = referenceConfig;
+        InitConfig initConfig = referenceConfig.copy();
 
         //configureTermLabelSupport(initConfig);
 

@@ -68,6 +68,11 @@ public class NamespaceSet {
         functions().add(ns.functions());
     }
 
+    public NamespaceSet copy() {
+        return new NamespaceSet(variables().copy(), programVariables().copy(), functions().copy(),
+                sorts().copy());
+    }
+
     @Override
     public String toString() {
         return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n" + "Variables: "

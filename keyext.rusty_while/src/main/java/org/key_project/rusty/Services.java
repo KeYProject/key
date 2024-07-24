@@ -4,6 +4,7 @@
 package org.key_project.rusty;
 
 
+
 import org.key_project.rusty.ldt.LDTs;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.TermBuilder;
@@ -15,7 +16,7 @@ public class Services {
     /**
      * proof specific namespaces (functions, predicates, sorts, variables)
      */
-    private final NamespaceSet namespaces = new NamespaceSet();
+    private NamespaceSet namespaces = new NamespaceSet(); // TODO ask Daniel; was final before
     private LDTs ldts;
 
     private final TermFactory tf;
@@ -38,6 +39,10 @@ public class Services {
         return namespaces;
     }
 
+    public void setNamespaces(NamespaceSet namespaces) {
+        this.namespaces = namespaces;
+    }
+
     public TermBuilder getTermBuilder() {
         return tb;
     }
@@ -54,6 +59,10 @@ public class Services {
         return ldts;
     }
 
+    public void setLDTs(LDTs ldts) {
+        this.ldts = ldts;
+    }
+
     public Proof getProof() {
         return proof;
     }
@@ -64,5 +73,15 @@ public class Services {
 
     public Profile getProfile() {
         return profile;
+    }
+
+    /**
+     * creates a new service object with the same ldt information as the actual one
+     */
+    public Services copyPreservesLDTInformation() {
+        Services s = new Services(getProfile());
+        s.setLDTs(getLDTs());
+        s.setNamespaces(namespaces.copy());
+        return s;
     }
 }

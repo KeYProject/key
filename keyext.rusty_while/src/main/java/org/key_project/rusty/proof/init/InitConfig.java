@@ -99,4 +99,20 @@ public class InitConfig {
     public Namespace<ProgramVariable> progVarNS() {
         return namespaces().programVariables();
     }
+
+    public InitConfig copy() {
+        return copyWithServices(services.copyPreservesLDTInformation());
+    }
+
+    // TODO fix ProofSettings
+    public InitConfig copyWithServices(Services services) {
+        InitConfig ic = new InitConfig(services);
+        if(settings != null) {
+            ic.setSettings(new ProofSettings());//settings));
+        }
+
+        // TODO add copies once more fields of InitConfig are added
+
+        return ic;
+    }
 }
