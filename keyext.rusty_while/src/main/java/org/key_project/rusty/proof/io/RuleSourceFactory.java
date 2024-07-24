@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof.io;
 
+
+import org.key_project.rusty.proof.Proof;
+
 import java.io.File;
 import java.net.URL;
 
@@ -17,24 +20,36 @@ public class RuleSourceFactory {
 
     public static RuleSource fromDefaultLocation(final String ruleFileName) {
         String stdTacletDir = System.getProperty(STD_TACLET_DIR_PROP_KEY);
-        // if (stdTacletDir == null) {
-        // return fromBuiltInRule(ruleFileName);
-        // } else {
-        return initRuleFile(new File(stdTacletDir, ruleFileName));
-        // }
+         if (stdTacletDir == null) {
+             return fromBuiltInRule(ruleFileName);
+
+         } else {
+            return initRuleFile(new File(stdTacletDir, ruleFileName));
+         }
     }
 
-    /*
-     * public static RuleSource fromBuiltInRule(final String ruleFileName) {
-     * final URL u = KeYResourceManager.getManager().getResourceFile(Proof.class,
-     * PATH_TO_RULES + ruleFileName);
-     * if (u == null) {
-     * // a more specific exception type would probably be better
-     * throw new RuntimeException("Could not find rule file " + PATH_TO_RULES + ruleFileName);
-     * }
-     * return new UrlRuleSource(u);
-     * }
-     */
+
+    public static RuleSource fromBuiltInRule(final String ruleFileName) {
+        //  final URL u = KeYResourceManager.getManager().getResourceFile(Proof.class,
+        final URL u = getResourceFile(Proof.class,
+                PATH_TO_RULES + ruleFileName);
+        if (u == null) {
+            // a more specific exception type would probably be better
+            throw new RuntimeException("Could not find rule file " + PATH_TO_RULES + ruleFileName);
+        }
+        return new UrlRuleSource(u);
+    }
+
+    // TODO very hacky test; method from KeYResourceManager pasted here
+    public static URL getResourceFile(Class<?> cl, String resourcename) {
+        URL resourceURL = cl.getResource(resourcename);
+        if (resourceURL == null && cl.getSuperclass() != null) {
+            return getResourceFile(cl.getSuperclass(), resourcename);
+        } else if (resourceURL == null && cl.getSuperclass() == null) {
+            return null;
+        }
+        return resourceURL;
+    }
 
     public static RuleSource initRuleFile(final URL url) {
         return new UrlRuleSource(url);

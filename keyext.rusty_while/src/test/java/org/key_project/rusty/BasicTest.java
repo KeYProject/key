@@ -9,16 +9,28 @@ import org.key_project.logic.Name;
 import org.key_project.rusty.ast.Converter;
 import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.logic.RustyBlock;
+import org.key_project.rusty.logic.Semisequent;
+import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.ProgramVariable;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
+import org.key_project.rusty.proof.Node;
+import org.key_project.rusty.proof.Proof;
+import org.key_project.rusty.util.TacletForTests;
 
 public class BasicTest {
+
     @Test
     public void testBasic() {
-        var services = new Services();
+        // load
+        TacletForTests.parse();
+        assert TacletForTests.services().getNamespaces().programVariables()
+                .lookup(new Name("i")) != null;
+
+        var services = TacletForTests.services();
         var tb = services.getTermBuilder();
 
         var example = "{a = a + b;\n" +
@@ -47,7 +59,18 @@ public class BasicTest {
             tb.and(tb.equals(tb.var(a), tb.var(b_old)), tb.equals(tb.var(b), tb.var(a_old))));
         var t = tb.imp(
             tb.and(tb.equals(tb.var(a), tb.var(a_old)), tb.equals(tb.var(b), tb.var(b_old))),
-            mod);
+            mod); // a = a_old && b = b_old -> <example> a = b_old && b = a_old
         System.out.println(t);
+
+
+        Semisequent succ = new Semisequent(new SequentFormula(t));
+        Sequent s = Sequent.createSuccSequent(succ);
+        Proof p = new Proof("FirstProof", TacletForTests.initConfig());
+        p.setRoot(new Node(p, s));
+    }
+
+    @Test
+    public void testInitialization() {
+
     }
 }

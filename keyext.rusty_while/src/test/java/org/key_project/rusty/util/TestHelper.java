@@ -6,14 +6,23 @@ package org.key_project.rusty.util;
 import java.io.File;
 
 import org.key_project.rusty.proof.ProofAggregate;
-import org.key_project.rusty.proof.init.KeYUserProblemFile;
-import org.key_project.rusty.proof.init.ProblemInitializer;
-import org.key_project.rusty.proof.init.Profile;
+import org.key_project.rusty.proof.init.*;
+import org.key_project.rusty.proof.io.RuleSourceFactory;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.helper.FindResources;
+
+import static org.key_project.rusty.proof.io.RuleSource.LDT_FILE;
 
 public class TestHelper {
     public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
     public static final File DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY, "dummyTrue.key");
+
+    public static final Profile profile = new RustProfile() {
+        @Override
+        public RuleCollection getStandardRules() {
+            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(LDT_FILE), ImmutableSLList.nil());
+        }
+    };
 
     public TestHelper() {
 
@@ -32,6 +41,7 @@ public class TestHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return result;
+        //return result;
+        return null;
     }
 }
