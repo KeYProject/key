@@ -63,6 +63,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                 } else {
                     programVariables().add(new ProgramVariable(pvName, krt));
                 }
+            }
         }
         return null;
     }

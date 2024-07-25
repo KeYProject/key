@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.builder;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
@@ -15,14 +19,10 @@ import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.ProgramVariable;
-
-import org.jspecify.annotations.NonNull;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.KeYRustyParser;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.jspecify.annotations.NonNull;
 
 public class DefaultBuilder extends AbstractBuilder<Object> {
     protected final Services services;
@@ -77,12 +77,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public String visitSimple_ident_dots(KeYRustyParser.Simple_ident_dotsContext ctx) {
         return ctx.getText();
     }
-    
+
     public List<Sort> visitArg_sorts_or_formula(KeYRustyParser.Arg_sorts_or_formulaContext ctx) {
         return mapOf(ctx.arg_sorts_or_formula_helper());
     }
-    
-    public Sort visitArg_sorts_or_formula_helper(KeYRustyParser.Arg_sorts_or_formula_helperContext ctx) {
+
+    public Sort visitArg_sorts_or_formula_helper(
+            KeYRustyParser.Arg_sorts_or_formula_helperContext ctx) {
         if (ctx.FORMULA() != null) {
             return RustyDLTheory.FORMULA;
         } else {
@@ -137,7 +138,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public List<String> visitSimple_ident_comma_list(KeYRustyParser.Simple_ident_comma_listContext ctx) {
+    public List<String> visitSimple_ident_comma_list(
+            KeYRustyParser.Simple_ident_comma_listContext ctx) {
         return mapOf(ctx.simple_ident());
     }
 

@@ -20,7 +20,8 @@ public class TestHelper {
     public static final Profile profile = new RustProfile() {
         @Override
         public RuleCollection getStandardRules() {
-            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(LDT_FILE), ImmutableSLList.nil());
+            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(LDT_FILE),
+                ImmutableSLList.nil());
         }
     };
 
@@ -41,7 +42,7 @@ public class TestHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        //return result;
+        // return result;
         return null;
     }
 }

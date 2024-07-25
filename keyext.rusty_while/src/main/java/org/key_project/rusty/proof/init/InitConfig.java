@@ -13,7 +13,6 @@ import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.settings.ProofSettings;
 
-import java.util.HashMap;
 
 
 public class InitConfig {
@@ -80,9 +79,9 @@ public class InitConfig {
     /**
      * returns the heuristics namespace of this initial configuration
      */
-//    public Namespace<RuleSet> ruleSetNS() {
-//        return namespaces().ruleSets();
-//    }
+    // public Namespace<RuleSet> ruleSetNS() {
+    // return namespaces().ruleSets();
+    // }
 
 
     /**
@@ -107,8 +106,8 @@ public class InitConfig {
     // TODO fix ProofSettings
     public InitConfig copyWithServices(Services services) {
         InitConfig ic = new InitConfig(services);
-        if(settings != null) {
-            ic.setSettings(new ProofSettings());//settings));
+        if (settings != null) {
+            ic.setSettings(new ProofSettings());// settings));
         }
 
         // TODO add copies once more fields of InitConfig are added

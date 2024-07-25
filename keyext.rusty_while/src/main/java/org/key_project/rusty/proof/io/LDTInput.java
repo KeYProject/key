@@ -1,5 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof.io;
 
+
+import java.io.File;
+import java.util.ArrayList;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.proof.init.Includes;
@@ -8,9 +14,6 @@ import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.init.ProofInputException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.io.File;
-import java.util.ArrayList;
 
 
 public class LDTInput implements EnvInput {
@@ -85,13 +88,14 @@ public class LDTInput implements EnvInput {
             warnings.addAll(w);
         }
         // create LDT objects to have them available for parsing
-        // TODO check whether this was the right spot to generate LDTs in services (previously, here was getTypeConverter().init)
+        // TODO check whether this was the right spot to generate LDTs in services (previously, here
+        // was getTypeConverter().init)
         initConfig.getServices().initLDTs();
 
         // TODO read rules once they are added
-//        for (KeYFile keyFile : keyFiles) {
-//            keyFile.readRules();
-//        }
+        // for (KeYFile keyFile : keyFiles) {
+        // keyFile.readRules();
+        // }
 
 
         return DefaultImmutableSet.fromCollection(warnings);

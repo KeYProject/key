@@ -70,7 +70,7 @@ public class NamespaceSet {
 
     public NamespaceSet copy() {
         return new NamespaceSet(variables().copy(), programVariables().copy(), functions().copy(),
-                sorts().copy());
+            sorts().copy());
     }
 
     @Override

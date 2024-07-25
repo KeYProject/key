@@ -13,13 +13,13 @@ import org.key_project.rusty.logic.Semisequent;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.proof.Node;
+import org.key_project.rusty.proof.Proof;
+import org.key_project.rusty.util.TacletForTests;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
-import org.key_project.rusty.proof.Node;
-import org.key_project.rusty.proof.Proof;
-import org.key_project.rusty.util.TacletForTests;
 
 public class BasicTest {
 

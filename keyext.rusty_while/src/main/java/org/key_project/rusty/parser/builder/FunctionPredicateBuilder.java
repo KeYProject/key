@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.builder;
 
+import java.util.List;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -11,10 +13,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.RFunction;
-import org.key_project.rusty.logic.sort.GenericSort;
 import org.key_project.rusty.parser.KeYRustyParser;
-
-import java.util.List;
 
 public class FunctionPredicateBuilder extends DefaultBuilder {
     public FunctionPredicateBuilder(Services services, NamespaceSet nss) {
@@ -81,18 +80,18 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             String sortName = pred_name.substring(0, separatorIndex);
             String baseName = pred_name.substring(separatorIndex + 2);
             Sort genSort = lookupSort(sortName);
-//            if (genSort instanceof GenericSort) {
-//                assert argSorts != null;
-//                p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-//                        new Name(baseName), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]), false);
-//            }
+            // if (genSort instanceof GenericSort) {
+            // assert argSorts != null;
+            // p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
+            // new Name(baseName), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]), false);
+            // }
         }
 
         if (p == null) {
             assert argSorts != null;
             p = new RFunction(new Name(pred_name), RustyDLTheory.FORMULA,
-                    argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
+                argSorts.toArray(new Sort[0]),
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
         }
 
         if (lookup(p.name()) == null) {
@@ -124,16 +123,16 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             String sortName = funcName.substring(0, separatorIndex);
             String baseName = funcName.substring(separatorIndex + 2);
             Sort genSort = lookupSort(sortName);
-//            if (genSort instanceof GenericSort) {
-//                f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-//                        new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique);
-//            }
+            // if (genSort instanceof GenericSort) {
+            // f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
+            // new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique);
+            // }
         }
 
         // TODO debug this; why Boolean[]?
         if (f == null) {
             f = new RFunction(new Name(funcName), retSort, argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
         }
 
         if (lookup(f.name()) == null) {
