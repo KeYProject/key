@@ -57,33 +57,7 @@ class Quicksort {
       @ //-- Below is the recorded control flow trace
       @ //-- (rules for predicates trace_O() & I(), traceIndex() are included in this KeY-version)
       @ requires tracer.Trace.index == 0;
-      @ requires \dl_traceIf(0);
-      @ requires \dl_traceIf(1);
-      @ requires \dl_traceIf(2);
-      @ requires ! \dl_traceIf(3);
-      @ requires \dl_traceIf(4);
-      @ requires ! \dl_traceIf(5);
-      @ requires \dl_traceIf(6);
-      @ requires ! \dl_traceIf(7);
-      @ requires \dl_traceIf(8);
-      @ requires ! \dl_traceIf(9);
-      @ requires ! \dl_traceIf(10);
-      @ requires ! \dl_traceIf(11);
-      @ requires \dl_traceIf(12);
-      @ requires \dl_traceIf(13);
-      @ requires ! \dl_traceIf(14);
-      @ requires \dl_traceIf(15);
-      @ requires \dl_traceIf(16);
-      @ requires \dl_traceIf(17);
-      @ requires ! \dl_traceIf(18);
-      @ requires ! \dl_traceIf(19);
-      @ requires ! \dl_traceIf(20);
-      @ requires \dl_traceIf(21);
-      @ requires \dl_traceIf(22);
-      @ requires ! \dl_traceIf(23);
-      @ requires ! \dl_traceIf(24);
-      @ requires ! \dl_traceIf(25);
-      @ requires ! \dl_traceIf(26);
+      @ requires \dl_traceAfter(0, "111010101000110111000110000");
       @
       @  ensures tracer.Trace.index == 27;
       @
