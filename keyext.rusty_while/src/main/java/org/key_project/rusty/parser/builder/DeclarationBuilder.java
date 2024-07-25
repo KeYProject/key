@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.sort.GenericSort;
 import org.key_project.rusty.logic.sort.SortImpl;
 import org.key_project.rusty.parser.KeYRustyParser;
@@ -28,8 +31,7 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYRustyParser.DeclsContext ctx) {
-        mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
-            ctx.datatype_decls(),
+        mapMapOf(ctx.sort_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
         return null;
     }
@@ -47,29 +49,20 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitProg_var_decls(KeYRustyParser.Prog_var_declsContext ctx) {
         for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
             List<String> varNames = accept(ctx.simple_ident_comma_list(i));
-            /*
-             * KeYJavaType kjt = accept(ctx.keyjavatype(i));
-             * assert varNames != null;
-             * for (String varName : varNames) {
-             * if (varName.equals("null")) {
-             * semanticError(ctx.simple_ident_comma_list(i),
-             * "Function '" + varName + "' is already defined!");
-             * }
-             * ProgramElementName pvName = new ProgramElementName(varName);
-             * Named name = lookup(pvName);
-             * if (name != null) {
-             * // commented out as pv do not have unique name (at the moment)
-             * // throw new AmbigiousDeclException(varName, getSourceName(), getLine(),
-             * // getColumn())
-             * if (!(name instanceof ProgramVariable pv)
-             * || !(pv).getKeYJavaType().equals(kjt)) {
-             * programVariables().add(new LocationVariable(pvName, kjt));
-             * }
-             * } else {
-             * programVariables().add(new LocationVariable(pvName, kjt));
-             * }
-             * }
-             */
+            KeYRustyType krt = accept(ctx.typemapping(i));
+            assert varNames != null;
+            for (String varName : varNames) {
+                Name pvName = new Name(varName);
+                Named name = lookup(pvName);
+                if (name != null) {
+                    // TODO question: throw warning?
+                    if (!(name instanceof ProgramVariable pv)
+                            || !pv.getKeYRustyType().equals(krt)) {
+                        programVariables().add(new ProgramVariable(pvName, krt));
+                    }
+                } else {
+                    programVariables().add(new ProgramVariable(pvName, krt));
+                }
         }
         return null;
     }

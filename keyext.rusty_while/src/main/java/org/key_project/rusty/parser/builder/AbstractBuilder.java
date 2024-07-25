@@ -96,4 +96,15 @@ public class AbstractBuilder<T> extends KeYRustyParserBaseVisitor<T> {
         return Arrays.stream(ctxss).flatMap(it -> it.stream().map(a -> (T2) accept(a)))
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Throws a semanticError for the given ast node and message.
+     *
+     * @param ctx
+     * @param format
+     * @param args
+     */
+    protected void semanticError(ParserRuleContext ctx, String format, Object... args) {
+        throw new BuildingException(ctx, String.format(format, args));
+    }
 }
