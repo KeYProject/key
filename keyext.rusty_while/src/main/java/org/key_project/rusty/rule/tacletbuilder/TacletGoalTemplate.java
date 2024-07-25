@@ -97,4 +97,12 @@ public class TacletGoalTemplate {
 
         return result.union(bvv.getBoundVariables());
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String name() {
+        return name;
+    }
 }

@@ -88,15 +88,12 @@ public class LDTInput implements EnvInput {
             warnings.addAll(w);
         }
         // create LDT objects to have them available for parsing
-        // TODO check whether this was the right spot to generate LDTs in services (previously, here
-        // was getTypeConverter().init)
         initConfig.getServices().initLDTs();
 
         // TODO read rules once they are added
-        // for (KeYFile keyFile : keyFiles) {
-        // keyFile.readRules();
-        // }
-
+         for (KeYFile keyFile : keyFiles) {
+            keyFile.readRules();
+         }
 
         return DefaultImmutableSet.fromCollection(warnings);
     }

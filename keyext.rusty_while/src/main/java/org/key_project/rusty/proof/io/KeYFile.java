@@ -13,17 +13,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+
 import org.key_project.logic.Name;
 import org.key_project.rusty.parser.KeYAst;
 import org.key_project.rusty.parser.KeYIO;
 import org.key_project.rusty.parser.ParsingFacade;
 import org.key_project.rusty.parser.ProblemInformation;
 import org.key_project.rusty.parser.builder.ProblemFinder;
+import org.key_project.rusty.parser.builder.TacletPBuilder;
 import org.key_project.rusty.proof.init.Includes;
 import org.key_project.rusty.proof.init.InitConfig;
 import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.init.ProofInputException;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
+import org.key_project.rusty.rule.Taclet;
 import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.rusty.util.parsing.BuildingIssue;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -229,7 +232,7 @@ public class KeYFile implements EnvInput {
         ImmutableSet<String> warnings = DefaultImmutableSet.nil();
         warnings = warnings.union(readExtendedSignature());
         // warnings = warnings.union(readContracts());
-        // warnings = warnings.add(getPositionedStrings(readRules()));
+        warnings = warnings.add(getPositionedStrings(readRules()));
         return warnings;
     }
 
@@ -313,18 +316,16 @@ public class KeYFile implements EnvInput {
      *
      * @return list of issues that occurred during parsing the taclets
      */
-    /*
-     * public List<BuildingIssue> readRules() {
-     * KeYAst.File ctx = getParseContext();
-     * TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),
-     * initConfig.namespaces(), initConfig.getTaclet2Builder());
-     * ctx.accept(visitor);
-     * List<Taclet> taclets = visitor.getTopLevelTaclets();
-     * initConfig.addTaclets(taclets);
-     *
-     * return visitor.getBuildingIssues();
-     * }
-     */
+    public List<BuildingIssue> readRules() {
+        KeYAst.File ctx = getParseContext();
+        TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),
+                initConfig.namespaces(), initConfig.getTaclet2Builder());
+        ctx.accept(visitor);
+        List<Taclet> taclets = visitor.getTopLevelTaclets();
+        initConfig.addTaclets(taclets);
+
+        return visitor.getBuildingIssues();
+    }
 
     public void close() {
         fileCtx = null;
@@ -336,8 +337,8 @@ public class KeYFile implements EnvInput {
      * constructs positioned strings from {@link BuildingIssue}s such that they can be displayed
      * like other issues
      *
-     * @param issues the {@link BuildingIssue}s to be converted into {@link PositionedString}s
-     * @return list containing a {@link PositionedString} for each {@link BuildingIssue}
+     * @param issues the {@link BuildingIssue}s to be converted into {@link String}s
+     * @return list containing a {@link String} for each {@link BuildingIssue}
      *         in <code>issues</code>
      */
     protected List<String> getPositionedStrings(List<BuildingIssue> issues) {

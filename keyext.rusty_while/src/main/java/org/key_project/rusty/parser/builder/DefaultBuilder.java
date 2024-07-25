@@ -23,6 +23,7 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.KeYRustyParser;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.rule.RuleSet;
 
 public class DefaultBuilder extends AbstractBuilder<Object> {
     protected final Services services;
@@ -70,6 +71,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().functions();
     }
 
+    protected Namespace<RuleSet> ruleSets() {
+        return namespaces().ruleSets();
+    }
+
     protected Namespace<ProgramVariable> programVariables() {
         return namespaces().programVariables();
     }
@@ -110,6 +115,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     public Namespace<SchemaVariable> schemaVariables() {
         return schemaVariablesNamespace;
+    }
+
+    public void setSchemaVariables(Namespace<SchemaVariable> ns) {
+        this.schemaVariablesNamespace = ns;
     }
 
     @Override

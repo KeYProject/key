@@ -107,4 +107,13 @@ public class AbstractBuilder<T> extends KeYRustyParserBaseVisitor<T> {
     protected void semanticError(ParserRuleContext ctx, String format, Object... args) {
         throw new BuildingException(ctx, String.format(format, args));
     }
+
+    /**
+     * Wraps an exception into a {@link de.uka.ilkd.key.util.parsing.BuildingException}
+     *
+     * @param e
+     */
+    protected void throwEx(Throwable e) {
+        throw new BuildingException(e);
+    }
 }

@@ -69,6 +69,8 @@ public class RewriteTaclet extends FindTaclet {
         public boolean matches(ApplicationRestriction o) {
             return (getValue() & o.getValue()) != 0;
         }
+
+        // TODO ask:
     }
 
     /**
