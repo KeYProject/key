@@ -3,20 +3,25 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.ast.expr.Expr;
+import org.key_project.rusty.ast.ty.KeYRustyType;
 
 public class ProgramVariable extends AbstractSortedOperator implements Expr {
-    public ProgramVariable(Name name, Sort s) {
+    private final KeYRustyType type;
+
+    public ProgramVariable(Name name, Sort s, KeYRustyType type) {
         super(name, s, Modifier.NONE);
+        this.type = type;
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException("Program variable does not have a child");
     }
 

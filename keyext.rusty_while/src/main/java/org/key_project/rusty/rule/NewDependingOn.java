@@ -9,6 +9,8 @@ import org.key_project.rusty.logic.op.sv.SkolemTermSV;
 import org.key_project.rusty.logic.op.sv.TermSV;
 
 /**
+ * TODO: remove?
+ * <br>
  * class containing a pair of SchemaVariables, the first one being a TermSV, the second one a
  * FormulaSV, representing a "c new depending on phi" statement within a varcond of a taclet
  */

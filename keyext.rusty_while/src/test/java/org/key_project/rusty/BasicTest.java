@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.ast.Converter;
+import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.op.ProgramVariable;
 
@@ -32,11 +33,12 @@ public class BasicTest {
         var block = Converter.visitBlockExpr(parser.blockExpr());
 
         var intSort = services.getNamespaces().sorts().lookup("int");
+        var intType = new KeYRustyType(intSort);
 
-        var a = new ProgramVariable(new Name("a"), intSort);
-        var b = new ProgramVariable(new Name("b"), intSort);
-        var a_old = new ProgramVariable(new Name("a_old"), intSort);
-        var b_old = new ProgramVariable(new Name("b_old"), intSort);
+        var a = new ProgramVariable(new Name("a"), intSort, intType);
+        var b = new ProgramVariable(new Name("b"), intSort, intType);
+        var a_old = new ProgramVariable(new Name("a_old"), intSort, intType);
+        var b_old = new ProgramVariable(new Name("b_old"), intSort, intType);
 
         services.getNamespaces().programVariables()
                 .add(Arrays.stream(new ProgramVariable[] { a, a_old, b, b_old }).toList());

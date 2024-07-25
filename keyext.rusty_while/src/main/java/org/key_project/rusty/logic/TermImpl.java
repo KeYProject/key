@@ -11,6 +11,7 @@ import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -245,5 +246,29 @@ class TermImpl implements Term {
             this.containsCodeBlockRecursive = result;
         }
         return containsCodeBlockRecursive == ThreeValuedTruth.TRUE;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (op() instanceof Modality mod) {
+            if (mod.kind() == org.key_project.rusty.logic.op.Modality.RustyModalityKind.DIA) {
+                sb.append("\\<").append(mod.program()).append("\\>");
+            } else {
+                sb.append("\\[").append(mod.program()).append("\\]");
+            }
+            sb.append("(").append(sub(0)).append(")");
+            return sb.toString();
+        } else {
+            sb.append(op().name());
+            if (!boundVars.isEmpty()) {
+                sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
+            }
+            if (arity() == 0) {
+                return sb.toString();
+            }
+            sb.append(Strings.formatAsList(subs(), "(", ",", ")"));
+            return sb.toString();
+        }
     }
 }

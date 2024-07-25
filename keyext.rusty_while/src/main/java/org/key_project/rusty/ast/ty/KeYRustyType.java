@@ -6,6 +6,8 @@ package org.key_project.rusty.ast.ty;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 public class KeYRustyType implements Type {
     /** the AST type */
     private Type rustyType = null;
@@ -45,7 +47,7 @@ public class KeYRustyType implements Type {
     }
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return rustyType == null ? sort.name() : rustyType.name();
     }
 }
