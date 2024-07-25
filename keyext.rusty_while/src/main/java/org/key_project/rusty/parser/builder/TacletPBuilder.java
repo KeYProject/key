@@ -1,12 +1,7 @@
 package org.key_project.rusty.parser.builder;
 
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
+
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
@@ -19,6 +14,8 @@ import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariableFactory;
+import org.key_project.rusty.logic.sort.ProgramSVSort;
+import org.key_project.rusty.parser.SchemaVariableModifierSet;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
@@ -495,7 +492,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     // TODO RESUME HERE
 
     @Override
-    public Object visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
+    public Object visitOne_schema_var_decl(KeYRustyParser.One_schema_var_declContext ctx) {
         boolean makeVariableSV = false;
         boolean makeSkolemTermSV = false;
         boolean makeTermLabelSV = false;
@@ -518,10 +515,11 @@ public class TacletPBuilder extends ExpressionBuilder {
                 semanticError(ctx, "Program SchemaVariable of type '%s' not found.", id);
             }
         }
+        // TODO ask: Do we also need SchemaVariableModifiers?
         if (ctx.FORMULA() != null) {
             mods = new SchemaVariableModifierSet.FormulaSV();
             accept(ctx.schema_modifiers(), mods);
-            s = JavaDLTheory.FORMULA;
+            s = RustyDLTheory.FORMULA;
         }
         if (ctx.TERMLABEL() != null) {
             makeTermLabelSV = true;
@@ -531,13 +529,13 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (ctx.UPDATE() != null) {
             mods = new SchemaVariableModifierSet.FormulaSV();
             accept(ctx.schema_modifiers(), mods);
-            s = JavaDLTheory.UPDATE;
+            s = RustyDLTheory.UPDATE;
         }
         if (ctx.SKOLEMFORMULA() != null) {
             makeSkolemTermSV = true;
             mods = new SchemaVariableModifierSet.FormulaSV();
             accept(ctx.schema_modifiers(), mods);
-            s = JavaDLTheory.FORMULA;
+            s = RustyDLTheory.FORMULA;
         }
         if (ctx.TERM() != null) {
             mods = new SchemaVariableModifierSet.TermSV();
@@ -571,7 +569,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitSchema_modifiers(KeYParser.Schema_modifiersContext ctx) {
+    public Object visitSchema_modifiers(KeYRustyParser.Schema_modifiersContext ctx) {
         SchemaVariableModifierSet mods = pop();
         List<String> ids = visitSimple_ident_comma_list(ctx.simple_ident_comma_list());
         for (String id : ids) {
@@ -584,30 +582,29 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
-        return this.<de.uka.ilkd.key.logic.op.SchemaVariable>mapOf(ctx.one_schema_var_decl());
+    public Object visitSchema_var_decls(KeYRustyParser.Schema_var_declsContext ctx) {
+        return this.<SchemaVariable>mapOf(ctx.one_schema_var_decl());
     }
 
-    protected de.uka.ilkd.key.logic.op.OperatorSV declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
-                                                                        boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
-                                                                        SchemaVariableModifierSet mods) {
-        de.uka.ilkd.key.logic.op.OperatorSV v;
-        if (s == JavaDLTheory.FORMULA && !makeSkolemTermSV) {
-            v = de.uka.ilkd.key.logic.op.SchemaVariableFactory.createFormulaSV(new Name(name), mods.rigid());
-        } else if (s == JavaDLTheory.UPDATE) {
-            v = de.uka.ilkd.key.logic.op.SchemaVariableFactory.createUpdateSV(new Name(name));
+    protected OperatorSV declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
+                                                                        boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV, SchemaVariableModifierSet mods) {
+        OperatorSV v;
+        if (s == RustyDLTheory.FORMULA && !makeSkolemTermSV) {
+            v = SchemaVariableFactory.createFormulaSV(new Name(name), mods.rigid());
+        } else if (s == RustyDLTheory.UPDATE) {
+            v = SchemaVariableFactory.createUpdateSV(new Name(name));
         } else if (s instanceof ProgramSVSort) {
-            v = de.uka.ilkd.key.logic.op.SchemaVariableFactory.createProgramSV(new ProgramElementName(name),
+            v = SchemaVariableFactory.createProgramSV(new Name(name),
                     (ProgramSVSort) s, mods.list());
         } else {
             if (makeVariableSV) {
-                v = de.uka.ilkd.key.logic.op.SchemaVariableFactory.createVariableSV(new Name(name), s);
+                v = SchemaVariableFactory.createVariableSV(new Name(name), s);
             } else if (makeSkolemTermSV) {
-                v = de.uka.ilkd.key.logic.op.SchemaVariableFactory.createSkolemTermSV(new Name(name), s);
-            } else if (makeTermLabelSV) {
-                v = de.uka.ilkd.key.logic.op.SchemaVariableFactory.createTermLabelSV(new Name(name));
+                v = SchemaVariableFactory.createSkolemTermSV(new Name(name), s);
+//            } else if (makeTermLabelSV) {
+//                v = SchemaVariableFactory.createTermLabelSV(new Name(name));
             } else {
-                v = de.uka.ilkd.key.logic.op.SchemaVariableFactory.createTermSV(new Name(name), s, mods.rigid(),
+                v = SchemaVariableFactory.createTermSV(new Name(name), s, mods.rigid(),
                         mods.strict());
             }
         }
@@ -618,13 +615,12 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         if (schemaVariables().lookup(v.name()) != null) {
-            de.uka.ilkd.key.logic.op.OperatorSV old = (de.uka.ilkd.key.logic.op.OperatorSV) schemaVariables().lookup(v.name());
+            OperatorSV old = (OperatorSV) schemaVariables().lookup(v.name());
             if (!old.sort().equals(v.sort())) {
                 semanticError(null,
                         "Schema variables clashes with previous declared schema variable: %s.",
                         v.name());
             }
-            LOGGER.error("Override: {} {}", old, v);
         }
         schemaVariables().add(v);
         return v;
