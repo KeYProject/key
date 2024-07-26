@@ -29,6 +29,31 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
 
     /**
+     * inserts an element at a specified index performing redundancy checks, this may result in
+     * returning same semisequent if inserting would create redundancies
+     *
+     * @param idx int encoding the place the element has to be put
+     * @param sequentFormula {@link de.uka.ilkd.key.logic.SequentFormula} to be inserted
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo insert(int idx, SequentFormula sequentFormula) {
+        return removeRedundance(idx, sequentFormula);
+    }
+
+    /**
+     * inserts element at index 0 performing redundancy checks, this may result in returning same
+     * semisequent if inserting would create redundancies
+     *
+     * @param sequentFormula SequentFormula to be inserted
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
+        return insert(0, sequentFormula);
+    }
+
+    /**
      * is this a semisequent that contains no formulas
      *
      * @return true if the semisequent contains no formulas

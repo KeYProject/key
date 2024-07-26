@@ -48,18 +48,18 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
 
-//    @Override
-//    public Semisequent visitSemisequent(KeYRustyParser.SemisequentContext ctx) {
-//        Semisequent ss = accept(ctx.ss);
-//        if (ss == null) {
-//            ss = Semisequent.EMPTY_SEMISEQUENT;
-//        }
-//        Term head = accept(ctx.term());
-//        if (head != null) {
-//            ss = ss.insertFirst(new SequentFormula(head)).semisequent();
-//        }
-//        return ss;
-//    }
+    @Override
+    public Semisequent visitSemisequent(KeYRustyParser.SemisequentContext ctx) {
+        Semisequent ss = accept(ctx.ss);
+        if (ss == null) {
+            ss = Semisequent.EMPTY_SEMISEQUENT;
+        }
+        Term head = accept(ctx.term());
+        if (head != null) {
+            ss = ss.insertFirst(new SequentFormula(head)).semisequent();
+        }
+        return ss;
+    }
     
     private ImmutableSet<Modality.RustyModalityKind> lookupOperatorSV(String opName,
                                                                      ImmutableSet<Modality.RustyModalityKind> modalityKinds) {
