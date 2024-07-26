@@ -8,6 +8,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.expr.ArithLogicalExpression;
+import org.key_project.rusty.ast.expr.IntegerLiteralExpression;
+import org.key_project.rusty.ast.expr.LiteralExpression;
 import org.key_project.rusty.logic.TermBuilder;
 
 import org.jspecify.annotations.NonNull;
@@ -166,5 +169,36 @@ public class IntLDT extends LDT {
 
     public Term one() {
         return one;
+    }
+
+
+    @Override
+    public Term translateLiteral(LiteralExpression lit, Services services) {
+        if (lit instanceof IntegerLiteralExpression i) {
+            return services.getTermBuilder().zTerm(i.getValue().toString());
+        }
+        return null;
+    }
+
+    @Override
+    public Function getFuctionFor(ArithLogicalExpression.Operator op, Services services) {
+        return null;
+    }
+
+    @Override
+    public boolean isResponsible(ArithLogicalExpression.Operator op, Term[] subs,
+            Services services) {
+        return false;
+    }
+
+    @Override
+    public boolean isResponsible(ArithLogicalExpression.Operator op, Term sub, Services services) {
+        return false;
+    }
+
+    @Override
+    public boolean isResponsible(ArithLogicalExpression.Operator op, Term left, Term right,
+            Services services) {
+        return false;
     }
 }

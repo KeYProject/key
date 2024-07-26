@@ -5,7 +5,9 @@ package org.key_project.rusty.ast.expr;
 
 import java.math.BigInteger;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ldt.IntLDT;
 
 public class IntegerLiteralExpression extends LiteralExpression {
     public enum IntegerSuffix {
@@ -68,5 +70,18 @@ public class IntegerLiteralExpression extends LiteralExpression {
     @Override
     public String toString() {
         return value + "_" + suffix.toString();
+    }
+
+    @Override
+    public Name getLDTName() {
+        return IntLDT.NAME;
+    }
+
+    public BigInteger getValue() {
+        return value;
+    }
+
+    public IntegerSuffix getSuffix() {
+        return suffix;
     }
 }

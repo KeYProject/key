@@ -35,6 +35,18 @@ public class ArithLogicalExpression implements Expr {
         this.right = right;
     }
 
+    public Expr getLeft() {
+        return left;
+    }
+
+    public Expr getRight() {
+        return right;
+    }
+
+    public Operator getOp() {
+        return op;
+    }
+
     @Override
     public String toString() {
         return left.toString() + " " + op + " " + right.toString();

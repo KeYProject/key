@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
 import org.key_project.logic.SyntaxElementCursor;
@@ -18,7 +21,7 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
         if (t.op() instanceof Modality mod
                 && op.getModalities().contains(mod.kind())) {
             return mc.setInstantiations(
-                    mc.getInstantiations().add(op, mod.<Modality.RustyModalityKind>kind(), services));
+                mc.getInstantiations().add(op, mod.<Modality.RustyModalityKind>kind(), services));
         } else {
             return null;
         }
@@ -26,7 +29,7 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
 
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions mc,
-                                 Services services) {
+            Services services) {
         return match((Term) cursor.getCurrentNode(), mc, services);
     }
 }

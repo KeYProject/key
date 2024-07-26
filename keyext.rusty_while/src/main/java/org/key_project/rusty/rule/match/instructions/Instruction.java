@@ -1,24 +1,30 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 public abstract class Instruction<Op extends Operator> implements MatchInstruction {
-    public static Instruction<Operator> matchOp(Operator op) {
+    public static Instruction<@NonNull Operator> matchOp(Operator op) {
         return new MatchOpIdentityInstruction<>(op);
     }
 
-    //public static Instruction<SortDependingFunction> matchSortDependingFunction(
-    //       SortDependingFunction op) {
-    //    return new MatchSortDependingFunctionInstruction(op);
-    //}
+    // public static Instruction<SortDependingFunction> matchSortDependingFunction(
+    // SortDependingFunction op) {
+    // return new MatchSortDependingFunctionInstruction(op);
+    // }
 
     public static MatchModalOperatorSVInstruction matchModalOperatorSV(
             ModalOperatorSV sv) {
@@ -29,45 +35,45 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
         return new MatchModalityInstruction(mod);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(
+    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchFormulaSV(
             FormulaSV sv) {
         return new MatchFormulaSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(TermSV sv) {
+    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchTermSV(
+            TermSV sv) {
         return new MatchTermSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(
+    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchVariableSV(
             VariableSV sv) {
         return new MatchVariableSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(
+    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchProgramSV(
             ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(
+    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchUpdateSV(
             UpdateSV sv) {
         return new MatchUpdateSVInstruction(sv);
     }
 
-    public static MatchInstruction matchTermLabelSV(ImmutableArray<TermLabel> labels) {
-        return new MatchTermLabelInstruction(labels);
-    }
-
-    public static MatchInstruction matchProgram(JavaProgramElement prg) {
+    public static MatchInstruction matchProgram(RustyProgramElement prg) {
         return new MatchProgramInstruction(prg);
     }
 
     public static MatchInstruction matchAndBindVariables(
-            ImmutableArray<QuantifiableVariable> boundVars) {
-        return new BindVariablesInstruction(boundVars);
+            ImmutableArray<? extends QuantifiableVariable> boundVars) {
+        // return new BindVariablesInstruction(boundVars);
+        throw new IllegalArgumentException("TODO @DD");
     }
 
-    public static MatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
-        return new UnbindVariablesInstruction();
+    public static MatchInstruction unbindVariables(
+            ImmutableArray<? extends QuantifiableVariable> boundVars) {
+        // return new UnbindVariablesInstruction();
+        throw new IllegalArgumentException("TODO @DD");
     }
 
     public static MatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
@@ -92,5 +98,5 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
      *         the pair {@code (sv, instantiationCandidate)} added
      */
     public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-                                          Services services);
+            Services services);
 }

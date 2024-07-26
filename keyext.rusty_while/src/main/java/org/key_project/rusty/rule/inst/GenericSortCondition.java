@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
 
 import org.key_project.logic.sort.Sort;
@@ -20,14 +23,14 @@ public abstract class GenericSortCondition {
      *         sorts that don't match)
      */
     public static GenericSortCondition createCondition(SchemaVariable sv,
-                                                       InstantiationEntry<?> p_entry) {
+            InstantiationEntry<?> p_entry) {
 
         if (!(p_entry instanceof TermInstantiation ti)) {
             return null;
         }
 
         return createCondition(((OperatorSV) sv).sort(), ti.getInstantiation().sort(),
-                !subSortsAllowed(sv));
+            !subSortsAllowed(sv));
     }
 
     /**
@@ -96,7 +99,7 @@ public abstract class GenericSortCondition {
     }
 
     public static GenericSortCondition createForceInstantiationCondition(GenericSort p_gs,
-                                                                         boolean p_maximum) {
+            boolean p_maximum) {
         return new GSCForceInstantiation(p_gs, p_maximum);
     }
 
@@ -194,7 +197,7 @@ public abstract class GenericSortCondition {
         /** toString */
         public String toString() {
             return "Force instantiation: " + getGenericSort() + ", "
-                    + (getMaximum() ? "maximum" : "minimum");
+                + (getMaximum() ? "maximum" : "minimum");
         }
     }
 }

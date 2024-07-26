@@ -6,11 +6,11 @@ package org.key_project.rusty.rule.match.instructions;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.op.sv.TermSV;
+import org.key_project.rusty.logic.op.sv.UpdateSV;
 import org.key_project.rusty.rule.MatchConditions;
 
-public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermSV> {
-    protected MatchTermSVInstruction(TermSV op) {
+public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<UpdateSV> {
+    protected MatchUpdateSVInstruction(UpdateSV op) {
         super(op);
     }
 
@@ -25,10 +25,11 @@ public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermS
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions mc,
             Services services) {
-        final MatchConditions result = match((Term) cursor.getCurrentNode(), mc, services);
+        MatchConditions result = match((Term) cursor.getCurrentNode(), mc, services);
         if (result != null) {
             cursor.gotoNextSibling();
         }
         return result;
     }
+
 }

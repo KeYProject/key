@@ -31,4 +31,8 @@ public class PathExpression implements Expr {
     public String toString() {
         return var.toString();
     }
+
+    public Identifier getVar() {
+        return var;
+    }
 }

@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match;
+
+import java.util.ArrayList;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
@@ -7,10 +12,10 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.*;
+import org.key_project.rusty.rule.match.instructions.Instruction;
 import org.key_project.rusty.rule.match.instructions.MatchInstruction;
+import org.key_project.rusty.rule.match.instructions.MatchSchemaVariableInstruction;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.ArrayList;
 
 /**
  * Instances of this class represent programs for matching a term against a given pattern. The
@@ -18,14 +23,14 @@ import java.util.ArrayList;
  * <br>
  * To create such a program use the static method {@link #createProgram(Term)} and provide as
  * argument the pattern for which you want to get a matcher.
- *<br>
+ * <br>
  * The program is executed by invoking
  * {@link TacletMatchProgram#match(Term, MatchConditions, Services)}.
  */
 public class TacletMatchProgram {
     /** the skip program (matches anything) */
     public static final TacletMatchProgram EMPTY_PROGRAM =
-            new TacletMatchProgram(new MatchInstruction[0]);
+        new TacletMatchProgram(new MatchInstruction[0]);
 
     /**
      * creates a matcher for the given pattern
@@ -39,7 +44,9 @@ public class TacletMatchProgram {
         return new TacletMatchProgram(program.toArray(new MatchInstruction[0]));
 
 
-    }/** the instructions of the program */
+    }
+
+    /** the instructions of the program */
     private final MatchInstruction[] instruction;
 
     /** creates an instance of the matcher consisting of the instruction */
@@ -69,7 +76,7 @@ public class TacletMatchProgram {
             instruction = Instruction.matchUpdateSV(updateSV);
         } else {
             throw new IllegalArgumentException(
-                    "Do not know how to match " + op + " of type " + op.getClass());
+                "Do not know how to match " + op + " of type " + op.getClass());
         }
         return instruction;
     }
@@ -85,7 +92,7 @@ public class TacletMatchProgram {
     private static void createProgram(Term pattern, ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
-        final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
+        final ImmutableArray<? extends QuantifiableVariable> boundVars = pattern.boundVars();
 
         if (!boundVars.isEmpty()) {
             program.add(Instruction.matchAndBindVariables(boundVars));
@@ -93,9 +100,11 @@ public class TacletMatchProgram {
 
         if (op instanceof SchemaVariable) {
             program.add(getMatchInstructionForSV((SchemaVariable) op));
-        } /*else if (op instanceof SortDependingFunction) {
-            program.add(Instruction.matchSortDependingFunction((SortDependingFunction) op));
-        }*/ else if (op instanceof ElementaryUpdate) {
+        } /*
+           * else if (op instanceof SortDependingFunction) {
+           * program.add(Instruction.matchSortDependingFunction((SortDependingFunction) op));
+           * }
+           */ else if (op instanceof ElementaryUpdate) {
             program.add(Instruction.matchElementaryUpdate((ElementaryUpdate) op));
         } else if (op instanceof Modality mod) {
             final var kind = mod.kind();

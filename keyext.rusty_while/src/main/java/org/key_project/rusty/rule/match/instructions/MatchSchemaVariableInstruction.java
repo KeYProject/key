@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
@@ -9,13 +11,15 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.IllegalInstantiationException;
 import org.key_project.rusty.rule.inst.SVInstantiations;
+
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class MatchSchemaVariableInstruction< SV extends @NonNull OperatorSV>
+public abstract class MatchSchemaVariableInstruction<SV extends @NonNull OperatorSV>
         extends Instruction<SV> {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
+        LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
 
     public MatchSchemaVariableInstruction(SV op) {
         super(op);
@@ -28,21 +32,23 @@ public abstract class MatchSchemaVariableInstruction< SV extends @NonNull Operat
      * given term.
      */
     protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
-                                                     Services services) {
+            Services services) {
         if (op.isRigid() && !term.isRigid()) {
             return null;
         }
 
         final SVInstantiations inst = matchCond.getInstantiations();
 
-        /*final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
-        if (t != null) {
-            if (!t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
-                return null;
-            } else {
-                return matchCond;
-            }
-        }*/
+        /*
+         * final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
+         * if (t != null) {
+         * if (!t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+         * return null;
+         * } else {
+         * return matchCond;
+         * }
+         * }
+         */
 
         try {
             return matchCond.setInstantiations(inst.add(op, term, services));
@@ -64,7 +70,7 @@ public abstract class MatchSchemaVariableInstruction< SV extends @NonNull Operat
      *         the pair ({@link SchemaVariable}, {@link RustyProgramElement}) added
      */
     public MatchConditions match(RustyProgramElement instantiationCandidate, MatchConditions mc,
-                                 Services services) {
+            Services services) {
         return null;
     }
 }

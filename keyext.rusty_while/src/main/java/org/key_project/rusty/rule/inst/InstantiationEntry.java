@@ -1,4 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
+
 /**
  * This is an abstract class that encapsulates an instantiation of a SchemaVariable. It is needed
  * because SchemaVariables can be instantiated as ProgramElements and as Terms according to their
@@ -6,7 +10,8 @@ package org.key_project.rusty.rule.inst;
  * map from SchemaVariable to InstantiationEntry is used TODO: Simplify subclasses further or remove
  * them completely as possible.
  */
-public abstract class InstantiationEntry<E> {private final E instantiation;
+public abstract class InstantiationEntry<E> {
+    private final E instantiation;
 
     /**
      * creates a new instantiation entry for the instantiation to be stored

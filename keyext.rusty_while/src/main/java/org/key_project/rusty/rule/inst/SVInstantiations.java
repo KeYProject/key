@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
 
+import java.util.Iterator;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
@@ -12,8 +14,6 @@ import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.*;
-
-import java.util.Iterator;
 
 public class SVInstantiations {
     /** the empty instantiation */
@@ -30,7 +30,7 @@ public class SVInstantiations {
 
     /** instantiations of generic sorts */
     private GenericSortInstantiations genericSortInstantiations =
-            GenericSortInstantiations.EMPTY_INSTANTIATIONS;
+        GenericSortInstantiations.EMPTY_INSTANTIATIONS;
 
     /** additional conditions for the generic sorts */
     private final ImmutableList<GenericSortCondition> genericSortConditions;
@@ -40,7 +40,7 @@ public class SVInstantiations {
         genericSortConditions = ImmutableSLList.nil();
         updateContext = ImmutableSLList.nil();
         map = DefaultImmutableMap.nilMap();
-        //interesting = DefaultImmutableMap.nilMap();
+        // interesting = DefaultImmutableMap.nilMap();
     }
 
     /**
@@ -49,12 +49,12 @@ public class SVInstantiations {
      * @param map the ImmMap<SchemaVariable,InstantiationEntry<?>> with the instantiations
      */
     private SVInstantiations(ImmutableMap<SchemaVariable, InstantiationEntry<?>> map,
-                             //ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
-                             ImmutableList<Term> updateContext,
-                             GenericSortInstantiations genericSortInstantiations,
-                             ImmutableList<GenericSortCondition> genericSortConditions) {
+            // ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
+            ImmutableList<Term> updateContext,
+            GenericSortInstantiations genericSortInstantiations,
+            ImmutableList<GenericSortCondition> genericSortConditions) {
         this.map = map;
-        //this.interesting = interesting;
+        // this.interesting = interesting;
         this.updateContext = updateContext;
         this.genericSortInstantiations = genericSortInstantiations;
         this.genericSortConditions = genericSortConditions;
@@ -88,14 +88,14 @@ public class SVInstantiations {
      * Add the given additional condition for the generic sort instantiations
      */
     public SVInstantiations add(SchemaVariable sv, Modality.RustyModalityKind kind,
-                                Services services) throws SortException {
+            Services services) throws SortException {
         return add(sv, new InstantiationEntry<>(kind) {
         }, services);
     }
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
         return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
-                services);
+            services);
     }
 
     /**
@@ -119,7 +119,8 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, Services services) {
-        return new SVInstantiations(map.put(sv, entry), getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions()).checkSorts(sv, entry, false,
+        return new SVInstantiations(map.put(sv, entry), getUpdateContext(),
+            getGenericSortInstantiations(), getGenericSortConditions()).checkSorts(sv, entry, false,
                 services);
     }
 
@@ -133,18 +134,18 @@ public class SVInstantiations {
     }
 
     private static final SortException INCOMPATIBLE_INSTANTIATION_EXCEPTION =
-            new SortException("Sort of SV " + "is not compatible with its " + "instantiation's sort\n"
-                    + "(This exception object is static)");
+        new SortException("Sort of SV " + "is not compatible with its " + "instantiation's sort\n"
+            + "(This exception object is static)");
 
     private static final IllegalInstantiationException CONVERT_INSTANTIATION_EXCEPTION =
-            new SortException("Instantiation of SV " + "cannot be converted to logic\n"
-                    + "(This exception object is static)");
+        new SortException("Instantiation of SV " + "cannot be converted to logic\n"
+            + "(This exception object is static)");
 
     private static final SortException UNSOLVABLE_SORT_CONDITIONS_EXCEPTION = new SortException(
-            "Conditions for sorts" + " cannot be satisfied\n" + "(This exception object is static)");
+        "Conditions for sorts" + " cannot be satisfied\n" + "(This exception object is static)");
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
-                                        boolean p_forceRebuild, Services services) {
+            boolean p_forceRebuild, Services services) {
         if (p_sv instanceof OperatorSV asv) {
             Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
@@ -161,7 +162,7 @@ public class SVInstantiations {
     }
 
     private SVInstantiations checkCondition(GenericSortCondition p_c, boolean p_forceRebuild,
-                                            Services services) {
+            Services services) {
         Boolean b = getGenericSortInstantiations().checkCondition(p_c);
 
         if (b == null) {
@@ -177,7 +178,7 @@ public class SVInstantiations {
 
     private SVInstantiations rebuildSorts(Services services) {
         genericSortInstantiations =
-               GenericSortInstantiations.create(map.iterator(), getGenericSortConditions(), services);
+            GenericSortInstantiations.create(map.iterator(), getGenericSortConditions(), services);
         return this;
     }
 
@@ -220,8 +221,8 @@ public class SVInstantiations {
     public SVInstantiations addUpdate(Term update) {
         assert update.sort() == RustyDLTheory.UPDATE;
         return new SVInstantiations(map,
-                updateContext.append(update),
-                getGenericSortInstantiations(), getGenericSortConditions());
+            updateContext.append(update),
+            getGenericSortInstantiations(), getGenericSortConditions());
     }
 
     public SVInstantiations addUpdateList(ImmutableList<Term> updates) {
@@ -230,7 +231,7 @@ public class SVInstantiations {
             return this;
         }
         return new SVInstantiations(map, updates, getGenericSortInstantiations(),
-                getGenericSortConditions());
+            getGenericSortConditions());
     }
 
     public SVInstantiations clearUpdateContext() {
@@ -239,16 +240,17 @@ public class SVInstantiations {
             return this;
         }
         return new SVInstantiations(map, ImmutableSLList.nil(),
-                getGenericSortInstantiations(), getGenericSortConditions());
+            getGenericSortInstantiations(), getGenericSortConditions());
     }
 
-    ///**
-    // * returns the instantiation entry for the context "schema variable" or null if non such exists
+    /// **
+    // * returns the instantiation entry for the context "schema variable" or null if non such
+    /// exists
     // */
-    //public ContextInstantiationEntry getContextInstantiation() {
-    //    final InstantiationEntry<?> entry = getInstantiationEntry(CONTEXTSV);
-    //    return (ContextInstantiationEntry) entry;
-    //}
+    // public ContextInstantiationEntry getContextInstantiation() {
+    // final InstantiationEntry<?> entry = getInstantiationEntry(CONTEXTSV);
+    // return (ContextInstantiationEntry) entry;
+    // }
 
     /**
      * returns iterator of the SchemaVariables that have an instantiation
@@ -300,13 +302,14 @@ public class SVInstantiations {
         } else if (getUpdateContext().isEmpty()) {
             updates = other.getUpdateContext();
         } else if (!getUpdateContext().equals(other.getUpdateContext())) {
-            //Debug.fail(
-          //          "The update context of one of" + " the instantiations has to be empty or equal.");
+            // Debug.fail(
+            // "The update context of one of" + " the instantiations has to be empty or equal.");
         } else {
             updates = other.getUpdateContext();
         }
-        return new SVInstantiations(result, updates, getGenericSortInstantiations(), getGenericSortConditions())
-                .rebuildSorts(services);
+        return new SVInstantiations(result, updates, getGenericSortInstantiations(),
+            getGenericSortConditions())
+                    .rebuildSorts(services);
     }
 
     @Override
@@ -320,8 +323,8 @@ public class SVInstantiations {
      */
     public SVInstantiations add(GenericSortCondition p_c, Services services) throws SortException {
         return new SVInstantiations(map, getUpdateContext(),
-                getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
-                .checkCondition(p_c, false, services);
+            getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
+                    .checkCondition(p_c, false, services);
     }
 
     public ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(Name name) {

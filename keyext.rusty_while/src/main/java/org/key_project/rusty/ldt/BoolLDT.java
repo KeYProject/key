@@ -7,6 +7,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.expr.ArithLogicalExpression;
+import org.key_project.rusty.ast.expr.BooleanLiteralExpression;
+import org.key_project.rusty.ast.expr.LiteralExpression;
 
 public class BoolLDT extends LDT {
     public static final Name NAME = new Name("bool");
@@ -66,4 +69,45 @@ public class BoolLDT extends LDT {
     public Name name() {
         return NAME;
     }
+
+
+    @Override
+    public Term translateLiteral(LiteralExpression lit, Services services) {
+        if (lit instanceof BooleanLiteralExpression b) {
+            return b.getValue() ? term_bool_true : term_bool_false;
+        }
+        return null;
+    }
+
+    @Override
+    public Function getFuctionFor(ArithLogicalExpression.Operator op, Services services) {
+        assert false;
+        return null;
+    }
+
+    @Override
+    public boolean isResponsible(ArithLogicalExpression.Operator op, Term[] subs,
+            Services services) {
+        if (subs.length == 1) {
+            return isResponsible(op, subs[0], services);
+        } else if (subs.length == 2) {
+            return isResponsible(op, subs[0], subs[1], services);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isResponsible(ArithLogicalExpression.Operator op, Term left, Term right,
+            Services services) {
+        return false;
+
+    }
+
+    @Override
+    public boolean isResponsible(ArithLogicalExpression.Operator op, Term sub,
+            Services services) {
+        return false;
+    }
+
+
 }
