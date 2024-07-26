@@ -141,7 +141,7 @@ public class AbstractBuilder<T> extends KeYRustyParserBaseVisitor<T> {
     }
 
     /**
-     * Wraps an exception into a {@link de.uka.ilkd.key.util.parsing.BuildingException}
+     * Wraps an exception into a {@link BuildingException}
      *
      * @param e
      */

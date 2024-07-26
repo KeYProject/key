@@ -94,6 +94,16 @@ public class Sequent implements Iterable<SequentFormula> {
         return succedent;
     }
 
+    /**
+     * String representation of the sequent
+     *
+     * @return String representation of the sequent
+     */
+    @Override
+    public String toString() {
+        return antecedent().toString() + "==>" + succedent().toString();
+    }
+
     @Override
     public @NonNull Iterator<SequentFormula> iterator() {
         return new SequentIterator(antecedent(), succedent());

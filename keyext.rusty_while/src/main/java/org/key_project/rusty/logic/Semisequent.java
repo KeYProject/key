@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+
 public class Semisequent implements Iterable<SequentFormula> {
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
@@ -82,6 +83,12 @@ public class Semisequent implements Iterable<SequentFormula> {
             return false;
         }
         return seqList.equals(((Semisequent) o).seqList);
+    }
+
+    /** @return String representation of this Semisequent */
+    @Override
+    public String toString() {
+        return seqList.toString();
     }
 
     // inner class used to represent an empty semisequent
