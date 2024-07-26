@@ -115,7 +115,7 @@ public abstract class FindTaclet extends Taclet {
 
 
     /**
-     * @return Set of schemavariables of the if and the (optional) find part
+     * @return Set of schemavariables of the {@code if} and the (optional) {@code find} part
      */
     public ImmutableSet<SchemaVariable> getIfFindVariables() {
         if (ifFindVariables == null) {
