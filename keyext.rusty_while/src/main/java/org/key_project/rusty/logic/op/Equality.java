@@ -10,6 +10,8 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This class defines the logic equality operator {@code =}. It is a binary predicate accepting
@@ -43,7 +45,7 @@ public final class Equality extends AbstractSortedOperator {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException(name() + " has no children");
     }
 }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -86,7 +87,8 @@ public final class GenericSortInstantiations {
 
 
     /**
-     * @return Boolean.TRUE if the sorts used within "p_entry" are correct, Boolean.FALSE if the
+     * @return {@code Boolean.TRUE} if the sorts used within "p_entry" are correct,
+     *         {@code Boolean.FALSE} if the
      *         sorts are definitely incorrect, null if the sorts could (perhaps) be made correct by
      *         choosing the right generic sort instantiations
      */
@@ -214,6 +216,7 @@ public final class GenericSortInstantiations {
 
 
     private static final class FailException extends Exception {
+        @Serial
         private static final long serialVersionUID = 5291022478863582449L;
     }
 
@@ -657,17 +660,17 @@ public final class GenericSortInstantiations {
 
     @Override
     public String toString() {
-        String res = "";
+        StringBuilder res = new StringBuilder();
 
         for (final ImmutableMapEntry<GenericSort, Sort> entry : insts) {
             if (!res.isEmpty()) {
-                res += ", ";
+                res.append(", ");
             }
 
-            res += entry.key() + "=" + entry.value();
+            res.append(entry.key()).append("=").append(entry.value());
         }
 
-        return res;
+        return res.toString();
     }
 
 

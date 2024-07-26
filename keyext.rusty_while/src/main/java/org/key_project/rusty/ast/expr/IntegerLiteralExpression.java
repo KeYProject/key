@@ -9,6 +9,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ldt.IntLDT;
 
+import org.jspecify.annotations.NonNull;
+
 public class IntegerLiteralExpression extends LiteralExpression {
     public enum IntegerSuffix {
         u8,
@@ -58,7 +60,7 @@ public class IntegerLiteralExpression extends LiteralExpression {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException("IntegerLiteralExpression has no children");
     }
 

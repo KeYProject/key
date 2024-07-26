@@ -52,6 +52,7 @@ public class ProblemFinder extends ExpressionBuilder {
     public @Nullable Term visitProblem(KeYRustyParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null) {
+                // TODO
                 chooseContract = ""; // ParsingFacade.getValueDocumentation(ctx.chooseContract);
             }
             // .replace("\\\\:", ":");

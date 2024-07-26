@@ -12,6 +12,8 @@ import org.key_project.rusty.proof.init.InitConfig;
 import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.init.ProofInputException;
 
+import org.jspecify.annotations.NonNull;
+
 public abstract class AbstractEnvInput implements EnvInput {
     protected final Name name;
     protected final String rustPath;
@@ -44,7 +46,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     // -------------------------------------------------------------------------
 
     @Override
-    public final Name name() {
+    public final @NonNull Name name() {
         return name;
     }
 

@@ -8,6 +8,8 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.Type;
 
+import org.jspecify.annotations.NonNull;
+
 public class Param implements RustyProgramElement {
     private final Pattern pattern;
     private final Type type;
@@ -23,7 +25,7 @@ public class Param implements RustyProgramElement {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         if (n == 0) {
             return pattern;
         }

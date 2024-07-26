@@ -10,7 +10,9 @@ import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.sv.FormulaSV;
 import org.key_project.rusty.rule.MatchConditions;
 
-public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<FormulaSV> {
+import org.jspecify.annotations.NonNull;
+
+public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<@NonNull FormulaSV> {
 
     protected MatchFormulaSVInstruction(FormulaSV op) {
         super(op);

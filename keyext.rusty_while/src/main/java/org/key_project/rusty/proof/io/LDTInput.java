@@ -15,6 +15,8 @@ import org.key_project.rusty.proof.init.ProofInputException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 
 public class LDTInput implements EnvInput {
 
@@ -112,7 +114,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return NAME;
     }
 }

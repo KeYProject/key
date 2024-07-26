@@ -36,7 +36,7 @@ public interface FileRepo {
     InputStream getInputStream(RuleSource ruleSource) throws IOException;
 
     /**
-     * Provides access to the InputStream of a file identified by an URL. The file is registered to
+     * Provides access to the InputStream of a file identified by a URL. The file is registered to
      * the FileRepo.
      *
      * May return <code>null</code> if the url cannot be handled by this repository.

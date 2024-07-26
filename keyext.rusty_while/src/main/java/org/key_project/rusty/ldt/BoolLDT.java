@@ -11,6 +11,8 @@ import org.key_project.rusty.ast.expr.ArithLogicalExpression;
 import org.key_project.rusty.ast.expr.BooleanLiteralExpression;
 import org.key_project.rusty.ast.expr.LiteralExpression;
 
+import org.jspecify.annotations.NonNull;
+
 public class BoolLDT extends LDT {
     public static final Name NAME = new Name("bool");
 
@@ -66,7 +68,7 @@ public class BoolLDT extends LDT {
 
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return NAME;
     }
 

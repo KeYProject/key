@@ -13,7 +13,7 @@ public class ProgramSVCollector {
      * create the ProgramSVCollector
      *
      * @param root the ProgramElement where to begin
-     * @param vars the IList<SchemaVariable> where to add the new found ones
+     * @param vars the IList<SchemaVariable> where to add the new-found ones
      * @param svInst the SVInstantiations previously found in order to determine the needed labels
      *        for the UnwindLoop construct.
      */

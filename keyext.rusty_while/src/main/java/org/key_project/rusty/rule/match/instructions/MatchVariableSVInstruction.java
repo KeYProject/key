@@ -10,7 +10,10 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.sv.VariableSV;
 import org.key_project.rusty.rule.MatchConditions;
 
-public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<VariableSV> {
+import org.jspecify.annotations.NonNull;
+
+public class MatchVariableSVInstruction
+        extends MatchSchemaVariableInstruction<@NonNull VariableSV> {
     protected MatchVariableSVInstruction(VariableSV op) {
         super(op);
     }

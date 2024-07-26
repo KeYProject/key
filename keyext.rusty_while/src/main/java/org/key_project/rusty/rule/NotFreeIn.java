@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.VariableSV;
 
@@ -12,33 +13,32 @@ import org.key_project.rusty.logic.op.sv.VariableSV;
  * the second one has to match a Term in order to model a pair of the not-free-in relation of a
  * Taclet.
  */
-public class NotFreeIn {
-    private final SchemaVariable first;
-    private final SchemaVariable second;
-
+public record NotFreeIn(SchemaVariable first, SchemaVariable second) {
     /**
      * constructs a pair of variables given two SchemaVariables. The first SchemaVariable has to
-     * occur bound in the Taclet, while the second one can stand for a an arbitrary term of formula,
-     * in order to model a pair of the not-free-in relation of an Taclet.
+     * occur bound in the Taclet, while the second one can stand for an arbitrary term of formula,
+     * in order to model a pair of the not-free-in relation of a Taclet.
      */
-    public NotFreeIn(SchemaVariable first, SchemaVariable second) {
+    public NotFreeIn {
         if (!(first instanceof VariableSV)) {
             throw new RuntimeException("Expected a SchemaVariable "
-                + "that has been only allowed to match " + "variables");
+                    + "that has been only allowed to match " + "variables");
         }
-        this.first = first;
-        this.second = second;
     }
 
     /**
      * returns the first SchemaVariable of the pair. This SchemaVariable has to be matched to a
      * QuantifiableVariable
      */
+    @Override
     public SchemaVariable first() {
         return first;
     }
 
-    /** returns the second SchemaVariable of the pair. */
+    /**
+     * returns the second SchemaVariable of the pair.
+     */
+    @Override
     public SchemaVariable second() {
         return second;
     }

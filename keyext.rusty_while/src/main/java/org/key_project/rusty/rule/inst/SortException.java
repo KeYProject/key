@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
 
+import java.io.Serial;
+
 /**
  * this exception is thrown from an "SVInstantiations"-Object if the sorts of a schema variable and
  * its instantiation are not compatible (and not generic)
@@ -12,6 +14,7 @@ public class SortException extends IllegalInstantiationException {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = -1659749880755516351L;
 
     public SortException(String description) {

@@ -25,7 +25,9 @@ import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public class TacletSchemaVariableCollector implements Visitor<Term> {
+import org.jspecify.annotations.NonNull;
+
+public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
     /** collects all found variables */
     protected ImmutableList<SchemaVariable> varList;
     /** the instantiations needed for unwind loop constructs */
@@ -150,7 +152,7 @@ public class TacletSchemaVariableCollector implements Visitor<Term> {
 
 
     /**
-     * goes through the given sequent an collects all vars found
+     * goes through the given sequent a collects all vars found
      *
      * @param seq the Sequent to visit
      */
@@ -182,17 +184,16 @@ public class TacletSchemaVariableCollector implements Visitor<Term> {
 
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
         for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
-            TacletGoalTemplate gt = tacletGoalTemplate;
-            visit(gt.sequent());
-            if (gt instanceof RewriteTacletGoalTemplate rt) {
+            visit(tacletGoalTemplate.sequent());
+            if (tacletGoalTemplate instanceof RewriteTacletGoalTemplate rt) {
                 rt.replaceWith().execPostOrder(this);
             } else {
-                if (gt instanceof AntecSuccTacletGoalTemplate ast) {
+                if (tacletGoalTemplate instanceof AntecSuccTacletGoalTemplate ast) {
                     visit(ast.replaceWith());
                 }
             }
             if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
+                for (Taclet taclet1 : tacletGoalTemplate.rules()) {
                     visit(taclet1, true);
                 }
             }

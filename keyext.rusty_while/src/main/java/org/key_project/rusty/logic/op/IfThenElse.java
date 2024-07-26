@@ -12,6 +12,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This singleton class implements a general conditional operator
@@ -54,7 +56,7 @@ public final class IfThenElse extends AbstractOperator implements Operator {
     }
 
     @Override
-    public Sort sort(Sort[] sorts) {
+    public @NonNull Sort sort(Sort @NonNull [] sorts) {
         final Sort s2 = sorts[1];
         final Sort s3 = sorts[2];
 
@@ -83,7 +85,7 @@ public final class IfThenElse extends AbstractOperator implements Operator {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException(name() + " has no children");
     }
 }

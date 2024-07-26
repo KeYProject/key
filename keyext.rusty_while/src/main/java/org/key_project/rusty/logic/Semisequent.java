@@ -8,6 +8,8 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 public class Semisequent implements Iterable<SequentFormula> {
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
@@ -62,7 +64,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      * @return Iterator<SequentFormula>
      */
     @Override
-    public Iterator<SequentFormula> iterator() {
+    public @NonNull Iterator<SequentFormula> iterator() {
         return seqList.iterator();
     }
 

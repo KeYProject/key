@@ -15,6 +15,8 @@ import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 
 public class Proof implements Named {
     /**
@@ -132,7 +134,7 @@ public class Proof implements Named {
     }
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 

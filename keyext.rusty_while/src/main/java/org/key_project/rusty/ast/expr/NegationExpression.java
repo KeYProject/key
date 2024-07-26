@@ -5,6 +5,8 @@ package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 public class NegationExpression implements Expr {
     public enum Operator {
         Neg, Not;
@@ -36,11 +38,11 @@ public class NegationExpression implements Expr {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
-        return switch (n) {
-        case 0 -> expr;
-        default -> throw new IndexOutOfBoundsException(
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) {
+            return expr;
+        }
+        throw new IndexOutOfBoundsException(
             "NegationExpression has only 1 children");
-        };
     }
 }

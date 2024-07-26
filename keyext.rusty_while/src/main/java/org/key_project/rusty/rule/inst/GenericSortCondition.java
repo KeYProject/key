@@ -19,7 +19,7 @@ public abstract class GenericSortCondition {
      * has to match the sort of the schemavariable's instantiation
      *
      * @return the resulting condition, if the schemavariable is of generic sort; null, if the sorts
-     *         are either always compatible (no generic sorts) or never compatible (non generic
+     *         are either always compatible (no generic sorts) or never compatible (non-generic
      *         sorts that don't match)
      */
     public static GenericSortCondition createCondition(SchemaVariable sv,
@@ -35,7 +35,8 @@ public abstract class GenericSortCondition {
 
     /**
      * @return <code>true</code> iff the variable <code>p_sv</code> is allowed to be instantiated
-     *         with expressions that have a real subtype of the type of <code>p_sv</code>. Otherwise
+     *         with expressions that have a real subtype of the type of <code>p_sv</code>.
+     *         Otherwise,
      *         the sorts have to match exactly
      */
     static boolean subSortsAllowed(SchemaVariable p_sv) {
@@ -49,7 +50,7 @@ public abstract class GenericSortCondition {
      * @param p_identity true iff an identity condition should be generated (otherwise: a supersort
      *        condition is generated)
      * @return the resulting condition, if "s0" is of generic sort; null, if the sorts are either
-     *         always compatible (no generic sorts) or never compatible (e.g. non generic sorts that
+     *         always compatible (no generic sorts) or never compatible (e.g. non-generic sorts that
      *         don't match)
      */
     protected static GenericSortCondition createCondition(Sort s0, Sort s1, boolean p_identity) {

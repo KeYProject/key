@@ -6,6 +6,8 @@ package org.key_project.rusty.ast.stmt;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.expr.Expr;
 
+import org.jspecify.annotations.NonNull;
+
 public class ExpressionStatement implements Statement {
     private final Expr expression;
 
@@ -14,7 +16,7 @@ public class ExpressionStatement implements Statement {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         if (n == 0) {
             return expression;
         }

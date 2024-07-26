@@ -15,6 +15,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * The objects of this class represent logical variables, used e.g. for quantification.
@@ -37,12 +39,12 @@ public final class LogicVariable extends AbstractSortedOperator
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return name() + ":" + sort();
     }
 
     @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
+    public boolean equalsModProofIrrelevancy(@NonNull Object obj) {
         if (!(obj instanceof LogicVariable that)) {
             return false;
         }
@@ -61,7 +63,7 @@ public final class LogicVariable extends AbstractSortedOperator
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException("Logic variable " + name() + " does not have children");
     }
 }

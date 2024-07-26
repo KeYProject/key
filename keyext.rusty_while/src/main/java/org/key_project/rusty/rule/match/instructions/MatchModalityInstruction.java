@@ -10,12 +10,14 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.rule.MatchConditions;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The match instruction reports a success if the top level operator of the term to be matched is
  * the <strong>same</strong> modality like the one for which this instruction has been
  * instantiated
  */
-public class MatchModalityInstruction extends Instruction<Modality>
+public class MatchModalityInstruction extends Instruction<@NonNull Modality>
         implements MatchOperatorInstruction {
 
     public MatchModalityInstruction(Modality op) {

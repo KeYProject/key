@@ -167,7 +167,7 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 
@@ -205,7 +205,6 @@ public class KeYFile implements EnvInput {
 
     @Override
     public String readRustPath() throws ProofInputException {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
         String rustPath = pi.getRustSource();
         if (rustPath != null) {

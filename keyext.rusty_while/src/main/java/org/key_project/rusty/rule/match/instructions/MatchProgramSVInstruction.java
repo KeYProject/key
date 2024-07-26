@@ -19,7 +19,9 @@ import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.IllegalInstantiationException;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 
-public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<ProgramSV>
+import org.jspecify.annotations.NonNull;
+
+public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@NonNull ProgramSV>
         implements MatchOperatorInstruction {
 
     public MatchProgramSVInstruction(ProgramSV sv) {
@@ -123,7 +125,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
             return tb.var(pv);
         }
         if (pe instanceof PathExpression path) {
-            return tb.var(services.getNamespaces().programVariables().lookup(path.getVar().name()));
+            return tb.var(services.getNamespaces().programVariables().lookup(path.var().name()));
         }
         if (pe instanceof LiteralExpression lit) {
             return convertLiteralExpression(lit, services);
@@ -139,10 +141,10 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
     // TODO: Generalize to all operators (once we have them)
     private Term convertArithLogicalExpression(ArithLogicalExpression ale, Services services) {
         var tb = services.getTermBuilder();
-        final var subs = new Term[] { convertToLogicElement(ale.getLeft(), services),
-            convertToLogicElement(ale.getRight(), services) };
+        final var subs = new Term[] { convertToLogicElement(ale.left(), services),
+            convertToLogicElement(ale.right(), services) };
 
-        var op = ale.getOp();
+        var op = ale.op();
         var responsibleLDT = getResponsibleLDT(op, subs, services);
         if (responsibleLDT != null) {
             return tb.func(responsibleLDT.getFuctionFor(op, services), subs);

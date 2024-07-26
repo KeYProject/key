@@ -9,7 +9,9 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.sv.TermSV;
 import org.key_project.rusty.rule.MatchConditions;
 
-public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermSV> {
+import org.jspecify.annotations.NonNull;
+
+public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<@NonNull TermSV> {
     protected MatchTermSVInstruction(TermSV op) {
         super(op);
     }

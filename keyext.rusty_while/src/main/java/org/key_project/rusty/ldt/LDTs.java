@@ -10,6 +10,8 @@ import java.util.Map;
 import org.key_project.logic.Name;
 import org.key_project.rusty.Services;
 
+import org.jspecify.annotations.NonNull;
+
 public class LDTs implements Iterable<LDT> {
     private final BoolLDT boolLDT;
     private final IntLDT intLDT;
@@ -37,7 +39,7 @@ public class LDTs implements Iterable<LDT> {
 
 
     @Override
-    public Iterator<LDT> iterator() {
+    public @NonNull Iterator<LDT> iterator() {
         return map.values().iterator();
     }
 }

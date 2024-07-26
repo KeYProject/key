@@ -14,6 +14,8 @@ import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
@@ -55,7 +57,7 @@ public class Modality extends org.key_project.logic.op.Modality {
     }
 
     @Override
-    public RustyBlock program() {
+    public @NonNull RustyBlock program() {
         return block;
     }
 

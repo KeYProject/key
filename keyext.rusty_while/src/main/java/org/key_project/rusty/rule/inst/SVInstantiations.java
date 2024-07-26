@@ -81,7 +81,7 @@ public class SVInstantiations {
     }
 
     public SVInstantiations add(SchemaVariable sv, ProgramList pes, Services services) {
-        return add(sv, new ProgramListInstantiation(pes.getList()), services);
+        return add(sv, new ProgramListInstantiation(pes.list()), services);
     }
 
     /**
@@ -295,6 +295,13 @@ public class SVInstantiations {
             result = result.put(entry.key(), entry.value());
         }
 
+        ImmutableList<Term> updates = getUpdates(other);
+        return new SVInstantiations(result, updates, getGenericSortInstantiations(),
+            getGenericSortConditions())
+                    .rebuildSorts(services);
+    }
+
+    private ImmutableList<Term> getUpdates(SVInstantiations other) {
         ImmutableList<Term> updates = ImmutableSLList.nil();
 
         if (other.getUpdateContext().isEmpty()) {
@@ -307,9 +314,7 @@ public class SVInstantiations {
         } else {
             updates = other.getUpdateContext();
         }
-        return new SVInstantiations(result, updates, getGenericSortInstantiations(),
-            getGenericSortConditions())
-                    .rebuildSorts(services);
+        return updates;
     }
 
     @Override

@@ -9,7 +9,9 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.sv.UpdateSV;
 import org.key_project.rusty.rule.MatchConditions;
 
-public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<UpdateSV> {
+import org.jspecify.annotations.NonNull;
+
+public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<@NonNull UpdateSV> {
     protected MatchUpdateSVInstruction(UpdateSV op) {
         super(op);
     }

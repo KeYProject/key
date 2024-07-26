@@ -8,6 +8,8 @@ import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.Type;
 
+import org.jspecify.annotations.NonNull;
+
 public class LetStatement implements Statement {
     private final Pattern pat;
     private final Type type;
@@ -21,7 +23,7 @@ public class LetStatement implements Statement {
 
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
         case 0 -> pat;
         case 1 -> init;

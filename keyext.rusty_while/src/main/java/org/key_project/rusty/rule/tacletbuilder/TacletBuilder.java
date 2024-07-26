@@ -160,7 +160,8 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     /**
-     * Add a "v0 depending on v1"-statement. "v0" may not occur within the if sequent or the find
+     * Add a "v0 depending on v1"-statement. "v0" may not occur within the {@code if} sequent or the
+     * {@code find}
      * formula/term, however, this is not checked
      */
     public void addVarsNewDependingOn(SchemaVariable v0, SchemaVariable v1) {
@@ -169,7 +170,7 @@ public abstract class TacletBuilder<T extends Taclet> {
 
 
     /**
-     * Add an additional generic condition on the instantiation of schema variables.
+     * Add a generic condition on the instantiation of schema variables.
      */
     public void addVariableCondition(VariableCondition vc) {
         variableConditions = variableConditions.append(vc);
@@ -196,7 +197,7 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     /**
      * builds and returns the Taclet that is specified by former set... / add... methods. If no name
-     * is specified then an Taclet with an empty string name is build. No specifications for
+     * is specified then a Taclet with an empty string name is build. No specifications for
      * variable conditions, goals or rule sets imply that the corresponding parts of the Taclet are
      * empty. No specification for the if-sequence is represented as a sequent with two empty
      * semisequences. No specification for the interactive or recursive flags imply that the flags

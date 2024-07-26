@@ -9,7 +9,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-public class BoundVarsVisitor implements Visitor<Term> {
+import org.jspecify.annotations.NonNull;
+
+public class BoundVarsVisitor implements Visitor<@NonNull Term> {
     private ImmutableSet<QuantifiableVariable> bdVars = DefaultImmutableSet.nil();
 
     /**

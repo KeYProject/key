@@ -15,6 +15,8 @@ import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.RFunction;
 import org.key_project.rusty.parser.KeYRustyParser;
 
+import org.jspecify.annotations.NonNull;
+
 public class FunctionPredicateBuilder extends DefaultBuilder {
     public FunctionPredicateBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -36,7 +38,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         var sort = sorts().lookup(ctx.name.getText());
-        var dtNamespace = new Namespace<Function>();
+        var dtNamespace = new Namespace<@NonNull Function>();
         for (KeYRustyParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
             Name name = new Name(constructorContext.name.getText());
@@ -75,6 +77,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         Function p = null;
 
+        assert pred_name != null;
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
             String sortName = pred_name.substring(0, separatorIndex);
