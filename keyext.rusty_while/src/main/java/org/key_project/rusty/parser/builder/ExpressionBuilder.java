@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Namespace;
-import org.key_project.logic.Term;
-import org.key_project.logic.TermCreationException;
+import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyReader;
@@ -23,16 +21,20 @@ import org.key_project.rusty.ldt.LDT;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.*;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
+import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.logic.op.sv.VariableSV;
 import org.key_project.rusty.parser.KeYRustyLexer;
 import org.key_project.rusty.parser.KeYRustyParser;
 import org.key_project.rusty.util.parsing.BuildingException;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class ExpressionBuilder extends DefaultBuilder {
     private boolean rustySchemaModeAllowed;
@@ -353,6 +355,132 @@ public class ExpressionBuilder extends DefaultBuilder {
         return term;
     }
 
+    @Override
+    public Object visitBracket_term(KeYRustyParser.Bracket_termContext ctx) {
+        Term t = accept(ctx.primitive_labeled_term());
+        /*
+         * for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
+         * KeYRustyParser.Brace_suffixContext brace_suffix =
+         * ctx.bracket_suffix_heap(i).brace_suffix();
+         * ParserRuleContext heap = ctx.bracket_suffix_heap(i).heap;
+         * t = accept(brace_suffix, t);
+         * if (heap != null) {
+         * t = replaceHeap(t, accept(heap), heap);
+         * }
+         * }
+         */
+        if (ctx.attribute().isEmpty()) {
+            return t;
+        }
+        throw new RuntimeException("TODO");
+        // return handleAttributes(t, ctx.attribute());
+    }
+
+    @Override
+    public Object visitPrimitive_labeled_term(KeYRustyParser.Primitive_labeled_termContext ctx) {
+        return accept(ctx.primitive_term());
+        // return updateOrigin(t, ctx, services);
+    }
+
+    public <T> T defaultOnException(T defaultValue, Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    private @Nullable Term[] visitArguments(KeYRustyParser.@Nullable Argument_listContext call) {
+        List<Term> arguments = accept(call);
+        return arguments == null ? null : arguments.toArray(new Term[0]);
+    }
+
+    @Override
+    public Term visitAccessterm(KeYRustyParser.AccesstermContext ctx) {
+        // weigl: I am unsure if this is wise.
+        Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
+        String firstName = accept(ctx.simple_ident());
+
+        ImmutableArray<QuantifiableVariable> boundVars = null;
+        Namespace<QuantifiableVariable> orig = null;
+        Term[] args = null;
+        if (ctx.call() != null) {
+            orig = variables();
+            List<QuantifiableVariable> bv = accept(ctx.call().boundVars);
+            boundVars =
+                bv != null ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0])) : null;
+            args = visitArguments(ctx.call().argument_list());
+            if (boundVars != null) {
+                unbindVars(orig);
+            }
+        }
+
+        assert firstName != null;
+        Operator op;
+
+        if ("skip".equals(firstName)) {
+            op = UpdateJunctor.SKIP;
+        } else {
+            op = lookupVarfuncId(ctx, firstName,
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+        }
+
+        Term current;
+        Operator finalOp = op;
+        if (op instanceof ParsableVariable) {
+            if (args != null) {
+                semanticError(ctx, "You used the variable `%s` like a predicate or function.", op);
+            }
+            if (boundVars != null) {
+                // addWarning(ctx, "Bounded variable are ignored on a variable");
+            }
+            current = termForParsedVariable((ParsableVariable) op, ctx);
+        } else {
+            if (boundVars == null) {
+                Term[] finalArgs = args;
+                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs));
+            } else {
+                // sanity check
+                assert op instanceof Function;
+                for (int i = 0; i < args.length; i++) {
+                    if (i < op.arity() && !op.bindVarsAt(i)) {
+                        for (QuantifiableVariable qv : args[i].freeVars()) {
+                            if (boundVars.contains(qv)) {
+                                semanticError(ctx,
+                                    "Building function term " + op
+                                        + " with bound variables failed: " + "Variable " + qv
+                                        + " must not occur free in subterm " + args[i]);
+                            }
+                        }
+                    }
+                }
+                ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
+                // create term
+                Term[] finalArgs1 = args;
+                current = capsulateTf(ctx,
+                    () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars));
+            }
+        }
+        return current;
+    }
+
+    private Term termForParsedVariable(ParsableVariable v, ParserRuleContext ctx) {
+        if (v instanceof LogicVariable lv) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
+        } else if (v instanceof ProgramVariable lv) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
+        } else {
+            if (v instanceof OperatorSV sv) {
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(sv));
+            } else {
+                String errorMessage = "";
+                errorMessage += v + " is not a logic or program variable";
+                semanticError(null, errorMessage);
+            }
+        }
+        return null;
+    }
+
     private LogicVariable bindVar(int idx, Sort s) {
         LogicVariable v = new LogicVariable(idx, s);
         namespaces().setVariables(variables().extended(v));
@@ -537,5 +665,233 @@ public class ExpressionBuilder extends DefaultBuilder {
     private static class PairOfStringAndRustyBlock {
         String opName;
         RustyBlock rustyBlock;
+    }
+
+    @Override
+    public Object visitBoolean_literal(KeYRustyParser.Boolean_literalContext ctx) {
+        if (ctx.TRUE() != null) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.TRUE));
+        } else {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.FALSE));
+        }
+    }
+
+    @Override
+    public Term visitIfThenElseTerm(KeYRustyParser.IfThenElseTermContext ctx) {
+        Term condF = (Term) ctx.condF.accept(this);
+        if (condF.sort() != RustyDLTheory.FORMULA) {
+            semanticError(ctx, "Condition of an \\if-then-else term has to be a formula.");
+        }
+        Term thenT = (Term) ctx.thenT.accept(this);
+        Term elseT = (Term) ctx.elseT.accept(this);
+        return capsulateTf(ctx,
+            () -> getTermFactory().createTerm(IfThenElse.IF_THEN_ELSE, condF, thenT, elseT));
+    }
+
+    @Override
+    public Object visitIfExThenElseTerm(KeYRustyParser.IfExThenElseTermContext ctx) {
+        Namespace<QuantifiableVariable> orig = variables();
+        List<QuantifiableVariable> exVars = accept(ctx.bound_variables());
+        Term condF = accept(ctx.condF);
+        if (condF.sort() != RustyDLTheory.FORMULA) {
+            semanticError(ctx, "Condition of an \\ifEx-then-else term has to be a formula.");
+        }
+
+        Term thenT = accept(ctx.thenT);
+        Term elseT = accept(ctx.elseT);
+        ImmutableArray<QuantifiableVariable> exVarsArray = new ImmutableArray<>(exVars);
+        Term result = null;/*
+                            * getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
+                            * new Term[] { condF, thenT, elseT }, exVarsArray, null);
+                            * unbindVars(orig);
+                            */
+        return result;
+    }
+
+    @Override
+    public Term visitQuantifierterm(KeYRustyParser.QuantifiertermContext ctx) {
+        Operator op = null;
+        Namespace<QuantifiableVariable> orig = variables();
+        if (ctx.FORALL() != null) {
+            op = Quantifier.ALL;
+        }
+        if (ctx.EXISTS() != null) {
+            op = Quantifier.EX;
+        }
+        List<QuantifiableVariable> vs = accept(ctx.bound_variables());
+        Term a1 = accept(ctx.sub);
+        Term a = getTermFactory().createTerm(op, new ImmutableArray<>(a1),
+            new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])));
+        unbindVars(orig);
+        return a;
+    }
+
+    @Override
+    public Object visitSubstitution_term(KeYRustyParser.Substitution_termContext ctx) {
+        throw new RuntimeException("TODO");
+    }
+
+    @Override
+    public Object visitUpdate_term(KeYRustyParser.Update_termContext ctx) {
+        Term t = oneOf(ctx.atom_prefix(), ctx.unary_formula());
+        if (ctx.u.isEmpty()) {
+            return t;
+        }
+        Term u = accept(ctx.u);
+        return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);
+    }
+
+    @Override
+    public QuantifiableVariable visitOne_bound_variable(
+            KeYRustyParser.One_bound_variableContext ctx) {
+        String id = accept(ctx.simple_ident());
+        Sort sort = accept(ctx.sortId());
+
+        SchemaVariable ts = schemaVariables().lookup(new Name(id));
+        if (ts != null) {
+            if (!(ts instanceof VariableSV)) {
+                semanticError(ctx,
+                    ts + " is not allowed in a quantifier. Note, that you can't "
+                        + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
+                        + " in taclets. You have to define the variable as a schema variable"
+                        + " and use the syntax \"\\exists i;\" instead.");
+            }
+            bindVar();
+            return (QuantifiableVariable) ts;
+        }
+
+        if (sort != null && id != null) {
+            throw new RuntimeException("TODO");
+            // return bindVar(id, sort);
+        }
+
+        QuantifiableVariable result =
+            doLookup(new Name(ctx.id.getText()), variables());
+
+        if (result == null) {
+            semanticError(ctx, "There is no schema variable or variable named " + id);
+        }
+
+        return result;
+    }
+
+    @Override
+    public Object visitModality_term(KeYRustyParser.Modality_termContext ctx) {
+        Term a1 = accept(ctx.sub);
+        if (ctx.MODALITY() == null) {
+            return a1;
+        }
+
+        PairOfStringAndRustyBlock sjb = getRustyBlock(ctx.MODALITY().getSymbol());
+        Operator op;
+        if (sjb.opName.charAt(0) == '#') {
+            /*
+             * if (!inSchemaMode()) { semanticError(ctx,
+             * "No schema elements allowed outside taclet declarations (" + sjb.opName + ")"); }
+             */
+            var kind = (Modality.RustyModalityKind) schemaVariables().lookup(new Name(sjb.opName));
+            op = Modality.getModality(kind, sjb.rustyBlock);
+        } else {
+            var kind = Modality.RustyModalityKind.getKind(sjb.opName);
+            op = Modality.getModality(kind, sjb.rustyBlock);
+        }
+        if (op == null) {
+            semanticError(ctx, "Unknown modal operator: " + sjb.opName);
+        }
+
+        return capsulateTf(ctx,
+            () -> getTermFactory().createTerm(op, new Term[] { a1 }, null));
+    }
+
+    @Override
+    public List<Term> visitArgument_list(KeYRustyParser.Argument_listContext ctx) {
+        return mapOf(ctx.term());
+    }
+
+    /**
+     * Handles "[sort]::a.name.or.something.else"
+     *
+     * @param ctx
+     * @return a Term or an operator, depending the referenced object.
+     */
+    @Override
+    public Object visitFuncpred_name(KeYRustyParser.Funcpred_nameContext ctx) {
+        Sort sortId = accept(ctx.sortId());
+        List<String> parts = mapOf(ctx.name.simple_ident());
+        String varfuncid = ctx.name.getText();
+
+        if (ctx.INT_LITERAL() != null) {// number
+            return toZNotation(ctx.INT_LITERAL().getText(), functions());
+        }
+
+        assert parts != null && varfuncid != null;
+
+        if ("skip".equals(varfuncid)) {
+            return UpdateJunctor.SKIP;
+        }
+
+        Operator op;
+        String firstName =
+            ctx.name == null ? ctx.INT_LITERAL().getText()
+                    : ctx.name.simple_ident(0).getText();
+        op = lookupVarfuncId(ctx, firstName,
+            ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+        if (op instanceof ProgramVariable v && ctx.name.simple_ident().size() > 1) {
+            List<KeYRustyParser.Simple_identContext> otherParts =
+                ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
+            Term tv = getServices().getTermFactory().createTerm(v);
+            String memberName = otherParts.get(0).getText();
+            memberName = StringUtil.trim(memberName, "()");
+            // Operator attr = getAttributeInPrefixSort(v.sort(), memberName);
+            // return createAttributeTerm(tv, attr, ctx);
+            throw new RuntimeException("TODO");
+        }
+        return op;
+    }
+
+    @Override
+    public Object visitTermParen(KeYRustyParser.TermParenContext ctx) {
+        Term base = accept(ctx.term());
+        if (ctx.attribute().isEmpty()) {
+            return base;
+        }
+        return null;// handleAttributes(base, ctx.attribute());
+    }
+
+    @Override
+    public Object visitInteger(KeYRustyParser.IntegerContext ctx) {
+        return toZNotation(ctx.getText());
+    }
+
+    private Term toZNotation(String number) {
+        return getTermFactory().createTerm(functions().lookup(new Name("Z")), toNum(number));
+    }
+
+    private Term toNum(String number) {
+        String s = number;
+        final boolean negative = (s.charAt(0) == '-');
+        if (negative) {
+            s = number.substring(1, s.length());
+        }
+        if (s.startsWith("0x")) {
+            try {
+                BigInteger bi = new BigInteger(s.substring(2), 16);
+                s = bi.toString();
+            } catch (NumberFormatException nfe) {
+                // Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
+            }
+        }
+        Term result = getTermFactory().createTerm(functions().lookup(new Name("#")));
+
+        for (int i = 0; i < s.length(); i++) {
+            result = getTermFactory()
+                    .createTerm(functions().lookup(new Name(s.substring(i, i + 1))), result);
+        }
+
+        if (negative) {
+            result = getTermFactory().createTerm(functions().lookup(new Name("neglit")), result);
+        }
+
+        return result;
     }
 }
