@@ -10,6 +10,8 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
+import static org.key_project.rusty.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 public class Semisequent implements Iterable<SequentFormula> {
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
@@ -19,6 +21,18 @@ public class Semisequent implements Iterable<SequentFormula> {
     /** used by inner class Empty */
     private Semisequent() {
         seqList = ImmutableSLList.nil();
+    }
+
+    /**
+     * Create a new Semisequent from an ordered collection of formulas.
+     * The provided list must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the sequent by subsequently inserting all formulas
+     *
+     * @param seqList list of sequent formulas
+     */
+    public Semisequent(ImmutableList<SequentFormula> seqList) {
+        assert !seqList.isEmpty();
+        this.seqList = seqList;
     }
 
     /**
@@ -34,7 +48,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      * returning same semisequent if inserting would create redundancies
      *
      * @param idx int encoding the place the element has to be put
-     * @param sequentFormula {@link de.uka.ilkd.key.logic.SequentFormula} to be inserted
+     * @param sequentFormula {@link SequentFormula} to be inserted
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
@@ -61,6 +75,75 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     public boolean isEmpty() {
         return seqList.isEmpty();
+    }
+
+    /**
+     * inserts new SequentFormula at index idx and removes duplicates, perform simplifications etc.
+     *
+     * @param fci null if the formula to be added is new, otherwise an object telling which formula
+     *        is replaced with the new formula <code>sequentFormula</code>, and what are the
+     *        differences between the two formulas
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    private SemisequentChangeInfo insertAndRemoveRedundancyHelper(int idx,
+                                                                  SequentFormula sequentFormula, SemisequentChangeInfo semiCI, FormulaChangeInfo fci) {
+
+        // Search for equivalent formulas and weakest constraint
+        ImmutableList<SequentFormula> searchList = semiCI.getFormulaList();
+        final SequentFormula[] newSeqList = new SequentFormula[searchList.size()];
+        SequentFormula cf;
+        int pos = -1;
+
+        while (!searchList.isEmpty()) {
+            ++pos;
+            cf = searchList.head();
+            searchList = searchList.tail();
+
+            if (sequentFormula != null
+                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(cf.formula(), sequentFormula.formula())) {
+                semiCI.rejectedFormula(sequentFormula);
+                return semiCI; // semisequent already contains formula
+
+            }
+            newSeqList[pos] = cf;
+        }
+
+
+        // compose resulting formula list
+        if (fci == null) {
+            semiCI.addedFormula(idx, sequentFormula);
+        } else {
+            semiCI.modifiedFormula(idx, fci);
+        }
+
+        final ImmutableList<SequentFormula> orig = semiCI.getFormulaList();
+        pos = Math.min(idx, orig.size());
+
+        searchList = semiCI.getFormulaList().take(pos).prepend(sequentFormula);
+
+        while (pos > 0) {
+            --pos;
+            searchList = searchList.prepend(newSeqList[pos]);
+        }
+
+        // add new formula list to result object
+        semiCI.setFormulaList(searchList);
+
+        return semiCI;
+    }
+
+    /**
+     * . inserts new SequentFormula at index {@code idx} and removes duplicates, perform
+     * simplifications etc.
+     *
+     * @param sequentFormula the SequentFormula to be inserted at position idx
+     * @param idx an int that means insert sequentFormula at the idx-th position in the semisequent
+     * @return new Semisequent with sequentFormula at index idx and removed redundancies
+     */
+    private SemisequentChangeInfo removeRedundance(int idx, SequentFormula sequentFormula) {
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula,
+                new SemisequentChangeInfo(seqList), null);
     }
 
     /**

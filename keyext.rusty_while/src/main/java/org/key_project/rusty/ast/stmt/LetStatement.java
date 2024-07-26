@@ -36,6 +36,14 @@ public class LetStatement implements Statement {
         return 3;
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public Pattern getPattern() {
+        return pat;
+    }
+
     @Override
     public String toString() {
         return "let " + pat + ": " + type + " = " + init;
