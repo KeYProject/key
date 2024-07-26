@@ -8,6 +8,8 @@ import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Identifier;
 
+import org.jspecify.annotations.NonNull;
+
 public class IdentPattern implements Pattern, Named {
     private final boolean mutable;
     private final Identifier ident;
@@ -18,7 +20,7 @@ public class IdentPattern implements Pattern, Named {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         if (n == 0) {
             return ident;
         }
@@ -30,7 +32,7 @@ public class IdentPattern implements Pattern, Named {
     }
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return ident.name();
     }
 

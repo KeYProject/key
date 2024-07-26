@@ -5,6 +5,8 @@ package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 public class AssignmentExpression implements Expr {
     private final Expr lhs;
     private final Expr rhs;
@@ -16,7 +18,7 @@ public class AssignmentExpression implements Expr {
 
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
         case 0 -> lhs;
         case 1 -> rhs;

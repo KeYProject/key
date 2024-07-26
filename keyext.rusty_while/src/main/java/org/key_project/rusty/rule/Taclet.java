@@ -148,7 +148,7 @@ public abstract class Taclet implements Rule {
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
      *
      * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequence, the
+     * @param applPart contains the application part of a Taclet that is the if-sequence, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
@@ -245,7 +245,7 @@ public abstract class Taclet implements Rule {
      * returns the name of the Taclet
      */
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 
@@ -361,7 +361,7 @@ public abstract class Taclet implements Rule {
     }
 
     /**
-     * @return set of schemavariables of the if and the (optional) find part
+     * @return set of schemavariables of the {@code if} and the (optional) {@code find} part
      */
     public abstract ImmutableSet<SchemaVariable> getIfFindVariables();
 

@@ -38,7 +38,7 @@ public class ModalOperatorSV extends Modality.RustyModalityKind implements Schem
     @Override
     public @NonNull String toString() {
         // TODO: HACKS, remove new-line and re-generate taclets.old.txt
-        return name().toString() + " ((modal operator))";
+        return name() + " ((modal operator))";
     }
 
 

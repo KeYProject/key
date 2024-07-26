@@ -12,33 +12,33 @@ import org.key_project.util.collection.ImmutableSet;
 
 public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /** sequent that replaces another one */
-    private Sequent replacewith = Sequent.EMPTY_SEQUENT;
+    private Sequent replaceWith = Sequent.EMPTY_SEQUENT;
 
     /**
-     * creates new Goaldescription
+     * creates new GoalDescription
      *
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
-     * @param replacewith the Sequent that replaces another one
+     * @param replaceWith the Sequent that replaces another one
      */
     public AntecSuccTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-            Sequent replacewith, ImmutableSet<SchemaVariable> pvs) {
+                                       Sequent replaceWith, ImmutableSet<SchemaVariable> pvs) {
         super(addedSeq, addedRules, pvs);
-        // TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith sequent");
-        this.replacewith = replacewith;
+        // TacletBuilder.checkContainsFreeVarSV(replaceWith, null, "replaceWith sequent");
+        this.replaceWith = replaceWith;
     }
 
     public AntecSuccTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-            Sequent replacewith) {
-        this(addedSeq, addedRules, replacewith, DefaultImmutableSet.nil());
+            Sequent replaceWith) {
+        this(addedSeq, addedRules, replaceWith, DefaultImmutableSet.nil());
     }
 
     /**
      * a Taclet may replace a Sequent by another. The new Sequent is returned. this Sequent.
      *
-     * @return Sequent being paramter in the rule goal replacewith(Seq)
+     * @return Sequent being parameter in the rule goal replaceWith(Seq)
      */
     public Sequent replaceWith() {
-        return replacewith;
+        return replaceWith;
     }
 }

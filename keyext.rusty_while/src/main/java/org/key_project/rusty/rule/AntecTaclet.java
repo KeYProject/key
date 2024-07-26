@@ -43,7 +43,6 @@ public class AntecTaclet extends FindTaclet {
         createTacletServices();
     }
 
-
     /**
      * this method is used to determine if top level updates are allowed to be ignored. This may be
      * the case if we have an Antec or SuccTaclet but not for a RewriteTaclet
@@ -56,13 +55,11 @@ public class AntecTaclet extends FindTaclet {
     }
 
 
-
     /** toString for the find part */
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
         return sb.append("\\find(").append(find().toString()).append("==>)\n");
     }
-
 
     @Override
     protected void createAndInitializeExecutor() {

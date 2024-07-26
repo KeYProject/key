@@ -6,10 +6,13 @@ package org.key_project.rusty.ldt;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.expr.ArithLogicalExpression;
+import org.key_project.rusty.ast.expr.LiteralExpression;
 
 import org.jspecify.annotations.NonNull;
 
@@ -74,4 +77,17 @@ public abstract class LDT implements Named {
         }
         return addFunction(f);
     }
+
+    public abstract Term translateLiteral(LiteralExpression lit, Services services);
+
+    public abstract Function getFuctionFor(ArithLogicalExpression.Operator op, Services services);
+
+    public abstract boolean isResponsible(ArithLogicalExpression.Operator op, Term[] subs,
+            Services services);
+
+    public abstract boolean isResponsible(ArithLogicalExpression.Operator op, Term sub,
+            Services services);
+
+    public abstract boolean isResponsible(ArithLogicalExpression.Operator op, Term left, Term right,
+            Services services);
 }

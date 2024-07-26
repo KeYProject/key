@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.sort;
 
+import java.util.Iterator;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -44,5 +47,40 @@ public class GenericSort extends SortImpl {
      */
     public ImmutableSet<Sort> getOneOf() {
         return oneOf;
+    }
+
+    /**
+     * @return true if "p_s" is a possible instantiation of this sort. This method does not check
+     *         the instantiations of other generic sorts, i.e. the return value true is possible
+     *         even if "p_s" is not a valid instantiation.
+     *
+     *         Use "GenericSortInstantiations" instead
+     */
+    public boolean isPossibleInstantiation(Sort p_s) {
+        return p_s != RustyDLTheory.FORMULA && (oneOf.isEmpty() || oneOf.contains(p_s))
+                && checkNonGenericSupersorts(p_s);
+    }
+
+    /**
+     * @return true iff "p_s" is subsort of every non-generic supersort of this sort
+     */
+    private boolean checkNonGenericSupersorts(Sort p_s) {
+        Iterator<Sort> it = extendsSorts().iterator();
+        Sort ss;
+
+        while (it.hasNext()) {
+            ss = it.next();
+            if (ss instanceof GenericSort) {
+                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s)) {
+                    return false;
+                }
+            } else {
+                if (!p_s.extendsTrans(ss)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

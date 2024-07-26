@@ -8,8 +8,10 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.ty.KeYRustyType;
+import org.key_project.rusty.rule.MatchConditions;
 
 import org.jspecify.annotations.NonNull;
 
@@ -37,5 +39,17 @@ public class ProgramVariable extends AbstractSortedOperator implements Expr {
 
     public KeYRustyType getKeYRustyType() {
         return type;
+    }
+
+
+    @Override
+    public MatchConditions match(SourceData source, MatchConditions mc) {
+        final var src = source.getSource();
+        source.next();
+        if (src == this) {
+            return mc;
+        } else {
+            return null;
+        }
     }
 }

@@ -5,6 +5,7 @@ package org.key_project.rusty;
 
 
 
+import org.key_project.logic.LogicServices;
 import org.key_project.rusty.ldt.LDTs;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.TermBuilder;
@@ -12,7 +13,7 @@ import org.key_project.rusty.logic.TermFactory;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.init.Profile;
 
-public class Services {
+public class Services implements LogicServices {
     /**
      * proof specific namespaces (functions, predicates, sorts, variables)
      */

@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op;
 
+import java.util.Arrays;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -54,9 +58,7 @@ public final class Junctor extends AbstractSortedOperator {
 
     private static Sort[] createFormulaSortArray(int arity) {
         Sort[] result = new Sort[arity];
-        for (int i = 0; i < arity; i++) {
-            result[i] = RustyDLTheory.FORMULA;
-        }
+        Arrays.fill(result, RustyDLTheory.FORMULA);
         return result;
     }
 
@@ -71,7 +73,7 @@ public final class Junctor extends AbstractSortedOperator {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException("The Junctor operator " + name() + " has no children");
     }
 }

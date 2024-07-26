@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.expr;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 public class BlockExpression implements Expr {
     private final ImmutableList<? extends Statement> statements;
@@ -19,8 +22,8 @@ public class BlockExpression implements Expr {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
-        return statements.get(n);
+    public @NonNull SyntaxElement getChild(int n) {
+        return Objects.requireNonNull(statements.get(n));
     }
 
     @Override

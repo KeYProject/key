@@ -4,35 +4,28 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.op.Operator;
 
-public class ArithLogicalExpression implements Expr {
-    public enum Operator {
-        Plus, Minus, Multiply, Divide, Modulo, BitwiseAnd, BitwiseOr, BitwiseXor;
+import org.jspecify.annotations.NonNull;
 
-        @Override
-        public String toString() {
-            return switch (this) {
-            case Plus -> "+";
-            case Minus -> "-";
-            case Multiply -> "*";
-            case Divide -> "/";
-            case Modulo -> "%";
-            case BitwiseAnd -> "&";
-            case BitwiseOr -> "|";
-            case BitwiseXor -> "^";
-            };
-        }
+public record ArithLogicalExpression(Expr left,org.key_project.rusty.ast.expr.ArithLogicalExpression.Operator op,Expr right)implements Expr{
+
+public enum Operator {
+    Plus, Minus, Multiply, Divide, Modulo, BitwiseAnd, BitwiseOr, BitwiseXor;
+
+    @Override
+    public String toString() {
+        return switch (this) {
+        case Plus -> "+";
+        case Minus -> "-";
+        case Multiply -> "*";
+        case Divide -> "/";
+        case Modulo -> "%";
+        case BitwiseAnd -> "&";
+        case BitwiseOr -> "|";
+        case BitwiseXor -> "^";
+        };
     }
 
-    private final Expr left;
-    private final Expr right;
-    private final Operator op;
-
-    public ArithLogicalExpression(Expr left, Operator op, Expr right) {
-        this.left = left;
-        this.op = op;
-        this.right = right;
     }
 
     @Override
@@ -46,7 +39,7 @@ public class ArithLogicalExpression implements Expr {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
         case 0 -> left;
         case 1 -> right;

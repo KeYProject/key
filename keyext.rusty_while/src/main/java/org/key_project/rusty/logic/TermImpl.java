@@ -16,6 +16,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 // TODO: Basically everything here can be moved tpo ncore.
 class TermImpl implements Term {
     /**
@@ -88,13 +90,13 @@ class TermImpl implements Term {
     }
 
     @Override
-    public Operator op() {
+    public @NonNull Operator op() {
         return op;
     }
 
 
     @Override
-    public <T> T op(Class<T> opClass) throws IllegalArgumentException {
+    public <T> @NonNull T op(@NonNull Class<T> opClass) throws IllegalArgumentException {
         if (!opClass.isInstance(op)) {
             throw new IllegalArgumentException("Operator does not match the expected type:\n"
                 + "Operator type was: " + op.getClass() + "\n" + "Expected type was: " + opClass);
@@ -103,25 +105,25 @@ class TermImpl implements Term {
     }
 
     @Override
-    public ImmutableArray<Term> subs() {
+    public @NonNull ImmutableArray<Term> subs() {
         return subs;
     }
 
 
     @Override
-    public Term sub(int nr) {
+    public @NonNull Term sub(int nr) {
         return subs.get(nr);
     }
 
 
     @Override
-    public ImmutableArray<QuantifiableVariable> boundVars() {
+    public @NonNull ImmutableArray<QuantifiableVariable> boundVars() {
         return boundVars;
     }
 
 
     @Override
-    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
+    public @NonNull ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
         return op.bindVarsAt(n) ? boundVars : EMPTY_VAR_LIST;
     }
 
@@ -131,7 +133,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public Sort sort() {
+    public @NonNull Sort sort() {
         if (sort == null) {
             Sort[] sorts = new Sort[subs.size()];
             for (int i = 0; i < sorts.length; i++) {
@@ -192,7 +194,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public void execPostOrder(Visitor visitor) {
+    public void execPostOrder(@NonNull Visitor visitor) {
         visitor.subtreeEntered(this);
         if (visitor.visitSubtree(this)) {
             for (int i = 0, ar = arity(); i < ar; i++) {
@@ -205,7 +207,7 @@ class TermImpl implements Term {
 
 
     @Override
-    public void execPreOrder(Visitor visitor) {
+    public void execPreOrder(@NonNull Visitor visitor) {
         visitor.subtreeEntered(this);
         visitor.visit(this);
         if (visitor.visitSubtree(this)) {

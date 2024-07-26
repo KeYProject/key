@@ -28,7 +28,7 @@ import org.key_project.rusty.rule.RuleSet;
 public class DefaultBuilder extends AbstractBuilder<Object> {
     protected final Services services;
     protected final NamespaceSet nss;
-    private Namespace<SchemaVariable> schemaVariablesNamespace = new Namespace<>();
+    private Namespace<@NonNull SchemaVariable> schemaVariablesNamespace = new Namespace<>();
 
 
     public DefaultBuilder(Services services, NamespaceSet nss) {
@@ -63,11 +63,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().variables();
     }
 
-    protected Namespace<Sort> sorts() {
+    protected Namespace<@NonNull Sort> sorts() {
         return namespaces().sorts();
     }
 
-    protected Namespace<Function> functions() {
+    protected Namespace<@NonNull Function> functions() {
         return namespaces().functions();
     }
 
@@ -75,7 +75,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().ruleSets();
     }
 
-    protected Namespace<ProgramVariable> programVariables() {
+    protected Namespace<@NonNull ProgramVariable> programVariables() {
         return namespaces().programVariables();
     }
 
@@ -98,7 +98,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     /**
      * looks up and returns the sort of the given name or null if none has been found. If the sort
-     * is not found for the first time, the name is expanded with "java.lang." and the look up
+     * is not found for the first time, the name is expanded with "java.lang." and the look-up
      * restarts
      */
     protected Sort lookupSort(String name) {

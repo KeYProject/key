@@ -12,6 +12,8 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Class of update junctor operators, i.e., operators connecting a given number of updates to create
@@ -43,7 +45,7 @@ public final class UpdateJunctor extends AbstractSortedOperator {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException("UpdateJunctor " + name() + " has no children");
     }
 }

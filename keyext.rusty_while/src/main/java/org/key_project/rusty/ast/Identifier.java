@@ -7,15 +7,17 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 public record Identifier(Name name) implements Named, RustyProgramElement {
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException("Identifier has no children");
     }
 

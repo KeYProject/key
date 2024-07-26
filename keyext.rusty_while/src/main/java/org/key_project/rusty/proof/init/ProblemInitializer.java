@@ -19,6 +19,8 @@ import org.key_project.rusty.proof.io.consistency.FileRepo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 
 public final class ProblemInitializer {
     private static InitConfig baseConfig;
@@ -71,9 +73,7 @@ public final class ProblemInitializer {
             baseConfig = currentBaseConfig;
         }
 
-        InitConfig ic = prepare(envInput, currentBaseConfig);
-
-        return ic;
+        return prepare(envInput, currentBaseConfig);
     }
 
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
@@ -131,8 +131,8 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    // TODO: change this to readRust(...)
-    private void readJava(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
+    // TODO
+    private void readRust(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
         /*
          * // this method must only be called once per init config
          * assert !initConfig.getServices().getJavaInfo().rec2key().parsedSpecial();
@@ -272,7 +272,7 @@ public final class ProblemInitializer {
      * See bug report #1185, #1189 (in Mantis)
      */
     private void cleanupNamespaces(InitConfig initConfig) {
-        Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
+        var newVarNS = new Namespace<@NonNull QuantifiableVariable>();
         // TODO: cover generics once they are added
         /*
          * Namespace<Sort> newSortNS = new Namespace<>();

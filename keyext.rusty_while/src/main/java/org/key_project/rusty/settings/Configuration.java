@@ -72,7 +72,7 @@ public class Configuration {
     }
 
     /**
-     * Returns the stored value for the given name casted to the given clazz if possible.
+     * Returns the stored value for the given name cast to the given clazz if possible.
      * If no value exists, or value is not compatible to {@code clazz}, {@code null} is returned.
      *
      * @param <T> an arbitrary class, exptected return type
@@ -320,7 +320,7 @@ public class Configuration {
     }
 
     /**
-     * Returns the meta data corresponding to the given entry.
+     * Returns the metadata corresponding to the given entry.
      */
     @Nullable
     public ConfigurationMeta getMeta(String name) {
@@ -328,7 +328,7 @@ public class Configuration {
     }
 
     /**
-     * Returns the meta data corresponding to the given entry, creates the entry if not existing.
+     * Returns the metadata corresponding to the given entry, creates the entry if not existing.
      */
     @NonNull
     private ConfigurationMeta getOrCreateMeta(String name) {

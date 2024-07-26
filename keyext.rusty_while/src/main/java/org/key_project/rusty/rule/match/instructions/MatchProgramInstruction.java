@@ -1,0 +1,35 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package org.key_project.rusty.rule.match.instructions;
+
+import org.key_project.logic.SyntaxElementCursor;
+import org.key_project.logic.Term;
+import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.SourceData;
+import org.key_project.rusty.logic.op.Modality;
+import org.key_project.rusty.rule.MatchConditions;
+
+public class MatchProgramInstruction implements MatchInstruction {
+
+    private final RustyProgramElement pe;
+
+    public MatchProgramInstruction(RustyProgramElement pe) {
+        this.pe = pe;
+    }
+
+    @Override
+    public MatchConditions match(SyntaxElementCursor cursor, MatchConditions matchConditions,
+            Services services) {
+        final var t = (Term) cursor.getCurrentNode();
+        final var mod = (Modality) t.op();
+        final MatchConditions result = pe.match(
+            new SourceData(mod.program().program(), -1, services),
+            matchConditions);
+        if (result != null) {
+            cursor.goToNext();
+        }
+        return result;
+    }
+}

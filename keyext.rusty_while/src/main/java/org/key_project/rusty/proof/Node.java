@@ -41,7 +41,7 @@ public class Node {
      * creates a node with the given contents, the given collection of children (all elements must
      * be of class Node) and the given parent node.
      */
-    public Node(Proof proof, Sequent seq, Node parent) {
+    public Node(Proof proof, Sequent seq, @Nullable Node parent) {
         this(proof, seq);
         this.parent = parent;
     }

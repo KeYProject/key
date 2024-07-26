@@ -6,16 +6,13 @@ package org.key_project.rusty.ast.expr;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Identifier;
 
-public class PathExpression implements Expr {
-    private final Identifier var;
+import org.jspecify.annotations.NonNull;
 
-    public PathExpression(Identifier var) {
-        this.var = var;
-    }
+public record PathExpression(Identifier var) implements Expr {
 
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         if (n == 0) {
             return var;
         }

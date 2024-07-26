@@ -14,6 +14,8 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 
+import org.jspecify.annotations.NonNull;
+
 public class ElementaryUpdate extends AbstractSortedOperator {
 
     private static final WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>> instances =
@@ -60,7 +62,7 @@ public class ElementaryUpdate extends AbstractSortedOperator {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         if (n == 0)
             return lhs;
         throw new IndexOutOfBoundsException("Elementary updates only contain 1 child");

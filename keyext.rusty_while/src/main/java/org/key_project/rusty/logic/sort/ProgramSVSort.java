@@ -42,7 +42,7 @@ public abstract class ProgramSVSort extends SortImpl {
         return true;
     }
 
-    protected abstract boolean canStandFor(RustyProgramElement check, Services services);
+    public abstract boolean canStandFor(RustyProgramElement check, Services services);
 
     public ProgramSVSort createInstance(String parameter) {
         throw new UnsupportedOperationException();
@@ -69,7 +69,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(RustyProgramElement pe, Services services) {
+        public boolean canStandFor(RustyProgramElement pe, Services services) {
             return pe instanceof ProgramVariable;
         }
     }
@@ -102,7 +102,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(RustyProgramElement pe, Services services) {
+        public boolean canStandFor(RustyProgramElement pe, Services services) {
             if (pe instanceof NegationExpression ne
                     && ne.getChild(0) instanceof IntegerLiteralExpression) {
                 return true;
@@ -130,7 +130,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(RustyProgramElement check, Services services) {
+        public boolean canStandFor(RustyProgramElement check, Services services) {
             if (!(check instanceof Expr))
                 return false;
             return !SIMPLEEXPRESSION.canStandFor(check, services);
@@ -151,7 +151,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(RustyProgramElement pe, Services services) {
+        public boolean canStandFor(RustyProgramElement pe, Services services) {
             return pe instanceof Expr;
         }
     }
@@ -165,7 +165,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(RustyProgramElement pe, Services services) {
+        public boolean canStandFor(RustyProgramElement pe, Services services) {
             return pe instanceof Statement;
         }
     }
@@ -179,7 +179,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(RustyProgramElement check, Services services) {
+        public boolean canStandFor(RustyProgramElement check, Services services) {
             // TODO
             return false;
         }
@@ -195,7 +195,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        protected boolean canStandFor(RustyProgramElement check, Services services) {
+        public boolean canStandFor(RustyProgramElement check, Services services) {
             // TODO
             return false;
         }

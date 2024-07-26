@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 public final class PrimitiveType implements Type {
     private static final Map<Name, PrimitiveType> typeMap =
         new LinkedHashMap<>();
@@ -37,8 +39,8 @@ public final class PrimitiveType implements Type {
     }
 
     @Override
-    public Name name() {
-        return null;
+    public @NonNull Name name() {
+        return name;
     }
 
     @Override

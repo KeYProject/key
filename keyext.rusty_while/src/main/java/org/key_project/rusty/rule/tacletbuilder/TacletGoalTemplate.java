@@ -36,7 +36,7 @@ public class TacletGoalTemplate {
      *
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
-     * @param addedProgVars a SetOf<SchemaVariable> which will be instantiated with a application
+     * @param addedProgVars a SetOf<SchemaVariable> which will be instantiated with an application
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */

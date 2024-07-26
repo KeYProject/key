@@ -8,6 +8,8 @@ import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 
+import org.jspecify.annotations.NonNull;
+
 public class SkolemTermSV extends OperatorSV implements TerminalSyntaxElement {
     /**
      * Creates a new schema variable that is used as placeholder for skolem terms.
@@ -22,7 +24,7 @@ public class SkolemTermSV extends OperatorSV implements TerminalSyntaxElement {
     }
 
     @Override
-    public String toString() {
-        return toString(sort().toString() + " skolem term");
+    public @NonNull String toString() {
+        return toString(sort() + " skolem term");
     }
 }

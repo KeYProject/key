@@ -7,17 +7,12 @@ import org.key_project.logic.Program;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.RustyProgramElement;
 
-public class RustyBlock implements Program {
-    private final RustyProgramElement program;
+import org.jspecify.annotations.NonNull;
 
-    public RustyBlock(RustyProgramElement program) {
-        this.program = program;
-    }
-
-    public RustyProgramElement program() { return program; }
+public record RustyBlock(RustyProgramElement program) implements Program {
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         if (n == 0)
             return program;
         throw new IndexOutOfBoundsException("RustyBlock " + this + " has only one child");

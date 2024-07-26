@@ -99,7 +99,7 @@ public class RewriteTaclet extends FindTaclet {
      * rewrite rule.
      *
      * @param name the Name of the Taclet
-     * @param applPart the TacletApplPart that contains the application part of an Taclet that is
+     * @param applPart the TacletApplPart that contains the application part of a Taclet that is
      *        the if-sequent, the variable conditions
      * @param goalTemplates a list of goal descriptions.
      * @param attrs the TacletAttributes; these are boolean values indicating a noninteractive or

@@ -124,8 +124,8 @@ public class AbstractBuilder<T> extends KeYRustyParserBaseVisitor<T> {
         }
     }
 
-    protected <T2> List<T2> mapMapOf(List<? extends RuleContext>... ctxss) {
-        return Arrays.stream(ctxss).flatMap(it -> it.stream().map(a -> (T2) accept(a)))
+    protected <T2> List<T2> mapMapOf(List<? extends RuleContext>... ctxs) {
+        return Arrays.stream(ctxs).flatMap(it -> it.stream().map(a -> (T2) accept(a)))
                 .collect(Collectors.toList());
     }
 

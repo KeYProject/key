@@ -33,11 +33,12 @@ public class BasicTest {
         var services = TacletForTests.services();
         var tb = services.getTermBuilder();
 
-        var example = "{a = a + b;\n" +
-            "b = a - b;\n" +
-            "a = a - b;\n" +
-            "1u32\n" +
-            "}";
+        var example = """
+                {a = a + b;
+                b = a - b;
+                a = a - b;
+                1u32
+                }""";
         var lexer =
             new org.key_project.rusty.parsing.RustyWhileLexer(CharStreams.fromString(example));
         var ts = new CommonTokenStream(lexer);

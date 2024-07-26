@@ -11,6 +11,8 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Singleton class defining a binary operator {u}t that applies updates u to terms, formulas, or
@@ -27,7 +29,7 @@ public final class UpdateApplication extends AbstractOperator implements Operato
 
 
     @Override
-    public Sort sort(Sort[] sorts) {
+    public @NonNull Sort sort(Sort @NonNull [] sorts) {
         return sorts[1];
     }
 
@@ -74,7 +76,7 @@ public final class UpdateApplication extends AbstractOperator implements Operato
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException("UpdateApplication has no children");
     }
 }

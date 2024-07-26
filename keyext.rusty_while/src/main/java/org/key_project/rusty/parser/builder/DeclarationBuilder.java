@@ -95,10 +95,9 @@ public class DeclarationBuilder extends DefaultBuilder {
             // attention: no expand to java.lang here!
             Sort existingSort = sorts().lookup(sortName);
             if (existingSort == null) {
-                Sort s = null;
+                Sort s;
                 if (isGenericSort) {
-                    var gs = new GenericSort(sortName, ext, oneOf);
-                    s = gs;
+                    s = new GenericSort(sortName, ext, oneOf);
                 } else if (new Name("any").equals(sortName)) {
                     s = RustyDLTheory.ANY;
                 } else {
