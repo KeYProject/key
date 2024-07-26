@@ -1,8 +1,8 @@
 package org.key_project.rusty.parser.builder;
 
 
+import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
@@ -445,6 +445,7 @@ public class TacletPBuilder extends ExpressionBuilder {
                 // there is a replacewith without a find.
                 //TODO ask what Exception to throw here
 //                throwEx(new RecognitionException(""));
+                throw new RuntimeException("TODO what is a RecognitionException used for");
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
                 if (rwObj instanceof Sequent) {
                     gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, (Sequent) rwObj, pvs);
