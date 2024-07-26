@@ -2,6 +2,7 @@ package org.key_project.rusty.parser.builder;
 
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
@@ -18,10 +19,8 @@ import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.parser.SchemaVariableModifierSet;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
-import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import org.key_project.rusty.rule.tacletbuilder.TacletBuilder;
+import org.key_project.rusty.rule.tacletbuilder.*;
 import org.key_project.rusty.parser.KeYRustyParser;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.util.parsing.BuildingException;
 import org.key_project.util.collection.*;
 
@@ -158,20 +157,20 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         // TODO ask about how this should done with the enum
-        // does it make sense to use an enum when you change the value to something
-        // that no enum element has initially?
+        //  does it make sense to use an enum when you change the value to something
+        //  that no enum element has initially?
         ApplicationRestriction applicationRestriction = ApplicationRestriction.None;
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
-            applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL;
+            applicationRestriction.uniteRestrictions(ApplicationRestriction.SameUpdateLevel);
         }
         if (!ctx.INSEQUENTSTATE().isEmpty()) {
-            applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE;
+            applicationRestriction.uniteRestrictions(ApplicationRestriction.InSequentState);
         }
         if (!ctx.ANTECEDENTPOLARITY().isEmpty()) {
-            applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY;
+            applicationRestriction.uniteRestrictions(ApplicationRestriction.AntecedentPolarity);
         }
         if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
-            applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
+            applicationRestriction.uniteRestrictions(ApplicationRestriction.SuccedentPolarity);
         }
         @Nullable
         Object find = accept(ctx.find);
@@ -444,9 +443,10 @@ public class TacletPBuilder extends ExpressionBuilder {
         } else {
             if (b instanceof NoFindTacletBuilder) {
                 // there is a replacewith without a find.
-                throwEx(new RecognitionException(""));
+                //TODO ask what Exception to throw here
+//                throwEx(new RecognitionException(""));
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
-                if (rwObj instanceof de.uka.ilkd.key.logic.Sequent) {
+                if (rwObj instanceof Sequent) {
                     gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, (Sequent) rwObj, pvs);
                 } else {
                     semanticError(ctx, // new UnfittingReplacewithException

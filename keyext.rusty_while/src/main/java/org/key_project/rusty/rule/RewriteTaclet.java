@@ -56,7 +56,8 @@ public class RewriteTaclet extends FindTaclet {
          */
         SuccedentPolarity(8);
 
-        private final int value;
+        // TODO ask: This was final before but we need to change the value
+        private int value;
 
         ApplicationRestriction(int value) {
             this.value = value;
@@ -70,7 +71,11 @@ public class RewriteTaclet extends FindTaclet {
             return (getValue() & o.getValue()) != 0;
         }
 
-        // TODO ask:
+        // This is necessary for a passage in TacletPBuilder
+        // Might work, but does not seem reasonable with an enum
+        public void uniteRestrictions(ApplicationRestriction restriction) {
+            this.value |= restriction.getValue();
+        }
     }
 
     /**
