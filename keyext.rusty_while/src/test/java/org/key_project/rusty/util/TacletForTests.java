@@ -23,7 +23,7 @@ public class TacletForTests {
     public static String standardFile = testRules;
 
     public static NamespaceSet nss = new NamespaceSet();
-    // public static TacletIndex rules = null;
+//    public static TacletIndex rules = null;
     public static Services services;
     public static InitConfig initConfig;
     public static File lastFile = null;
@@ -64,7 +64,7 @@ public class TacletForTests {
                 // rules = initConfig.createTacletIndex();
                 services = initConfig.getServices();
                 lastFile = file;
-                // variables = envInput.variables();
+//                 variables = envInput.variables();
                 // schemaVariables = envInput.schemaVariables();
             }
         } catch (Exception e) {

@@ -60,6 +60,38 @@ public class AbstractBuilder<T> extends KeYRustyParserBaseVisitor<T> {
         return accept(seq.iterator().next());
     }
 
+    // ask about parameterization
+    protected <T> T pop() {
+        if (parameters == null) {
+            throw new IllegalStateException("Stack is empty");
+        }
+        return (T) parameters.pop();
+    }
+
+    protected void push(Object... obj) {
+        if (parameters == null) {
+            parameters = new Stack<>();
+        }
+        for (Object a : obj) {
+            parameters.push(a);
+        }
+    }
+
+    protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
+        if (parameters == null) {
+            parameters = new Stack<>();
+        }
+        int stackSize = parameters.size();
+        push(args);
+        T t = accept(ctx);
+        // Stack hygiene
+        while (parameters.size() > stackSize) {
+            parameters.pop();
+        }
+        return t;
+    }
+
+    // TODO ask about generics; should this be parameterized?
     protected <S> S oneOf(ParserRuleContext... ctxs) {
         for (ParserRuleContext ctx : ctxs) {
             if (ctx != null) {
@@ -106,5 +138,14 @@ public class AbstractBuilder<T> extends KeYRustyParserBaseVisitor<T> {
      */
     protected void semanticError(ParserRuleContext ctx, String format, Object... args) {
         throw new BuildingException(ctx, String.format(format, args));
+    }
+
+    /**
+     * Wraps an exception into a {@link BuildingException}
+     *
+     * @param e
+     */
+    protected void throwEx(Throwable e) {
+        throw new BuildingException(e);
     }
 }

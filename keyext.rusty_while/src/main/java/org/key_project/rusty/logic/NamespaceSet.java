@@ -10,12 +10,14 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.op.ProgramVariable;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.rule.RuleSet;
 
 public class NamespaceSet {
     private Namespace<@NonNull QuantifiableVariable> varNS = new Namespace<>();
     private Namespace<@NonNull ProgramVariable> progVarNS = new Namespace<>();
     // TODO: Operators should not be local to goals
     private Namespace<@NonNull Function> funcNS = new Namespace<>();
+    private Namespace<@NonNull RuleSet> ruleSetNS = new Namespace<RuleSet>();
     private Namespace<@NonNull Sort> sortNS = new Namespace<>();
 
     public NamespaceSet() {}
@@ -53,6 +55,14 @@ public class NamespaceSet {
         this.funcNS = funcNS;
     }
 
+    public Namespace<@NonNull RuleSet> ruleSets() {
+        return ruleSetNS;
+    }
+
+    public void setRuleSets(Namespace<@NonNull RuleSet> ruleSetNS) {
+        this.ruleSetNS = ruleSetNS;
+    }
+
     public Namespace<@NonNull Sort> sorts() {
         return sortNS;
     }
@@ -65,6 +75,7 @@ public class NamespaceSet {
         variables().add(ns.variables());
         programVariables().add(ns.programVariables());
         sorts().add(ns.sorts());
+        ruleSets().add(ns.ruleSets());
         functions().add(ns.functions());
     }
 

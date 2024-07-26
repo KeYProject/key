@@ -206,7 +206,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     public abstract T getTaclet();
 
-    private static class TacletBuilderException extends IllegalArgumentException {
+    public static class TacletBuilderException extends IllegalArgumentException {
         private final Name tacletName;
         private final String errorMessage;
 

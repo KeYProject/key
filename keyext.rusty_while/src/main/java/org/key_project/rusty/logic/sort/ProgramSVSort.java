@@ -44,6 +44,10 @@ public abstract class ProgramSVSort extends SortImpl {
 
     public abstract boolean canStandFor(RustyProgramElement check, Services services);
 
+    public ProgramSVSort createInstance(String parameter) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * TODO: <a href=
      * "https://doc.rust-lang.org/reference/expressions.html#place-expressions-and-value-expressions">Follow
@@ -195,5 +199,9 @@ public abstract class ProgramSVSort extends SortImpl {
             // TODO
             return false;
         }
+    }
+
+    public static Map<Name, ProgramSVSort> name2sort() {
+        return NAME2SORT;
     }
 }
