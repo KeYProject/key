@@ -45,4 +45,16 @@ public class Node {
         this(proof, seq);
         this.parent = parent;
     }
+
+    /**
+     * sets the sequent at this node
+     */
+    public void setSequent(Sequent seq) {
+        this.seq = seq;
+    }
+
+    /** returns the sequent of this node */
+    public Sequent sequent() {
+        return seq;
+    }
 }

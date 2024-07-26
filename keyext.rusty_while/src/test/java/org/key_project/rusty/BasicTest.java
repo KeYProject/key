@@ -68,6 +68,9 @@ public class BasicTest {
         Sequent s = Sequent.createSuccSequent(succ);
         Proof p = new Proof("FirstProof", TacletForTests.initConfig());
         p.setRoot(new Node(p, s));
+
+        p.getRoot().sequent().succedent().getFirst().formula();
+        // continue manual proof like for example in TestApplyTaclet
     }
 
     @Test
