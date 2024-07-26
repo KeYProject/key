@@ -21,9 +21,9 @@ import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.KeYRustyParser;
+import org.key_project.rusty.rule.RuleSet;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.rule.RuleSet;
 
 public class DefaultBuilder extends AbstractBuilder<Object> {
     protected final Services services;

@@ -15,6 +15,7 @@ import org.key_project.rusty.ast.expr.ArithLogicalExpression;
 import org.key_project.rusty.ast.expr.LiteralExpression;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class LDT implements Named {
     private final Name name;
@@ -90,4 +91,26 @@ public abstract class LDT implements Named {
 
     public abstract boolean isResponsible(ArithLogicalExpression.Operator op, Term left, Term right,
             Services services);
+
+    public Sort targetSort() {
+        return sort;
+    }
+
+    /**
+     * get the function in this LDT for an operation identified by generic operationName. If the LDT
+     * does not support this named function, it should return null.
+     *
+     * This is used to resolve overloaded symbols.
+     *
+     * For example: "+" may map to "add" for integers, and to "addFloat" for floats.
+     *
+     * @param operationName non-null operationName for a generic function
+     * @param services services to use
+     * @return reference to the respective LDT-specific function for the operation, null if not
+     *         available
+     */
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
+        // by default an LDT does not support overloaded symbols
+        return null;
+    }
 }

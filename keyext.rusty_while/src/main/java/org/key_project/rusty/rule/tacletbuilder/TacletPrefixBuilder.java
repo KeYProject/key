@@ -1,16 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
 
+import java.util.Iterator;
+
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.*;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.rule.*;
 import org.key_project.util.collection.*;
-
-import java.util.Iterator;
 
 
 public class TacletPrefixBuilder {
@@ -18,11 +21,11 @@ public class TacletPrefixBuilder {
      * set of all schemavariables that are only allowed to be matched with quantifiable variables.
      */
     private ImmutableSet<SchemaVariable> currentlyBoundVars =
-            DefaultImmutableSet.nil();
+        DefaultImmutableSet.nil();
     private final TacletBuilder<? extends Taclet> tacletBuilder;
 
     protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
-            DefaultImmutableMap.nilMap();
+        DefaultImmutableMap.nilMap();
 
     public TacletPrefixBuilder(TacletBuilder<? extends Taclet> tacletBuilder) {
         this.tacletBuilder = tacletBuilder;
@@ -39,7 +42,7 @@ public class TacletPrefixBuilder {
     }
 
     private void setPrefixOfOccurrence(SchemaVariable sv,
-                                       ImmutableSet<SchemaVariable> relevantBoundVars) {
+            ImmutableSet<SchemaVariable> relevantBoundVars) {
         prefixMap = prefixMap.put(sv, new TacletPrefix(relevantBoundVars, false));
     }
 
@@ -71,8 +74,9 @@ public class TacletPrefixBuilder {
                 if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
                     setPrefixOfOccurrence(sv, relevantBoundVars);
                 } else {
-                    throw new TacletPrefixBuilder.InvalidPrefixException(tacletBuilder.getName().toString(), sv, prefix,
-                            relevantBoundVars);
+                    throw new TacletPrefixBuilder.InvalidPrefixException(
+                        tacletBuilder.getName().toString(), sv, prefix,
+                        relevantBoundVars);
                 }
             }
         }
@@ -83,20 +87,22 @@ public class TacletPrefixBuilder {
             currentlyBoundVars = oldBounds;
         }
 
-//        if (t.hasLabels()) {
-//            for (TermLabel l : t.getLabels()) {
-//                if (l instanceof SchemaVariable sv) {
-//                    ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
-//                    TacletPrefix prefix = prefixMap.get(sv);
-//                    if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
-//                        setPrefixOfOccurrence(sv, relevantBoundVars);
-//                    } else {
-//                        throw new de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder.InvalidPrefixException(tacletBuilder.getName().toString(), sv,
-//                                prefix, relevantBoundVars);
-//                    }
-//                }
-//            }
-//        }
+        // if (t.hasLabels()) {
+        // for (TermLabel l : t.getLabels()) {
+        // if (l instanceof SchemaVariable sv) {
+        // ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
+        // TacletPrefix prefix = prefixMap.get(sv);
+        // if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
+        // setPrefixOfOccurrence(sv, relevantBoundVars);
+        // } else {
+        // throw new
+        // de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder.InvalidPrefixException(tacletBuilder.getName().toString(),
+        // sv,
+        // prefix, relevantBoundVars);
+        // }
+        // }
+        // }
+        // }
     }
 
     private void visit(Sequent s) {
@@ -139,8 +145,9 @@ public class TacletPrefixBuilder {
             final TacletPrefix addRulePrefix = addRuleSV2PrefixMap.get(entry.key());
 
             if (addRulePrefix != null && !addRulePrefix.prefix().equals(entry.value().prefix())) {
-                throw new TacletPrefixBuilder.InvalidPrefixException(tacletBuilder.getName().toString(), entry.key(),
-                        entry.value(), addRulePrefix.prefix());
+                throw new TacletPrefixBuilder.InvalidPrefixException(
+                    tacletBuilder.getName().toString(), entry.key(),
+                    entry.value(), addRulePrefix.prefix());
             }
         }
 
@@ -157,7 +164,7 @@ public class TacletPrefixBuilder {
     private boolean atMostOneRepl() {
         @SuppressWarnings("unchecked")
         RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder =
-                (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
+            (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
         int count = 0;
         for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
             if (tmpl instanceof RewriteTacletGoalTemplate rtgt) {
@@ -175,7 +182,7 @@ public class TacletPrefixBuilder {
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
         @SuppressWarnings("unchecked")
         RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder =
-                (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
+            (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
         TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
         svc.visit(rwtacletBuilder.ifSequent());
         for (TacletGoalTemplate tacletGoalTemplate : rwtacletBuilder.goalTemplates()) {
@@ -212,11 +219,11 @@ public class TacletPrefixBuilder {
         private static final long serialVersionUID = 5855187579027274363L;
 
         InvalidPrefixException(String tacletName, SchemaVariable sv, TacletPrefix prefix,
-                               ImmutableSet<SchemaVariable> sndPrefixVar) {
+                ImmutableSet<SchemaVariable> sndPrefixVar) {
             super("Schema variable " + sv + "occurs at different places " + "in taclet "
-                    + tacletName + " with different prefixes.\n" + "Prefix P1:"
-                    + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix())
-                    + "\n" + "Prefix P2:" + sndPrefixVar);
+                + tacletName + " with different prefixes.\n" + "Prefix P1:"
+                + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix())
+                + "\n" + "Prefix P2:" + sndPrefixVar);
         }
 
     }

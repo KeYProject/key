@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
 
@@ -19,10 +22,10 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         NoFindTaclet t = new NoFindTaclet(this.name,
-                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
-                        variableConditions),
-                goals, attrs, prefixBuilder.getPrefixMap(), tacletAnnotations);
-//        t.setOrigin(origin);
+            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                variableConditions),
+            goals, attrs, prefixBuilder.getPrefixMap(), tacletAnnotations);
+        // t.setOrigin(origin);
         return t;
     }
 
@@ -46,7 +49,8 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
     protected void checkBoundInIfAndFind() {
         final BoundUniquenessChecker ch = new BoundUniquenessChecker(ifSequent());
         if (!ch.correct()) {
-            throw new TacletBuilder.TacletBuilderException(this, "A bound SchemaVariable occurs twice in if.");
+            throw new TacletBuilder.TacletBuilderException(this,
+                "A bound SchemaVariable occurs twice in if.");
         }
     }
 

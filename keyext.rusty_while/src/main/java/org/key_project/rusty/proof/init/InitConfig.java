@@ -4,6 +4,10 @@
 package org.key_project.rusty.proof.init;
 
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -20,9 +24,6 @@ import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import org.jspecify.annotations.NonNull;
 
 public class InitConfig {
@@ -151,9 +152,9 @@ public class InitConfig {
     /**
      * returns the heuristics namespace of this initial configuration
      */
-     public Namespace<RuleSet> ruleSetNS() {
+    public Namespace<RuleSet> ruleSetNS() {
         return namespaces().ruleSets();
-     }
+    }
 
 
     /**

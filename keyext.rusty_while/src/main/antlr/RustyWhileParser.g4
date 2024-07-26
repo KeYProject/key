@@ -4,7 +4,7 @@ parser grammar RustyWhileParser;
 options { tokenVocab = RustyWhileLexer; }
 @ header
 {
-    package org.key_project.rusty.parsing;
+package org.key_project.rusty.parsing;
 }
 crate
    : item* EOF

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-
 import org.key_project.logic.Name;
 import org.key_project.rusty.parser.KeYAst;
 import org.key_project.rusty.parser.KeYIO;
@@ -318,7 +317,7 @@ public class KeYFile implements EnvInput {
     public List<BuildingIssue> readRules() {
         KeYAst.File ctx = getParseContext();
         TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),
-                initConfig.namespaces(), initConfig.getTaclet2Builder());
+            initConfig.namespaces(), initConfig.getTaclet2Builder());
         ctx.accept(visitor);
         List<Taclet> taclets = visitor.getTopLevelTaclets();
         initConfig.addTaclets(taclets);

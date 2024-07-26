@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op.sv;
 
 
@@ -47,7 +50,7 @@ public class SchemaVariableFactory {
      * @return the SchemaVariable
      */
     public static ModalOperatorSV createModalOperatorSV(Name name, Sort sort,
-                                                                                 ImmutableSet<Modality.RustyModalityKind> modalityKinds) {
+            ImmutableSet<Modality.RustyModalityKind> modalityKinds) {
         return new ModalOperatorSV(name, modalityKinds);
     }
 
@@ -83,7 +86,7 @@ public class SchemaVariableFactory {
      * creates a SchemaVariable representing a program construct
      */
     public static ProgramSV createProgramSV(Name name, ProgramSVSort s,
-                                                                     boolean listSV) {
+            boolean listSV) {
         return new ProgramSV(name, s, listSV);
     }
 

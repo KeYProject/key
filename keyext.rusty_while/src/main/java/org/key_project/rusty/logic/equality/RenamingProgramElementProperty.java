@@ -1,34 +1,39 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.equality;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.logic.NameAbstractionTable;
-import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.ProgramVariable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class RenamingProgramElementProperty implements Property<RustyProgramElement> {
     /**
      * The single instance of this property.
      */
     public static final RenamingProgramElementProperty RENAMING_PROGRAM_ELEMENT_PROPERTY =
-            new RenamingProgramElementProperty();
+        new RenamingProgramElementProperty();
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
      * can be accessed
-     * through {@link RenamingProgramElementProperty#RENAMING_PROGRAM_ELEMENT_PROPERTY} and is used as
+     * through {@link RenamingProgramElementProperty#RENAMING_PROGRAM_ELEMENT_PROPERTY} and is used
+     * as
      * a parameter for
      * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private RenamingProgramElementProperty() {}
 
     /**
-     * Checks if {@code rpe2} is a source element syntactically equal to {@code rpe1} modulo renaming.
+     * Checks if {@code rpe2} is a source element syntactically equal to {@code rpe1} modulo
+     * renaming.
      * <p>
      * When this method is supplied with a {@link NameAbstractionTable}, it will use this table to
      * compare the abstract names of the source elements. If no {@link NameAbstractionTable} is
@@ -42,7 +47,8 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      * @param <V> is supposed to be {@link NameAbstractionTable} for this equality check
      */
     @Override
-    public <V> boolean equalsModThisProperty(RustyProgramElement rpe1, RustyProgramElement rpe2, V... v) {
+    public <V> boolean equalsModThisProperty(RustyProgramElement rpe1, RustyProgramElement rpe2,
+            V... v) {
         NameAbstractionTable nat;
         if (v.length > 0 && (v[0] instanceof NameAbstractionTable n)) {
             nat = n;
@@ -69,7 +75,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
                 }
             } else if (next1.getChildCount() > 0) {
                 if (!handleRustyNonTerminalProgramElement(next1,
-                        next2)) {
+                    next2)) {
                     return false;
                 }
             } else {
@@ -110,7 +116,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             if (next instanceof LetStatement ls) {
                 hashCode = 31 * hashCode + ls.getChildCount();
                 hashCode =
-                        31 * hashCode + 17 * ((ls.getType() == null) ? 0 : ls.getType().hashCode());
+                    31 * hashCode + 17 * ((ls.getType() == null) ? 0 : ls.getType().hashCode());
                 absMap.add(ls);
             } else if (next instanceof ProgramVariable || next instanceof Name) {
                 hashCode = 31 * hashCode + absMap.getAbstractName((RustyProgramElement) next);
@@ -137,7 +143,8 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      */
     private boolean handleStandard(SyntaxElement se1, SyntaxElement se2) {
         /*
-         * As the prior implementations of equalsModRenaming for RustyProgramElements were mostly the same
+         * As the prior implementations of equalsModRenaming for RustyProgramElements were mostly
+         * the same
          * as their normal equals methods, we decided to move equalsModRenaming completely into the
          * equals method and handle the special cases separately while walking through the tree that
          * is a RustyProgramElement.
@@ -155,9 +162,10 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      *         as {@code jnte}
      */
     private boolean handleRustyNonTerminalProgramElement(SyntaxElement rnte,
-                                                         SyntaxElement se) {
+            SyntaxElement se) {
         /*
-         * A JavaNonTerminalProgramElement is a special case of a RustyProgramElement, as we must not
+         * A JavaNonTerminalProgramElement is a special case of a RustyProgramElement, as we must
+         * not
          * traverse the children recursively through the normal equals method. This is the case
          * as we might have to add some entries of children nodes to a NameAbstractionTable so
          * that they can be compared later on by the TreeWalker.
@@ -175,14 +183,14 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      * Handles the special case of comparing a {@link LetStatement} to a
      * {@link SyntaxElement}.
      *
-     * @param ls  the {@link LetStatement} to be compared
-     * @param se  the {@link SyntaxElement} to be compared
+     * @param ls the {@link LetStatement} to be compared
+     * @param se the {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} the variable of {@code vs} should be added to
      * @return {@code true} iff {@code se} is of the same class as {@code vs} and has the same
-     * number of children, dimensions and type
+     *         number of children, dimensions and type
      */
     private boolean handleLetStatement(LetStatement ls, SyntaxElement se,
-                                       NameAbstractionTable nat) {
+            NameAbstractionTable nat) {
         /*
          * A VariableSpecification is a special case of a JavaNonTerminalProgramElement similar to
          * LabeledStatement, but we also need to check the dimensions and type of the
@@ -223,9 +231,10 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      * @return {@code true} iff {@code se1} and {@code se2} have the same abstract name
      */
     private boolean handleProgramVariableOrElementName(SyntaxElement se1, SyntaxElement se2,
-                                                       NameAbstractionTable nat) {
+            NameAbstractionTable nat) {
         /*
-         * A ProgramVariable or a ProgramElementName is a special case of a RustyProgramElement and one
+         * A ProgramVariable or a ProgramElementName is a special case of a RustyProgramElement and
+         * one
          * of the main reasons for equalsModRenaming. Equality here comes down to checking the
          * abstract name of the elements in a NAT.
          */
@@ -266,14 +275,16 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
         }
 
         /**
-         * Returns the abstract name of a {@link RustyProgramElement} or {@code -1} if the element is not
+         * Returns the abstract name of a {@link RustyProgramElement} or {@code -1} if the element
+         * is not
          * in the map.
          * <p>
          * A common case for a look-up of an element that is not in the map, is a built-in datatype,
          * e.g., the {@link Name} {@code int}.
          *
          * @param element the {@link RustyProgramElement} whose abstract name should be returned
-         * @return the abstract name of the {@link RustyProgramElement} or {@code -1} if the element is
+         * @return the abstract name of the {@link RustyProgramElement} or {@code -1} if the element
+         *         is
          *         not in the map
          */
         public int getAbstractName(RustyProgramElement element) {

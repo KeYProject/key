@@ -6,11 +6,13 @@ package org.key_project.rusty.logic.op.sv;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.UpdateableOperator;
+import org.key_project.rusty.logic.ProgramConstruct;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 
 import org.jspecify.annotations.NonNull;
 
-public final class ProgramSV extends OperatorSV implements SyntaxElement, UpdateableOperator {
+public final class ProgramSV extends OperatorSV
+        implements SyntaxElement, UpdateableOperator, ProgramConstruct {
     private final boolean isListSV;
 
     /**

@@ -87,7 +87,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      *         which formulas have been added or removed
      */
     private SemisequentChangeInfo insertAndRemoveRedundancyHelper(int idx,
-                                                                  SequentFormula sequentFormula, SemisequentChangeInfo semiCI, FormulaChangeInfo fci) {
+            SequentFormula sequentFormula, SemisequentChangeInfo semiCI, FormulaChangeInfo fci) {
 
         // Search for equivalent formulas and weakest constraint
         ImmutableList<SequentFormula> searchList = semiCI.getFormulaList();
@@ -101,7 +101,8 @@ public class Semisequent implements Iterable<SequentFormula> {
             searchList = searchList.tail();
 
             if (sequentFormula != null
-                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(cf.formula(), sequentFormula.formula())) {
+                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(cf.formula(),
+                        sequentFormula.formula())) {
                 semiCI.rejectedFormula(sequentFormula);
                 return semiCI; // semisequent already contains formula
 
@@ -143,7 +144,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     private SemisequentChangeInfo removeRedundance(int idx, SequentFormula sequentFormula) {
         return insertAndRemoveRedundancyHelper(idx, sequentFormula,
-                new SemisequentChangeInfo(seqList), null);
+            new SemisequentChangeInfo(seqList), null);
     }
 
     /**

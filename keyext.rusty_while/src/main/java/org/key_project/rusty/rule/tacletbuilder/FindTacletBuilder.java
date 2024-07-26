@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.logic.Term;
@@ -16,7 +19,7 @@ public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuil
         final BoundUniquenessChecker ch = new BoundUniquenessChecker(getFind(), ifSequent());
         if (!ch.correct()) {
             throw new TacletBuilder.TacletBuilderException(this,
-                    "A bound SchemaVariable variables occurs both " + "in assumes and find clauses.");
+                "A bound SchemaVariable variables occurs both " + "in assumes and find clauses.");
         }
     }
 

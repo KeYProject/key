@@ -1,7 +1,7 @@
 lexer grammar KeYRustyLexer;
 
 import KeYLexer;
-
-@header {
+@ header
+{
 package org.key_project.rusty.parser;
 }

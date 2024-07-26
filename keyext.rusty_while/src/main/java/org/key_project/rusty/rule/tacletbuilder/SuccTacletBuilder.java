@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
 
@@ -31,7 +34,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
         if (goal instanceof RewriteTacletGoalTemplate) {
             throw new TacletBuilder.TacletBuilderException(this,
-                    "Tried to add a RewriteTaclet" + "GoalTemplate to a Succ" + "Taclet");
+                "Tried to add a RewriteTaclet" + "GoalTemplate to a Succ" + "Taclet");
         }
         goals = goals.prepend(goal);
     }
@@ -56,10 +59,11 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         final TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         SuccTaclet t = new SuccTaclet(name,
-                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
-                        variableConditions),
-                goals, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(), tacletAnnotations);
-//        t.setOrigin(origin);
+            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                variableConditions),
+            goals, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
+            tacletAnnotations);
+        // t.setOrigin(origin);
         return t;
     }
 

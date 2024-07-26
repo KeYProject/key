@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 
 import org.jspecify.annotations.NonNull;
@@ -41,5 +42,14 @@ public class LDTs implements Iterable<LDT> {
     @Override
     public @NonNull Iterator<LDT> iterator() {
         return map.values().iterator();
+    }
+
+    public LDT getLDTFor(Sort s) {
+        for (LDT ldt : this) {
+            if (s.equals(ldt.targetSort())) {
+                return ldt;
+            }
+        }
+        return null;
     }
 }

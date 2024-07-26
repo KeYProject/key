@@ -8,9 +8,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.rule.RuleSet;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.rule.RuleSet;
 
 public class NamespaceSet {
     private Namespace<@NonNull QuantifiableVariable> varNS = new Namespace<>();

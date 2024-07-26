@@ -1,10 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.builder;
 
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import java.util.*;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
@@ -16,22 +17,24 @@ import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariableFactory;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
+import org.key_project.rusty.parser.KeYRustyParser;
 import org.key_project.rusty.parser.SchemaVariableModifierSet;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
 import org.key_project.rusty.rule.tacletbuilder.*;
-import org.key_project.rusty.parser.KeYRustyParser;
 import org.key_project.rusty.util.parsing.BuildingException;
 import org.key_project.util.collection.*;
 
-import java.util.*;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static java.text.MessageFormat.format;
 
 public class TacletPBuilder extends ExpressionBuilder {
 
     private final Deque<TacletBuilder<?>> currentTBuilder = new ArrayDeque<>(8);
-    
+
     private Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
 
     private final List<Taclet> topLevelTaclets = new ArrayList<>(2048);
@@ -39,12 +42,13 @@ public class TacletPBuilder extends ExpressionBuilder {
     // --------------------------
     // Constructors
     // --------------------------
-    
+
     public TacletPBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
     }
 
-    public TacletPBuilder(Services services, NamespaceSet nss, Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder) {
+    public TacletPBuilder(Services services, NamespaceSet nss,
+            Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder) {
         this(services, nss);
         this.taclet2Builder = taclet2Builder;
     }
@@ -63,23 +67,24 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitRulesOrAxioms(KeYRustyParser.RulesOrAxiomsContext ctx) {
-//        enableJavaSchemaMode();
-//        if (ctx.RULES() != null) {
-//            axiomMode = false;
-//        }
-//        if (ctx.AXIOMS() != null) {
-//            axiomMode = true;
-//        }
-//        ChoiceExpr choices = accept(ctx.choices);
-//        this.requiredChoices = Objects.requireNonNullElse(choices, ChoiceExpr.TRUE);
+        // enableJavaSchemaMode();
+        // if (ctx.RULES() != null) {
+        // axiomMode = false;
+        // }
+        // if (ctx.AXIOMS() != null) {
+        // axiomMode = true;
+        // }
+        // ChoiceExpr choices = accept(ctx.choices);
+        // this.requiredChoices = Objects.requireNonNullElse(choices, ChoiceExpr.TRUE);
         List<Taclet> seq = mapOf(ctx.taclet());
         topLevelTaclets.addAll(seq);
-//        disableJavaSchemaMode();
+        // disableJavaSchemaMode();
         return null;
     }
 
     @Override
-    public Object visitOne_schema_modal_op_decl(KeYRustyParser.One_schema_modal_op_declContext ctx) {
+    public Object visitOne_schema_modal_op_decl(
+            KeYRustyParser.One_schema_modal_op_declContext ctx) {
         ImmutableSet<Modality.RustyModalityKind> modalities = DefaultImmutableSet.nil();
         Sort sort = accept(ctx.sort);
         if (sort != null && sort != RustyDLTheory.FORMULA) {
@@ -92,7 +97,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             modalities = opSVHelper(s, modalities);
         }
         SchemaVariable osv =
-                SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
+            SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
         schemaVariables().add(osv);
         return osv;
     }
@@ -110,7 +115,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         b.setTrigger(new Trigger(triggerVar, t, ImmutableList.fromList(avoidConditions)));
         return null;
     }
-    
+
     @Override
     public Taclet visitTaclet(KeYRustyParser.TacletContext ctx) {
         Sequent ifSeq = Sequent.EMPTY_SEQUENT;
@@ -119,17 +124,17 @@ public class TacletPBuilder extends ExpressionBuilder {
             tacletAnnotations = tacletAnnotations.add(TacletAnnotation.LEMMA);
         }
         String name = ctx.name.getText();
-        //ChoiceExpr ch = accept(ctx.option_list());
-//        var choices = requiredChoices;
-//        if (ch != null) {
-//            choices = ChoiceExpr.and(ch, choices);
-//        }
-        
+        // ChoiceExpr ch = accept(ctx.option_list());
+        // var choices = requiredChoices;
+        // if (ch != null) {
+        // choices = ChoiceExpr.and(ch, choices);
+        // }
+
         Term form = accept(ctx.form);
         if (form != null) {
-//            if (!axiomMode) {
-//                semanticError(ctx, "formula rules are only permitted for \\axioms");
-//            }
+            // if (!axiomMode) {
+            // semanticError(ctx, "formula rules are only permitted for \\axioms");
+            // }
             TacletBuilder<?> b = createTacletBuilderFor(null, ApplicationRestriction.None, ctx);
             currentTBuilder.push(b);
             SequentFormula sform = new SequentFormula(form);
@@ -139,9 +144,9 @@ public class TacletPBuilder extends ExpressionBuilder {
             DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
             addGoalTemplate(null, null, addSeq, noTaclets, noSV, ctx);
             b.setName(new Name(name));
-//            b.setChoices(choices);
+            // b.setChoices(choices);
             b.setAnnotations(tacletAnnotations);
-//            b.setOrigin(BuilderHelpers.getPosition(ctx));
+            // b.setOrigin(BuilderHelpers.getPosition(ctx));
             Taclet r = b.getTaclet();
             registerTaclet(ctx, r);
             currentTBuilder.pop();
@@ -157,8 +162,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         // TODO ask about how this should done with the enum
-        //  does it make sense to use an enum when you change the value to something
-        //  that no enum element has initially?
+        // does it make sense to use an enum when you change the value to something
+        // that no enum element has initially?
         ApplicationRestriction applicationRestriction = ApplicationRestriction.None;
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
             applicationRestriction.uniteRestrictions(ApplicationRestriction.SameUpdateLevel);
@@ -181,9 +186,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         accept(ctx.goalspecs());
         mapOf(ctx.varexplist());
         accept(ctx.modifiers());
-//        b.setChoices(choices);
+        // b.setChoices(choices);
         b.setAnnotations(tacletAnnotations);
-//        b.setOrigin(BuilderHelpers.getPosition(ctx));
+        // b.setOrigin(BuilderHelpers.getPosition(ctx));
         try {
             Taclet r = peekTBuilder().getTaclet();
             registerTaclet(ctx, r);
@@ -204,37 +209,37 @@ public class TacletPBuilder extends ExpressionBuilder {
     private void registerTaclet(ParserRuleContext ctx, Taclet taclet) {
         taclet2Builder.put(taclet, peekTBuilder());
     }
-    
+
     private TacletBuilder<?> peekTBuilder() {
         return currentTBuilder.peek();
     }
 
-//    @Override
-//    public Object visitDatatype_decl(KeYRustyParser.Datatype_declContext ctx) {
-//        var tbAx = createAxiomTaclet(ctx);
-//        registerTaclet(ctx, tbAx);
-//
-//        var tbInd = createInductionTaclet(ctx);
-//        registerTaclet(ctx, tbInd);
-//
-//        var tbSplit = createConstructorSplit(ctx);
-//        registerTaclet(ctx, tbSplit);
-//
-//        Sort dtSort = namespaces().sorts().lookup(ctx.name.getText());
-//        for (var constructor : ctx.datatype_constructor()) {
-//            for (int i = 0; i < constructor.sortId().size(); i++) {
-//                var argName = constructor.argName.get(i).getText();
-//
-//                var tbDeconstructor = createDeconstructorTaclet(constructor, argName, i);
-//                registerTaclet(ctx, tbDeconstructor);
-//
-//                var tbDeconsEq = createDeconstructorEQTaclet(constructor, argName, i, dtSort);
-//                registerTaclet(ctx, tbDeconsEq);
-//            }
-//        }
-//
-//        return null;
-//    }
+    // @Override
+    // public Object visitDatatype_decl(KeYRustyParser.Datatype_declContext ctx) {
+    // var tbAx = createAxiomTaclet(ctx);
+    // registerTaclet(ctx, tbAx);
+    //
+    // var tbInd = createInductionTaclet(ctx);
+    // registerTaclet(ctx, tbInd);
+    //
+    // var tbSplit = createConstructorSplit(ctx);
+    // registerTaclet(ctx, tbSplit);
+    //
+    // Sort dtSort = namespaces().sorts().lookup(ctx.name.getText());
+    // for (var constructor : ctx.datatype_constructor()) {
+    // for (int i = 0; i < constructor.sortId().size(); i++) {
+    // var argName = constructor.argName.get(i).getText();
+    //
+    // var tbDeconstructor = createDeconstructorTaclet(constructor, argName, i);
+    // registerTaclet(ctx, tbDeconstructor);
+    //
+    // var tbDeconsEq = createDeconstructorEQTaclet(constructor, argName, i, dtSort);
+    // registerTaclet(ctx, tbDeconsEq);
+    // }
+    // }
+    //
+    // return null;
+    // }
 
     // ------------------------------------------------------------------------------------------
     // here we skip everything from createDeconstructorTaclet(...) to createConstructorSplit(...)
@@ -246,89 +251,89 @@ public class TacletPBuilder extends ExpressionBuilder {
         TacletBuilder<?> b = peekTBuilder();
         List<RuleSet> rs = accept(ctx.rs);
         // TODO uncomment this when rulesets are added
-//        if (!ctx.NONINTERACTIVE().isEmpty()) {
-//            b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable")));
-//        }
-//
-//        if (rs != null) {
-//            rs.forEach(b::addRuleSet);
-//        }
+        // if (!ctx.NONINTERACTIVE().isEmpty()) {
+        // b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable")));
+        // }
+        //
+        // if (rs != null) {
+        // rs.forEach(b::addRuleSet);
+        // }
 
         if (ctx.DISPLAYNAME() != null) {// last entry
             b.setDisplayName(accept(ctx.dname));
         }
 
-//        if (ctx.HELPTEXT() != null) { // last entry
-//            b.setHelpText(accept(ctx.htext));
-//        }
+        // if (ctx.HELPTEXT() != null) { // last entry
+        // b.setHelpText(accept(ctx.htext));
+        // }
 
         mapOf(ctx.triggers());
         return null;
     }
 
-//    @Override
-//    public Object visitVarexplist(KeYRustyParser.VarexplistContext ctx) {
-//        return mapOf(ctx.varexp());
-//    }
-//
-//    @Override
-//    public Object visitVarexp(KeYRustyParser.VarexpContext ctx) {
-//        boolean negated = ctx.NOT_() != null;
-//        String name = ctx.varexpId().getText();
-//        List<KeYRustyParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
-//        List<TacletBuilderCommand> suitableManipulators =
-//                TacletBuilderManipulators.getConditionBuildersFor(name);
-//        List<String> parameters =
-//                ctx.parameter.stream().map(Token::getText).collect(Collectors.toList());
-//        boolean applied = false;
-//        Object[] argCache = new Object[arguments.size()];
-//        for (TacletBuilderCommand manipulator : suitableManipulators) {
-//            if (applyManipulator(negated, argCache, manipulator, arguments, parameters)) {
-//                applied = true;
-//                break;
-//            }
-//        }
-//        if (!applied) {
-//            semanticError(ctx, "Could not apply the given variable condition: %s", ctx.getText());
-//        }
-//        return null;
-//    }
-//
-//    private boolean applyManipulator(boolean negated, Object[] args,
-//                                     TacletBuilderCommand manipulator, List<KeYRustyParser.Varexp_argumentContext> arguments,
-//                                     List<String> parameters) {
-//        assert args.length == arguments.size();
-//        ArgumentType[] types = manipulator.getArgumentTypes();
-//
-//        if (types.length != arguments.size()) {
-//            return false;
-//        }
-//        try {
-//            for (int i = 0; i < arguments.size(); i++) {
-//                args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
-//            }
-//            manipulator.apply(peekTBuilder(), args, parameters, negated);
-//            return true;
-//        } catch (Throwable e) {
-//            return false;
-//        }
-//    }
-//
-//    private Object evaluateVarcondArgument(ArgumentType expectedType, Object prevValue,
-//                                           KeYRustyParser.Varexp_argumentContext ctx) {
-//        if (prevValue != null && expectedType.clazz.isAssignableFrom(prevValue.getClass())) {
-//            return prevValue; // previous value is of suitable type, we do not re-evaluate
-//        }
-//
-//        return switch (expectedType) {
-//            case TYPE_RESOLVER -> buildTypeResolver(ctx);
-//            case SORT -> visitSortId(ctx.term().getText(), ctx.term());
-//            case JAVA_TYPE -> getOrCreateJavaType(ctx.term().getText(), ctx);
-//            case VARIABLE -> varId(ctx, ctx.getText());
-//            case STRING -> ctx.getText();
-//            case TERM -> accept(ctx.term());
-//        };
-//    }
+    // @Override
+    // public Object visitVarexplist(KeYRustyParser.VarexplistContext ctx) {
+    // return mapOf(ctx.varexp());
+    // }
+    //
+    // @Override
+    // public Object visitVarexp(KeYRustyParser.VarexpContext ctx) {
+    // boolean negated = ctx.NOT_() != null;
+    // String name = ctx.varexpId().getText();
+    // List<KeYRustyParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
+    // List<TacletBuilderCommand> suitableManipulators =
+    // TacletBuilderManipulators.getConditionBuildersFor(name);
+    // List<String> parameters =
+    // ctx.parameter.stream().map(Token::getText).collect(Collectors.toList());
+    // boolean applied = false;
+    // Object[] argCache = new Object[arguments.size()];
+    // for (TacletBuilderCommand manipulator : suitableManipulators) {
+    // if (applyManipulator(negated, argCache, manipulator, arguments, parameters)) {
+    // applied = true;
+    // break;
+    // }
+    // }
+    // if (!applied) {
+    // semanticError(ctx, "Could not apply the given variable condition: %s", ctx.getText());
+    // }
+    // return null;
+    // }
+    //
+    // private boolean applyManipulator(boolean negated, Object[] args,
+    // TacletBuilderCommand manipulator, List<KeYRustyParser.Varexp_argumentContext> arguments,
+    // List<String> parameters) {
+    // assert args.length == arguments.size();
+    // ArgumentType[] types = manipulator.getArgumentTypes();
+    //
+    // if (types.length != arguments.size()) {
+    // return false;
+    // }
+    // try {
+    // for (int i = 0; i < arguments.size(); i++) {
+    // args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
+    // }
+    // manipulator.apply(peekTBuilder(), args, parameters, negated);
+    // return true;
+    // } catch (Throwable e) {
+    // return false;
+    // }
+    // }
+    //
+    // private Object evaluateVarcondArgument(ArgumentType expectedType, Object prevValue,
+    // KeYRustyParser.Varexp_argumentContext ctx) {
+    // if (prevValue != null && expectedType.clazz.isAssignableFrom(prevValue.getClass())) {
+    // return prevValue; // previous value is of suitable type, we do not re-evaluate
+    // }
+    //
+    // return switch (expectedType) {
+    // case TYPE_RESOLVER -> buildTypeResolver(ctx);
+    // case SORT -> visitSortId(ctx.term().getText(), ctx.term());
+    // case JAVA_TYPE -> getOrCreateJavaType(ctx.term().getText(), ctx);
+    // case VARIABLE -> varId(ctx, ctx.getText());
+    // case STRING -> ctx.getText();
+    // case TERM -> accept(ctx.term());
+    // };
+    // }
 
 
     // ---------------------------------------------------------------------------
@@ -346,7 +351,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitGoalspec(KeYRustyParser.GoalspecContext ctx) {
-//        var soc = this.goalChoice;
+        // var soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
         Sequent addSeq = Sequent.EMPTY_SEQUENT;
@@ -395,9 +400,10 @@ public class TacletPBuilder extends ExpressionBuilder {
         List<Taclet> taclets = mapOf(ctx.taclet());
         return ImmutableList.fromList(taclets);
     }
-    
-    
-    private @NonNull TacletBuilder<?> createTacletBuilderFor(Object find, RewriteTaclet.ApplicationRestriction applicationRestriction, ParserRuleContext ctx) {
+
+
+    private @NonNull TacletBuilder<?> createTacletBuilderFor(Object find,
+            RewriteTaclet.ApplicationRestriction applicationRestriction, ParserRuleContext ctx) {
         if (find == null) {
             return new NoFindTacletBuilder();
         } else if (find instanceof Term) {
@@ -411,14 +417,14 @@ public class TacletPBuilder extends ExpressionBuilder {
                 AntecTacletBuilder b = new AntecTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
-                        !applicationRestriction.matches(ApplicationRestriction.InSequentState));
+                    !applicationRestriction.matches(ApplicationRestriction.InSequentState));
                 return b;
             } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
                 Term findFma = findSeq.succedent().get(0).formula();
                 SuccTacletBuilder b = new SuccTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
-                        !applicationRestriction.matches(ApplicationRestriction.InSequentState));
+                    !applicationRestriction.matches(ApplicationRestriction.InSequentState));
                 return b;
             } else {
                 semanticError(ctx, "Unknown find-sequent (perhaps null?):" + findSeq);
@@ -428,13 +434,13 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         throw new IllegalArgumentException(
-                format("Could not find a suitable TacletBuilder for {0}", find));
+            format("Could not find a suitable TacletBuilder for {0}", find));
     }
 
     private void addGoalTemplate(String id, Object rwObj, Sequent addSeq,
-                                 ImmutableList<Taclet> addRList, ImmutableSet<SchemaVariable> pvs,
-                                 //@Nullable ChoiceExpr soc, 
-                                 ParserRuleContext ctx) {
+            ImmutableList<Taclet> addRList, ImmutableSet<SchemaVariable> pvs,
+            // @Nullable ChoiceExpr soc,
+            ParserRuleContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         TacletGoalTemplate gt = null;
         if (rwObj == null) {
@@ -443,15 +449,15 @@ public class TacletPBuilder extends ExpressionBuilder {
         } else {
             if (b instanceof NoFindTacletBuilder) {
                 // there is a replacewith without a find.
-                //TODO ask what Exception to throw here
-//                throwEx(new RecognitionException(""));
+                // TODO ask what Exception to throw here
+                // throwEx(new RecognitionException(""));
                 throw new RuntimeException("TODO what is a RecognitionException used for");
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
                 if (rwObj instanceof Sequent) {
                     gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, (Sequent) rwObj, pvs);
                 } else {
                     semanticError(ctx, // new UnfittingReplacewithException
-                            "Replacewith in a Antec-or SuccTaclet has to contain a sequent (not a term)");
+                        "Replacewith in a Antec-or SuccTaclet has to contain a sequent (not a term)");
 
                 }
             } else if (b instanceof RewriteTacletBuilder) {
@@ -460,19 +466,19 @@ public class TacletPBuilder extends ExpressionBuilder {
                 } else {
                     // throwEx(/new UnfittingReplacewithException
                     semanticError(ctx,
-                            "Replacewith in a RewriteTaclet has to contain a term (not a sequent)");
+                        "Replacewith in a RewriteTaclet has to contain a term (not a sequent)");
                 }
             }
         }
         if (gt == null) {
             throw new NullPointerException(
-                    "Could not find a suitable goal template builder for: " + b.getClass());
+                "Could not find a suitable goal template builder for: " + b.getClass());
         }
         gt.setName(id);
         b.addTacletGoalTemplate(gt);
-//        if (soc != null) {
-//            b.addGoal2ChoicesMapping(gt, soc);
-//        }
+        // if (soc != null) {
+        // b.addGoal2ChoicesMapping(gt, soc);
+        // }
     }
 
     @Override
@@ -564,7 +570,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         for (String id : Objects.requireNonNull(ids)) {
             declareSchemaVariable(ctx, id, s, makeVariableSV, makeSkolemTermSV, makeTermLabelSV,
-                    mods);
+                mods);
         }
         return null;
     }
@@ -576,7 +582,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         for (String id : ids) {
             if (!mods.addModifier(id)) {
                 semanticError(ctx,
-                        "Illegal or unknown modifier in declaration of schema variable: %s", id);
+                    "Illegal or unknown modifier in declaration of schema variable: %s", id);
             }
         }
         return null;
@@ -588,7 +594,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     protected OperatorSV declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
-                                                                        boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV, SchemaVariableModifierSet mods) {
+            boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
+            SchemaVariableModifierSet mods) {
         OperatorSV v;
         if (s == RustyDLTheory.FORMULA && !makeSkolemTermSV) {
             v = SchemaVariableFactory.createFormulaSV(new Name(name), mods.rigid());
@@ -596,31 +603,31 @@ public class TacletPBuilder extends ExpressionBuilder {
             v = SchemaVariableFactory.createUpdateSV(new Name(name));
         } else if (s instanceof ProgramSVSort) {
             v = SchemaVariableFactory.createProgramSV(new Name(name),
-                    (ProgramSVSort) s, mods.list());
+                (ProgramSVSort) s, mods.list());
         } else {
             if (makeVariableSV) {
                 v = SchemaVariableFactory.createVariableSV(new Name(name), s);
             } else if (makeSkolemTermSV) {
                 v = SchemaVariableFactory.createSkolemTermSV(new Name(name), s);
-//            } else if (makeTermLabelSV) {
-//                v = SchemaVariableFactory.createTermLabelSV(new Name(name));
+                // } else if (makeTermLabelSV) {
+                // v = SchemaVariableFactory.createTermLabelSV(new Name(name));
             } else {
                 v = SchemaVariableFactory.createTermSV(new Name(name), s, mods.rigid(),
-                        mods.strict());
+                    mods.strict());
             }
         }
 
         if (variables().lookup(v.name()) != null) {
             semanticError(null, "Schema variables shadows previous declared variable: %s.",
-                    v.name());
+                v.name());
         }
 
         if (schemaVariables().lookup(v.name()) != null) {
             OperatorSV old = (OperatorSV) schemaVariables().lookup(v.name());
             if (!old.sort().equals(v.sort())) {
                 semanticError(null,
-                        "Schema variables clashes with previous declared schema variable: %s.",
-                        v.name());
+                    "Schema variables clashes with previous declared schema variable: %s.",
+                    v.name());
             }
         }
         schemaVariables().add(v);

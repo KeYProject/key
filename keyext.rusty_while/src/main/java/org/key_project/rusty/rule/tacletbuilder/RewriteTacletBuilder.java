@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
 
@@ -16,13 +19,15 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      * <li>{@link ApplicationRestriction#SameUpdateLevel} then <code>\assumes</code> must match on a
      * formula within the same state as <code>\find</code> rsp. <code>\add</code>. For efficiency no
      * modalities are allowed above the <code>\find</code> position</li>
-     * <li>{@link ApplicationRestriction#InSequentState} the <code>\find</code> part is only allowed to
+     * <li>{@link ApplicationRestriction#InSequentState} the <code>\find</code> part is only allowed
+     * to
      * match on formulas which are evaluated in the same state as the sequent</li>
      * </ul>
      */
     protected ApplicationRestriction applicationRestriction;
 
-    public RewriteTacletBuilder<T> setApplicationRestriction(ApplicationRestriction p_applicationRestriction) {
+    public RewriteTacletBuilder<T> setApplicationRestriction(
+            ApplicationRestriction p_applicationRestriction) {
         applicationRestriction = p_applicationRestriction;
         return this;
     }
@@ -66,10 +71,11 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         RewriteTaclet t = new RewriteTaclet(name,
-                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
-                        variableConditions),
-                goals, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction, surviveSmbExec, tacletAnnotations);
-//        t.setOrigin(origin);
+            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                variableConditions),
+            goals, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
+            surviveSmbExec, tacletAnnotations);
+        // t.setOrigin(origin);
         return (T) t;
     }
 
@@ -82,7 +88,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
         if (goal instanceof AntecSuccTacletGoalTemplate) {
             throw new IllegalArgumentException(
-                    "Tried to add a AntecSucc" + "GoalTemplate to a Rewrite" + "Taclet");
+                "Tried to add a AntecSucc" + "GoalTemplate to a Rewrite" + "Taclet");
         }
 
         goals = goals.prepend(goal);

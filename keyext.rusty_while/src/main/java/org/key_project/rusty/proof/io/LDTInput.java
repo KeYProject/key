@@ -93,9 +93,9 @@ public class LDTInput implements EnvInput {
         initConfig.getServices().initLDTs();
 
         // TODO read rules once they are added
-         for (KeYFile keyFile : keyFiles) {
+        for (KeYFile keyFile : keyFiles) {
             keyFile.readRules();
-         }
+        }
 
         return DefaultImmutableSet.fromCollection(warnings);
     }

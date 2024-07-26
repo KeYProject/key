@@ -1,5 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -7,9 +13,6 @@ import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 
 /**
  * The bound uniqueness checker ensures that schemavariables can be bound at most once in the
@@ -22,7 +25,7 @@ import java.util.LinkedHashSet;
 public class BoundUniquenessChecker {
 
     private final HashSet<QuantifiableVariable> boundVars =
-            new LinkedHashSet<>();
+        new LinkedHashSet<>();
     private ImmutableList<Term> terms = ImmutableSLList.nil();
 
     public BoundUniquenessChecker(Sequent seq) {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.equality;
 
 import org.key_project.logic.Term;
@@ -43,7 +46,7 @@ public class RenamingTermProperty implements Property<Term> {
             return true;
         }
         return unifyHelp(term1, term2, ImmutableSLList.nil(),
-                ImmutableSLList.nil(), null);
+            ImmutableSLList.nil(), null);
     }
 
     /**
@@ -69,8 +72,8 @@ public class RenamingTermProperty implements Property<Term> {
      * @param cmpBoundVars variables bound above the current position
      */
     private static boolean compareBoundVariables(QuantifiableVariable ownVar,
-                                                 QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
-                                                 ImmutableList<QuantifiableVariable> cmpBoundVars) {
+            QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars) {
 
         final int ownNum = indexOf(ownVar, ownBoundVars);
         final int cmpNum = indexOf(cmpVar, cmpBoundVars);
@@ -112,7 +115,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @return <code>true</code> is returned iff the terms are equal modulo bound renaming
      */
     private boolean unifyHelp(Term t0, Term t1, ImmutableList<QuantifiableVariable> ownBoundVars,
-                              ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat) {
+            ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat) {
 
         if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
             return true;
@@ -166,11 +169,11 @@ public class RenamingTermProperty implements Property<Term> {
      * @return <code>true</code> iff the quantifiable variables are equal modulo renaming
      */
     private boolean handleQuantifiableVariable(Term t0, Term t1,
-                                               ImmutableList<QuantifiableVariable> ownBoundVars,
-                                               ImmutableList<QuantifiableVariable> cmpBoundVars) {
+            ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars) {
         return (t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
-                (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars);
+                    (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars);
     }
 
     /**
@@ -180,7 +183,8 @@ public class RenamingTermProperty implements Property<Term> {
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
 
     /**
-     * Checks whether the given {@link RustyBlock}s are equal modulo renaming and returns the updated
+     * Checks whether the given {@link RustyBlock}s are equal modulo renaming and returns the
+     * updated
      * {@link NameAbstractionTable} or {@link #FAILED} if the {@link RustyBlock}s are not equal.
      *
      * @param jb0 the first {@link RustyBlock} to compare
@@ -190,7 +194,7 @@ public class RenamingTermProperty implements Property<Term> {
      *         renaming or {@link #FAILED} if they are not
      */
     private static NameAbstractionTable handleRusty(RustyBlock jb0, RustyBlock jb1,
-                                                    NameAbstractionTable nat) {
+            NameAbstractionTable nat) {
         if (!jb0.isEmpty() || !jb1.isEmpty()) {
             nat = checkNat(nat);
             if (RustyBlocksNotEqualModRenaming(jb0, jb1, nat)) {
@@ -209,7 +213,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @return true if the given {@link RustyBlock}s are NOT equal modulo renaming
      */
     public static boolean RustyBlocksNotEqualModRenaming(RustyBlock rb1, RustyBlock rb2,
-                                                        NameAbstractionTable nat) {
+            NameAbstractionTable nat) {
         RustyProgramElement pe1 = rb1.program();
         RustyProgramElement pe2 = rb2.program();
         if (pe1 == null && pe2 == null) {
@@ -232,8 +236,8 @@ public class RenamingTermProperty implements Property<Term> {
      * @return <code>true</code> iff the subterms are equal modulo renaming
      */
     private boolean descendRecursively(Term t0, Term t1,
-                                       ImmutableList<QuantifiableVariable> ownBoundVars,
-                                       ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat) {
+            ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat) {
 
         for (int i = 0; i < t0.arity(); i++) {
             ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
@@ -254,7 +258,7 @@ public class RenamingTermProperty implements Property<Term> {
             }
 
             boolean newConstraint =
-                    unifyHelp(t0.sub(i), t1.sub(i), subOwnBoundVars, subCmpBoundVars, nat);
+                unifyHelp(t0.sub(i), t1.sub(i), subOwnBoundVars, subCmpBoundVars, nat);
 
             if (!newConstraint) {
                 return false;
@@ -295,7 +299,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @return the hash code
      */
     private int hashTermHelper(Term term, ImmutableList<QuantifiableVariable> nameAbstractionList,
-                               int hashCode) {
+            int hashCode) {
         // mirrors the implementation of unifyHelp that is responsible for equality modulo renaming
         hashCode = 17 * hashCode + term.sort().hashCode();
         hashCode = 17 * hashCode + term.arity();
@@ -307,7 +311,8 @@ public class RenamingTermProperty implements Property<Term> {
             hashCode = 17 * hashCode + mod.kind().hashCode();
             hashCode = 17 * hashCode + hashRustyBlock(mod);
         } else if (op instanceof ProgramVariable pv) {
-            hashCode = 17 * hashCode + RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(pv);
+            hashCode =
+                17 * hashCode + RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(pv);
         }
 
         return recursiveHelper(term, nameAbstractionList, hashCode);
@@ -326,7 +331,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @return the hash code
      */
     private int hashQuantifiableVariable(QuantifiableVariable qv,
-                                         ImmutableList<QuantifiableVariable> nameAbstractionList) {
+            ImmutableList<QuantifiableVariable> nameAbstractionList) {
         final int index = indexOf(qv, nameAbstractionList);
         // if the variable is bound, we just need to consider the place it is bound at and abstract
         // from the name
@@ -364,7 +369,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @return the hash code
      */
     private int recursiveHelper(Term term, ImmutableList<QuantifiableVariable> nameAbstractionList,
-                                int hashCode) {
+            int hashCode) {
         for (int i = 0; i < term.arity(); i++) {
             ImmutableList<QuantifiableVariable> subBoundVars = nameAbstractionList;
 
