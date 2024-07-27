@@ -24,4 +24,9 @@ public class SequentFormula {
     public Term formula() {
         return term;
     }
+
+    /** String representation */
+    public String toString() {
+        return term.toString();
+    }
 }

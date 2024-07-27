@@ -80,6 +80,10 @@ public class TacletGoalTemplate {
         return addedRules;
     }
 
+    public ImmutableSet<SchemaVariable> addedProgVars() {
+        return addedProgVars;
+    }
+
     /**
      * retrieves and returns all variables that are bound in the goal template
      *
@@ -104,5 +108,20 @@ public class TacletGoalTemplate {
 
     public String name() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        if (!sequent().isEmpty()) {
+            result += "\\add " + sequent() + " ";
+        }
+        if (!rules().isEmpty()) {
+            result += "\\addrules " + rules() + " ";
+        }
+        if (!addedProgVars().isEmpty()) {
+            result += "\\addprogvars " + addedProgVars() + " ";
+        }
+        return result;
     }
 }

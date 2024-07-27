@@ -41,4 +41,12 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     public Sequent replaceWith() {
         return replaceWith;
     }
+
+    /** toString */
+    @Override
+    public String toString() {
+        String result = super.toString();
+        result += "\\replacewith(" + replaceWith() + ") ";
+        return result;
+    }
 }
