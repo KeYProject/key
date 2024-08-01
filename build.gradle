@@ -24,7 +24,7 @@ plugins {
     id "com.diffplug.spotless" version "6.25.0"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.41"
+    id "org.checkerframework" version "0.6.43"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -81,9 +81,9 @@ subprojects {
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
-        compileOnly("org.jspecify:jspecify:0.3.0")
-        testCompileOnly("org.jspecify:jspecify:0.3.0")
-        def eisop_version = "3.42.0-eisop3"
+        compileOnly("org.jspecify:jspecify:1.0.0")
+        testCompileOnly("org.jspecify:jspecify:1.0.0")
+        def eisop_version = "3.42.0-eisop4"
         compileOnly "io.github.eisop:checker-qual:$eisop_version"
         compileOnly "io.github.eisop:checker-util:$eisop_version"
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
