@@ -340,7 +340,7 @@ subprojects {
             /* At the moment, we have to ensure that version 4.22 of the eclipse formatter is run, since newer versions
              * of the formatter crash in SymbolicExecutionTreeBuilder (seems to be a but in the formatter)!
              */
-            eclipse("4.22").configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
+            eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
             //googleJavaFormat().aosp().reflowLongStrings()
 

@@ -1428,7 +1428,7 @@ public class JMLSpecFactory {
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
             clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
             clauses.hasFreeAssignable, clauses.decreases, services)
-                    .create();
+                .create();
     }
 
     /**
@@ -1463,7 +1463,7 @@ public class JMLSpecFactory {
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
             clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
             clauses.hasFreeAssignable, clauses.decreases, services)
-                    .create();
+                .create();
     }
 
     private ProgramVariableCollection createProgramVariablesForStatement(Statement statement,
