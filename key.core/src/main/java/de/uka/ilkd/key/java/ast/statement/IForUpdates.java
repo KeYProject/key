@@ -8,7 +8,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 
 import org.key_project.util.collection.ImmutableArray;
 
-public interface IForUpdates extends TerminalProgramElement {
+public interface IForUpdates extends de.uka.ilkd.key.java.NonTerminalProgramElement {
 
     int size();
 

@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 
-public class ProgramList implements SVSubstitute {
+public class ProgramList implements SyntaxElement {
 
     private final ImmutableArray<ProgramElement> list;
 
@@ -31,4 +31,14 @@ public class ProgramList implements SVSubstitute {
         return list.hashCode();
     }
 
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        return list.get(n);
+    }
+
+    @Override
+    public int getChildCount() {
+        return list.size();
+    }
 }

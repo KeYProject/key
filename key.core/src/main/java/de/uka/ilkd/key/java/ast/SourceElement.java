@@ -6,7 +6,10 @@ package de.uka.ilkd.key.java.ast;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.equality.EqualsModProperty;
+import de.uka.ilkd.key.logic.equality.Property;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * A source element is a piece of syntax. It does not necessarily have a semantics, at least none
@@ -14,7 +17,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  * to achieve an immutable structure
  */
 
-public interface SourceElement extends SVSubstitute {
+public interface SourceElement extends SyntaxElement, EqualsModProperty<SourceElement> {
 
 
     /**
@@ -86,8 +89,16 @@ public interface SourceElement extends SVSubstitute {
      * seen as {int decl_1; decl_1=0;} for the first one but {int decl_1; i=0;} for the second one.
      * These are not syntactical equal, therefore false is returned.
      */
-    boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat);
+    @Override
+    default <V> boolean equalsModProperty(Object o, Property<SourceElement> property, V... v) {
+        if (!(o instanceof SourceElement)) {
+            return false;
+        }
+        return property.equalsModThisProperty(this, (SourceElement) o, v);
+    }
 
-
-
+    @Override
+    default int hashCodeModProperty(Property<SourceElement> property) {
+        return property.hashCodeModThisProperty(this);
+    }
 }

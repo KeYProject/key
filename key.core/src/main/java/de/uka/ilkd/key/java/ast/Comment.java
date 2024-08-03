@@ -6,6 +6,8 @@ package de.uka.ilkd.key.java.ast;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.logic.SyntaxElement;
+
 /**
  * Comment element of Java source code.
  */
@@ -45,28 +47,32 @@ public class Comment extends JavaSourceElement {
         return text;
     }
 
-
+    @Override
     public String toString() {
         return getText();
     }
 
-
-    /**
-     * comments can be ignored
-     */
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return true;
-    }
-
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + getText().hashCode();
         return result;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == this) { return true; }
         if (!(o instanceof Comment cmp)) { return false; }
         return (getText().equals(cmp.getText()));
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Comment has no children");
     }
 }

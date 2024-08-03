@@ -346,7 +346,6 @@ public final class ProblemInitializer {
         if (pl == null) { throw new ProofInputException("No proof"); }
 
         // register non-built-in rules
-        // register non-built-in rules
         Proof[] proofs = pl.getProofs();
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {

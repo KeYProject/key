@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.literal;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -69,11 +68,12 @@ public non-sealed class RealLiteral extends Literal {
         this.value = value;
     }
 
-    /**
-     * tests if equals
-     */
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof RealLiteral)) { return false; }
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
         return ((RealLiteral) o).getValue().equals(getValue());
     }
 

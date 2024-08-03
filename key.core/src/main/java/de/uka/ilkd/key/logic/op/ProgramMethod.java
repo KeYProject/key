@@ -258,14 +258,11 @@ public final class ProgramMethod extends ObserverFunction
         return null;
     }
 
-    /**
-     * equals modulo renaming is described in class SourceElement.
-     */
     @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof IProgramMethod)) { return false; }
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IProgramMethod ipm)) { return false; }
 
-        return method == ((IProgramMethod) se).getMethodDeclaration();
+        return method == ipm.getMethodDeclaration();
     }
 
     @Deprecated

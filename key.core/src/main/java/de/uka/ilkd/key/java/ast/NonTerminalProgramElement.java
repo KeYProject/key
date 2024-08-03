@@ -5,6 +5,8 @@ package de.uka.ilkd.key.java.ast;
 
 import java.util.stream.Stream;
 
+import org.key_project.logic.SyntaxElement;
+
 /**
  * Non terminal program element. taken from COMPOST and changed to achieve an immutable structure
  */
@@ -33,5 +35,10 @@ public interface NonTerminalProgramElement extends ProgramElement {
         Stream<ProgramElement> s = Stream.<ProgramElement>empty();
         for (int i = 0; i < getChildCount(); i++) { s = Stream.concat(s, Stream.of(getChildAt(i))); }
         return s;
+    }
+
+    @Override
+    default SyntaxElement getChild(int n) {
+        return getChildAt(n);
     }
 }

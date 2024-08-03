@@ -126,4 +126,6 @@ public interface SpecExtractor {
      * unsupported features which have been ignored by the translation)
      */
     ImmutableList<PositionedString> getWarnings();
+
+    Contract createDefaultContract(IProgramMethod pm, boolean useSoundDefault);
 }

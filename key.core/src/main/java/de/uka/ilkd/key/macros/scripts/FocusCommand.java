@@ -19,7 +19,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * The command "focus" allows you to select formulas from the current sequent
@@ -79,7 +79,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         for (SequentFormula seqFormula : ante) {
             // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
             if (!keepAnte.exists(
-                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_PROPERTY))) {
+                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_TERM_PROPERTY))) {
                 Taclet tac = getHideTaclet("left");
                 makeTacletApp(goal, seqFormula, tac, true);
             }
@@ -89,7 +89,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         ImmutableList<SequentFormula> succ = goal.sequent().succedent().asList();
         for (SequentFormula seqFormula : succ) {
             if (!keepSucc.exists(
-                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_PROPERTY))) {
+                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_TERM_PROPERTY))) {
                 Taclet tac = getHideTaclet("right");
                 makeTacletApp(goal, seqFormula, tac, false);
             }

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.proof.init.DependencyContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
 
@@ -145,7 +145,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         if (originalSelfVar != null) { map.put(originalSelfVar, selfVar); }
         for (LocationVariable originalParamVar : originalParamVars) {
             map.put(originalParamVar, paramVars.head());
@@ -190,7 +190,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) { map.put(services.getTermBuilder().var(originalSelfVar), selfTerm); }
         for (LocationVariable originalParamVar : originalParamVars) {
@@ -255,7 +255,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         if (originalSelfVar != null) { map.put(originalSelfVar, selfVar); }
         for (LocationVariable originalParamVar : originalParamVars) {
             map.put(originalParamVar, paramVars.head());
@@ -275,7 +275,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         for (LocationVariable heap : heapTerms.keySet()) {
             map.put(services.getTermBuilder().var(heap), heapTerms.get(heap));
         }
@@ -360,7 +360,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         if (originalSelfVar != null) { map.put(originalSelfVar, selfVar); }
         for (LocationVariable originalParamVar : originalParamVars) {
             map.put(originalParamVar, paramVars.head());
@@ -388,7 +388,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) { map.put(services.getTermBuilder().var(originalSelfVar), selfTerm); }
         for (LocationVariable originalParamVar : originalParamVars) {

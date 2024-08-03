@@ -58,7 +58,8 @@ public class MethodFrame extends JavaStatement
         this.execContext = execContext;
 
         firstActiveChildPos =
-            body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(getChildCount() - 1).down(0);
+            body.isEmpty() ? PosInProgram.TOP
+                    : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");
         Debug.assertTrue(body != null, "methodframe: body missing");
@@ -85,7 +86,8 @@ public class MethodFrame extends JavaStatement
         this.execContext = execContext;
 
         firstActiveChildPos =
-            body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(getChildCount() - 1).down(0);
+            body.isEmpty() ? PosInProgram.TOP
+                    : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
 
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");

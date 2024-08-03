@@ -135,16 +135,6 @@ public final class BooleanLiteral extends Literal {
         return (value ? "true" : "false");
     }
 
-    /**
-     * tests if equals
-     */
-    public boolean equalsModRenaming(
-            SourceElement o,
-            NameAbstractionTable nat) {
-        if (!(o instanceof BooleanLiteral)) { return false; }
-        return ((BooleanLiteral) o).getValue() == getValue();
-    }
-
     @Override
     protected int computeHashCode() {
         return 37 * super.computeHashCode() + (getValue() ? 0 : 1);
@@ -152,7 +142,13 @@ public final class BooleanLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+        return ((BooleanLiteral) o).getValue() == getValue();
     }
 
     /**

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.logic.equality.TermProperty;
+import de.uka.ilkd.key.logic.equality.Property;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -330,13 +330,13 @@ class TermImpl implements Term {
     }
 
     @Override
-    public boolean equalsModProperty(Object o, TermProperty property) {
+    public <V> boolean equalsModProperty(Object o, Property<Term> property, V... v) {
         if (!(o instanceof Term other)) { return false; }
         return property.equalsModThisProperty(this, other);
     }
 
     @Override
-    public int hashCodeModProperty(TermProperty property) {
+    public int hashCodeModProperty(Property<Term> property) {
         return property.hashCodeModThisProperty(this);
     }
 

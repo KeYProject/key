@@ -151,7 +151,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     @NonNull
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
     /**

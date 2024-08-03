@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.literal;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -19,12 +18,15 @@ public non-sealed class EmptySetLiteral extends Literal {
 
     public static final EmptySetLiteral LOCSET = new EmptySetLiteral();
 
-
     @Override
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
+    public boolean equals(Object o) {
         return o == this;
     }
 
+    @Override
+    protected int computeHashCode() {
+        return System.identityHashCode(this);
+    }
 
     public void visit(Visitor v) {
         v.performActionOnEmptySetLiteral(this);

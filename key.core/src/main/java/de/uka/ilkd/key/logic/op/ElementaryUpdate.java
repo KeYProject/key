@@ -9,6 +9,7 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 
@@ -55,5 +56,17 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
      */
     public UpdateableOperator lhs() {
         return lhs;
+    }
+
+    @Override
+    public int getChildCount() {
+        return 1;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        if (n == 0)
+            return lhs;
+        throw new IndexOutOfBoundsException("Elementary updates only contain 1 child");
     }
 }

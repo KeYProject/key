@@ -93,16 +93,6 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         return comments;
     }
 
-
-    /**
-     * commented in interface SourceElement. The default equals method compares two elements by
-     * testing if they have the same type and calling the default equals method.
-     */
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return (this.getClass() == se.getClass());
-    }
-
     protected int computeHashCode() {
         int result = 17 * this.getClass().hashCode();
         return result;
@@ -125,9 +115,9 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     @Override
     public boolean equals(Object o) {
         if (o == this) { return true; }
-        if (o == null || o.getClass() != this.getClass()) { return false; }
-
-        return equalsModRenaming((JavaProgramElement) o, NameAbstractionTableDisabled.INSTANCE);
+        if (o == null ) { return false;
+        }
+        return (this.getClass() == o.getClass());
     }
 
 

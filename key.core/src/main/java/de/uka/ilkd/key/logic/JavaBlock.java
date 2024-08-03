@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.logic.Program;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.slf4j.Logger;
@@ -119,5 +120,19 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
             if (hashCode == -1) { hashCode = 0; }
         }
         return hashCode;
+    }
+
+    @Override
+    public int getChildCount() {
+        if (prg == null || this == EMPTY_JAVABLOCK)
+            return 0;
+        return 1;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        if (n == 0)
+            return prg;
+        throw new IndexOutOfBoundsException("JavaBlock " + this + " has only one child");
     }
 }

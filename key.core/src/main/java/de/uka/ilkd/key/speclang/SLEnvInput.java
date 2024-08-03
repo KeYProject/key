@@ -8,11 +8,15 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.io.File;
+import java.net.URL;
+import java.util.*;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
@@ -282,6 +286,21 @@ public final class SLEnvInput extends AbstractEnvInput {
                 var iter = methodSpecs.iterator();
                 var params = iter.hasNext() ? ((Contract) iter.next()).getOrigVars().params : null;
                 specRepos.addSpecs(methodSpecs);
+
+                Type declaringType = pm.getContainerType().getJavaType();
+
+                // Create default contracts for all methods except KeY default methods (like <init>)
+                // and Object methods.
+                if (methodSpecs.isEmpty()
+                        && (declaringType instanceof TypeDeclaration decl && decl.isLibraryClass())
+                        && !declaringType.getFullName().equals("java.lang.Object")
+                        && !pm.isImplicit()) {
+                    specRepos.addContract(specExtractor.createDefaultContract(pm,
+                        initConfig.getActivatedChoices().exists(
+                            choice -> choice.category().equals("soundDefaultContracts")
+                                    && choice.name().toString()
+                                            .equals("soundDefaultContracts:on"))));
+                }
 
                 addLoopInvariants(specExtractor, specRepos, kjt, pm);
                 addLoopContracts(specExtractor, specRepos, pm);

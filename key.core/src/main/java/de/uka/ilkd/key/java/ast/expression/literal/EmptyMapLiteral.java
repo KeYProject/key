@@ -11,6 +11,10 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.MapLDT;
 
@@ -26,10 +30,13 @@ public non-sealed class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public boolean equalsModRenaming(
-            SourceElement o,
-            NameAbstractionTable nat) {
+    public boolean equals(Object o) {
         return o == this;
+    }
+
+    @Override
+    protected int computeHashCode() {
+        return System.identityHashCode(this);
     }
 
     @Override

@@ -12,11 +12,12 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.Test;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestApplyUpdateOnRigidCondition {
@@ -25,8 +26,11 @@ public class TestApplyUpdateOnRigidCondition {
         Term term = TacletForTests.parseTerm("{i:=0}\\forall int a; a = i");
         Term result = applyUpdateOnFormula(term);
         Term expected = TacletForTests.parseTerm("\\forall int a; {i:=0}(a = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_PROPERTY),
+        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
             "Update without free variables was not properly applied on formula!");
+        assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Terms should be equal modulo renaming. (0)");
 
         term = TacletForTests.parseTerm("{i:=0}(i = 0)");
         result = applyUpdateOnFormula(term);
@@ -37,8 +41,11 @@ public class TestApplyUpdateOnRigidCondition {
         term = TacletForTests.parseTerm("{i:=0} f(const)");
         result = applyUpdateOnTerm(term);
         expected = TacletForTests.parseTerm("f({i:=0} const)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_PROPERTY),
+        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
             "Update without free variables was not properly applied on term!");
+        assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Terms should be equal modulo renaming. (1)");
     }
 
     @Test
@@ -51,22 +58,31 @@ public class TestApplyUpdateOnRigidCondition {
         Term result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         Term expected =
             TacletForTests.parseTerm("\\forall int b; \\forall java.lang.Object a; {i:=b} (a = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_PROPERTY),
+        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
             "Update is not simply pulled over quantification!");
+        assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Terms should be equal modulo renaming. (0)");
 
         term = TacletForTests.parseTerm("\\forall int b; {i:=b} (0 = i)");
         b = term.boundVars().get(0);
         result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         expected = TacletForTests.parseTerm("\\forall int b; {i:=b} 0 = {i:=b} i");
-        assertTrue(expected.equalsModProperty(result, RENAMING_PROPERTY),
+        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
             "Update is not simply pulled over equality!");
+        assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Terms should be equal modulo renaming. (1)");
 
         term = TacletForTests.parseTerm("\\forall int b; {i:=b} f(const) = 0");
         b = term.boundVars().get(0);
         result = tb.all(b, tb.equals(applyUpdateOnTerm(term.sub(0).sub(0)), term.sub(0).sub(1)));
         expected = TacletForTests.parseTerm("\\forall int b; f({i:=b} const) = 0");
-        assertTrue(expected.equalsModProperty(result, RENAMING_PROPERTY),
+        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
             "Update is not simply pulled over function symbol!");
+        assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Terms should be equal modulo renaming. (2)");
     }
 
     @Test
@@ -79,8 +95,11 @@ public class TestApplyUpdateOnRigidCondition {
         Term result = tb.all(a, applyUpdateOnFormula(term.sub(0)));
         Term expected = TacletForTests
                 .parseTerm("\\forall int a; \\forall java.lang.Object a1; {i:=a} (a1 = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_PROPERTY),
+        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
             "Renaming or applying update afterwards !");
+        assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Terms should be equal modulo renaming. (0)");
 
         term = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; {i:=a}\\forall java.lang.Object a; i = a1");
@@ -89,8 +108,11 @@ public class TestApplyUpdateOnRigidCondition {
         result = tb.all(a, tb.all(a1, applyUpdateOnFormula(term.sub(0).sub(0))));
         expected = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; \\forall java.lang.Object a2; {i:=a} (i = a1)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_PROPERTY),
+        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
             "Counter appended to stem was not increased high enough!");
+        assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Terms should be equal modulo renaming. (1)");
     }
 
     @Test
@@ -235,7 +257,7 @@ public class TestApplyUpdateOnRigidCondition {
      *        <code>term</code>
      * @param result
      *        the {@link SchemaVariable} that is instantiated with the result of a
-     *        {@link ApplyUpdateOnRigidCondition#check(SchemaVariable, SVSubstitute, MatchConditions, Services)}
+     *        {@link ApplyUpdateOnRigidCondition#check(SchemaVariable, SyntaxElement, MatchConditions, Services)}
      *        call
      *
      * @return the original formula or term if the update cannot be applied; else, the updated

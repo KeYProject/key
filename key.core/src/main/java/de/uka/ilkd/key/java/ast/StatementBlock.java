@@ -27,7 +27,6 @@ import org.jspecify.annotations.Nullable;
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
  */
-
 public class StatementBlock extends JavaStatement implements StatementContainer,
         TypeDeclarationContainer, VariableScope, TypeScope, ProgramPrefix {
 
@@ -65,7 +64,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * @param children
      *        an ExtList that contains the children
      */
-
     public StatementBlock(ExtList children) {
         super(children);
         body = new ImmutableArray<>(children.collect(Statement.class));
@@ -94,13 +92,32 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return super.equalsModRenaming(se, nat)
-                // why do we care here// about position info and
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
+        if (jnte.getChildCount() != getChildCount()) {
+            return false;
+        }
+
+        for (int i = 0, cc = getChildCount(); i < cc; i++) {
+            if (!getChildAt(i).equals(jnte.getChildAt(i))) {
+                return false;
+            }
+        }
+
+        return (this.getStartPosition().equals(Position.UNDEFINED) || // why do we care here
+                                                                      // about position info and
                 // nowhere else?
-                && (this.getStartPosition().equals(Position.UNDEFINED) ||
-                        se.getStartPosition().equals(Position.UNDEFINED)
-                        || this.getStartPosition().line() == se.getStartPosition().line());
+                                                                      // We also care in
+                                                                      // LoopStatement
+                jnte.getStartPosition().equals(Position.UNDEFINED)
+                || this.getStartPosition().line() == jnte.getStartPosition().line());
     }
 
     /**
@@ -132,13 +149,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         return body.isEmpty();
     }
 
-
     /**
      * Returns the number of children of this node.
      *
      * @return an int giving the number of children of this node
      */
-
     public int getChildCount() {
         return body.size();
     }
@@ -153,7 +168,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * @throws ArrayIndexOutOfBoundsException
      *         if <tt>index</tt> is out of bounds
      */
-
     public ProgramElement getChildAt(int index) {
         return body.get(index);
     }
@@ -163,12 +177,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @return the number of statements.
      */
-
     public int getStatementCount() {
         return body.size();
     }
 
-    /*
+    /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
      * @param index an index for a statement.
@@ -177,7 +190,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
-
     public Statement getStatementAt(int index) {
         return body.get(index);
     }
@@ -187,14 +199,13 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @return the number of type declarations.
      */
-
     public int getTypeDeclarationCount() {
         int count = 0;
         for (int i = body.size() - 1; i >= 0; i -= 1) { if (body.get(i) instanceof TypeDeclaration) { count += 1; } }
         return count;
     }
 
-    /*
+    /**
      * Return the type declaration at the specified index in this node's "virtual" type declaration
      * array.
      *
@@ -204,7 +215,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
-
     public TypeDeclaration getTypeDeclarationAt(int index) {
         int s = body.size();
         for (int i = 0; i < s && index >= 0; i++) {
@@ -244,7 +254,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             return getBody().get(0);
         }
     }
-
 
     @Override
     public boolean hasNextPrefixElement() {

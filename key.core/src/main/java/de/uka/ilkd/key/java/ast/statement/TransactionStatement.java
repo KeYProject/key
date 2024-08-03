@@ -50,11 +50,15 @@ public class TransactionStatement extends JavaStatement {
         return type.symbol;
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (o instanceof TransactionStatement) { return ((TransactionStatement) o).type == this.type; }
-        return false;
+        if (o == this) { return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+        return ((TransactionStatement) o).type == this.type;
     }
-
 
     public MatchConditions match(SourceData source, MatchConditions conditions) {
         if (this.equals(source.getSource())) {
@@ -63,10 +67,4 @@ public class TransactionStatement extends JavaStatement {
         }
         return null;
     }
-
-    public boolean equalsModRenaming(SourceElement source, NameAbstractionTable nat) {
-        return this.equals(source);
-    }
-
-
 }

@@ -25,7 +25,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * instantiate var=a occ=2 with="a_8" hide
@@ -105,14 +105,14 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) { continue; }
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) { continue; }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) { continue; }
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) { continue; }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
         }
@@ -127,7 +127,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,
-                    RENAMING_PROPERTY)) { return pta; }
+                    RENAMING_TERM_PROPERTY)) { return pta; }
             }
         }
         return null;

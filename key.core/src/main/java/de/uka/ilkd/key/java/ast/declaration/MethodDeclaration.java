@@ -224,7 +224,7 @@ public class MethodDeclaration extends JavaDeclaration
     @NonNull
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
 

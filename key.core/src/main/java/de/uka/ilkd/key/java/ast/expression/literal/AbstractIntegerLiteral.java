@@ -65,12 +65,10 @@ public abstract non-sealed class AbstractIntegerLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o.getClass() == this.getClass())) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
         return ((AbstractIntegerLiteral) o).getValue() == getValue();
     }
 
