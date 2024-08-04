@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -61,11 +59,12 @@ public class FloatLiteral extends Literal {
         this.value = value;
     }
 
-    /**
-     * tests if equals
-     */
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof FloatLiteral)) {
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
         return ((FloatLiteral) o).getValue().equals(getValue());
@@ -74,10 +73,6 @@ public class FloatLiteral extends Literal {
     @Override
     protected int computeHashCode() {
         return 37 * super.computeHashCode() + getValue().hashCode();
-    }
-
-    public boolean equals(Object o) {
-        return super.equals(o);
     }
 
     /**

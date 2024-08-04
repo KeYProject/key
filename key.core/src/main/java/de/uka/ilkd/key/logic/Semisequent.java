@@ -9,7 +9,7 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 /**
@@ -187,7 +187,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
             if (sequentFormula != null
                     && cf.formula().equalsModProperty(sequentFormula.formula(),
-                        RENAMING_PROPERTY)) {
+                        RENAMING_TERM_PROPERTY)) {
                 semiCI.rejectedFormula(sequentFormula);
                 return semiCI; // semisequent already contains formula
 

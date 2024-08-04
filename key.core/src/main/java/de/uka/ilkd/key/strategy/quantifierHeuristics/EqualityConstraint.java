@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.equality.RenamingProperty;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -26,6 +26,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 
 
 /**
@@ -414,7 +416,7 @@ public class EqualityConstraint implements Constraint {
 
         if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
             nat = checkNat(nat);
-            if (RenamingProperty.javaBlocksNotEqualModRenaming(t0.javaBlock(), t1.javaBlock(),
+            if (RenamingTermProperty.javaBlocksNotEqualModRenaming(t0.javaBlock(), t1.javaBlock(),
                 nat)) {
                 return FAILED;
             }
@@ -425,7 +427,8 @@ public class EqualityConstraint implements Constraint {
                 return FAILED;
             }
             nat = checkNat(nat);
-            if (!((ProgramVariable) t0.op()).equalsModRenaming((ProgramVariable) t1.op(), nat)) {
+            if (!((ProgramVariable) t0.op()).equalsModProperty(t1.op(),
+                RENAMING_SOURCE_ELEMENT_PROPERTY, nat)) {
                 return FAILED;
             }
         }

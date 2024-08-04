@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 
@@ -51,12 +49,10 @@ public abstract class AbstractIntegerLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o.getClass() == this.getClass())) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
         return ((AbstractIntegerLiteral) o).getValue() == getValue();
