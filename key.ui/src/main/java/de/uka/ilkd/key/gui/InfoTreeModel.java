@@ -52,7 +52,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         private static final long serialVersionUID = -5546552277804988834L;
         private static final String COLLECTION =
             "This node stands for a category of symbols; expand it to browse the symbols "
-                + "in the category.";
+                    + "in the category.";
         private static final String DEFAULT_FUNCTIONS_LABEL =
             "Display descriptions for documented interpreted function and predicate symbols.";
 
@@ -126,9 +126,7 @@ public class InfoTreeModel extends DefaultTreeModel {
                 }
                 Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
                 OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
-                if (simplifier != null && !simplifier.isShutdown()) {
-                    set.addAll(simplifier.getCapturedTaclets());
-                }
+                if (simplifier != null && !simplifier.isShutdown()) { set.addAll(simplifier.getCapturedTaclets()); }
 
                 for (final NoPosTacletApp app : sort(set)) {
                     RuleJustification just = goal.proof().mgt().getJustification(app);

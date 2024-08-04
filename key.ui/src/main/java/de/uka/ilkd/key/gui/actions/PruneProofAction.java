@@ -34,7 +34,8 @@ public final class PruneProofAction extends MainWindowAction {
     /**
      * Creates a new PruneProofAction.
      *
-     * @param mainWindow the MainWindow this action belongs to (needed for shortcut and icon
+     * @param mainWindow
+     *        the MainWindow this action belongs to (needed for shortcut and icon
      *        settings)
      */
     public PruneProofAction(MainWindow mainWindow) {

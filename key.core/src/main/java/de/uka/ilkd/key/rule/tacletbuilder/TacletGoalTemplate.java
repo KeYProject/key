@@ -36,9 +36,12 @@ public class TacletGoalTemplate {
     /**
      * creates new Goaldescription
      *
-     * @param addedSeq new Sequent to be added
-     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
-     * @param addedProgVars a SetOf<SchemaVariable> which will be instantiated with a application
+     * @param addedSeq
+     *        new Sequent to be added
+     * @param addedRules
+     *        IList<Taclet> contains the new allowed rules at this branch
+     * @param addedProgVars
+     *        a SetOf<SchemaVariable> which will be instantiated with a application
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
@@ -57,8 +60,10 @@ public class TacletGoalTemplate {
      *                                             SetAsListOf.<SchemaVariable>nil())
      *                                             </code>
      *
-     * @param addedSeq new Sequent to be added
-     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
+     * @param addedSeq
+     *        new Sequent to be added
+     * @param addedRules
+     *        IList<Taclet> contains the new allowed rules at this branch
      */
     public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());
@@ -111,9 +116,7 @@ public class TacletGoalTemplate {
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
         ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
-        for (Taclet taclet : rules()) {
-            result = result.union(taclet.getBoundVariables());
-        }
+        for (Taclet taclet : rules()) { result = result.union(taclet.getBoundVariables()); }
 
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(sequent());
@@ -135,16 +138,10 @@ public class TacletGoalTemplate {
     @Override
     public boolean equals(Object o) {
 
-        if (o == null) {
-            return false;
-        }
-        if (o == this) {
-            return true;
-        }
+        if (o == null) { return false; }
+        if (o == this) { return true; }
 
-        if (getClass() != o.getClass()) {
-            return false;
-        }
+        if (getClass() != o.getClass()) { return false; }
 
         TacletGoalTemplate other = (TacletGoalTemplate) o;
 
@@ -164,15 +161,9 @@ public class TacletGoalTemplate {
     @Override
     public String toString() {
         String result = "";
-        if (!sequent().isEmpty()) {
-            result += "\\add " + sequent() + " ";
-        }
-        if (!rules().isEmpty()) {
-            result += "\\addrules " + rules() + " ";
-        }
-        if (!addedProgVars().isEmpty()) {
-            result += "\\addprogvars " + addedProgVars() + " ";
-        }
+        if (!sequent().isEmpty()) { result += "\\add " + sequent() + " "; }
+        if (!rules().isEmpty()) { result += "\\addrules " + rules() + " "; }
+        if (!addedProgVars().isEmpty()) { result += "\\addprogvars " + addedProgVars() + " "; }
         return result;
     }
 }

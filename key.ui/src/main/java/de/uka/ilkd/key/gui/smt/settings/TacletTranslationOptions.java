@@ -53,8 +53,7 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
 
     protected JTextField createFileChooserPanel() {
         return addFileChooserPanel("Store taclet translation to file:", "", infoFileChooserPanel,
-            true, e -> {
-            });
+            true, e -> {});
     }
 
     @Override

@@ -997,9 +997,7 @@ public class ProofCollections {
         // use for debugging purposes.
         // c.keep("VSTTE10");
         String s = System.getenv(ENV_KEY_RAP_FUN_KEEP);
-        if (s != null) {
-            c.keep(s.split(","));
-        }
+        if (s != null) { c.keep(s.split(",")); }
         return c;
     }
 

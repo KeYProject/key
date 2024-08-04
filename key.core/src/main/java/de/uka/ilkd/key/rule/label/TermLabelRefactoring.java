@@ -52,9 +52,12 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * have a FormulaTag.
      * </p>
      *
-     * @param rule the rule being applied.
-     * @param goal the goal on which the rule is being applied.
-     * @param hint an optional hint passed from the active rule to describe the term which should be
+     * @param rule
+     *        the rule being applied.
+     * @param goal
+     *        the goal on which the rule is being applied.
+     * @param hint
+     *        an optional hint passed from the active rule to describe the term which should be
      *        created.
      * @return whether any refactorings should be applied on an application of the given rule.
      */
@@ -93,18 +96,26 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     /**
      * Defines if a refactoring is required and if so in which {@link RefactoringScope}.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state
+     *        The {@link TermLabelState} of the current rule application.
+     * @param services
+     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence
+     *        The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm
+     *        The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
+     * @param rule
+     *        The {@link Rule} which is applied.
+     * @param goal
+     *        The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint
+     *        An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm The optional taclet {@link Term}.
+     * @param tacletTerm
+     *        The optional taclet {@link Term}.
      * @return The required {@link RefactoringScope}.
      */
     RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
@@ -114,20 +125,30 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     /**
      * This method is used to refactor the labels of the given {@link Term}.
      *
-     * @param state The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state
+     *        The {@link TermLabelState} of the current rule application.
+     * @param services
+     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence
+     *        The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm
+     *        The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule The {@link Rule} which is applied.
-     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint An optional hint passed from the active rule to describe the term which should be
+     * @param rule
+     *        The {@link Rule} which is applied.
+     * @param goal
+     *        The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint
+     *        An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm The optional taclet {@link Term}.
-     * @param term The {@link Term} which is now refactored.
-     * @param labels The new labels the {@link Term} will have after the refactoring.
+     * @param tacletTerm
+     *        The optional taclet {@link Term}.
+     * @param term
+     *        The {@link Term} which is now refactored.
+     * @param labels
+     *        The new labels the {@link Term} will have after the refactoring.
      */
     void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,

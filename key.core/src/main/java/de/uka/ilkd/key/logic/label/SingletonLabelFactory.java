@@ -14,7 +14,8 @@ import de.uka.ilkd.key.logic.TermServices;
  * The resulting factory does not accept arguments for the builder methods and always returns a
  * fixed term level value.
  *
- * @param <T> the type of the wrapped term label can be narrowed.
+ * @param <T>
+ *        the type of the wrapped term label can be narrowed.
  */
 public final class SingletonLabelFactory<T extends TermLabel> implements TermLabelFactory<T> {
 
@@ -26,7 +27,8 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
     /**
      * Instantiates a new singleton label factory for a label.
      *
-     * @param singletonLabel the label to be wrapped, not <code>null</code>.
+     * @param singletonLabel
+     *        the label to be wrapped, not <code>null</code>.
      */
     public SingletonLabelFactory(T singletonLabel) {
         assert singletonLabel != null;

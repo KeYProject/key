@@ -19,8 +19,10 @@ public abstract class AbstractTacletBuilderCommand implements TacletBuilderComma
      * Construct this class with the parameters for {@link #isSuitableFor(String)} and
      * {@link #getArgumentTypes()}.
      *
-     * @param triggerName the name of this command.
-     * @param argumentsTypes the argument type of this command.
+     * @param triggerName
+     *        the name of this command.
+     * @param argumentsTypes
+     *        the argument type of this command.
      */
     public AbstractTacletBuilderCommand(@NonNull String triggerName,
             @NonNull ArgumentType... argumentsTypes) {
@@ -30,13 +32,9 @@ public abstract class AbstractTacletBuilderCommand implements TacletBuilderComma
 
     @Override
     public boolean isSuitableFor(@NonNull String name) {
-        if (triggerName.equalsIgnoreCase(name)) {
-            return true;
-        }
+        if (triggerName.equalsIgnoreCase(name)) { return true; }
         if (name.startsWith("\\")) // handling leading backslashes
-        {
-            return isSuitableFor(name.substring(1));
-        }
+        { return isSuitableFor(name.substring(1)); }
         return false;
     }
 

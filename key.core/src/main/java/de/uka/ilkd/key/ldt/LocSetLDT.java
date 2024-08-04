@@ -3,17 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
-import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.EmptySetLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.operator.Intersect;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SetMinus;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SetUnion;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -141,21 +142,24 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(
+            Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return isResponsible(op, (Term) null, services, ec);
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(
+            Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(
+            Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return op instanceof Singleton || op instanceof SetUnion || op instanceof Intersect
                 || op instanceof SetMinus || op instanceof AllFields;
@@ -170,7 +174,8 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public JFunction getFunctionFor(
+            Operator op, Services serv,
             ExecutionContext ec) {
         if (op instanceof Singleton) {
             return singleton;
@@ -180,9 +185,7 @@ public final class LocSetLDT extends LDT {
             return intersect;
         } else if (op instanceof SetMinus) {
             return setMinus;
-        } else if (op instanceof AllFields) {
-            return allFields;
-        }
+        } else if (op instanceof AllFields) { return allFields; }
         assert false;
         return null;
     }
@@ -196,9 +199,7 @@ public final class LocSetLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op().equals(empty)) {
-            return EmptySetLiteral.LOCSET;
-        }
+        if (t.op().equals(empty)) { return EmptySetLiteral.LOCSET; }
         assert false;
         return null;
     }

@@ -181,9 +181,7 @@ public class JavaProfile extends AbstractProfile {
      */
     public OneStepSimplifier getOneStepSimpilifier() {
         synchronized (this) {
-            if (oneStepSimpilifier == null) {
-                oneStepSimpilifier = new OneStepSimplifier();
-            }
+            if (oneStepSimpilifier == null) { oneStepSimpilifier = new OneStepSimplifier(); }
             return oneStepSimpilifier;
         }
     }
@@ -193,7 +191,8 @@ public class JavaProfile extends AbstractProfile {
      * new instance of a {@link ComplexRuleJustification} otherwise the rule justification
      * determined by the super class is returned
      *
-     * @param r the rule described above
+     * @param r
+     *        the rule described above
      * @return justification for the given rule
      */
     @Override
@@ -235,19 +234,16 @@ public class JavaProfile extends AbstractProfile {
      * {@link Thread}).
      * </p>
      *
-     * @param perms boolean to decide whether we use permissions
+     * @param perms
+     *        boolean to decide whether we use permissions
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
     public static synchronized JavaProfile getDefaultInstance(boolean perms) {
         if (!perms) {
-            if (defaultInstance == null) {
-                defaultInstance = new JavaProfile();
-            }
+            if (defaultInstance == null) { defaultInstance = new JavaProfile(); }
             return defaultInstance;
         } else {
-            if (defaultInstancePermissions == null) {
-                defaultInstancePermissions = new JavaProfile(true);
-            }
+            if (defaultInstancePermissions == null) { defaultInstancePermissions = new JavaProfile(true); }
             return defaultInstancePermissions;
         }
     }

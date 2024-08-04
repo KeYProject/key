@@ -31,9 +31,12 @@ public class ProofSaverEvent extends EventObject {
     /**
      * Constructor.
      *
-     * @param source The {@link ProofSaver} which throws this event.
-     * @param filename The file name.
-     * @param errorMsg The error message.
+     * @param source
+     *        The {@link ProofSaver} which throws this event.
+     * @param filename
+     *        The file name.
+     * @param errorMsg
+     *        The error message.
      */
     public ProofSaverEvent(ProofSaver source, String filename, String errorMsg) {
         super(source);

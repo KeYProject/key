@@ -29,9 +29,7 @@ public class SMTBeautifierTest {
             Streams.toString(r2).replaceAll(System.lineSeparator(), "\n").split("; *----+");
         assertEquals(smt.length, expected.length, "The two files must have same number of clauses");
         var b = Stream.<Arguments>builder();
-        for (int i = 0; i < smt.length; i++) {
-            b.add(Arguments.of(smt[i], expected[i]));
-        }
+        for (int i = 0; i < smt.length; i++) { b.add(Arguments.of(smt[i], expected[i])); }
         return b.build();
     }
 

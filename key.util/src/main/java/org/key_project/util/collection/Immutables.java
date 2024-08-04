@@ -32,17 +32,13 @@ public final class Immutables {
      *
      * The implementation uses a hash set internally and thus runs in O(n).
      *
-     * @param list any list, must not be <code>null</code>
+     * @param list
+     *        any list, must not be <code>null</code>
      * @return true iff every
      */
     public static <T extends @Nullable Object> boolean isDuplicateFree(ImmutableList<T> list) {
         HashSet<T> set = new HashSet<>();
-        for (T element : list) {
-            if (set.contains(element)) {
-                return false;
-            }
-            set.add(element);
-        }
+        for (T element : list) { if (set.contains(element)) { return false; } set.add(element); }
 
         return true;
     }
@@ -68,23 +64,19 @@ public final class Immutables {
      *
      * Sidenote: Would that not make a nice KeY-Verification condition? Eat your own dogfood.
      *
-     * @param list any list, must not be <code>null</code>
+     * @param list
+     *        any list, must not be <code>null</code>
      *
      * @return a duplicate-free version of the argument, never <code>null</code>
      */
     public static <T extends @Nullable Object> ImmutableList<T> removeDuplicates(
             ImmutableList<T> list) {
 
-        if (list.isEmpty()) {
-            return list;
-        }
+        if (list.isEmpty()) { return list; }
 
         ImmutableList<ImmutableList<T>> stack = ImmutableSLList.nil();
 
-        while (!list.isEmpty()) {
-            stack = stack.prepend(list);
-            list = list.tail();
-        }
+        while (!list.isEmpty()) { stack = stack.prepend(list); list = list.tail(); }
 
         HashSet<T> alreadySeen = new HashSet<>();
         ImmutableList<T> result = ImmutableSLList.nil();
@@ -122,16 +114,10 @@ public final class Immutables {
             ImmutableList<? extends T> l2) {
 
         HashSet<T> lookup = new HashSet<>();
-        for (T element : l1) {
-            lookup.add(element);
-        }
+        for (T element : l1) { lookup.add(element); }
 
         ImmutableList<T> result = l1;
-        for (T element : l2) {
-            if (!lookup.contains(element)) {
-                result = result.prepend(element);
-            }
-        }
+        for (T element : l2) { if (!lookup.contains(element)) { result = result.prepend(element); } }
 
         return result;
     }
@@ -142,7 +128,8 @@ public final class Immutables {
      *
      * The iteration order of the result is identical to that of the argument.
      *
-     * @param iterable the collection to iterate through to obtain the elements
+     * @param iterable
+     *        the collection to iterate through to obtain the elements
      *        for the resulting list
      *
      * @return the view onto the iterable as an immutable set
@@ -158,16 +145,15 @@ public final class Immutables {
      *
      * The iteration order of the result is identical to that of the argument.
      *
-     * @param iterable the collection to iterate through to obtain the elements
+     * @param iterable
+     *        the collection to iterate through to obtain the elements
      *        for the resulting list
      *
      * @return the view onto the iterable as an immutable list
      */
     public static <T> ImmutableList<T> createListFrom(Iterable<? extends T> iterable) {
         ImmutableList<T> result = ImmutableSLList.nil();
-        for (T t : iterable) {
-            result = result.prepend(t);
-        }
+        for (T t : iterable) { result = result.prepend(t); }
         return result.reverse();
     }
 
@@ -175,9 +161,11 @@ public final class Immutables {
      * Returns an immutable list consisting of the elements of the list that match
      * the given predicate.
      *
-     * @param ts non-null immutable list.
+     * @param ts
+     *        non-null immutable list.
      *
-     * @param predicate a non-interfering, stateless
+     * @param predicate
+     *        a non-interfering, stateless
      *        predicate to apply to each element to determine if it
      *        should be included
      *
@@ -188,13 +176,7 @@ public final class Immutables {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<T> acc = ImmutableSLList.nil();
-        while (!ts.isEmpty()) {
-            T hd = ts.head();
-            if (predicate.test(hd)) {
-                acc = acc.prepend(hd);
-            }
-            ts = ts.tail();
-        }
+        while (!ts.isEmpty()) { T hd = ts.head(); if (predicate.test(hd)) { acc = acc.prepend(hd); } ts = ts.tail(); }
         return acc.reverse();
     }
 
@@ -202,9 +184,12 @@ public final class Immutables {
      * Returns an immutable list consisting of the results of applying the given
      * function to the elements of the list.
      *
-     * @param <R> The element type of the result list
-     * @param ts ts non-null immutable list.
-     * @param function a non-interfering, stateless function to apply to each element
+     * @param <R>
+     *        The element type of the result list
+     * @param ts
+     *        ts non-null immutable list.
+     * @param function
+     *        a non-interfering, stateless function to apply to each element
      * @return the mapped list of the same length as this
      */
     public static <T extends @Nullable Object, R extends @Nullable Object> ImmutableList<R> map(
@@ -212,11 +197,7 @@ public final class Immutables {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<R> acc = ImmutableSLList.nil();
-        while (!ts.isEmpty()) {
-            T hd = ts.head();
-            acc = acc.prepend(function.apply(hd));
-            ts = ts.tail();
-        }
+        while (!ts.isEmpty()) { T hd = ts.head(); acc = acc.prepend(function.apply(hd)); ts = ts.tail(); }
         return acc.reverse();
     }
 }

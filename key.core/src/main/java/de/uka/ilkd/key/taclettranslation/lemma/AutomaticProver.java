@@ -32,7 +32,8 @@ public class AutomaticProver {
      * @param proof
      * @param maxNumberOfRules
      * @param timeout
-     * @throws InterruptedException If the prover is interrupted by the user, this exception is
+     * @throws InterruptedException
+     *         If the prover is interrupted by the user, this exception is
      *         thrown
      */
     public void start(Proof proof, int maxNumberOfRules, long timeout) throws InterruptedException {
@@ -82,9 +83,7 @@ public class AutomaticProver {
 
         private LinkedList<Goal> copyGoals(ImmutableList<Goal> goals) {
             LinkedList<Goal> result = new LinkedList<>();
-            for (Goal goal : goals) {
-                result.add(goal);
-            }
+            for (Goal goal : goals) { result.add(goal); }
             return result;
         }
 
@@ -104,15 +103,9 @@ public class AutomaticProver {
                         openGoals.removeFirst();
                     } else {
                         ImmutableList<Goal> goals = goal.apply(app);
-                        for (Goal res : goals) {
-                            if (!res.equals(goal)) {
-                                openGoals.add(res);
-                            }
-                        }
+                        for (Goal res : goals) { if (!res.equals(goal)) { openGoals.add(res); } }
                         ruleCounter++;
-                        if (goal.node().isClosed()) {
-                            openGoals.removeFirst();
-                        }
+                        if (goal.node().isClosed()) { openGoals.removeFirst(); }
                     }
                 }
             } catch (Throwable e) {

@@ -18,7 +18,8 @@ public final class GoalSelectAboveAction extends MainWindowAction {
     /**
      * Creates the new action.
      *
-     * @param mainWindow the main window this action belongs to
+     * @param mainWindow
+     *        the main window this action belongs to
      */
     public GoalSelectAboveAction(MainWindow mainWindow) {
         super(mainWindow, true);

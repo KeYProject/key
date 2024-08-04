@@ -24,9 +24,12 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
     /**
      * Create a new shortened edge.
      *
-     * @param initial the initial node for this shortened chain
-     * @param last the last node of this shortened chain
-     * @param consumesInput whether the input graph node is consumed
+     * @param initial
+     *        the initial node for this shortened chain
+     * @param last
+     *        the last node of this shortened chain
+     * @param consumesInput
+     *        whether the input graph node is consumed
      */
     public AnnotatedShortenedEdge(Node initial, Node last, boolean consumesInput) {
         super(last, consumesInput);
@@ -48,9 +51,7 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
             sb.append(" ... ");
         }
         RuleApp ruleApp2 = last.getAppliedRuleApp();
-        if (ruleApp2 != null) {
-            sb.append(ruleApp2.rule().displayName()).append("_").append(last.serialNr());
-        }
+        if (ruleApp2 != null) { sb.append(ruleApp2.rule().displayName()).append("_").append(last.serialNr()); }
         return sb.toString();
     }
 

@@ -67,8 +67,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all java information
+     * @param goal
+     *        the Goal where to apply the rule
+     * @param services
+     *        the Services encapsulating all java information
      * @return list of new created goals
      */
     @Override
@@ -146,22 +148,16 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof IBuiltInRuleApp that)) {
-            return false;
-        }
+        if (!(obj instanceof IBuiltInRuleApp that)) { return false; }
         if (!(Objects.equals(rule(), that.rule())
                 && Objects.equals(getHeapContext(), that.getHeapContext()))) {
             return false;
         }
         ImmutableList<PosInOccurrence> ifInsts1 = ifInsts();
         ImmutableList<PosInOccurrence> ifInsts2 = that.ifInsts();
-        if (ifInsts1.size() != ifInsts2.size()) {
-            return false;
-        }
+        if (ifInsts1.size() != ifInsts2.size()) { return false; }
         while (!ifInsts1.isEmpty()) {
-            if (!ifInsts1.head().eqEquals(ifInsts2.head())) {
-                return false;
-            }
+            if (!ifInsts1.head().eqEquals(ifInsts2.head())) { return false; }
             ifInsts1 = ifInsts1.tail();
             ifInsts2 = ifInsts2.tail();
         }

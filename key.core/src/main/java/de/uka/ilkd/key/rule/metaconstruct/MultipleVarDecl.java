@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.VariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -38,9 +38,7 @@ public class MultipleVarDecl extends ProgramTransformer {
         VariableSpecification headVar = variables.get(0);
         VariableSpecification[] tailVars = new VariableSpecification[variables.size() - 1];
 
-        for (int i = 0; i < variables.size() - 1; i++) {
-            tailVars[i] = variables.get(i + 1);
-        }
+        for (int i = 0; i < variables.size() - 1; i++) { tailVars[i] = variables.get(i + 1); }
 
         if (pe instanceof LocalVariableDeclaration) {
             LocalVariableDeclaration newVarDecl =

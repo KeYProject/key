@@ -26,15 +26,17 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  */
 public final class HTMLReport {
     /** to prevent from instantiating */
-    private HTMLReport() {
-    }
+    private HTMLReport() {}
 
     /**
      * Prints out the given check results to a target path.
      *
-     * @param data the check results to print
-     * @param target the target path of the output
-     * @throws IOException if an error occurs when accessing to the target path or the string
+     * @param data
+     *        the check results to print
+     * @param target
+     *        the target path of the output
+     * @throws IOException
+     *         if an error occurs when accessing to the target path or the string
      *         template resources
      */
     public static void print(CheckerData data, Path target) throws IOException {
@@ -66,16 +68,15 @@ public final class HTMLReport {
      * Set up StringTemplate model adaptors and listeners.
      *
      * @return the ST object for rendering the HTML report
-     * @throws IOException if an error occurs accessing the StringTemplate resources
+     * @throws IOException
+     *         if an error occurs accessing the StringTemplate resources
      */
     @SuppressWarnings("rawtypes")
     private static ST prepareStringTemplate() throws IOException {
         ClassLoader classLoader = HTMLReport.class.getClassLoader();
         URL url = classLoader.getResource("report/html");
 
-        if (url == null) {
-            throw new IOException("Could not load report template resource from report/html.");
-        }
+        if (url == null) { throw new IOException("Could not load report template resource from report/html."); }
 
         STGroup group = new STRawGroupDir(url, "UTF-8", '$', '$');
 
@@ -105,9 +106,7 @@ public final class HTMLReport {
             public Object getProperty(Interpreter interp, ST self, Map<?, ?> map, Object property,
                     String propertyName)
                     throws STNoSuchPropertyException {
-                if (property.equals("entrySet")) {
-                    return map.entrySet();
-                }
+                if (property.equals("entrySet")) { return map.entrySet(); }
                 return super.getProperty(interp, self, map, property, propertyName);
             }
         });
@@ -127,9 +126,7 @@ public final class HTMLReport {
                     throws STNoSuchPropertyException {
                 if (property.equals("value")) {
                     return entry.getValue();
-                } else if (property.equals("key")) {
-                    return entry.getKey();
-                }
+                } else if (property.equals("key")) { return entry.getKey(); }
                 return super.getProperty(interp, self, entry, property, propertyName);
             }
         });

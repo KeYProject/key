@@ -45,9 +45,7 @@ public class SyntaxElementCursorTest {
     private List<Integer> traverse(Node n) {
         var lst = new ArrayList<Integer>();
         var cursor = n.getCursor();
-        do {
-            lst.add(((Node) cursor.getCurrentNode()).getValue());
-        } while (cursor.goToNext());
+        do { lst.add(((Node) cursor.getCurrentNode()).getValue()); } while (cursor.goToNext());
         return lst;
     }
 

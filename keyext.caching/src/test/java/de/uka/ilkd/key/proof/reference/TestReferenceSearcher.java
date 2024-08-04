@@ -35,11 +35,13 @@ class TestReferenceSearcher {
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
+                        .toPath());
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
+                        .toPath());
         Proof p2 = env2.getLoadedProof();
 
         List<Proof> previousProofs = new CopyOnWriteArrayList<>();
@@ -54,9 +56,7 @@ class TestReferenceSearcher {
         // -> only check the first node in each closed branch
         for (Goal g : p.closedGoals()) {
             Node n = g.node();
-            while (n.parent().childrenCount() == 1) {
-                n = n.parent();
-            }
+            while (n.parent().childrenCount() == 1) { n = n.parent(); }
             if (ReferenceSearcher.suitableForCloseByReference(n)) {
                 ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, n);
                 assertEquals(n.serialNr(), c.node().serialNr());
@@ -113,15 +113,15 @@ class TestReferenceSearcher {
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "proofCaching/proofWithRule.proof"));
+                "proofCaching/proofWithRule.proof").toPath());
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "proofCaching/proofWithoutRule.proof"));
+                "proofCaching/proofWithoutRule.proof").toPath());
         Proof p2 = env2.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env3 =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "proofCaching/proofWithRule.proof"));
+                "proofCaching/proofWithRule.proof").toPath());
         Proof p3 = env3.getLoadedProof();
 
         List<Proof> previousProofs = new CopyOnWriteArrayList<>();

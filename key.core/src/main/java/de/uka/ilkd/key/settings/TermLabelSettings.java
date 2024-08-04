@@ -51,7 +51,7 @@ public class TermLabelSettings extends AbstractSettings {
             setUseOriginLabels(category.getBool(USE_ORIGIN_LABELS));
         } catch (Exception e) {
             LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
-                + "Using the default value: true." + "The string read was: {}",
+                    + "Using the default value: true." + "The string read was: {}",
                 category.get(USE_ORIGIN_LABELS), e);
             setUseOriginLabels(true);
         }
@@ -73,7 +73,8 @@ public class TermLabelSettings extends AbstractSettings {
     /**
      * Sets the value returned by {@link #getUseOriginLabels()}
      *
-     * @param useOriginLabels whether {@link OriginTermLabel}s should be used.
+     * @param useOriginLabels
+     *        whether {@link OriginTermLabel}s should be used.
      */
     public void setUseOriginLabels(boolean useOriginLabels) {
         var old = this.useOriginLabels;

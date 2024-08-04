@@ -3,31 +3,31 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.ClassType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.SuperReference;
+import de.uka.ilkd.key.java.ast.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -67,7 +67,8 @@ public class MethodCall extends ProgramTransformer {
     /**
      * creates the methodcall-MetaConstruct
      *
-     * @param body the ProgramElement contained by the meta construct
+     * @param body
+     *        the ProgramElement contained by the meta construct
      */
     public MethodCall(ProgramElement body) {
         this(null, null, body);
@@ -76,8 +77,10 @@ public class MethodCall extends ProgramTransformer {
     /**
      * creates the methodcall-MetaConstruct
      *
-     * @param result the SchemaVariable that is used to keep the result
-     * @param body the ProgramElement contained by the meta construct
+     * @param result
+     *        the SchemaVariable that is used to keep the result
+     * @param body
+     *        the ProgramElement contained by the meta construct
      */
     public MethodCall(SchemaVariable result, ProgramElement body) {
         this(null, result, body);
@@ -86,8 +89,10 @@ public class MethodCall extends ProgramTransformer {
     /**
      * creates the methodcall-MetaConstruct
      *
-     * @param result the SchemaVariable that is used to keep the result
-     * @param body the ProgramElement contained by the meta construct
+     * @param result
+     *        the SchemaVariable that is used to keep the result
+     * @param body
+     *        the ProgramElement contained by the meta construct
      */
     public MethodCall(ProgramSV ec, SchemaVariable result, ProgramElement body) {
         this(new Name("method-call"), ec, result, body);
@@ -96,10 +101,14 @@ public class MethodCall extends ProgramTransformer {
     /**
      * creates the methodcall-MetaConstruct
      *
-     * @param result the SchemaVariable that is used to keep the result
-     * @param body the ProgramElement contained by the meta construct
-     * @param name Method name.
-     * @param ec The Schema Variable.
+     * @param result
+     *        the SchemaVariable that is used to keep the result
+     * @param body
+     *        the ProgramElement contained by the meta construct
+     * @param name
+     *        Method name.
+     * @param ec
+     *        The Schema Variable.
      */
     protected MethodCall(Name name, ProgramSV ec, SchemaVariable result, ProgramElement body) {
         super(name, body);
@@ -150,9 +159,12 @@ public class MethodCall extends ProgramTransformer {
     /**
      * Returns the method.
      *
-     * @param prefixType TODO
-     * @param mr TODO
-     * @param services TODO
+     * @param prefixType
+     *        TODO
+     * @param mr
+     *        TODO
+     * @param services
+     *        TODO
      * @return TODO
      */
     protected IProgramMethod getMethod(KeYJavaType prefixType, MethodReference mr,
@@ -165,11 +177,10 @@ public class MethodCall extends ProgramTransformer {
                 // execContext are in different packages we have to
                 // simulate visibility rules like being in prefixType
                 result = mr.method(services, prefixType,
-                    mr.getMethodSignature(services, execContext), prefixType);
+                    mr.getMethodSignature(services, execContext));
             }
         } else {
-            result = mr.method(services, prefixType, mr.getMethodSignature(services, execContext),
-                prefixType);
+            result = mr.method(services, prefixType, mr.getMethodSignature(services, execContext));
         }
         return result;
     }
@@ -186,17 +197,17 @@ public class MethodCall extends ProgramTransformer {
     /**
      * performs the program transformation needed for symbolic program execution
      *
-     * @param services the Services with all necessary information about the java programs
-     * @param svInst the instantiations esp. of the inner and outer label
+     * @param services
+     *        the Services with all necessary information about the java programs
+     * @param svInst
+     *        the instantiations esp. of the inner and outer label
      * @return the transformed program
      */
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         LOGGER.trace("method-call: called for {}", pe);
-        if (resultVar != null) {
-            pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
-        }
+        if (resultVar != null) { pvar = (ProgramVariable) svInst.getInstantiation(resultVar); }
 
         execContext =
             execContextSV == null ? svInst.getContextInstantiation().activeStatementContext()
@@ -215,11 +226,9 @@ public class MethodCall extends ProgramTransformer {
         staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(), services);
         pm = execContext == null
                 ? methRef.method(services, staticPrefixType,
-                    methRef.getMethodSignature(services, null), staticPrefixType)
+                    methRef.getMethodSignature(services, null))
                 : methRef.method(services, staticPrefixType, execContext);
-        if (pm == null) {
-            Debug.fail("methodcall:No implementation available for ", methRef);
-        }
+        if (pm == null) { Debug.fail("methodcall:No implementation available for ", methRef); }
 
         newContext = methRef.getReferencePrefix();
         if (newContext == null) {
@@ -275,15 +284,15 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleInstanceInvocation(Services services, Statement result) {
         if (pm.isPrivate() || (methRef.implicit() && methRef.getName()
-                .equals(ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
+                .equals(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
             LOGGER.trace("method-call: invocation of private method detected."
-                + "Requires static resolving.");
+                    + "Requires static resolving.");
             result = makeMbs(staticPrefixType, services);
         } else {
             LOGGER.trace("method-call: invocation of non-private" + " instance method detected."
-                + "Requires dynamic resolving.");
+                    + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps =
                 services.getJavaInfo().getKeYProgModelInfo().findImplementations(staticPrefixType,
                     methRef.getName(), getTypes(arguments, services));
@@ -333,9 +342,7 @@ public class MethodCall extends ProgramTransformer {
             }
 
             result = KeYJavaASTFactory.methodBody(pvar, localContext, meth, arguments);
-            if (castedThisVar != null) {
-                result = KeYJavaASTFactory.block(castedThisVar, result);
-            }
+            if (castedThisVar != null) { result = KeYJavaASTFactory.block(castedThisVar, result); }
 
         } else {
             result = KeYJavaASTFactory.methodBody(pvar, newContext, meth, arguments);
@@ -352,8 +359,10 @@ public class MethodCall extends ProgramTransformer {
     /**
      * TODO
      *
-     * @param imps TODO
-     * @param services The Services object.
+     * @param imps
+     *        TODO
+     * @param services
+     *        The Services object.
      * @return TODO
      */
     protected Statement makeIfCascade(ImmutableList<KeYJavaType> imps, Services services) {
@@ -429,7 +438,8 @@ public class MethodCall extends ProgramTransformer {
      *
      *        see examples/java_dl/java5/vararg.key for examples and tests.
      *
-     * @param originalSpec the original sepcification of the formal paramater
+     * @param originalSpec
+     *        the original sepcification of the formal paramater
      * @return an Newarray expression conglomerating all remaining arguments may be zero.
      */
     private Expression makeVariableArgument(VariableSpecification originalSpec) {
@@ -438,9 +448,7 @@ public class MethodCall extends ProgramTransformer {
         int args = methRef.getArguments().size();
         Expression[] exps = new Expression[args - params + 1];
 
-        for (int i = 0; i < exps.length; i++) {
-            exps[i] = methRef.getArgumentAt(params - 1 + i);
-        }
+        for (int i = 0; i < exps.length; i++) { exps[i] = methRef.getArgumentAt(params - 1 + i); }
 
         Type type = originalSpec.getType();
 
@@ -470,9 +478,7 @@ public class MethodCall extends ProgramTransformer {
 
     private ImmutableArray<Expression> getVariables(VariableSpecification[] varspecs) {
         Expression[] vars = new Expression[varspecs.length];
-        for (int i = 0; i < varspecs.length; i++) {
-            vars[i] = (Expression) varspecs[i].getProgramVariable();
-        }
+        for (int i = 0; i < varspecs.length; i++) { vars[i] = (Expression) varspecs[i].getProgramVariable(); }
         return new ImmutableArray<>(vars);
     }
 
@@ -486,8 +492,10 @@ public class MethodCall extends ProgramTransformer {
      *
      * In the absence of autoboxing this is the case if the type is a subtype.
      *
-     * @param exp expression to check
-     * @param type type to check for
+     * @param exp
+     *        expression to check
+     * @param type
+     *        type to check for
      * @return true iff exp is assign compatible with type
      */
     private boolean assignmentCompatible(Expression exp, Type type, Services services) {

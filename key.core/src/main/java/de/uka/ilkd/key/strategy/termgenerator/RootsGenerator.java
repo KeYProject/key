@@ -67,22 +67,16 @@ public class RootsGenerator implements TermGenerator {
 
         final Monomial mon = Monomial.create(powerRel.sub(0), services);
         final int pow = mon.getParts().size();
-        if (pow <= 1 || !mon.getCoefficient().equals(one)) {
-            return emptyIterator();
-        }
+        if (pow <= 1 || !mon.getCoefficient().equals(one)) { return emptyIterator(); }
 
         final Term var = mon.getParts().head();
-        if (!mon.getParts().removeAll(var).isEmpty()) {
-            return emptyIterator();
-        }
+        if (!mon.getParts().removeAll(var).isEmpty()) { return emptyIterator(); }
 
         if (op == numbers.getLessOrEquals()) {
             return toIterator(breakDownLeq(var, lit, pow, services));
         } else if (op == numbers.getGreaterOrEquals()) {
             return toIterator(breakDownGeq(var, lit, pow, services));
-        } else if (op == Equality.EQUALS) {
-            return toIterator(breakDownEq(var, lit, pow, services));
-        }
+        } else if (op == Equality.EQUALS) { return toIterator(breakDownEq(var, lit, pow, services)); }
 
         return emptyIterator();
     }
@@ -92,9 +86,7 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Iterator<Term> toIterator(Term res) {
-        if (res.equalsModProperty(tb.ff(), IRRELEVANT_TERM_LABELS_PROPERTY)) {
-            return emptyIterator();
-        }
+        if (res.equalsModProperty(tb.ff(), IRRELEVANT_TERM_LABELS_PROPERTY)) { return emptyIterator(); }
         return ImmutableSLList.<Term>nil().prepend(res).iterator();
     }
 
@@ -104,24 +96,24 @@ public class RootsGenerator implements TermGenerator {
         if ((pow % 2 == 0)) {
             // the even case
             return switch (lit.signum()) {
-                case -1 -> // no solutions
-                        tb.ff();
-                case 0 -> // exactly one solution
-                        tb.equals(var, zero);
-                case 1 -> {
-                    final BigInteger r = root(lit, pow);
-                    if (power(r, pow).equals(lit)) {
-                        // two solutions
-                        final Term rTerm = tb.zTerm(r.toString());
-                        final Term rNegTerm = tb.zTerm(r.negate().toString());
-                        yield tb.or(tb.or(tb.lt(var, rNegTerm), tb.gt(var, rTerm)),
-                                tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
-                    } else {
-                        // no solution
-                        yield tb.ff();
-                    }
+            case -1 -> // no solutions
+                    tb.ff();
+            case 0 -> // exactly one solution
+                    tb.equals(var, zero);
+            case 1 -> {
+                final BigInteger r = root(lit, pow);
+                if (power(r, pow).equals(lit)) {
+                    // two solutions
+                    final Term rTerm = tb.zTerm(r.toString());
+                    final Term rNegTerm = tb.zTerm(r.negate().toString());
+                    yield tb.or(tb.or(tb.lt(var, rNegTerm), tb.gt(var, rTerm)),
+                        tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
+                } else {
+                    // no solution
+                    yield tb.ff();
                 }
-                default -> null;
+            }
+            default -> null;
             };
         } else {
             // the odd case
@@ -142,15 +134,15 @@ public class RootsGenerator implements TermGenerator {
             // the even case
 
             return switch (lit.signum()) {
-                case -1, 0 -> // the inequation is no restriction
-                        tb.ff();
-                case 1 -> {
-                    final BigInteger r = rootRoundingUpwards(lit, pow);
-                    final Term rTerm = tb.zTerm(r.toString());
-                    final Term rNegTerm = tb.zTerm(r.negate().toString());
-                    yield tb.or(tb.leq(var, rNegTerm), tb.geq(var, rTerm));
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
+            case -1, 0 -> // the inequation is no restriction
+                    tb.ff();
+            case 1 -> {
+                final BigInteger r = rootRoundingUpwards(lit, pow);
+                final Term rTerm = tb.zTerm(r.toString());
+                final Term rNegTerm = tb.zTerm(r.negate().toString());
+                yield tb.or(tb.leq(var, rNegTerm), tb.geq(var, rTerm));
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
             };
         } else {
             // the odd case
@@ -163,16 +155,16 @@ public class RootsGenerator implements TermGenerator {
             // the even case
 
             return switch (lit.signum()) {
-                case -1 -> // no solutions
-                        tb.ff();
-                case 0 -> tb.equals(var, tb.zero());
-                case 1 -> {
-                    final BigInteger r = root(lit, pow);
-                    final Term rTerm = tb.zTerm(r.toString());
-                    final Term rNegTerm = tb.zTerm(r.negate().toString());
-                    yield tb.and(tb.geq(var, rNegTerm), tb.leq(var, rTerm));
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
+            case -1 -> // no solutions
+                    tb.ff();
+            case 0 -> tb.equals(var, tb.zero());
+            case 1 -> {
+                final BigInteger r = root(lit, pow);
+                final Term rTerm = tb.zTerm(r.toString());
+                final Term rNegTerm = tb.zTerm(r.negate().toString());
+                yield tb.and(tb.geq(var, rNegTerm), tb.leq(var, rTerm));
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
             };
         } else {
             // the odd case
@@ -185,9 +177,7 @@ public class RootsGenerator implements TermGenerator {
      */
     private BigInteger rootRoundingUpwards(BigInteger prod, int exp) {
         final BigInteger res = root(prod, exp);
-        if (power(res, exp).compareTo(prod) < 0) {
-            return res.add(one);
-        }
+        if (power(res, exp).compareTo(prod) < 0) { return res.add(one); }
         return res;
     }
 
@@ -203,9 +193,7 @@ public class RootsGenerator implements TermGenerator {
             assert exp % 2 != 0;
 
             BigInteger res = posRoot(prod.abs(), exp).negate();
-            while (power(res, exp).compareTo(prod) > 0) {
-                res = res.subtract(one);
-            }
+            while (power(res, exp).compareTo(prod) > 0) { res = res.subtract(one); }
 
             return res;
         }
@@ -237,14 +225,10 @@ public class RootsGenerator implements TermGenerator {
 
         BigInteger res = BigInteger.ONE;
         while (true) {
-            if (exp % 2 != 0) {
-                res = res.multiply(base);
-            }
+            if (exp % 2 != 0) { res = res.multiply(base); }
 
             exp >>= 1;
-            if (exp == 0) {
-                return res;
-            }
+            if (exp == 0) { return res; }
 
             base = base.multiply(base);
         }

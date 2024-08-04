@@ -5,12 +5,12 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.ContextStatementBlock;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -42,8 +42,7 @@ public class TacletGenerator {
     private static final TacletGenerator instance = new TacletGenerator();
 
 
-    private TacletGenerator() {
-    }
+    private TacletGenerator() {}
 
 
     public static TacletGenerator getInstance() {
@@ -137,9 +136,7 @@ public class TacletGenerator {
         final OperatorSV selfSV = createSchemaVariable(self);
 
         ImmutableList<OperatorSV> paramSVs = ImmutableSLList.nil();
-        for (LocationVariable paramVar : paramVars) {
-            paramSVs = paramSVs.append(createSchemaVariable(paramVar));
-        }
+        for (LocationVariable paramVar : paramVars) { paramSVs = paramSVs.append(createSchemaVariable(paramVar)); }
         pvs = pvs.append(self).append(paramVars);
         svs = svs.append(selfSV).append(paramSVs);
 
@@ -151,15 +148,9 @@ public class TacletGenerator {
         final Sequent addedSeq = Sequent.createAnteSequent(
             Semisequent.EMPTY_SEMISEQUENT.insertFirst(guardedSchemaAxiom).semisequent());
         ImmutableList<Term> vars = ImmutableSLList.nil();
-        for (TermSV heapSV : heapSVs) {
-            vars = vars.append(tb.var(heapSV));
-        }
-        if (!target.isStatic()) {
-            vars = vars.append(tb.var(selfSV));
-        }
-        for (OperatorSV sv : paramSVs) {
-            vars = vars.append(tb.var(sv));
-        }
+        for (TermSV heapSV : heapSVs) { vars = vars.append(tb.var(heapSV)); }
+        if (!target.isStatic()) { vars = vars.append(tb.var(selfSV)); }
+        for (OperatorSV sv : paramSVs) { vars = vars.append(tb.var(sv)); }
         final Term findTerm = tb.func(target, vars.toArray(new Term[0]));
 
         final RewriteTacletGoalTemplate axiomTemplate =
@@ -179,12 +170,8 @@ public class TacletGenerator {
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, selfSV);
-        for (SchemaVariable heapSV : heapSVs) {
-            tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV);
-        }
-        for (SchemaVariable paramSV : paramSVs) {
-            tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, paramSV);
-        }
+        for (SchemaVariable heapSV : heapSVs) { tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV); }
+        for (SchemaVariable paramSV : paramSVs) { tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, paramSV); }
 
         tacletBuilder.addRuleSet(ruleSet);
         return tacletBuilder.getTaclet();
@@ -222,9 +209,7 @@ public class TacletGenerator {
 
         final TermSV selfSV = createSchemaVariable(self);
         ImmutableList<OperatorSV> paramSVs = ImmutableSLList.nil();
-        for (ProgramVariable paramVar : paramVars) {
-            paramSVs = paramSVs.append(createSchemaVariable(paramVar));
-        }
+        for (ProgramVariable paramVar : paramVars) { paramSVs = paramSVs.append(createSchemaVariable(paramVar)); }
         pvs = pvs.append(self).append(paramVars);
         svs = svs.append(selfSV).append(paramSVs);
         final TermAndBoundVarPair schemaRepresents =
@@ -288,15 +273,9 @@ public class TacletGenerator {
                 }
             }
             final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL());
-            if (wfFormula != null) {
-                addForumlaTerm = TB.and(addForumlaTerm, wfFormula);
-            }
-            if (createdFormula != null) {
-                addForumlaTerm = TB.and(addForumlaTerm, createdFormula);
-            }
-            if (selfNull != null) {
-                addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
-            }
+            if (wfFormula != null) { addForumlaTerm = TB.and(addForumlaTerm, wfFormula); }
+            if (createdFormula != null) { addForumlaTerm = TB.and(addForumlaTerm, createdFormula); }
+            if (selfNull != null) { addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull)); }
 
         }
 
@@ -313,24 +292,14 @@ public class TacletGenerator {
          * ImmutableSLList.<Taclet>nil()); tgc.setName("Precondition of "+target.name());
          * tacletBuilder.addTacletGoalTemplate (tgc); }
          */
-        if (ifSeq != null) {
-            tacletBuilder.setIfSequent(ifSeq);
-        }
+        if (ifSeq != null) { tacletBuilder.setIfSequent(ifSeq); }
         tacletBuilder.setName(name);
         tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
-        if (satisfiability) {
-            tacletBuilder.addRuleSet(new RuleSet(new Name("split")));
-        }
+        if (satisfiability) { tacletBuilder.addRuleSet(new RuleSet(new Name("split"))); }
         for (VariableSV boundSV : schemaRepresents.boundVars) {
-            for (SchemaVariable heapSV : heapSVs) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
-            }
-            if (selfSV != null) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
-            }
-            for (SchemaVariable paramSV : paramSVs) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, paramSV);
-            }
+            for (SchemaVariable heapSV : heapSVs) { tacletBuilder.addVarsNotFreeIn(boundSV, heapSV); }
+            if (selfSV != null) { tacletBuilder.addVarsNotFreeIn(boundSV, selfSV); }
+            for (SchemaVariable paramSV : paramSVs) { tacletBuilder.addVarsNotFreeIn(boundSV, paramSV); }
         }
         var c = ChoiceExpr.variable("modelFields",
             satisfiability ? "showSatisfiability" : "treatAsAxiom");
@@ -359,15 +328,9 @@ public class TacletGenerator {
         final Sequent addedSeq = Sequent.createSuccSequent(addedSemiSeq);
         final var skolemSV =
             SchemaVariableFactory.createSkolemTermSV(new Name("sk"), target.sort());
-        for (SchemaVariable heapSV : heapSVs) {
-            tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
-        }
-        if (!target.isStatic()) {
-            tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
-        }
-        for (SchemaVariable paramSV : paramSVs) {
-            tacletBuilder.addVarsNewDependingOn(skolemSV, paramSV);
-        }
+        for (SchemaVariable heapSV : heapSVs) { tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV); }
+        if (!target.isStatic()) { tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV); }
+        for (SchemaVariable paramSV : paramSVs) { tacletBuilder.addVarsNewDependingOn(skolemSV, paramSV); }
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
             ImmutableSLList.nil(), services.getTermBuilder().var(skolemSV)));
         tacletBuilder.goalTemplates().tail().head().setName("Use Axiom");
@@ -381,15 +344,9 @@ public class TacletGenerator {
             final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
         ImmutableList<Term> vars = ImmutableSLList.nil();
         TermBuilder TB = services.getTermBuilder();
-        for (var heapSV : heapSVs) {
-            vars = vars.append(TB.var(heapSV));
-        }
-        if (!target.isStatic()) {
-            vars = vars.append(TB.var(selfSV));
-        }
-        for (var sv : paramSVs) {
-            vars = vars.append(TB.var(sv));
-        }
+        for (var heapSV : heapSVs) { vars = vars.append(TB.var(heapSV)); }
+        if (!target.isStatic()) { vars = vars.append(TB.var(selfSV)); }
+        for (var sv : paramSVs) { vars = vars.append(TB.var(sv)); }
         final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
         final Term axiomSatisfiable;
@@ -413,12 +370,8 @@ public class TacletGenerator {
                     targetSVReachable = TB.and(targetSVReachable, tReach);
                 }
             }
-            if (!target.isStatic()) {
-                tacletBuilder.addVarsNotFreeIn(targetSV, selfSV);
-            }
-            for (SchemaVariable paramSV : paramSVs) {
-                tacletBuilder.addVarsNotFreeIn(targetSV, paramSV);
-            }
+            if (!target.isStatic()) { tacletBuilder.addVarsNotFreeIn(targetSV, selfSV); }
+            for (SchemaVariable paramSV : paramSVs) { tacletBuilder.addVarsNotFreeIn(targetSV, paramSV); }
             axiomSatisfiable =
                 TB.ex(targetSV, TB.and(targetSVReachable, OpReplacer.replace(targetTerm,
                     TB.var(targetSV), schemaRepresents.term, services.getTermFactory())));
@@ -493,31 +446,17 @@ public class TacletGenerator {
         // create find
         final Term[] subs = new Term[target.arity()];
         int i = 0;
-        for (var heapSV : heapSVs) {
-            subs[i++] = TB.var(heapSV);
-        }
-        if (!target.isStatic()) {
-            subs[i++] = TB.var(selfSV);
-        }
-        for (int j = 0; j < paramSVs.length; j++) {
-            subs[j + i] = TB.var(paramSVs[j]);
-        }
+        for (var heapSV : heapSVs) { subs[i++] = TB.var(heapSV); }
+        if (!target.isStatic()) { subs[i++] = TB.var(selfSV); }
+        for (int j = 0; j < paramSVs.length; j++) { subs[j + i] = TB.var(paramSVs[j]); }
         final Term find = TB.func(target, subs);
 
         // build taclet
         Term addFormulaTerm = originalPre;
-        if (wfFormula != null) {
-            addFormulaTerm = TB.and(addFormulaTerm, wfFormula);
-        }
-        if (createdFormula != null) {
-            addFormulaTerm = TB.and(addFormulaTerm, createdFormula);
-        }
-        if (selfNull != null) {
-            addFormulaTerm = TB.and(addFormulaTerm, TB.not(selfNull));
-        }
-        if (mbyOK != null) {
-            addFormulaTerm = TB.and(addFormulaTerm, mbyOK);
-        }
+        if (wfFormula != null) { addFormulaTerm = TB.and(addFormulaTerm, wfFormula); }
+        if (createdFormula != null) { addFormulaTerm = TB.and(addFormulaTerm, createdFormula); }
+        if (selfNull != null) { addFormulaTerm = TB.and(addFormulaTerm, TB.not(selfNull)); }
+        if (mbyOK != null) { addFormulaTerm = TB.and(addFormulaTerm, mbyOK); }
 
         pvs = pvs.append(originalSelfVar).append(originalParamVars); // .append(originalResultVar)
         svs = svs.append(selfSV).append(paramSVs); // .append(resultSV)
@@ -534,15 +473,9 @@ public class TacletGenerator {
         final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
 
         for (VariableSV boundSV : schemaAdd.boundVars) {
-            for (SchemaVariable heapSV : heapSVs) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
-            }
-            if (selfSV != null) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
-            }
-            for (SchemaVariable paramSV : paramSVs) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, paramSV);
-            }
+            for (SchemaVariable heapSV : heapSVs) { tacletBuilder.addVarsNotFreeIn(boundSV, heapSV); }
+            if (selfSV != null) { tacletBuilder.addVarsNotFreeIn(boundSV, selfSV); }
+            for (SchemaVariable paramSV : paramSVs) { tacletBuilder.addVarsNotFreeIn(boundSV, paramSV); }
             // tacletBuilder.addVarsNotFreeIn(boundSV, resultSV);
         }
 
@@ -585,7 +518,7 @@ public class TacletGenerator {
         final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
                 .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
         final IProgramMethod targetImpl = services.getJavaInfo().getProgramMethod(kjt,
-            ((ProgramMethod) target).getName(), sig, kjt);
+            ((ProgramMethod) target).getName(), sig);
 
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
             resultProgSV, new ImmutableArray<>(paramProgSVs));
@@ -614,12 +547,8 @@ public class TacletGenerator {
         if (target.getStateCount() == 2) {
             updateSubs[i++] = TB.var(services.getTypeConverter().getHeapLDT().getHeap());
         }
-        if (!target.isStatic()) {
-            updateSubs[i++] = TB.var(selfProgSV);
-        }
-        for (int j = 0; j < paramProgSVs.length; j++) {
-            updateSubs[j + i] = TB.var(paramProgSVs[j]);
-        }
+        if (!target.isStatic()) { updateSubs[i++] = TB.var(selfProgSV); }
+        for (int j = 0; j < paramProgSVs.length; j++) { updateSubs[j + i] = TB.var(paramProgSVs[j]); }
 
         final Term replaceTerm =
             TB.apply(TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
@@ -671,9 +600,7 @@ public class TacletGenerator {
 
         final Term[] hs = new Term[heapSVs.size()];
         i = 0;
-        for (var heapSV : heapSVs) {
-            hs[i++] = TB.var(heapSV);
-        }
+        for (var heapSV : heapSVs) { hs[i++] = TB.var(heapSV); }
         // create taclet
         final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
         final Term invTerm;
@@ -693,15 +620,9 @@ public class TacletGenerator {
         tacletBuilder.setName(name);
         tacletBuilder.addRuleSet(new RuleSet(new Name("partialInvAxiom")));
         for (VariableSV boundSV : schemaAxiom.boundVars) {
-            for (SchemaVariable heapSV : heapSVs) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
-            }
-            if (selfSV != null) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
-            }
-            if (eqSV != null && eqVersion) {
-                tacletBuilder.addVarsNotFreeIn(boundSV, eqSV);
-            }
+            for (SchemaVariable heapSV : heapSVs) { tacletBuilder.addVarsNotFreeIn(boundSV, heapSV); }
+            if (selfSV != null) { tacletBuilder.addVarsNotFreeIn(boundSV, selfSV); }
+            if (eqSV != null && eqVersion) { tacletBuilder.addVarsNotFreeIn(boundSV, eqSV); }
         }
 
         if (eqVersion) {
@@ -786,9 +707,7 @@ public class TacletGenerator {
         Iterator<OperatorSV> schemaIt = schemaVars.iterator();
         for (LocationVariable progVar : programVars) {
             OperatorSV schemaVar = schemaIt.next();
-            if (progVar != null) {
-                map.put(progVar, schemaVar);
-            }
+            if (progVar != null) { map.put(progVar, schemaVar); }
         }
         return new OpReplacer(map, services.getTermFactory());
     }
@@ -798,7 +717,8 @@ public class TacletGenerator {
      * Replaces any bound logical variables in t with schema variables (necessary for proof
      * saving/loading, if t occurs as part of a taclet).
      *
-     * @param services TODO
+     * @param services
+     *        TODO
      */
     private TermAndBoundVarPair replaceBoundLogicVars(Term t, TermServices services) {
         // recursive replacement process
@@ -813,9 +733,7 @@ public class TacletGenerator {
         final OpCollector oc = new OpCollector();
         oc.visit(t);
         final Set<Name> usedNames = new LinkedHashSet<>();
-        for (Operator op : oc.ops()) {
-            usedNames.add(op.name());
-        }
+        for (Operator op : oc.ops()) { usedNames.add(op.name()); }
 
         // find and resolve name conflicts between schema variables
         ImmutableSet<VariableSV> newSVs = DefaultImmutableSet.nil();
@@ -827,9 +745,7 @@ public class TacletGenerator {
                 final String baseName = sv.name().toString();
                 int i = 0;
                 Name newName;
-                do {
-                    newName = new Name(baseName + "_" + i++);
-                } while (usedNames.contains(newName));
+                do { newName = new Name(baseName + "_" + i++); } while (usedNames.contains(newName));
 
                 // create new SV, register in replace map
                 final VariableSV newSV = SchemaVariableFactory.createVariableSV(newName, sv.sort());
@@ -881,9 +797,7 @@ public class TacletGenerator {
             final TermAndBoundVarPair subPair = replaceBoundLVsWithSVsHelper(newSubs[i], services);
             newSubs[i] = subPair.term;
             svs = svs.union(subPair.boundVars);
-            if (newSubs[i] != t.sub(i)) {
-                changedSub = true;
-            }
+            if (newSubs[i] != t.sub(i)) { changedSub = true; }
         }
 
         // build overall term
@@ -957,15 +871,9 @@ public class TacletGenerator {
 
         final TermBuilder TB = services.getTermBuilder();
         ImmutableList<Term> vars = ImmutableSLList.nil();
-        for (TermSV heapSV : heapSVs) {
-            vars = vars.append(TB.var(heapSV));
-        }
-        if (!target.isStatic()) {
-            vars = vars.append(TB.var(selfSV));
-        }
-        for (var sv : paramSVs) {
-            vars = vars.append(TB.var(sv));
-        }
+        for (TermSV heapSV : heapSVs) { vars = vars.append(TB.var(heapSV)); }
+        if (!target.isStatic()) { vars = vars.append(TB.var(selfSV)); }
+        for (var sv : paramSVs) { vars = vars.append(TB.var(sv)); }
         final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
         final Term axiomSatisfiable;
@@ -976,16 +884,10 @@ public class TacletGenerator {
         } else {
             final VariableSV targetSV = SchemaVariableFactory.createVariableSV(
                 new Name(target.sort().name().toString().charAt(0) + "_lv"), target.sort());
-            for (SchemaVariable heapSV : heapSVs) {
-                tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
-            }
-            if (!target.isStatic()) {
-                tacletBuilder.addVarsNotFreeIn(targetSV, selfSV);
-            }
+            for (SchemaVariable heapSV : heapSVs) { tacletBuilder.addVarsNotFreeIn(targetSV, heapSV); }
+            if (!target.isStatic()) { tacletBuilder.addVarsNotFreeIn(targetSV, selfSV); }
 
-            for (var paramSV : paramSVs) {
-                tacletBuilder.addVarsNotFreeIn(targetSV, paramSV);
-            }
+            for (var paramSV : paramSVs) { tacletBuilder.addVarsNotFreeIn(targetSV, paramSV); }
             Term targetLVReachable = null;
             for (var heapSV : heapSVs) {
                 final Term targetReachable =

@@ -450,16 +450,10 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     public void setMediator(KeYMediator mediator) {
-        if (this.mediator != null) {
-            this.mediator.removeKeYSelectionListener(mediatorListener);
-        }
+        if (this.mediator != null) { this.mediator.removeKeYSelectionListener(mediatorListener); }
         this.mediator = mediator;
-        if (components.getMaxRuleAppSlider() != null) {
-            components.getMaxRuleAppSlider().setMediator(this.mediator);
-        }
-        if (this.mediator != null) {
-            this.mediator.addKeYSelectionListener(mediatorListener);
-        }
+        if (components.getMaxRuleAppSlider() != null) { components.getMaxRuleAppSlider().setMediator(this.mediator); }
+        if (this.mediator != null) { this.mediator.addKeYSelectionListener(mediatorListener); }
     }
 
     /**
@@ -469,9 +463,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         if (proof == null) {
             enableAll(false);
         } else {
-            if (components.getMaxRuleAppSlider() != null) {
-                components.getMaxRuleAppSlider().refresh();
-            }
+            if (components.getMaxRuleAppSlider() != null) { components.getMaxRuleAppSlider().refresh(); }
             StrategyProperties sp =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             for (Entry<String, List<JRadioButton>> entry : components.getPropertyButtons()
@@ -499,27 +491,22 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     /**
      * enables or disables all components
      *
-     * @param enable boolean saying whether to activate or deactivate the components
+     * @param enable
+     *        boolean saying whether to activate or deactivate the components
      */
     private void enableAll(boolean enable) {
-        if (components.getMaxRuleAppSlider() != null) {
-            components.getMaxRuleAppSlider().setEnabled(enable);
-        }
+        if (components.getMaxRuleAppSlider() != null) { components.getMaxRuleAppSlider().setEnabled(enable); }
         components.getDefaultButton().setEnabled(enable);
         components.getStrategyPredefSettingsCmb().setEnabled(enable);
         for (Entry<String, List<JRadioButton>> entry : components.getPropertyButtons().entrySet()) {
-            for (JRadioButton button : entry.getValue()) {
-                button.setEnabled(enable);
-            }
+            for (JRadioButton button : entry.getValue()) { button.setEnabled(enable); }
         }
     }
 
     public Strategy getStrategy(String strategyName, Proof proof, StrategyProperties properties) {
         if (mediator != null) {
             for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
-                if (strategyName.equals(s.name().toString())) {
-                    return s.create(proof, properties);
-                }
+                if (strategyName.equals(s.name().toString())) { return s.create(proof, properties); }
             }
             LOGGER.info("Selected Strategy '{}' not found falling back to {}", strategyName,
                 mediator.getProfile().getDefaultStrategyFactory().name());
@@ -622,7 +609,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * Sets the {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
          *
-         * @param maxRuleAppSlider The {@link MaxRuleAppSlider} in which the maximal number of steps
+         * @param maxRuleAppSlider
+         *        The {@link MaxRuleAppSlider} in which the maximal number of steps
          *        is edited.
          */
         public void setMaxRuleAppSlider(MaxRuleAppSlider maxRuleAppSlider) {
@@ -632,8 +620,10 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * Registers the given {@link JRadioButton} for the given key.
          *
-         * @param button The {@link JRadioButton}.
-         * @param key The key.
+         * @param button
+         *        The {@link JRadioButton}.
+         * @param key
+         *        The key.
          */
         public void addPropertyButton(JRadioButton button, String key) {
             List<JRadioButton> buttons =
@@ -664,7 +654,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * Sets the {@link JButton} which restores default values.
          *
-         * @param defaultButton The {@link JButton} which restores default values.
+         * @param defaultButton
+         *        The {@link JButton} which restores default values.
          */
         public void setDefaultButton(JButton defaultButton) {
             this.defaultButton = defaultButton;
@@ -680,7 +671,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * Sets the {@link JComboBox} for choosing a predefined value set.
          *
-         * @param strategyPredefSettingsCmb The {@link JComboBox} for choosing a predefined value
+         * @param strategyPredefSettingsCmb
+         *        The {@link JComboBox} for choosing a predefined value
          *        set.
          */
         public void setPredefsChoiceCmb(JComboBox<String> strategyPredefSettingsCmb) {
@@ -699,8 +691,10 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * Adds the property group.
          *
-         * @param property The property.
-         * @param group The {@link ButtonGroup}.
+         * @param property
+         *        The property.
+         * @param group
+         *        The {@link ButtonGroup}.
          */
         public void addPropertyGroup(String property, ButtonGroup group) {
             propertyGroups.put(property, group);

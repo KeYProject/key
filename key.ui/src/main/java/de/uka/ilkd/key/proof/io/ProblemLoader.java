@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.SwingWorker;
@@ -36,7 +36,8 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     private final KeYMediator mediator;
 
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, List<File> includes,
+    public ProblemLoader(
+            Path file, List<Path> classPath, Path bootClassPath, List<Path> includes,
             Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs, KeYMediator mediator,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce, ProverTaskListener ptl) {
@@ -62,7 +63,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
         long runTime = System.currentTimeMillis() - currentTime;
         if (message != null) {
             final String errorMessage = "Failed to load "
-                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                    + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
             mediator.notify(new ExceptionFailureEvent(errorMessage, message));
             mediator.getUI().reportStatus(this, errorMessage);
         }
@@ -79,9 +80,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     }
 
     private void fireTaskStarted() {
-        if (ptl != null) {
-            ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Loading, "Loading problem ...", 0));
-        }
+        if (ptl != null) { ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Loading, "Loading problem ...", 0)); }
     }
 
     private void fireTaskFinished(long runningTime, final Throwable message) {
@@ -98,9 +97,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     @Override
     protected void selectAndLoadProof(ProblemLoaderControl control, InitConfig initConfig) {
-        if (control.selectProofObligation(initConfig)) {
-            setProof(mediator.getSelectedProof());
-        }
+        if (control.selectProofObligation(initConfig)) { setProof(mediator.getSelectedProof()); }
     }
 
     /**
@@ -138,14 +135,12 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                     mediator.startInterface(true);
                     if (message != null) {
                         final String errorMessage = "Failed to load "
-                            + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
                         mediator.notify(new ExceptionFailureEvent(errorMessage, message));
                         mediator.getUI().reportStatus(this, errorMessage);
                     }
                     fireTaskFinished(runTime, message);
-                    if (mediator.getSelectedProof() != null) {
-                        mediator.getSelectionModel().defaultSelection();
-                    }
+                    if (mediator.getSelectedProof() != null) { mediator.getSelectionModel().defaultSelection(); }
                 }
             }
         };

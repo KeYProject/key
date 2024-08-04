@@ -13,9 +13,7 @@ class NameTest {
 
     @Test
     void testToString() {
-        for (var s : names) {
-            assertEquals(s, new Name(s).toString());
-        }
+        for (var s : names) { assertEquals(s, new Name(s).toString()); }
     }
 
     @Test
@@ -72,7 +70,7 @@ class NameTest {
                 } else {
                     assertNotEquals(n1.hashCode(), n2.hashCode(),
                         "Hash Code function is not wrong, " +
-                            "but most likely not sufficiently good.");
+                                "but most likely not sufficiently good.");
                 }
             }
         }

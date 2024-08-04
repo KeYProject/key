@@ -28,7 +28,7 @@ public class NewDependingOn {
                 && (second instanceof FormulaSV || second instanceof TermSV))) {
             throw new RuntimeException(
                 "NewDependingOn: First SchemaVariable has to be a SkolemTermSV or FormulaSV, "
-                    + "the second one has to be a FormulaSV or a TermSV");
+                        + "the second one has to be a FormulaSV or a TermSV");
         }
         this.first = first;
         this.second = second;
@@ -52,9 +52,7 @@ public class NewDependingOn {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof NewDependingOn nfi)) {
-            return false;
-        }
+        if (!(o instanceof NewDependingOn nfi)) { return false; }
         return (nfi.first == first() && nfi.second == second());
     }
 

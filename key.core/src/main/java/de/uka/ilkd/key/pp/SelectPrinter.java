@@ -5,11 +5,12 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -39,9 +40,7 @@ class SelectPrinter extends FieldPrinter {
         if (lp.notationInfo.isPrettySyntax() && heapLDT != null) {
 
             // if tacitHeap is null, use default heap as tacitHeap
-            if (tacitHeap == null) {
-                tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
-            }
+            if (tacitHeap == null) { tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap()); }
 
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
@@ -49,9 +48,7 @@ class SelectPrinter extends FieldPrinter {
             if (fieldTerm.op() == heapLDT.getArr()) {
                 KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(objectTerm.sort());
                 Type jtype = null;
-                if (kjt != null) {
-                    jtype = kjt.getJavaType();
-                }
+                if (kjt != null) { jtype = kjt.getJavaType(); }
                 if (jtype instanceof ArrayType && ((ArrayType) jtype).getBaseType().getKeYJavaType()
                         .getSort() == t.sort()) {
                     printArraySelect(lp, heapTerm, objectTerm, fieldTerm, tacitHeap);
@@ -69,7 +66,7 @@ class SelectPrinter extends FieldPrinter {
                     printAnySelect(lp, heapTerm, objectTerm, fieldTerm, tacitHeap);
                 }
             } else if (isBuiltinObjectProperty(fieldTerm)) {
-                // object properties denoted like o.<created>
+                // object properties denoted like o.$created
                 printBuiltinObjectProperty(lp, t, heapTerm, objectTerm, fieldTerm, tacitHeap);
             } else if (isStaticFieldConstant(objectTerm, fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
@@ -120,7 +117,7 @@ class SelectPrinter extends FieldPrinter {
      * Get sort of selected field.
      */
     private Sort getFieldSort(Term fieldTerm) {
-        String lookup = fieldTerm.op().toString().replace("$", "");
+        String lookup = JavaDLFieldNames.toJava(fieldTerm.op().name());
         ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);
         return progVar.sort();
     }
@@ -225,7 +222,7 @@ class SelectPrinter extends FieldPrinter {
 
     /*
      * Print a select-term of the following form: T::select( ... , ... , java.lang.Object::<...>)
-     * For example: boolean::select(heap, object, java.lang.Object::<created>)
+     * For example: boolean::select(heap, object, java.lang.Object::#$created)
      */
     private void printBuiltinObjectProperty(LogicPrinter lp, Term t, Term heapTerm, Term objectTerm,
             Term fieldTerm,
@@ -236,8 +233,7 @@ class SelectPrinter extends FieldPrinter {
         KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
 
         if (selectKJT != null && objectKJT != null) {
-
-            assert fieldTerm.op().name().toString().contains("::<");
+            assert JavaDLFieldNames.isImplicitField(fieldTerm.op().name());
             String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
             ProgramVariable pv =
                 javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);

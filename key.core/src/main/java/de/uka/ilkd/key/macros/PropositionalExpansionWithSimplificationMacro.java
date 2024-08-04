@@ -20,7 +20,7 @@ public class PropositionalExpansionWithSimplificationMacro
     @Override
     public String getDescription() {
         return "Apply rules to decompose propositional toplevel formulas; "
-            + "does not split the goal. Applies one step simplifications.";
+                + "does not split the goal. Applies one step simplifications.";
     }
 
     private static final String[] ADMITTED_RULES = { "andLeft", "orRight", "impRight", "notLeft",

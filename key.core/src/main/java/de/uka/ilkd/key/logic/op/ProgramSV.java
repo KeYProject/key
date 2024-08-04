@@ -4,12 +4,14 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -45,7 +47,8 @@ public final class ProgramSV extends OperatorSV
     /**
      * creates a new SchemaVariable used as a placeholder for program constructs
      *
-     * @param name the Name of the SchemaVariable allowed to match a list of program constructs
+     * @param name
+     *        the Name of the SchemaVariable allowed to match a list of program constructs
      */
     ProgramSV(Name name, ProgramSVSort s, boolean isListSV) {
         super(name, s, false, false);
@@ -88,11 +91,6 @@ public final class ProgramSV extends OperatorSV
     @Override
     public Position getEndPosition() {
         return Position.UNDEFINED;
-    }
-
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
     @Override
@@ -210,17 +208,18 @@ public final class ProgramSV extends OperatorSV
      * and returns the updated match conditions or null if mapping is not possible because of
      * violating some variable condition
      *
-     * @param pe the ProgramElement <code>var</code> is mapped to
-     * @param matchCond the MatchConditions to be updated
-     * @param services the Services provide access to the Java model
+     * @param pe
+     *        the ProgramElement <code>var</code> is mapped to
+     * @param matchCond
+     *        the MatchConditions to be updated
+     * @param services
+     *        the Services provide access to the Java model
      * @return the updated match conditions including mapping <code>var</code> to <code>pe</code> or
      *         null if some variable condition would be hurt by the mapping
      */
     private MatchConditions addProgramInstantiation(ProgramElement pe, MatchConditions matchCond,
             Services services) {
-        if (matchCond == null) {
-            return null;
-        }
+        if (matchCond == null) { return null; }
 
         SVInstantiations insts = matchCond.getInstantiations();
 
@@ -251,17 +250,18 @@ public final class ProgramSV extends OperatorSV
      * <code>list</code> and returns the updated match conditions or null if mapping is not possible
      * because of violating some variable condition
      *
-     * @param list the ProgramList <code>var</code> is mapped to
-     * @param matchCond the MatchConditions to be updated
-     * @param services the Services provide access to the Java model
+     * @param list
+     *        the ProgramList <code>var</code> is mapped to
+     * @param matchCond
+     *        the MatchConditions to be updated
+     * @param services
+     *        the Services provide access to the Java model
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
     private MatchConditions addProgramInstantiation(ProgramList list, MatchConditions matchCond,
             Services services) {
-        if (matchCond == null) {
-            return null;
-        }
+        if (matchCond == null) { return null; }
 
         SVInstantiations insts = matchCond.getInstantiations();
         final ProgramList pl = (ProgramList) insts.getInstantiation(this);
@@ -281,9 +281,7 @@ public final class ProgramSV extends OperatorSV
         final Services services = source.getServices();
         ProgramElement src = source.getSource();
 
-        if (src == null) {
-            return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services);
-        }
+        if (src == null) { return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services); }
 
         SVInstantiations instantiations = matchCond.getInstantiations();
 
@@ -293,9 +291,7 @@ public final class ProgramSV extends OperatorSV
             new java.util.ArrayList<>();
 
         while (src != null) {
-            if (!check(src, ec, services)) {
-                break;
-            }
+            if (!check(src, ec, services)) { break; }
             matchedElements.add(src);
             source.next();
             src = source.getSource();
@@ -309,23 +305,21 @@ public final class ProgramSV extends OperatorSV
     /**
      * returns true, if the given SchemaVariable can stand for the ProgramElement
      *
-     * @param match the ProgramElement to be matched
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param match
+     *        the ProgramElement to be matched
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return true if the SchemaVariable can stand for the given element
      */
     private boolean check(ProgramElement match, ExecutionContext ec, Services services) {
-        if (match == null) {
-            return false;
-        }
+        if (match == null) { return false; }
         return ((ProgramSVSort) sort()).canStandFor(match, ec, services);
     }
 
     @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
-        if (isListSV()) {
-            return matchListSV(source, matchCond);
-        }
+        if (isListSV()) { return matchListSV(source, matchCond); }
 
         final Services services = source.getServices();
         final ProgramElement src = source.getSource();
@@ -334,9 +328,7 @@ public final class ProgramSV extends OperatorSV
 
         final ExecutionContext ec = instantiations.getExecutionContext();
 
-        if (!check(src, ec, services)) {
-            return null;
-        }
+        if (!check(src, ec, services)) { return null; }
 
         final Object instant = instantiations.getInstantiation(this);
         if (instant == null || instant.equals(src)
@@ -351,7 +343,7 @@ public final class ProgramSV extends OperatorSV
             }
         } else {
             LOGGER.debug("Match failed: Former match of "
-                + " SchemaVariable incompatible with " + " the current match.");
+                    + " SchemaVariable incompatible with " + " the current match.");
             return null; // FAILED mismatch
         }
         source.next();

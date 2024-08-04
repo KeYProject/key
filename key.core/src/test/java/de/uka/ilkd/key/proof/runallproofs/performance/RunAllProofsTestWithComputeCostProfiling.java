@@ -53,9 +53,7 @@ public class RunAllProofsTestWithComputeCostProfiling {
     @BeforeAll
     public static void initPlotScriptLocation() {
         plotScript = new File("../scripts/tools/runAllProofs_createPerformancePlots/plot2png.sh");
-        if (!plotScript.exists()) {
-            throw new RuntimeException("Error: Script for plot creation not found!");
-        }
+        if (!plotScript.exists()) { throw new RuntimeException("Error: Script for plot creation not found!"); }
     }
 
     @AfterAll

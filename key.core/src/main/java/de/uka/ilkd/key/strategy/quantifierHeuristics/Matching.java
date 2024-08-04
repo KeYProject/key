@@ -18,8 +18,10 @@ class Matching {
     /**
      * matching <code>trigger</code> to <code>targetTerm</code> recursively
      *
-     * @param trigger a uni-trigger
-     * @param targetTerm a gound term
+     * @param trigger
+     *        a uni-trigger
+     * @param targetTerm
+     *        a gound term
      * @return all substitution found from this matching
      */
     public static ImmutableSet<Substitution> basicMatching(Trigger trigger, Term targetTerm) {

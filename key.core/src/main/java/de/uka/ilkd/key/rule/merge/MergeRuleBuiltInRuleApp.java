@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -93,9 +93,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         final ImmutableList<MergePartner> mergePartners =
             MergeRule.findPotentialMergePartners(goal, pio);
 
-        if (mergePartners.isEmpty()) {
-            return this;
-        }
+        if (mergePartners.isEmpty()) { return this; }
 
         final MergePointStatement mps = (MergePointStatement) JavaTools
                 .getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());

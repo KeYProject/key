@@ -17,7 +17,7 @@ public class AutoSave extends MainWindowAction {
     public AutoSave(MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Proofs will be automatically saved to +" + IOUtil.getTempDirectory()
-            + "periodically and when finished.");
+                + "periodically and when finished.");
         setName("Auto Save Proofs");
         setSelected(
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSavePeriod() > 0);

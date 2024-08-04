@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
@@ -43,9 +43,7 @@ public abstract class InitArray extends ProgramTransformer {
 
         if (aInit == null)
         // nothing to do for us
-        {
-            return null;
-        }
+        { return null; }
 
         return aInit.getArguments();
     }
@@ -69,9 +67,7 @@ public abstract class InitArray extends ProgramTransformer {
 
         ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
 
-        if (initializers == null) {
-            return p_creationExpression;
-        }
+        if (initializers == null) { return p_creationExpression; }
 
         KeYJavaType arrayType = p_creationExpression.getKeYJavaType();
 
@@ -91,9 +87,7 @@ public abstract class InitArray extends ProgramTransformer {
 
         ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
 
-        if (initializers == null) {
-            return new ProgramVariable[0];
-        }
+        if (initializers == null) { return new ProgramVariable[0]; }
 
         KeYJavaType elementType = getElementType(p_creationExpression);
 
@@ -119,9 +113,7 @@ public abstract class InitArray extends ProgramTransformer {
             ProgramVariable[] p_initializers, ReferencePrefix p_array,
             NewArray p_creationExpression) {
 
-        if (p_initializers == null || p_initializers.length == 0) {
-            return;
-        }
+        if (p_initializers == null || p_initializers.length == 0) { return; }
 
         KeYJavaType elementType = p_initializers[0].getKeYJavaType();
         TypeReference baseType = p_creationExpression.getTypeReference();

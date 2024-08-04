@@ -29,7 +29,7 @@ public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements
         String mother;
         if (motherTaclet().rule() instanceof Taclet) {
             LogicPrinter tacPrinter =
-                    LogicPrinter.purePrinter(new NotationInfo(), node.proof().getServices());
+                LogicPrinter.purePrinter(new NotationInfo(), node.proof().getServices());
             tacPrinter.printTaclet((Taclet) (motherTaclet().rule()));
             mother = tacPrinter.result();
         } else {

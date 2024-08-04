@@ -31,10 +31,14 @@ public abstract class BinaryFeature implements Feature {
      * Compute whether the result of the feature is zero (<code>true</code>) or infinity
      * (<code>false</code>)
      *
-     * @param app the RuleApp
-     * @param pos position where <code>app</code> is to be applied
-     * @param goal the goal on which <code>app</code> is to be applied
-     * @param mState mutable state needed for feature computation
+     * @param app
+     *        the RuleApp
+     * @param pos
+     *        position where <code>app</code> is to be applied
+     * @param goal
+     *        the goal on which <code>app</code> is to be applied
+     * @param mState
+     *        mutable state needed for feature computation
      * @return true iff the result of the feature is supposed to be zero.
      */
     protected abstract boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,

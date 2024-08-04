@@ -3,19 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.JavaSourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -51,14 +48,14 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
  */
 public final class KeYFacade {
     // prevents from instantiating this class
-    private KeYFacade() {
-    }
+    private KeYFacade() {}
 
     /**
      * Ensures that the given CheckerData object has a valid DependencyGraph built.
      * Does not update an existing DependencyGraph!
      *
-     * @param data the CheckerData object to store the result
+     * @param data
+     *        the CheckerData object to store the result
      */
     public static void ensureDependencyGraphBuilt(CheckerData data) {
         if (data.getDependencyGraph() == null) {
@@ -75,7 +72,8 @@ public final class KeYFacade {
      * CheckerData object. Does not replay the proofs! Proofs that already have been loaded
      * are not reloaded.
      *
-     * @param data the CheckerData object to store the result
+     * @param data
+     *        the CheckerData object to store the result
      * @throws ProofManagementException
      */
     public static void ensureProofsLoaded(CheckerData data) throws ProofManagementException {
@@ -116,9 +114,7 @@ public final class KeYFacade {
 
     private static CheckerData.ProofEntry findProofLine(Path proofPath, CheckerData data) {
         for (CheckerData.ProofEntry line : data.getProofEntries()) {
-            if (line.proofFile != null && line.proofFile.equals(proofPath)) {
-                return line;
-            }
+            if (line.proofFile != null && line.proofFile.equals(proofPath)) { return line; }
         }
         return null;
     }
@@ -168,7 +164,7 @@ public final class KeYFacade {
         /////////////////// comparison to AbstractProblemLoader load
         /////////////////// createEnvInput
         KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
-            path.toFile(), fileRepo, control, profile, false);
+            path, fileRepo, control, profile, false);
         line.envInput = keyFile; // store in CheckerData for later use (e.g. in ReplayChecker)
 
         /////////////////// createEnvInput
@@ -212,7 +208,7 @@ public final class KeYFacade {
         }
         Contract contract = contractPO.getContract();
         line.contract = contract;
-        Type type = contract.getTarget().getContainerType().getJavaType();
+        var type = contract.getTarget().getContainerType().getJavaType();
         if (type instanceof JavaSourceElement jse) {
             line.sourceFile = jse.getPositionInfo().getURL().orElseThrow();
             String str = line.sourceFile.toString();
@@ -229,7 +225,8 @@ public final class KeYFacade {
      * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
      *
      * @return The {@link IPersistablePO.LoadedPOContainer} or {@code null} if not available.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
             InitConfig initConfig, Configuration properties) throws Exception {
@@ -245,9 +242,7 @@ public final class KeYFacade {
             int ind = -1;
             for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
                 ind = chooseContract.indexOf("." + tag);
-                if (ind > 0) {
-                    break;
-                }
+                if (ind > 0) { break; }
                 proofNum++;
             }
             if (ind == -1) {
@@ -269,14 +264,12 @@ public final class KeYFacade {
             String poClass = properties.getString(IPersistablePO.PROPERTY_CLASS);
             if (poClass == null || poClass.isEmpty()) {
                 throw new IOException("Proof obligation class property \""
-                    + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
+                        + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
             }
             ServiceLoader<ProofObligationLoader> loader =
                 ServiceLoader.load(ProofObligationLoader.class);
             for (ProofObligationLoader poloader : loader) {
-                if (poloader.handles(poClass)) {
-                    return poloader.loadFrom(initConfig, proofObligation);
-                }
+                if (poloader.handles(poClass)) { return poloader.loadFrom(initConfig, proofObligation); }
             }
             throw new IllegalArgumentException(
                 "There is no builder that can build the PO for the id " + poClass);
@@ -291,7 +284,8 @@ public final class KeYFacade {
      * inside the given CheckerData object. Proofs for which a replay has already been tried are not
      * replayed again.
      *
-     * @param data the CheckerData object to store the result
+     * @param data
+     *        the CheckerData object to store the result
      * @throws ProofManagementException
      */
     public static void ensureProofsReplayed(CheckerData data) throws ProofManagementException {
@@ -314,7 +308,7 @@ public final class KeYFacade {
                         } catch (ProofInputException e) {
                             throw new ProofManagementException(
                                 "Could not replay proof from " + envInput
-                                    + System.lineSeparator() + e);
+                                        + System.lineSeparator() + e);
                         }
                     }
                 }
@@ -381,9 +375,7 @@ public final class KeYFacade {
             status +=
                 (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
                         : "Error while loading proof.");
-            if (replayResult != null) {
-                errors.addAll(replayResult.getErrors());
-            }
+            if (replayResult != null) { errors.addAll(replayResult.getErrors()); }
 
             // reset OSS
             StrategyProperties newProps = proof.getSettings().getStrategySettings()
@@ -418,7 +410,8 @@ public final class KeYFacade {
      * Ensures that the source files contained by the bundle stored in the given CheckerData object
      * are loaded. Result is stored in CheckerData object as SLEnvInput.
      *
-     * @param data the CheckerData object to store the results
+     * @param data
+     *        the CheckerData object to store the results
      * @throws ProofManagementException
      */
     public static void ensureSourceLoaded(CheckerData data) throws ProofManagementException {
@@ -426,21 +419,16 @@ public final class KeYFacade {
         try {
             // load all contracts from source files
             ProofBundleHandler pbh = data.getPbh();
-            File src = pbh.getPath("src").toFile();
-            List<File> cp = null;
-            if (!pbh.getClasspathFiles().isEmpty()) {
-                cp = pbh.getClasspathFiles().stream()
-                        .map(Path::toFile)
-                        .collect(Collectors.toList());
-            }
-            File bcp = null;
-            if (pbh.getBootclasspath() != null) {
-                bcp = pbh.getBootclasspath().toFile();
-            }
+            var src = pbh.getPath("src");
+            List<Path> cp = null;
+            if (!pbh.getClasspathFiles().isEmpty()) { cp = pbh.getClasspathFiles().stream()
+                    .toList(); }
+            Path bcp = null;
+            if (pbh.getBootclasspath() != null) { bcp = pbh.getBootclasspath(); }
 
             Profile profile = AbstractProfile.getDefaultProfile();
 
-            SLEnvInput slenv = new SLEnvInput(src.toString(), cp, bcp, profile, null);
+            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, null);
             data.setSlenv(slenv);
             data.setSrcLoadingState(CheckerData.LoadingState.SUCCESS);
             data.print(LogLevel.DEBUG, "Java sources successfully loaded!");
@@ -448,7 +436,7 @@ public final class KeYFacade {
         } catch (IOException e) {
             data.setSrcLoadingState(CheckerData.LoadingState.ERROR);
             throw new ProofManagementException("Java sources could not be loaded."
-                + System.lineSeparator() + e.getMessage());
+                    + System.lineSeparator() + e.getMessage());
         }
     }
 }

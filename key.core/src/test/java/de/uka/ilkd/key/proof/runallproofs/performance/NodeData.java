@@ -21,10 +21,7 @@ public class NodeData {
 
     private static int getDepth(Node node) {
         int depth = -1;
-        while (node != null) {
-            node = node.parent();
-            depth++;
-        }
+        while (node != null) { node = node.parent(); depth++; }
         return depth;
     }
 
@@ -41,20 +38,14 @@ public class NodeData {
 
     private static int countAST(Sequent sequent) {
         int sum = 0;
-        for (SequentFormula f : sequent.antecedent().asList()) {
-            sum += countAST(f.formula());
-        }
-        for (SequentFormula f : sequent.succedent().asList()) {
-            sum += countAST(f.formula());
-        }
+        for (SequentFormula f : sequent.antecedent().asList()) { sum += countAST(f.formula()); }
+        for (SequentFormula f : sequent.succedent().asList()) { sum += countAST(f.formula()); }
         return sum;
     }
 
     private static int countAST(Term term) {
         int sum = 0;
-        for (Term t : term.subs()) {
-            sum += countAST(t);
-        }
+        for (Term t : term.subs()) { sum += countAST(t); }
         return sum + 1;
     }
 

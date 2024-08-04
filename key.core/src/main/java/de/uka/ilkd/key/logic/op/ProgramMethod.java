@@ -4,12 +4,14 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.Constructor;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.Constructor;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -73,7 +75,8 @@ public final class ProgramMethod extends ObserverFunction
     /**
      * Get the java types of the parameters required by the method md.
      *
-     * @param md some method declaration
+     * @param md
+     *        some method declaration
      * @return java types of the parameters required by md
      */
     private static ImmutableArray<KeYJavaType> getParamTypes(MethodDeclaration md) {
@@ -143,7 +146,8 @@ public final class ProgramMethod extends ObserverFunction
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     @Override
     public void visit(Visitor v) {
@@ -170,18 +174,6 @@ public final class ProgramMethod extends ObserverFunction
     @Override
     public Position getEndPosition() {
         return pi.getEndPosition();
-    }
-
-    /**
-     * Returns the relative position (number of blank heading lines and columns) of the primary
-     * token of this element. To get the relative position of the syntactical first token, call the
-     * corresponding method of <CODE>getFirstElement()</CODE>.
-     *
-     * @return the relative position of the primary token.
-     */
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return pi.getRelativePosition();
     }
 
     @Override
@@ -268,9 +260,7 @@ public final class ProgramMethod extends ObserverFunction
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof IProgramMethod ipm)) {
-            return false;
-        }
+        if (!(obj instanceof IProgramMethod ipm)) { return false; }
 
         return method == ipm.getMethodDeclaration();
     }
@@ -320,9 +310,9 @@ public final class ProgramMethod extends ObserverFunction
     @Override
     public String getUniqueName() {
         return getName() + "_"
-            + Math.abs(ContractFactory
-                    .generateContractTypeName("", getContainerType(), this, getContainerType())
-                    .hashCode());
+                + Math.abs(ContractFactory
+                        .generateContractTypeName("", getContainerType(), this, getContainerType())
+                        .hashCode());
     } // Included HashCode to make IF-Predicates unique and still reproducible
 
     /*
@@ -463,8 +453,7 @@ public final class ProgramMethod extends ObserverFunction
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);
             IProgramVariable paramProgVar = pd.getVariableSpecification().getProgramVariable();
-            assert paramProgVar instanceof LocationVariable
-                    : "Parameter declaration expected to be location var!";
+            assert paramProgVar instanceof LocationVariable : "Parameter declaration expected to be location var!";
             LocationVariable paramLocVar = (LocationVariable) paramProgVar;
             paramVars = paramVars.prepend(paramLocVar);
         }

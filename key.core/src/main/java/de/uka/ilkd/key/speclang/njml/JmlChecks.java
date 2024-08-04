@@ -75,14 +75,12 @@ class JmlWarnDifferentRequiresSemantics extends AbstractCheck implements JmlChec
     private void checkRequires(List<JmlParser.ClauseContext> clauses) {
         boolean otherClause = false;
         for (JmlParser.ClauseContext clause : clauses) {
-            if (!isRequiresClause(clause)) {
-                otherClause = true;
-            }
+            if (!isRequiresClause(clause)) { otherClause = true; }
 
             if (isRequiresClause(clause) && otherClause) {
                 addWarning(clause,
                     "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
-                        + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO");
+                            + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO");
             }
         }
     }

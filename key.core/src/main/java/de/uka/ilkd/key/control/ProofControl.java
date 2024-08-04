@@ -61,7 +61,8 @@ public interface ProofControl {
     /**
      * collects all built-in rules that are applicable at the given sequent position 'pos'.
      *
-     * @param pos the PosInSequent where to look for applicable rules
+     * @param pos
+     *        the PosInSequent where to look for applicable rules
      */
     ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
 
@@ -79,12 +80,16 @@ public interface ProofControl {
     /**
      * selected rule to apply
      *
-     * @param rule the selected built-in rule
-     * @param pos the PosInSequent describes the position where to apply the rule
-     * @param forced a boolean indicating that if the rule is complete or can be made complete
+     * @param rule
+     *        the selected built-in rule
+     * @param pos
+     *        the PosInSequent describes the position where to apply the rule
+     * @param forced
+     *        a boolean indicating that if the rule is complete or can be made complete
      *        automatically then the rule should be applied automatically without asking the user at
      *        all (e.g. if a loop invariant is available do not ask the user to provide one)
-     * @param interactive whether the rule was applied by the user
+     * @param interactive
+     *        whether the rule was applied by the user
      */
     void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos,
             boolean forced, boolean interactive);
@@ -106,7 +111,8 @@ public interface ProofControl {
      * Checks if the auto mode of this {@link UserInterfaceControl} supports the given
      * {@link Proof}.
      *
-     * @param proof The {@link Proof} to check.
+     * @param proof
+     *        The {@link Proof} to check.
      * @return {@code true} auto mode support proofs, {@code false} auto mode don't support proof.
      */
     boolean isAutoModeSupported(Proof proof);
@@ -121,15 +127,18 @@ public interface ProofControl {
     /**
      * Starts the auto mode for the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to start auto mode of.
+     * @param proof
+     *        The {@link Proof} to start auto mode of.
      */
     void startAutoMode(Proof proof);
 
     /**
      * Starts the auto mode for the given {@link Proof} and the given {@link Goal}s.
      *
-     * @param proof The {@link Proof} to start auto mode of.
-     * @param goals The {@link Goal}s to close.
+     * @param proof
+     *        The {@link Proof} to start auto mode of.
+     * @param goals
+     *        The {@link Goal}s to close.
      */
     void startAutoMode(Proof proof, ImmutableList<Goal> goals);
 
@@ -155,8 +164,10 @@ public interface ProofControl {
      * Starts the auto mode for the given proof which must be contained in this user interface and
      * blocks the current thread until it has finished.
      *
-     * @param proof The {@link Proof} to start auto mode and to wait for.
-     * @param goals The {@link Goal}s to close.
+     * @param proof
+     *        The {@link Proof} to start auto mode and to wait for.
+     * @param goals
+     *        The {@link Goal}s to close.
      */
     void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals);
 
@@ -164,7 +175,8 @@ public interface ProofControl {
      * Starts the auto mode for the given proof which must be contained in this user interface and
      * blocks the current thread until it has finished.
      *
-     * @param proof The {@link Proof} to start auto mode and to wait for.
+     * @param proof
+     *        The {@link Proof} to start auto mode and to wait for.
      */
     void startAndWaitForAutoMode(Proof proof);
 
@@ -174,9 +186,12 @@ public interface ProofControl {
      * Runs the given {@link ProofMacro} at the given {@link PosInOccurrence} on the given
      * {@link Node}.
      *
-     * @param node The {@link Node} to start macro at.
-     * @param macro The {@link ProofMacro} to execute.
-     * @param posInOcc The exact {@link PosInOccurrence} at which the {@link ProofMacro} is started
+     * @param node
+     *        The {@link Node} to start macro at.
+     * @param macro
+     *        The {@link ProofMacro} to execute.
+     * @param posInOcc
+     *        The exact {@link PosInOccurrence} at which the {@link ProofMacro} is started
      *        at.
      */
     void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc);

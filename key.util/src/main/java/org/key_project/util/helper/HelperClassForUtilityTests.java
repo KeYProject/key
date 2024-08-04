@@ -15,13 +15,12 @@ public class HelperClassForUtilityTests {
     /**
      * Creates a folder.
      *
-     * @param folder The folder to create.
+     * @param folder
+     *        The folder to create.
      * @return The created folder.
      */
     public static File createFolder(File folder) {
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
+        if (!folder.exists()) { folder.mkdirs(); }
         /*
          * TestCase.assertEquals(!folder.exists(), folder.mkdirs());
          * TestCase.assertTrue(folder.exists()); TestCase.assertTrue(folder.isDirectory());
@@ -32,10 +31,13 @@ public class HelperClassForUtilityTests {
     /**
      * Creates a file
      *
-     * @param file The file to create.
-     * @param content The content to write to file.
+     * @param file
+     *        The file to create.
+     * @param content
+     *        The content to write to file.
      * @return The created file.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     public static File createFile(File file, String content) throws IOException {
         try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {

@@ -47,8 +47,10 @@ public class TruthValuePOExtension implements POExtension {
      * Labels all predicates in the given {@link Term} and its children with a
      * {@link FormulaTermLabel}.
      *
-     * @param services The {@link Services} to use.
-     * @param term The {@link Term} to label.
+     * @param services
+     *        The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to label.
      * @return The labeled {@link Term}.
      */
     protected Term labelPostTerm(Services services, Term term) {
@@ -61,9 +63,7 @@ public class TruthValuePOExtension implements POExtension {
                 for (int i = 0; i < newSubs.length; i++) {
                     Term oldTerm = term.sub(i);
                     newSubs[i] = labelPostTerm(services, oldTerm);
-                    if (oldTerm != newSubs[i]) {
-                        subsChanged = true;
-                    }
+                    if (oldTerm != newSubs[i]) { subsChanged = true; }
                 }
                 term = subsChanged
                         ? tf.createTerm(term.op(), new ImmutableArray<>(newSubs),

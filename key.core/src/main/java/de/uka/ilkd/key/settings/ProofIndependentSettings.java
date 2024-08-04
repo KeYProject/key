@@ -74,12 +74,8 @@ public class ProofIndependentSettings {
         if (!this.settings.contains(settings)) {
             this.settings.add(settings);
             settings.addPropertyChangeListener(settingsListener);
-            if (lastReadedProperties != null) {
-                settings.readSettings(lastReadedProperties);
-            }
-            if (lastReadedConfiguration != null) {
-                settings.readSettings(lastReadedConfiguration);
-            }
+            if (lastReadedProperties != null) { settings.readSettings(lastReadedProperties); }
+            if (lastReadedConfiguration != null) { settings.readSettings(lastReadedConfiguration); }
         }
     }
 
@@ -103,29 +99,21 @@ public class ProofIndependentSettings {
             try (FileInputStream in = new FileInputStream(file)) {
                 Properties properties = new Properties();
                 properties.load(in);
-                for (Settings settings : settings) {
-                    settings.readSettings(properties);
-                }
+                for (Settings settings : settings) { settings.readSettings(properties); }
                 lastReadedProperties = properties;
             }
         } else {
             this.lastReadedConfiguration = Configuration.load(file);
-            for (Settings settings : settings) {
-                settings.readSettings(lastReadedConfiguration);
-            }
+            for (Settings settings : settings) { settings.readSettings(lastReadedConfiguration); }
         }
     }
 
     public void saveSettings() {
         if (!filename.getName().endsWith(".json")) {
             Properties result = new Properties();
-            for (Settings settings : settings) {
-                settings.writeSettings(result);
-            }
+            for (Settings settings : settings) { settings.writeSettings(result); }
 
-            if (!filename.exists()) {
-                filename.getParentFile().mkdirs();
-            }
+            if (!filename.exists()) { filename.getParentFile().mkdirs(); }
 
             try (var out = new FileOutputStream(filename)) {
                 result.store(out, "Proof-Independent-Settings-File. Generated " + new Date());
@@ -137,9 +125,7 @@ public class ProofIndependentSettings {
         Configuration config = new Configuration();
         for (var settings : settings)
             settings.writeSettings(config);
-        if (!filename.exists()) {
-            filename.getParentFile().mkdirs();
-        }
+        if (!filename.exists()) { filename.getParentFile().mkdirs(); }
 
         try (var out =
             new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
@@ -185,7 +171,8 @@ public class ProofIndependentSettings {
     /**
      * Defines if pretty printing is enabled or not.
      *
-     * @param usePrettyPrinting {@code true} pretty printing is enabled, {@code false} pretty
+     * @param usePrettyPrinting
+     *        {@code true} pretty printing is enabled, {@code false} pretty
      *        printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {

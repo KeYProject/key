@@ -101,9 +101,12 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     /**
      * Constructor.
      *
-     * @param mediator The {@link KeYMediator} to use.
-     * @param originalProof The {@link Proof} to generate test cases for.
-     * @param showInMainWindow Defines if created {@link Proof}s are visible in the
+     * @param mediator
+     *        The {@link KeYMediator} to use.
+     * @param originalProof
+     *        The {@link Proof} to generate test cases for.
+     * @param showInMainWindow
+     *        Defines if created {@link Proof}s are visible in the
      *        {@link MainWindow} or not.
      */
     public MainWindowTestGenerator(KeYMediator mediator, Proof originalProof,
@@ -120,13 +123,9 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     public void dispose() {
         if (showInMainWindow) {
             List<Proof> proofs = getProofs();
-            if (proofs == null) {
-                return;
-            }
+            if (proofs == null) { return; }
             for (final Proof p : proofs) {
-                if (MainWindow.getInstance().getProofList().containsProof(p)) {
-                    p.dispose();
-                }
+                if (MainWindow.getInstance().getProofList().containsProof(p)) { p.dispose(); }
             }
             mediator.getSelectionModel().setSelectedProof(super.getOriginalProof());
         } else {
@@ -172,8 +171,6 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      */
     @Override
     protected void selectProof(UserInterfaceControl ui, Proof proof) {
-        if (showInMainWindow) {
-            mediator.getSelectionModel().setSelectedProof(proof);
-        }
+        if (showInMainWindow) { mediator.getSelectionModel().setSelectedProof(proof); }
     }
 }

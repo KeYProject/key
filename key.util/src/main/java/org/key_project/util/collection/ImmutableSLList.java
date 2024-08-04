@@ -52,16 +52,11 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
      */
     @Override
     public ImmutableList<T> reverse() {
-        if (size() <= 1) {
-            return this;
-        }
+        if (size() <= 1) { return this; }
 
         ImmutableList<T> rest = this;
         ImmutableList<T> rev = nil();
-        while (!rest.isEmpty()) {
-            rev = rev.prepend(rest.head());
-            rest = rest.tail();
-        }
+        while (!rest.isEmpty()) { rev = rev.prepend(rest.head()); rest = rest.tail(); }
         return rev;
     }
 
@@ -73,17 +68,13 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         S[] result;
         if (array.length < size()) {
             Class<? extends Object[]> arrayClass = array.getClass();
-            assert arrayClass.isArray()
-                    : "@AssumeAssertion(nullness): This has indeed a component type";
+            assert arrayClass.isArray() : "@AssumeAssertion(nullness): This has indeed a component type";
             result = (S[]) Array.newInstance(arrayClass.getComponentType(), size());
         } else {
             result = array;
         }
         ImmutableList<T> rest = this;
-        for (int i = 0, sz = size(); i < sz; i++) {
-            result[i] = (S) rest.head();
-            rest = rest.tail();
-        }
+        for (int i = 0, sz = size(); i < sz; i++) { result[i] = (S) rest.head(); rest = rest.tail(); }
         return result;
     }
 
@@ -108,7 +99,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     /**
      * prepends array (O(n))
      *
-     * @param array the array of the elements to be prepended
+     * @param array
+     *        the array of the elements to be prepended
      * @return IList<T> the new list
      */
     @Override
@@ -120,15 +112,15 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     /**
      * prepends the first <code>n</code> elements of an array (O(n))
      *
-     * @param array the array of the elements to be prepended
-     * @param n an int specifying the number of elements to be prepended
+     * @param array
+     *        the array of the elements to be prepended
+     * @param n
+     *        an int specifying the number of elements to be prepended
      * @return IList<T> the new list
      */
     protected ImmutableList<T> prepend(T[] array, int n) {
         ImmutableSLList<T> res = this;
-        while (n-- != 0) {
-            res = new Cons<>(array[n], res);
-        }
+        while (n-- != 0) { res = new Cons<>(array[n], res); }
         return res;
     }
 
@@ -136,18 +128,14 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     @Override
     public ImmutableList<T> append(Iterable<T> collection) {
         ImmutableList<T> tmp = this;
-        for (T elem : collection) {
-            tmp = tmp.append(elem);
-        }
+        for (T elem : collection) { tmp = tmp.append(elem); }
         return tmp;
     }
 
     @Override
     public ImmutableList<T> prependReverse(Iterable<T> collection) {
         ImmutableSLList<T> tmp = this;
-        for (T elem : collection) {
-            tmp = new Cons<>(elem, tmp);
-        }
+        for (T elem : collection) { tmp = new Cons<>(elem, tmp); }
         return tmp;
     }
 
@@ -155,7 +143,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     /**
      * first <code>n</code> elements of the list are truncated
      *
-     * @param n an int specifying the number of elements to be truncated
+     * @param n
+     *        an int specifying the number of elements to be truncated
      * @return IList<T> this list without the first <code>n</code> elements
      */
     @Override
@@ -167,9 +156,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         ImmutableList<T> rest = this;
 
-        while (n-- != 0) {
-            rest = rest.tail();
-        }
+        while (n-- != 0) { rest = rest.tail(); }
 
         return rest;
     }
@@ -192,7 +179,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * new list with only one element
          *
-         * @param element the only element in list
+         * @param element
+         *        the only element in list
          */
         Cons(S element) {
             this.element = element;
@@ -203,8 +191,10 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * constructs a new list with element as head and cons as tail
          *
-         * @param element a <T> stored in the head element of the list
-         * @param cons tail of the list
+         * @param element
+         *        a <T> stored in the head element of the list
+         * @param cons
+         *        tail of the list
          */
         Cons(S element, ImmutableSLList<S> cons) {
             this.element = element;
@@ -215,7 +205,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * creates a new list with element as head and the momentan list as tail (O(1))
          *
-         * @param e the <T> to be prepended
+         * @param e
+         *        the <T> to be prepended
          * @return IList<T> the new list
          */
         @Override
@@ -226,7 +217,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * prepends list (O(n)+O(m))
          *
-         * @param list the IList<T> to be prepended
+         * @param list
+         *        the IList<T> to be prepended
          * @return IList<T> the new list
          */
         @Override
@@ -244,9 +236,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
                 }
                 Cons<S> result = this;
                 final Object[] listElements = list.toArray(new Object[sz]);
-                for (int i = sz - 1; i >= 0; i--) {
-                    result = new Cons<>((S) listElements[i], result);
-                }
+                for (int i = sz - 1; i >= 0; i--) { result = new Cons<>((S) listElements[i], result); }
                 return result;
             }
         }
@@ -254,7 +244,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * prepends list (O(n)+O(m)) in reversed order
          *
-         * @param list the IList<T> to be prepended
+         * @param list
+         *        the IList<T> to be prepended
          * @return IList<T> the new list
          */
         @Override
@@ -275,18 +266,14 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * return true if predicate is fullfilled for at least one element
          *
-         * @param predicate the predicate
+         * @param predicate
+         *        the predicate
          * @return true if predicate is fullfilled for at least one element
          */
         @Override
         public boolean exists(Predicate<? super S> predicate) {
             ImmutableList<S> list = this;
-            while (!list.isEmpty()) {
-                if (predicate.test(list.head())) {
-                    return true;
-                }
-                list = list.tail();
-            }
+            while (!list.isEmpty()) { if (predicate.test(list.head())) { return true; } list = list.tail(); }
             return false;
         }
 
@@ -294,7 +281,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * appends element at end (non-destructive) (O(n))
          *
-         * @param e the <T> to be prepended
+         * @param e
+         *        the <T> to be prepended
          * @return IList<T> the new list
          */
         @Override
@@ -305,7 +293,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * appends element at end (non-destructive) (O(n))
          *
-         * @param list the IList<T> to be appended
+         * @param list
+         *        the IList<T> to be appended
          * @return IList<T> the new list
          */
         @Override
@@ -316,7 +305,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * appends element at end (non-destructive) (O(n))
          *
-         * @param array the array to be appended
+         * @param array
+         *        the array to be appended
          * @return IList<T> the new list
          */
         @Override
@@ -375,9 +365,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             S t;
             while (!list.isEmpty()) {
                 t = list.head();
-                if (Objects.equals(t, obj)) {
-                    return true;
-                }
+                if (Objects.equals(t, obj)) { return true; }
                 list = list.tail();
             }
             return false;
@@ -445,22 +433,16 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         @Override
         public boolean equals(@Nullable Object o) {
-            if (!(o instanceof ImmutableList)) {
-                return false;
-            }
+            if (!(o instanceof ImmutableList)) { return false; }
             final ImmutableList<S> o1 = (ImmutableList<S>) o;
-            if (o1.size() != size()) {
-                return false;
-            }
+            if (o1.size() != size()) { return false; }
 
             final Iterator<S> p = iterator();
             final Iterator<S> q = o1.iterator();
             while (p.hasNext()) {
                 S ep = p.next();
                 S eq = q.next();
-                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq))) {
-                    return false;
-                }
+                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq))) { return false; }
             }
             return true;
         }
@@ -481,7 +463,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * constructs the iterator
          *
-         * @param list the IList<T> that has to be iterated
+         * @param list
+         *        the IList<T> that has to be iterated
          */
         public SLListIterator(ImmutableList<T> list) {
             this.list = list;
@@ -511,7 +494,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Removing elements via an iterator"
-                + " is not supported for immutable datastructures.");
+                    + " is not supported for immutable datastructures.");
         }
 
     }
@@ -528,8 +511,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         private final transient Iterator<S> iterator = new SLNilListIterator();
 
-        private NIL() {
-        }
+        private NIL() {}
 
         /**
          * the NIL list is a singleton. Deserialization builds a new NIL object that has to be
@@ -592,7 +574,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * return true if predicate is fullfilled for at least one element
          *
-         * @param predicate the predicate
+         * @param predicate
+         *        the predicate
          * @return true if predicate is fullfilled for at least one element
          */
         @Override
@@ -643,8 +626,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             /**
              * creates the NIL list iterator
              */
-            public SLNilListIterator() {
-            }
+            public SLNilListIterator() {}
 
             /** @return next element in list */
             @Override
@@ -667,7 +649,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             @Override
             public void remove() {
                 throw new UnsupportedOperationException("Removing elements via an iterator"
-                    + " is not supported for immutable datastructures.");
+                        + " is not supported for immutable datastructures.");
             }
         }
 

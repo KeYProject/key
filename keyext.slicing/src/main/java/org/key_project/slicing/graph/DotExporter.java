@@ -33,18 +33,21 @@ public final class DotExporter {
         SHAPES.put(ClosedGoal.class, "rectangle");
     }
 
-    private DotExporter() {
-    }
+    private DotExporter() {}
 
     /**
      * Convert the given dependency graph into a text representation (DOT format).
      * If analysis results are given, useless nodes and edges are marked in red.
      * If <code>abbreviateFormulas</code> is true, node labels are shortened.
      *
-     * @param proof proof to export
-     * @param graph dependency graph to show
-     * @param analysisResults analysis results (may be null)
-     * @param abbreviateFormulas whether node labels should be shortened
+     * @param proof
+     *        proof to export
+     * @param graph
+     *        dependency graph to show
+     * @param analysisResults
+     *        analysis results (may be null)
+     * @param abbreviateFormulas
+     *        whether node labels should be shortened
      * @return string representing the dependency graph
      */
     public static String exportDot(
@@ -67,9 +70,7 @@ public final class DotExporter {
             node.childrenIterator().forEachRemaining(queue::add);
             var edges = graph.edgesOf(node);
             var data = node.lookup(DependencyNodeData.class);
-            if (edges == null || edges.isEmpty() || data == null) {
-                continue;
-            }
+            if (edges == null || edges.isEmpty() || data == null) { continue; }
             outputEdge(buf, analysisResults, abbreviateFormulas, false, node, data, edges);
         }
         // colorize useless nodes
@@ -88,11 +89,16 @@ public final class DotExporter {
     /**
      * Export the graph around a specific node.
      *
-     * @param graph graph
-     * @param analysisResults analysis results
-     * @param abbreviateFormulas whether to abbreviate node labels
-     * @param omitBranch whether to omit branch information
-     * @param graphNode the graph node to export a drawing around
+     * @param graph
+     *        graph
+     * @param analysisResults
+     *        analysis results
+     * @param abbreviateFormulas
+     *        whether to abbreviate node labels
+     * @param omitBranch
+     *        whether to omit branch information
+     * @param graphNode
+     *        the graph node to export a drawing around
      * @return DOT string of the nodes and edges around {@code graphNode}
      */
     public static String exportDotAround(
@@ -112,22 +118,16 @@ public final class DotExporter {
         Set<Node> drawn = new HashSet<>();
         while (!queue.isEmpty()) {
             Pair<GraphNode, Integer> nodePair = queue.remove(queue.size() - 1);
-            if (visited.contains(nodePair.first)) {
-                continue;
-            }
+            if (visited.contains(nodePair.first)) { continue; }
             GraphNode nodeB = nodePair.first;
             visited.add(nodeB);
             Stream<Node> incoming = graph.incomingEdgesOf(nodeB);
             Stream<Node> outgoing = graph.outgoingEdgesOf(nodeB);
             Stream.concat(incoming, outgoing).forEach(node -> {
-                if (drawn.contains(node)) {
-                    return;
-                }
+                if (drawn.contains(node)) { return; }
                 drawn.add(node);
                 DependencyNodeData data = node.lookup(DependencyNodeData.class);
-                if (data == null) {
-                    return;
-                }
+                if (data == null) { return; }
                 outputEdge(buf, analysisResults, abbreviateFormulas, omitBranch, node, data);
             });
             if (nodePair.second < 1) {
@@ -146,12 +146,18 @@ public final class DotExporter {
      * This will emit an edge between every input and output of the provided node.
      * It will also style the formula nodes using the shapes specified in {@link #SHAPES}.
      *
-     * @param buf output buffer
-     * @param analysisResults analysis results (if available)
-     * @param abbreviateFormulas whether to shorten node labels
-     * @param omitBranch whether to omit branch labels
-     * @param node the node to describe
-     * @param data dependency graph data on the node
+     * @param buf
+     *        output buffer
+     * @param analysisResults
+     *        analysis results (if available)
+     * @param abbreviateFormulas
+     *        whether to shorten node labels
+     * @param omitBranch
+     *        whether to omit branch labels
+     * @param node
+     *        the node to describe
+     * @param data
+     *        dependency graph data on the node
      */
     private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
             boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data) {
@@ -210,9 +216,7 @@ public final class DotExporter {
             String outString = out.toString(abbreviateFormulas, omitBranch);
             // label for edge itself
             String label = data.label;
-            if (edge instanceof AnnotatedShortenedEdge ase) {
-                label = ase.getEdgeLabel();
-            }
+            if (edge instanceof AnnotatedShortenedEdge ase) { label = ase.getEdgeLabel(); }
             buf
                     .append('"')
                     .append(inString)

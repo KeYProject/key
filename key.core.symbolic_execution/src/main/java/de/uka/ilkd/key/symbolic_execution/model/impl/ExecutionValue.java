@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.ClassType;
+import de.uka.ilkd.key.java.ast.abstraction.Field;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -62,15 +62,23 @@ public class ExecutionValue extends AbstractExecutionValue {
     /**
      * Constructor.
      *
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param variable The parent {@link ExecutionVariable} which contains this value.
-     * @param valueUnknown Is the value unknown?
-     * @param value The value.
-     * @param valueString The value as human-readable string.
-     * @param typeString The type of the value.
-     * @param condition The condition under which the variable has this value
-     * @param conditionString the condition under which the variable has this value as
+     * @param variable
+     *        The parent {@link ExecutionVariable} which contains this value.
+     * @param valueUnknown
+     *        Is the value unknown?
+     * @param value
+     *        The value.
+     * @param valueString
+     *        The value as human-readable string.
+     * @param typeString
+     *        The type of the value.
+     * @param condition
+     *        The condition under which the variable has this value
+     * @param conditionString
+     *        the condition under which the variable has this value as
      *        human-readable {@link String}
      */
     public ExecutionValue(Node proofNode, ExecutionVariable variable, boolean valueUnknown,
@@ -113,9 +121,7 @@ public class ExecutionValue extends AbstractExecutionValue {
     @Override
     public IExecutionVariable[] getChildVariables() throws ProofInputException {
         synchronized (this) {
-            if (childVariables == null) {
-                childVariables = lazyComputeChildVariables();
-            }
+            if (childVariables == null) { childVariables = lazyComputeChildVariables(); }
             return childVariables;
         }
     }
@@ -125,7 +131,8 @@ public class ExecutionValue extends AbstractExecutionValue {
      * first time.
      *
      * @return The contained child {@link IExecutionVariable}s.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
         List<IExecutionVariable> children = new LinkedList<>();

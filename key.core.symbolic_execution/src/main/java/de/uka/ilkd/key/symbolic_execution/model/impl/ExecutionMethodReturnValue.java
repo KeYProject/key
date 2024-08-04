@@ -46,11 +46,15 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param returnValue The return value.
-     * @param condition The optional condition or {@code null} if no condition is available.
+     * @param returnValue
+     *        The return value.
+     * @param condition
+     *        The optional condition or {@code null} if no condition is available.
      */
     public ExecutionMethodReturnValue(ITreeSettings settings, Node proofNode,
             PosInOccurrence modalityPIO, Term returnValue, Term condition) {
@@ -95,9 +99,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      */
     @Override
     public String getReturnValueString() throws ProofInputException {
-        if (returnValueString == null) {
-            returnValueString = lazyComputeReturnValueString();
-        }
+        if (returnValueString == null) { returnValueString = lazyComputeReturnValueString(); }
         return returnValueString;
     }
 
@@ -132,9 +134,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      */
     @Override
     public String getConditionString() throws ProofInputException {
-        if (conditionString == null) {
-            conditionString = lazyComputeConditionString();
-        }
+        if (conditionString == null) { conditionString = lazyComputeConditionString(); }
         return conditionString;
     }
 

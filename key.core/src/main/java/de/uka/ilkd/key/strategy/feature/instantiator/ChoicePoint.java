@@ -17,7 +17,8 @@ public interface ChoicePoint {
     /**
      * Obtain the branches that can be taken at this point.
      *
-     * @param oldApp the current rule application, which can already have been modified by earlier
+     * @param oldApp
+     *        the current rule application, which can already have been modified by earlier
      *        <code>ChoicePoint</code>s
      * @return an iterator over the branches of the <code>ChoicePoint</code>
      */

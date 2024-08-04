@@ -26,9 +26,7 @@ public class CompoundProof extends ProofAggregate {
     }
 
     private void flatten(List<Proof> l) {
-        for (ProofAggregate pa : proofs) {
-            flatten(pa, l);
-        }
+        for (ProofAggregate pa : proofs) { flatten(pa, l); }
     }
 
     @Override
@@ -63,26 +61,18 @@ public class CompoundProof extends ProofAggregate {
     @Override
     public ProofStatus getStatus() {
         ProofStatus result = proofs.get(0).getStatus();
-        for (int i = 1; i < proofs.size(); i++) {
-            result = result.combine(proofs.get(i).getStatus());
-        }
+        for (int i = 1; i < proofs.size(); i++) { result = result.combine(proofs.get(i).getStatus()); }
         return result;
     }
 
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
-        }
+        if (!super.equals(o)) { return false; }
 
         final CompoundProof other = (CompoundProof) o;
 
-        for (int i = 0; i < proofs.size(); i++) {
-            if (!proofs.get(i).equals(other.proofs.get(i))) {
-                return false;
-            }
-        }
+        for (int i = 0; i < proofs.size(); i++) { if (!proofs.get(i).equals(other.proofs.get(i))) { return false; } }
         return true;
     }
 
@@ -90,9 +80,7 @@ public class CompoundProof extends ProofAggregate {
     @Override
     public int hashCode() {
         int result = 17;
-        for (ProofAggregate proof : proofs) {
-            result = 37 * result + proof.hashCode();
-        }
+        for (ProofAggregate proof : proofs) { result = 37 * result + proof.hashCode(); }
         return result;
     }
 }

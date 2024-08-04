@@ -33,7 +33,7 @@ public class ProofExplorationServiceTest {
     public void setup() throws ProblemLoaderException {
         location = new File("src/test/resources//org/key_project/exploration/testAdditions.key");
         Assumptions.assumeTrue(location.exists(), "File testAdditions.key not found.");
-        env = KeYEnvironment.load(location);
+        env = KeYEnvironment.load(location.toPath());
         currentProof = env.getLoadedProof();
         expService = new ProofExplorationService(currentProof, env.getServices());
     }
@@ -225,9 +225,7 @@ public class ProofExplorationServiceTest {
         if (lookup != null) {
             foundExploration = true;
             String explorationAction = lookup.getExplorationAction();
-            if (explorationAction != null) {
-                foundExplorationAction = true;
-            }
+            if (explorationAction != null) { foundExplorationAction = true; }
         }
 
         return foundExploration & foundExplorationAction;

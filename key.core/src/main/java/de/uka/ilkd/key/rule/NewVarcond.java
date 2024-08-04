@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
@@ -67,6 +67,6 @@ public class NewVarcond {
     @Override
     public String toString() {
         return "\\new(" + sv + ", "
-            + (type != null ? String.valueOf(type) : "\\typeof(" + peerSV + ")") + ")";
+                + (type != null ? String.valueOf(type) : "\\typeof(" + peerSV + ")") + ")";
     }
 }

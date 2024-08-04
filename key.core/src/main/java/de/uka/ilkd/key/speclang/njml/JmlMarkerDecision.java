@@ -27,7 +27,8 @@ public class JmlMarkerDecision {
     /**
      * Initialize this class with default {@code enabledKeys} of {@code "key"}.
      *
-     * @param lexer a lexer instance which stream is used
+     * @param lexer
+     *        a lexer instance which stream is used
      */
     public JmlMarkerDecision(JmlLexer lexer) {
         this.lexer = lexer;
@@ -39,7 +40,8 @@ public class JmlMarkerDecision {
      * Sets the enabled keys for the recognition of active JML comments. Keys are treated
      * case-insensitive.
      *
-     * @param markers a collection of keys without prefix ([+-])
+     * @param markers
+     *        a collection of keys without prefix ([+-])
      */
     public void setEnabledKeys(@NonNull Collection<String> markers) {
         this.enabledKeys = markers.stream().map(String::toLowerCase).collect(Collectors.toSet());
@@ -95,9 +97,7 @@ public class JmlMarkerDecision {
 
         try {
             // matching the expected start of the comment
-            if (consume(expectedCommentStart)) {
-                return false;
-            }
+            if (consume(expectedCommentStart)) { return false; }
 
             // consume until '@' is hit, or else it is not a JML comment
             StringBuilder markerBuilder = new StringBuilder();
@@ -151,9 +151,7 @@ public class JmlMarkerDecision {
             enabledPlusKeyFound = enabledPlusKeyFound || isPositive(marker) && isEnabled(marker);
             enabledNegativeKeyFound =
                 enabledNegativeKeyFound || isNegative(marker) && isEnabled(marker);
-            if ("-".equals(marker) || "+".equals(marker)) {
-                return false;
-            }
+            if ("-".equals(marker) || "+".equals(marker)) { return false; }
         }
 
         return (!plusKeyFound || enabledPlusKeyFound) && !enabledNegativeKeyFound;

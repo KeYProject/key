@@ -57,9 +57,9 @@ public class TestGoal {
                                           // new BuiltInRuleAppIndex(new BuiltInRuleIndex()),
                                           // proof.getServices()));
         ImmutableList<Goal> lg = g.split(3);
-        lg.head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_right"));
-        lg.tail().head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_left"));
-        lg.tail().tail().head().addNoPosTacletApp(TacletForTests.getRules().lookup("or_right"));
+        lg.head().addNoPosTacletApp(TacletForTests.lookupTaclet("imp_right"));
+        lg.tail().head().addNoPosTacletApp(TacletForTests.lookupTaclet("imp_left"));
+        lg.tail().tail().head().addNoPosTacletApp(TacletForTests.lookupTaclet("or_right"));
         // just check if the test is trivially correct because of rules
         // not found
         assertNotNull(lg.head().indexOfTaclets().lookup("imp_right"));
@@ -73,13 +73,13 @@ public class TestGoal {
         assertEquals(1, proof.openGoals().size());
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("imp_right"),
             "Taclet Index of set back goal contains rule \"imp-right\" that were not "
-                + "there before");
+                    + "there before");
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("or_right"),
             "Taclet Index of set back goal contains rule \"or-right\"that were not "
-                + "there before");
+                    + "there before");
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("imp_left"),
             "Taclet Index of set back goal contains rule \"imp-left\" that were not "
-                + "there before");
+                    + "there before");
 
     }
 
@@ -92,16 +92,16 @@ public class TestGoal {
         Goal g = new Goal(root, TacletIndexKit.getKit().createTacletIndex(),
             new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices());
         ImmutableList<Goal> lg = g.split(3);
-        lg.head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_right"));
-        lg.tail().head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_left"));
-        lg.tail().tail().head().addNoPosTacletApp(TacletForTests.getRules().lookup("or_right"));
+        lg.head().addNoPosTacletApp(TacletForTests.lookupTaclet("imp_right"));
+        lg.tail().head().addNoPosTacletApp(TacletForTests.lookupTaclet("imp_left"));
+        lg.tail().tail().head().addNoPosTacletApp(TacletForTests.lookupTaclet("or_right"));
         // just check if the test is trivially correct because of rules
         // not found
         assertNotNull(lg.head().indexOfTaclets().lookup("imp_right"));
 
         ImmutableList<Goal> lg0 = lg.head().split(4);
-        lg0.head().addNoPosTacletApp(TacletForTests.getRules().lookup("or_left"));
-        lg0.tail().head().addNoPosTacletApp(TacletForTests.getRules().lookup("or_left"));
+        lg0.head().addNoPosTacletApp(TacletForTests.lookupTaclet("or_left"));
+        lg0.tail().head().addNoPosTacletApp(TacletForTests.lookupTaclet("or_left"));
         ImmutableList<Goal> lg1 = lg.tail().tail().head().split(2);
         proof.add(lg1.append(lg0).append(lg.tail().head()));
         proof.pruneProof(lg0.tail().head());

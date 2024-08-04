@@ -29,8 +29,7 @@ public class SemisequentChangeInfo {
     /** */
     private int lastFormulaIndex = -1;
 
-    public SemisequentChangeInfo() {
-    }
+    public SemisequentChangeInfo() {}
 
     public SemisequentChangeInfo(ImmutableList<SequentFormula> formulas) {
         this.modifiedSemisequent = formulas;
@@ -123,7 +122,8 @@ public class SemisequentChangeInfo {
      * adding formula <tt>f</tt> to the semisequent failed due to a redundance check. This means an
      * equal or stronger formula is already present in the semisequent
      *
-     * @param f the SequentFormula
+     * @param f
+     *        the SequentFormula
      */
     public void rejectedFormula(SequentFormula f) {
         this.rejected = this.rejected.append(f);
@@ -147,9 +147,7 @@ public class SemisequentChangeInfo {
         lastFormulaIndex = (lastFormulaIndex == idx) ? -1
                 : lastFormulaIndex > idx ? lastFormulaIndex - 1 : lastFormulaIndex;
 
-        if (lastFormulaIndex < -1) {
-            lastFormulaIndex = -1;
-        }
+        if (lastFormulaIndex < -1) { lastFormulaIndex = -1; }
 
     }
 
@@ -158,13 +156,12 @@ public class SemisequentChangeInfo {
      * takes over ownership over <code>succ</code> and does not release it. This means when
      * invoking the method it must be snsured that succ is never used afterwards.
      *
-     * @param succ the SemisequentChangeInfo to combine with
+     * @param succ
+     *        the SemisequentChangeInfo to combine with
      */
     public void combine(SemisequentChangeInfo succ) {
         final SemisequentChangeInfo predecessor = this;
-        if (succ == predecessor) {
-            return;
-        }
+        if (succ == predecessor) { return; }
 
         for (SequentFormula sf : succ.removed) {
             predecessor.added = predecessor.added.removeAll(sf);
@@ -180,9 +177,7 @@ public class SemisequentChangeInfo {
                     break;
                 }
             }
-            if (!skip) {
-                predecessor.removedFormula(succ.lastFormulaIndex, sf);
-            }
+            if (!skip) { predecessor.removedFormula(succ.lastFormulaIndex, sf); }
         }
 
         for (FormulaChangeInfo fci : succ.modified) {
@@ -196,15 +191,11 @@ public class SemisequentChangeInfo {
 
         for (SequentFormula sf : succ.added) {
             predecessor.removed = predecessor.removed.removeAll(sf);
-            if (!predecessor.added.contains(sf)) {
-                predecessor.addedFormula(succ.lastFormulaIndex, sf);
-            }
+            if (!predecessor.added.contains(sf)) { predecessor.addedFormula(succ.lastFormulaIndex, sf); }
         }
 
         for (SequentFormula sf : succ.rejected) {
-            if (!predecessor.rejected.contains(sf)) {
-                predecessor.rejectedFormula(sf);
-            }
+            if (!predecessor.rejected.contains(sf)) { predecessor.rejectedFormula(sf); }
         }
 
         predecessor.lastFormulaIndex = succ.lastFormulaIndex;
@@ -237,7 +228,7 @@ public class SemisequentChangeInfo {
      */
     public String toString() {
         return "changed:" + hasChanged() + "\n  added (pos):" + added + "(" + lastFormulaIndex + ")"
-            + "\n  removed:" + removed + "\n  modified:" + modified + "\n  rejected:" + rejected
-            + "\n  new semisequent:" + modifiedSemisequent;
+                + "\n  removed:" + removed + "\n  modified:" + modified + "\n  rejected:" + rejected
+                + "\n  new semisequent:" + modifiedSemisequent;
     }
 }
