@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -34,6 +37,11 @@ public class DefaultProofControl extends AbstractProofControl {
      * The currently running {@link Thread}.
      */
     private Thread autoModeThread;
+
+    /**
+     * A condition which is non-null during auto-mode. You can wait for end of macro/auto on it.
+     */
+    private Condition inAutoMode;
 
     /**
      * Constructor.
@@ -79,19 +87,17 @@ public class DefaultProofControl extends AbstractProofControl {
         }
     }
 
+
     @Override
-    public void waitWhileAutoMode() {
-        while (isInAutoMode()) { // Wait until auto mode has stopped.
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
+    public void waitWhileAutoMode() throws InterruptedException {
+        if (inAutoMode != null) {
+            inAutoMode.await();
         }
     }
 
     @Override
     public boolean isInAutoMode() {
-        return autoModeThread != null;
+        return inAutoMode != null;
     }
 
     private class AutoModeThread extends Thread {
@@ -105,6 +111,9 @@ public class DefaultProofControl extends AbstractProofControl {
             this.proof = proof;
             this.goals = goals;
             this.ptl = ptl;
+
+            var lock = new ReentrantLock();
+            inAutoMode = lock.newCondition();
         }
 
         @Override
@@ -122,6 +131,8 @@ public class DefaultProofControl extends AbstractProofControl {
                     starter.start();
                 }
             } finally {
+                inAutoMode.signalAll();
+                inAutoMode = null;
                 autoModeThread = null;
                 fireAutoModeStopped(new ProofEvent(proof));
             }
@@ -150,6 +161,9 @@ public class DefaultProofControl extends AbstractProofControl {
             this.node = node;
             this.macro = macro;
             this.posInOcc = posInOcc;
+
+            var lock = new ReentrantLock();
+            inAutoMode = lock.newCondition();
         }
 
         @Override
@@ -172,7 +186,9 @@ public class DefaultProofControl extends AbstractProofControl {
                 if (ptl != null) {
                     ptl.taskFinished(info);
                 }
+                inAutoMode.signalAll();
                 autoModeThread = null;
+                inAutoMode = null;
                 fireAutoModeStopped(new ProofEvent(proof));
             }
         }

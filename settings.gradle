@@ -14,6 +14,8 @@ include 'keyext.ui.testgen'
 include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
+include 'keyext.api'
+include 'keyext.api.doc'
 include 'keyext.caching'
 
 // ENABLE NULLNESS here or on the CLI

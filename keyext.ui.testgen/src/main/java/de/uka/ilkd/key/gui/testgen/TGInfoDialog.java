@@ -35,9 +35,12 @@ public class TGInfoDialog extends JDialog {
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality. No functionality is allowed in this method body!
             new Thread(() -> {
-                MainWindow.getInstance().getMediator().getUI().getProofControl()
-                        .stopAndWaitAutoMode();
-                ThreadUtilities.invokeOnEventQueue(() -> exitButton.setEnabled(true));
+                try {
+                    MainWindow.getInstance().getMediator().getUI().getProofControl()
+                            .stopAndWaitAutoMode();
+                    ThreadUtilities.invokeOnEventQueue(() -> exitButton.setEnabled(true));
+                } catch (InterruptedException ignore) {
+                }
             }).start();
         }
     };
