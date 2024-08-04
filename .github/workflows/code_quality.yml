@@ -20,7 +20,7 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.3.2
+        uses: gradle/actions/setup-gradle@v3.5.0
       - name: Build with Gradle
         run: ./gradlew -DENABLE_NULLNESS=true compileTest
 
@@ -33,7 +33,7 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3.3.2
-        with:
-          arguments: --continue spotlessCheck
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.5.0
+      - name: SpotlessCheck
+        run: ./gradlew --continue spotlessCheck
