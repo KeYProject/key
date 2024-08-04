@@ -15,6 +15,8 @@ public abstract class AbstractSort implements Sort {
     private final Name name;
     private final boolean isAbstract;
 
+    private final @Nullable String origin;
+
     /**
      * Documentation for this sort given by the associated documentation comment.
      * //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
@@ -22,8 +24,15 @@ public abstract class AbstractSort implements Sort {
     private @Nullable String documentation;
 
     public AbstractSort(Name name, boolean isAbstract) {
+        this(name, isAbstract, null, null);
+    }
+
+    public AbstractSort(Name name, boolean isAbstract, @Nullable String origin,
+            @Nullable String documentation) {
         this.name = name;
         this.isAbstract = isAbstract;
+        this.origin = origin;
+        this.documentation = documentation;
     }
 
     public boolean equals(@Nullable Object o) {
@@ -61,5 +70,10 @@ public abstract class AbstractSort implements Sort {
     @Override
     public @Nullable String getDocumentation() {
         return documentation;
+    }
+
+    @Override
+    public @Nullable String getOrigin() {
+        return origin;
     }
 }
