@@ -14,6 +14,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +71,8 @@ public class ProofSettings {
     private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
 
-    private Properties lastLoadedProperties = null;
-    private Configuration lastLoadedConfiguration = null;
+    private @Nullable Properties lastLoadedProperties = null;
+    private @Nullable Configuration lastLoadedConfiguration = null;
 
     /**
      * create a proof settings object. When you add a new settings object, PLEASE UPDATE THE LIST

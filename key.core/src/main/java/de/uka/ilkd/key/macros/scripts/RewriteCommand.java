@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -254,6 +255,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
          * Formula, where to find {@see find}.
          */
         @Option(value = "formula", required = false)
+        @Nullable
         public Term formula;
     }
 }

@@ -813,7 +813,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * pm.name().toString().equals(kjt.getFullName() + "::" + mn)) { List<Term> arguments =
      * mapOf(suffix.attribute_or_query_suffix().result.args.argument()); Term[] args =
      * arguments.toArray(new Term[0]); return getJavaInfo().getStaticProgramMethodTerm(mn, args,
-     * kjt.getFullName()); } } } assert false; return null; }
+     * kjt.getFullName()); } } } throw new RuntimeException("Not Implemented"); }
      */
 
     @Override

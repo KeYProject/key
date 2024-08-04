@@ -47,6 +47,7 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
     /**
      * The Assigned parameters (currently only the passed goals).
      */
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The number of open and enabled goals.

@@ -93,6 +93,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
         return "hide";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public Sequent sequent;

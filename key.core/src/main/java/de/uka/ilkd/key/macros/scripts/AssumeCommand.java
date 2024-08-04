@@ -47,6 +47,7 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @SuppressWarnings("initialization")
     public static class FormulaParameter {
         @Option("#2")
         public Term formula;

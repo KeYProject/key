@@ -14,6 +14,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Takes care of providing the whole ProofMacro interface by only making it necessary to implement
  * to most general application methods for a given list of goals and translating the less general
@@ -67,7 +69,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
-            PosInOccurrence posInOcc, ProverTaskListener listener)
+            @Nullable PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }
