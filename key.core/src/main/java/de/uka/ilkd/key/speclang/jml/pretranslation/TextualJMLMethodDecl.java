@@ -30,7 +30,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     public String getParsableDeclaration() {
         String m = modifiers.stream().map(it -> {
-            if (JMLTransformer.javaModifiers.contains(it)) {
+            if (JMLTransformer.JAVA_MODS.contains(it)) {
                 return it.toString();
             } else {
                 JMLModifier jmlModifier = JMLModifier.valueOf(it.name());
@@ -71,12 +71,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
         return Objects.equals(methodDefinition, that.methodDefinition);
     }
@@ -87,12 +83,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     public int getStateCount() {
-        if (modifiers.contains(JMLModifier.TWO_STATE)) {
-            return 2;
-        }
-        if (modifiers.contains(JMLModifier.NO_STATE)) {
-            return 0;
-        }
+        if (modifiers.contains(JMLModifier.TWO_STATE)) { return 2; }
+        if (modifiers.contains(JMLModifier.NO_STATE)) { return 0; }
         return 1;
     }
 

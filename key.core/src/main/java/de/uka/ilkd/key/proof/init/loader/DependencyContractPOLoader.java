@@ -24,8 +24,10 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link de.uka.ilkd.key.proof.init.InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already load {@link de.uka.ilkd.key.proof.init.InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
@@ -36,9 +38,7 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
         int ind = -1;
         for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
             ind = contractName.indexOf("." + tag);
-            if (ind > 0) {
-                break;
-            }
+            if (ind > 0) { break; }
             proofNum++;
         }
         if (ind == -1) {

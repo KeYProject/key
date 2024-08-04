@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.java.ast.expression.literal;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.ast.TerminalProgramElement;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 
 import org.key_project.util.collection.ImmutableArray;
 
-public interface IForUpdates extends de.uka.ilkd.key.java.NonTerminalProgramElement {
+public interface IForUpdates extends NonTerminalProgramElement {
 
     int size();
 

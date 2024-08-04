@@ -606,23 +606,19 @@ public abstract class AbstractProblemLoader {
     private LoadedPOContainer loadByProofObligation(Configuration proofObligation)
             throws Exception {
         // Load proof obligation settings
-        proofObligation.set(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
+        proofObligation.set(IPersistablePO.PROPERTY_FILENAME, file.toString());
 
-        if (poPropertiesToForce != null) {
-            proofObligation.overwriteWith(proofObligation);
-        }
+        if (poPropertiesToForce != null) { proofObligation.overwriteWith(proofObligation); }
 
         String poClass = proofObligation.getString(IPersistablePO.PROPERTY_CLASS);
         if (poClass == null || poClass.isEmpty()) {
             throw new IOException("Proof obligation class property \""
-                + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+                    + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
         }
         ServiceLoader<ProofObligationLoader> loader =
             ServiceLoader.load(ProofObligationLoader.class);
         for (ProofObligationLoader poloader : loader) {
-            if (poloader.handles(poClass)) {
-                return poloader.loadFrom(initConfig, proofObligation);
-            }
+            if (poloader.handles(poClass)) { return poloader.loadFrom(initConfig, proofObligation); }
         }
         throw new IllegalArgumentException(
             "There is no builder that can build the PO for the id " + poClass);
@@ -634,7 +630,7 @@ public abstract class AbstractProblemLoader {
         int ind = -1;
         for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
             ind = chooseContract.indexOf("." + tag);
-                if (ind > 0) { break; }
+            if (ind > 0) { break; }
             proofNum++;
         }
         if (ind == -1) {

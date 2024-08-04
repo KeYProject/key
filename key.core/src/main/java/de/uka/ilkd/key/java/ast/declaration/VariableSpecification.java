@@ -269,31 +269,21 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == this) { return true; }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
 
         VariableSpecification vs = (VariableSpecification) o;
 
-        if (dimensions != vs.getDimensions()) {
-            return false;
-        }
+        if (dimensions != vs.getDimensions()) { return false; }
         if (type != null) {
             if (!(type.equals(vs.getType()))) { return false; }
         } else {
             if (vs.getType() != null) { return false; }
         }
 
-        if (vs.getChildCount() != getChildCount()) {
-            return false;
-        }
+        if (vs.getChildCount() != getChildCount()) { return false; }
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equals(vs.getChildAt(i))) {
-                return false;
-            }
+            if (!getChildAt(i).equals(vs.getChildAt(i))) { return false; }
         }
         return true;
     }

@@ -1466,7 +1466,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
         } else if (v instanceof LocationVariable lv) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
-        }else {
+        } else {
             if (v instanceof OperatorSV sv) {
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(sv));
             } else {

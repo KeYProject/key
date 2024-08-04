@@ -8,15 +8,12 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.io.File;
-import java.net.URL;
-import java.util.*;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
@@ -24,7 +21,7 @@ import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
@@ -181,7 +178,7 @@ public final class SLEnvInput extends AbstractEnvInput {
 
     private void addMergePointStatements(SpecExtractor specExtractor,
             final SpecificationRepository specRepos, final IProgramMethod pm,
-            final ImmutableList<ProgramVariable> methodParameters) throws ProofInputException {
+            final ImmutableList<LocationVariable> methodParameters) throws ProofInputException {
         // merge point statements
         final JavaASTCollector mpsCollector =
             new JavaASTCollector(pm.getBody(), MergePointStatement.class);
@@ -287,7 +284,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 var params = iter.hasNext() ? ((Contract) iter.next()).getOrigVars().params : null;
                 specRepos.addSpecs(methodSpecs);
 
-                Type declaringType = pm.getContainerType().getJavaType();
+                var declaringType = pm.getContainerType().getJavaType();
 
                 // Create default contracts for all methods except KeY default methods (like <init>)
                 // and Object methods.

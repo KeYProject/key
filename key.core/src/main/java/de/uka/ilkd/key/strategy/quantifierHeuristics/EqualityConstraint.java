@@ -403,14 +403,18 @@ public class EqualityConstraint implements Constraint {
         if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
             nat = checkNat(nat);
             if (RenamingTermProperty.javaBlocksNotEqualModRenaming(t0.javaBlock(), t1.javaBlock(),
-                nat)) { return FAILED; }
+                nat)) {
+                return FAILED;
+            }
         }
 
         if (!(t0.op() instanceof SchemaVariable) && t0.op() instanceof ProgramVariable) {
             if (!(t1.op() instanceof ProgramVariable)) { return FAILED; }
             nat = checkNat(nat);
             if (!((ProgramVariable) t0.op()).equalsModProperty(t1.op(),
-                RENAMING_SOURCE_ELEMENT_PROPERTY, nat)) { return FAILED; }
+                RENAMING_SOURCE_ELEMENT_PROPERTY, nat)) {
+                return FAILED;
+            }
         }
 
         return nat;

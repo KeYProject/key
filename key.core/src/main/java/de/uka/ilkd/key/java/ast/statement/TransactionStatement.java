@@ -52,11 +52,8 @@ public class TransactionStatement extends JavaStatement {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true;
-        }
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == this) { return true; }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
         return ((TransactionStatement) o).type == this.type;
     }
 

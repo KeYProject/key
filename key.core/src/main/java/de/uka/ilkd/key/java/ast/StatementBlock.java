@@ -6,7 +6,6 @@ package de.uka.ilkd.key.java.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
@@ -93,29 +92,21 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == this) { return true; }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
 
         final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
-        if (jnte.getChildCount() != getChildCount()) {
-            return false;
-        }
+        if (jnte.getChildCount() != getChildCount()) { return false; }
 
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equals(jnte.getChildAt(i))) {
-                return false;
-            }
+            if (!getChildAt(i).equals(jnte.getChildAt(i))) { return false; }
         }
 
         return (this.getStartPosition().equals(Position.UNDEFINED) || // why do we care here
                                                                       // about position info and
-                // nowhere else?
-                                                                      // We also care in
-                                                                      // LoopStatement
+        // nowhere else?
+        // We also care in
+        // LoopStatement
                 jnte.getStartPosition().equals(Position.UNDEFINED)
                 || this.getStartPosition().line() == jnte.getStartPosition().line());
     }
@@ -184,11 +175,13 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
-     * @param index an index for a statement.
+     * @param index
+     *        an index for a statement.
      *
      * @return the statement with the given index.
      *
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
         return body.get(index);
@@ -209,11 +202,13 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * Return the type declaration at the specified index in this node's "virtual" type declaration
      * array.
      *
-     * @param index an index for a type declaration.
+     * @param index
+     *        an index for a type declaration.
      *
      * @return the type declaration with the given index.
      *
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds.
      */
     public TypeDeclaration getTypeDeclarationAt(int index) {
         int s = body.size();

@@ -70,7 +70,8 @@ public interface IPersistablePO extends ProofOblInput {
      * {@link Sequent} (if code and specifications are unchanged).
      *
      * @return
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     Configuration createLoaderConfig() throws IOException;
 

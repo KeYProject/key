@@ -521,9 +521,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             }
         }
 
-        if (!app.complete()) {
-            return null;
-        }
+        if (!app.complete()) { return null; }
         return app;
     }
 
@@ -601,7 +599,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
                 app = app.addCheckedInstantiation(operatorSv, tb.var(v), services, true);
             } else {
-                if (force) { return null; }}
+                if (force) { return null; }
+            }
         }
         return app;
     }

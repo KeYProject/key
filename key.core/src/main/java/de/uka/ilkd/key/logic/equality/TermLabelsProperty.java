@@ -35,18 +35,20 @@ public class TermLabelsProperty implements Property<Term> {
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, ignoring <b>all</b>
      * term labels.
      *
-     * @param term1 a term
-     * @param term2 the term compared to {@code term1}
-     * @param v should not be used for this equality check
+     * @param term1
+     *        a term
+     * @param term2
+     *        the term compared to {@code term1}
+     * @param v
+     *        should not be used for this equality check
      * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}
      *         ignoring <b>all</b> term labels
-     * @param <V> is not needed for this equality check
+     * @param <V>
+     *        is not needed for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
-        if (term2 == term1) {
-            return true;
-        }
+        if (term2 == term1) { return true; }
 
         if (!(term1.op().equals(term2.op()) && term1.boundVars().equals(term2.boundVars())
                 && term1.javaBlock().equals(term2.javaBlock()))) {
@@ -57,9 +59,7 @@ public class TermLabelsProperty implements Property<Term> {
         final ImmutableArray<Term> term2Subs = term2.subs();
         final int numOfSubs = term1Subs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), TERM_LABELS_PROPERTY)) {
-                return false;
-            }
+            if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), TERM_LABELS_PROPERTY)) { return false; }
         }
         return true;
     }
@@ -67,7 +67,8 @@ public class TermLabelsProperty implements Property<Term> {
     /**
      * Computes the hash code of {@code term} while ignoring <b>all</b> term labels.
      *
-     * @param term the term to compute the hash code for
+     * @param term
+     *        the term to compute the hash code for
      * @return the hash code
      */
     @Override

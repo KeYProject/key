@@ -803,7 +803,7 @@ public final class SpecificationRepository {
     /**
      * Registers the passed (atomic) contract, and inherits it to all overriding methods.
      */
-    private void addContract(Contract contract) {
+    public void addContract(Contract contract) {
         contract = prepareContract(contract);
 
         // register and inherit

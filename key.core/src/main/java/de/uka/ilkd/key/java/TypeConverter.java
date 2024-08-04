@@ -169,9 +169,7 @@ public final class TypeConverter {
     private Term convertReferencePrefix(ReferencePrefix prefix, ExecutionContext ec) {
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
-        } else if (prefix instanceof VariableReference vr) {
-            prefix = vr.getProgramVariable();
-        }
+        } else if (prefix instanceof VariableReference vr) { prefix = vr.getProgramVariable(); }
         if (prefix instanceof MetaClassReference) {
             LOGGER.warn("WARNING: metaclass references not supported yet");
             throw new IllegalArgumentException("TypeConverter could not handle" + " this");

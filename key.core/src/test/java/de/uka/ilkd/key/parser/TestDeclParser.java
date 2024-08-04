@@ -234,7 +234,7 @@ public class TestDeclParser {
                 + o.getClass() + ", but the type SchemaVariable was expected");
         assertSame(((FormulaSV) o).sort(), JavaDLTheory.FORMULA,
             "Only matches to terms of sort FORMULA allowed. " + "But term has sort "
-                + ((FormulaSV) o).sort());
+                    + ((FormulaSV) o).sort());
 
 
     }

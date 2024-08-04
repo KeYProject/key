@@ -30,7 +30,8 @@ public class BoundVariableTools {
      * and in case of differences substitute variables from the former array with the ones of the
      * latter array (in <code>originalTerm</code>)
      *
-     * @param services the Services
+     * @param services
+     *        the Services
      */
     public Term renameVariables(Term originalTerm,
             ImmutableArray<QuantifiableVariable> oldBoundVars,
@@ -63,10 +64,13 @@ public class BoundVariableTools {
      * Replace all variables of <code>oldVars</code> that also turn up in <code>criticalPairs</code>
      * with new variables (currently just with the same name).
      *
-     * @param oldVars variables to be checked
-     * @param newVars array in which either the original variables (if a variable is not an element
+     * @param oldVars
+     *        variables to be checked
+     * @param newVars
+     *        array in which either the original variables (if a variable is not an element
      *        of <code>criticalVars</code>) or newly created variables are stored
-     * @param criticalVars variables that must not turn up in the resulting array
+     * @param criticalVars
+     *        variables that must not turn up in the resulting array
      *        <code>newVars</code>
      * @return <code>true</code> iff it was necessary to create at least one new variable
      */
@@ -109,7 +113,8 @@ public class BoundVariableTools {
      * operator of <code>t</code> (by bound renaming). The resulting subterms and arrays of bound
      * variables are stored in <code>newSubs</code> and <code>newBoundVars</code> (resp.)
      *
-     * @param services TODO
+     * @param services
+     *        TODO
      *
      * @return <code>true</code> if it was necessary to rename a variable, i.e. to changed anything
      *         in the term <code>originalTerm</code>
@@ -144,13 +149,18 @@ public class BoundVariableTools {
      * <code>subtermsEnd</code>) the same variables are bound. In case of differences bound renaming
      * is applied (existing variables are renamed to new ones)
      *
-     * @param boundVarsPerSub bound variables per subterms
-     * @param subs subterms (in which variables are renamed if necessary)
-     * @param subtermsBegin first subterm that is supposed to be considered
-     * @param subtermsEnd subterm after the last subterm to be consider
+     * @param boundVarsPerSub
+     *        bound variables per subterms
+     * @param subs
+     *        subterms (in which variables are renamed if necessary)
+     * @param subtermsBegin
+     *        first subterm that is supposed to be considered
+     * @param subtermsEnd
+     *        subterm after the last subterm to be consider
      *
      *        PRE: <code>subtermsEnd {@literal >} subtermsBegin</code>
-     * @param services TODO
+     * @param services
+     *        TODO
      */
     public ImmutableArray<QuantifiableVariable> unifyBoundVariables(
             ImmutableArray<QuantifiableVariable>[] boundVarsPerSub, Term[] subs, int subtermsBegin,
@@ -184,19 +194,14 @@ public class BoundVariableTools {
      */
     public boolean consistentVariableArrays(ImmutableArray<QuantifiableVariable> ar0,
             ImmutableArray<QuantifiableVariable> ar1) {
-        if (ar0.size() != ar1.size()) {
-            return false;
-        }
-        for (int i = 0; i != ar0.size(); ++i) {
-            if (ar0.get(i).sort() != ar1.get(i).sort()) {
-                return false;
-            }
-        }
+        if (ar0.size() != ar1.size()) { return false; }
+        for (int i = 0; i != ar0.size(); ++i) { if (ar0.get(i).sort() != ar1.get(i).sort()) { return false; } }
         return true;
     }
 
     /**
-     * @param services TODO
+     * @param services
+     *        TODO
      * @return <code>true</code> iff the two arrays of variables are compatible
      *         (<code>compatibleVariableArrays()</code>) and the two given terms are equal modulo
      *         renaming after unification of the two arrays (of variables occurring free in the
@@ -204,12 +209,8 @@ public class BoundVariableTools {
      */
     public boolean equalsModRenaming(ImmutableArray<QuantifiableVariable> vars0, Term term0,
             ImmutableArray<QuantifiableVariable> vars1, Term term1, TermServices services) {
-        if (!consistentVariableArrays(vars0, vars1)) {
-            return false;
-        }
-        if (vars0.size() == 0) {
-            return term0.equalsModProperty(term1, RENAMING_TERM_PROPERTY);
-        }
+        if (!consistentVariableArrays(vars0, vars1)) { return false; }
+        if (vars0.size() == 0) { return term0.equalsModProperty(term1, RENAMING_TERM_PROPERTY); }
 
         final ImmutableArray<QuantifiableVariable> unifiedVars = unifyVariableArrays(vars0, vars1,
             new LinkedHashMap<>());
@@ -229,14 +230,10 @@ public class BoundVariableTools {
         final QuantifiableVariable[] res = new QuantifiableVariable[ar0.size()];
         for (int i = 0; i != ar0.size(); ++i) {
             QuantifiableVariable pv0 = ar0.get(i);
-            if (variableRenaming.containsKey(pv0)) {
-                pv0 = variableRenaming.get(pv0);
-            }
+            if (variableRenaming.containsKey(pv0)) { pv0 = variableRenaming.get(pv0); }
 
             QuantifiableVariable pv1 = ar1.get(i);
-            if (variableRenaming.containsKey(pv1)) {
-                pv1 = variableRenaming.get(pv1);
-            }
+            if (variableRenaming.containsKey(pv1)) { pv1 = variableRenaming.get(pv1); }
 
             if (pv0 != pv1) {
                 // introduce a new variable

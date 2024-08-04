@@ -187,9 +187,7 @@ public final class SortDependingFunction extends JFunction {
 
     @Override
     public SyntaxElement getChild(int n) {
-        if (n == 0) {
-            return sortDependingOn;
-        }
+        if (n == 0) { return sortDependingOn; }
         throw new IndexOutOfBoundsException(
             "SortDependingFunction " + name() + " has only one child");
     }

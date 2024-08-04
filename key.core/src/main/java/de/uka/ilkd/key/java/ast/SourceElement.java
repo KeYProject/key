@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
@@ -91,9 +90,7 @@ public interface SourceElement extends SyntaxElement, EqualsModProperty<SourceEl
      */
     @Override
     default <V> boolean equalsModProperty(Object o, Property<SourceElement> property, V... v) {
-        if (!(o instanceof SourceElement)) {
-            return false;
-        }
+        if (!(o instanceof SourceElement)) { return false; }
         return property.equalsModThisProperty(this, (SourceElement) o, v);
     }
 

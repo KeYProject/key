@@ -10,7 +10,8 @@ import org.key_project.logic.Name;
 /**
  * Label attached to the modality of the validity branch of a block contract.
  *
- * @param exceptionVariable The name of the exception variable to distinguish normal from exceptional termination.
+ * @param exceptionVariable
+ *        The name of the exception variable to distinguish normal from exceptional termination.
  */
 public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable) implements TermLabel {
     /**

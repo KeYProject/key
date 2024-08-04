@@ -1668,8 +1668,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             }
 
             ProgramSV execSV = null;
-            for (var programSV : labels) {
-                if (programSV.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+            for (SchemaVariable programSV : labels) {
+                if (((OperatorSV) programSV).sort() == ProgramSVSort.EXECUTIONCONTEXT) {
                     execSV = (ProgramSV) programSV;
                     break;
                 }
@@ -1682,7 +1682,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
             for (int i = 0; i < labels.size(); i++) {
-                final var sv = labels.get(i);
+                final var sv = (OperatorSV) labels.get(i);
                 if (sv.sort() == ProgramSVSort.VARIABLE) { returnSV = (ProgramSV) sv; }
                 if (sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) { execSV = (ProgramSV) sv; }
             }

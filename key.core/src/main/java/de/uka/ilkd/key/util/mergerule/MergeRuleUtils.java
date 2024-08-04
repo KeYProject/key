@@ -1865,7 +1865,7 @@ public class MergeRuleUtils {
         @Override
         public boolean equals(Object obj) {
             return obj instanceof TermWrapper
-                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
+                    && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
         }
 
         @Override

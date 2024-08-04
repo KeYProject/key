@@ -198,9 +198,7 @@ public class RewriteTaclet extends FindTaclet {
                     svi = svi.addUpdate(update, t.getLabels());
                 }
             } else if (getApplicationRestriction() != NONE
-                    && (op instanceof Modality)) {
-                return null;
-            }
+                    && (op instanceof Modality)) { return null; }
 
             if (polarity != 0) { polarity = polarity(op, it, polarity); }
         }

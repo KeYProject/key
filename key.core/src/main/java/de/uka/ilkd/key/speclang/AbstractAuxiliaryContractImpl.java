@@ -133,21 +133,36 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     /**
      *
-     * @param baseName the base name.
-     * @param block the block this contract belongs to.
-     * @param labels all labels belonging to the block.
-     * @param method the method containing the block.
-     * @param modalityKind this contract's modality kind.
-     * @param preconditions this contract's preconditions on every heap.
-     * @param measuredBy this contract's measured-by term.
-     * @param postconditions this contract's postconditions on every heap.
-     * @param modifiableClauses this contract's modifiable clauses on every heap.
-     * @param freeModifiableClauses this contract's free modifiable clauses on every heap.
-     * @param infFlowSpecs this contract's information flow specifications.
-     * @param variables this contract's variables.
-     * @param transactionApplicable whether this contract is applicable for transactions.
-     * @param hasModifiable a map specifying on which heaps this contract has a modifiable clause.
-     * @param functionalContracts the functional contracts corresponding to this contract.
+     * @param baseName
+     *        the base name.
+     * @param block
+     *        the block this contract belongs to.
+     * @param labels
+     *        all labels belonging to the block.
+     * @param method
+     *        the method containing the block.
+     * @param modalityKind
+     *        this contract's modality kind.
+     * @param preconditions
+     *        this contract's preconditions on every heap.
+     * @param measuredBy
+     *        this contract's measured-by term.
+     * @param postconditions
+     *        this contract's postconditions on every heap.
+     * @param modifiableClauses
+     *        this contract's modifiable clauses on every heap.
+     * @param freeModifiableClauses
+     *        this contract's free modifiable clauses on every heap.
+     * @param infFlowSpecs
+     *        this contract's information flow specifications.
+     * @param variables
+     *        this contract's variables.
+     * @param transactionApplicable
+     *        whether this contract is applicable for transactions.
+     * @param hasModifiable
+     *        a map specifying on which heaps this contract has a modifiable clause.
+     * @param functionalContracts
+     *        the functional contracts corresponding to this contract.
      */
     public AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method,
@@ -611,7 +626,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String pres = getHtmlPres(baseHeap, heapLDT, services);
         String posts = getHtmlPosts(baseHeap, heapLDT, services);
         return "<html>" + "<i>" + LogicPrinter.escapeHTML(stringBuilder.toString(), false) + "</i>"
-            + pres + posts + modifiables + "<br><b>termination</b> " + getModalityKind()
+                + pres + posts + modifiables + "<br><b>termination</b> " + getModalityKind()
                 /*
                  * + (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" :
                  * "")
@@ -1115,14 +1130,21 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param signals
          *        the contract's postcondition for abrupt termination due to abrupt
          *        termination.
-         * @param signalsOnly a term specifying which uncaught exceptions may occur.
-         * @param diverges a diverges clause.
-         * @param modifiables map from every heap to an modifiable term.
-         * @param modifiablesFree map from every heap to a free modifiable term.
-         * @param hasMod map specifying on which heaps this contract has a modifiable clause.
-         * @param hasFreeModifiable map specifying on which heaps this contract has a free
+         * @param signalsOnly
+         *        a term specifying which uncaught exceptions may occur.
+         * @param diverges
+         *        a diverges clause.
+         * @param modifiables
+         *        map from every heap to an modifiable term.
+         * @param modifiablesFree
+         *        map from every heap to a free modifiable term.
+         * @param hasMod
+         *        map specifying on which heaps this contract has a modifiable clause.
+         * @param hasFreeModifiable
+         *        map specifying on which heaps this contract has a free
          *        modifiable clause.
-         * @param services services.
+         * @param services
+         *        services.
          */
         public Creator(final String baseName, final StatementBlock block, final List<Label> labels,
                 final IProgramMethod method, final Behavior behavior, final Variables variables,
@@ -1489,10 +1511,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
         /**
          *
-         * @param preconditions the contracts' preconditions.
-         * @param postconditions the contracts' postconditions.
-         * @param modifiableClauses the contracts' modifiable clauses.
-         * @param infFlowSpecs the contracts' information flow specifications.
+         * @param preconditions
+         *        the contracts' preconditions.
+         * @param postconditions
+         *        the contracts' postconditions.
+         * @param modifiableClauses
+         *        the contracts' modifiable clauses.
+         * @param infFlowSpecs
+         *        the contracts' information flow specifications.
          * @return a set of one or two contracts depending on whether the {@code diverges} clause
          *         is trivial (i.e., {@code true} or {@code false}) or not.
          */
@@ -1526,22 +1552,37 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         }
 
         /**
-         * @param baseName the base name.
-         * @param block the block this contract belongs to.
-         * @param labels all labels belonging to the block.
-         * @param method the method containing the block.
-         * @param modalityKind this contract's modality kind.
-         * @param preconditions this contract's preconditions on every heap.
-         * @param measuredBy this contract's measured-by term.
-         * @param postconditions this contract's postconditions on every heap.
-         * @param modifiableClauses this contract's modifiable clauses on every heap.
-         * @param freeModifiableClauses this contract's free modifiable clauses on every heap.
-         * @param infFlowSpecs this contract's information flow specifications.
-         * @param variables this contract's variables.
-         * @param transactionApplicable whether this contract is applicable for transactions.
-         * @param hasModifiable a map specifying on which heaps this contract has a modifiable
+         * @param baseName
+         *        the base name.
+         * @param block
+         *        the block this contract belongs to.
+         * @param labels
+         *        all labels belonging to the block.
+         * @param method
+         *        the method containing the block.
+         * @param modalityKind
+         *        this contract's modality kind.
+         * @param preconditions
+         *        this contract's preconditions on every heap.
+         * @param measuredBy
+         *        this contract's measured-by term.
+         * @param postconditions
+         *        this contract's postconditions on every heap.
+         * @param modifiableClauses
+         *        this contract's modifiable clauses on every heap.
+         * @param freeModifiableClauses
+         *        this contract's free modifiable clauses on every heap.
+         * @param infFlowSpecs
+         *        this contract's information flow specifications.
+         * @param variables
+         *        this contract's variables.
+         * @param transactionApplicable
+         *        whether this contract is applicable for transactions.
+         * @param hasModifiable
+         *        a map specifying on which heaps this contract has a modifiable
          *        clause.
-         * @param hasFreeModifiable a map specifying on which heaps this contract has a free
+         * @param hasFreeModifiable
+         *        a map specifying on which heaps this contract has a free
          *        modifiable clause.
          * @return an instance of {@code T} with the specified attributes.
          */

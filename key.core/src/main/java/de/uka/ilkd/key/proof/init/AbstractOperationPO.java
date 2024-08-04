@@ -688,10 +688,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Creates the precondition.
      *
-     * @param modifiableHeaps The heaps.
-     * @param selfVar The self variable.
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which
+     * @param modifiableHeaps
+     *        The heaps.
+     * @param selfVar
+     *        The self variable.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
+     * @param atPreVars
+     *        Mapping of {@link LocationVariable} to the {@link LocationVariable} which
      *        contains the initial value.
      * @param services
      *        The {@link Services} to use.
@@ -704,12 +708,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Creates the postcondition.
      *
-     * @param modifiableHeaps The heaps.
-     * @param selfVar The self variable.
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param resultVar The result variable.
-     * @param exceptionVar The exception variable.
-     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which
+     * @param modifiableHeaps
+     *        The heaps.
+     * @param selfVar
+     *        The self variable.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
+     * @param resultVar
+     *        The result variable.
+     * @param exceptionVar
+     *        The exception variable.
+     * @param atPreVars
+     *        Mapping of {@link LocationVariable} to the {@link LocationVariable} which
      *        contains the initial value.
      * @param services
      *        The {@link Services} to use.
@@ -819,11 +829,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Builds the frame clause including the modifiable clause.
      *
-     * @param modifiableHeaps The heaps.
-     * @param heapToAtPre The previous heap before execution.
-     * @param selfVar The self variable.
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param services services instance
+     * @param modifiableHeaps
+     *        The heaps.
+     * @param heapToAtPre
+     *        The previous heap before execution.
+     * @param selfVar
+     *        The self variable.
+     * @param paramVars
+     *        The parameters {@link ProgramVariable}s.
+     * @param services
+     *        services instance
      * @return The created {@link Term} representing the frame clause.
      */
     protected abstract Term buildFrameClause(List<LocationVariable> modifiableHeaps,

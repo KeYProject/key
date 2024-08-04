@@ -979,10 +979,14 @@ public class IntermediateProofReplayer {
     /**
      * Instantiates a schema variable in the given taclet application. 1st pass: only VariableSV.
      *
-     * @param app Application to instantiate.
-     * @param sv VariableSV to instantiate.
-     * @param value Name for the instantiated logic variable.
-     * @param services The services object.
+     * @param app
+     *        Application to instantiate.
+     * @param sv
+     *        VariableSV to instantiate.
+     * @param value
+     *        Name for the instantiated logic variable.
+     * @param services
+     *        The services object.
      * @return An instantiated taclet application, where the schema variable has been instantiated
      *         by a logic variable of the given name.
      */

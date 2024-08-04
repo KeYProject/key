@@ -446,10 +446,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Computes the anonymizing update, the loop heap, the base heap, and the anonymized heap.
      *
-     * @param heap The original heap {@link LocationVariable}.
-     * @param modifiable The modifiable term.
-     * @param inv The loop invariant.
-     * @param services The {@link Services} object.
+     * @param heap
+     *        The original heap {@link LocationVariable}.
+     * @param modifiable
+     *        The modifiable term.
+     * @param inv
+     *        The loop invariant.
+     * @param services
+     *        The {@link Services} object.
      * @return An {@link AnonUpdateData} object encapsulating the anonymizing update, the loop heap,
      *         the base heap, and the anonymized heap.
      */

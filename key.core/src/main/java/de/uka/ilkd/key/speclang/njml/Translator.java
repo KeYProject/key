@@ -1401,9 +1401,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrimaryStoreRef(JmlParser.PrimaryStoreRefContext ctx) {
-        if (ctx.storeRefUnion() == null) {
-            return new SLExpression(termFactory.createLocSet(ImmutableSLList.nil()));
-        }
+        if (ctx.storeRefUnion() == null) { return new SLExpression(termFactory.createLocSet(ImmutableSLList.nil())); }
         Term t = accept(ctx.storeRefUnion());
         return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
     }
@@ -1868,9 +1866,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert storeRef != null;
             t = termFactory.assignable(storeRef);
         }
-        for (LocationVariable heap : heaps) {
-            contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
-        }
+        for (LocationVariable heap : heaps) { contractClauses.add(ContractClauses.ASSIGNABLE, heap, t); }
         return new SLExpression(t);
     }
 
@@ -2389,11 +2385,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 // Actually, KeY only talks about what is modifiable and not assignable in general,
                 // but for legacy reasons, we use the name 'assignable'.
                 addWarning(ctx, clauseName + " does not conform to KeY's supported JML dialect, "
-                    + "but is interpreted by KeY as \"assignable\" clause in order to deal with "
-                    + "other JML dialects. "
-                    + "However, this interpretation may not correspond to the semantics "
-                    + "which you actually intended. Please consult KeY's official documentation "
-                    + "of the \"assignable\" clause.");
+                        + "but is interpreted by KeY as \"assignable\" clause in order to deal with "
+                        + "other JML dialects. "
+                        + "However, this interpretation may not correspond to the semantics "
+                        + "which you actually intended. Please consult KeY's official documentation "
+                        + "of the \"assignable\" clause.");
             }
         }
     }

@@ -8,12 +8,9 @@ import java.util.List;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.java.ast.TerminalProgramElement;
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.util.ExtList;
 
 /**
  * Modifier. taken from COMPOST and changed to achieve an immutable structure

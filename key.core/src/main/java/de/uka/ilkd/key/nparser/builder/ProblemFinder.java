@@ -54,9 +54,11 @@ public class ProblemFinder extends ExpressionBuilder {
      * {@link #getChooseContract()} or the
      * proof obligation information via {@link #getProofObligation()}.
      *
-     * @param ctx the parse tree
+     * @param ctx
+     *        the parse tree
      * @return a term if {@code \problem} entry exists.
-     * @throws BuildingException if the
+     * @throws BuildingException
+     *         if the
      */
     @Override
     public @Nullable Term visitProblem(KeYParser.ProblemContext ctx) {
@@ -82,7 +84,7 @@ public class ProblemFinder extends ExpressionBuilder {
                 } catch (IOException e) {
                     throw new BuildingException(ctx,
                         "Could not load the proof obligation given " +
-                            "as a property file due to an error in the properties format",
+                                "as a property file due to an error in the properties format",
                         e);
                 }
             } else if (obl instanceof KeYParser.TableContext tbl) {

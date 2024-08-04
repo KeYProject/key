@@ -222,7 +222,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /**
      * get the assumptions made by the logic.
      *
-     * @param services the services object to be used.
+     * @param services
+     *        the services object to be used.
      * @param assumptionTypes
      * @return ArrayList of Formulas, that are assumed to be true.
      */

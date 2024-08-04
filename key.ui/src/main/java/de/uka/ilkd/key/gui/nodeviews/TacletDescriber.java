@@ -26,7 +26,7 @@ class TacletDescriber {
         boolean started = false;
         if (psv instanceof OperatorSV sv) {
             if (sv.isRigid() && !(sv instanceof VariableSV)) {
-            if (!started) { out.append("["); }
+                if (!started) { out.append("["); }
                 out.append("rigid");
                 started = true;
             }

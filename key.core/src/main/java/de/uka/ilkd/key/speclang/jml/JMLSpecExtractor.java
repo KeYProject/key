@@ -565,7 +565,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
     public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
             MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
-        return jsf.createJMLMergeContracts(method, mps);
+        // In cases of specifications immediately following each other (like a
+        // merge_point and a block contract / loop invariant), it might happen
+        // that we're passed multiple constructs here. Therefore, we filter the
+        // merge point specific parts here
+        final TextualJMLConstruct[] constructs =
+            Arrays.stream(parseMethodLevelComments(mps.getComments(), getFileName(method)))
+                    .filter(c -> c instanceof TextualJMLMergePointDecl)
+                    .toArray(TextualJMLConstruct[]::new);
+
+        return jsf.createJMLMergeContracts(method, mps, (TextualJMLMergePointDecl) constructs[0]);
     }
 
     private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,

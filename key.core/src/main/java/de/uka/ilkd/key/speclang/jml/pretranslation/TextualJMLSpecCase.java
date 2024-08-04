@@ -120,16 +120,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
         super(modifiers);
-        if (behavior == null) {
-            throw new IllegalArgumentException();
-        }
+        if (behavior == null) { throw new IllegalArgumentException(); }
         this.behavior = behavior;
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
-        if (clauses.isEmpty()) {
-            setPosition(ctx);
-        }
+        if (clauses.isEmpty()) { setPosition(ctx); }
         clauses.add(new Entry(clause, ctx));
         return this;
     }
@@ -140,9 +136,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
             LabeledParserRuleContext ctx) {
-        if (heapName == null) {
-            heapName = HeapLDT.BASE_HEAP_NAME;
-        }
+        if (heapName == null) { heapName = HeapLDT.BASE_HEAP_NAME; }
         clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }
@@ -196,7 +190,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     @Override
     public String toString() {
         return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
-            + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
+                + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
 
 
@@ -268,12 +262,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof TextualJMLSpecCase that)) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (!(o instanceof TextualJMLSpecCase that)) { return false; }
         return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }
 

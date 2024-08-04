@@ -60,6 +60,7 @@ public final class JMLTransformer extends JavaTransformer {
         EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
             JMLModifier.PROTECTED,
             JMLModifier.PUBLIC, JMLModifier.STATIC);
+
     public static final DataKey<TextualJMLConstruct> KEY_CONSTRUCT = new DataKey<>() {};
 
     private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
@@ -211,8 +212,8 @@ public final class JMLTransformer extends JavaTransformer {
     private static Modifier.@NonNull Keyword getModifier(TextualJMLFieldDecl decl)
             throws SLTranslationException {
         // ghost or model?
-        boolean isGhost = decl.getMods().contains(JMLModifier.GHOST);
-        boolean isModel = decl.getMods().contains(JMLModifier.MODEL);
+        boolean isGhost = decl.getModifiers().contains(JMLModifier.GHOST);
+        boolean isModel = decl.getModifiers().contains(JMLModifier.MODEL);
         if (isGhost == isModel) {
             throw new SLTranslationException(
                 "JML field declaration must be either ghost or model!", decl.getLocation());
@@ -227,7 +228,7 @@ public final class JMLTransformer extends JavaTransformer {
         assert !originalComments.isEmpty();
 
         // prepend Java modifiers
-        PositionedString declWithMods = convertToString(decl.getMods(), decl.getDecl());
+        PositionedString declWithMods = convertToString(decl.getModifiers(), decl.getDecl());
 
         // parse declaration, attach to AST
         var result = services.getParser()
@@ -242,8 +243,8 @@ public final class JMLTransformer extends JavaTransformer {
         }
 
         var fieldDecl = (FieldDeclaration) result.getResult().get();
-        if (decl.getMods().contains(JMLModifier.INSTANCE)
-                && decl.getMods().contains(JMLModifier.STATIC)) {
+        if (decl.getModifiers().contains(JMLModifier.INSTANCE)
+                && decl.getModifiers().contains(JMLModifier.STATIC)) {
             throw new SLTranslationException(
                 "JML field can't be static and instance at once " + declWithMods.text);
         }
@@ -251,7 +252,7 @@ public final class JMLTransformer extends JavaTransformer {
         // set comments: the original list of comments with the declaration, and the JML
         // modifiers
         NodeList<Comment> newComments = new NodeList<>(originalComments);
-        Comment jmlComment = getJMLModComment(decl.getMods());
+        Comment jmlComment = getJMLModComment(decl.getModifiers());
         jmlComment.setParentNode(fieldDecl);
         newComments.add(jmlComment);
         fieldDecl.setAssociatedSpecificationComments(newComments);
@@ -275,7 +276,7 @@ public final class JMLTransformer extends JavaTransformer {
     private Statement transformVariableDecl(TextualJMLFieldDecl decl)
             throws SLTranslationException {
         // prepend Java modifiers
-        PositionedString declWithMods = convertToString(decl.getMods(), decl.getDecl());
+        PositionedString declWithMods = convertToString(decl.getModifiers(), decl.getDecl());
         var mod = getModifier(decl);
 
         // parse declaration, attach to AST
@@ -317,7 +318,7 @@ public final class JMLTransformer extends JavaTransformer {
             new PositionedString(decl.getParsableDeclaration());
 
         // only handle model methods
-        if (!decl.getMods().contains(JMLModifier.MODEL)) {
+        if (!decl.getModifiers().contains(JMLModifier.MODEL)) {
             throw new SLTranslationException("JML method declaration has to be model!",
                 declWithMods.location);
         }
@@ -334,13 +335,13 @@ public final class JMLTransformer extends JavaTransformer {
 
         // add model modifier
         methodDecl.addModifier(Modifier.Keyword.MODEL);
-        if (decl.getMods().contains(JMLModifier.TWO_STATE)) { methodDecl.addModifier(Modifier.Keyword.TWO_STATE); }
-        if (decl.getMods().contains(JMLModifier.NO_STATE)) { methodDecl.addModifier(Modifier.Keyword.NO_STATE); }
+        if (decl.getModifiers().contains(JMLModifier.TWO_STATE)) { methodDecl.addModifier(Modifier.Keyword.TWO_STATE); }
+        if (decl.getModifiers().contains(JMLModifier.NO_STATE)) { methodDecl.addModifier(Modifier.Keyword.NO_STATE); }
 
         // set comments: the original list of comments with the declaration,
         // and the JML modifiers
         NodeList<Comment> newComments = new NodeList<>(originalComments);
-        Comment jmlComment = getJMLModComment(decl.getMods());
+        Comment jmlComment = getJMLModComment(decl.getModifiers());
         jmlComment.setParentNode(methodDecl);
         newComments.add(jmlComment);
         methodDecl.setAssociatedSpecificationComments(newComments);

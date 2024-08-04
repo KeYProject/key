@@ -23,10 +23,13 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already loaded {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already loaded {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) throws IOException {
@@ -36,9 +39,7 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
         int ind = -1;
         for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
             ind = contractName.indexOf("." + tag);
-            if (ind > 0) {
-                break;
-            }
+            if (ind > 0) { break; }
             proofNum++;
         }
         if (ind == -1) {

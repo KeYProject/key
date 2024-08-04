@@ -18,10 +18,8 @@ package de.uka.ilkd.key.java.ast.expression.literal;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 
 import org.key_project.logic.Name;
@@ -65,9 +63,7 @@ public abstract non-sealed class AbstractIntegerLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
+        if (o == this) { return true; }
         if (o == null || o.getClass() != this.getClass()) { return false; }
         return ((AbstractIntegerLiteral) o).getValue() == getValue();
     }

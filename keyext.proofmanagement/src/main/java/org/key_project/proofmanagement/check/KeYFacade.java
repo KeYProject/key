@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -19,7 +17,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
@@ -272,9 +269,7 @@ public final class KeYFacade {
             ServiceLoader<ProofObligationLoader> loader =
                 ServiceLoader.load(ProofObligationLoader.class);
             for (ProofObligationLoader poloader : loader) {
-                if (poloader.handles(poClass)) {
-                    return poloader.loadFrom(initConfig, proofObligation);
-                }
+                if (poloader.handles(poClass)) { return poloader.loadFrom(initConfig, proofObligation); }
             }
             throw new IllegalArgumentException(
                 "There is no builder that can build the PO for the id " + poClass);
@@ -313,7 +308,7 @@ public final class KeYFacade {
                         } catch (ProofInputException e) {
                             throw new ProofManagementException(
                                 "Could not replay proof from " + envInput
-                                    + System.lineSeparator() + e);
+                                        + System.lineSeparator() + e);
                         }
                     }
                 }

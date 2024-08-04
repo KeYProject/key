@@ -38,19 +38,21 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for some
      * irrelevant labels.
      *
-     * @param term1 a term
-     * @param term2 the term compared to {@code term1}
-     * @param v should not be used for this equality check
+     * @param term1
+     *        a term
+     * @param term2
+     *        the term compared to {@code term1}
+     * @param v
+     *        should not be used for this equality check
      * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}, except
      *         for their irrelevant labels.
-     * @param <V> is not needed for this equality check
+     * @param <V>
+     *        is not needed for this equality check
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
-        if (term2 == term1) {
-            return true;
-        }
+        if (term2 == term1) { return true; }
 
         if (!(term1.op().equals(term2.op()) && term1.boundVars().equals(term2.boundVars())
                 && term1.javaBlock().equals(term2.javaBlock()))) {
@@ -60,14 +62,10 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
         final ImmutableArray<TermLabel> term1Labels = term1.getLabels();
         final ImmutableArray<TermLabel> term2Labels = term2.getLabels();
         for (TermLabel label : term1Labels) {
-            if (label.isProofRelevant() && !term2Labels.contains(label)) {
-                return false;
-            }
+            if (label.isProofRelevant() && !term2Labels.contains(label)) { return false; }
         }
         for (TermLabel label : term2Labels) {
-            if (label.isProofRelevant() && !term1Labels.contains(label)) {
-                return false;
-            }
+            if (label.isProofRelevant() && !term1Labels.contains(label)) { return false; }
         }
 
         final ImmutableArray<Term> termSubs = term1.subs();
@@ -75,9 +73,7 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
             if (!termSubs.get(i).equalsModProperty(term2Subs.get(i),
-                IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                return false;
-            }
+                IRRELEVANT_TERM_LABELS_PROPERTY)) { return false; }
         }
 
         return true;
@@ -86,7 +82,8 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
     /**
      * Computes the hash code of {@code term} while ignoring irrelevant labels.
      *
-     * @param term the term to compute the hash code for
+     * @param term
+     *        the term to compute the hash code for
      * @return the hash code
      */
     @Override
@@ -101,9 +98,7 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
         final ImmutableArray<TermLabel> labels = term.getLabels();
         for (int i = 0, sz = labels.size(); i < sz; i++) {
             final TermLabel currentLabel = labels.get(i);
-            if (currentLabel.isProofRelevant()) {
-                hashcode += 7 * currentLabel.hashCode();
-            }
+            if (currentLabel.isProofRelevant()) { hashcode += 7 * currentLabel.hashCode(); }
         }
 
         return hashcode;

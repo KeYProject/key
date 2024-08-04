@@ -127,7 +127,9 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,
-                    RENAMING_TERM_PROPERTY)) { return pta; }
+                    RENAMING_TERM_PROPERTY)) {
+                    return pta;
+                }
             }
         }
         return null;

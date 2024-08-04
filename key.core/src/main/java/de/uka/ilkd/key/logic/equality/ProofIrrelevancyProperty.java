@@ -48,18 +48,20 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * LabeledTermImpl.
      * </p>
      *
-     * @param term1 a term
-     * @param term2 the term compared to {@code term1}
-     * @param v should not be used for this equality check
+     * @param term1
+     *        a term
+     * @param term2
+     *        the term compared to {@code term1}
+     * @param v
+     *        should not be used for this equality check
      * @return true iff {@code term2} is a term syntactically equal to {@code term1}, except for
      *         proof-irrelevant attributes.
-     * @param <V> is not needed for this equality check
+     * @param <V>
+     *        is not needed for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
-        if (term2 == term1) {
-            return true;
-        }
+        if (term2 == term1) { return true; }
 
         final boolean opResult = term1.op().equalsModProofIrrelevancy(term2.op());
         if (!(opResult
@@ -72,23 +74,17 @@ public class ProofIrrelevancyProperty implements Property<Term> {
         final ImmutableArray<TermLabel> termLabels = term1.getLabels();
         final ImmutableArray<TermLabel> term2Labels = term2.getLabels();
         for (TermLabel label : termLabels) {
-            if (label.isProofRelevant() && !term2Labels.contains(label)) {
-                return false;
-            }
+            if (label.isProofRelevant() && !term2Labels.contains(label)) { return false; }
         }
         for (TermLabel label : term2Labels) {
-            if (label.isProofRelevant() && !termLabels.contains(label)) {
-                return false;
-            }
+            if (label.isProofRelevant() && !termLabels.contains(label)) { return false; }
         }
 
         final ImmutableArray<Term> term1Subs = term1.subs();
         final ImmutableArray<Term> term2Subs = term2.subs();
         final int numOfSubs = term1Subs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), PROOF_IRRELEVANCY_PROPERTY)) {
-                return false;
-            }
+            if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), PROOF_IRRELEVANCY_PROPERTY)) { return false; }
         }
 
         return true;
@@ -101,7 +97,8 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
      *
-     * @param term the term to compute the hashcode for
+     * @param term
+     *        the term to compute the hashcode for
      * @return the hashcode
      */
     @Override
@@ -114,9 +111,7 @@ public class ProofIrrelevancyProperty implements Property<Term> {
         final ImmutableArray<TermLabel> labels = term.getLabels();
         for (int i = 0, sz = labels.size(); i < sz; i++) {
             final TermLabel currentLabel = labels.get(i);
-            if (currentLabel.isProofRelevant()) {
-                hashcode += 7 * currentLabel.hashCode();
-            }
+            if (currentLabel.isProofRelevant()) { hashcode += 7 * currentLabel.hashCode(); }
         }
         return hashcode;
     }

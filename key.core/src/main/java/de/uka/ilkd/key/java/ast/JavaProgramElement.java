@@ -115,8 +115,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     @Override
     public boolean equals(Object o) {
         if (o == this) { return true; }
-        if (o == null ) { return false;
-        }
+        if (o == null) { return false; }
         return (this.getClass() == o.getClass());
     }
 

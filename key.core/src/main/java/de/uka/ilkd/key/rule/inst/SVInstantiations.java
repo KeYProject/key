@@ -229,8 +229,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
             if (b == null) {
                 return rebuildSorts(services);
-        } else if (!b) { throw INCOMPATIBLE_INSTANTIATION_EXCEPTION; }
-        if (p_forceRebuild) { return rebuildSorts(services); }}
+            } else if (!b) { throw INCOMPATIBLE_INSTANTIATION_EXCEPTION; }
+            if (p_forceRebuild) { return rebuildSorts(services); }
+        }
         return this;
     }
 

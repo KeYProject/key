@@ -21,7 +21,6 @@ import java.util.List;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -142,12 +141,8 @@ public final class BooleanLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o == this) { return true; }
+        if (o == null || o.getClass() != this.getClass()) { return false; }
         return ((BooleanLiteral) o).getValue() == getValue();
     }
 

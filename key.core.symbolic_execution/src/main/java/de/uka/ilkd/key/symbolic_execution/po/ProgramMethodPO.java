@@ -282,9 +282,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     public Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         c.set("method", getProgramMethodSignature(getProgramMethod(), true));
-        if (getPrecondition() != null && !getPrecondition().isEmpty()) {
-            c.set("precondition", getPrecondition());
-        }
+        if (getPrecondition() != null && !getPrecondition().isEmpty()) { c.set("precondition", getPrecondition()); }
         return c;
     }
 

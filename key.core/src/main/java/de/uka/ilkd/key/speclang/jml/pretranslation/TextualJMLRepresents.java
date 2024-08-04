@@ -41,9 +41,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLRepresents r)) {
-            return false;
-        }
+        if (!(o instanceof TextualJMLRepresents r)) { return false; }
         return modifiers.equals(r.modifiers) && represents.equals(r.represents);
     }
 

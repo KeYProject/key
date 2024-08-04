@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.ast;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
@@ -62,9 +61,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
+        if (o == this) { return true; }
         if (o == null || o.getClass() != this.getClass()) { return false; }
 
         final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;

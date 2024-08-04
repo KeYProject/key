@@ -220,8 +220,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, TermServices services) {
         Sort[] argSorts = new Sort[svSet.size()];
         int i = 0;
-        for (var sv : svSet) {if (sv instanceof OperatorSV asv)
-                argSorts[i] = replaceSort(asv.sort(), services); i++; }
+        for (var sv : svSet) {
+            if (sv instanceof OperatorSV asv)
+                argSorts[i] = replaceSort(asv.sort(), services);
+            i++;
+        }
         return argSorts;
     }
 

@@ -37,9 +37,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLSetStatement ss)) {
-            return false;
-        }
+        if (!(o instanceof TextualJMLSetStatement ss)) { return false; }
         return modifiers.equals(ss.modifiers) && assignment.equals(ss.assignment);
     }
 
