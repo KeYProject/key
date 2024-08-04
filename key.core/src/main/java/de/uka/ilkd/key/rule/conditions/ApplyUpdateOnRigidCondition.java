@@ -17,7 +17,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 /**
@@ -217,7 +217,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
-        } else if (resultInst.equalsModProperty(properResultInst, RENAMING_PROPERTY)) {
+        } else if (resultInst.equalsModProperty(properResultInst, RENAMING_TERM_PROPERTY)) {
             return mc;
         } else {
             return null;

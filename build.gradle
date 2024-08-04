@@ -24,7 +24,7 @@ plugins {
     id "com.diffplug.spotless" version "6.25.0"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.39"
+    id "org.checkerframework" version "0.6.41"
 
     id("org.sonarqube") version "5.0.0.4638"
 }
@@ -101,11 +101,11 @@ subprojects {
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
         testImplementation("ch.qos.logback:logback-classic:1.5.6")
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.3'
         testImplementation project(':key.util')
 
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
     }
 
     tasks.withType(JavaCompile) {
