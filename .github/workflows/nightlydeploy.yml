@@ -31,7 +31,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.3.2
+        uses: gradle/actions/setup-gradle@v3.5.0
       - name: Build with Gradle
         run: ./gradlew --parallel assemble
 

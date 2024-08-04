@@ -45,25 +45,19 @@ public class Comment extends JavaSourceElement {
         return text;
     }
 
-
+    @Override
     public String toString() {
         return getText();
     }
 
-
-    /**
-     * comments can be ignored
-     */
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return true;
-    }
-
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + getText().hashCode();
         return result;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;

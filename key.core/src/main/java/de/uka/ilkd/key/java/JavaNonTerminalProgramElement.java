@@ -55,35 +55,26 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         return -1;
     }
 
-
-    /**
-     * commented in interface SourceElement. Overwrites the default method implementation in
-     * ProgramElement by descending down to the children.
-     */
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-
-        if (se == this) {
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
             return true;
-        } else if (se == null || this.getClass() != se.getClass()) {
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
 
-        final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) se;
+        final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
         if (jnte.getChildCount() != getChildCount()) {
             return false;
         }
 
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equalsModRenaming(jnte.getChildAt(i), nat)) {
+            if (!getChildAt(i).equals(jnte.getChildAt(i))) {
                 return false;
             }
         }
         return true;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
     }
 
     @Override

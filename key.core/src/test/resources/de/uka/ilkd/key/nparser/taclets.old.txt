@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Fri Jun 21 16:10:16 CEST 2024
+# Date: Wed Jun 26 12:45:30 CEST 2024
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1304,7 +1304,7 @@ assignmentAdditionInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 + #seCharByteShortInt1;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1313,7 +1313,7 @@ assignmentAdditionLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt + #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1322,7 +1322,7 @@ assignmentAdditionLong2 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong + #seCharByteShortInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1331,7 +1331,7 @@ assignmentAdditionLong3 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 + #seLong1;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong0,#seLong1)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1644,7 +1644,7 @@ assignmentMultiplicationInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 * #seCharByteShortInt1;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaMulInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1653,7 +1653,7 @@ assignmentMultiplicationLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt * #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1662,7 +1662,7 @@ assignmentMultiplicationLong2 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong * #seCharByteShortInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1671,7 +1671,7 @@ assignmentMultiplicationLong3 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 * #seLong1;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong0,#seLong1)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1680,7 +1680,7 @@ assignmentShiftLeftInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 << #se;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1689,7 +1689,7 @@ assignmentShiftLeftLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 << #se;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftLong(#seLong0,#se)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1698,7 +1698,7 @@ assignmentShiftRightInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 >> #se;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1707,7 +1707,7 @@ assignmentShiftRightLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 >> #se;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightLong(#seLong0,#se)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1774,7 +1774,7 @@ assignmentSubtractionInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 - #seCharByteShortInt1;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaSubInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1783,7 +1783,7 @@ assignmentSubtractionLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt - #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1792,7 +1792,7 @@ assignmentSubtractionLong2 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong - #seCharByteShortInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1801,7 +1801,7 @@ assignmentSubtractionLong3 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 - #seLong1;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong0,#seLong1)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1810,7 +1810,7 @@ assignmentUnsignedShiftRightInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 >>> #se;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1819,7 +1819,7 @@ assignmentUnsignedShiftRightLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 >>> #se;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightLong(#seLong0,#se)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5400,7 +5400,7 @@ Choices: sequences:on}
 defOfSeqUpd {
 \find(seqUpd(seq,idx,value))
 \varcond(\notFreeIn(uSub (variable), seq (Seq term)), \notFreeIn(uSub (variable), value (any term)), \notFreeIn(uSub (variable), idx (int term)))
-\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,any::seqGet(seq,uSub))))
+\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,any::seqGet(seq,uSub)))) 
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9697,7 +9697,7 @@ Choices: sequences:on}
 == getOfSeqUpd (getOfSeqUpd) =========================================
 getOfSeqUpd {
 \find(alpha::seqGet(seqUpd(seq,idx,value),jdx))
-\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),alpha::cast(value),alpha::seqGet(seq,jdx)))
+\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),alpha::cast(value),alpha::seqGet(seq,jdx))) 
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -12135,7 +12135,7 @@ Choices: sequences:on}
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
 lenOfSeqUpd {
 \find(seqLen(seqUpd(seq,idx,value)))
-\replacewith(seqLen(seq))
+\replacewith(seqLen(seq)) 
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -13516,7 +13516,7 @@ narrowingByteCastInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (byte) #seInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seInt)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13525,7 +13525,7 @@ narrowingByteCastLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (byte) #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seLong)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13534,7 +13534,7 @@ narrowingByteCastShort {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (byte) #seShort;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seShort)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seShort)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13570,7 +13570,7 @@ narrowingCharCastByte {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (char) #seByte;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seByte)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seByte)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13579,7 +13579,7 @@ narrowingCharCastInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (char) #seInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seInt)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13588,7 +13588,7 @@ narrowingCharCastLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (char) #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seLong)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13597,7 +13597,7 @@ narrowingCharCastShort {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (char) #seShort;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seShort)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seShort)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13615,7 +13615,7 @@ narrowingIntCastLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (int) #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastInt(#seLong)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastInt(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13642,7 +13642,7 @@ narrowingShortCastInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (short) #seInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seInt)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13651,7 +13651,7 @@ narrowingShortCastLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (short) #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seLong)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16555,7 +16555,7 @@ Choices: true}
 == ssubsortDirect (ssubsortDirect) =========================================
 ssubsortDirect {
 \find(ssubsort(alphSub::ssort,alph::ssort))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -16563,14 +16563,14 @@ Choices: true}
 ssubsortSup {
 \find(ssubsort(alph::ssort,alphSub::ssort))
 \varcond(\not\same(alphSub, alph))
-\replacewith(false)
+\replacewith(false) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == ssubsortTop (ssubsortTop) =========================================
 ssubsortTop {
 \find(ssubsort(s,anySORT))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -17071,8 +17071,8 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == subsortTrans (subsortTrans) =========================================
 subsortTrans {
-\assumes ([ssubsort(s1,s2),ssubsort(s2,s3)]==>[])
-\add [ssubsort(s1,s3)]==>[]
+\assumes ([ssubsort(s1,s2),ssubsort(s2,s3)]==>[]) 
+\add [ssubsort(s1,s3)]==>[] 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
@@ -18209,7 +18209,7 @@ unaryMinusInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = -#seCharByteShortInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusInt(#seCharByteShortInt)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusInt(#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18218,7 +18218,7 @@ unaryMinusLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = -#seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusLong(#seLong)),#normalassign(post))) 
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusLong(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------

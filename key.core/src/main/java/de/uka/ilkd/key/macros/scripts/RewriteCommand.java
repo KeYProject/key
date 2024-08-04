@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * This class provides the command <code>rewrite</code>.
@@ -114,7 +114,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) {
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -124,7 +124,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // filter taclets that are applicable on the given formula in the succedent
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_PROPERTY)) {
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
