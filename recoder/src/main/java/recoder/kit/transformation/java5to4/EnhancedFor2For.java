@@ -25,7 +25,7 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 /**
- * converts an enhanced for loop to an "old style" for loop. This follows JLS 3rd edition, �14.14.2.
+ * converts an enhanced for loop to an "old style" for loop. This follows JLS 3rd edition, §14.14.2.
  * <p>
  * Currently, if given enhanced for iterates over an array, this will replace the enhanced for with
  * a statement block and not inline it into a possibly given statement block, yielding possibly not
