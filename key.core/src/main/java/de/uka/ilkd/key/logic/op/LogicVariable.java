@@ -9,6 +9,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
@@ -42,5 +43,15 @@ public final class LogicVariable extends AbstractSortedOperator
     @Override
     public int hashCodeModProofIrrelevancy() {
         return Objects.hash(name(), sort());
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Logic variable " + name() + " does not have children");
     }
 }
