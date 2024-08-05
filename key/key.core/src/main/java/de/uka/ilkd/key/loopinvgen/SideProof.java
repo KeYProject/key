@@ -115,7 +115,7 @@ public class SideProof {
 			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
 		}
 
-		sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+//		sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
 
 		if (simplifyOnly) {
 			sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF);
@@ -162,7 +162,8 @@ public class SideProof {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-//		COUNTER++;
+		COUNTER++;
+		System.out.println(COUNTER);
 	}
 
 	public static boolean isProvable(Sequent seq2prove, int maxRuleApp,

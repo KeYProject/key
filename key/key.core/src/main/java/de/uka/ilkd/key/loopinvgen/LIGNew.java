@@ -45,7 +45,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
-//		// Initial Predicate Sets for stencil, conditionalWithDifferentEvents, conditionWithDifferentEvents0:
+//		// Initial Predicate Sets for stencil, conditionalWithDifferentEvents:
 //		allCompPreds.add(tb.geq(index, tb.sub(low,tb.one())));//
 //		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
 //		for (Term arr : arrays) {
@@ -60,6 +60,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
 			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
 		}
+
 
 //		System.out.println("Initial comp Predicate Set: " + allCompPreds);
 //		for (Term term : allPreds) {
