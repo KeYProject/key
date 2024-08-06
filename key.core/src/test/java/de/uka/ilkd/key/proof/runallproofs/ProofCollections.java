@@ -372,6 +372,10 @@ public class ProofCollections {
         g.provable("sort.key");
         g.provable("split.key");
 
+        //g = c.group("path_validation");
+        // TODO add tracing:on to the settings
+        //g.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
+        //g.provable("heap/pathValidation/quicksort.key");
 
         /*
          * These are simpler regression tests that show a certain feature works
