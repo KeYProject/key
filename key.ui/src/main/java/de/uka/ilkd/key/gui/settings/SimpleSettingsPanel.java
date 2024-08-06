@@ -194,7 +194,7 @@ public class SimpleSettingsPanel extends JPanel {
         if (s == null || s.isEmpty()) {
             s = "";
         }
-        if(s.contains("\n")){
+        if (s.contains("\n")) {
             s = s.substring(0, s.indexOf('\n'));
         }
 

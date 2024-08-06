@@ -157,7 +157,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 return (Configuration) res.get(0);
             else
                 throw new RuntimeException("Error in configuration. Source: "
-                        + ctx.start.getTokenSource().getSourceName());
+                    + ctx.start.getTokenSource().getSourceName());
         }
     }
 
