@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Properties;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -34,6 +32,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private final ProofSettings proofSettings;
 
     private final ProofIndependentSettings independentSettings;
+    private OptionContentNode tacletOptionsItem;
 
     public SettingsTreeModel(ProofSettings proofSettings,
             ProofIndependentSettings independentSettings) {
@@ -52,7 +51,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
         // ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-        proofSettingsNode.add(generateTableNode("Taclets", choiceSettings));
+        tacletOptionsItem = generateTableNode("Taclet Options", choiceSettings);
+        proofSettingsNode.add(tacletOptionsItem);
 
         Settings strategySettings = proofSettings.getStrategySettings();
         proofSettingsNode.add(generateTableNode("Strategy", strategySettings));
@@ -115,6 +115,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         JTextArea ta = new JTextArea(5, 20);
         ta.append(text);
         ta.setEditable(false);
+        ta.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JScrollPane scrollpane = new JScrollPane(ta);
         return scrollpane;
     }
@@ -130,6 +131,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
             i++;
         }
 
+        Arrays.sort(data, (a, b) -> a[0].toString().compareToIgnoreCase(b[0].toString()));
+
         JTable table = new JTable();
 
         DefaultTableModel tableModel = new DefaultTableModel() {
@@ -143,9 +146,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
         };
 
         tableModel.setDataVector(data, columnNames);
-
         table.setModel(tableModel);
-
+        table.setRowHeight(table.getRowHeight() + 10);
 
         JScrollPane scrollpane = new JScrollPane(table);
         return scrollpane;
@@ -157,6 +159,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         return new OptionContentNode(title, generateScrollPane(text));
     }
 
-
-
+    public OptionContentNode getTacletOptionsItem() {
+        return tacletOptionsItem;
+    }
 }

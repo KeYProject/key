@@ -1015,7 +1015,7 @@ public final class MainWindow extends JFrame {
         }
         proof.addSeparator();
         proof.add(new ShowUsedContractsAction(this, selected));
-        proof.add(new ShowActiveTactletOptionsAction(this, selected));
+        proof.add(new ShowActiveTactletOptionsAction(this, showActiveSettingsAction));
         proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this, selected));
         proof.add(new ShowKnownTypesAction(this, selected));
@@ -1027,7 +1027,8 @@ public final class MainWindow extends JFrame {
         options.setMnemonic(KeyEvent.VK_O);
 
         options.add(SettingsManager.getActionShowSettings(this));
-        options.add(new TacletOptionsAction(this));
+        // remove since taclet options should only be set through the general settings dialog
+        // options.add(new TacletOptionsAction(this));
         options.add(new SMTOptionsAction(this));
         // options.add(setupSpeclangMenu()); // legacy since only JML supported
         options.addSeparator();
