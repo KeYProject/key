@@ -34,9 +34,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
-
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
@@ -122,9 +119,6 @@ public abstract class SequentView extends JEditorPane {
     // an additional highlight to mark the first active java statement
     private Object additionalJavaHighlight;
 
-    // Highlighting color during drag and drop action.
-    public final Object dndHighlight;
-
     /*
      * Store highlights in a HashMap in order to prevent duplicate highlights.
      */
@@ -169,9 +163,8 @@ public abstract class SequentView extends JEditorPane {
 
         // sets the painter for the highlighting
         setHighlighter(new DefaultHighlighter());
-        additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
-        defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
-        dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR.get());
+        additionalJavaHighlight = createColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
+        defaultHighlight = createColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
         currentHighlight = defaultHighlight;
 
         // add a SeqViewChangeListener to this component
@@ -296,13 +289,14 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * registers a highlighter that marks the regions specified by the returned tag with the given
+     * creates and registers a highlighter that marks the regions specified by the returned tag with
+     * the given
      * color
      *
      * @param color the Color used to highlight regions of the sequent
      * @return the highlight for the specified color
      */
-    public final Object getColorHighlight(Color color) {
+    public final Object createColorHighlight(Color color) {
         Object highlight = null;
         if (!color2Highlight.containsKey(color)) {
             // show highlights above each other
@@ -502,11 +496,10 @@ public abstract class SequentView extends JEditorPane {
     public void paintHighlights(Point p) {
         // re-initialize highlights if needed
         if (!Arrays.asList(getHighlighter().getHighlights()).contains(additionalJavaHighlight)) {
-            additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
+            additionalJavaHighlight = createColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
         }
         if (!Arrays.asList(getHighlighter().getHighlights()).contains(defaultHighlight)) {
-            defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
-            currentHighlight = defaultHighlight;
+            defaultHighlight = createColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
         }
 
         // Change highlight for additional Java statement ...
@@ -767,7 +760,7 @@ public abstract class SequentView extends JEditorPane {
                         // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView.
                         // rangeForPath ist schuld
                         Range newR = new Range(r.start() + 1, r.end() + 1);
-                        Object tag = getColorHighlight(color);
+                        Object tag = createColorHighlight(color);
                         paintHighlight(newR, tag);
                     }
                 }
@@ -786,7 +779,7 @@ public abstract class SequentView extends JEditorPane {
                     // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
                     // ist schuld
                     Range newR = new Range(r.start() + 1, r.end() + 1);
-                    Object tag = getColorHighlight(color);
+                    Object tag = createColorHighlight(color);
                     paintHighlight(newR, tag);
                 }
                 ++i;
@@ -895,7 +888,7 @@ public abstract class SequentView extends JEditorPane {
                     // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
                     // ist schuld
                     Range newR = new Range(r.start() + 1, r.end() + 1);
-                    Object tag = getColorHighlight(color);
+                    Object tag = createColorHighlight(color);
                     paintHighlight(newR, tag);
                 }
             }
@@ -912,7 +905,7 @@ public abstract class SequentView extends JEditorPane {
                     // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
                     // ist schuld
                     Range newR = new Range(r.start() + 1, r.end() + 1);
-                    Object tag = getColorHighlight(color);
+                    Object tag = createColorHighlight(color);
                     paintHighlight(newR, tag);
                 }
             }

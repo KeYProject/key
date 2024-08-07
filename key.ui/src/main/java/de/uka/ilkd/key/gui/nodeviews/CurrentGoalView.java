@@ -156,7 +156,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
                 // be a starting place to find the mistake.
                 range = new Range(range.start() + 1, range.end() + 1);
 
-                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
+                Object tag = createColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
             }
