@@ -7,12 +7,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.*;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -29,6 +26,7 @@ import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import de.uka.ilkd.key.util.DoNothingCaret;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -49,17 +47,32 @@ public abstract class SequentView extends JEditorPane {
 
     public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
 
-    public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
+    public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
+        ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
 
-    protected static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
+    public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
+        ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
+
+    public static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
+        ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
+
+    public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
+        ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 255));
+
+    public static final ColorSettings.ColorProperty HEATMAP_COLOR = ColorSettings.define(
+        "[Heatmap]basecolor", "Base color of the heatmap. Other colors are derived from this one.",
+        new Color(252, 202, 80));
+
+    public static final ColorSettings.ColorProperty MOUSE_SELECTION_COLOR = ColorSettings.define(
+        "[currentGoal]mouseSelectionColor", "Color of the mouse selection in the sequent view.",
+        new Color(230, 230, 230, 255));
 
     protected static final Color INACTIVE_BACKGROUND_COLOR =
         new Color(UIManager.getColor("Panel.background").getRGB());
 
-    //
-    private static final ColorSettings.ColorProperty HEATMAP_COLOR = ColorSettings.define(
-        "[Heatmap]basecolor", "Base color of the heatmap. Other colors are derived from this one.",
-        new Color(252, 202, 80));
+    private static final HighlightPainter MOUSE_SELECTION_PAINTER =
+        new DefaultHighlightPainter(MOUSE_SELECTION_COLOR.get());
+
 
     // maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
@@ -173,6 +186,9 @@ public abstract class SequentView extends JEditorPane {
         KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(), this,
             KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
 
+        // MU 2024: The (colourless) mouse selection would sometimes get in the way of the other
+        // highlights. This disables the caret altogether.
+        setCaret(DoNothingCaret.INSTANCE);
     }
 
     public final void setFont() {
@@ -318,6 +334,7 @@ public abstract class SequentView extends JEditorPane {
      *
      * @see javax.swing.JEditorPane#getText()
      */
+
     /**
      * Returns the plain text of this sequent view.
      */
@@ -631,10 +648,8 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     *
      * @param point a point.
      * @return {@code true} if and only if the argument points to the user selection.
-     *
      * @see #setUserSelectionHighlight(PosInSequent)
      * @see #setUserSelectionHighlight(Point)
      * @see #removeUserSelectionHighlight()
@@ -649,7 +664,6 @@ public abstract class SequentView extends JEditorPane {
      * Highlights the term at the specified position as the user's selection.
      *
      * @param pis the term to select.
-     *
      * @see #setUserSelectionHighlight(Point)
      * @see #removeUserSelectionHighlight()
      * @see #isInUserSelectionHighlight(Point)
@@ -1017,7 +1031,6 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     *
      * @return {@code true} if this sequent view is supposed to be shown in the {@link MainFrame},
      *         {@code false} if it is only supposed to be shown in some other frame.
      */
@@ -1030,7 +1043,6 @@ public abstract class SequentView extends JEditorPane {
      * term heatmap highlighting.
      *
      * @author jschiffl
-     *
      */
     static class PIO_age {
         PosInOccurrence pio;
