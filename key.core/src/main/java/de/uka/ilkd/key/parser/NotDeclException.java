@@ -10,7 +10,8 @@ public class NotDeclException extends KeYSemanticException {
     private static final long serialVersionUID = 1630322840671708203L;
 
     public NotDeclException(TokenStream input, String cat, String undeclared_symbol, String addtl) {
-        super(input, input.getSourceName(), getMessage(cat, undeclared_symbol, addtl));
+        super(input, input == null ? "<unknown source>" : input.getSourceName(),
+            getMessage(cat, undeclared_symbol, addtl));
     }
 
     public NotDeclException(TokenStream input, String cat, String undeclared_symbol) {
