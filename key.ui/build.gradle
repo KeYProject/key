@@ -29,6 +29,7 @@ dependencies {
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.cacheproofs")
     runtimeOnly project(":keyext.slicing")
+    runtimeOnly project(":keyext.incremental")
 }
 
 repositories {

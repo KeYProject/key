@@ -206,6 +206,10 @@ proofCmdCase:
   ;
 proofArg: (argLabel=SC_IDENT SC_EQUAL_SINGLE)? token=( SC_DECLITERAL | /*NATIVE?*/ STRING_LITERAL | SC_IDENT);
 
+proofCmdsEOF:
+   ( proofCmd )+ EOF
+   ;
+
 // ---
 
 mergeparamsspec:

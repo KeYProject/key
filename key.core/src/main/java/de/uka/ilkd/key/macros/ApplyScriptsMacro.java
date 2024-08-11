@@ -38,6 +38,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import javax.annotation.Nullable;
 
 public class ApplyScriptsMacro extends AbstractProofMacro {
@@ -70,18 +71,21 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 || goals.exists(g -> getJmlAssert(g.node()) != null);
     }
 
-    private static JmlAssert getJmlAssert(Node node) {
-        RuleApp ruleApp = node.parent().getAppliedRuleApp();
-        if (ruleApp instanceof JmlAssertBuiltInRuleApp) {
-            Term target = ruleApp.posInOccurrence().subTerm();
-            if (target.op() instanceof UpdateApplication) {
-                target = UpdateApplication.getTarget(target);
-            }
-            final SourceElement activeStatement = JavaTools.getActiveStatement(target.javaBlock());
-            if (activeStatement instanceof JmlAssert) {
-                JmlAssert ass = (JmlAssert) activeStatement;
-                if (ass.getAssertionProof() != null) {
-                    return (JmlAssert) activeStatement;
+    public static JmlAssert getJmlAssert(Node node) {
+        Node parent = node.parent();
+        if(parent != null) {
+            RuleApp ruleApp = parent.getAppliedRuleApp();
+            if (ruleApp instanceof JmlAssertBuiltInRuleApp) {
+                Term target = ruleApp.posInOccurrence().subTerm();
+                if (target.op() instanceof UpdateApplication) {
+                    target = UpdateApplication.getTarget(target);
+                }
+                final SourceElement activeStatement = JavaTools.getActiveStatement(target.javaBlock());
+                if (activeStatement instanceof JmlAssert) {
+                    JmlAssert ass = (JmlAssert) activeStatement;
+                    if (ass.getAssertionProof() != null) {
+                        return (JmlAssert) activeStatement;
+                    }
                 }
             }
         }
@@ -105,7 +109,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Running attached script from goal " + goal.node().serialNr(), 0));
 
             AssertionProofContext proofCtx = ass.getAssertionProof();
-            String renderedProof = renderProof(proofCtx, goal.sequent().succedent().getLast().formula(), proof.getServices());
+            String renderedProof = renderProof(proofCtx.proofCmd(),
+                    goal.sequent().succedent().getLast().formula(), proof.getServices());
 
             Path script = Files.createTempFile("key.script", "key");
             Files.writeString(script, renderedProof);
@@ -134,27 +139,13 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return new ProofMacroFinishedInfo(this, proof);
     }
 
-    private Position getSourcePos(ProofScriptEngine pse) {
-        Object entry = pse.getStateMap().getUserData("user.sourcePos");
-        if(entry == null) {
-            return null;
-        }
-        String[] parts = entry.toString().split(" *, *");
-        try {
-            return Position.newOneBased(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
-        } catch (RuntimeException ex) {
-            LOGGER.info("Cannot read sourcePos information", ex);
-            return null;
-        }
-    }
-
-    private static String renderProof(AssertionProofContext ctx, Term assertion,
-            Services services) {
+    public static String renderProof(List<ProofCmdContext> cmds, Term assertion,
+                                     Services services) {
         StringBuilder sb = new StringBuilder();
         sb.append("@failonclosed off;\n");
         sb.append("set stack='push';\n");
         sb.append("let @assert='").append(printTerm(assertion, services)).append("';\n");
-        for (ProofCmdContext proofCmdContext : ctx.proofCmd()) {
+        for (ProofCmdContext proofCmdContext : cmds) {
             renderProofCmd(proofCmdContext, sb);
         }
         sb.append("set stack=\"pop\";\n");
