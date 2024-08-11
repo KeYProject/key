@@ -27,9 +27,6 @@ import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
  */
 public interface ProofScriptCommand<T> {
 
-    /**
-     *
-     */
     List<ProofScriptArgument<T>> getArguments();
 
     /**
