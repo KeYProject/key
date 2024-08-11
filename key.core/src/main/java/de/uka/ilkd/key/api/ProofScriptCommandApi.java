@@ -18,7 +18,7 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
  * @version 1 (21.04.17)
  */
 public class ProofScriptCommandApi {
-    private Map<String, ProofScriptCommand> commandMap = new HashMap<>();
+    private Map<String, ProofScriptCommand<?>> commandMap = new HashMap<>();
 
     public ProofScriptCommandApi() {
         initialize();
@@ -36,7 +36,7 @@ public class ProofScriptCommandApi {
      *
      * @return a collection of proof script commands
      */
-    public Collection<ProofScriptCommand> getScriptCommands() {
+    public Collection<ProofScriptCommand<?>> getScriptCommands() {
         return commandMap.values();
     }
 

@@ -93,8 +93,12 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      */
     @Override
     public String getDocumentation() {
-        if (documentation == null) {
-            documentation = DescriptionFacade.getDocumentation(this);
+        if(documentation == null) {
+            if(parameterClazz == null) {
+                documentation = DescriptionFacade.getDocumentation(this.getClass());
+            } else {
+                documentation = DescriptionFacade.getDocumentation(parameterClazz);
+            }
         }
         return documentation;
     }

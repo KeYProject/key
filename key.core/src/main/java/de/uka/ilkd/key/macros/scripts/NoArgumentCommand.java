@@ -29,6 +29,6 @@ public abstract class NoArgumentCommand implements ProofScriptCommand<Void> {
 
     @Override
     public String getDocumentation() {
-        return DescriptionFacade.getDocumentation(this);
+        return DescriptionFacade.getDocumentation(this.getClass());
     }
 }

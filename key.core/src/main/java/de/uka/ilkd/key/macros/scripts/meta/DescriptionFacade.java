@@ -4,11 +4,11 @@
 
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import java.io.IOException;
-import java.util.Properties;
+import java.lang.reflect.Field;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
+import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,77 +25,97 @@ public final class DescriptionFacade {
     /**
      * The filename of the XML properties containing the documentation of proof script commands.
      */
-    private static final String COMMANDS_DESCRIPTION = "commands_description.xml";
     private static final Logger LOGGER = LoggerFactory.getLogger(DescriptionFacade.class);
 
-    /**
-     * Lazy-loaded properties
-     *
-     * @see #getProperties
-     */
-    private static Properties properties = null;
+    private static final String NO_DOCUMENTATION = "No documentation available.";
+    private static final String HTML_NO_DOCUMENTATION = "<i>" + NO_DOCUMENTATION + "</i>";
 
     private DescriptionFacade() {
     }
 
-    /**
-     * Lazy loading of the properties.
-     *
-     * @return a properties
-     */
-    public static Properties getProperties() {
-        try {
-            if (properties == null) {
-                properties = new Properties();
-                properties.loadFromXML(
-                    DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
+    public static <T> String getHTMLDocumentation(Class<T> parameterClazz) {
+        if (parameterClazz == null)
+            return HTML_NO_DOCUMENTATION;
+
+        StringBuilder sb = new StringBuilder();
+        Description description = parameterClazz.getAnnotation(Description.class);
+
+        if(description != null) {
+
+            for (String p : StringUtil.escapeHtmlEntities(description.value()).split("\n")) {
+                sb.append("<p>").append(p).append("</p>");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            String[] examples = description.examples();
+            if (examples.length > 0) {
+                sb.append("<h2>Examples</h2>");
+                sb.append("<ul>");
+                for (String li : examples) {
+                    sb.append("<li>").append(StringUtil.escapeHtmlEntities(li)).append("</li>");
+                }
+                sb.append("</ul>");
+            }
         }
-        return properties;
+
+        boolean fields = false;
+        for (Field field : parameterClazz.getDeclaredFields()) {
+            Option option = field.getDeclaredAnnotation(Option.class);
+            if (option != null) {
+                if (!fields) {
+                    sb.append("<h2>Parameters</h2>");
+                    sb.append("<dl>");
+                    fields = true;
+                }
+                sb.append("<dt>").append(option.value()).append("</dt><dd>").append(option.help()).append("</dd>");
+            }
+        }
+        if (fields) {
+            sb.append("</dl>");
+        }
+
+        if(sb.length() == 0) {
+            return HTML_NO_DOCUMENTATION;
+        }
+
+        return sb.toString();
     }
 
-    /**
-     * Looks up the documentation for the given command in the properties file.
-     * If no documentation is available an empty string is returned.
-     *
-     * @param cmd non-null proof script command
-     * @return a non-null string
-     * @see ProofScriptCommand#getDocumentation()
-     */
-    public static String getDocumentation(ProofScriptCommand<?> cmd) {
-        return getString(cmd.getName());
-    }
+    public static <T> String getDocumentation(Class<T> parameterClazz) {
+        if (parameterClazz == null)
+            return NO_DOCUMENTATION;
 
-    /**
-     * Looks up the documentation for the given proof script argument.
-     * If no documentation is available an empty string is returned.
-     *
-     * @param arg non-null proof script argument
-     * @return a string or null, if {@code arg} is null or {@code arg.getCommand} returns null
-     * @see ProofScriptArgument#getDocumentation()
-     */
-    public static String getDocumentation(ProofScriptArgument<?> arg) {
-        if (arg == null || arg.getCommand() == null) {
-            return null;
-        }
-        String key = arg.getCommand().getName() + "." + arg.getName();
-        return getString(key);
-    }
+        StringBuilder sb = new StringBuilder();
+        Description description = parameterClazz.getAnnotation(Description.class);
 
-    /**
-     * Helper function for look-ups in the property file.
-     *
-     * @param key look up key
-     * @return a non-null string
-     */
-    private static String getString(String key) {
-        String property = getProperties().getProperty(key);
-        if (null == property) {
-            LOGGER.warn("No documentation entry found for {} in {}", key, COMMANDS_DESCRIPTION);
-            return "";
+        if(description != null) {
+
+            sb.append(description.value().replace("\n", "\n\n"));
+
+            String[] examples = description.examples();
+            if (examples.length > 0) {
+                sb.append("\n\nExamples:\n");
+                for (String li : examples) {
+                    sb.append("    ").append(li).append("\n");
+                }
+            }
         }
-        return property;
+
+        boolean fields = false;
+        for (Field field : parameterClazz.getDeclaredFields()) {
+            Option option = field.getDeclaredAnnotation(Option.class);
+            if (option != null) {
+                if (!fields) {
+                    sb.append("\nParameters:\n");
+                    fields = true;
+                }
+                sb.append(" > ").append(option.value()).append(" <\n    ").append(option.help()).append("\n");
+            }
+        }
+
+        if(sb.length() == 0) {
+            return NO_DOCUMENTATION;
+        }
+
+        return sb.toString();
     }
 }

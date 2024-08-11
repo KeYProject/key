@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.macros.scripts.meta.Description;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import java.lang.annotation.Documented;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -113,10 +115,14 @@ public class WitnessCommand
         throw new NoSuchElementException("No schema variable with name " + name);
     }
 
+    @Description(value = "Skolemize a quantified formula. The name of the Skolem variable can be controlled to make " +
+            "scripts more robust.",
+    examples = { "witness \"\\forall int x; int:_ > 0\" as=\"positiveX\"",
+            "witness \"\\exists int i; s[i] = 0\" as=\"j_2\"" })
     public static class Parameters {
-        @Option(value = "as")
+        @Option(help = "Name of the variable to be introduced", value = "as")
         public String as;
-        @Option(value = "#2")
+        @Option(help = "The quantified formula to be skolemised", value = "#2")
         public Term formula;
     }
 

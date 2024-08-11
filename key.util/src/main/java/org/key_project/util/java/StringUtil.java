@@ -18,6 +18,10 @@ import javax.swing.JFileChooser;
  * @author Martin Hentschel
  */
 public final class StringUtil {
+
+    public static final String[] HTML_ENTITIES = {"&", "<", ">", "\"", "'", "/"};
+    public static final String[] HTML_REPLACED =  {"&amp;", "&lt;", "&gt;", "&quot;", "&apos;", "&sol;"};
+
     /** Pattern for newlines */
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("(\\r\\n|\\r|\\n)");
     /**
@@ -462,5 +466,12 @@ public final class StringUtil {
     public static int count(String text, int beginIndex, int endIndex, char x) {
         return (int) text.chars().skip(beginIndex).limit(endIndex - beginIndex)
                 .filter(ch -> ch == x).count();
+    }
+
+    public static String escapeHtmlEntities(String text) {
+        for (int i = 0; i < HTML_ENTITIES.length; i++) {
+            text = text.replace(HTML_ENTITIES[i], HTML_REPLACED[i]);
+        }
+        return text;
     }
 }

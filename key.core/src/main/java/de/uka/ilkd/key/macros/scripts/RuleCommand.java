@@ -16,6 +16,7 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.macros.scripts.meta.Description;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -443,23 +444,31 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return true;
     }
 
+    @Description(value = "Apply a calculus rule to the current goal.\nAdditional instantiations can be added as paramaters prefixed with inst_",
+        examples = {
+            "rule \"and_left\"",
+            "rule \"and_left\" on=\"A & B\"",
+            "rule \"and_left\" on=\"A & B\" formula=\"A & B -> C\"",
+            "rule \"and_left\" on=\"A & B\" formula=\"A & B -> C\" occ=1",
+            "rule \"and_left\" on=\"A & B\" formula=\"A & B -> C\" occ=1 inst_A=\"true\" inst_B=\"false\""
+        })
     public static class Parameters {
-        @Option(value = "#2")
+        @Option(value = "#2", help = "The name of the rule to be applied.")
         public String rulename;
-        @Option(value = "on", required = false)
+        @Option(value = "on", required = false, help = "The term to be used as the \"find\" term in a taclet with \"find\". (Matching artifacts are supported)")
         public Term on;
         @Option(value = "formula", required = false)
         public Term formula;
-        @Option(value = "occ", required = false)
+        @Option(value = "occ", required = false, help = "The number of the occurrence of 'on' in case there are several applicable rule apps.")
         public int occ = -1;
         /**
          * Represents a part of a formula (may use Java regular expressions as
          * long as supported by proof script parser). Rule is applied to the
          * sequent formula which matches that string.
          */
-        @Option(value = "matches", required = false)
+        @Option(value = "matches", required = false, help = "Instead of giving the toplevel formula completely, a regular expression can be specified to match the toplevel formula as a string.")
         public String matches = null;
-        @Option(value = "assumes", required = false)
+        @Option(value = "assumes", required = false, help = "The assumptions that must be satisfied for the rule to be applied.")
         public Sequent assumes = null;
         @Varargs(as = Term.class, prefix = "inst_")
         public Map<String, Term> instantiations = new HashMap<>();

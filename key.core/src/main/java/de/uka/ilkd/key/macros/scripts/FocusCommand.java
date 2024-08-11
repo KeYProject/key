@@ -8,6 +8,7 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.macros.scripts.meta.Description;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -24,6 +25,11 @@ import org.key_project.util.collection.ImmutableSLList;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Focuses on a given sequent by hiding all formulas that are not in the given parameter sequent.
+ *
+ * @author Mattias Ulbrich
+ */
 public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
     private static final Name HIDELEFT_TACLET_NAME = new Name("hide_left");
@@ -92,8 +98,9 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         return result;
     }
 
+    @Description("Focuses on a given sequent by hiding all formulas that are not in the given parameter sequent.")
     public static class Parameters {
-        @Option(value = "#2")
+        @Option(value = "#2", help = "The sequent to focus on. Matching mechanisms are supported.")
         Sequent sequent;
     }
 }

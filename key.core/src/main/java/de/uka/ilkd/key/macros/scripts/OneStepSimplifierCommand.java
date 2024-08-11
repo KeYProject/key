@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.macros.scripts.meta.Description;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
@@ -70,11 +71,12 @@ public class OneStepSimplifierCommand extends AbstractCommand<OneStepSimplifierC
         }
     }
 
+    @Description("Applies the one-step simplifier to the current goal.")
     public static class Parameters {
-        @Option(value = "antecedent", required = false)
+        @Option(value = "antecedent", required = false, help = "Apply the one-step simplifier to the antecedent. (bool)")
         public boolean antecedent = true;
 
-        @Option(value = "succedent", required = false)
+        @Option(value = "succedent", required = false, help = "Apply the one-step simplifier to the succedent. (bool)")
         public boolean succedent = true;
     }
 }

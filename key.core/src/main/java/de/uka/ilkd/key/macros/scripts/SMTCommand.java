@@ -6,6 +6,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.*;
 
+import de.uka.ilkd.key.macros.scripts.meta.Description;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
@@ -111,14 +112,20 @@ public class SMTCommand
         return new SolverTypeCollection(value, 1, types);
     }
 
+    @Description(value = "Run an SMT solver on the current goal.",
+    examples = {
+        "smt solver=\"Z3\"",
+        "smt solver=\"CVC5\" all=\"true\"",
+        "smt solver=\"CVC4\" timeout=\"1000\""
+    })
     public static class SMTCommandArguments {
-        @Option("solver")
+        @Option(value = "solver", help = "The SMT solver to use.")
         public String solver = "Z3";
 
-        @Option(value = "all", required = false)
+        @Option(value = "all", required = false, help = "Run the solver on all open goals.")
         public boolean all = false;
 
-        @Option(value = "timeout", required = false)
+        @Option(value = "timeout", required = false, help = "The timeout of the call in milliseconds.")
         public int timeout = -1;
     }
 

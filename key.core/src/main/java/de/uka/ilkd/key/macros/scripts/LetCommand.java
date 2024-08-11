@@ -7,6 +7,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.macros.scripts.meta.Description;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
 /**
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.pp.AbbrevMap;
  * This command allows you to assign a term to an abbreviation variable.
  * </scriptDoc>
  */
+@Description(value = "This command allows you to assign a term to an abbreviation variable.",
+    examples = { "let @x = \"@y + 1\"", "let @xzy = \"int::_ > 0\"  (not yet impl)" })
 public class LetCommand extends AbstractCommand<Map<String, String>> {
 
     public LetCommand() {

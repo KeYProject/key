@@ -4,17 +4,12 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import javax.swing.tree.DefaultTreeModel;
 
+import de.uka.ilkd.key.api.ProofScriptCommandApi;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -45,6 +40,7 @@ public class InfoTreeModel extends DefaultTreeModel {
             (InfoTreeNode) root);
         insertAsLast(new FunctionsNode(xmlResources.getFunctionExplanations()),
             (InfoTreeNode) root);
+        insertAsLast(new ScriptCommandNode(), (InfoTreeNode)root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
@@ -225,6 +221,21 @@ public class InfoTreeModel extends DefaultTreeModel {
             });
             return l;
         }
+    }
+
+    private class ScriptCommandNode extends InfoTreeNode {
+
+        ScriptCommandNode() {
+            super("Proof script commands", "Show descriptions for available proof scripts commands.");
+
+            Collection<ProofScriptCommand<?>> cmds = new ProofScriptCommandApi().getScriptCommands();
+            List<ProofScriptCommand<?>> sortedCmds = new ArrayList<>(cmds);
+            sortedCmds.sort(Comparator.comparing(ProofScriptCommand::getName));
+            for (ProofScriptCommand<?> cmd : sortedCmds) {
+                insertAsLast(new InfoTreeNode(cmd.getName(), cmd.getDocumentation()), this);
+            }
+        }
+
     }
 
 }

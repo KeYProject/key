@@ -26,7 +26,7 @@ public class ProofScriptArgument<T> {
     /**
      * Holds the documentation of this argument.
      */
-    private String documentation;
+    // private String documentation;
 
     public ProofScriptCommand<T> getCommand() {
         return command;
@@ -117,25 +117,25 @@ public class ProofScriptArgument<T> {
         this.field = field;
     }
 
-    /**
-     * Documentation for this argument.
-     *
-     * @return a non null string
-     */
-    public String getDocumentation() {
-        return documentation;
-    }
-
-    /**
-     * Documentation for this argument.
-     *
-     * @param documentation a string
-     * @return this
-     */
-    public ProofScriptArgument<T> setDocumentation(String documentation) {
-        this.documentation = documentation;
-        return this;
-    }
+//    /**
+//     * Documentation for this argument.
+//     *
+//     * @return a non null string
+//     */
+//    public String getDocumentation() {
+//        return documentation;
+//    }
+//
+//    /**
+//     * Documentation for this argument.
+//     *
+//     * @param documentation a string
+//     * @return this
+//     */
+//    public ProofScriptArgument<T> setDocumentation(String documentation) {
+//        this.documentation = documentation;
+//        return this;
+//    }
 
     public ProofScriptArgument<T> setVariableArguments(boolean hasVariableArguments) {
         this.variableArguments = hasVariableArguments;
