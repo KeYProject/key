@@ -25,7 +25,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.util.collection.ImmutableList;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         implements StartSideProofMacro {
@@ -51,7 +51,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (goals == null || goals.head() == null || goals.head().node() == null
+        if (goals == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
         }
@@ -77,7 +77,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
-        return posInOcc.subTerm().equalsModProperty(selfComposedExec, RENAMING_PROPERTY);
+        return posInOcc.subTerm().equalsModProperty(selfComposedExec, RENAMING_TERM_PROPERTY);
     }
 
     @Override

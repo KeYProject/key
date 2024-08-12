@@ -22,6 +22,9 @@ final class For implements Iterable {
     @ ensures false;
     @*/
   void infiniteLoop(For f) {
+    // `this.iterator()` has the default contract (see taclet option `soundDefaultContracts` for documentation)
+    // To prove this method, one must thus expand the method call to `this.iterator()` instead of using this contract.
+
     //@ maintaining \invariant_for(f);
     //@ assignable \strictly_nothing;
     for (Object o: f);

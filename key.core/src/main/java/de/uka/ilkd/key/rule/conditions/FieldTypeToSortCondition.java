@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -28,13 +29,13 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort sort;
 
-    public FieldTypeToSortCondition(final SchemaVariable exprOrTypeSV, final GenericSort sort) {
+    public FieldTypeToSortCondition(final OperatorSV exprOrTypeSV, final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         assert checkSortedSV(exprOrTypeSV);
     }
 
-    public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
+    public static boolean checkSortedSV(final OperatorSV exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
         return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE
@@ -42,7 +43,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute svSubst,
+    public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
             MatchConditions matchCond, Services services) {
 
         if (var != exprOrTypeSV) {

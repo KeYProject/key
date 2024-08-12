@@ -43,12 +43,11 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Apr 05 11:26:30 CEST 2018
-name=DualPivotQuicksort_sort_methods[DualPivotQuicksort_sort_methods\\:\\:calcE(int,int)].JML normal_behavior operation contract.0
-contract=DualPivotQuicksort_sort_methods[DualPivotQuicksort_sort_methods\\:\\:calcE(int,int)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "DualPivotQuicksort_sort_methods[DualPivotQuicksort_sort_methods::calcE(int,int)].JML normal_behavior operation contract.0",
+	"contract": "DualPivotQuicksort_sort_methods[DualPivotQuicksort_sort_methods::calcE(int,int)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Flo" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

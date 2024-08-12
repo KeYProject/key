@@ -5,10 +5,10 @@ package org.key_project.logic.op;
 
 import java.util.Objects;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-import org.key_project.logic.Program;
+import org.key_project.logic.*;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box for a target
@@ -39,10 +39,25 @@ public abstract class Modality extends AbstractSortedOperator {
      */
     public abstract Program program();
 
+    @Override
+    public int getChildCount() {
+        return 2;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        return switch (n) {
+        case 0 -> kind;
+        case 1 -> program();
+        default -> throw new IndexOutOfBoundsException(
+            "Modality " + name() + " has only two children");
+        };
+    }
+
     /**
      * Modality kinds like box and diamond.
      */
-    public abstract static class Kind implements Named {
+    public abstract static class Kind implements Named, TerminalSyntaxElement {
         private final Name name;
 
         public Kind(Name name) {
@@ -60,7 +75,7 @@ public abstract class Modality extends AbstractSortedOperator {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o)
                 return true;
             if (!(o instanceof Kind kind))

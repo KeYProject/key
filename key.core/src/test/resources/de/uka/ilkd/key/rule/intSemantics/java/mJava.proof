@@ -1,0 +1,132 @@
+\profile "Java Profile";
+
+\settings // Proof-Settings-Config-File
+{ 
+    "Choice" : { 
+        "JavaCard" : "JavaCard:off",
+        "Strings" : "Strings:on",
+        "assertions" : "assertions:safe",
+        "bigint" : "bigint:on",
+        "floatRules" : "floatRules:strictfpOnly",
+        "initialisation" : "initialisation:disableStaticInitialisation",
+        "intRules" : "intRules:javaSemantics",
+        "integerSimplificationRules" : "integerSimplificationRules:full",
+        "javaLoopTreatment" : "javaLoopTreatment:efficient",
+        "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
+        "methodExpansion" : "methodExpansion:modularOnly",
+        "modelFields" : "modelFields:treatAsAxiom",
+        "moreSeqRules" : "moreSeqRules:off",
+        "permissions" : "permissions:off",
+        "programRules" : "programRules:Java",
+        "reach" : "reach:on",
+        "runtimeExceptions" : "runtimeExceptions:ban",
+        "sequences" : "sequences:on",
+        "wdChecks" : "wdChecks:off",
+        "wdOperator" : "wdOperator:L"
+     },
+    "Labels" : { 
+        "UseOriginLabels" : true
+     },
+    "NewSMT" : { 
+        
+     },
+    "SMTSettings" : { 
+        "SelectedTaclets" : [ 
+            
+         ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+     },
+    "Strategy" : { 
+        "ActiveStrategy" : "JavaCardDLStrategy",
+        "MaximumNumberOfAutomaticApplications" : 10000,
+        "Timeout" : -1,
+        "options" : { 
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "INF_FLOW_CHECK_PROPERTY" : "INF_FLOW_CHECK_FALSE",
+            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_ON",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
+            "VBT_PHASE" : "VBT_SYM_EX"
+         }
+     }
+ } 
+
+\javaSource ".";
+
+\proofObligation 
+// Proof-Obligation settings
+{ 
+    "class" : "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+    "contract" : "IntSemanticsJava[IntSemanticsJava::mJava()].JML normal_behavior operation contract.0",
+    "name" : "IntSemanticsJava[IntSemanticsJava::mJava()].JML normal_behavior operation contract.0"
+ }
+
+\proof {
+(keyLog "0" (keyUser "wolfram" ) (keyVersion "7f892ecb2af976fa9780876087af8978f3eed91b"))
+
+(autoModeTime "147")
+
+(branch "dummy ID"
+ (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,o,f"))
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "assignment" (formula "7"))
+(rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_mJava,savedHeapBefore_mJava"))
+ (builtin "One Step Simplification" (formula "7"))
+(rule "returnUnfold" (formula "7") (term "1") (inst "#v0=i"))
+(rule "variableDeclarationAssign" (formula "7") (term "1"))
+(rule "variableDeclaration" (formula "7") (term "1") (newnames "i"))
+(rule "assignmentAdditionInt" (formula "7") (term "1"))
+ (builtin "One Step Simplification" (formula "7"))
+(rule "translateJavaAddInt" (formula "7") (term "0,1,0"))
+(rule "expand_addJint" (formula "7") (term "0,1,0"))
+(rule "add_literals" (formula "7") (term "0,0,1,0"))
+(rule "expand_moduloInteger" (formula "7") (term "0,1,0"))
+(rule "replace_int_RANGE" (formula "7") (term "1,1,0,1,0"))
+(rule "replace_int_HALFRANGE" (formula "7") (term "0,0,1,0,1,0"))
+(rule "replace_int_MIN" (formula "7") (term "0,0,1,0"))
+(rule "add_literals" (formula "7") (term "0,1,0,1,0"))
+(rule "mod_axiom" (formula "7") (term "1,0,1,0"))
+(rule "polySimp_mulLiterals" (formula "7") (term "1,1,0,1,0"))
+(rule "div_literals" (formula "7") (term "0,1,1,0,1,0"))
+(rule "mul_literals" (formula "7") (term "1,1,0,1,0"))
+(rule "add_literals" (formula "7") (term "1,0,1,0"))
+(rule "add_zero_right" (formula "7") (term "0,1,0"))
+(rule "methodCallReturn" (formula "7") (term "1"))
+(rule "assignment" (formula "7") (term "1"))
+ (builtin "One Step Simplification" (formula "7"))
+(rule "methodCallEmpty" (formula "7") (term "1"))
+(rule "tryEmpty" (formula "7") (term "1"))
+(rule "emptyModality" (formula "7") (term "1"))
+ (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "5")))
+(rule "closeTrue" (formula "7"))
+)
+}

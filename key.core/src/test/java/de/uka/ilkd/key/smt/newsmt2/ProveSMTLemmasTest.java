@@ -33,7 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * This test case makes sure that all KeY formulas which are translated to axioms in SMT can
@@ -92,7 +92,7 @@ public class ProveSMTLemmasTest {
                     KeyIO io = new KeyIO(loadedProof.getServices());
                     Term parsedLemma = io.parseExpression(lemmaString);
                     Term actual = loadedProof.root().sequent().succedent().get(0).formula();
-                    if (!actual.equalsModProperty(parsedLemma, RENAMING_PROPERTY)) {
+                    if (!actual.equalsModProperty(parsedLemma, RENAMING_TERM_PROPERTY)) {
                         LOGGER.info("Stored : {}", parsedLemma);
                         LOGGER.warn("Proven : {}", actual);
                         Assertions.fail("The proven lemma is different from the stored one.");

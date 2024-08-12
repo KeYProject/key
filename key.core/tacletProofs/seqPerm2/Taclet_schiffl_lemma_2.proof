@@ -39,11 +39,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Thu Oct 27 13:34:28 CEST 2016
-name=schiffl_lemma_2
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "schiffl_lemma_2",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proofScript "
 macro split-prop;
@@ -371,10 +370,8 @@ tryclose branch;
 # established: r3 fixes v_y_0
 # from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and  
 # s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0
-cut 'int::seqGet(s_0, v_y_0)=v_x_0';
 # This corresponds to case B4ii  in the Notes.
 # in the following r4 refers to this instantion
-tryclose branch;
 # established: r4 is of the correct length
 rule seqNPermSwapNPerm;
 instantiate hide var=iv with='jv_1';
@@ -406,4 +403,3 @@ instantiate hide var=jv with='jv_1';
 instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
 tryclose branch;
 "
-

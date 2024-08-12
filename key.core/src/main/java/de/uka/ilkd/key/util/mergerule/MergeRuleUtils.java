@@ -45,7 +45,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -821,7 +822,8 @@ public class MergeRuleUtils {
 
         // Quick short cut for the special case where no program variables
         // have to be renamed.
-        if (se1.equalsModRenaming(se2, new NameAbstractionTable())) {
+        if (se1.equalsModProperty(se2, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable())) {
             return true;
         }
 
@@ -836,7 +838,8 @@ public class MergeRuleUtils {
         replVisitor1.start();
         replVisitor2.start();
 
-        return replVisitor1.result().equalsModRenaming(replVisitor2.result(),
+        return replVisitor1.result().equalsModProperty(replVisitor2.result(),
+            RENAMING_SOURCE_ELEMENT_PROPERTY,
             new NameAbstractionTable());
     }
 
@@ -1721,7 +1724,7 @@ public class MergeRuleUtils {
 
         public TermWrapper wrapTerm(Term term) {
             for (Term existingTerm : wrappedTerms) {
-                if (existingTerm.equalsModProperty(term, RENAMING_PROPERTY)) {
+                if (existingTerm.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     return new TermWrapper(term, existingTerm.hashCode());
                 }
             }
@@ -1752,7 +1755,7 @@ public class MergeRuleUtils {
         @Override
             public boolean equals(Object obj) {
                 return obj instanceof TermWrapper
-                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_PROPERTY);
+                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
             }
 
             @Override
@@ -1856,12 +1859,12 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     private static class LocVarReplBranchUniqueMap
-            extends HashMap<ProgramVariable, ProgramVariable> {
+            extends HashMap<LocationVariable, LocationVariable> {
         private static final long serialVersionUID = 2305410114265133879L;
 
         private final Node node;
         private final ImmutableSet<LocationVariable> doNotRename;
-        private final HashMap<LocationVariable, ProgramVariable> cache =
+        private final HashMap<LocationVariable, LocationVariable> cache =
             new HashMap<>();
 
         public LocVarReplBranchUniqueMap(Node goal, ImmutableSet<LocationVariable> doNotRename) {
@@ -1885,7 +1888,7 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public ProgramVariable get(Object key) {
+        public LocationVariable get(Object key) {
             if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) {
@@ -1896,7 +1899,7 @@ public class MergeRuleUtils {
                     return cache.get(var);
                 }
 
-                final ProgramVariable result = getBranchUniqueLocVar(var, node);
+                final LocationVariable result = getBranchUniqueLocVar(var, node);
                 cache.put(var, result);
 
                 return result;
@@ -1906,27 +1909,27 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public ProgramVariable put(ProgramVariable key, ProgramVariable value) {
+        public LocationVariable put(LocationVariable key, LocationVariable value) {
             return null;
         }
 
         @Override
-        public ProgramVariable remove(Object key) {
+        public LocationVariable remove(Object key) {
             return null;
         }
 
         @Override
-        public Set<ProgramVariable> keySet() {
+        public Set<LocationVariable> keySet() {
             return null;
         }
 
         @Override
-        public Collection<ProgramVariable> values() {
+        public Collection<LocationVariable> values() {
             return null;
         }
 
         @Override
-        public Set<java.util.Map.Entry<ProgramVariable, ProgramVariable>> entrySet() {
+        public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
             return null;
         }
     }

@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
@@ -144,7 +144,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Sort sort) {
         Name name = new Name(varfuncName);
         Operator[] operators =
-            new Operator[] { schemaVariables().lookup(name), variables().lookup(name),
+            new Operator[] { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
                 functions().lookup(name), AbstractTermTransformer.name2metaop(varfuncName),
 
@@ -160,7 +160,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Name fqName =
                 new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
             operators =
-                new Operator[] { schemaVariables().lookup(fqName), variables().lookup(fqName),
+                new Operator[] { (OperatorSV) schemaVariables().lookup(fqName),
+                    variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
                     functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };

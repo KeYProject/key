@@ -233,6 +233,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     getMediator().startInterface(true);
                     if (p != null) {
                         mainWindow.getUserInterface().registerProofAggregate(p);
+                        mainWindow.getMediator().getSelectionModel()
+                                .setSelectedProof(p.getFirstProof());
                     }
                 }
 

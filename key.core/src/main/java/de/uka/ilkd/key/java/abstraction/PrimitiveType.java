@@ -55,6 +55,8 @@ public final class PrimitiveType implements Type {
         new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
     public static final PrimitiveType JAVA_MAP =
         new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
+    public static final PrimitiveType JAVA_TYPE =
+        new PrimitiveType("\\TYPE", NullLiteral.NULL, SortLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 

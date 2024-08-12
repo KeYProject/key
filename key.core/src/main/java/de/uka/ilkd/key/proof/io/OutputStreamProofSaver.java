@@ -195,26 +195,27 @@ public class OutputStreamProofSaver {
             ps.print(header);
 
             // \problem or \proofObligation
-            if (po instanceof IPersistablePO
+            if (po instanceof IPersistablePO ppo
                     && (!(po instanceof AbstractInfFlowPO) || (!(po instanceof InfFlowCompositePO)
                             && ((InfFlowProof) proof).getIFSymbols().isFreshContract()))) {
-                final Properties properties = new Properties();
-                ((IPersistablePO) po).fillSaveProperties(properties);
-                try (StringWriter writer = new StringWriter()) {
-                    properties.store(writer, "Proof Obligation Settings");
-                    ps.println(
-                        "\\proofObligation \"" + escapeCharacters(writer.toString()) + "\";\n");
-                }
+                var loadingConfig = ppo.createLoaderConfig();
+                ps.println("\\proofObligation ");
+                loadingConfig.save(ps, "Proof-Obligation settings");
+                ps.println("\n");
             } else {
                 if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
                         || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
-                    final Properties properties = new Properties();
-                    ((IPersistablePO) po).fillSaveProperties(properties);
                     ps.print(((InfFlowProof) proof).printIFSymbols());
                 }
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
-                printer.printSemisequent(problemSeq.succedent());
+                if (problemSeq.antecedent().isEmpty() && problemSeq.succedent().size() == 1) {
+                    // Problem statement is a single formula ...
+                    printer.printSemisequent(problemSeq.succedent());
+                } else {
+                    // Problem statement is a proper sequent ...
+                    printer.printSequent(problemSeq);
+                }
                 ps.println(printer.result());
                 ps.println("}\n");
             }

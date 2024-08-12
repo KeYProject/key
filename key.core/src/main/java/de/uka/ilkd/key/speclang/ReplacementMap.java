@@ -13,7 +13,8 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * A map from some type to the same type.
@@ -22,7 +23,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  *
  * @author lanzinger
  */
-public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
+public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
         extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
 
     /**
@@ -57,13 +58,13 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
      * @param newFlags new flags.
      * @param services services.
      */
-    public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
+    public void replaceFlags(final Map<Label, LocationVariable> oldFlags,
             final Map<Label, S> newFlags, TermServices services) {
         if (newFlags != null) {
             if (newFlags.size() != oldFlags.size()) {
                 throw new IllegalArgumentException("flags have to have the same size");
             }
-            for (Entry<Label, ProgramVariable> oldFlag : oldFlags.entrySet()) {
+            for (Entry<Label, LocationVariable> oldFlag : oldFlags.entrySet()) {
                 replaceVariable(oldFlag.getValue(), newFlags.get(oldFlag.getKey()), services);
             }
         }

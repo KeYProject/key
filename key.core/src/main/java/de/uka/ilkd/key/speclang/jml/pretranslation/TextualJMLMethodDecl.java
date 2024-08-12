@@ -21,21 +21,21 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     private final JmlParser.Method_declarationContext methodDefinition;
 
 
-    public TextualJMLMethodDecl(ImmutableList<JMLModifier> mods,
+    public TextualJMLMethodDecl(ImmutableList<JMLModifier> modifiers,
             JmlParser.Method_declarationContext methodDefinition) {
-        super(mods);
+        super(modifiers);
         this.methodDefinition = methodDefinition;
         setPosition(methodDefinition);
     }
 
     public String getParsableDeclaration() {
-        String m = mods.stream().map(it -> {
-            if (JMLTransformer.javaMods.contains(it)) {
+        String m = modifiers.stream().map(it -> {
+            if (JMLTransformer.javaModifiers.contains(it)) {
                 return it.toString();
             } else {
-                JMLModifier jmlMod = JMLModifier.valueOf(it.name());
-                if (jmlMod == JMLModifier.NON_NULL || jmlMod == JMLModifier.NULLABLE) {
-                    return "/*@ " + jmlMod + " @*/";
+                JMLModifier jmlModifier = JMLModifier.valueOf(it.name());
+                if (jmlModifier == JMLModifier.NON_NULL || jmlModifier == JMLModifier.NULLABLE) {
+                    return "/*@ " + jmlModifier + " @*/";
                 } else {
                     return StringUtil.repeat(" ", it.toString().length());
                 }
@@ -87,10 +87,10 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     public int getStateCount() {
-        if (mods.contains(JMLModifier.TWO_STATE)) {
+        if (modifiers.contains(JMLModifier.TWO_STATE)) {
             return 2;
         }
-        if (mods.contains(JMLModifier.NO_STATE)) {
+        if (modifiers.contains(JMLModifier.NO_STATE)) {
             return 0;
         }
         return 1;

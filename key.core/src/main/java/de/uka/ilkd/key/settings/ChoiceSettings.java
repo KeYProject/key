@@ -34,7 +34,6 @@ public class ChoiceSettings extends AbstractSettings {
 
     private static final String PROP_CHOICE_DEFAULT = "category2Default";
     private static final String PROP_CHOICE_CATEGORIES = "category2Choices";
-    private HashMap<String, String> category2Default;
 
 
     /**
@@ -42,6 +41,7 @@ public class ChoiceSettings extends AbstractSettings {
      * category).
      */
     private Map<String, Set<String>> category2Choices = new LinkedHashMap<>();
+    private Map<String, String> category2Default;
 
 
     public ChoiceSettings() {
@@ -74,8 +74,7 @@ public class ChoiceSettings extends AbstractSettings {
      * <p>
      * The method name is somewhat misleading.
      */
-    @NonNull
-    public Map<String, String> getDefaultChoices() {
+    public @NonNull Map<String, String> getDefaultChoices() {
         return Collections.unmodifiableMap(category2Default);
     }
 
@@ -83,8 +82,7 @@ public class ChoiceSettings extends AbstractSettings {
     /**
      * returns the current selected choices as an immutable set
      */
-    @NonNull
-    public ImmutableSet<Choice> getDefaultChoicesAsSet() {
+    public @NonNull ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }
 
