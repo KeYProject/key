@@ -11,6 +11,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.ty.KeYRustyType;
+import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.rule.MatchConditions;
 
 import org.jspecify.annotations.NonNull;
@@ -51,5 +52,10 @@ public class ProgramVariable extends AbstractSortedOperator implements Expr {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnProgramVariable(this);
     }
 }

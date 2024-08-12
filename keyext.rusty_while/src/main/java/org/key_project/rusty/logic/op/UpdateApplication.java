@@ -5,6 +5,7 @@ package org.key_project.rusty.logic.op;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.op.Operator;
@@ -52,14 +53,23 @@ public final class UpdateApplication extends AbstractOperator implements Operato
     }
 
 
-    /// **
-    // * @return the subterm representing the update being applies
-    // * @param t term with this operator as top level operator
-    // */
-    // public static Term getUpdate(Term t) {
-    // assert t.op() == UPDATE_APPLICATION;
-    // return t.sub(updatePos());
-    // }
+    /**
+     * @return the subterm representing the update being applies
+     * @param t term with this operator as top level operator
+     */
+     public static Term getUpdate(Term t) {
+     assert t.op() == UPDATE_APPLICATION;
+     return t.sub(updatePos());
+     }
+
+    /**
+     * @return the subterm representing the update being applies
+     * @param t term with this operator as top level operator
+     */
+    public static Term getTarget(Term t) {
+        assert t.op() == UPDATE_APPLICATION;
+        return t.sub(targetPos());
+    }
 
 
     /**

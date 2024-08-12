@@ -6,6 +6,9 @@ package org.key_project.rusty.rule;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 
 public class MatchConditions {
+    public static final MatchConditions EMPTY_MATCHCONDITIONS =
+            new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS);
+
     private final SVInstantiations instantiations;
 
     public MatchConditions() {

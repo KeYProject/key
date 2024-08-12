@@ -7,6 +7,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.expr.Expr;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public class ExpressionStatement implements Statement {
     private final Expr expression;
@@ -31,5 +32,10 @@ public class ExpressionStatement implements Statement {
     @Override
     public String toString() {
         return expression.toString() + ";";
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        expression.visit(v);
     }
 }

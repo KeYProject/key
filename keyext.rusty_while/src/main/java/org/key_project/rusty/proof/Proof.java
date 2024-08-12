@@ -70,13 +70,13 @@ public class Proof implements Named {
         this(new Name(name), initConfig);
     }
 
-    private Proof(String name, Sequent problem,
+    private Proof(String name, Sequent problem, TacletIndex tacletIndex,
             InitConfig initConfig) {
         this(new Name(name), initConfig);
 
         final var rootNode = new Node(this, problem);
         final var firstGoal =
-            new Goal(rootNode);
+            new Goal(rootNode, tacletIndex, initConfig.getServices());
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
     }
@@ -85,6 +85,7 @@ public class Proof implements Named {
         this(name,
             Sequent.createSuccSequent(
                 new Semisequent(new SequentFormula(problem))),
+            initConfig.createTacletIndex(),
             initConfig);
     }
 
@@ -92,7 +93,8 @@ public class Proof implements Named {
         this(name, initConfig);
         final var rootNode = new Node(this, problem);
         final var firstGoal =
-            new Goal(rootNode);
+            new Goal(rootNode, initConfig.createTacletIndex(),
+                    initConfig.getServices());
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
     }
@@ -139,4 +141,7 @@ public class Proof implements Named {
     }
 
 
+    public Node root() {
+        return root;
+    }
 }

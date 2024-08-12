@@ -4,6 +4,7 @@
 package org.key_project.rusty.rule;
 
 import org.key_project.rusty.Services;
+import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
@@ -14,6 +15,12 @@ public interface RuleApp {
      * returns the rule of this rule application
      */
     Rule rule();
+
+    /**
+     * returns the PositionInOccurrence (representing a SequentFormula and a position in the
+     * corresponding formula) of this rule application
+     */
+    PosInOccurrence posInOccurrence();
 
     /**
      * applies the specified rule at the specified position if all schema variables have been

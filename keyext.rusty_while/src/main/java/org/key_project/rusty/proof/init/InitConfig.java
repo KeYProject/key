@@ -15,6 +15,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
 import org.key_project.rusty.rule.BuiltInRule;
 import org.key_project.rusty.rule.RuleSet;
@@ -186,5 +187,9 @@ public class InitConfig {
         // TODO add copies once more fields of InitConfig are added
 
         return ic;
+    }
+
+    public TacletIndex createTacletIndex() {
+        return new TacletIndex(taclets);
     }
 }

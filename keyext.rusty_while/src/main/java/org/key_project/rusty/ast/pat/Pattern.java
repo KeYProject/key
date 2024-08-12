@@ -4,6 +4,11 @@
 package org.key_project.rusty.ast.pat;
 
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public interface Pattern extends RustyProgramElement {
+    @Override
+    default void visit(Visitor v) {
+        throw new RuntimeException("TODO @ DD");
+    }
 }

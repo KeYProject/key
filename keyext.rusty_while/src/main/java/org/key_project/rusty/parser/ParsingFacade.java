@@ -81,6 +81,20 @@ public final class ParsingFacade {
         return new KeYAst.File(ctx);
     }
 
+    public static KeYAst.Term parseExpression(CharStream stream) {
+        KeYRustyParser p = createParser(stream);
+        KeYRustyParser.TermContext term = p.termEOF().term();
+        //p.getErrorReporter().throwException();
+        return new KeYAst.Term(term);
+    }
+
+    public static KeYAst.Seq parseSequent(CharStream stream) {
+        KeYRustyParser p = createParser(stream);
+        var seq = new KeYAst.Seq(p.seqEOF().seq());
+        //p.getErrorReporter().throwException();
+        return seq;
+    }
+
     /**
      * Parses the configuration determined by the given {@code file}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.

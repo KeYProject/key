@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -31,5 +32,10 @@ public class Crate implements RustyProgramElement {
     @Override
     public String toString() {
         return items.map(Item::toString).stream().collect(Collectors.joining("\n"));
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        throw new RuntimeException("Shouldn't be called");
     }
 }

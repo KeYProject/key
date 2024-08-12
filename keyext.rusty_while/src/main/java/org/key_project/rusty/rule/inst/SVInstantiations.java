@@ -213,7 +213,26 @@ public class SVInstantiations {
         return entry == null ? null : entry.getInstantiation();
     }
 
-
+    /**
+     * returns the instantiation of the given SchemaVariable as Term. If the instantiation is a
+     * program element it is tried to convert it to a term otherwise an exception is thrown
+     *
+     * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
+     *         stored
+     */
+    public Term getTermInstantiation(SchemaVariable sv, Services services) {
+        final Object inst = getInstantiation(sv);
+        if (inst == null) {
+            return null;
+        } else if (inst instanceof Term) {
+            return (Term) inst;
+        } else if (inst instanceof RustyProgramElement pe) {
+            //return services.getTypeConverter().convertToLogicElement((ProgramElement) inst, ec);
+            throw new RuntimeException("TODO @ DD");
+        } else {
+            throw CONVERT_INSTANTIATION_EXCEPTION;
+        }
+    }
 
     /**
      * adds an update to the update context

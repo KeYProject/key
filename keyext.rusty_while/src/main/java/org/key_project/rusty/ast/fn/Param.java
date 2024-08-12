@@ -9,6 +9,7 @@ import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.Type;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public class Param implements RustyProgramElement {
     private final Pattern pattern;
@@ -35,5 +36,10 @@ public class Param implements RustyProgramElement {
     @Override
     public String toString() {
         return pattern.toString() + ": " + type.toString();
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        throw new RuntimeException("Shouldn't be called");
     }
 }

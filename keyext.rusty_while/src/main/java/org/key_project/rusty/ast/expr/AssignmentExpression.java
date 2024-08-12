@@ -6,6 +6,7 @@ package org.key_project.rusty.ast.expr;
 import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public class AssignmentExpression implements Expr {
     private final Expr lhs;
@@ -35,5 +36,10 @@ public class AssignmentExpression implements Expr {
     @Override
     public String toString() {
         return lhs + " = " + rhs;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnAssignmentExpression(this);
     }
 }

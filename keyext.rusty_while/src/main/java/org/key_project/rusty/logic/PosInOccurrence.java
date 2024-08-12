@@ -99,4 +99,81 @@ public class PosInOccurrence {
         }
         return subTermCache;
     }
+
+    public PIOPathIterator iterator() {
+return new PIOPathIteratorImpl();
+    }
+
+    private final class PIOPathIteratorImpl implements PIOPathIterator {
+        int child;
+        int count = 0;
+        IntIterator currentPathIt;
+        Term currentSubTerm = null;
+
+        private PIOPathIteratorImpl() {
+            currentPathIt = posInTerm().iterator();
+        }
+
+        /**
+         * @return the number of the next child on the path, or <code>-1</code> if no further child
+         *         exists (this is the number that was also returned by the last call of
+         *         <code>next()</code>)
+         */
+        public int getChild() {
+            return child;
+        }
+
+        /**
+         * @return the current position within the term (i.e. corresponding to the latest
+         *         <code>next()</code>-call)
+         */
+        public PosInOccurrence getPosInOccurrence() {
+            // the object is created only now to make the method
+            // <code>next()</code> faster
+
+            final PosInOccurrence pio;
+            pio = new PosInOccurrence(sequentFormula, posInTerm.firstN(count - 1), inAntec);
+
+
+            return pio;
+        }
+
+        /**
+         * @return the current subterm this object points to (i.e. corresponding to the latest
+         *         <code>next()</code>-call); this method satisfies
+         *         <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
+         */
+        public Term getSubTerm() {
+            return currentSubTerm;
+        }
+
+        public boolean hasNext() {
+            return currentPathIt != null;
+        }
+
+        /**
+         * @return the number of the next child on the path, or <code>-1</code> if no further child
+         *         exists
+         */
+        public int next() {
+            int res;
+
+            if (currentSubTerm == null) {
+                currentSubTerm = sequentFormula.formula();
+            } else {
+                currentSubTerm = currentSubTerm.sub(child);
+            }
+
+            if (currentPathIt.hasNext()) {
+                res = currentPathIt.next();
+            } else {
+                res = -1;
+                currentPathIt = null;
+            }
+
+            child = res;
+            ++count;
+            return res;
+        }
+    }
 }

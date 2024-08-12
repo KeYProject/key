@@ -81,4 +81,16 @@ public abstract class KeYAst<T extends ParserRuleContext> {
                 throw new RuntimeException();
         }
     }
+
+    public static class Term extends KeYAst<KeYRustyParser.TermContext> {
+        Term(KeYRustyParser.TermContext ctx) {
+            super(ctx);
+        }
+    }
+
+    public static class Seq extends KeYAst<KeYRustyParser.SeqContext> {
+        Seq(KeYRustyParser.SeqContext ctx) {
+            super(ctx);
+        }
+    }
 }

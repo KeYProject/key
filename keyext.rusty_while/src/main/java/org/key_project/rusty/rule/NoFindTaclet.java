@@ -6,7 +6,7 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.rule.executor.javadl.NoFindTacletExecutor;
+import org.key_project.rusty.rule.executor.rustydl.NoFindTacletExecutor;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;

@@ -6,6 +6,7 @@ package org.key_project.rusty.logic.op.sv;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.UpdateableOperator;
+import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.ProgramConstruct;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 
@@ -37,5 +38,10 @@ public final class ProgramSV extends OperatorSV
     @Override
     public int getChildCount() {
         return 0;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnSchemaVariable(this);
     }
 }

@@ -494,4 +494,13 @@ public class TermBuilder {
             return func(integerLDT.getAdd(), t1, t2);
         }
     }
+
+    public Term applyUpdatePairsSequential(ImmutableList<Term> updates, Term target) {
+        if (updates.isEmpty()) {
+            return target;
+        } else {
+            return apply(updates.head(),
+                    applyUpdatePairsSequential(updates.tail(), target));
+        }
+    }
 }

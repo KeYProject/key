@@ -8,6 +8,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public record Identifier(Name name) implements Named, RustyProgramElement {
 
@@ -29,5 +30,10 @@ public record Identifier(Name name) implements Named, RustyProgramElement {
     @Override
     public String toString() {
         return name().toString();
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        throw new RuntimeException("Should never be called");
     }
 }

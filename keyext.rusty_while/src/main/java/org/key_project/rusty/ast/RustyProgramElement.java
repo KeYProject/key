@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.rule.MatchConditions;
 
 public interface RustyProgramElement extends SyntaxElement {
@@ -69,4 +70,12 @@ public interface RustyProgramElement extends SyntaxElement {
     default boolean compatibleBlockSize(int pos, int max) {
         return pos >= max;
     }
+
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
+     * @param v the Visitor
+     */
+    void visit(Visitor v);
 }

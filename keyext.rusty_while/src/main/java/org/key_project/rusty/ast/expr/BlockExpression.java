@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.stmt.Statement;
+import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -31,11 +32,24 @@ public class BlockExpression implements Expr {
         return statements.size();
     }
 
+    public ImmutableList<? extends Statement> getStatements() {
+        return statements;
+    }
+
+    public Expr getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return "{\n"
             + statements.stream().map(s -> "\t" + s.toString()).collect(Collectors.joining("\n"))
             + "\n\t" + value.toString()
             + "\n}";
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnBlockExpression(this);
     }
 }

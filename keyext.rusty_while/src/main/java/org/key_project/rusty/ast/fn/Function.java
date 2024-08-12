@@ -12,6 +12,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Item;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -39,5 +40,10 @@ public record Function(Name name, ImmutableList<Param> params, Type returnType,
         return "fn " + name() + "("
                 + params.map(Param::toString).stream().collect(Collectors.joining(", ")) + ") -> "
                 + returnType + " " + body;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        throw new RuntimeException("TODO @ DD");
     }
 }

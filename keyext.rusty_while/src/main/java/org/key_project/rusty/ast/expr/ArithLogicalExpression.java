@@ -6,6 +6,7 @@ package org.key_project.rusty.ast.expr;
 import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public record ArithLogicalExpression(Expr left,org.key_project.rusty.ast.expr.ArithLogicalExpression.Operator op,Expr right)implements Expr{
 
@@ -46,5 +47,10 @@ public enum Operator {
         default -> throw new IndexOutOfBoundsException(
             "ArithLogicalExpression has only 2 children");
         };
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnArithLogicalExpression(this);
     }
 }

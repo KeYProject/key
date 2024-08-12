@@ -5,8 +5,16 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+import org.key_project.rusty.logic.PIOPathIterator;
+import org.key_project.rusty.logic.PosInOccurrence;
+import org.key_project.rusty.logic.op.IfThenElse;
+import org.key_project.rusty.logic.op.Junctor;
+import org.key_project.rusty.logic.op.Modality;
+import org.key_project.rusty.logic.op.UpdateApplication;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.rule.executor.javadl.RewriteTacletExecutor;
+import org.key_project.rusty.rule.executor.rustydl.RewriteTacletExecutor;
+import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -198,5 +206,71 @@ public class RewriteTaclet extends FindTaclet {
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
             prefixMap, applicationRestriction, tacletAnnotations);
+    }
+
+    public MatchConditions checkPrefix(PosInOccurrence p_pos, MatchConditions p_mc) {
+        int polarity = p_pos.isInAntec() ? -1 : 1; // init polarity
+        SVInstantiations svi = p_mc.getInstantiations();
+        // this is assumed to hold
+        assert p_pos.posInTerm() != null;
+
+        PIOPathIterator it = p_pos.iterator();
+        Operator op;
+        while (it.next() != -1) {
+            final Term t = it.getSubTerm();
+            op = t.op();
+            if (op instanceof UpdateApplication
+                    && it.getChild() == UpdateApplication.targetPos()
+                    && !getApplicationRestriction().matches(ApplicationRestriction.None)) {
+                if (getApplicationRestriction().matches(ApplicationRestriction.InSequentState) || veto(t)) {
+                    return null;
+                } else {
+                    Term update = UpdateApplication.getUpdate(t);
+                    svi = svi.addUpdate(update);
+                }
+            } else if (!getApplicationRestriction().matches(ApplicationRestriction.None)
+                    && (op instanceof Modality)) {
+                return null;
+            }
+
+            if (polarity != 0) {
+                polarity = polarity(op, it, polarity);
+            }
+        }
+
+        if (getApplicationRestriction().matches(ApplicationRestriction.None)) {
+            return p_mc;
+        }
+        if ((getApplicationRestriction().matches(ApplicationRestriction.AntecedentPolarity) && polarity != -1)
+                || (getApplicationRestriction().matches(ApplicationRestriction.SuccedentPolarity) && polarity != 1)) {
+            return null;
+        }
+        return p_mc.setInstantiations(svi);
+    }
+
+    /**
+     * Compute polarity
+     * <br>
+     * (the {@code AntecSuccPrefixChecker} seems to reimplement this.
+     */
+    private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
+        // toggle polarity if find term is
+        // subterm of
+        if ((op == Junctor.NOT) || // not
+                (op == Junctor.IMP && it.getChild() == 0)) { // left hand side of implication
+            polarity = polarity * -1;
+            // do not change polarity if find term
+            // is subterm of
+        } else if ((op == Junctor.AND) || // and
+                (op == Junctor.OR) || // or
+                (op == Junctor.IMP && it.getChild() != 0) || // right hand side of implication
+                (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { // then or else part of
+            // if-then-else
+            // do nothing
+        } else { // find term has no polarity in any
+            // other case
+            polarity = 0;
+        }
+        return polarity;
     }
 }

@@ -53,7 +53,10 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions matchConditions,
             Services services) {
-        MatchConditions result = match((Term) cursor.getCurrentNode(), matchConditions, services);
+        // TODO: Is there a more suitable place for this?
+        // Go to op
+        cursor.goToNext();
+        MatchConditions result = match((Operator) cursor.getCurrentNode(), matchConditions, services);
         if (result != null) {
             cursor.goToNext();
         }

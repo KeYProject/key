@@ -7,6 +7,7 @@ import java.math.BigInteger;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.ldt.IntLDT;
 
 import org.jspecify.annotations.NonNull;
@@ -85,5 +86,10 @@ public class IntegerLiteralExpression extends LiteralExpression {
 
     public IntegerSuffix getSuffix() {
         return suffix;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnIntegerLiteralExpression(this);
     }
 }

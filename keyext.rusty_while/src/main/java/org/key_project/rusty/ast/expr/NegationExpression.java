@@ -6,6 +6,7 @@ package org.key_project.rusty.ast.expr;
 import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public class NegationExpression implements Expr {
     public enum Operator {
@@ -44,5 +45,10 @@ public class NegationExpression implements Expr {
         }
         throw new IndexOutOfBoundsException(
             "NegationExpression has only 1 children");
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnNegationExpression(this);
     }
 }

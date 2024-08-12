@@ -148,6 +148,50 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
 
     /**
+     * . inserts new ConstrainedFormulas starting at index idx and removes duplicates, perform
+     * simplifications etc.
+     *
+     * @param sequentFormula the IList<SequentFormula> to be inserted at position idx
+     * @param idx an int that means insert sequentFormula at the idx-th position in the semisequent
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    private SemisequentChangeInfo removeRedundance(int idx,
+                                                   ImmutableList<SequentFormula> sequentFormula) {
+        return insertAndRemoveRedundancy(idx, sequentFormula, new SemisequentChangeInfo(seqList));
+    }
+
+    /**
+     * . inserts new ConstrainedFormulas starting at index idx and removes duplicates, perform
+     * simplifications etc.
+     *
+     * @param sequentFormulasToBeInserted the {@link ImmutableList<SequentFormula>} to be inserted
+     *        at position idx
+     * @param idx an int that means insert sequentFormula at the idx-th position in the semisequent
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    private SemisequentChangeInfo insertAndRemoveRedundancy(int idx,
+                                                            ImmutableList<SequentFormula> sequentFormulasToBeInserted, SemisequentChangeInfo sci) {
+
+        int pos = idx;
+        ImmutableList<SequentFormula> oldFormulas = sci.getFormulaList();
+
+        while (!sequentFormulasToBeInserted.isEmpty()) {
+            final SequentFormula aSequentFormula = sequentFormulasToBeInserted.head();
+            sequentFormulasToBeInserted = sequentFormulasToBeInserted.tail();
+
+            sci = insertAndRemoveRedundancyHelper(pos, aSequentFormula, sci, null);
+
+            if (sci.getFormulaList() != oldFormulas) {
+                pos = sci.getIndex() + 1;
+                oldFormulas = sci.getFormulaList();
+            }
+        }
+        return sci;
+    }
+
+    /**
      * gets the element at a specific index
      *
      * @param idx int representing the index of the element we want to have
@@ -199,6 +243,130 @@ public class Semisequent implements Iterable<SequentFormula> {
     @Override
     public String toString() {
         return seqList.toString();
+    }
+
+    /**
+     * inserts the elements of the list at the specified index performing redundancy checks
+     *
+     * @param idx int encoding the place where the insertion starts
+     * @param insertionList IList<SequentFormula> to be inserted starting at idx
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo insert(int idx, ImmutableList<SequentFormula> insertionList) {
+        return removeRedundance(idx, insertionList);
+    }
+
+    /**
+     * inserts element at the end of the semisequent performing redundancy checks, this may result
+     * in returning same semisequent if inserting would create redundancies
+     *
+     * @param sequentFormula {@link SequentFormula} to be inserted
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo insertLast(SequentFormula sequentFormula) {
+        return insert(size(), sequentFormula);
+    }
+
+    /**
+     * returns the index of the given {@link SequentFormula} or {@code -1} if the sequent formula is
+     * not found. Equality of sequent formulas is checked sing the identy check (i.e.,
+     * <code>==</code>)
+     *
+     * @param sequentFormula the {@link SequentFormula} to look for
+     * @return index of sequentFormula (-1 if not found)
+     */
+    public int indexOf(SequentFormula sequentFormula) {
+        ImmutableList<SequentFormula> searchList = seqList;
+        int index = 0;
+        while (!searchList.isEmpty()) {
+            if (searchList.head() == sequentFormula) {
+                return index;
+            }
+            searchList = searchList.tail();
+            index++;
+        }
+        return -1;
+    }
+
+    /**
+     * inserts element at index 0 performing redundancy checks, this may result in returning same
+     * semisequent if inserting would create redundancies
+     *
+     * @param insertions IList<SequentFormula> to be inserted
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo insertFirst(ImmutableList<SequentFormula> insertions) {
+        return insert(0, insertions);
+    }
+
+    /**
+     * inserts the formulas of the list at the end of the semisequent performing redundancy checks,
+     * this may result in returning same semisequent if inserting would create redundancies
+     *
+     * @param insertions the IList<SequentFormula> to be inserted
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo insertLast(ImmutableList<SequentFormula> insertions) {
+        return insert(size(), insertions);
+    }
+
+    /**
+     * replaces the element at place idx with the first element of the given list and adds the rest
+     * of the list to the semisequent behind the replaced formula
+     *
+     * @param pos the formula to be replaced
+     * @param replacements the IList<SequentFormula> whose head replaces the element at index idx
+     *        and the tail is added to the semisequent
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo replace(PosInOccurrence pos,
+                                         ImmutableList<SequentFormula> replacements) {
+        final int idx = indexOf(pos.sequentFormula());
+        return insertAndRemoveRedundancy(idx, replacements, remove(idx));
+    }
+
+    /**
+     * removes an element
+     *
+     * @param idx int being the index of the element that has to be removed
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo remove(int idx) {
+
+        ImmutableList<SequentFormula> newList = seqList;
+        int index = 0;
+
+        if (idx < 0 || idx >= size()) {
+            return new SemisequentChangeInfo(seqList);
+        }
+
+        final SequentFormula[] temp = new SequentFormula[idx];
+
+        while (index < idx) {// go to idx
+            temp[index] = newList.head();
+            newList = newList.tail();
+            index++;
+        }
+
+        // remove the element that is at head of newList
+        final SequentFormula removedFormula = newList.head();
+        newList = newList.tail();
+
+        for (int k = index - 1; k >= 0; k--) {
+            newList = newList.prepend(temp[k]);
+        }
+
+        // create change info object
+        final SemisequentChangeInfo sci = new SemisequentChangeInfo(newList);
+        sci.removedFormula(idx, removedFormula);
+
+        return sci;
     }
 
     // inner class used to represent an empty semisequent

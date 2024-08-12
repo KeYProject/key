@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.Sequent;
@@ -29,7 +30,6 @@ public class TacletGoalTemplate {
     private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
 
     private String name = null;
-
 
     /**
      * creates new Goaldescription
@@ -82,6 +82,10 @@ public class TacletGoalTemplate {
 
     public ImmutableSet<SchemaVariable> addedProgVars() {
         return addedProgVars;
+    }
+
+    public Object replaceWithExpressionAsObject() {
+        return null;
     }
 
     /**

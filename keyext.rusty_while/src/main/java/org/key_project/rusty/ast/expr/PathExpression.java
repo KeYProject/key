@@ -7,6 +7,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Identifier;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public record PathExpression(Identifier var) implements Expr {
 
@@ -27,5 +28,10 @@ public record PathExpression(Identifier var) implements Expr {
     @Override
     public String toString() {
         return var.toString();
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        throw new RuntimeException("Shouldn't be called");
     }
 }

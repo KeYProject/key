@@ -5,6 +5,7 @@ package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.ldt.BoolLDT;
 
 import org.jspecify.annotations.NonNull;
@@ -40,5 +41,10 @@ public class BooleanLiteralExpression extends LiteralExpression {
 
     public boolean getValue() {
         return value;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnBooleanLiteralExpression(this);
     }
 }
