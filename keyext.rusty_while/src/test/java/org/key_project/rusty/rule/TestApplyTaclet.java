@@ -1,7 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.logic.*;
@@ -12,12 +13,15 @@ import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.util.TacletForTests;
 import org.key_project.util.collection.ImmutableList;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestApplyTaclet {
     final static String[] strings = {
-            "", "(A -> B) -> (!(!(A -> B)))"
+        "", "(A -> B) -> (!(!(A -> B)))"
     };
     Proof[] proof;
 
@@ -31,7 +35,7 @@ public class TestApplyTaclet {
     }
 
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
-        //final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
+        // final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
         return new Goal(n, tacletIndex, n.proof().getServices());
     }
 
@@ -61,9 +65,9 @@ public class TestApplyTaclet {
         tacletIndex.add(impright);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
         PosInOccurrence applyPos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false);
+            PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
-                goal.ruleAppIndex().getTacletAppAt(applyPos, null);
+            goal.ruleAppIndex().getTacletAppAt(applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
@@ -71,8 +75,8 @@ public class TestApplyTaclet {
         assertEquals(1, goals.size(), "Too many or zero goals for imp-right.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
-                "Wrong antecedent after imp-right");
+            "Wrong antecedent after imp-right");
         assertEquals(seq.succedent().getFirst().formula(), fma.sub(1),
-                "Wrong succedent after imp-right");
+            "Wrong succedent after imp-right");
     }
 }

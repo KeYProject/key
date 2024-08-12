@@ -4,9 +4,9 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.ast.visitor.Visitor;
 
 public record ArithLogicalExpression(Expr left,org.key_project.rusty.ast.expr.ArithLogicalExpression.Operator op,Expr right)implements Expr{
 

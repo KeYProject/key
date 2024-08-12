@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
 import org.key_project.logic.Term;
@@ -26,30 +29,31 @@ public class TermTacletAppIndex {
      * Create a TermTacletAppIndex
      */
     private TermTacletAppIndex(Term term, ImmutableList<NoPosTacletApp> localTacletApps,
-                               ImmutableArray<TermTacletAppIndex> subtermIndices) {
+            ImmutableArray<TermTacletAppIndex> subtermIndices) {
         this.term = term;
         this.subtermIndices = subtermIndices;
         this.localTacletApps = localTacletApps;
     }
 
-    public static TermTacletAppIndex create(PosInOccurrence pos, Services services, TacletIndex tacletIndex) {
+    public static TermTacletAppIndex create(PosInOccurrence pos, Services services,
+            TacletIndex tacletIndex) {
         assert pos.isTopLevel() : "Someone tried to create a term index for a real subterm";
 
         return createHelp(pos, services, tacletIndex);
     }
 
     private static TermTacletAppIndex createHelp(PosInOccurrence pos, Services services,
-                                                 TacletIndex tacletIndex) {
+            TacletIndex tacletIndex) {
         final Term localTerm = pos.subTerm();
 
         final ImmutableList<NoPosTacletApp> localApps =
-                getFindTaclet(pos, services, tacletIndex);
+            getFindTaclet(pos, services, tacletIndex);
 
         final ImmutableArray<TermTacletAppIndex> subIndices =
-                createSubIndices(pos, services, tacletIndex);
+            createSubIndices(pos, services, tacletIndex);
 
         final TermTacletAppIndex res =
-                new TermTacletAppIndex(localTerm, localApps, subIndices);
+            new TermTacletAppIndex(localTerm, localApps, subIndices);
 
         return res;
     }
@@ -89,7 +93,7 @@ public class TermTacletAppIndex {
      * @return list of all possible instantiations
      */
     private static ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
-                                                                  Services services, TacletIndex tacletIndex) {
+            Services services, TacletIndex tacletIndex) {
 
         return tacletIndex.getRewriteTaclet(pos, services);
     }
@@ -103,16 +107,16 @@ public class TermTacletAppIndex {
      * @return list of all possible instantiations
      */
     private static ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos,
-                                                               Services services, TacletIndex tacletIndex) {
+            Services services, TacletIndex tacletIndex) {
         ImmutableList<NoPosTacletApp> tacletInsts = ImmutableSLList.nil();
         if (pos.isTopLevel()) {
             if (pos.isInAntec()) {
                 tacletInsts = tacletInsts.prepend(antecTaclet(pos, services, tacletIndex));
             } else {
-                tacletInsts = tacletInsts.prepend(succTaclet(pos,  services, tacletIndex));
+                tacletInsts = tacletInsts.prepend(succTaclet(pos, services, tacletIndex));
             }
         } else {
-            tacletInsts = tacletInsts.prepend(getRewriteTaclet(pos,services, tacletIndex));
+            tacletInsts = tacletInsts.prepend(getRewriteTaclet(pos, services, tacletIndex));
         }
         return tacletInsts;
     }
@@ -127,7 +131,7 @@ public class TermTacletAppIndex {
      * @return list of all possible instantiations
      */
     private static ImmutableList<NoPosTacletApp> antecTaclet(PosInOccurrence pos,
-                                                             Services services, TacletIndex tacletIndex) {
+            Services services, TacletIndex tacletIndex) {
         return tacletIndex.getAntecedentTaclet(pos, services);
     }
 
@@ -141,7 +145,7 @@ public class TermTacletAppIndex {
      * @return list of all possible instantiations
      */
     private static ImmutableList<NoPosTacletApp> succTaclet(PosInOccurrence pos,
-                                                            Services services, TacletIndex tacletIndex) {
+            Services services, TacletIndex tacletIndex) {
         return tacletIndex.getSuccedentTaclet(pos, services);
     }
 
@@ -152,7 +156,7 @@ public class TermTacletAppIndex {
      * @return list of the index objects
      */
     private static ImmutableArray<TermTacletAppIndex> createSubIndices(PosInOccurrence pos,
-                                                                       Services services, TacletIndex tacletIndex) {
+            Services services, TacletIndex tacletIndex) {
         final Term localTerm = pos.subTerm();
         final TermTacletAppIndex[] result = new TermTacletAppIndex[localTerm.arity()];
 
@@ -175,11 +179,11 @@ public class TermTacletAppIndex {
      * @param taclets the list of {@link Taclet}s to be filtered
      * @return filtered list
      */
-    public static ImmutableList<NoPosTacletApp> filter(                                                       ImmutableList<NoPosTacletApp> taclets) {
+    public static ImmutableList<NoPosTacletApp> filter(ImmutableList<NoPosTacletApp> taclets) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 
         for (final NoPosTacletApp app : taclets) {
-                result = result.prepend(app);
+            result = result.prepend(app);
         }
 
         return result;

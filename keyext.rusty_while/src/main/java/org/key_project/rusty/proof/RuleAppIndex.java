@@ -1,13 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.TacletApp;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 public class RuleAppIndex {
 
@@ -34,12 +35,13 @@ public class RuleAppIndex {
      * given sequent.
      *
      * //@param filter the TacletFiler filtering the taclets of interest
+     *
      * @param pos the PosInOccurrence to focus
      * @param services the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      */
     public ImmutableList<TacletApp> getTacletAppAt(PosInOccurrence pos,
-                                                   Services services) {
+            Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         result = result.prepend(tacletAppIndex.getTacletAppAt(pos, services));
         return result;
@@ -51,7 +53,8 @@ public class RuleAppIndex {
      */
     public RuleAppIndex copy(Goal goal) {
         TacletIndex copiedTacletIndex = tacletIndex.copy();
-        return new RuleAppIndex(copiedTacletIndex, goal, tacletAppIndex.copyWith(copiedTacletIndex, goal));
+        return new RuleAppIndex(copiedTacletIndex, goal,
+            tacletAppIndex.copyWith(copiedTacletIndex, goal));
     }
 
 

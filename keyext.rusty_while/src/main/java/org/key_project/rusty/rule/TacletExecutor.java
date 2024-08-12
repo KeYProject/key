@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import java.util.Iterator;
+
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.*;
@@ -16,10 +18,6 @@ import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 
 public abstract class TacletExecutor<T extends Taclet> {
     private static final String AUTO_NAME = "_taclet";
@@ -58,8 +56,8 @@ public abstract class TacletExecutor<T extends Taclet> {
      *         obligation for the to be proven formulas of the assumes goal
      */
     protected ImmutableList<SequentChangeInfo> checkIfGoals(Goal p_goal,
-                                                            ImmutableList<IfFormulaInstantiation> p_list, MatchConditions p_matchCond,
-                                                            int p_numberOfNewGoals) {
+            ImmutableList<IfFormulaInstantiation> p_list, MatchConditions p_matchCond,
+            int p_numberOfNewGoals) {
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
 
@@ -90,8 +88,8 @@ public abstract class TacletExecutor<T extends Taclet> {
                         res = ImmutableSLList.nil();
                         for (int j = 0; j < p_numberOfNewGoals + 1; j++) {
                             res = res.prepend(SequentChangeInfo.createSequentChangeInfo(
-                                    (SemisequentChangeInfo) null, null,
-                                    p_goal.sequent(), p_goal.sequent()));
+                                (SemisequentChangeInfo) null, null,
+                                p_goal.sequent(), p_goal.sequent()));
                         }
                         ifObl = ifPart;
                     } else {
@@ -118,8 +116,8 @@ public abstract class TacletExecutor<T extends Taclet> {
             res = ImmutableSLList.nil();
             for (int j = 0; j < p_numberOfNewGoals; j++) {
                 res = res.prepend(
-                        SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo) null,
-                                null, p_goal.sequent(), p_goal.sequent()));
+                    SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo) null,
+                        null, p_goal.sequent(), p_goal.sequent()));
             }
         } else {
             // find the sequent the if obligation has to be added to
@@ -147,7 +145,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      *        (only looked at if pos == null)
      */
     private void addToPosWithoutInst(SequentFormula frm, SequentChangeInfo currentSequent,
-                                     PosInOccurrence pos, boolean antec) {
+            PosInOccurrence pos, boolean antec) {
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(frm, pos));
         } else {
@@ -168,7 +166,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      *        schemavariables
      */
     protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, Services services,
-                                MatchConditions matchCond) {
+            MatchConditions matchCond) {
 
         for (Taclet tacletToAdd : rules) {
             final Node n = goal.getNode();
@@ -195,12 +193,12 @@ public abstract class TacletExecutor<T extends Taclet> {
             for (SchemaVariable sv : collector.vars()) {
                 if (matchCond.getInstantiations().isInstantiated(sv)) {
                     neededInstances = neededInstances.add(sv,
-                            matchCond.getInstantiations().getInstantiationEntry(sv), services);
+                        matchCond.getInstantiations().getInstantiationEntry(sv), services);
                 }
             }
 
             final ImmutableList<GenericSortCondition> cs =
-                    matchCond.getInstantiations().getGenericSortInstantiations().toConditions();
+                matchCond.getInstantiations().getGenericSortInstantiations().toConditions();
 
             for (final GenericSortCondition gsc : cs) {
                 neededInstances = neededInstances.add(gsc, services);
@@ -211,8 +209,8 @@ public abstract class TacletExecutor<T extends Taclet> {
     }
 
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
-                                    SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
-                                    Services services, MatchConditions matchCond) {
+            SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
+            Services services, MatchConditions matchCond) {
         // TODO @ DD
     }
 
@@ -232,11 +230,12 @@ public abstract class TacletExecutor<T extends Taclet> {
      *        schemavariables
      * @param services the Services encapsulating all java information
      */
-    protected void addToAntec(Semisequent semi,                               SequentChangeInfo currentSequent, PosInOccurrence pos,
-                              PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-                              RuleApp tacletApp, Services services) {
+    protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
+            PosInOccurrence pos,
+            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            RuleApp tacletApp, Services services) {
         addToPos(semi, currentSequent, pos, applicationPosInOccurrence, true,
-                 matchCond, goal, services, tacletApp);
+            matchCond, goal, services, tacletApp);
     }
 
     /**
@@ -254,11 +253,12 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @param goal the Goal that knows the node the formulae have to be added
      * @param services the Services encapsulating all java information
      */
-    protected void addToSucc(Semisequent semi, SequentChangeInfo currentSequent, PosInOccurrence pos,
-                             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-                             RuleApp ruleApp, Services services) {
+    protected void addToSucc(Semisequent semi, SequentChangeInfo currentSequent,
+            PosInOccurrence pos,
+            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            RuleApp ruleApp, Services services) {
         addToPos(semi, currentSequent, pos, applicationPosInOccurrence, false,
-                 matchCond, goal, services, ruleApp);
+            matchCond, goal, services, ruleApp);
     }
 
     /**
@@ -273,10 +273,10 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @param services the Services encapsulating all java information
      */
     protected void replaceAtPos(Semisequent semi,
-                                SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
-                                 Goal goal, RuleApp ruleApp, Services services) {
+            SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
+            Goal goal, RuleApp ruleApp, Services services) {
         final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
-                 pos, matchCond, goal, ruleApp, services);
+            pos, matchCond, goal, ruleApp, services);
         currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
     }
 
@@ -295,13 +295,13 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @param matchCond the MatchConditions containing in particular
      * @param services the Services encapsulating all java information
      */
-    private void addToPos(Semisequent semi,                          SequentChangeInfo currentSequent, PosInOccurrence pos,
-                          PosInOccurrence applicationPosInOccurrence, boolean antec,
-                          MatchConditions matchCond, Goal goal, Services services, RuleApp tacletApp) {
+    private void addToPos(Semisequent semi, SequentChangeInfo currentSequent, PosInOccurrence pos,
+            PosInOccurrence applicationPosInOccurrence, boolean antec,
+            MatchConditions matchCond, Goal goal, Services services, RuleApp tacletApp) {
 
         final ImmutableList<SequentFormula> replacements =
-                instantiateSemisequent(semi, applicationPosInOccurrence,
-                        matchCond, goal, tacletApp, services);
+            instantiateSemisequent(semi, applicationPosInOccurrence,
+                matchCond, goal, tacletApp, services);
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(replacements, pos));
         } else {
@@ -322,15 +322,15 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @return the as far as possible instantiated SequentFormula
      */
     private SequentFormula instantiateReplacement(
-                                                  SequentFormula schemaFormula, Services services, MatchConditions matchCond,
-                                                  PosInOccurrence applicationPosInOccurrence,  Goal goal,
-                                                  RuleApp tacletApp) {
+            SequentFormula schemaFormula, Services services, MatchConditions matchCond,
+            PosInOccurrence applicationPosInOccurrence, Goal goal,
+            RuleApp tacletApp) {
 
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(),
-                applicationPosInOccurrence, matchCond,
-                goal, tacletApp, services);
+            applicationPosInOccurrence, matchCond,
+            goal, tacletApp, services);
 
         if (!svInst.getUpdateContext().isEmpty()) {
             instantiatedFormula = services.getTermBuilder()
@@ -354,10 +354,10 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @return the (partially) instantiated term
      */
     protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
-                                      MatchConditions mc, Goal goal, RuleApp ruleApp, Services services) {
+            MatchConditions mc, Goal goal, RuleApp ruleApp, Services services) {
         final SyntacticalReplaceVisitor srVisitor =
-                new SyntacticalReplaceVisitor(applicationPosInOccurrence,
-                        mc.getInstantiations(), goal, taclet, ruleApp, services);
+            new SyntacticalReplaceVisitor(applicationPosInOccurrence,
+                mc.getInstantiations(), goal, taclet, ruleApp, services);
         term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
@@ -375,14 +375,14 @@ public abstract class TacletExecutor<T extends Taclet> {
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
 
-                                                                   PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-                                                                   RuleApp tacletApp, Services services) {
+            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            RuleApp tacletApp, Services services) {
 
         ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(sf, services,
-                    matchCond, applicationPosInOccurrence, goal, tacletApp));
+                matchCond, applicationPosInOccurrence, goal, tacletApp));
         }
 
         return replacements;

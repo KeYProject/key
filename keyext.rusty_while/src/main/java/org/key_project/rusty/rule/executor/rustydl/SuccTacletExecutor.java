@@ -22,24 +22,30 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet>
     }
 
     @Override
-    protected void applyAdd(Sequent add, SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+    protected void applyAdd(Sequent add, SequentChangeInfo currentSequent,
+            PosInOccurrence whereToAdd, PosInOccurrence posOfFind, MatchConditions matchCond,
+            Goal goal, RuleApp ruleApp, Services services) {
         addToAntec(add.antecedent(),
-                currentSequent, null,
-                posOfFind, matchCond, goal, ruleApp, services);
+            currentSequent, null,
+            posOfFind, matchCond, goal, ruleApp, services);
         addToSucc(add.succedent(), currentSequent, whereToAdd,
-                posOfFind, matchCond, goal, ruleApp, services);    }
+            posOfFind, matchCond, goal, ruleApp, services);
+    }
 
     @Override
-    protected void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent, PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+    protected void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent,
+            PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp,
+            Services services) {
         if (gt instanceof AntecSuccTacletGoalTemplate astgt) {
             final Sequent replWith = astgt.replaceWith();
 
             replaceAtPos(replWith.succedent(), currentSequent, posOfFind, matchCond,
-                    goal, ruleApp,
-                    services);
+                goal, ruleApp,
+                services);
             if (!replWith.antecedent().isEmpty()) {
                 addToAntec(replWith.antecedent(),
-                        currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
+                    currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
             }
-        }    }
+        }
+    }
 }

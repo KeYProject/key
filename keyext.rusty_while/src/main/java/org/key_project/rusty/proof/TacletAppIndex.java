@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.Sequent;
@@ -8,7 +10,8 @@ import org.key_project.rusty.rule.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.Map;
+import org.jspecify.annotations.NonNull;
+
 
 public class TacletAppIndex {
     private final TacletIndex tacletIndex;
@@ -30,7 +33,7 @@ public class TacletAppIndex {
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
-                           SemisequentTacletAppIndex succIndex, @NonNull Goal goal, Sequent seq) {
+            SemisequentTacletAppIndex succIndex, @NonNull Goal goal, Sequent seq) {
         this.tacletIndex = tacletIndex;
         this.antecIndex = antecIndex;
         this.succIndex = succIndex;
@@ -47,7 +50,7 @@ public class TacletAppIndex {
     }
 
     private ImmutableList<TacletApp> getFindTacletWithPos(PosInOccurrence pos,
-                                                          Services services) {
+            Services services) {
         ImmutableList<NoPosTacletApp> tacletInsts = getFindTaclet(pos);
         return createTacletApps(tacletInsts, pos, services);
     }
@@ -85,9 +88,9 @@ public class TacletAppIndex {
         this.seq = getNode().sequent();
 
         antecIndex =
-                new SemisequentTacletAppIndex(getSequent(), true, getServices(), tacletIndex());
+            new SemisequentTacletAppIndex(getSequent(), true, getServices(), tacletIndex());
         succIndex =
-                new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex());
+            new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex());
     }
 
     private Services getServices() {
@@ -126,7 +129,7 @@ public class TacletAppIndex {
     }
 
     private static ImmutableList<TacletApp> prepend(ImmutableList<TacletApp> l1,
-                                                    ImmutableList<NoPosTacletApp> l2) {
+            ImmutableList<NoPosTacletApp> l2) {
         for (NoPosTacletApp aL2 : l2) {
             l1 = l1.prepend(aL2);
         }
@@ -141,7 +144,7 @@ public class TacletAppIndex {
      * @return list of all created TacletApps
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
-                                                     PosInOccurrence pos, Services services) {
+            PosInOccurrence pos, Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
@@ -170,6 +173,6 @@ public class TacletAppIndex {
      * @param tacletApp the partially instantiated Taclet to add
      */
     public void addedNoPosTacletApp(NoPosTacletApp tacletApp) {
-// TODO
+        // TODO
     }
 }

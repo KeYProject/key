@@ -7,9 +7,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.ast.visitor.Visitor;
 
 public class LetStatement implements Statement {
     private final Pattern pat;

@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.executor.rustydl;
 
+import java.util.Iterator;
+
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
-
-import java.util.Iterator;
 
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         extends TacletExecutor<TacletKind> {
@@ -27,7 +27,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         final MatchConditions mc = tacletApp.matchConditions();
 
         final ImmutableList<SequentChangeInfo> newSequentsForGoals =
-                checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
+            checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
 
         final ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
@@ -41,17 +41,17 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
             applyReplacewith(gt, currentSequent, tacletApp.posInOccurrence(), mc,
-                    currentGoal, ruleApp, services);
+                currentGoal, ruleApp, services);
 
             /*
              * update position information, as original formula may no longer be in the current
              * sequent
              */
             final PosInOccurrence posWhereToAdd =
-                    updatePositionInformation(tacletApp, gt, currentSequent);
+                updatePositionInformation(tacletApp, gt, currentSequent);
 
             applyAdd(gt.sequent(), currentSequent, posWhereToAdd,
-                    tacletApp.posInOccurrence(), mc, goal, ruleApp, services);
+                tacletApp.posInOccurrence(), mc, goal, ruleApp, services);
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 
@@ -59,7 +59,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             // found; this is taken directly from the posinoccurrence and not searched for
             // in the new sequent
             applyAddProgVars(gt.addedProgVars(), currentSequent, currentGoal,
-                    tacletApp.posInOccurrence(), services, mc);
+                tacletApp.posInOccurrence(), services, mc);
 
             currentGoal.setSequent(currentSequent);
 
@@ -97,8 +97,9 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
      */
-    protected abstract void applyAdd(Sequent add, SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
-                                     MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
+    protected abstract void applyAdd(Sequent add, SequentChangeInfo currentSequent,
+            PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
 
     /**
      * applies the {@code replacewith}-expression of taclet goal descriptions
@@ -114,8 +115,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt,
-                                             SequentChangeInfo currentSequent, PosInOccurrence posOfFind, MatchConditions matchCond,
-                                             Goal goal, RuleApp ruleApp, Services services);
+            SequentChangeInfo currentSequent, PosInOccurrence posOfFind, MatchConditions matchCond,
+            Goal goal, RuleApp ruleApp, Services services);
 
     /**
      * creates a new position information object, describing where to add the formulas or
@@ -127,18 +128,18 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @return the PosInOccurrence object describing where to add the formula
      */
     private PosInOccurrence updatePositionInformation(TacletApp tacletApp, TacletGoalTemplate gt,
-                                                      SequentChangeInfo currentSequent) {
+            SequentChangeInfo currentSequent) {
         PosInOccurrence result = tacletApp.posInOccurrence();
 
         if (result != null && gt.replaceWithExpressionAsObject() != null) {
             final boolean inAntec = result.isInAntec();
             final ImmutableList<FormulaChangeInfo> modifiedFormulas =
-                    currentSequent.modifiedFormulas(inAntec);
+                currentSequent.modifiedFormulas(inAntec);
             if (modifiedFormulas != null && !modifiedFormulas.isEmpty()) {
                 // add it close to the modified formula
                 final FormulaChangeInfo head = modifiedFormulas.head();
                 result =
-                        new PosInOccurrence(head.newFormula(), PosInTerm.getTopLevel(), inAntec);
+                    new PosInOccurrence(head.newFormula(), PosInTerm.getTopLevel(), inAntec);
             } else {
                 // just add it
                 result = null;

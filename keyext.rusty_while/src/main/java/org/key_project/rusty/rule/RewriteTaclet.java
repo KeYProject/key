@@ -222,7 +222,8 @@ public class RewriteTaclet extends FindTaclet {
             if (op instanceof UpdateApplication
                     && it.getChild() == UpdateApplication.targetPos()
                     && !getApplicationRestriction().matches(ApplicationRestriction.None)) {
-                if (getApplicationRestriction().matches(ApplicationRestriction.InSequentState) || veto(t)) {
+                if (getApplicationRestriction().matches(ApplicationRestriction.InSequentState)
+                        || veto(t)) {
                     return null;
                 } else {
                     Term update = UpdateApplication.getUpdate(t);
@@ -241,8 +242,10 @@ public class RewriteTaclet extends FindTaclet {
         if (getApplicationRestriction().matches(ApplicationRestriction.None)) {
             return p_mc;
         }
-        if ((getApplicationRestriction().matches(ApplicationRestriction.AntecedentPolarity) && polarity != -1)
-                || (getApplicationRestriction().matches(ApplicationRestriction.SuccedentPolarity) && polarity != 1)) {
+        if ((getApplicationRestriction().matches(ApplicationRestriction.AntecedentPolarity)
+                && polarity != -1)
+                || (getApplicationRestriction().matches(ApplicationRestriction.SuccedentPolarity)
+                        && polarity != 1)) {
             return null;
         }
         return p_mc.setInstantiations(svi);

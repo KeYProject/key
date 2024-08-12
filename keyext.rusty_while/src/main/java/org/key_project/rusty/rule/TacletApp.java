@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
@@ -18,9 +22,8 @@ import org.key_project.rusty.rule.inst.InstantiationEntry;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.*;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class TacletApp implements RuleApp {
     /** the taclet for which the application information is collected */
@@ -60,7 +63,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
     TacletApp(Taclet taclet, SVInstantiations instantiations,
-              ImmutableList<IfFormulaInstantiation> ifInstantiations) {
+            ImmutableList<IfFormulaInstantiation> ifInstantiations) {
         this.taclet = taclet;
         this.instantiations = instantiations;
         this.ifInstantiations = ifInstantiations;
@@ -75,7 +78,7 @@ public abstract class TacletApp implements RuleApp {
      * @return set of the bound variables
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-                                                                             SVInstantiations instantiations) {
+            SVInstantiations instantiations) {
         return collectPrefixInstantiations(prefix, instantiations);
     }
 
@@ -88,7 +91,7 @@ public abstract class TacletApp implements RuleApp {
      * @return set of the bound variables
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-                                                                             SVInstantiations instantiations, PosInOccurrence pos) {
+            SVInstantiations instantiations, PosInOccurrence pos) {
 
         ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
@@ -108,14 +111,14 @@ public abstract class TacletApp implements RuleApp {
      *         SchemaVariable appearing in the TacletPrefix
      */
     private static ImmutableSet<QuantifiableVariable> collectPrefixInstantiations(TacletPrefix pre,
-                                                                                  SVInstantiations instantiations) {
+            SVInstantiations instantiations) {
 
         ImmutableSet<QuantifiableVariable> instanceSet =
-                DefaultImmutableSet.nil();
+            DefaultImmutableSet.nil();
 
         for (final SchemaVariable var : pre.prefix()) {
             instanceSet =
-                    instanceSet.add((LogicVariable) ((Term) instantiations.getInstantiation(var)).op());
+                instanceSet.add((LogicVariable) ((Term) instantiations.getInstantiation(var)).op());
         }
         return instanceSet;
     }
@@ -174,14 +177,16 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff all variable conditions x not free in y are hold
      */
     public static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations,
-                                                PosInOccurrence pos) {
+            PosInOccurrence pos) {
 
         Iterator<SchemaVariable> it = instantiations.svIterator();
         while (it.hasNext()) {
             SchemaVariable sv = it.next();
             if (sv instanceof TermSV || sv instanceof FormulaSV) {
-                if ( !((ImmutableSet<QuantifiableVariable>) ((Term) instantiations.getInstantiation(sv)).freeVars())
-                        .subset(boundAtOccurrenceSet(taclet.getPrefix(sv), instantiations, pos))) {
+                if (!((ImmutableSet<QuantifiableVariable>) ((Term) instantiations
+                        .getInstantiation(sv)).freeVars())
+                                .subset(boundAtOccurrenceSet(taclet.getPrefix(sv), instantiations,
+                                    pos))) {
                     return false;
                 }
             }
@@ -196,12 +201,12 @@ public abstract class TacletApp implements RuleApp {
      * @return the resolved SVInstantiations
      */
     protected static SVInstantiations resolveCollisionVarSV(Taclet taclet, SVInstantiations insts,
-                                                            Services services) {
+            Services services) {
 
         HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<>();
 
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-                insts.pairIterator();
+            insts.pairIterator();
         while (it.hasNext()) {
             ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair = it.next();
             if (pair.key() instanceof VariableSV) {
@@ -233,23 +238,23 @@ public abstract class TacletApp implements RuleApp {
             try {
                 if (!complete()) {
                     throw new IllegalStateException(
-                            "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
+                        "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
                 }
 
                 if (!isExecutable(services)) {
                     throw new RuntimeException(
-                            "taclet application with unsatisfied 'checkPrefix': " + this);
+                        "taclet application with unsatisfied 'checkPrefix': " + this);
                 }
                 registerSkolemConstants(goal.getLocalNamespaces());
                 goal.addAppliedRuleApp(this);
             } finally {
-                //PERF_PRE.getAndAdd(System.nanoTime() - timePre);
+                // PERF_PRE.getAndAdd(System.nanoTime() - timePre);
             }
 
             return taclet().apply(goal, services, this);
         } finally {
-            //PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
-            //PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
+            // PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
+            // PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
         }
     }
 
@@ -257,14 +262,14 @@ public abstract class TacletApp implements RuleApp {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet rwt) {
             ImmutableList<Term> oldUpdCtx =
-                    matchConditions().getInstantiations().getUpdateContext();
+                matchConditions().getInstantiations().getUpdateContext();
             MatchConditions newConditions = rwt.checkPrefix(posInOccurrence(),
-                    MatchConditions.EMPTY_MATCHCONDITIONS);
+                MatchConditions.EMPTY_MATCHCONDITIONS);
             if (newConditions == null) {
                 return false;
             }
             ImmutableList<Term> newUpdCtx =
-                    newConditions.getInstantiations().getUpdateContext();
+                newConditions.getInstantiations().getUpdateContext();
             return oldUpdCtx.equals(newUpdCtx);
         }
         return true;
@@ -275,15 +280,17 @@ public abstract class TacletApp implements RuleApp {
      * SchemaVariable varSV to a new LogicVariable.
      */
     protected static SVInstantiations replaceInstantiation(Taclet taclet, SVInstantiations insts,
-                                                           SchemaVariable varSV, Services services) {
+            SchemaVariable varSV, Services services) {
         throw new RuntimeException("TODO");
-        /*Term term = getTermBelowQuantifier(taclet, varSV);
-        LogicVariable newVariable = new LogicVariable(
-                new Name(((Term) insts.getInstantiation(varSV)).op().name() + "0"),
-                ((Term) insts.getInstantiation(varSV)).sort());
-        // __CHANGE__ How to name the new variable? TODO
-        Term newVariableTerm = services.getTermBuilder().var(newVariable);
-        return replaceInstantiation(insts, term, varSV, newVariableTerm, services);*/
+        /*
+         * Term term = getTermBelowQuantifier(taclet, varSV);
+         * LogicVariable newVariable = new LogicVariable(
+         * new Name(((Term) insts.getInstantiation(varSV)).op().name() + "0"),
+         * ((Term) insts.getInstantiation(varSV)).sort());
+         * // __CHANGE__ How to name the new variable? TODO
+         * Term newVariableTerm = services.getTermBuilder().var(newVariable);
+         * return replaceInstantiation(insts, term, varSV, newVariableTerm, services);
+         */
     }
 
     /**
@@ -291,29 +298,30 @@ public abstract class TacletApp implements RuleApp {
      * SchemaVariable u to the Term (that is a LogicVariable) y.
      */
     private static SVInstantiations replaceInstantiation(SVInstantiations insts, Term t,
-                                                         SchemaVariable u, Term y, Services services) {
+            SchemaVariable u, Term y, Services services) {
         throw new RuntimeException("TODO");
-/*
-        SVInstantiations result = insts;
-        LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u)).op();
-        if (t.op() instanceof SchemaVariable) {
-            if (!(t.op() instanceof VariableSV)) {
-                SchemaVariable sv = (SchemaVariable) t.op();
-                ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
-                result =
-                        result.replace(sv, cfSubst.apply((Term) insts.getInstantiation(sv)), services);
-            }
-        } else {
-            for (int i = 0; i < t.arity(); i++) {
-                if (!contains(t.varsBoundHere(i), x, insts)) {
-                    result = replaceInstantiation(result, t.sub(i), u, y, services);
-                }
-            }
-
-        }
-
-        result = result.replace(u, y, services);
-        return result;*/
+        /*
+         * SVInstantiations result = insts;
+         * LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u)).op();
+         * if (t.op() instanceof SchemaVariable) {
+         * if (!(t.op() instanceof VariableSV)) {
+         * SchemaVariable sv = (SchemaVariable) t.op();
+         * ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
+         * result =
+         * result.replace(sv, cfSubst.apply((Term) insts.getInstantiation(sv)), services);
+         * }
+         * } else {
+         * for (int i = 0; i < t.arity(); i++) {
+         * if (!contains(t.varsBoundHere(i), x, insts)) {
+         * result = replaceInstantiation(result, t.sub(i), u, y, services);
+         * }
+         * }
+         *
+         * }
+         *
+         * result = result.replace(u, y, services);
+         * return result;
+         */
     }
 
     /**
@@ -371,9 +379,9 @@ public abstract class TacletApp implements RuleApp {
     protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
         if (missingVars == null) {
             ImmutableSet<SchemaVariable> localMissingVars =
-                    DefaultImmutableSet.nil();
+                DefaultImmutableSet.nil();
             TacletSchemaVariableCollector coll =
-                    new TacletSchemaVariableCollector(instantiations());
+                new TacletSchemaVariableCollector(instantiations());
             coll.visitWithoutAddrule(taclet());
             Iterator<SchemaVariable> it = coll.varIterator();
             while (it.hasNext()) {
@@ -429,6 +437,6 @@ public abstract class TacletApp implements RuleApp {
             throw new IllegalStateException("Cannot add position to an taclet" + " without find");
         }
         return PosTacletApp.createPosTacletApp((FindTaclet) taclet(), instantiations(),
-                ifFormulaInstantiations(), pos, services);
+            ifFormulaInstantiations(), pos, services);
     }
 }

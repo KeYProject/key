@@ -500,7 +500,7 @@ public class TermBuilder {
             return target;
         } else {
             return apply(updates.head(),
-                    applyUpdatePairsSequential(updates.tail(), target));
+                applyUpdatePairsSequential(updates.tail(), target));
         }
     }
 }

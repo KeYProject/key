@@ -101,7 +101,7 @@ public class PosInOccurrence {
     }
 
     public PIOPathIterator iterator() {
-return new PIOPathIteratorImpl();
+        return new PIOPathIteratorImpl();
     }
 
     private final class PIOPathIteratorImpl implements PIOPathIterator {

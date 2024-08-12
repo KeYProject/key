@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
+
+import java.util.Iterator;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -8,8 +13,6 @@ import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.Iterator;
 
 public class NoPosTacletApp extends TacletApp {
     /**
@@ -32,13 +35,13 @@ public class NoPosTacletApp extends TacletApp {
      * @param instantiations the SVInstantiations
      */
     public static NoPosTacletApp createNoPosTacletApp(Taclet taclet,
-                                                      SVInstantiations instantiations, Services services) {
+            SVInstantiations instantiations, Services services) {
         return createNoPosTacletApp(taclet, instantiations, null, services);
     }
 
     public static NoPosTacletApp createNoPosTacletApp(Taclet taclet,
-                                                      SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
-                                                      Services services) {
+            SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
+            Services services) {
         SVInstantiations inst = resolveCollisionVarSV(taclet, instantiations, services);
         if (checkVarCondNotFreeIn(taclet, inst)) {
             return new NoPosTacletApp(taclet, inst, ifInstantiations);
@@ -47,7 +50,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     public static NoPosTacletApp createNoPosTacletApp(Taclet taclet, MatchConditions matchCond,
-                                                      Services services) {
+            Services services) {
         return createNoPosTacletApp(taclet, matchCond.getInstantiations(), null, services);
     }
 
@@ -58,7 +61,7 @@ public class NoPosTacletApp extends TacletApp {
      * "addrules" part of taclets.
      */
     public static NoPosTacletApp createFixedNoPosTacletApp(Taclet taclet,
-                                                           SVInstantiations instantiations, Services services) {
+            SVInstantiations instantiations, Services services) {
         NoPosTacletApp res = createNoPosTacletApp(taclet, instantiations, null, services);
         // Make the given SVs fixed
         if (res != null) {
@@ -84,7 +87,7 @@ public class NoPosTacletApp extends TacletApp {
      * @param instantiations the SVInstantiations
      */
     private NoPosTacletApp(Taclet taclet, SVInstantiations instantiations,
-                           ImmutableList<IfFormulaInstantiation> ifInstantiations) {
+            ImmutableList<IfFormulaInstantiation> ifInstantiations) {
         super(taclet, instantiations, ifInstantiations);
     }
 
@@ -115,11 +118,13 @@ public class NoPosTacletApp extends TacletApp {
             }
 
             final var boundVarSet =
-                    (ImmutableSet<QuantifiableVariable>) boundAtOccurrenceSet(prefix, instantiations);
+                (ImmutableSet<QuantifiableVariable>) boundAtOccurrenceSet(prefix, instantiations);
             final Term inst = (Term) instantiations.getInstantiation(sv);
-            /*TODO: if (!inst.freeVars().subset(boundVarSet)) {
-                return false;
-            }*/
+            /*
+             * TODO: if (!inst.freeVars().subset(boundVarSet)) {
+             * return false;
+             * }
+             */
         }
 
         return true;
@@ -230,7 +235,7 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public TacletApp setMatchConditions(MatchConditions mc, Services services) {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(), ifFormulaInstantiations(),
-                services);
+            services);
     }
 
     private boolean updateContextCompatible(MatchConditions p_mc) {

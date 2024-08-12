@@ -56,7 +56,8 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
         // TODO: Is there a more suitable place for this?
         // Go to op
         cursor.goToNext();
-        MatchConditions result = match((Operator) cursor.getCurrentNode(), matchConditions, services);
+        MatchConditions result =
+            match((Operator) cursor.getCurrentNode(), matchConditions, services);
         if (result != null) {
             cursor.goToNext();
         }

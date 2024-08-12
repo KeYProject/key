@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
 import org.key_project.rusty.Services;
@@ -7,7 +10,7 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Instantiation of an if-formula that is a formula of an existing sequent.
  */
-public class IfFormulaInstSeq implements IfFormulaInstantiation{
+public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * Sequent and formula
      */
@@ -44,7 +47,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation{
      * Create a list with all formulas of a given semisequent
      */
     private static ImmutableArray<IfFormulaInstantiation> createListHelp(Sequent p_s,
-                                                                         boolean antec) {
+            boolean antec) {
         Semisequent semi;
         if (antec) {
             semi = p_s.antecedent();
@@ -64,7 +67,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation{
     }
 
     public static ImmutableArray<IfFormulaInstantiation> createList(Sequent p_s, boolean antec,
-                                                                    Services services) {
+            Services services) {
         return createListHelp(p_s, antec);
     }
 

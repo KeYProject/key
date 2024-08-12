@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
+
+import java.util.Iterator;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -9,8 +14,6 @@ import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.Iterator;
 
 /**
  * A position taclet application object, contains already the information to which term/formula of
@@ -39,15 +42,15 @@ public class PosTacletApp extends TacletApp {
      * @return new PosTacletApp or null if conditions (assertions) have been hurted
      */
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
-                                                  SVInstantiations instantiations, PosInOccurrence pos, Services services) {
+            SVInstantiations instantiations, PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, instantiations, null, pos, services);
     }
 
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
-                                                  SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
-                                                  PosInOccurrence pos, Services services) {
+            SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
+            PosInOccurrence pos, Services services) {
         instantiations = resolveCollisionWithContext(taclet,
-                resolveCollisionVarSV(taclet, instantiations, services), pos, services);
+            resolveCollisionVarSV(taclet, instantiations, services), pos, services);
         if (checkVarCondNotFreeIn(taclet, instantiations, pos)) {
             return new PosTacletApp(taclet, instantiations, ifInstantiations, pos);
         }
@@ -56,7 +59,7 @@ public class PosTacletApp extends TacletApp {
     }
 
     public static PosTacletApp createPosTacletApp(FindTaclet taclet, MatchConditions matchCond,
-                                                  PosInOccurrence pos, Services services) {
+            PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, matchCond.getInstantiations(), null, pos, services);
     }
 
@@ -69,7 +72,7 @@ public class PosTacletApp extends TacletApp {
      * @param pos the PosInOccurrence storing the position where to apply the Taclet
      */
     private PosTacletApp(FindTaclet taclet, SVInstantiations instantiations,
-                         ImmutableList<IfFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
+            ImmutableList<IfFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
         super(taclet, instantiations, ifInstantiations);
         this.pos = pos;
     }
@@ -83,7 +86,7 @@ public class PosTacletApp extends TacletApp {
      *         of the TacletApp.
      */
     private static ImmutableSet<QuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
-                                                                            PosInOccurrence pos) {
+            PosInOccurrence pos) {
 
         if (!(taclet instanceof RewriteTaclet)) {
             return DefaultImmutableSet.nil();
@@ -99,7 +102,7 @@ public class PosTacletApp extends TacletApp {
     }
 
 
-    //@Override
+    // @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
         if (!taclet().getPrefix(sv).context()) {
             return DefaultImmutableSet.nil();
@@ -114,7 +117,7 @@ public class PosTacletApp extends TacletApp {
      * @return the resolved SVInstantiations
      */
     private static SVInstantiations resolveCollisionWithContext(Taclet taclet,
-                                                                SVInstantiations insts, PosInOccurrence pos, Services services) {
+            SVInstantiations insts, PosInOccurrence pos, Services services) {
 
         if (taclet.isContextInPrefix()) {
             ImmutableSet<QuantifiableVariable> k = varsBoundAboveFindPos(taclet, pos);
@@ -138,20 +141,20 @@ public class PosTacletApp extends TacletApp {
      * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
-    //@Override
+    // @Override
     public TacletApp addInstantiation(SchemaVariable sv, Term term,
-                                      Services services) {
+            Services services) {
 
         return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().add(sv, term, services), ifFormulaInstantiations(),
-                posInOccurrence(), services);
+            instantiations().add(sv, term, services), ifFormulaInstantiations(),
+            posInOccurrence(), services);
     }
 
 
     @Override
     public TacletApp setMatchConditions(MatchConditions mc, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(),
-                ifFormulaInstantiations(), posInOccurrence(), services);
+            ifFormulaInstantiations(), posInOccurrence(), services);
     }
 
     @Override

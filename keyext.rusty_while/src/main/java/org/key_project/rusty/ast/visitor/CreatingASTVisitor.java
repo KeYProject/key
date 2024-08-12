@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.visitor;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
@@ -7,9 +13,6 @@ import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Walks through a Rust AST in depth-left-fist-order.
@@ -39,7 +42,7 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
     @Override
     protected void walk(RustyProgramElement node) {
         ExtList l = new ExtList();
-        //l.add(node.getPositionInfo());
+        // l.add(node.getPositionInfo());
         stack.push(l);
         super.walk(node);
     }
@@ -62,7 +65,7 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
 
     @Override
     public void performActionOnArithLogicalExpression(ArithLogicalExpression x) {
-    throw new RuntimeException("TODO @ DD");
+        throw new RuntimeException("TODO @ DD");
     }
 
     @Override
@@ -149,9 +152,11 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
             }
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
-                /*if (!preservesPositionInfo) {
-                    changeList.removeFirstOccurrence(PositionInfo.class);
-                }*/
+                /*
+                 * if (!preservesPositionInfo) {
+                 * changeList.removeFirstOccurrence(PositionInfo.class);
+                 * }
+                 */
                 addNewChild(changeList);
             } else {
                 doDefaultAction(x);

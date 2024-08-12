@@ -5,9 +5,9 @@ package org.key_project.rusty.ast.stmt;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.expr.Expr;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.ast.visitor.Visitor;
 
 public class ExpressionStatement implements Statement {
     private final Expr expression;

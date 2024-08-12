@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
-import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.Sequent;

@@ -6,8 +6,6 @@ package org.key_project.rusty.parser;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
@@ -17,6 +15,8 @@ import org.key_project.rusty.parser.builder.FunctionPredicateBuilder;
 import org.key_project.rusty.util.parsing.BuildingException;
 import org.key_project.rusty.util.parsing.BuildingIssue;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
 
 public class KeYIO {
@@ -79,10 +79,12 @@ public class KeYIO {
     public @NonNull Term parseExpression(@NonNull CharStream stream) {
         KeYAst.Term ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
-        /*visitor.setAbbrevMap(abbrevMap);
-        if (schemaNamespace != null) {
-            visitor.setSchemaVariables(schemaNamespace);
-        }*/
+        /*
+         * visitor.setAbbrevMap(abbrevMap);
+         * if (schemaNamespace != null) {
+         * visitor.setSchemaVariables(schemaNamespace);
+         * }
+         */
         Term t = (Term) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return t;

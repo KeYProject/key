@@ -5,9 +5,9 @@ package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Identifier;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.ast.visitor.Visitor;
 
 public record PathExpression(Identifier var) implements Expr {
 

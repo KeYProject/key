@@ -163,7 +163,7 @@ public class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = first ? seq.insertFirst(cf) : seq.insertLast(cf);
 
         return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-                composeSequent(antec, semiCI.semisequent()), this);
+            composeSequent(antec, semiCI.semisequent()), this);
     }
 
     /**
@@ -180,15 +180,15 @@ public class Sequent implements Iterable<SequentFormula> {
      *         have been added or removed
      */
     public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions, boolean antec,
-                                        boolean first) {
+            boolean first) {
 
         final Semisequent seq = antec ? antecedent : succedent;
 
         final SemisequentChangeInfo semiCI =
-                first ? seq.insertFirst(insertions) : seq.insertLast(insertions);
+            first ? seq.insertFirst(insertions) : seq.insertLast(insertions);
 
         return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-                composeSequent(antec, semiCI.semisequent()), this);
+            composeSequent(antec, semiCI.semisequent()), this);
     }
 
     /**
@@ -230,7 +230,7 @@ public class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.sequentFormula()), cf);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-                composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /**
@@ -243,14 +243,14 @@ public class Sequent implements Iterable<SequentFormula> {
      *         have been added or removed
      */
     public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions,
-                                        PosInOccurrence p) {
+            PosInOccurrence p) {
         final Semisequent seq = getSemisequent(p);
 
         final SemisequentChangeInfo semiCI =
-                seq.insert(seq.indexOf(p.sequentFormula()), insertions);
+            seq.insert(seq.indexOf(p.sequentFormula()), insertions);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-                composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /**
@@ -287,12 +287,12 @@ public class Sequent implements Iterable<SequentFormula> {
      *         have been added or removed
      */
     public SequentChangeInfo changeFormula(ImmutableList<SequentFormula> replacements,
-                                           PosInOccurrence p) {
+            PosInOccurrence p) {
 
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, replacements);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
-                semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     private static final class NILSequent extends Sequent {

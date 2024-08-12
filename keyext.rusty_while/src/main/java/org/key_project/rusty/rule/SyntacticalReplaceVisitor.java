@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Stack;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
@@ -21,10 +28,6 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Stack;
 
 /**
  * visitor for <t> execPostOrder </t> of {@link Term}. Called with that method
@@ -67,8 +70,8 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
      * @param termBuilder the TermBuilder to use (allows to use the non cached version)
      */
     private SyntacticalReplaceVisitor(
-                                      PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
-                                      Rule rule, RuleApp ruleApp, Services services, TermBuilder termBuilder) {
+            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
+            Rule rule, RuleApp ruleApp, Services services, TermBuilder termBuilder) {
         this.services = services;
         this.tb = termBuilder;
         this.svInst = svInst;
@@ -91,17 +94,17 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
      * @param services the Services
      */
     public SyntacticalReplaceVisitor(
-                                     PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
-                                     Rule rule, RuleApp ruleApp, Services services) {
-        this( applicationPosInOccurrence, svInst, goal, rule, ruleApp,
-                services, services.getTermBuilder());
+            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
+            Rule rule, RuleApp ruleApp, Services services) {
+        this(applicationPosInOccurrence, svInst, goal, rule, ruleApp,
+            services, services.getTermBuilder());
     }
 
     public SyntacticalReplaceVisitor(
-                                     PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
-                                     Services services, TermBuilder termBuilder) {
+            PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
+            Services services, TermBuilder termBuilder) {
         this(applicationPosInOccurrence,
-                SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, services);
+            SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, services);
     }
 
     /**
@@ -115,7 +118,7 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
                 && svInst.isInstantiated(sv)
                 && (!(visitedOp instanceof ProgramSV psv && psv.isListSV()))) {
             final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
-                    /*svInst.getExecutionContext(),*/ services));
+                /* svInst.getExecutionContext(), */ services));
             pushNew(newTerm);
         } else {
             // instantiation of java block
@@ -136,13 +139,14 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
 
             // instantiate bound variables
             final var boundVars =
-                    instantiateBoundVariables(visited);
+                instantiateBoundVariables(visited);
 
             // instantiate sub terms
             final Term[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
-                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, (ImmutableArray<QuantifiableVariable>) boundVars);
+                final Term newTerm = tb.tf().createTerm(newOp, neededsubs,
+                    (ImmutableArray<QuantifiableVariable>) boundVars);
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
@@ -171,8 +175,8 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
 
         if (rb.program() instanceof ContextBlockExpression cbe) {
             trans = new ProgramReplaceVisitor(
-                    new BlockExpression(cbe.getStatements(), cbe.getValue()),
-                    services, svInst);
+                new BlockExpression(cbe.getStatements(), cbe.getValue()),
+                services, svInst);
             trans.start();
             result = addContext((BlockExpression) trans.result());
         } else {
@@ -199,17 +203,19 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
     }
 
     private Term resolveSubst(Term t) {
-       /* TODO: if (t.op() instanceof SubstOp) {
-            Term resolved = ((SubstOp) t.op()).apply(t, tb);
-            resolved = tb.label(resolved, t.sub(1).getLabels());
-            if (t.hasLabels()) {
-                resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved,
-                        rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
-            }
-            return resolved;
-        } else {*/
-            return t;
-        //}
+        /*
+         * TODO: if (t.op() instanceof SubstOp) {
+         * Term resolved = ((SubstOp) t.op()).apply(t, tb);
+         * resolved = tb.label(resolved, t.sub(1).getLabels());
+         * if (t.hasLabels()) {
+         * resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved,
+         * rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
+         * }
+         * return resolved;
+         * } else {
+         */
+        return t;
+        // }
     }
 
     private Term[] neededSubs(int n) {
@@ -239,7 +245,7 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final Term instantiationForBoundSchemaVariable =
-                            (Term) svInst.getInstantiation(boundSchemaVariable);
+                        (Term) svInst.getInstantiation(boundSchemaVariable);
                     if (instantiationForBoundSchemaVariable != null) {
                         boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
                     } else {
@@ -260,17 +266,19 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
 
     private Operator instantiateOperator(Operator p_operatorToBeInstantiated) {
         Operator instantiatedOp = p_operatorToBeInstantiated;
-       /* if (p_operatorToBeInstantiated instanceof SortDependingFunction) {
+        /*
+         * if (p_operatorToBeInstantiated instanceof SortDependingFunction) {
+         * instantiatedOp =
+         * handleSortDependingSymbol((SortDependingFunction) p_operatorToBeInstantiated);
+         * } else
+         */ if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
             instantiatedOp =
-                    handleSortDependingSymbol((SortDependingFunction) p_operatorToBeInstantiated);
-        } else*/ if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
-            instantiatedOp =
-                    instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
+                instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV)
                     || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
                 instantiatedOp =
-                        (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
             }
         }
         assert instantiatedOp != null;
@@ -292,7 +300,7 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
             } else {
                 assert false : "not updateable: " + lhsInst;
                 throw new IllegalStateException("Encountered non-updateable operator " + lhsInst
-                        + " on left-hand side of update.");
+                    + " on left-hand side of update.");
             }
             return newLhs == originalLhs ? op : ElementaryUpdate.getInstance(newLhs);
         } else {

@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.visitor;
 
-import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -24,7 +26,8 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
      * @param services The Services object.
      * @param svi Schema Variable Instantiations
      */
-    public ProgramReplaceVisitor(RustyProgramElement root, Services services, SVInstantiations svi) {
+    public ProgramReplaceVisitor(RustyProgramElement root, Services services,
+            SVInstantiations svi) {
         super(root, false, services);
         svinsts = svi;
     }
@@ -70,11 +73,13 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
             final var instArray = (ImmutableArray<RustyProgramElement>) inst;
             // the assertion ensures the intended instanceof check from above
             addChildren(instArray);
-        } /* TODO: else if (inst instanceof Term t && t.op() instanceof ProgramInLogic) {
-            addChild(services.getTypeConverter().convertToProgramElement((Term) inst));
-        }*/ else {
+        } /*
+           * TODO: else if (inst instanceof Term t && t.op() instanceof ProgramInLogic) {
+           * addChild(services.getTypeConverter().convertToProgramElement((Term) inst));
+           * }
+           */ else {
             throw new IllegalStateException(
-                    "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);
+                "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);
         }
         changed();
     }

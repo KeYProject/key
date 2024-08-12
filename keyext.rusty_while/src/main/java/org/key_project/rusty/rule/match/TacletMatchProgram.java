@@ -153,7 +153,7 @@ public class TacletMatchProgram {
             mc = instruction[instrPtr].match(navi, mc, services);
             instrPtr++;
         }
-        //navi.release();
+        // navi.release();
         return mc;
     }
 }

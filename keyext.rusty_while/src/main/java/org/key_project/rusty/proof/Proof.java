@@ -94,7 +94,7 @@ public class Proof implements Named {
         final var rootNode = new Node(this, problem);
         final var firstGoal =
             new Goal(rootNode, initConfig.createTacletIndex(),
-                    initConfig.getServices());
+                initConfig.getServices());
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
     }

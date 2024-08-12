@@ -27,12 +27,16 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
     }
 
     @Override
-    protected void applyAdd(Sequent add, SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+    protected void applyAdd(Sequent add, SequentChangeInfo currentSequent,
+            PosInOccurrence whereToAdd, PosInOccurrence posOfFind, MatchConditions matchCond,
+            Goal goal, RuleApp ruleApp, Services services) {
         throw new RuntimeException("TODO @ DD");
     }
 
     @Override
-    protected void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent, PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+    protected void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent,
+            PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp,
+            Services services) {
         throw new RuntimeException("TODO @ DD");
     }
 }

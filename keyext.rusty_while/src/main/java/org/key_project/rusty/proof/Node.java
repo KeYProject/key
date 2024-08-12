@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.key_project.rusty.logic.Sequent;
-
-import org.jspecify.annotations.Nullable;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 public class Node {
     /** the proof the node belongs to */
@@ -41,7 +41,7 @@ public class Node {
      * taclet with an addrule section on this node, then these taclets are stored in this list
      */
     private ImmutableSet<NoPosTacletApp> localIntroducedRules =
-            DefaultImmutableSet.nil();
+        DefaultImmutableSet.nil();
 
     /**
      * creates an empty node that is root and leaf.
@@ -87,9 +87,9 @@ public class Node {
     }
 
     public void setAppliedRuleApp(RuleApp ruleApp) {
-       // this.nodeInfo.updateNoteInfo();
+        // this.nodeInfo.updateNoteInfo();
         this.appliedRuleApp = ruleApp;
-        //clearNameCache();
+        // clearNameCache();
     }
 
     public Proof proof() {
@@ -129,7 +129,7 @@ public class Node {
         Node n = this;
 
         while (n != null) {
-            //c += n.localIntroducedRules.size();
+            // c += n.localIntroducedRules.size();
 
             if (n.parent != null && n.parent.childrenCount() > 1) {
                 id.append(n.siblingNr);

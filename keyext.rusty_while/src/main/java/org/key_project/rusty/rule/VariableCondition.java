@@ -10,7 +10,7 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 /**
  * The instantiations of a schemavariable can be restricted on rule scope by attaching conditions on
  * these variables. Such a condition is realized by a class which implements this interface.
- *<br>
+ * <br>
  * The usual place where to put these implementations is inside package
  * <code>de.uka.ilkd.key.rule.conditions</code>. For variable conditions that know only black and
  * white answers there exists a convenience class
@@ -29,6 +29,6 @@ public interface VariableCondition {
      *         otherwise
      */
     MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                          MatchConditions matchCond,
-                          Services services);
+            MatchConditions matchCond,
+            Services services);
 }

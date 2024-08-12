@@ -26,7 +26,7 @@ public interface TacletMatcher {
      * @return the found schema variable mapping or <code>null</code> if the matching failed
      */
     MatchConditions matchFind(Term term, MatchConditions matchCond,
-                              Services services);
+            Services services);
 
     /**
      * checks if the conditions for a correct instantiation are satisfied
@@ -40,5 +40,5 @@ public interface TacletMatcher {
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
     MatchConditions checkVariableConditions(SchemaVariable var,
-                                            SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services);
+            SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services);
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
 import org.key_project.util.collection.ImmutableList;
@@ -46,7 +49,7 @@ public class SequentChangeInfo {
      *         sequent together with the operations result.
      */
     public static SequentChangeInfo createSequentChangeInfo(boolean antec,
-                                                            SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
+            SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
         if (antec) {
             return new SequentChangeInfo(semiCI, null, result, original);
         } else {
@@ -66,7 +69,7 @@ public class SequentChangeInfo {
      *         sequent together with the operations result.
      */
     public static SequentChangeInfo createSequentChangeInfo(SemisequentChangeInfo anteCI,
-                                                            SemisequentChangeInfo sucCI, Sequent result, Sequent original) {
+            SemisequentChangeInfo sucCI, Sequent result, Sequent original) {
         return new SequentChangeInfo(anteCI, sucCI, result, original);
     }
 
@@ -80,7 +83,7 @@ public class SequentChangeInfo {
      * @param originalSequent the Sequent that has been transformed
      */
     private SequentChangeInfo(SemisequentChangeInfo antecedent, SemisequentChangeInfo succedent,
-                              Sequent resultingSequent, Sequent originalSequent) {
+            Sequent resultingSequent, Sequent originalSequent) {
         this.antecedent = antecedent;
         this.succedent = succedent;
         this.resultingSequent = resultingSequent;
@@ -89,10 +92,10 @@ public class SequentChangeInfo {
 
     public SequentChangeInfo copy() {
         return new SequentChangeInfo(
-                antecedent == null ? null : antecedent.copy(),
-                succedent == null ? null : succedent.copy(),
-                resultingSequent,
-                originalSequent);
+            antecedent == null ? null : antecedent.copy(),
+            succedent == null ? null : succedent.copy(),
+            resultingSequent,
+            originalSequent);
     }
 
     /**
@@ -199,7 +202,7 @@ public class SequentChangeInfo {
      * @return the concatenated list
      */
     private <T> ImmutableList<T> concatenateHelper(final ImmutableList<T> antecList,
-                                                   final ImmutableList<T> succList) {
+            final ImmutableList<T> succList) {
         final int sizeAntec = antecList.size();
         final int sizeSucc = succList.size();
 

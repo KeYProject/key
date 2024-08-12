@@ -14,8 +14,6 @@ import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public final class Goal {
     private Node node;
@@ -47,7 +45,7 @@ public final class Goal {
      * copy constructor
      */
     private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
-                  NamespaceSet localNamespace) {
+            NamespaceSet localNamespace) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex.copy(this);
         this.appliedRuleApps = appliedRuleApps;
@@ -163,7 +161,7 @@ public final class Goal {
             return;
         }
         getNode().setSequent(sci.sequent());
-       // getNode().getNodeInfo().setSequentChangeInfo(sci);
+        // getNode().getNodeInfo().setSequentChangeInfo(sci);
     }
 
     public void setBranchLabel(String name) {
@@ -190,14 +188,16 @@ public final class Goal {
      */
     public void addTaclet(Taclet rule, SVInstantiations insts, boolean isAxiom) {
         NoPosTacletApp tacletApp =
-                NoPosTacletApp.createFixedNoPosTacletApp(rule, insts, proof().getServices());
+            NoPosTacletApp.createFixedNoPosTacletApp(rule, insts, proof().getServices());
         if (tacletApp != null) {
             addNoPosTacletApp(tacletApp);
-            /*if (proof().getInitConfig() != null) { // do not break everything
-                // because of ProofMgt
-                proof().getInitConfig().registerRuleIntroducedAtNode(tacletApp,
-                        node.parent() != null ? node.parent() : node, isAxiom);
-            }*/
+            /*
+             * if (proof().getInitConfig() != null) { // do not break everything
+             * // because of ProofMgt
+             * proof().getInitConfig().registerRuleIntroducedAtNode(tacletApp,
+             * node.parent() != null ? node.parent() : node, isAxiom);
+             * }
+             */
         }
     }
 }

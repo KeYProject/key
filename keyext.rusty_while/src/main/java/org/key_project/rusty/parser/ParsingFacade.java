@@ -84,14 +84,14 @@ public final class ParsingFacade {
     public static KeYAst.Term parseExpression(CharStream stream) {
         KeYRustyParser p = createParser(stream);
         KeYRustyParser.TermContext term = p.termEOF().term();
-        //p.getErrorReporter().throwException();
+        // p.getErrorReporter().throwException();
         return new KeYAst.Term(term);
     }
 
     public static KeYAst.Seq parseSequent(CharStream stream) {
         KeYRustyParser p = createParser(stream);
         var seq = new KeYAst.Seq(p.seqEOF().seq());
-        //p.getErrorReporter().throwException();
+        // p.getErrorReporter().throwException();
         return seq;
     }
 

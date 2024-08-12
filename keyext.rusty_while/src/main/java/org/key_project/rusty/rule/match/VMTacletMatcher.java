@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
@@ -16,9 +19,6 @@ import org.key_project.rusty.rule.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
-
-import java.util.HashMap;
-import java.util.Iterator;
 
 public class VMTacletMatcher implements TacletMatcher {
     /** the matcher for the find expression of the taclet */
@@ -78,12 +78,12 @@ public class VMTacletMatcher implements TacletMatcher {
         if (findMatchProgram != TacletMatchProgram.EMPTY_PROGRAM) {
             if (ignoreTopLevelUpdates) {
                 Pair</* term below updates */Term, MatchConditions> resultUpdateMatch =
-                        matchAndIgnoreUpdatePrefix(term, matchCond);
+                    matchAndIgnoreUpdatePrefix(term, matchCond);
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }
             matchCond =
-                    checkConditions(findMatchProgram.match(term, matchCond, services), services);
+                checkConditions(findMatchProgram.match(term, matchCond, services), services);
         } else {
             matchCond = null;
         }
@@ -145,7 +145,7 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final MatchConditions checkVariableConditions(SchemaVariable var,
-                                                         SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services) {
+            SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services) {
         if (matchCond != null) {
             if (instantiationCandidate instanceof Term term) {
                 if (!(term.op() instanceof QuantifiableVariable)) {
@@ -178,7 +178,7 @@ public class VMTacletMatcher implements TacletMatcher {
      *         (Which have been added to the update context in the match conditions)
      */
     private Pair<Term, MatchConditions> matchAndIgnoreUpdatePrefix(final Term term,
-                                                                   MatchConditions matchCond) {
+            MatchConditions matchCond) {
 
         final Operator sourceOp = term.op();
 
@@ -186,7 +186,7 @@ public class VMTacletMatcher implements TacletMatcher {
             // updates can be ignored
             Term update = UpdateApplication.getUpdate(term);
             matchCond = matchCond.setInstantiations(
-                    matchCond.getInstantiations().addUpdate(update));
+                matchCond.getInstantiations().addUpdate(update));
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), matchCond);
         } else {
             return new Pair<>(term, matchCond);

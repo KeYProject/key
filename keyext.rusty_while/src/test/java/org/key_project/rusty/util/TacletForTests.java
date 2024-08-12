@@ -9,10 +9,10 @@ import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.parser.KeYIO;
+import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.proof.init.*;
 import org.key_project.rusty.proof.io.KeYFile;
 import org.key_project.rusty.proof.io.RuleSourceFactory;
-import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -27,7 +27,7 @@ public class TacletForTests {
     public static String standardFile = testRules;
 
     public static NamespaceSet nss = new NamespaceSet();
-     public static TacletIndex rules = null;
+    public static TacletIndex rules = null;
     public static Services services;
     public static InitConfig initConfig;
     public static File lastFile = null;

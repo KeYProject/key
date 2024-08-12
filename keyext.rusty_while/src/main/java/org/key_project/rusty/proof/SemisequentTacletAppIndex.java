@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
 import org.key_project.rusty.Services;
@@ -14,7 +17,7 @@ public class SemisequentTacletAppIndex {
     private final Sequent seq;
     private final boolean antec;
     private ImmutableMap<SequentFormula, TermTacletAppIndex> termIndices =
-            DefaultImmutableMap.nilMap();
+        DefaultImmutableMap.nilMap();
 
     /**
      * Create an index object for the semisequent determined by <code>s</code> and
@@ -23,7 +26,8 @@ public class SemisequentTacletAppIndex {
      * @param antec iff true create an index for the antecedent of <code>s</code>, otherwise for the
      *        succedent
      */
-    SemisequentTacletAppIndex(Sequent s, boolean antec, Services services, TacletIndex tacletIndex) {
+    SemisequentTacletAppIndex(Sequent s, boolean antec, Services services,
+            TacletIndex tacletIndex) {
         this.seq = s;
         this.antec = antec;
         addTermIndices((antec ? s.antecedent() : s.succedent()).asList(), services, tacletIndex);
@@ -40,7 +44,7 @@ public class SemisequentTacletAppIndex {
      * replaced with the new indices. Note: destructive, use only when constructing new index
      */
     private void addTermIndices(ImmutableList<SequentFormula> cfmas, Services services,
-                                TacletIndex tacletIndex) {
+            TacletIndex tacletIndex) {
         while (!cfmas.isEmpty()) {
             final SequentFormula cfma = cfmas.head();
             cfmas = cfmas.tail();
@@ -53,7 +57,7 @@ public class SemisequentTacletAppIndex {
      * replaced with the new one. Note: destructive, use only when constructing new index
      */
     private void addTermIndex(SequentFormula cfma, Services services,
-                              TacletIndex tacletIndex) {
+            TacletIndex tacletIndex) {
         final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
         termIndices = termIndices.put(cfma, TermTacletAppIndex.create(pos, services, tacletIndex));
     }

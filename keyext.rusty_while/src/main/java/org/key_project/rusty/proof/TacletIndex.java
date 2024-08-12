@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
+
+import java.util.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -20,8 +25,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 public class TacletIndex {
     private static final Object DEFAULT_SV_KEY = new Object();
@@ -57,10 +60,10 @@ public class TacletIndex {
     }
 
     private TacletIndex(HashMap<Object, ImmutableList<NoPosTacletApp>> rwList,
-                        HashMap<Object, ImmutableList<NoPosTacletApp>> antecList,
-                        HashMap<Object, ImmutableList<NoPosTacletApp>> succList,
-                        ImmutableList<NoPosTacletApp> noFindList,
-                        HashSet<NoPosTacletApp> partialInstantiatedRuleApps) {
+            HashMap<Object, ImmutableList<NoPosTacletApp>> antecList,
+            HashMap<Object, ImmutableList<NoPosTacletApp>> succList,
+            ImmutableList<NoPosTacletApp> noFindList,
+            HashSet<NoPosTacletApp> partialInstantiatedRuleApps) {
         this.rwList = rwList;
         this.antecList = antecList;
         this.succList = succList;
@@ -156,7 +159,7 @@ public class TacletIndex {
             noFindList = noFindList.prepend(tacletApp);
         } else {
             // should never be reached
-           // Debug.fail("Tried to add an unknown type of Taclet");
+            // Debug.fail("Tried to add an unknown type of Taclet");
         }
 
         if (tacletApp.instantiations() != SVInstantiations.EMPTY_SVINSTANTIATIONS) {
@@ -165,7 +168,7 @@ public class TacletIndex {
     }
 
     private void insertToMap(NoPosTacletApp tacletApp,
-                             HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
+            HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
         Object indexObj = getIndexObj((FindTaclet) tacletApp.taclet());
         ImmutableList<NoPosTacletApp> opList = map.get(indexObj);
         if (opList == null) {
@@ -214,6 +217,7 @@ public class TacletIndex {
 
     /**
      * get all Taclets having no find expression.
+     *
      * @param services the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return IList<NoPosTacletApp> containing all applicable rules and an empty part for the
@@ -255,7 +259,7 @@ public class TacletIndex {
      *         instantiations to get the rule fit.
      */
     public ImmutableList<NoPosTacletApp> getAntecedentTaclet(PosInOccurrence pos,
-                                                             Services services) {
+            Services services) {
         return getTopLevelTaclets(antecList, pos, services);
     }
 
@@ -269,7 +273,7 @@ public class TacletIndex {
      *         instantiations to get the rule fit.
      */
     public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence pos,
-                                                            Services services) {
+            Services services) {
 
         return getTopLevelTaclets(succList, pos, services);
     }
@@ -281,9 +285,9 @@ public class TacletIndex {
         assert pos.isTopLevel();
 
         final ImmutableList<NoPosTacletApp> rwTaclets =
-                getFindTaclet(getList(rwList, pos.subTerm(), true), pos, services);
+            getFindTaclet(getList(rwList, pos.subTerm(), true), pos, services);
         final ImmutableList<NoPosTacletApp> seqTaclets =
-                getFindTaclet(getList(findTaclets, pos.subTerm(), true), pos, services);
+            getFindTaclet(getList(findTaclets, pos.subTerm(), true), pos, services);
         return rwTaclets.size() > 0 ? rwTaclets.prependReverse(seqTaclets)
                 : seqTaclets.prependReverse(rwTaclets);
     }
@@ -296,7 +300,7 @@ public class TacletIndex {
      *        like (static)types etc.
      */
     private ImmutableList<NoPosTacletApp> getFindTaclet(ImmutableList<NoPosTacletApp> taclets,
-                                                        PosInOccurrence pos, Services services) {
+            PosInOccurrence pos, Services services) {
         return matchTaclets(taclets, pos, services);
     }
 
@@ -309,9 +313,9 @@ public class TacletIndex {
      *         instantiations to get the rule fit.
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
-                                                          Services services) {
+            Services services) {
         ImmutableList<NoPosTacletApp> result =
-                matchTaclets(getList(rwList, pos.subTerm(), false),  pos, services);
+            matchTaclets(getList(rwList, pos.subTerm(), false), pos, services);
         return result;
     }
 
@@ -351,7 +355,8 @@ public class TacletIndex {
             int next = prefixOccurrences.occurred(pe);
             var nt = pe;
             if (next < nt.getChildCount()) {
-                return getRustyTacletList(map, (RustyProgramElement) nt.getChild(next), prefixOccurrences);
+                return getRustyTacletList(map, (RustyProgramElement) nt.getChild(next),
+                    prefixOccurrences);
             }
         } else {
             final ImmutableList<NoPosTacletApp> apps = map.get(pe.getClass());
@@ -381,9 +386,11 @@ public class TacletIndex {
 
         final ImmutableList<NoPosTacletApp> inMap;
 
-        /*if (op instanceof SortDependingFunction) {
-            inMap = map.get(((SortDependingFunction) op).getKind());
-        } else*/ if (op instanceof ElementaryUpdate) {
+        /*
+         * if (op instanceof SortDependingFunction) {
+         * inMap = map.get(((SortDependingFunction) op).getKind());
+         * } else
+         */ if (op instanceof ElementaryUpdate) {
             inMap = map.get(ElementaryUpdate.class);
         } else if (op instanceof Modality) {
             inMap = map.get(Modality.class);
@@ -398,7 +405,7 @@ public class TacletIndex {
             final Term target = UpdateApplication.getTarget(term);
             if (!(target.op() instanceof UpdateApplication)) {
                 final ImmutableList<NoPosTacletApp> targetIndexed =
-                        getListHelp(map, target, false, prefixOccurrences);
+                    getListHelp(map, target, false, prefixOccurrences);
                 return merge(res, targetIndexed);// otherwise only duplicates are added
             }
         }
@@ -417,7 +424,7 @@ public class TacletIndex {
      * @return the merged list
      */
     private ImmutableList<NoPosTacletApp> merge(ImmutableList<NoPosTacletApp> first,
-                                                final ImmutableList<NoPosTacletApp> second) {
+            final ImmutableList<NoPosTacletApp> second) {
         if (second == null) {
             return first;
         } else if (first == null) {
@@ -433,11 +440,10 @@ public class TacletIndex {
 
     public TacletIndex copy() {
         return new TacletIndex(
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
-                (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone()
-        );
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
+            (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
     }
 
     /**
@@ -449,7 +455,7 @@ public class TacletIndex {
          * the classes that represent prefix elements of a java block
          */
         static final Class<?>[] prefixClasses =
-                new Class<?>[] { BlockExpression.class };
+            new Class<?>[] { BlockExpression.class };
 
         /**
          * number of prefix types
