@@ -274,4 +274,9 @@ public class NoPosTacletApp extends TacletApp {
                 ifFormulaInstantiations(), services);
         }
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " at " + posInOccurrence();
+    }
 }

@@ -71,6 +71,8 @@ class TermImpl implements Term {
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
     }
 
+    // TODO Remove
+    @Deprecated
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
         ImmutableSet<QuantifiableVariable> localFreeVars =
             DefaultImmutableSet.nil();
@@ -88,6 +90,8 @@ class TermImpl implements Term {
         }
         return localFreeVars;
     }
+
+
 
     @Override
     public @NonNull Operator op() {

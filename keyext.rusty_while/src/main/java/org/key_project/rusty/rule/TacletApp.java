@@ -87,7 +87,6 @@ public abstract class TacletApp implements RuleApp {
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
             SVInstantiations instantiations, PosInOccurrence pos) {
-
         ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
         if (prefix.context()) {
@@ -107,7 +106,6 @@ public abstract class TacletApp implements RuleApp {
      */
     private static ImmutableSet<QuantifiableVariable> collectPrefixInstantiations(TacletPrefix pre,
             SVInstantiations instantiations) {
-
         ImmutableSet<QuantifiableVariable> instanceSet =
             DefaultImmutableSet.nil();
 
@@ -173,19 +171,11 @@ public abstract class TacletApp implements RuleApp {
      */
     public static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations,
             PosInOccurrence pos) {
-
-        Iterator<SchemaVariable> it = instantiations.svIterator();
-        while (it.hasNext()) {
-            SchemaVariable sv = it.next();
-            if (sv instanceof TermSV || sv instanceof FormulaSV) {
-                if (!((ImmutableSet<QuantifiableVariable>) ((Term) instantiations
-                        .getInstantiation(sv)).freeVars())
-                                .subset(boundAtOccurrenceSet(taclet.getPrefix(sv), instantiations,
-                                    pos))) {
-                    return false;
-                }
-            }
-        }
+        /*
+         * TODO: Now that we work with DeBruijn indices, we only need to ensure that any variable
+         * with index `n` has
+         * at least `n` binding ops above it.
+         */
         return true;
     }
 
@@ -722,4 +712,10 @@ public abstract class TacletApp implements RuleApp {
      */
     public abstract TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services);
+
+    @Override
+    public String toString() {
+        return "Application of Taclet " + taclet() + " with " + instantiations() + " and "
+            + ifFormulaInstantiations();
+    }
 }

@@ -123,6 +123,10 @@ public class PosInOccurrence {
             return child;
         }
 
+        public String toString() {
+            return "Term " + posInTerm() + " of " + sequentFormula();
+        }
+
         /**
          * @return the current position within the term (i.e. corresponding to the latest
          *         <code>next()</code>-call)
