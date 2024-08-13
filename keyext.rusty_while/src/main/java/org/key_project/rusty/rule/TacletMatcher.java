@@ -41,4 +41,36 @@ public interface TacletMatcher {
      */
     MatchConditions checkVariableConditions(SchemaVariable var,
             SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services);
+
+    /**
+     * checks the provided matches against the variable conditions of this taclet It returns the
+     * resulting match conditions or <code>null</code> if the found matches do not satisfy the
+     * variable conditions. If the given matchconditions are <code>null</code> then
+     * <code>null</code> is returned
+     *
+     * @param matchConditions the matches to be checked
+     * @param services the {@link Services}
+     * @return the resulting match conditions or <code>null</code> if given matches do not satisfy
+     *         the taclet's variable conditions
+     */
+    MatchConditions checkConditions(MatchConditions matchConditions, Services services);
+
+    /**
+     * Match the given template (which is probably a formula of the assumes-sequent) against a list
+     * of
+     * constraint formulas (probably the formulas of the antecedent or the succedent), starting with
+     * the given instantiations and constraint {@code p_matchCond}.
+     *
+     * @param toMatch list of constraint formulas to match p_template to
+     * @param template template formula as in "match"
+     * @param matchCond already performed instantiations
+     * @param services the Services object encapsulating information about the java datastructures
+     *        like (static)types etc.
+     * @return Two lists (in an {@link IfMatchResult} object), containing the elements of
+     *         {@code p_toMatch} that
+     *         could successfully be matched against p_template, and the corresponding
+     *         MatchConditions.
+     */
+    IfMatchResult matchIf(Iterable<IfFormulaInstantiation> toMatch, Term template,
+            MatchConditions matchCond, Services services);
 }

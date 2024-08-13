@@ -503,4 +503,16 @@ public class TermBuilder {
                 applyUpdatePairsSequential(updates.tail(), target));
         }
     }
+
+    /**
+     * Creates a substitution term
+     *
+     * @param substVar the QuantifiableVariable to be substituted
+     * @param substTerm the Term that replaces substVar
+     * @param origTerm the Term that is substituted
+     */
+    public Term subst(SubstOp op, QuantifiableVariable substVar, Term substTerm, Term origTerm) {
+        return tf.createTerm(op, new ImmutableArray<>(substTerm, origTerm),
+            new ImmutableArray<>(substVar));
+    }
 }

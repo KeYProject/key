@@ -273,4 +273,36 @@ class TermImpl implements Term {
             return sb.toString();
         }
     }
+
+    /**
+     * true iff <code>o</code> is syntactically equal to this term
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (o == null || o.getClass() != getClass() || hashCode() != o.hashCode()) {
+            return false;
+        }
+
+        final TermImpl t = (TermImpl) o;
+
+        return op.equals(t.op) && subs.equals(t.subs)
+                && boundVars.equals(t.boundVars);
+    }
+
+    @Override
+    public final int hashCode() {
+        int hashcode = 5;
+        hashcode = hashcode * 17 + op().hashCode();
+        hashcode = hashcode * 17 + subs().hashCode();
+        hashcode = hashcode * 17 + boundVars().hashCode();
+
+        if (hashcode == -1) {
+            hashcode = 0;
+        }
+        return hashcode;
+    }
 }

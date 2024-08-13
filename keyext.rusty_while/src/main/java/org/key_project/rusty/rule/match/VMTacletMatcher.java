@@ -16,9 +16,8 @@ import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.UpdateApplication;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.*;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
+
 
 public class VMTacletMatcher implements TacletMatcher {
     /** the matcher for the find expression of the taclet */
@@ -191,5 +190,75 @@ public class VMTacletMatcher implements TacletMatcher {
         } else {
             return new Pair<>(term, matchCond);
         }
+    }
+
+    @Override
+    public final IfMatchResult matchIf(Iterable<IfFormulaInstantiation> toMatch,
+            Term template, MatchConditions matchCond, Services services) {
+        TacletMatchProgram prg = assumesMatchPrograms.get(template);
+
+
+        ImmutableList<IfFormulaInstantiation> resFormulas =
+            ImmutableSLList.nil();
+        ImmutableList<MatchConditions> resMC = ImmutableSLList.nil();
+
+        final boolean updateContextPresent =
+            !matchCond.getInstantiations().getUpdateContext().isEmpty();
+        ImmutableList<Term> context =
+            ImmutableSLList.nil();
+
+        if (updateContextPresent) {
+            context = matchCond.getInstantiations().getUpdateContext();
+        }
+
+        for (var cf : toMatch) {
+            Term formula = cf.getConstrainedFormula().formula();
+
+            if (updateContextPresent) {
+                formula = matchUpdateContext(context, formula);
+            }
+            if (formula != null) {// update context not present or update context match succeeded
+                final MatchConditions newMC =
+                    checkConditions(prg.match(formula, matchCond, services), services);
+
+                if (newMC != null) {
+                    resFormulas = resFormulas.prepend(cf);
+                    resMC = resMC.prepend(newMC);
+                }
+            }
+        }
+        return new IfMatchResult(resFormulas, resMC);
+    }
+
+    /**
+     * the formula ensures that the update context described the update of the given formula.
+     * If it does not then {@code null} is returned, otherwise the formula without the update
+     * context.
+     *
+     * @param context the list of update label pairs describing the update context
+     * @param formula the formula whose own update context must be equal (modulo renaming) to the
+     *        given one
+     * @return {@code null} if the update context does not match the one of the formula or the
+     *         formula without the update context
+     */
+    private Term matchUpdateContext(ImmutableList<Term> context, Term formula) {
+        ImmutableList<Term> curContext = context;
+        for (int i = 0, size = context.size(); i < size; i++) {
+            if (formula.op() instanceof UpdateApplication) {
+                final Term update = UpdateApplication.getUpdate(formula);
+                final Term ulp = curContext.head();
+                /*
+                 * TODO @ Tobias : if (ulp.equalsModProperty(update, RENAMING_TERM_PROPERTY)
+                 * && ulp.updateApplicationlabels().equals(update.getLabels())) {
+                 * curContext = curContext.tail();
+                 * formula = UpdateApplication.getTarget(formula);
+                 * continue;
+                 * }
+                 */
+            }
+            // update context does not match update prefix of formula
+            return null;
+        }
+        return formula;
     }
 }

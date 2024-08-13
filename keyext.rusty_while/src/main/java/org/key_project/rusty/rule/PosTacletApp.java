@@ -171,4 +171,15 @@ public class PosTacletApp extends TacletApp {
     public boolean complete() {
         return posInOccurrence() != null && uninstantiatedVars().isEmpty() && ifInstsComplete();
     }
+
+    /**
+     * creates a new Taclet application containing all the instantiations, constraints, new
+     * metavariables and if formula instantiations given and forget the old ones
+     */
+    @Override
+    protected TacletApp setAllInstantiations(MatchConditions mc,
+            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
+        return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(), ifInstantiations,
+            posInOccurrence(), services);
+    }
 }

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
+import java.util.Iterator;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
@@ -143,5 +145,70 @@ public class Proof implements Named {
 
     public Node root() {
         return root;
+    }
+
+    /**
+     * Close the given goals and all goals in the subtree below it.
+     *
+     * @param goalToClose the goal to close.
+     */
+    public void closeGoal(Goal goalToClose) {
+        Node closedSubtree = goalToClose.getNode().close();
+
+        boolean b = false;
+        Iterator<Node> it = closedSubtree.leavesIterator();
+        Goal goal;
+
+        // close all goals below the given goalToClose
+        while (it.hasNext()) {
+            goal = getOpenGoal(it.next());
+            if (goal != null) {
+                b = true;
+                // if (!GeneralSettings.noPruningClosed) {
+                closedGoals = closedGoals.prepend(goal);
+                // }
+                remove(goal);
+            }
+        }
+
+        if (b) {
+            // For the moment it is necessary to fire the message ALWAYS
+            // in order to detect branch closing.
+            // fireProofGoalsAdded(ImmutableSLList.nil());
+        }
+    }
+
+    /**
+     * returns the goal that belongs to the given node or null if the node is an inner one
+     *
+     * @return the goal that belongs to the given node or null if the node is an inner one
+     */
+    public Goal getOpenGoal(Node node) {
+        for (final Goal result : openGoals) {
+            if (result.getNode() == node) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * removes the given goal from the list of open goals. Take care removing the last goal will
+     * fire the proofClosed event
+     *
+     * @param goal the Goal to be removed
+     */
+    private void remove(Goal goal) {
+        ImmutableList<Goal> newOpenGoals = openGoals.removeAll(goal);
+        if (newOpenGoals != openGoals) {
+            openGoals = newOpenGoals;
+        }
+    }
+
+    /**
+     * returns true if the root node is marked as closed and all goals have been removed
+     */
+    public boolean closed() {
+        return root.isClosed() && openGoals.isEmpty();
     }
 }

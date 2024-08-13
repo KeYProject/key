@@ -200,4 +200,8 @@ public final class Goal {
              */
         }
     }
+
+    public TacletIndex indexOfTaclets() {
+        return ruleAppIndex.tacletIndex();
+    }
 }

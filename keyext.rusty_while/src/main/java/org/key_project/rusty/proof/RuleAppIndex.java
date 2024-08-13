@@ -68,4 +68,8 @@ public class RuleAppIndex {
 
         tacletAppIndex.addedNoPosTacletApp(tacletApp);
     }
+
+    public TacletIndex tacletIndex() {
+        return tacletIndex;
+    }
 }

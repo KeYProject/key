@@ -5,15 +5,20 @@ package org.key_project.rusty.util;
 
 import java.io.File;
 
+import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
+import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.KeYIO;
 import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.proof.init.*;
-import org.key_project.rusty.proof.io.KeYFile;
+import org.key_project.rusty.proof.io.KeYFileForTests;
 import org.key_project.rusty.proof.io.RuleSourceFactory;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.key_project.rusty.proof.io.RuleSource.LDT_FILE;
@@ -32,8 +37,9 @@ public class TacletForTests {
     public static InitConfig initConfig;
     public static File lastFile = null;
 
+    private static Namespace<@NonNull SchemaVariable> schemaVariables;
+
     // private static Namespace<QuantifiableVariable> variables = null;
-    // private static Namespace<SchemaVariable> schemaVariables;
 
     public static final Profile profile = new RustProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
@@ -73,7 +79,7 @@ public class TacletForTests {
     public static void parse(File file) {
         try {
             if (!file.equals(lastFile)) {
-                KeYFile envInput = new KeYFile("Test", file, profile);
+                var envInput = new KeYFileForTests("Test", file, profile);
                 ProblemInitializer pi = new ProblemInitializer(envInput.getProfile());
                 initConfig = pi.prepare(envInput);
                 nss = initConfig.namespaces();
@@ -81,7 +87,7 @@ public class TacletForTests {
                 services = initConfig.getServices();
                 lastFile = file;
                 // variables = envInput.variables();
-                // schemaVariables = envInput.schemaVariables();
+                schemaVariables = envInput.schemaVariables();
             }
         } catch (Exception e) {
             throw new RuntimeException("Exception occurred while parsing " + file, e);
@@ -131,5 +137,13 @@ public class TacletForTests {
 
     public static Term parseTerm(String termstr) {
         return parseTerm(termstr, services());
+    }
+
+    public static Namespace<@NonNull SchemaVariable> getSchemaVariables() {
+        return schemaVariables;
+    }
+
+    public static Namespace<@NonNull Function> getFunctions() {
+        return nss.functions();
     }
 }

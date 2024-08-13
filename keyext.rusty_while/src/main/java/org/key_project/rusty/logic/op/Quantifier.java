@@ -5,6 +5,8 @@ package org.key_project.rusty.logic.op;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
+import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
@@ -49,5 +51,25 @@ public final class Quantifier extends AbstractSortedOperator {
     @Override
     public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException(name() + " has no children");
+    }
+
+    @Override
+    public <T extends Term> void validTopLevelException(T term) throws TermCreationException {
+        if (arity() != term.arity()) {
+            throw new TermCreationException(this, term);
+        }
+
+        if (arity() != term.subs().size()) {
+            throw new TermCreationException(this, term);
+        }
+
+        // Skip bound var check
+        // TODO: do this for all binding ops?
+
+        for (int i = 0; i < arity(); i++) {
+            if (term.sub(i) == null) {
+                throw new TermCreationException(this, term);
+            }
+        }
     }
 }

@@ -369,4 +369,37 @@ public class SVInstantiations {
         final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = lookupEntryForSV(name);
         return e == null ? null : e.value().getInstantiation();
     }
+
+    /**
+     * returns true if the given object and this one have the same mappings
+     *
+     * @return true if the given object and this one have the same mappings
+     */
+    public boolean equals(Object obj) {
+        final SVInstantiations cmp;
+        if (!(obj instanceof SVInstantiations)) {
+            return false;
+        } else {
+            cmp = (SVInstantiations) obj;
+        }
+        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) {
+            return false;
+        }
+
+        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
+            pairIterator();
+        while (it.hasNext()) {
+            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+            final Object inst = e.value().getInstantiation();
+            assert inst != null : "Illegal null instantiation.";
+            if (inst instanceof Term instAsTerm) {
+                if (!instAsTerm.equals(cmp.getInstantiation(e.key()))) {
+                    return false;
+                }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

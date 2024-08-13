@@ -5,11 +5,13 @@ package org.key_project.rusty.parser.builder;
 
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.key_project.logic.*;
+import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -37,7 +39,10 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class ExpressionBuilder extends DefaultBuilder {
+    public record BoundVar(Name name, Sort sort) {}
+
     private boolean rustySchemaModeAllowed;
+    private List<BoundVar> boundVars = new ArrayList<>();
 
     public ExpressionBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -481,15 +486,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         return null;
     }
 
-    private LogicVariable bindVar(int idx, Sort s) {
-        LogicVariable v = new LogicVariable(idx, s);
-        namespaces().setVariables(variables().extended(v));
-        return v;
-    }
-
-    private LogicVariable bindVar(LogicVariable v) {
-        namespaces().setVariables(variables().extended(v));
-        return v;
+    private BoundVar bindVar(String name, Sort sort) {
+        BoundVar e = new BoundVar(new Name(name), sort);
+        boundVars.add(e);
+        return e;
     }
 
     private void bindVar() {
@@ -624,42 +624,42 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private PairOfStringAndRustyBlock getRustyBlock(Token t) {
-        PairOfStringAndRustyBlock sjb = new PairOfStringAndRustyBlock();
+        PairOfStringAndRustyBlock srb = new PairOfStringAndRustyBlock();
         String s = t.getText().trim();
-        String cleanJava = trimRustyBlock(s);
-        sjb.opName = operatorOfJavaBlock(s);
+        String cleanRusty = trimRustyBlock(s);
+        srb.opName = operatorOfJavaBlock(s);
 
         try {
             try {
                 if (rustySchemaModeAllowed) {// TEST
-                    SchemaRustyReader jr = new SchemaRustyReader(services, nss);
-                    jr.setSVNamespace(schemaVariables());
+                    SchemaRustyReader rr = new SchemaRustyReader(services, nss);
+                    rr.setSVNamespace(schemaVariables());
                     try {
-                        sjb.rustyBlock =
-                            jr.readBlockWithProgramVariables(programVariables(), cleanJava);
+                        srb.rustyBlock =
+                            rr.readBlockWithProgramVariables(programVariables(), cleanRusty);
                     } catch (Exception e) {
-                        sjb.rustyBlock = jr.readBlockWithEmptyContext(cleanJava);
+                        srb.rustyBlock = rr.readBlockWithEmptyContext(cleanRusty);
                     }
                 }
             } catch (Exception e) {
-                if (cleanJava.startsWith("{..")) {// do not fallback
+                if (cleanRusty.startsWith("{..")) {// do not fallback
                     throw e;
                 }
             }
 
-            if (sjb.rustyBlock == null) {
-                RustyReader jr = new RustyReader(services, nss);
+            if (srb.rustyBlock == null) {
+                RustyReader rr = new RustyReader(services, nss);
                 try {
-                    sjb.rustyBlock =
-                        jr.readBlockWithProgramVariables(programVariables(), cleanJava);
+                    srb.rustyBlock =
+                        rr.readBlockWithProgramVariables(programVariables(), cleanRusty);
                 } catch (Exception e1) {
-                    sjb.rustyBlock = jr.readBlockWithEmptyContext(cleanJava);
+                    srb.rustyBlock = rr.readBlockWithEmptyContext(cleanRusty);
                 }
             }
         } catch (Exception e) {
-            throw new BuildingException(t, "Could not parse java: '" + cleanJava + "'", e);
+            throw new BuildingException(t, "Could not parse Rust: '" + cleanRusty + "'", e);
         }
-        return sjb;
+        return srb;
     }
 
     private static class PairOfStringAndRustyBlock {
@@ -718,17 +718,39 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.EXISTS() != null) {
             op = Quantifier.EX;
         }
-        List<QuantifiableVariable> vs = accept(ctx.bound_variables());
+        List<@NonNull BoundVar> vars = accept(ctx.bound_variables());
         Term a1 = accept(ctx.sub);
         Term a = getTermFactory().createTerm(op, new ImmutableArray<>(a1),
-            new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])));
+            new ImmutableArray<>());
         unbindVars(orig);
+        unbindVars(vars);
         return a;
     }
 
     @Override
     public Object visitSubstitution_term(KeYRustyParser.Substitution_termContext ctx) {
-        throw new RuntimeException("TODO");
+        SubstOp op = SubstOp.SUBST;
+        Namespace<QuantifiableVariable> orig = variables();
+        AbstractSortedOperator v = accept(ctx.bv);
+        unbindVars(orig);
+        if (v instanceof LogicVariable) {
+            // bindVar((LogicVariable) v);
+            throw new RuntimeException("TODO @ DD");
+        } else {
+            bindVar();
+        }
+
+        Term a1 = accept(ctx.replacement);
+        Term a2 = oneOf(ctx.atom_prefix(), ctx.unary_formula());
+        try {
+            Term result =
+                getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
+            return result;
+        } catch (Exception e) {
+            throw new BuildingException(ctx, e);
+        } finally {
+            unbindVars(orig);
+        }
     }
 
     @Override
@@ -741,12 +763,17 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);
     }
 
+    public List<@NonNull BoundVar> visitBound_variables(KeYRustyParser.Bound_variablesContext ctx) {
+        return mapOf(ctx.one_bound_variable());
+    }
+
     @Override
-    public QuantifiableVariable visitOne_bound_variable(
+    public Object visitOne_bound_variable(
             KeYRustyParser.One_bound_variableContext ctx) {
         String id = accept(ctx.simple_ident());
         Sort sort = accept(ctx.sortId());
 
+        assert id != null;
         SchemaVariable ts = schemaVariables().lookup(new Name(id));
         if (ts != null) {
             if (!(ts instanceof VariableSV)) {
@@ -757,12 +784,11 @@ public class ExpressionBuilder extends DefaultBuilder {
                         + " and use the syntax \"\\exists i;\" instead.");
             }
             bindVar();
-            return (QuantifiableVariable) ts;
+            return ts;
         }
 
-        if (sort != null && id != null) {
-            throw new RuntimeException("TODO");
-            // return bindVar(id, sort);
+        if (sort != null) {
+            return bindVar(id, sort);
         }
 
         QuantifiableVariable result =
@@ -893,5 +919,28 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         return result;
+    }
+
+    @Override
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
+            Sort sort) {
+        // Might be quantified variable
+        var idx = -1;
+        for (int i = 0; i < boundVars.size(); ++i) {
+            if (varfuncName.equals(boundVars.get(i).name().toString())) {
+                idx = i;
+                break;
+            }
+        }
+        if (idx != -1) {
+            var deBruijn = boundVars.size() - idx;
+            return new LogicVariable(deBruijn, boundVars.get(idx).sort());
+        }
+
+        return super.lookupVarfuncId(ctx, varfuncName, sortName, sort);
+    }
+
+    private void unbindVars(List<@NonNull BoundVar> vars) {
+        boundVars.removeAll(vars);
     }
 }

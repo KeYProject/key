@@ -12,7 +12,9 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
+import java.util.*;
 
+import org.key_project.rusty.proof.io.RuleSource;
 import org.key_project.rusty.settings.Configuration;
 
 import org.antlr.v4.runtime.*;
@@ -48,6 +50,27 @@ public final class ParsingFacade {
         } finally {
             long stop = System.currentTimeMillis();
         }
+    }
+
+    public static List<KeYAst.File> parseFiles(URL url) throws IOException {
+        List<KeYAst.File> ctxs = new LinkedList<>();
+        ArrayDeque<URL> queue = new ArrayDeque<>();
+        queue.push(url);
+        Set<URL> reached = new HashSet<>();
+
+        while (!queue.isEmpty()) {
+            url = queue.pop();
+            reached.add(url);
+            KeYAst.File ctx = parseFile(url);
+            ctxs.add(ctx);
+            Collection<RuleSource> includes = ctx.getIncludes(url).getRuleSets();
+            for (RuleSource u : includes) {
+                if (!reached.contains(u.url())) {
+                    queue.push(u.url());
+                }
+            }
+        }
+        return ctxs;
     }
 
     public static KeYAst.File parseFile(Path file) throws IOException {

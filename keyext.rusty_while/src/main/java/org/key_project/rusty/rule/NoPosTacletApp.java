@@ -238,6 +238,16 @@ public class NoPosTacletApp extends TacletApp {
             services);
     }
 
+    /**
+     * creates a new Taclet application containing all the instantiations, constraints, new
+     * metavariables and if formula instantiations given and forget the old ones
+     */
+    @Override
+    protected TacletApp setAllInstantiations(MatchConditions mc,
+            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
+        return createNoPosTacletApp(taclet(), mc.getInstantiations(), ifInstantiations, services);
+    }
+
     private boolean updateContextCompatible(MatchConditions p_mc) {
         return instantiations.getUpdateContext()
                 .equals(p_mc.getInstantiations().getUpdateContext());

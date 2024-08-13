@@ -368,4 +368,15 @@ public class Sequent implements Iterable<SequentFormula> {
                 "No formula nr. " + formulaNumber + " in seq. " + this);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Sequent o1)) {
+            return false;
+        }
+        return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
+    }
 }

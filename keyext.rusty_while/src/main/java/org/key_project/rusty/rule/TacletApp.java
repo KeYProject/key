@@ -3,23 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.PIOPathIterator;
-import org.key_project.rusty.logic.PosInOccurrence;
+import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.LogicVariable;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.proof.Goal;
-import org.key_project.rusty.rule.inst.InstantiationEntry;
-import org.key_project.rusty.rule.inst.SVInstantiations;
+import org.key_project.rusty.rule.inst.*;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
@@ -439,4 +434,282 @@ public abstract class TacletApp implements RuleApp {
         return PosTacletApp.createPosTacletApp((FindTaclet) taclet(), instantiations(),
             ifFormulaInstantiations(), pos, services);
     }
+
+    /**
+     * @return A TacletApp with this.sufficientlyComplete() or null
+     */
+    public final @Nullable TacletApp tryToInstantiate(Services services) {
+        TacletApp app = instantiationHelper(true, services);
+        if (app == null)
+            return null;
+
+        if (app != this) {
+            final MatchConditions appMC =
+                app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
+            if (appMC == null) {
+                return null;
+            } else {
+                app = app.setMatchConditions(appMC, services);
+            }
+        }
+
+        if (!app.complete()) {
+            return null;
+        }
+        return app;
+    }
+
+    private TacletApp instantiationHelper(boolean force, Services services) {
+        // final VariableNamer varNamer = services.getVariableNamer();
+        final TermBuilder tb = services.getTermBuilder();
+
+        TacletApp app = this;
+        ImmutableList<String> proposals = ImmutableSLList.nil();
+
+        for (final SchemaVariable variable : uninstantiatedVars()) {
+            /*
+             * if (!(variable instanceof OperatorSV operatorSv)) {
+             * continue;
+             * }
+             * if (operatorSv.arity() != 0) {
+             * continue;
+             * }
+             *
+             * if (operatorSv.sort() == ProgramSVSort.VARIABLE) {
+             * String proposal =
+             * varNamer.getSuggestiveNameProposalForProgramVariable(operatorSv, this,
+             * services, proposals);
+             * RustyProgramElement pe =
+             * app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
+             * app = app.addCheckedInstantiation(operatorSv, pe, services, true);
+             * proposals = proposals.append(proposal);
+             * } else if (operatorSv.sort() == ProgramSVSort.LABEL) {
+             * boolean nameclash;
+             * do {
+             * String proposal =
+             * VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services,
+             * null, proposals);
+             * ProgramElement pe =
+             * app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
+             * proposals = proposals.prepend(proposal);
+             * try {
+             * app = app.addCheckedInstantiation(operatorSv, pe, services, true);
+             * } catch (IllegalInstantiationException iie) {
+             * // name clash
+             * nameclash = true;
+             * }
+             * // FIXME: This loop is never executed more than once
+             * // The following line might belong to the try-block.
+             * // Leave it untouched, however, since no problems
+             * // reported with this established code. MU 10-2012
+             * nameclash = false;
+             * } while (nameclash);
+             * } else if (operatorSv instanceof SkolemTermSV) {
+             * // if the sort of the schema variable is generic,
+             * // ensure that it is instantiated
+             * app = forceGenericSortInstantiation(app, operatorSv, services);
+             * if (app == null) {
+             * return null;
+             * }
+             *
+             * String proposal =
+             * VariableNameProposer.DEFAULT.getProposal(app, operatorSv, services, null,
+             * proposals);
+             *
+             * proposals = proposals.append(proposal);
+             *
+             * app = app.createSkolemConstant(proposal, operatorSv, true, services);
+             * } else if (operatorSv instanceof VariableSV) {
+             * // if the sort of the schema variable is generic,
+             * // ensure that it is instantiated
+             * app = forceGenericSortInstantiation(app, operatorSv, services);
+             * if (app == null) {
+             * return null;
+             * }
+             *
+             * String proposal;
+             * Collection<String> conflictNames = collectClashNames(operatorSv, services);
+             * do {
+             * proposal =
+             * VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services, null,
+             * proposals);
+             * proposals = proposals.prepend(proposal);
+             * } while (conflictNames.contains(proposal));
+             *
+             * LogicVariable v =
+             * new LogicVariable(new Name(proposal), getRealSort(operatorSv, services));
+             *
+             * app = app.addCheckedInstantiation(operatorSv, tb.var(v), services, true);
+             * } else {
+             * if (force) {
+             * return null;
+             * }
+             * }
+             */
+        }
+        return app;
+    }
+
+    /**
+     * <p>
+     * Collect names which would result in a clash for a new logical variable.
+     * </p>
+     * <p>
+     * The clashing names include the names of the bound and unbound variables of "notFreeIn"
+     * clauses. Additionally, equally-named program variables are avoided.
+     * </p>
+     * <p>
+     * While this analysis is not strictly necessary (two different variables may bear the same
+     * name), it is vital not to cause confusion with the user.
+     * </p>
+     *
+     * @param sv the schema variable to instantiate with a fresh variable, not <code>null</code>
+     * @param services the services object, not <code>null</code>
+     * @return a fresh created collection of strings in which a freshly created variable name should
+     *         not fall.
+     */
+    private Collection<String> collectClashNames(SchemaVariable sv, Services services) {
+        Collection<String> result = new LinkedHashSet<>();
+        /*
+         * VariableCollectVisitor vcv = new VariableCollectVisitor();
+         * for (final NotFreeIn nv : taclet().varsNotFreeIn()) {
+         * if (nv.first() == sv) {
+         * Term term = (Term) instantiations.getInstantiation(nv.second());
+         * if (term != null) {
+         * term.execPostOrder(vcv);
+         * }
+         * }
+         * }
+         *
+         * for (QuantifiableVariable var : vcv.vars()) {
+         * result.add(var.name().toString());
+         * }
+         *
+         * for (Named progvar : services.getNamespaces().programVariables().allElements()) {
+         * result.add(progvar.name().toString());
+         * }
+         */
+
+        return result;
+    }
+
+    /**
+     * If the sort of the given schema variable is generic, add a condition to the instantiations of
+     * the given taclet app that requires the sort to be instantiated
+     *
+     * @return the new taclet app, or <code>null</code> if the sort of <code>sv</code> is generic
+     *         and cannot be instantiated (at least at the time)
+     */
+    private static TacletApp forceGenericSortInstantiation(TacletApp app, OperatorSV sv,
+            Services services) {
+        final GenericSortCondition c = GenericSortCondition.forceInstantiation(sv.sort(), false);
+        if (c != null) {
+            try {
+                // app = app.setInstantiation(app.instantiations().add(c, services), services);
+            } catch (GenericSortException e) {
+                return null;
+            }
+        }
+        return app;
+    }
+
+    /**
+     * Find all possible instantiations of the assumes-sequent formulas within the sequent "seq".
+     *
+     * @param seq uninstantiated if sequent from taclet
+     * @param services the {@link Services} to access information about the logic signature or
+     *        program model
+     * @return a list of tacletapps with the found assumes-formula instantiations When the IfSequent
+     *         is
+     *         empty, it returns a tacletapp with ifInstantiations == null instead of
+     *         ifInstantiations == nil(), seemingly (LG 2022-02-07) to be more efficient.
+     */
+    public ImmutableList<TacletApp> findIfFormulaInstantiations(Sequent seq, Services services) {
+        // TODO Why not return just the list of IfFormulaInstantiations?
+
+        if (taclet().ifSequent().isEmpty()) {
+            return ImmutableSLList.<TacletApp>nil().prepend(this);
+        }
+
+        return findIfFormulaInstantiationsHelp(
+            createSemisequentList(taclet().ifSequent().succedent()),
+            createSemisequentList(taclet().ifSequent().antecedent()),
+            IfFormulaInstSeq.createList(seq, false, services),
+            IfFormulaInstSeq.createList(seq, true, services),
+            ImmutableSLList.nil(), matchConditions(), services);
+    }
+
+    /**
+     * Recursive function for matching the remaining tail of an if sequent
+     *
+     * @param ruleSuccTail tail of the current uninstantiated semisequent as list (i.e. if
+     *        succedent)
+     * @param ruleAntecTail the following uninstantiated semisequent (i.e. if antecedent) or null
+     * @param instSucc list of the formulas to match the current if semisequent formulas with
+     * @param instAntec list of the formulas of the antecedent
+     * @param instAlreadyMatched matched instantiations, for exactly those formulas that are no
+     *        longer in ruleSuccTail and ruleAntecTail
+     * @param matchCond match conditions until now, i.e. after matching the first formulas of the
+     *        assumes-sequent
+     * @param services the {@link Services} to access information about the logic signature or
+     *        program model
+     * @return a list of tacletapps with the found if formula instantiations
+     */
+    private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
+            ImmutableList<SequentFormula> ruleSuccTail, ImmutableList<SequentFormula> ruleAntecTail,
+            ImmutableArray<IfFormulaInstantiation> instSucc,
+            ImmutableArray<IfFormulaInstantiation> instAntec,
+            ImmutableList<IfFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
+            Services services) {
+
+        while (ruleSuccTail.isEmpty()) {
+            if (ruleAntecTail == null) {
+                // All formulas have been matched, collect the results
+                TacletApp res = setAllInstantiations(matchCond, instAlreadyMatched, services);
+                if (res != null) {
+                    return ImmutableSLList.<TacletApp>nil().prepend(res);
+                }
+                return ImmutableSLList.nil();
+            } else {
+                // Change from succedent to antecedent
+                ruleSuccTail = ruleAntecTail;
+                ruleAntecTail = null;
+                instSucc = instAntec;
+            }
+        }
+
+        // Match the current formula
+        IfMatchResult mr = taclet().getMatcher().matchIf(instSucc, ruleSuccTail.head().formula(),
+            matchCond, services);
+
+        // For each matching formula call the method again to match
+        // the remaining terms
+        ImmutableList<TacletApp> res = ImmutableSLList.nil();
+        Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
+        Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
+        ruleSuccTail = ruleSuccTail.tail();
+        while (itCand.hasNext()) {
+            res = res.prepend(findIfFormulaInstantiationsHelp(ruleSuccTail, ruleAntecTail, instSucc,
+                instAntec, instAlreadyMatched.prepend(itCand.next()), itMC.next(), services));
+        }
+
+        return res;
+    }
+
+    private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
+        ImmutableList<SequentFormula> res = ImmutableSLList.nil();
+
+        for (SequentFormula p_s : p_ss) {
+            res = res.prepend(p_s);
+        }
+
+        return res;
+    }
+
+    /**
+     * creates a new Taclet application containing all the instantiations, constraints, new
+     * metavariables and if formula instantiations given and forget the old ones
+     */
+    protected abstract TacletApp setAllInstantiations(MatchConditions mc,
+            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services);
 }

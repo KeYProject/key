@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.rule.NoPosTacletApp;
@@ -155,5 +154,66 @@ public class Node {
      */
     public void addNoPosTacletApp(NoPosTacletApp s) {
         localIntroducedRules = localIntroducedRules.add(s);
+    }
+
+    /** marks a node as closed */
+    Node close() {
+        closed = true;
+        Node tmp = parent;
+        Node result = this;
+        while (tmp != null && tmp.isCloseable()) {
+            tmp.closed = true;
+            result = tmp;
+            tmp = tmp.parent();
+        }
+        // clearNameCache();
+        return result;
+    }
+
+    /** @return true iff this inner node is closeable */
+    private boolean isCloseable() {
+        assert childrenCount() > 0;
+        for (Node child : children) {
+            if (!child.isClosed()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    /**
+     * Computes the leaves of the current subtree and returns them.
+     *
+     * @return the leaves of the current subtree.
+     */
+    List<Node> getLeaves() {
+        final List<Node> leaves = new LinkedList<>();
+        final LinkedList<Node> nodesToCheck = new LinkedList<>();
+        nodesToCheck.add(this);
+        do {
+            final Node n = nodesToCheck.poll();
+            if (n.leaf()) {
+                leaves.add(n);
+            } else {
+                nodesToCheck.addAll(0, n.children);
+            }
+        } while (!nodesToCheck.isEmpty());
+        return leaves;
+    }
+
+    public boolean leaf() {
+        return children.isEmpty();
+    }
+
+    /**
+     * @return an iterator for the leaves of the subtree below this node. The computation is called
+     *         at every call!
+     */
+    public Iterator<Node> leavesIterator() {
+        return new NodeIterator(getLeaves().iterator());
     }
 }
