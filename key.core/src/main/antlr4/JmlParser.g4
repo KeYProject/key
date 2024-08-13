@@ -204,7 +204,7 @@ proofCmdCase:
     SC_CASE ( STRING_LITERAL )? SC_COLON ( proofCmd )*
   | SC_DEFAULT SC_COLON ( proofCmd )*
   ;
-proofArg: (argLabel=SC_IDENT SC_EQUAL_SINGLE)? token=( SC_DECLITERAL | /*NATIVE?*/ STRING_LITERAL | SC_IDENT);
+proofArg: (argLabel=SC_IDENT SC_EQUAL_SINGLE)? token=( SC_DECLITERAL | /*NATIVE?*/ STRING_LITERAL | SC_JML_STRING | SC_IDENT);
 
 proofCmdsEOF:
    ( proofCmd )+ EOF

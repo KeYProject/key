@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.antlr.v4.runtime.CharStreams;
@@ -165,9 +166,10 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
     }
 
     private List<JmlParser.ProofCmdContext> parseScript(String script) {
-        JmlLexer jmlLexer = new JmlLexer(CharStreams.fromString(script));
+        JmlLexer jmlLexer = JmlFacade.createLexer(script);
         jmlLexer.pushMode(JmlLexer.script);
-        JmlParser jmlParser = new JmlParser(new CommonTokenStream(jmlLexer));
+        jmlLexer.bracesLevel = 1;
+        JmlParser jmlParser = JmlFacade.createParser(jmlLexer);
         return jmlParser.proofCmdsEOF().proofCmd();
     }
 

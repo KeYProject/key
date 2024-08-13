@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
    private void incrParen() { parenthesisLevel++;}
    private void decrParen() { parenthesisLevel--;}
 
-   private int bracesLevel = 0;
+   // FIXME: For incremental scripts in JML I need to be able to set the brace level from the outside
+   public int bracesLevel = 0;
    private void incrBrace() { bracesLevel++;}
    private void decrBrace() { bracesLevel--;}
 

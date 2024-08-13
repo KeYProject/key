@@ -24,6 +24,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.JmlAssertBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
