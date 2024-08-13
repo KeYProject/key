@@ -76,17 +76,14 @@ public class ExpandDefCommand extends AbstractCommand {
         if (p.on != null) {
             apps = apps.filter(
                 it -> it instanceof PosTacletApp &&
-                        ((JTerm) it.posInOccurrence().subTerm()).equalsModProperty(p.on,
-                            TermLabelsProperty.TERM_LABELS_PROPERTY));
+                        p.on.matches(it.posInOccurrence()));
         } else if (p.formula != null) {
             apps = apps.filter(
                 it -> it instanceof PosTacletApp &&
-                        ((JTerm) it.posInOccurrence().sequentFormula().formula()).equalsModProperty(
-                            p.formula, TermLabelsProperty.TERM_LABELS_PROPERTY));
+                        p.formula.matchesToplevel(it.posInOccurrence().sequentFormula()));
         } else {
             throw new ScriptException("Either 'formula' or 'on' must be specified");
         }
-
 
         if (apps.isEmpty()) {
             throw new ScriptException("There is no expansion rule app that matches 'on'");
@@ -107,11 +104,11 @@ public class ExpandDefCommand extends AbstractCommand {
 
     public static class Parameters {
         @Option(value = "on")
-        public @Nullable JTerm on;
+        public @Nullable TermWithHoles on;
         @Option(value = "occ")
         public @Nullable Integer occ;
         @Option(value = "formula")
-        public @Nullable JTerm formula;
+        public @Nullable TermWithHoles formula;
 
     }
 
