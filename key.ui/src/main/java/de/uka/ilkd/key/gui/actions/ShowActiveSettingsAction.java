@@ -37,7 +37,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
     private ViewSettingsDialog showDialog() {
         ProofSettings settings =
-            (getMediator().getSelectedProof() == null) ? ProofSettings.DEFAULT_SETTINGS
+            (getMediator().getSelectedProof() == null) ? null
                     : getMediator().getSelectedProof().getSettings();
         SettingsTreeModel model =
             new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);

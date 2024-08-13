@@ -1015,7 +1015,8 @@ public final class MainWindow extends JFrame {
         }
         proof.addSeparator();
         proof.add(new ShowUsedContractsAction(this, selected));
-        proof.add(new ShowActiveTactletOptionsAction(this, showActiveSettingsAction));
+        // We merge the old window to view the active taclet options with the window for all active settings
+        //proof.add(new ShowActiveTactletOptionsAction(this, showActiveSettingsAction));
         proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this, selected));
         proof.add(new ShowKnownTypesAction(this, selected));

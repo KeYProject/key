@@ -45,23 +45,29 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private void generateTree() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.getRoot();
 
-        OptionContentNode proofSettingsNode =
-            generateOptionContentNode("Proof Settings", "These are the proof dependent settings.");
-        root.add(proofSettingsNode);
+        if (proofSettings == null) {
+            OptionContentNode proofSettingsNode =
+                    generateOptionContentNode("Proof Settings", "There is currently no proof loaded!");
+            root.add(proofSettingsNode);
+        } else {
+            OptionContentNode proofSettingsNode =
+                    generateOptionContentNode("Proof Settings", "These are the proof dependent settings.");
+            root.add(proofSettingsNode);
 
-        // ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
-        ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-        tacletOptionsItem = generateTableNode("Taclet Options", choiceSettings);
-        proofSettingsNode.add(tacletOptionsItem);
+            // ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
+            ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
+            tacletOptionsItem = generateTableNode("Taclet Options", choiceSettings);
+            proofSettingsNode.add(tacletOptionsItem);
 
-        Settings strategySettings = proofSettings.getStrategySettings();
-        proofSettingsNode.add(generateTableNode("Strategy", strategySettings));
+            Settings strategySettings = proofSettings.getStrategySettings();
+            proofSettingsNode.add(generateTableNode("Strategy", strategySettings));
 
-        Settings smtSettings = proofSettings.getSMTSettings();
-        proofSettingsNode.add(generateTableNode("SMT", smtSettings));
+            Settings smtSettings = proofSettings.getSMTSettings();
+            proofSettingsNode.add(generateTableNode("SMT", smtSettings));
+        }
 
         OptionContentNode independentSettingsNode = generateOptionContentNode(
-            "Proof-Independent Settings", "These are the proof independent settings.");
+                "Proof-Independent Settings", "These are the proof independent settings.");
         root.add(independentSettingsNode);
 
         Settings generalSettings = independentSettings.getGeneralSettings();
@@ -75,7 +81,9 @@ public class SettingsTreeModel extends DefaultTreeModel {
         Settings viewSettings = independentSettings.getViewSettings();
         independentSettingsNode.add(generateTableNode("View", viewSettings));
         Settings termLabelSettings = independentSettings.getTermLabelSettings();
-        proofSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
+        // Previously, the termLabelSettings were added to the proofSettingsNode, but judging by the previous line,
+        // it should really be added to the independentSettingsNode
+        independentSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
     }
 
 
