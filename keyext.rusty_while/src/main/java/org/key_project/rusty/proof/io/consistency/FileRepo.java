@@ -6,7 +6,6 @@ package org.key_project.rusty.proof.io.consistency;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.List;
 
 import org.key_project.rusty.proof.io.RuleSource;
 
@@ -65,33 +64,17 @@ public interface FileRepo {
     // void registerProof(Proof proof);
 
     /**
-     * Sets the bootclasspath (containing available classes from the Java Class Library).
+     * Sets the Rust path (where the source files are located).
      *
-     * @param path the bootclasspath to set (the method does nothing if null is given)
-     * @throws IllegalStateException if the java path is already set
+     * @param rustyPath the java path to set (the method does nothing if null is given)
+     * @throws IllegalStateException if the Rust path is already set
      */
-    void setBootClassPath(File path) throws IllegalStateException;
-
-    /**
-     * Sets the classpath.
-     *
-     * @param classPath the classpath to set (the method does nothing if null is given)
-     * @throws IllegalStateException if the java path is already set
-     */
-    void setClassPath(List<File> classPath) throws IllegalStateException;
-
-    /**
-     * Sets the java path (where the source files are located).
-     *
-     * @param javaPath the java path to set (the method does nothing if null is given)
-     * @throws IllegalStateException if the java path is already set
-     */
-    void setJavaPath(String javaPath) throws IllegalStateException;
+    void setRustyPath(String rustyPath) throws IllegalStateException;
 
     /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.
-     * When loading Java sources this is the directory the loaded file resides in. When loading
-     * .key-Files this is the directory specified via "\\javaSource" or the directory of the
+     * When loading Rust sources this is the directory the loaded file resides in. When loading
+     * .key-Files this is the directory specified via "\\programSource" or the directory of the
      * .key-File, if no source directory is specified.
      *
      * This is needed by the FileRepo for resolving pathnames.

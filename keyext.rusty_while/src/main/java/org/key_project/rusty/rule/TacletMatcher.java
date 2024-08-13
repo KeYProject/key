@@ -35,7 +35,7 @@ public interface TacletMatcher {
      * @param instantiationCandidate the SVSubstitute, which is a candidate for a possible
      *        instantiation of var
      * @param matchCond the MatchConditions which have to be respected for the new match
-     * @param services the Services object encapsulating information about the Java type model
+     * @param services the Services object encapsulating information about the Rust type model
      * @return the match conditions resulting from matching <code>var</code> with
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
@@ -64,7 +64,7 @@ public interface TacletMatcher {
      * @param toMatch list of constraint formulas to match p_template to
      * @param template template formula as in "match"
      * @param matchCond already performed instantiations
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return Two lists (in an {@link IfMatchResult} object), containing the elements of
      *         {@code p_toMatch} that

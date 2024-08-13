@@ -78,7 +78,7 @@ public class TermFactory {
         final TermImpl newTerm =
             new TermImpl(op, subs, boundVars);
 
-        // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
+        // Check if caching is possible. It is not possible if a non-empty RustyBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (cache != null && !newTerm.containsCodeBlockRecursive()) {

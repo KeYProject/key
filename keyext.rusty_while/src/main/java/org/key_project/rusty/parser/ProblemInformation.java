@@ -31,7 +31,7 @@ public class ProblemInformation {
     private @Nullable String preferences;
 
     /**
-     * Value of the "\javaSource".
+     * Value of the "\rustSource".
      */
     private @Nullable String rustSource;
 

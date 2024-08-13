@@ -105,7 +105,7 @@ public class KeYIO {
 
     /**
      * Loading of complete KeY files into the given schema. Supports recursive loading, but does not
-     * provide support for Java and Java type informations.
+     * provide support for Java and Rust type informations.
      * <p>
      * Little sister of {@link ProblemInitializer}.
      *

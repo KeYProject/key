@@ -19,7 +19,7 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     protected final Services services;
 
     /**
-     * create the JavaASTVisitor
+     * create the RustyASTVisitor
      *
      * @param root the ProgramElement where to begin
      * @param services the Services object

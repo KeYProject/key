@@ -121,15 +121,15 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
                 /* svInst.getExecutionContext(), */ services));
             pushNew(newTerm);
         } else {
-            // instantiation of java block
-            boolean jblockChanged = false;
+            // instantiation of Rust block
+            boolean rBlockChanged = false;
 
             if (visitedOp instanceof Modality mod) {
                 var rb = mod.program();
                 var olfRb = rb;
                 rb = replacePrg(svInst, rb);
                 if (rb != olfRb) {
-                    jblockChanged = true;
+                    rBlockChanged = true;
                 }
 
                 visitedOp = instantiateModality(mod, rb);
@@ -143,7 +143,7 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
 
             // instantiate sub terms
             final Term[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
-            if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
+            if (boundVars != visited.boundVars() || rBlockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final Term newTerm = tb.tf().createTerm(newOp, neededsubs,
                     (ImmutableArray<QuantifiableVariable>) boundVars);

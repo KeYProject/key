@@ -37,7 +37,7 @@ public class RuleAppIndex {
      * //@param filter the TacletFiler filtering the taclets of interest
      *
      * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      */
     public ImmutableList<TacletApp> getTacletAppAt(PosInOccurrence pos,

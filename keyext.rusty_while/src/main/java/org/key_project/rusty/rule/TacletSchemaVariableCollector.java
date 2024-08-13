@@ -49,9 +49,9 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
 
 
     /**
-     * collects all SchemVariables that occur in the JavaBlock
+     * collects all SchemVariables that occur in the RustBlock
      *
-     * @param rb the JavaBlock where to look for Schemavariables
+     * @param rb the RustBlock where to look for Schemavariables
      * @param vars the IList<SchemaVariable> where to add the found SchemaVariables
      * @return the extended list of found schemavariables
      */

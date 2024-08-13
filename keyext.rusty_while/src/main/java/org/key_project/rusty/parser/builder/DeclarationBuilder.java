@@ -92,7 +92,6 @@ public class DeclarationBuilder extends DefaultBuilder {
             ImmutableSet<Sort> oneOf = sortOneOf == null ? ImmutableSet.empty()
                     : Immutables.createSetFrom(sortOneOf);
 
-            // attention: no expand to java.lang here!
             Sort existingSort = sorts().lookup(sortName);
             if (existingSort == null) {
                 Sort s;

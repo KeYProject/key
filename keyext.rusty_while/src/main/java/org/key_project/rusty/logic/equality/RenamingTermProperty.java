@@ -177,7 +177,7 @@ public class RenamingTermProperty implements Property<Term> {
     }
 
     /**
-     * used to encode that <tt>handleJava</tt> results in an unsatisfiable constraint (faster than
+     * used to encode that <tt>handleRusty</tt> results in an unsatisfiable constraint (faster than
      * using exceptions)
      */
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
@@ -339,9 +339,9 @@ public class RenamingTermProperty implements Property<Term> {
     }
 
     /**
-     * Computes the hash code of a Java block modulo bound renaming.
+     * Computes the hash code of a Rust block modulo bound renaming.
      * <p>
-     * The hash code is computed based on the hash code of the program element of the Java block.
+     * The hash code is computed based on the hash code of the program element of the Rust block.
      *
      * @param mod the {@link Modality} to compute the hash code for
      * @return the hash code
@@ -352,7 +352,7 @@ public class RenamingTermProperty implements Property<Term> {
             final RustyProgramElement rpe = rb.program();
             return rpe != null ? RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(rpe) : 0;
         }
-        // if the Java block is empty, we do not add anything to the hash code
+        // if the Rust block is empty, we do not add anything to the hash code
         return 0;
     }
 

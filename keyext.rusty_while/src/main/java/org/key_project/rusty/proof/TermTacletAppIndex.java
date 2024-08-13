@@ -88,7 +88,7 @@ public class TermTacletAppIndex {
      * constrainedFormula described by a PosInOccurrence
      *
      * @param pos the {@link PosInOccurrence} to focus
-     * @param services the {@link Services} object encapsulating information about the java
+     * @param services the {@link Services} object encapsulating information about the Rust
      *        datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -102,7 +102,7 @@ public class TermTacletAppIndex {
      * collects all FindTaclets with instantiations for the given heuristics and position
      *
      * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -126,7 +126,7 @@ public class TermTacletAppIndex {
      *
      * @param pos the PosInOccurrence of the SequentFormula the taclets have to be connected to (pos
      *        must point to the top level formula, i.e. <tt>pos.isTopLevel()</tt> must be true)
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -140,7 +140,7 @@ public class TermTacletAppIndex {
      *
      * @param pos the PosInOccurrence of the SequentFormula the taclets have to be connected to (pos
      *        must point to the top level formula, i.e. <tt>pos.isTopLevel()</tt> must be true)
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */

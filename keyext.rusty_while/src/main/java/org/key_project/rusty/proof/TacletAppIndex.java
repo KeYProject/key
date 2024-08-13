@@ -59,7 +59,7 @@ public class TacletAppIndex {
     /**
      * collects all NoFindTacletInstantiations
      *
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */

@@ -32,7 +32,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      * @param matchCond the MatchConditions with all required instantiations
      * @param goal the Goal the taclet is applied to
      * @param ruleApp the rule application to apply
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      */
     @Override
     protected void applyAdd(Sequent add,

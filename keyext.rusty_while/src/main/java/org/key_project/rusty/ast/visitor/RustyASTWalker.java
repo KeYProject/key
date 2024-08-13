@@ -22,7 +22,7 @@ public abstract class RustyASTWalker {
     private int depth = -1;
 
     /**
-     * create the JavaASTWalker
+     * create the RustyASTWalker
      *
      * @param root the ProgramElement where to begin
      */
@@ -56,7 +56,7 @@ public abstract class RustyASTWalker {
     /**
      * walks through the AST. While keeping track of the current node
      *
-     * @param node the JavaProgramElement the walker is at
+     * @param node the RustyProgramElement the walker is at
      */
     protected void walk(RustyProgramElement node) {
         if (node.getChildCount() > 0) {

@@ -222,7 +222,7 @@ public abstract class TacletApp implements RuleApp {
      * instantiated
      *
      * @param goal the Goal at which the Taclet is applied
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      * @return list of new created goals
      */
     @Override

@@ -86,7 +86,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             // if (genSort instanceof GenericSort) {
             // assert argSorts != null;
             // p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-            // new Name(baseName), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]), false);
+            // new Name(baseName), RustyDLTheory.FORMULA, argSorts.toArray(new Sort[0]), false);
             // }
         }
 

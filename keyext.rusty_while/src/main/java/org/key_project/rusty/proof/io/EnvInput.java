@@ -37,7 +37,7 @@ public interface EnvInput extends Named {
     String readRustPath() throws ProofInputException;
 
     /**
-     * Returns the file path to specific requested Java file.
+     * Returns the file path to specific requested Rust file.
      */
     default @Nullable String getRustFile() throws ProofInputException {
         return null;

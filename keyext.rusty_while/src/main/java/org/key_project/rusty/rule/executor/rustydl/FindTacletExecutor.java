@@ -95,7 +95,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param matchCond the {@link MatchConditions} with all required instantiations
      * @param goal the Goal where the taclet is applied to
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
-     * @param services the {@link Services} encapsulating all Java model information
+     * @param services the {@link Services} encapsulating all Rust model information
      */
     protected abstract void applyAdd(Sequent add, SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
@@ -112,7 +112,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param matchCond the {@link MatchConditions} with all required instantiations
      * @param goal the {@link Goal} on which the taclet is applied
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
-     * @param services the {@link Services} encapsulating all Java model information
+     * @param services the {@link Services} encapsulating all Rust model information
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt,
             SequentChangeInfo currentSequent, PosInOccurrence posOfFind, MatchConditions matchCond,

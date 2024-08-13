@@ -104,9 +104,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     /**
-     * looks up and returns the sort of the given name or null if none has been found. If the sort
-     * is not found for the first time, the name is expanded with "java.lang." and the look-up
-     * restarts
+     * looks up and returns the sort of the given name or null if none has been found
      */
     protected Sort lookupSort(String name) {
         return sorts().lookup(new Name(name));
@@ -114,7 +112,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     /**
      * looks up a function, (program) variable or static query of the given name varfunc_id and the
-     * argument terms args in the namespaces and java info.
+     * argument terms args in the namespaces and Rust info.
      *
      * @param varfuncName the String with the symbols name
      */

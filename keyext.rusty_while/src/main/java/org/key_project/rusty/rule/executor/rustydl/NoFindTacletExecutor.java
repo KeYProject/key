@@ -22,7 +22,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * the rule is applied on the given goal using the information of rule application.
      *
      * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      * @param ruleApp the taclet application that is executed
      */
     @Override
@@ -71,7 +71,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param add the Sequent to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the
      *        taclet
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      * @param matchCond the MatchConditions with all required instantiations
      */
     protected void applyAdd(Sequent add,

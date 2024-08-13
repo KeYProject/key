@@ -76,7 +76,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     /**
      * Given a raw modality string, this method determines the operator name.
      */
-    public static String operatorOfJavaBlock(String raw) {
+    public static String operatorOfRustyBlock(String raw) {
         if (raw.startsWith("\\<")) {
             return "diamond";
         }
@@ -615,11 +615,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         return modalityKinds;
     }
 
-    protected void enableJavaSchemaMode() {
+    protected void enableRustySchemaMode() {
         rustySchemaModeAllowed = true;
     }
 
-    protected void disableJavaSchemaMode() {
+    protected void disableRustySchemaMode() {
         rustySchemaModeAllowed = false;
     }
 
@@ -627,7 +627,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         PairOfStringAndRustyBlock srb = new PairOfStringAndRustyBlock();
         String s = t.getText().trim();
         String cleanRusty = trimRustyBlock(s);
-        srb.opName = operatorOfJavaBlock(s);
+        srb.opName = operatorOfRustyBlock(s);
 
         try {
             try {

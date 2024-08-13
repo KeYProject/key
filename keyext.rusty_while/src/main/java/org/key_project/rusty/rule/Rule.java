@@ -15,7 +15,7 @@ public interface Rule extends Named {
      * the rule is applied on the given goal using the information of rule application.
      *
      * @param goal the Goal on which to apply <tt>ruleApp</tt>
-     * @param services the Services with the necessary information about the java programs
+     * @param services the Services with the necessary information about the Rust programs
      * @param ruleApp the rule application to be executed
      * @return all open goals below \old(goal.node()), i.e. the goals resulting from the rule
      *         application

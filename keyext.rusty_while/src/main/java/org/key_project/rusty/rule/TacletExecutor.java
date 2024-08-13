@@ -32,7 +32,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      * applies the given rule application to the specified goal
      *
      * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      * @param ruleApp the rule application that is executed.
      * @return List of the goals created by the rule which have to be proved. If this is a
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
@@ -161,7 +161,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      *
      * @param rules the rules to be added
      * @param goal the goal describing the node where the rules should be added
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      */
@@ -228,7 +228,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      *        rewritten
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      */
     protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
@@ -251,7 +251,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      * @param goal the Goal that knows the node the formulae have to be added
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      */
     protected void addToSucc(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
@@ -270,7 +270,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      *        taclet
      * @param pos the PosInOccurrence describing the place in the sequent
      * @param matchCond the MatchConditions containing in particular
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      */
     protected void replaceAtPos(Semisequent semi,
             SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
@@ -293,7 +293,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
      *        (only looked at if pos == null)
      * @param matchCond the MatchConditions containing in particular
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      */
     private void addToPos(Semisequent semi, SequentChangeInfo currentSequent, PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, boolean antec,
@@ -350,7 +350,7 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @param mc the {@link MatchConditions} with all instantiations and the constraint
      * @param goal the {@link Goal} on which this taclet is applied
      * @param ruleApp the {@link RuleApp} with application information
-     * @param services the {@link Services} with the Java model information
+     * @param services the {@link Services} with the Rust model information
      * @return the (partially) instantiated term
      */
     protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,

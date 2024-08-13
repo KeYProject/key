@@ -218,7 +218,7 @@ public class TacletIndex {
     /**
      * get all Taclets having no find expression.
      *
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return IList<NoPosTacletApp> containing all applicable rules and an empty part for the
      *         instantiations because no instantiations are necessary.
@@ -253,7 +253,7 @@ public class TacletIndex {
      * get all Taclets for the antecedent.
      *
      * @param pos the PosOfOccurrence describing the formula for which to look for top level taclets
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return IList<NoPosTacletApp> containing all applicable rules and the corresponding
      *         instantiations to get the rule fit.
@@ -267,7 +267,7 @@ public class TacletIndex {
      * get all Taclets for the succedent.
      *
      * @param pos the PosOfOccurrence describing the formula for which to look for top level taclets
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return IList<NoPosTacletApp> containing all applicable rules and the corresponding
      *         instantiations to get the rule fit.
@@ -296,7 +296,7 @@ public class TacletIndex {
      * returns a list of Taclets and instantiations from the given list of taclets with respect to
      * term and the filter object.
      *
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      */
     private ImmutableList<NoPosTacletApp> getFindTaclet(ImmutableList<NoPosTacletApp> taclets,
@@ -307,7 +307,7 @@ public class TacletIndex {
     /**
      * get all Rewrite-Taclets.
      *
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
      * @return IList<NoPosTacletApp> containing all applicable rules and the corresponding
      *         instantiations to get the rule fit.
@@ -322,10 +322,10 @@ public class TacletIndex {
     /**
      * creates and returns a selection from the given map of NoPosTacletApps that are compatible
      * with the given term. It is assumed that the map (key -> value mapping) (1) contains keys with
-     * the top operator of its value, if no java block is involved on top level of the value and no
-     * update is on top level (2) contains keys with the class of its top Java operator of its
-     * value's java block, if a java block is involved on the top level (3) contains keys with the
-     * special 'operators' PROGSVOP and DEFAULTSVOP if the top Java operator or top operator (resp.)
+     * the top operator of its value, if no Rust block is involved on top level of the value and no
+     * update is on top level (2) contains keys with the class of its top Rust operator of its
+     * value's Rust block, if a Rust block is involved on the top level (3) contains keys with the
+     * special 'operators' PROGSVOP and DEFAULTSVOP if the top Rust operator or top operator (resp.)
      * of the value is a program (or variable, resp.) schema variable. (4) contains keys with the
      * sort of the value if this is an other schema variable. If updates are on top level, they are
      * ignored; and indexing starts on the first level beneath updates.
@@ -447,12 +447,12 @@ public class TacletIndex {
     }
 
     /**
-     * Inner class to track the occurrences of prefix elements in java blocks
+     * Inner class to track the occurrences of prefix elements in Rust blocks
      */
     private static class PrefixOccurrences {
 
         /**
-         * the classes that represent prefix elements of a java block
+         * the classes that represent prefix elements of a Rust block
          */
         static final Class<?>[] prefixClasses =
             new Class<?>[] { BlockExpression.class };

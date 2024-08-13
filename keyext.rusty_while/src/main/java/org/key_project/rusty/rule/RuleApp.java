@@ -27,7 +27,7 @@ public interface RuleApp {
      * instantiated
      *
      * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all java information
+     * @param services the Services encapsulating all Rust information
      * @return list of new created goals
      */
     @Nullable
