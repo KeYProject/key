@@ -3,14 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import java.util.Iterator;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.op.Quantifier;
+import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.util.TacletForTests;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +30,9 @@ public class TestApplyTaclet {
         "", "\\forall s z; p(z)",
         "(A -> B) -> (!(!(A -> B)))", "(A -> B) -> (!(!(A -> B)))",
         "(A -> B) -> (!(!(A -> B)))", "",
-        "", "\\<{x=3u32}\\>A"
+        "", "\\<{x=3u32}\\>A",
+        "A & B", "",
+        "", ""
     };
     Proof[] proof;
 
@@ -285,5 +293,133 @@ public class TestApplyTaclet {
                 "D is in succedent of first new goal, but not in antecedent "
                     + "of second new goal");
         }
+    }
+
+    @Test
+    public void testIncompleteNoFindTacletApp() {
+        NoPosTacletApp cut = TacletForTests.getRules().lookup(new Name("TestApplyTaclet_cut"));
+        assertFalse(cut.complete(), "TacletApp should not be complete, as b is not instantiated");
+        SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
+        assertTrue(cut.uninstantiatedVars().contains(b),
+            "b should be in the set of not instantiated SVs");
+    }
+
+    @Test
+    public void testIncompleteSuccTacletApp() {
+        TacletApp orright = TacletForTests.getRules().lookup(new Name("or_right"));
+        assertFalse(orright.complete(),
+            "TacletApp should not be complete, as SVs are not instantiated");
+
+        Services services = TacletForTests.services();
+        SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
+        SchemaVariable c = TacletForTests.getSchemaVariables().lookup(new Name("c"));
+        assertEquals(orright.uninstantiatedVars(),
+            DefaultImmutableSet.<SchemaVariable>nil().add(b).add(c),
+            "b and c should be in the set of not instantiated SVs");
+        orright = orright.addInstantiation(b, TacletForTests.parseTerm("A"), false, services);
+        assertFalse(orright.complete(),
+            "TacletApp should not be complete, as B is not instantiated");
+        orright = orright.addInstantiation(c, TacletForTests.parseTerm("B"), false, services);
+        assertFalse(orright.complete(), "TacletApp should not be complete, as Position unknown");
+        Sequent seq = proof[0].root().sequent();
+        orright = orright.setPosInOccurrence(
+            new PosInOccurrence(seq.succedent().get(0), PosInTerm.getTopLevel(), false), services);
+        assertTrue(orright.complete(),
+            "TacletApp should now be complete with Position set and SVs " + "instantiated");
+    }
+
+    @Test
+    public void testPrgTacletApp() {
+        // TODO
+    }
+
+    @Test
+    public void testBugBrokenApply() {
+        // several times the following bug got broken
+        // The application of
+        // 'find (b==>) replacewith(b==>); add (==>b);'
+        // resulted in
+        // ==> , b==>b instead of
+        // b==> , b==>b
+        NoPosTacletApp cdr =
+            TacletForTests.getRules().lookup(new Name("TestApplyTaclet_cut_direct_r"));
+
+        Sequent seq = proof[1].root().sequent();
+        PosInOccurrence pio =
+            new PosInOccurrence(seq.succedent().get(0), PosInTerm.getTopLevel(), false);
+        TacletIndex tacletIndex = new TacletIndex();
+        tacletIndex.add(cdr);
+        Goal goal = createGoal(proof[1].root(), tacletIndex);
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAt(pio, null);
+        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services);
+
+        assertEquals(2, goals.size(), "Expected two goals");
+        assertTrue(
+            goals.head().sequent().antecedent().size() == 1
+                    && goals.head().sequent().antecedent().iterator().next().formula()
+                            .op() == Quantifier.ALL
+                    && goals.head().sequent().succedent().size() == 1
+                    && goals.head().sequent().succedent().iterator().next().formula()
+                            .op() == Quantifier.ALL,
+            "First goal should be 'b==>b', but is " + goals.head().sequent());
+        goals = goals.tail();
+        assertTrue(
+            goals.head().sequent().antecedent().size() == 0
+                    && goals.head().sequent().succedent().size() == 1
+                    && goals.head().sequent().succedent().iterator().next().formula()
+                            .op() == Quantifier.ALL,
+            "Second goal should be '==>b', but is " + goals.head().sequent());
+    }
+
+    @Test
+    public void testBugID176() {
+        // the last time the bug above had been fixed, the hidden
+        // taclets got broken (did not hide anymore)
+        // also known as bug #176
+        NoPosTacletApp hide_r =
+            TacletForTests.getRules().lookup(new Name("TestApplyTaclet_hide_r"));
+
+        Sequent seq = proof[1].root().sequent();
+        PosInOccurrence pio =
+            new PosInOccurrence(seq.succedent().get(0), PosInTerm.getTopLevel(), false);
+        TacletIndex tacletIndex = new TacletIndex();
+        tacletIndex.add(hide_r);
+        Goal goal = createGoal(proof[1].root(), tacletIndex);
+
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAt(pio, null);
+        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+
+        assertEquals(1, goals.size(), "Expected one goal");
+        assertTrue(goals.head().sequent().isEmpty(),
+            "Expected '==>', but is " + goals.head().sequent());
+
+    }
+
+    @Test
+    public void testBugID177() {
+        // bug #177
+        NoPosTacletApp al = TacletForTests.getRules().lookup(new Name("and_left"));
+
+        Sequent seq = proof[5].root().sequent();
+        PosInOccurrence pio =
+            new PosInOccurrence(seq.antecedent().get(0), PosInTerm.getTopLevel(), true);
+        TacletIndex tacletIndex = new TacletIndex();
+        tacletIndex.add(al);
+        Goal goal = createGoal(proof[5].root(), tacletIndex);
+
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAt(pio, null);
+        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+
+
+        assertEquals(1, goals.size(), "Expected one goal");
+        Iterator<SequentFormula> it = goals.head().sequent().antecedent().iterator();
+        assertTrue(
+            goals.head().sequent().antecedent().size() == 2
+                    && it.next().formula().equals(TacletForTests.parseTerm("A"))
+                    && it.next().formula().equals(TacletForTests.parseTerm("B")),
+            "Expected 'A, B ==>', but is " + goals.head().sequent());
     }
 }
