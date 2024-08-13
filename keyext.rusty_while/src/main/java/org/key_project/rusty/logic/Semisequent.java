@@ -369,6 +369,21 @@ public class Semisequent implements Iterable<SequentFormula> {
         return sci;
     }
 
+    /**
+     * replaces the element at place idx with sequentFormula
+     *
+     * @param pos the PosInOccurrence describing the position of and within the formula below which
+     *        the formula differs from the new formula <code>sequentFormula</code>
+     * @param sequentFormula the SequentFormula replacing the old element at index idx
+     * @return a semi sequent change information object with the new semisequent and information
+     *         which formulas have been added or removed
+     */
+    public SemisequentChangeInfo replace(PosInOccurrence pos, SequentFormula sequentFormula) {
+        final int idx = indexOf(pos.sequentFormula());
+        final FormulaChangeInfo fci = new FormulaChangeInfo(pos, sequentFormula);
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
+    }
+
     // inner class used to represent an empty semisequent
     private static class Empty extends Semisequent {
 

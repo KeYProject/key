@@ -17,7 +17,7 @@ public class NamespaceSet {
     private Namespace<@NonNull ProgramVariable> progVarNS = new Namespace<>();
     // TODO: Operators should not be local to goals
     private Namespace<@NonNull Function> funcNS = new Namespace<>();
-    private Namespace<@NonNull RuleSet> ruleSetNS = new Namespace<RuleSet>();
+    private Namespace<@NonNull RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<@NonNull Sort> sortNS = new Namespace<>();
 
     public NamespaceSet() {}

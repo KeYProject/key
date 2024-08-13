@@ -712,4 +712,14 @@ public abstract class TacletApp implements RuleApp {
      */
     protected abstract TacletApp setAllInstantiations(MatchConditions mc,
             ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services);
+
+    /**
+     * adds a new instantiation to this TacletApp
+     *
+     * @param sv the SchemaVariable to be instantiated
+     * @param term the Term the SchemaVariable is instantiated with
+     * @return the new TacletApp
+     */
+    public abstract TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+            Services services);
 }

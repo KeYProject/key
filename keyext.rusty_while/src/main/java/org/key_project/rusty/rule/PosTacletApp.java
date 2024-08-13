@@ -182,4 +182,28 @@ public class PosTacletApp extends TacletApp {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(), ifInstantiations,
             posInOccurrence(), services);
     }
+
+    /**
+     * adds a new instantiation to this TacletApp
+     *
+     * @param sv the SchemaVariable to be instantiated
+     * @param term the Term the SchemaVariable is instantiated with
+     * @return the new TacletApp
+     */
+    @Override
+    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+            Services services) {
+
+        /*
+         * if (interesting) {
+         * return createPosTacletApp((FindTaclet) taclet(),
+         * instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
+         * posInOccurrence(), services);
+         * } else
+         */ {
+            return createPosTacletApp((FindTaclet) taclet(),
+                instantiations().add(sv, term, services), ifFormulaInstantiations(),
+                posInOccurrence(), services);
+        }
+    }
 }

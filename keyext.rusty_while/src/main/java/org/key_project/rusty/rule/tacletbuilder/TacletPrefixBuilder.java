@@ -125,7 +125,6 @@ public class TacletPrefixBuilder {
         visit(tacletBuilder.ifSequent());
 
         if (tacletBuilder instanceof FindTacletBuilder) {
-            @SuppressWarnings("unchecked")
             final Term find = ((FindTacletBuilder<? extends FindTaclet>) tacletBuilder).getFind();
             visit(find);
         }
@@ -162,7 +161,6 @@ public class TacletPrefixBuilder {
 
 
     private boolean atMostOneRepl() {
-        @SuppressWarnings("unchecked")
         RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder =
             (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
         int count = 0;
@@ -180,7 +178,6 @@ public class TacletPrefixBuilder {
     }
 
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
-        @SuppressWarnings("unchecked")
         RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder =
             (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
         TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();

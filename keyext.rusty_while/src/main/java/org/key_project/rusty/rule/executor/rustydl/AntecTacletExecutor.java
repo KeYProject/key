@@ -11,6 +11,7 @@ import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.AntecTaclet;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.RuleApp;
+import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
@@ -30,13 +31,27 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
     protected void applyAdd(Sequent add, SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services) {
-        throw new RuntimeException("TODO @ DD");
+        addToAntec(add.antecedent(), currentSequent, whereToAdd,
+            posOfFind, matchCond, goal, ruleApp, services);
+        addToSucc(add.succedent(), currentSequent, null,
+            posOfFind, matchCond, goal, ruleApp, services);
     }
 
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp,
             Services services) {
-        throw new RuntimeException("TODO @ DD");
+        if (gt instanceof AntecSuccTacletGoalTemplate astgt) {
+            final Sequent replWith = astgt.replaceWith();
+            replaceAtPos(replWith.antecedent(), currentSequent, posOfFind,
+                matchCond,
+                goal, ruleApp, services);
+            if (!replWith.succedent().isEmpty()) {
+                addToSucc(replWith.succedent(),
+                    currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
+            }
+        } else {
+            // Then there was no replacewith...
+        }
     }
 }

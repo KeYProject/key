@@ -3,15 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.executor.rustydl;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.PosInOccurrence;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentChangeInfo;
+import org.key_project.rusty.logic.*;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.RewriteTaclet;
 import org.key_project.rusty.rule.RuleApp;
+import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
+import org.key_project.util.collection.ImmutableArray;
 
 public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         extends FindTacletExecutor<TacletKind> {
@@ -59,6 +62,63 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
     protected void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp,
             Services services) {
+        if (gt instanceof RewriteTacletGoalTemplate rwtgt) {
+            final SequentFormula cf = applyReplacewithHelper(goal,
+                rwtgt, posOfFind, services, matchCond, ruleApp);
+            currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
+        } else {
+            // Then there was no replacewith...
+            // This is strange in a RewriteTaclet, but who knows...
+            // However, term label refactorings have to be performed.
+            throw new RuntimeException("TODO @ DD");
+        }
+    }
 
+    private SequentFormula applyReplacewithHelper(Goal goal,
+            RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind, Services services,
+            MatchConditions matchCond, RuleApp ruleApp) {
+        final Term term = posOfFind.sequentFormula().formula();
+        final IntIterator it = posOfFind.posInTerm().iterator();
+        final Term rwTemplate = gt.replaceWith();
+
+        Term formula = replace(term, rwTemplate,
+            posOfFind, it, matchCond, term.sort(), goal, services, ruleApp);
+        if (term == formula) {
+            return posOfFind.sequentFormula();
+        } else {
+            return new SequentFormula(formula);
+        }
+    }
+
+    /**
+     * does the work for applyReplacewith (wraps recursion)
+     */
+    private Term replace(Term term, Term with, PosInOccurrence posOfFind, IntIterator it,
+            MatchConditions mc, Sort maxSort, Goal goal, Services services, RuleApp ruleApp) {
+        if (it.hasNext()) {
+            final int indexOfNextSubTerm = it.next();
+
+            final Term[] subs = new Term[term.arity()];
+            term.subs().arraycopy(0, subs, 0, term.arity());
+
+            final Sort newMaxSort = maxSort; // TODO? TermHelper.getMaxSort(term,
+                                             // indexOfNextSubTerm);
+            subs[indexOfNextSubTerm] = replace(term.sub(indexOfNextSubTerm), with, posOfFind, it,
+                mc, newMaxSort, goal, services, ruleApp);
+
+            return services.getTermFactory().createTerm(term.op(), subs,
+                (ImmutableArray<QuantifiableVariable>) term.boundVars());
+        }
+
+        with = syntacticalReplace(with, posOfFind, mc, goal, ruleApp,
+            services);
+
+        /*
+         * if (!with.sort().extendsTrans(maxSort)) {
+         * with = services.getTermBuilder().cast(maxSort, with);
+         * }
+         */
+
+        return with;
     }
 }

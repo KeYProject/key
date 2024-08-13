@@ -295,6 +295,22 @@ public class Sequent implements Iterable<SequentFormula> {
             semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
+    /**
+     * replaces the formula at the given position with another one (NOTICE:Sequent determines index
+     * using identity (==) not equality.)
+     *
+     * @param newCF the SequentFormula replacing the old one
+     * @param p a PosInOccurrence describes position in the sequent
+     * @return a SequentChangeInfo which contains the new sequent and information which formulas
+     *         have been added or removed
+     */
+    public SequentChangeInfo changeFormula(SequentFormula newCF, PosInOccurrence p) {
+        final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, newCF);
+
+        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
+            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+    }
+
     private static final class NILSequent extends Sequent {
         private static final NILSequent INSTANCE = new NILSequent();
 

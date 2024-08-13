@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestApplyTaclet {
     final static String[] strings = {
@@ -191,5 +190,100 @@ public class TestApplyTaclet {
          * rApp.complete()); IList<Goal> goals=rApp.execute(goal, TacletForTests.services());
          * assertTrue("Too many goals for close.", goals.size()==0);
          */
+    }
+
+    @Test
+    public void testAntecTacletWithoutIf() {
+        Term fma = proof[3].root().sequent().antecedent().getFirst().formula();
+        NoPosTacletApp impleft = TacletForTests.getRules().lookup(new Name("imp_left"));
+        TacletIndex tacletIndex = new TacletIndex();
+        tacletIndex.add(impleft);
+        Goal goal = createGoal(proof[3].root(), tacletIndex);
+        PosInOccurrence applyPos = new PosInOccurrence(goal.sequent().antecedent().getFirst(),
+            PosInTerm.getTopLevel(), true);
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAt(applyPos, null);
+        assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
+        RuleApp rApp = rApplist.head();
+        assertTrue(rApp.complete(), "Rule App should be complete");
+        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        assertEquals(2, goals.size(), "Too many or zero goals for imp-left.");
+        Sequent seq = goals.head().sequent();
+        if (!seq.succedent().isEmpty()) {
+            assertEquals(seq.succedent().getFirst().formula(), fma.sub(0),
+                "Wrong succedent after imp-left");
+            goals = goals.tail();
+            seq = goals.head().getNode().sequent();
+            assertEquals(seq.antecedent().getFirst().formula(), fma.sub(1),
+                "Wrong antecedent after imp-left");
+        } else {
+            assertEquals(seq.antecedent().getFirst().formula(), fma.sub(1),
+                "Wrong antecedent after imp-left");
+            goals = goals.tail();
+            seq = goals.head().getNode().sequent();
+
+            assertEquals(seq.succedent().getFirst().formula(), fma.sub(0),
+                "Wrong succedent after imp-left");
+        }
+    }
+
+    @Test
+    public void testRewriteTacletWithoutIf() {
+        NoPosTacletApp contradiction =
+            TacletForTests.getRules().lookup(new Name("TestApplyTaclet_contradiction"));
+        TacletIndex tacletIndex = new TacletIndex();
+        tacletIndex.add(contradiction);
+        Goal goal = createGoal(proof[0].root(), tacletIndex);
+        PosInOccurrence pos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+            PosInTerm.getTopLevel().down(1).down(0).down(0), false);
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAt(pos, null);
+
+        assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
+        RuleApp rApp = rApplist.head();
+        assertTrue(rApp.complete(), "Rule App should be complete");
+        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        assertEquals(1, goals.size(), "Too many or zero goals for contradiction.");
+        Sequent seq = goals.head().sequent();
+        Term term = seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
+        assertEquals(term, TacletForTests.parseTerm("!B -> !A"));
+    }
+
+
+    @Test
+    public void testNoFindTacletWithoutIf() {
+        NoPosTacletApp cut = TacletForTests.getRules().lookup(new Name("TestApplyTaclet_cut"));
+        TacletIndex tacletIndex = new TacletIndex();
+        Term t_c = TacletForTests.parseTerm("D");
+        tacletIndex.add(cut);
+        Goal goal = createGoal(proof[0].root(), tacletIndex);
+        PosInOccurrence pos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+            PosInTerm.getTopLevel(), false);
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAt(pos, null);
+        assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
+        TacletApp rApp = rApplist.head().addInstantiation(
+            TacletForTests.getSchemaVariables().lookup(new Name("b")), t_c, false,
+            proof[0].getServices());
+        assertTrue(rApp.complete(), "Rule App should be complete");
+        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        assertEquals(2, goals.size(), "Too many or too few goals.");
+        Sequent seq1 = goals.head().sequent();
+        goals = goals.tail();
+        Sequent seq2 = goals.head().sequent();
+        if (!seq1.antecedent().isEmpty() && seq1.antecedent().getFirst().formula().equals(t_c)) {
+            assertTrue(
+                seq2.succedent().getFirst().formula().equals(t_c)
+                        || seq2.succedent().get(1).formula().equals(t_c),
+                "D is in antecedent of 1st goal but not in succedent of 2nd");
+        } else {
+            assertTrue(
+                seq1.succedent().getFirst().formula().equals(t_c)
+                        || seq1.succedent().get(1).formula().equals(t_c),
+                "D is not in antecedent and not in succedent " + "of first new goal");
+            assertEquals(seq2.antecedent().getFirst().formula(), t_c,
+                "D is in succedent of first new goal, but not in antecedent "
+                    + "of second new goal");
+        }
     }
 }

@@ -288,7 +288,7 @@ public class TacletIndex {
             getFindTaclet(getList(rwList, pos.subTerm(), true), pos, services);
         final ImmutableList<NoPosTacletApp> seqTaclets =
             getFindTaclet(getList(findTaclets, pos.subTerm(), true), pos, services);
-        return rwTaclets.size() > 0 ? rwTaclets.prependReverse(seqTaclets)
+        return !rwTaclets.isEmpty() ? rwTaclets.prependReverse(seqTaclets)
                 : seqTaclets.prependReverse(rwTaclets);
     }
 
