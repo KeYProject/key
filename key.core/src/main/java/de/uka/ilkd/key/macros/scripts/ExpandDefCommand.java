@@ -90,14 +90,15 @@ public class ExpandDefCommand extends AbstractCommand<ExpandDefCommand.Parameter
                     getTacletAppAtAndBelow(FILTER, new PosInOccurrence(succForm, PosInTerm.getTopLevel(), false), proof.getServices()));
         }
 
+        TermComparisonWithHoles tc = new TermComparisonWithHoles(proof.getServices());
         if (p.on != null) {
             apps = apps.filter(
                     it -> it instanceof PosTacletApp &&
-                          it.posInOccurrence().subTerm().equalsModTermLabels(p.on));
+                          tc.compareModHoles(p.on, it.posInOccurrence().subTerm()));
         } else if (p.formula != null) {
             apps = apps.filter(
                     it -> it instanceof PosTacletApp &&
-                          it.posInOccurrence().sequentFormula().formula().equalsModTermLabels(p.formula));
+                          tc.compareModHoles(p.formula, it.posInOccurrence().sequentFormula().formula()));
         } else {
             throw new ScriptException("Either 'formula' or 'on' must be specified");
         }
