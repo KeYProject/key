@@ -19,10 +19,10 @@ public interface Rule extends org.key_project.ncore.rules.Rule<Goal, RuleApp>, H
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
-     * @param goal    the Goal on which to apply <tt>ruleApp</tt>
+     * @param goal the Goal on which to apply <tt>ruleApp</tt>
      * @param ruleApp the rule application to be executed
      * @return all open goals below \old(goal.node()), i.e. the goals resulting from the rule
-     * application
+     *         application
      * @throws RuleAbortException when this rule was aborted
      */
     @NonNull

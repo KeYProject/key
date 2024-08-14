@@ -53,8 +53,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
                 term.getLabels());
         }
 
-        with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp
-        );
+        with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp);
 
         if (!with.sort().extendsTrans(maxSort)) {
             with = services.getTermBuilder().cast(maxSort, with);

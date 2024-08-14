@@ -212,7 +212,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     @Override
     public @NonNull ImmutableList<Goal> apply(final Goal goal,
-                                              final RuleApp ruleApp) throws RuleAbortException {
+            final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractExternalBuiltInRuleApp;
         LoopContractExternalBuiltInRuleApp application =
             (LoopContractExternalBuiltInRuleApp) ruleApp;

@@ -65,18 +65,18 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *
-     * @param termLabelState             the termlabel state
-     * @param labelHint                  hints about how to deal with labels
+     * @param termLabelState the termlabel state
+     * @param labelHint hints about how to deal with labels
      * @param applicationPosInOccurrence the application position
-     * @param svInst                     mapping of schemavariables to their instantiation
-     * @param goal                       the current goal
-     * @param rule                       the applied rule
-     * @param ruleApp                    the rule application
-     * @param useTermCache               the TermBuilder to use (allows to use the non cached version)
+     * @param svInst mapping of schemavariables to their instantiation
+     * @param goal the current goal
+     * @param rule the applied rule
+     * @param ruleApp the rule application
+     * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
     private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-                                      PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
-                                      Rule rule, RuleApp ruleApp, boolean useTermCache) {
+            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
+            Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = goal.getOverlayServices();
         this.tb = services.getTermBuilder(useTermCache);
@@ -96,24 +96,24 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *
-     * @param termLabelState             the termlabel state
-     * @param labelHint                  hints about how to deal with labels
+     * @param termLabelState the termlabel state
+     * @param labelHint hints about how to deal with labels
      * @param applicationPosInOccurrence the application position
-     * @param svInst                     mapping of schemavariables to their instantiation
-     * @param goal                       the current goal
-     * @param rule                       the applied rule
-     * @param ruleApp                    the rule application
+     * @param svInst mapping of schemavariables to their instantiation
+     * @param goal the current goal
+     * @param rule the applied rule
+     * @param ruleApp the rule application
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
             Rule rule, RuleApp ruleApp) {
         this(termLabelState, labelHint, applicationPosInOccurrence, svInst, goal, rule, ruleApp,
-                true);
+            true);
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-                                     PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
-                                     boolean useTermCache) {
+            PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
+            boolean useTermCache) {
         this(termLabelState, labelHint, applicationPosInOccurrence,
             SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, useTermCache);
     }

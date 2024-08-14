@@ -22,7 +22,7 @@ public interface RuleApp<G extends ProofGoal> {
      * @return list of new created goals
      */
     @Nullable
-     ImmutableList<G> execute(G goal);
+    ImmutableList<G> execute(G goal);
 
     /**
      * returns true if all variables are instantiated

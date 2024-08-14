@@ -313,8 +313,8 @@ public final class AuxiliaryContractBuilders {
         private final Services services;
 
         /**
-         * @param goal                 If this is not null, all created variables are added to it. If it is null,
-         *                             the variables are instead added to the {@code services}' namespace.
+         * @param goal If this is not null, all created variables are added to it. If it is null,
+         *        the variables are instead added to the {@code services}' namespace.
          * @param placeholderVariables the placeholders from which to create the variables.
          */
         public VariablesCreatorAndRegistrar(final Goal goal,

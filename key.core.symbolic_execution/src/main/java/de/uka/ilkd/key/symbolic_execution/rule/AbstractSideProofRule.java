@@ -76,10 +76,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * New used names are automatically added to the {@link Namespace} of the {@link Services}.
      * </p>
      *
-     * @param goal                 The {@link Goal} on which this {@link BuiltInRule} should be applied on.
+     * @param goal The {@link Goal} on which this {@link BuiltInRule} should be applied on.
      * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
-     * @param sequentToProve       The {@link Sequent} to prove in a side proof.
-     * @param newPredicate         The {@link JFunction} which is used to compute the result.
+     * @param sequentToProve The {@link Sequent} to prove in a side proof.
+     * @param newPredicate The {@link JFunction} which is used to compute the result.
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */

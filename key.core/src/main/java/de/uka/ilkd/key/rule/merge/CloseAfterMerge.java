@@ -96,7 +96,7 @@ public class CloseAfterMerge implements BuiltInRule {
 
     @Override
     public @NonNull ImmutableList<Goal> apply(final Goal goal,
-                                              final RuleApp ruleApp) throws RuleAbortException {
+            final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 
         assert ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp : //

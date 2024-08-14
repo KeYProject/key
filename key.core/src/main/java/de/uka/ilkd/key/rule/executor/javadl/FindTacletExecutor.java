@@ -76,7 +76,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
-     * @param goal    the goal that the rule application should refer to.
+     * @param goal the goal that the rule application should refer to.
      * @param ruleApp the taclet application that is executed.
      */
     @Override

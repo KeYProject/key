@@ -232,7 +232,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      * {U}{ x := modelMethod(heap, obj, params) }[...]post.
      */
     private ImmutableList<Goal> applyForMethods(Goal goal, Instantiation inst,
-                                                RuleApp ruleApp) {
+            RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         final JavaBlock jb = inst.progPost.javaBlock();
         final var services = goal.getOverlayServices();

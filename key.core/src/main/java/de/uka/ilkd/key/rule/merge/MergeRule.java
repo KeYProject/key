@@ -130,7 +130,7 @@ public class MergeRule implements BuiltInRule {
 
     @Override
     public final @NonNull ImmutableList<Goal> apply(Goal goal,
-                                                    RuleApp ruleApp)
+            RuleApp ruleApp)
             throws RuleAbortException {
 
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
