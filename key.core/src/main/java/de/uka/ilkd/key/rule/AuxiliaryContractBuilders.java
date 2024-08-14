@@ -48,6 +48,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -317,11 +319,22 @@ public final class AuxiliaryContractBuilders {
          *        the variables are instead added to the {@code services}' namespace.
          * @param placeholderVariables the placeholders from which to create the variables.
          */
-        public VariablesCreatorAndRegistrar(final Goal goal,
+        public VariablesCreatorAndRegistrar(final @NonNull Goal goal,
                 final Variables placeholderVariables) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
             this.services = goal.getOverlayServices();
+        }
+
+        /**
+         * @param services services.
+         * @param placeholderVariables the placeholders from which to create the variables.
+         */
+        public VariablesCreatorAndRegistrar(final @NonNull Services services,
+                final Variables placeholderVariables) {
+            this.goal = null;
+            this.placeholderVariables = placeholderVariables;
+            this.services = services;
         }
 
         /**
