@@ -374,7 +374,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+        final var services = goal.getOverlayServices();
         // collect information
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final PosInOccurrence pio = ruleApp.posInOccurrence();

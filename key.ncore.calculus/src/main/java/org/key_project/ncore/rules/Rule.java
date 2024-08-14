@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-public interface Rule extends Named {
+public interface Rule <G extends ProofGoal, App extends RuleApp<G>> extends Named {
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
@@ -21,7 +21,7 @@ public interface Rule extends Named {
      * @throws RuleAbortException when this rule was aborted
      */
     @NonNull
-    <G extends ProofGoal> ImmutableList<G> apply(G goal, RuleApp ruleApp)
+    ImmutableList<G> apply(G goal, App ruleApp)
             throws RuleAbortException;
 
     /**

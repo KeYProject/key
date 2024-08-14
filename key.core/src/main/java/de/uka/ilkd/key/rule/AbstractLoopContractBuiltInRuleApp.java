@@ -60,7 +60,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
         }
         final Services services = goal.proof().getServices();
         final AbstractLoopContractRule.Instantiation instantiation =
-            rule.instantiate(posInOccurrence().subTerm(), goal, services);
+            rule.instantiate(posInOccurrence().subTerm(), goal);
         final ImmutableSet<LoopContract> contracts =
             AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement());

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.smt;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
@@ -102,13 +101,12 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
          * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
          * with the same sequent as the given one.
          *
-         * @param goal the Goal on which to apply <tt>ruleApp</tt>
-         * @param services the Services with the necessary information about the java programs
+         * @param goal    the Goal on which to apply <tt>ruleApp</tt>
          * @param ruleApp the rule application to be executed
          * @return a list with an identical goal as the given <tt>goal</tt>
          */
         @Override
-        public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+        public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
                 goal.proof().getInitConfig().registerRule(RULE, () -> false);
             }

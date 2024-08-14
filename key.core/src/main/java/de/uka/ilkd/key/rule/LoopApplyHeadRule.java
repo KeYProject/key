@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
@@ -64,7 +63,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
     public static final Name NAME = new Name("Loop Apply Head");
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp application)
             throws RuleAbortException {
         assert application instanceof LoopApplyHeadBuiltInRuleApp;
         LoopApplyHeadBuiltInRuleApp ruleApp = (LoopApplyHeadBuiltInRuleApp) application;
@@ -75,7 +74,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         StatementBlock block = new StatementBlock(
             new While(someContract.getGuard(), someContract.getBody()), someContract.getTail());
         StatementBlock headAndBlock = new StatementBlock(someContract.getHead(), block);
-
+        var services = goal.getOverlayServices();
         TermBuilder tb = services.getTermBuilder();
         AbstractLoopContractRule.Instantiation instantiation = ruleApp.instantiation;
         Modality modality = instantiation.modality();
@@ -136,8 +135,8 @@ public class LoopApplyHeadRule implements BuiltInRule {
         }
 
         final AbstractLoopContractRule.Instantiation instantiation =
-            new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
-                goal.proof().getServices()).instantiate();
+            new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal
+            ).instantiate();
 
         if (instantiation == null) {
             return false;

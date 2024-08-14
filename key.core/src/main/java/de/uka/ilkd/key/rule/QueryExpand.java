@@ -61,7 +61,7 @@ public class QueryExpand implements BuiltInRule {
     private final WeakHashMap<Term, Long> timeOfTerm = new WeakHashMap<>(DEFAULT_MAP_SIZE);
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         final PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term query = pio.subTerm();
@@ -69,7 +69,7 @@ public class QueryExpand implements BuiltInRule {
         // new goal
         ImmutableList<Goal> newGoal = goal.split(1);
         Goal g = newGoal.head();
-
+        var services = goal.getOverlayServices();
         Pair<Term, Term> queryEval = queryEvalTerm(services, query, null);
 
         // The following additional rewrite taclet increases performance

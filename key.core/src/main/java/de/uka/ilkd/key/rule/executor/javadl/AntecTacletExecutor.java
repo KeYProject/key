@@ -49,7 +49,7 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
             if (!replWith.succedent().isEmpty()) {
                 addToSucc(replWith.succedent(), termLabelState,
                     new TacletLabelHint(TacletOperation.REPLACE_TO_SUCCEDENT, replWith),
-                    currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
+                    currentSequent, null, posOfFind, matchCond, goal, ruleApp);
             }
         } else {
             // Then there was no replacewith...
@@ -81,10 +81,10 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
         addToAntec(add.antecedent(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, whereToAdd,
-            posOfFind, matchCond, goal, ruleApp, services);
+            posOfFind, matchCond, goal, ruleApp);
         addToSucc(add.succedent(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null,
-            posOfFind, matchCond, goal, ruleApp, services);
+            posOfFind, matchCond, goal, ruleApp);
     }
 
 }
