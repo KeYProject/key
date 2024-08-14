@@ -29,7 +29,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, labelHint, applicationPosInOccurrence, goal, rule, ruleApp,
-                false);
+            false);
         this.metavariableInst = metavariableInst;
     }
 

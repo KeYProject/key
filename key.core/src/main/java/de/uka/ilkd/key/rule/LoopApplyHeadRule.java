@@ -135,8 +135,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         }
 
         final AbstractLoopContractRule.Instantiation instantiation =
-            new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal
-            ).instantiate();
+            new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal).instantiate();
 
         if (instantiation == null) {
             return false;

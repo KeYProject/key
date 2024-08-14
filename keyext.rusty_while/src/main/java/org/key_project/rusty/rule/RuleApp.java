@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-public interface RuleApp {
+public interface RuleApp extends org.key_project.ncore.rules.RuleApp<Goal> {
     /**
      * returns the rule of this rule application
      */
@@ -27,11 +26,10 @@ public interface RuleApp {
      * instantiated
      *
      * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all Rust information
      * @return list of new created goals
      */
     @Nullable
-    ImmutableList<Goal> execute(Goal goal, Services services);
+    ImmutableList<Goal> execute(Goal goal);
 
     /**
      * returns true if all variables are instantiated

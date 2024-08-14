@@ -172,7 +172,7 @@ public abstract class TacletApp implements RuleApp {
         PIOPathIterator it = pos.iterator();
         int i;
 
-        while((i = it.next()) != -1) {
+        while ((i = it.next()) != -1) {
             --deBruijn;
         }
 
@@ -212,35 +212,24 @@ public abstract class TacletApp implements RuleApp {
      * instantiated
      *
      * @param goal the Goal at which the Taclet is applied
-     * @param services the Services encapsulating all Rust information
      * @return list of new created goals
      */
     @Override
-    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
-        var time = System.nanoTime();
-        try {
-            var timePre = System.nanoTime();
-            try {
-                if (!complete()) {
-                    throw new IllegalStateException(
-                        "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
-                }
-
-                if (!isExecutable(services)) {
-                    throw new RuntimeException(
-                        "taclet application with unsatisfied 'checkPrefix': " + this);
-                }
-                registerSkolemConstants(goal.getLocalNamespaces());
-                goal.addAppliedRuleApp(this);
-            } finally {
-                // PERF_PRE.getAndAdd(System.nanoTime() - timePre);
-            }
-
-            return taclet().apply(goal, services, this);
-        } finally {
-            // PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
-            // PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
+    public @Nullable ImmutableList<Goal> execute(Goal goal) {
+        final var services = goal.getOverlayServices();
+        if (!complete()) {
+            throw new IllegalStateException(
+                "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
         }
+
+        if (!isExecutable(services)) {
+            throw new RuntimeException(
+                "taclet application with unsatisfied 'checkPrefix': " + this);
+        }
+        registerSkolemConstants(goal.getLocalNamespaces());
+        goal.addAppliedRuleApp(this);
+
+        return taclet().apply(goal, this);
     }
 
     public boolean isExecutable(Services services) {

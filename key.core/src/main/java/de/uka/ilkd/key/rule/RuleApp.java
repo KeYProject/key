@@ -14,7 +14,8 @@ import org.jspecify.annotations.Nullable;
 /**
  * rule application with specific information how and where the rule has to be applied
  */
-public interface RuleApp extends org.key_project.ncore.rules.RuleApp<Goal>, EqualsModProofIrrelevancy {
+public interface RuleApp
+        extends org.key_project.ncore.rules.RuleApp<Goal>, EqualsModProofIrrelevancy {
 
     /**
      * returns the rule of this rule application

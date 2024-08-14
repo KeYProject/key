@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import java.util.Iterator;
 
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.logic.op.sv.VariableSV;
-import org.key_project.util.collection.ImmutableSet;
 
 /**
  * @param prefixLength  the prefix of the taclet

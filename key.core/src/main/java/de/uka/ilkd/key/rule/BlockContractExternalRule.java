@@ -189,7 +189,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
     @Override
     public @NonNull ImmutableList<Goal> apply(final Goal goal,
-                                              final RuleApp ruleApp) throws RuleAbortException {
+            final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof BlockContractExternalBuiltInRuleApp;
         BlockContractExternalBuiltInRuleApp application =
             (BlockContractExternalBuiltInRuleApp) ruleApp;

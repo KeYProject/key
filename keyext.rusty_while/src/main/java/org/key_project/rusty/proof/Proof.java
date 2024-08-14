@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
+import org.key_project.ncore.proof.ProofObject;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.Semisequent;
 import org.key_project.rusty.logic.Sequent;
@@ -20,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.jspecify.annotations.NonNull;
 
 
-public class Proof implements Named {
+public class Proof implements ProofObject<Goal>, Named {
     /**
      * name of the proof
      */
@@ -145,6 +146,60 @@ public class Proof implements Named {
 
     public Node root() {
         return root;
+    }
+
+    /**
+     * Returns the list of open goals.
+     *
+     * @return list with the open goals
+     */
+    @Override
+    public @NonNull ImmutableList<@NonNull Goal> openGoals() {
+        return openGoals;
+    }
+
+    /**
+     * adds a list with new goals to the list of open goals
+     *
+     * @param goals the Iterable<Goal> to be prepended
+     */
+    @Override
+    public void add(@NonNull Iterable<@NonNull Goal> goals) {
+        ImmutableList<Goal> addGoals;
+        if (goals instanceof ImmutableList<Goal> asList) {
+            addGoals = asList;
+        } else {
+            addGoals = ImmutableList.fromList(goals);
+        }
+        add(addGoals);
+    }
+
+    /**
+     * adds a list with new goals to the list of open goals
+     *
+     * @param goals the IList<Goal> to be prepended
+     */
+    public void add(ImmutableList<Goal> goals) {
+        ImmutableList<Goal> newOpenGoals = openGoals.prepend(goals);
+        if (openGoals != newOpenGoals) {
+            openGoals = newOpenGoals;
+        }
+    }
+
+    /**
+     * removes the given goal and adds the new goals in list
+     *
+     * @param oldGoal the old goal that has to be removed from list
+     * @param newGoals the Iterable<Goal> with the new goals that were result of a rule application
+     *        on goal
+     */
+    @Override
+    public void replace(Goal oldGoal, @NonNull Iterable<@NonNull Goal> newGoals) {
+        openGoals = openGoals.removeAll(oldGoal);
+
+        if (!closed()) {
+            add(newGoals);
+        }
     }
 
     /**

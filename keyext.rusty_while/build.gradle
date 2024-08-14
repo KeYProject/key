@@ -15,6 +15,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     antlr 'org.antlr:antlr4:4.13.1'
     api project(':key.ncore')
+    api project(':key.ncore.calculus')
     api project(':key.util')
 }
 

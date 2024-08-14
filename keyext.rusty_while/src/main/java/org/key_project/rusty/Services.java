@@ -36,6 +36,15 @@ public class Services implements LogicServices {
         this.profile = profile;
     }
 
+    public Services(Services services) {
+        this.namespaces = services.namespaces;
+        this.ldts = services.ldts;
+        this.tf = services.tf;
+        this.tb = services.tb;
+        this.proof = services.proof;
+        this.profile = services.profile;
+    }
+
     public NamespaceSet getNamespaces() {
         return namespaces;
     }
@@ -84,5 +93,11 @@ public class Services implements LogicServices {
         s.setLDTs(getLDTs());
         s.setNamespaces(namespaces.copy());
         return s;
+    }
+
+    public Services getOverlay(NamespaceSet localNamespaces) {
+        Services result = new Services(this);
+        result.setNamespaces(namespaces);
+        return result;
     }
 }

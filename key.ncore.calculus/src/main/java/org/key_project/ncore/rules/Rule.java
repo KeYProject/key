@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-public interface Rule <G extends ProofGoal, App extends RuleApp<G>> extends Named {
+public interface Rule<G extends ProofGoal, App extends RuleApp<G>> extends Named {
     /**
      * the rule is applied on the given goal using the information of rule application.
      *

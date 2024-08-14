@@ -32,13 +32,12 @@ public abstract class TacletExecutor<T extends Taclet> {
      * applies the given rule application to the specified goal
      *
      * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all Rust information
      * @param ruleApp the rule application that is executed.
      * @return List of the goals created by the rule which have to be proved. If this is a
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
-    public abstract ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp);
+    public abstract ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
 
     /**
      * Search for formulas within p_list that have to be proved by an explicit assumes-goal, i.e.

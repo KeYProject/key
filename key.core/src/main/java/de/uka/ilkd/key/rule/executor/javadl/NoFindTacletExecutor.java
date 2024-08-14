@@ -34,14 +34,14 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * adds the sequent of the add part of the Taclet to the goal sequent
      *
      * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param add            the Sequent to be added
+     * @param add the Sequent to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the
-     *                       taclet
-     * @param matchCond      the MatchConditions with all required instantiations
+     *        taclet
+     * @param matchCond the MatchConditions with all required instantiations
      */
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
-                            SequentChangeInfo currentSequent, MatchConditions matchCond,
-                            Goal goal, RuleApp ruleApp) {
+            SequentChangeInfo currentSequent, MatchConditions matchCond,
+            Goal goal, RuleApp ruleApp) {
         addToAntec(add.antecedent(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, null,
             matchCond, goal, ruleApp);
@@ -53,7 +53,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
-     * @param goal    the goal that the rule application should refer to.
+     * @param goal the goal that the rule application should refer to.
      * @param ruleApp the taclet application that is executed
      */
     public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {

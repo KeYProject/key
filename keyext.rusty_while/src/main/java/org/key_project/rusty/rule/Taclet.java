@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -450,15 +449,14 @@ public abstract class Taclet implements Rule {
      * applies the given rule application to the specified goal
      *
      * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all Rust information
      * @param tacletApp the rule application that is executed.
      * @return List of the goals created by the rule which have to be proved. If this is a
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
-        return getExecutor().apply(goal, services, tacletApp);
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp tacletApp) {
+        return getExecutor().apply(goal, tacletApp);
     }
 
     public TacletExecutor<? extends Taclet> getExecutor() {

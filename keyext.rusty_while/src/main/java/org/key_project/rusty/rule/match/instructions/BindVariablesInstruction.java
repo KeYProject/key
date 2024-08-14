@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -32,65 +34,66 @@ public class BindVariablesInstruction implements MatchInstruction {
 
     private interface VariableBinderSubinstruction {
         MatchConditions match(LogicVariable instantiationCandidate,
-                              MatchConditions matchCond, Services services);
+                MatchConditions matchCond, Services services);
     }
 
     private record LogicVariableBinder(LogicVariable templateVar) implements VariableBinderSubinstruction {
-        /**
-         * a match between two logic variables is possible if they have been assigned they are same
-         * or have been assigned to the same abstract name and the sorts are equal.
-         */
-        public MatchConditions match(LogicVariable instantiationCandidate,
-                                     MatchConditions matchCond, Services services) {
-            if (templateVar != instantiationCandidate) {
-                if (instantiationCandidate.sort() != templateVar.sort()) {
-                    matchCond = null;
-                }
-            }
-            return matchCond;
-        }
-    }
 
-
-    private static class VariableSVBinder extends MatchSchemaVariableInstruction<VariableSV>
-            implements VariableBinderSubinstruction {
-
-        public VariableSVBinder(VariableSV templateVar) {
-            super(templateVar);
-        }
-
-        public MatchConditions match(LogicVariable instantiationCandidate,
-                                     MatchConditions matchCond, Services services) {
-            final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
-            if (foundMapping == null) {
-                final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
-                matchCond = addInstantiation(substTerm, matchCond, services);
-            } else if (((Term) foundMapping).op() != instantiationCandidate) {
+    /**
+     * a match between two logic variables is possible if they have been assigned they are same
+     * or have been assigned to the same abstract name and the sorts are equal.
+     */
+    public MatchConditions match(LogicVariable instantiationCandidate,
+            MatchConditions matchCond, Services services) {
+        if (templateVar != instantiationCandidate) {
+            if (instantiationCandidate.sort() != templateVar.sort()) {
                 matchCond = null;
             }
-            return matchCond;
         }
+        return matchCond;
+    }
+}
 
-        @Override
-        public MatchConditions match(SyntaxElementCursor termPosition, MatchConditions matchConditions,
-                                     Services services) {
-            throw new UnsupportedOperationException();
-        }
 
-        @Override
-        public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-                                     Services services) {
-            throw new UnsupportedOperationException();
+private static class VariableSVBinder extends MatchSchemaVariableInstruction<VariableSV>
+        implements VariableBinderSubinstruction {
+
+    public VariableSVBinder(VariableSV templateVar) {
+        super(templateVar);
+    }
+
+    public MatchConditions match(LogicVariable instantiationCandidate,
+            MatchConditions matchCond, Services services) {
+        final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
+        if (foundMapping == null) {
+            final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
+            matchCond = addInstantiation(substTerm, matchCond, services);
+        } else if (((Term) foundMapping).op() != instantiationCandidate) {
+            matchCond = null;
         }
+        return matchCond;
+    }
+
+    @Override
+    public MatchConditions match(SyntaxElementCursor termPosition, MatchConditions matchConditions,
+            Services services) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
+            Services services) {
+        throw new UnsupportedOperationException();
+    }
 
     }
 
     @Override
     public MatchConditions match(SyntaxElementCursor termPosition, MatchConditions matchConditions,
-                                 Services services) {
+            Services services) {
         var term = (Term) termPosition.getCurrentNode();
         var variablesToMatchAndBind =
-                term.boundVars();
+            term.boundVars();
 
         if (variablesToMatchAndBind.size() == boundVarBinders.length) {
             for (int i = 0; i < boundVarBinders.length && matchConditions != null; i++) {

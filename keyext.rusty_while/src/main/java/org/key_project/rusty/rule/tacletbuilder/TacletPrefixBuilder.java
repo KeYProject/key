@@ -7,7 +7,6 @@ package org.key_project.rusty.rule.tacletbuilder;
 import java.util.Iterator;
 
 import org.key_project.logic.Term;
-import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.Modality;
@@ -65,7 +64,7 @@ public class TacletPrefixBuilder {
             if (sv instanceof TermSV || sv instanceof FormulaSV || sv instanceof UpdateSV) {
                 int numberOfBoundVars = removeNotFreeIn(sv);
                 TacletPrefix prefix = prefixMap.get(sv);
-                if (prefix == null || prefix.prefixLength()  == numberOfBoundVars) {
+                if (prefix == null || prefix.prefixLength() == numberOfBoundVars) {
                     setPrefixOfOccurrence(sv, numberOfBoundVars);
                 } else {
                     throw new TacletPrefixBuilder.InvalidPrefixException(
@@ -137,7 +136,8 @@ public class TacletPrefixBuilder {
         for (final ImmutableMapEntry<SchemaVariable, TacletPrefix> entry : prefixMap) {
             final TacletPrefix addRulePrefix = addRuleSV2PrefixMap.get(entry.key());
 
-             if (addRulePrefix != null && addRulePrefix.prefixLength() != entry.value().prefixLength()) {
+            if (addRulePrefix != null
+                    && addRulePrefix.prefixLength() != entry.value().prefixLength()) {
                 throw new TacletPrefixBuilder.InvalidPrefixException(
                     tacletBuilder.getName().toString(), entry.key(),
                     entry.value(), addRulePrefix.prefixLength());

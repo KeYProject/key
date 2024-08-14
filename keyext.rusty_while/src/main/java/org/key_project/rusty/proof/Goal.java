@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
+import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.Sequent;
@@ -15,7 +16,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 
-public final class Goal {
+public final class Goal implements ProofGoal {
     private Node node;
     /**
      * The namespaces local to this goal. This may evolve over time.
@@ -203,5 +204,9 @@ public final class Goal {
 
     public TacletIndex indexOfTaclets() {
         return ruleAppIndex.tacletIndex();
+    }
+
+    public Services getOverlayServices() {
+        return proof().getServices().getOverlay(getLocalNamespaces());
     }
 }

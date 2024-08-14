@@ -19,7 +19,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+        final var services = goal.getOverlayServices();
         // Number without the if-goal eventually needed
         final int numberOfNewGoals = taclet.goalTemplates().size();
 

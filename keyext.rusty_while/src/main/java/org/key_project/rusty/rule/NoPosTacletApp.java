@@ -3,16 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import java.util.Iterator;
 
 import org.key_project.logic.Term;
-import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 public class NoPosTacletApp extends TacletApp {
     /**

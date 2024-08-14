@@ -25,11 +25,11 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
-import org.key_project.ncore.rules.RuleAbortException;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -66,10 +66,10 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * new set of goals, that is splitting the current goal is no longer required after calling this
      * method.
      *
-     * @param goal    the Goal on which to apply <tt>ruleApp</tt>
+     * @param goal the Goal on which to apply <tt>ruleApp</tt>
      * @param ruleApp the rule application to be executed
      * @return The {@link LoopInvariantInformation} object containing the data for the application
-     * of loop invariant rules.
+     *         of loop invariant rules.
      */
     public LoopInvariantInformation doPreparations(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {

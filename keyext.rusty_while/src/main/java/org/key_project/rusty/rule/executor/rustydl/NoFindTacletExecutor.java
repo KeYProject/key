@@ -22,11 +22,10 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * the rule is applied on the given goal using the information of rule application.
      *
      * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all Rust information
      * @param ruleApp the taclet application that is executed
      */
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         // Number without the if-goal eventually needed
         int numberOfNewGoals = taclet.goalTemplates().size();
 
@@ -42,6 +41,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
         Iterator<Goal> goalIt = newGoals.iterator();
         Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
 
+        final var services = goal.getOverlayServices();
         while (it.hasNext()) {
             TacletGoalTemplate gt = it.next();
             Goal currentGoal = goalIt.next();
