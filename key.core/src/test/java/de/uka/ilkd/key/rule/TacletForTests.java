@@ -17,8 +17,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
@@ -216,5 +215,11 @@ public class TacletForTests {
     public static ProgramElement parsePrg(String prgString) {
         Recoder2KeY r2k = new Recoder2KeY(services(), new NamespaceSet());
         return r2k.readBlockWithEmptyContext(prgString).program();
+    }
+
+    public static Goal createGoal() {
+        return new Goal(new Node(new Proof("Some name", initConfig())),
+            TacletIndexKit.getKit().createTacletIndex(),
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), services());
     }
 }

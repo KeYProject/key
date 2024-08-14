@@ -93,6 +93,37 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
     /**
+     * ONLY TO BE USED BZ ConstraintAwareSyntacticalReplaceVisitor (HACK)
+     * constructs a term visitor replacing any occurrence of a schemavariable found in
+     * {@code svInst} by its instantiation
+     *
+     * @param termLabelState the termlabel state
+     * @param labelHint hints about how to deal with labels
+     * @param applicationPosInOccurrence the application position
+     * @param services the services
+     * @param rule the applied rule
+     * @param ruleApp the rule application
+     * @param useTermCache the TermBuilder to use (allows to use the non cached version)
+     */
+    protected SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
+            PosInOccurrence applicationPosInOccurrence, Services services,
+            Rule rule, RuleApp ruleApp, boolean useTermCache) {
+        this.termLabelState = termLabelState;
+        this.services = services;
+        this.tb = this.services.getTermBuilder(useTermCache);
+        this.svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        this.applicationPosInOccurrence = applicationPosInOccurrence;
+        this.rule = rule;
+        this.ruleApp = ruleApp;
+        this.labelHint = labelHint;
+        this.goal = null;
+        subStack = new Stack<>(); // of Term
+        if (labelHint instanceof TacletLabelHint) {
+            labelHint.setTacletTermStack(tacletTermStack);
+        }
+    }
+
+    /**
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *

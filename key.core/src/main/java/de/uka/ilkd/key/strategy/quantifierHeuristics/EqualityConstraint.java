@@ -185,9 +185,10 @@ public class EqualityConstraint implements Constraint {
      * @return the instantiated term
      */
     private Term instantiate(Term p, Services services) {
+
         ConstraintAwareSyntacticalReplaceVisitor srVisitor =
             new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(), services, this, null,
-                null, null, null, null);
+                null, null, null);
         p.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
@@ -205,7 +206,6 @@ public class EqualityConstraint implements Constraint {
     public Constraint unify(Term t1, Term t2, Services services) {
         return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
-
 
     /**
      * executes unification for terms t1 and t2.

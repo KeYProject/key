@@ -155,7 +155,8 @@ public class TestSchemaModalOperators {
             new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
         PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
         Term instReplace =
-            t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
+            t.getRewriteResult(TacletForTests.createGoal(), new TermLabelState(), services,
+                tacletApp).formula();
         assertNotNull(instReplace);
         assertSame(Modality.JavaModalityKind.DIA, ((Modality) instReplace.op()).kind());
     }
