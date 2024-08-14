@@ -162,7 +162,7 @@ public class TestApplyTaclet {
     }
 
     @Test
-    public void testTacletWithIf() {
+    public void testTacletWithAssumes() {
         NoPosTacletApp close = TacletForTests.getRules().lookup(new Name("close_goal"));
         TacletIndex tacletIndex = new TacletIndex();
         tacletIndex.add(close);
@@ -201,7 +201,7 @@ public class TestApplyTaclet {
     }
 
     @Test
-    public void testAntecTacletWithoutIf() {
+    public void testAntecTacletWithoutAssumes() { // TODO: rename all "if"s in taclets to "assumes"
         Term fma = proof[3].root().sequent().antecedent().getFirst().formula();
         NoPosTacletApp impleft = TacletForTests.getRules().lookup(new Name("imp_left"));
         TacletIndex tacletIndex = new TacletIndex();

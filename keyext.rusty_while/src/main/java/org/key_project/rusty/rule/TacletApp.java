@@ -66,57 +66,6 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * collects all bound variables above the occurrence of the schemavariable whose prefix is given
-     *
-     * @param prefix the TacletPrefix of the schemavariable
-     * @param instantiations the SVInstantiations so that the find(if)-expression matches
-     * @return set of the bound variables
-     */
-    protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-            SVInstantiations instantiations) {
-        return collectPrefixInstantiations(prefix, instantiations);
-    }
-
-    /**
-     * collects all bound variables above the occurrence of the schemavariable whose prefix is given
-     *
-     * @param prefix the TacletPrefix of the schemavariable
-     * @param instantiations the SVInstantiations so that the find(if)-expression matches
-     * @param pos the posInOccurrence describing the position of the schemavariable
-     * @return set of the bound variables
-     */
-    protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-            SVInstantiations instantiations, PosInOccurrence pos) {
-        ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
-
-        if (prefix.context()) {
-            result = result.union(collectBoundVarsAbove(pos));
-        }
-
-        return result;
-    }
-
-    /**
-     * collects all those logic variable that are instances of the variableSV of the given prefix
-     *
-     * @param pre the TacletPrefix of a SchemaVariable that is bound
-     * @param instantiations the SVInstantiations to look at
-     * @return the set of the logic variables whose elements are the instantiations of a bound
-     *         SchemaVariable appearing in the TacletPrefix
-     */
-    private static ImmutableSet<QuantifiableVariable> collectPrefixInstantiations(TacletPrefix pre,
-            SVInstantiations instantiations) {
-        ImmutableSet<QuantifiableVariable> instanceSet =
-            DefaultImmutableSet.nil();
-
-        for (final SchemaVariable var : pre.prefix()) {
-            instanceSet =
-                instanceSet.add((LogicVariable) ((Term) instantiations.getInstantiation(var)).op());
-        }
-        return instanceSet;
-    }
-
-    /**
      * returns the taclet the application information is collected for
      *
      * @return the Taclet the application information is collected for
@@ -177,6 +126,57 @@ public abstract class TacletApp implements RuleApp {
          * at least `n` binding ops above it.
          */
         return true;
+    }
+
+    protected static boolean checkNoFreeVars(Taclet taclet) {
+        // TODO
+        return true;
+    }
+
+    public static boolean checkNoFreeVars(Taclet taclet, SVInstantiations instantiations,
+            PosInOccurrence pos) {
+        Iterator<SchemaVariable> it = instantiations.svIterator();
+        while (it.hasNext()) {
+            SchemaVariable sv = it.next();
+            if (sv instanceof TermSV || sv instanceof FormulaSV) {
+                // TODO: Is this enough? Do we need, e.g., sort checks?
+                var t = (Term) instantiations.getInstantiation(sv);
+                if (isFreeAtPos(pos, maximalDeBruijnIndex(t))) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static int maximalDeBruijnIndex(Term t) {
+        int max = 0;
+        // No need to check for other types of QuantifiedVariable; in the instantiations, no SV cam
+        // appear
+        if (t.op() instanceof LogicVariable lv) {
+            max = lv.getIndex();
+        }
+        for (int i = 0; i < t.arity(); ++i) {
+            int index = maximalDeBruijnIndex(t.sub(i));
+            int boundHere = t.varsBoundHere(i).size();
+            index -= boundHere;
+            if (index > max) {
+                max = index;
+            }
+        }
+        return max;
+    }
+
+    private static boolean isFreeAtPos(PosInOccurrence pos, int deBruijn) {
+        PIOPathIterator it = pos.iterator();
+        int i;
+
+        while((i = it.next()) != -1) {
+            --deBruijn;
+        }
+
+        return deBruijn > 0;
     }
 
     /**

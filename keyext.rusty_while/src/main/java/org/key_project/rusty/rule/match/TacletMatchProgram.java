@@ -125,10 +125,6 @@ public class TacletMatchProgram {
         for (int i = 0; i < pattern.arity(); i++) {
             createProgram(pattern.sub(i), program);
         }
-
-        if (!boundVars.isEmpty()) {
-            program.add(Instruction.unbindVariables(boundVars));
-        }
     }
 
     /**

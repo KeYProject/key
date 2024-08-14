@@ -43,7 +43,7 @@ public class NoPosTacletApp extends TacletApp {
             SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
             Services services) {
         SVInstantiations inst = resolveCollisionVarSV(taclet, instantiations, services);
-        if (checkVarCondNotFreeIn(taclet, inst)) {
+        if (checkNoFreeVars(taclet)) {
             return new NoPosTacletApp(taclet, inst, ifInstantiations);
         }
         return null;
@@ -89,45 +89,6 @@ public class NoPosTacletApp extends TacletApp {
     private NoPosTacletApp(Taclet taclet, SVInstantiations instantiations,
             ImmutableList<IfFormulaInstantiation> ifInstantiations) {
         super(taclet, instantiations, ifInstantiations);
-    }
-
-
-    /**
-     * checks if the variable conditions of type 'x not free in y' are hold by the found
-     * instantiations. The variable conditions is used implicit in the prefix. (Used to calculate
-     * the prefix)
-     *
-     * @param taclet the Taclet that is tried to be instantiated. A match for the find (or/and if)
-     *        has been found.
-     * @param instantiations the SVInstantiations so that the find(if) matches
-     * @return true iff all variable conditions x not free in y are hold
-     */
-    protected static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations) {
-        final Iterator<SchemaVariable> it = instantiations.svIterator();
-        while (it.hasNext()) {
-            final SchemaVariable sv = it.next();
-
-            if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
-                    || sv instanceof SkolemTermSV) {
-                continue;
-            }
-
-            final TacletPrefix prefix = taclet.getPrefix(sv);
-            if (prefix.context()) {
-                continue;
-            }
-
-            final var boundVarSet =
-                (ImmutableSet<QuantifiableVariable>) boundAtOccurrenceSet(prefix, instantiations);
-            final Term inst = (Term) instantiations.getInstantiation(sv);
-            /*
-             * TODO: if (!inst.freeVars().subset(boundVarSet)) {
-             * return false;
-             * }
-             */
-        }
-
-        return true;
     }
 
     protected MatchConditions setupMatchConditions(PosInOccurrence pos, Services services) {

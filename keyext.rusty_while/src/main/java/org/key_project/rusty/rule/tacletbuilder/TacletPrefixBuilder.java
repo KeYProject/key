@@ -20,8 +20,8 @@ public class TacletPrefixBuilder {
     /**
      * set of all schemavariables that are only allowed to be matched with quantifiable variables.
      */
-    private ImmutableSet<SchemaVariable> currentlyBoundVars =
-        DefaultImmutableSet.nil();
+    private int numberOfCurrentlyBoundVars =
+        0;
     private final TacletBuilder<? extends Taclet> tacletBuilder;
 
     protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
@@ -32,31 +32,25 @@ public class TacletPrefixBuilder {
     }
 
     private void addVarsBoundHere(Term visited, int subTerm) {
-        ImmutableArray<? extends QuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
-        for (int i = 0; i < bdVars.size(); i++) {
-            QuantifiableVariable boundVar = bdVars.get(i);
-            if (boundVar instanceof VariableSV) {
-                currentlyBoundVars = currentlyBoundVars.add((SchemaVariable) boundVar);
-            }
-        }
+        numberOfCurrentlyBoundVars += visited.varsBoundHere(subTerm).size();
     }
 
     private void setPrefixOfOccurrence(SchemaVariable sv,
-            ImmutableSet<SchemaVariable> relevantBoundVars) {
-        prefixMap = prefixMap.put(sv, new TacletPrefix(relevantBoundVars, false));
+            int numberOfBoundVars) {
+        prefixMap = prefixMap.put(sv, new TacletPrefix(numberOfBoundVars, false));
     }
 
     /**
      * removes all variables x that are declared as x not free in sv from the currently bound vars
      * set.
      */
-    private ImmutableSet<SchemaVariable> removeNotFreeIn(SchemaVariable sv) {
-        ImmutableSet<SchemaVariable> result = currentlyBoundVars;
+    private int removeNotFreeIn(SchemaVariable sv) {
+        int result = numberOfCurrentlyBoundVars;
         Iterator<NotFreeIn> it = tacletBuilder.varsNotFreeIn();
         while (it.hasNext()) {
             NotFreeIn notFreeIn = it.next();
             if (notFreeIn.second() == sv) {
-                result = result.remove(notFreeIn.first());
+                // TODO: result = result.remove(notFreeIn.first());
             }
         }
         return result;
@@ -65,26 +59,26 @@ public class TacletPrefixBuilder {
     private void visit(Term t) {
         if (t.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV msv) {
             // TODO: Is false correct?
-            prefixMap.put(msv, new TacletPrefix(ImmutableSet.empty(), false));
+            prefixMap.put(msv, new TacletPrefix(0, false));
         }
         if (t.op() instanceof SchemaVariable sv && t.arity() == 0) {
             if (sv instanceof TermSV || sv instanceof FormulaSV || sv instanceof UpdateSV) {
-                ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
+                int numberOfBoundVars = removeNotFreeIn(sv);
                 TacletPrefix prefix = prefixMap.get(sv);
-                if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
-                    setPrefixOfOccurrence(sv, relevantBoundVars);
+                if (prefix == null || prefix.prefixLength()  == numberOfBoundVars) {
+                    setPrefixOfOccurrence(sv, numberOfBoundVars);
                 } else {
                     throw new TacletPrefixBuilder.InvalidPrefixException(
                         tacletBuilder.getName().toString(), sv, prefix,
-                        relevantBoundVars);
+                        numberOfBoundVars);
                 }
             }
         }
         for (int i = 0; i < t.arity(); i++) {
-            ImmutableSet<SchemaVariable> oldBounds = currentlyBoundVars;
+            int oldBounds = numberOfCurrentlyBoundVars;
             addVarsBoundHere(t, i);
             visit(t.sub(i));
-            currentlyBoundVars = oldBounds;
+            numberOfCurrentlyBoundVars = oldBounds;
         }
 
         // if (t.hasLabels()) {
@@ -124,8 +118,8 @@ public class TacletPrefixBuilder {
     public void build() {
         visit(tacletBuilder.ifSequent());
 
-        if (tacletBuilder instanceof FindTacletBuilder) {
-            final Term find = ((FindTacletBuilder<? extends FindTaclet>) tacletBuilder).getFind();
+        if (tacletBuilder instanceof FindTacletBuilder<? extends FindTaclet> ftb) {
+            final Term find = ftb.getFind();
             visit(find);
         }
 
@@ -143,10 +137,10 @@ public class TacletPrefixBuilder {
         for (final ImmutableMapEntry<SchemaVariable, TacletPrefix> entry : prefixMap) {
             final TacletPrefix addRulePrefix = addRuleSV2PrefixMap.get(entry.key());
 
-            if (addRulePrefix != null && !addRulePrefix.prefix().equals(entry.value().prefix())) {
+             if (addRulePrefix != null && addRulePrefix.prefixLength() != entry.value().prefixLength()) {
                 throw new TacletPrefixBuilder.InvalidPrefixException(
                     tacletBuilder.getName().toString(), entry.key(),
-                    entry.value(), addRulePrefix.prefix());
+                    entry.value(), addRulePrefix.prefixLength());
             }
         }
 
@@ -216,11 +210,11 @@ public class TacletPrefixBuilder {
         private static final long serialVersionUID = 5855187579027274363L;
 
         InvalidPrefixException(String tacletName, SchemaVariable sv, TacletPrefix prefix,
-                ImmutableSet<SchemaVariable> sndPrefixVar) {
+                int numberOfBoundVars) {
             super("Schema variable " + sv + "occurs at different places " + "in taclet "
                 + tacletName + " with different prefixes.\n" + "Prefix P1:"
-                + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix())
-                + "\n" + "Prefix P2:" + sndPrefixVar);
+                + ((prefix == null) ? 0 : prefix.prefixLength())
+                + "\n" + "Prefix P2:" + numberOfBoundVars);
         }
 
     }

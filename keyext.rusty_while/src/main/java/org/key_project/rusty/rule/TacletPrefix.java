@@ -10,41 +10,17 @@ import org.key_project.rusty.logic.op.sv.VariableSV;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
- * @param prefix  the prefix of the taclet
+ * @param prefixLength  the prefix of the taclet
  * @param context used by rewrite taclets to mark the context
  */
-public record TacletPrefix(ImmutableSet<SchemaVariable> prefix, boolean context) {
+public record TacletPrefix(int prefixLength, boolean context) {
     /**
      * creates the prefix
      *
-     * @param prefix  the SetOf<SchemaVariable> that is the prefix of a termsv or formulasv
+     * @param prefixLength  the SetOf<SchemaVariable> that is the prefix of a termsv or formulasv
      * @param context a boolean marker
      */
     public TacletPrefix {
-    }
-
-    /**
-     * returns the prefix
-     *
-     * @return the prefix
-     */
-    @Override
-    public ImmutableSet<SchemaVariable> prefix() {
-        return prefix;
-    }
-
-    public Iterator<SchemaVariable> iterator() {
-        return prefix().iterator();
-    }
-
-    /**
-     * returns the context marker
-     *
-     * @return the context marker
-     */
-    @Override
-    public boolean context() {
-        return context;
     }
 
     /**
@@ -54,20 +30,16 @@ public record TacletPrefix(ImmutableSet<SchemaVariable> prefix, boolean context)
      * @return a newly created TacletPrefix
      */
     public TacletPrefix setContext(boolean setTo) {
-        return new TacletPrefix(prefix, setTo);
+        return new TacletPrefix(prefixLength, setTo);
     }
 
     /**
      * creates a new TacletPrefix with a new prefix entry
      *
-     * @param var the SchemaVariable to be added
      * @return the new prefix
      */
-    public TacletPrefix put(SchemaVariable var) {
-        if (!(var instanceof VariableSV)) {
-            throw new RuntimeException("var can match more than " + "bound variables");
-        }
-        return new TacletPrefix(prefix.add(var), context);
+    public TacletPrefix increase() {
+        return new TacletPrefix(prefixLength+1, context);
     }
 
     /**
@@ -76,8 +48,9 @@ public record TacletPrefix(ImmutableSet<SchemaVariable> prefix, boolean context)
      * @param var the SchemaVariable to be removed
      * @return the new prefix
      */
-    public TacletPrefix remove(SchemaVariable var) {
-        return new TacletPrefix(prefix.remove(var), context);
+    public TacletPrefix decrease(SchemaVariable var) {
+        assert prefixLength > 0;
+        return new TacletPrefix(prefixLength-1, context);
     }
 
     public boolean equals(Object o) {
@@ -87,17 +60,17 @@ public record TacletPrefix(ImmutableSet<SchemaVariable> prefix, boolean context)
         if (!(o instanceof TacletPrefix other)) {
             return false;
         }
-        return (other.prefix().equals(prefix())) && (other.context() == context());
+        return (other.prefixLength() == prefixLength()) && (other.context() == context());
     }
 
     public int hashCode() {
         int result = 17;
-        result = 37 * result + prefix().hashCode();
+        result = 37 * result + prefixLength();
         result = 37 * result + (context() ? 0 : 1);
         return result;
     }
 
     public String toString() {
-        return "TacletPrefix: " + prefix + (context() ? "+ { K }" : "");
+        return "TacletPrefix: " + prefixLength() + (context() ? "+ { K }" : "");
     }
 }

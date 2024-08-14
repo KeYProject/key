@@ -66,14 +66,7 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
 
     public static MatchInstruction matchAndBindVariables(
             ImmutableArray<? extends QuantifiableVariable> boundVars) {
-        // return new BindVariablesInstruction(boundVars);
-        throw new IllegalArgumentException("TODO @DD");
-    }
-
-    public static MatchInstruction unbindVariables(
-            ImmutableArray<? extends QuantifiableVariable> boundVars) {
-        // return new UnbindVariablesInstruction();
-        throw new IllegalArgumentException("TODO @DD");
+        return new BindVariablesInstruction(boundVars);
     }
 
     public static MatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
