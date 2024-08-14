@@ -139,10 +139,10 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             createAnonOutHeaps(heaps, services, tb);
 
         final BlockContract.Variables variables =
-            new VariablesCreatorAndRegistrar(null, contract.getPlaceholderVariables())
+            new VariablesCreatorAndRegistrar(services, contract.getPlaceholderVariables())
                     .createAndRegister(selfTerm, false, contract.getBlock());
         final LoopContract.Variables nextVariables =
-            new VariablesCreatorAndRegistrar(null, variables)
+            new VariablesCreatorAndRegistrar(services, variables)
                     .createAndRegisterCopies("_NEXT");
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =

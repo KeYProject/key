@@ -149,6 +149,27 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, useTermCache);
     }
 
+    /**
+     * ONLY used by {@link de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations}
+     *
+     * @param termLabelState
+     * @param svInst
+     * @param services
+     */
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState, SVInstantiations svInst,
+            Services services) {
+        this.termLabelState = termLabelState;
+        this.svInst = svInst;
+        this.services = services;
+        this.tb = services.getTermBuilder();
+        this.applicationPosInOccurrence = null;
+        this.rule = null;
+        this.goal = null;
+        this.ruleApp = null;
+        this.labelHint = null;
+        subStack = new Stack<>();
+    }
+
     private JavaProgramElement addContext(StatementBlock pe) {
         final ContextInstantiationEntry cie = svInst.getContextInstantiation();
         if (cie == null) {
