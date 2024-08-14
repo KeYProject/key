@@ -216,19 +216,20 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
-            final RuleApp ruleApp) throws RuleAbortException {
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
+                                              final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof BlockContractInternalBuiltInRuleApp;
         BlockContractInternalBuiltInRuleApp application =
             (BlockContractInternalBuiltInRuleApp) ruleApp;
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal, services);
+            instantiate(application.posInOccurrence().subTerm(), goal);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());
         final Term contextUpdate = instantiation.update();
 
+        final var services = goal.getOverlayServices();
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
@@ -237,7 +238,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final Map<LocationVariable, JFunction> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
-            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
+            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
                     .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
@@ -287,7 +288,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             return false;
         }
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+            instantiate(occurrence.subTerm(), goal);
         if (instantiation == null) {
             return false;
         }

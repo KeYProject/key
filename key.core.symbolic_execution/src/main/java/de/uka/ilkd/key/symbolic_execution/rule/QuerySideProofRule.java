@@ -187,7 +187,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         try {
             // Extract required Terms from goal
@@ -226,11 +226,12 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
             // Compute results and their conditions
             List<ResultsAndCondition> conditionsAndResultsMap =
-                computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
+                computeResultsAndConditions(goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
             ImmutableList<Goal> goals = goal.split(1);
             Goal resultGoal = goals.head();
+            final var services = goal.getOverlayServices();
             final TermBuilder tb = services.getTermBuilder();
             resultGoal.removeFormula(pio);
             if (pio.isTopLevel() || queryConditionTerm != null) {

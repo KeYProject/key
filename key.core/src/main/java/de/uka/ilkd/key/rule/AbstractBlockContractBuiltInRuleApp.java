@@ -60,7 +60,7 @@ public abstract class AbstractBlockContractBuiltInRuleApp
         }
         final Services services = goal.proof().getServices();
         final AbstractBlockContractRule.Instantiation instantiation =
-            rule.instantiate(posInOccurrence().subTerm(), goal, services);
+            rule.instantiate(posInOccurrence().subTerm(), goal);
         final ImmutableSet<BlockContract> contracts =
             AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement());

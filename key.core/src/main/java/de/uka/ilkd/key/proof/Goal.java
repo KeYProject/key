@@ -606,12 +606,10 @@ public final class Goal implements ProofGoal {
          * wrap the services object into an overlay such that any addition to local symbols is
          * caught.
          */
-        NamespaceSet originalNamespaces = getLocalNamespaces();
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
         try {
-            Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
-            goalList = ruleApp.execute(this, overlayServices);
+            goalList = ruleApp.execute(this);
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
         }
@@ -637,6 +635,10 @@ public final class Goal implements ProofGoal {
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
         proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
         return goalList;
+    }
+
+    public Services getOverlayServices() {
+        return proof().getServices().getOverlay(getLocalNamespaces());
     }
 
     /*

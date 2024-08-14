@@ -151,12 +151,13 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+        final var services = goal.getOverlayServices();
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate(ruleApp.posInOccurrence().subTerm(), services);
         assert inst != null : "If isApplicable has been checked, this must not be null";
         if (inst.isFirst()) {
-            return applyForMethods(goal, inst.getFirst(), services, ruleApp);
+            return applyForMethods(goal, inst.getFirst(), ruleApp);
         } else {
             return applyForModelFields(goal, inst.getSecond(), services, ruleApp);
         }
@@ -230,10 +231,11 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      * Turn an assignment {U}[ x = obj.modelMethod(params); ... ]post into
      * {U}{ x := modelMethod(heap, obj, params) }[...]post.
      */
-    private ImmutableList<Goal> applyForMethods(Goal goal, Instantiation inst, Services services,
-            RuleApp ruleApp) {
+    private ImmutableList<Goal> applyForMethods(Goal goal, Instantiation inst,
+                                                RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         final JavaBlock jb = inst.progPost.javaBlock();
+        final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
 
         // split goal into branches

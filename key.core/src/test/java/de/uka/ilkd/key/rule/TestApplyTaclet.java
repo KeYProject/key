@@ -113,7 +113,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(1, goals.size(), "Too many or zero goals for imp-right.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
@@ -138,7 +138,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(1, goals.size(), "Too many or zero goals for imp_right_add.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
@@ -154,7 +154,7 @@ public class TestApplyTaclet {
                     .getInstantiation(TacletForTests.getSchemaVariables().lookup(new Name("b"))),
             aimpb, "Inserted cut rule's b should be instantiated to A -> B.");
         assertTrue(rApp.complete(), "Rule App should be complete");
-        goals = nfapp.head().execute(goals.head(), TacletForTests.services());
+        goals = nfapp.head().execute(goals.head());
         Sequent seq1 = goals.head().sequent();
         Sequent seq2 = goals.tail().head().sequent();
         assertEquals(2, goals.size(), "Preinstantiated cut-rule should be executed");
@@ -184,7 +184,7 @@ public class TestApplyTaclet {
         TacletApp rApp = rApplist.head();
         rApp = rApp.tryToInstantiate(TacletForTests.services());
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent(), Semisequent.EMPTY_SEMISEQUENT,
@@ -214,7 +214,7 @@ public class TestApplyTaclet {
         assertEquals(1, appList.size(), "Too many matches.");
         assertSame(appList.head().instantiations(), rApp.instantiations(), "Wrong match found.");
         assertTrue(appList.head().complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = appList.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = appList.head().execute(goal);
         assertEquals(1, goals.size(), "Wrong number of goals for close.");
         proof[2].closeGoal(goals.head());
         assertTrue(proof[2].closed(), "Proof should be closed.");
@@ -243,7 +243,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(2, goals.size(), "Too many or zero goals for imp-left.");
         Sequent seq = goals.head().sequent();
         if (!seq.succedent().isEmpty()) {
@@ -280,7 +280,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(1, goals.size(), "Too many or zero goals for contradiction.");
         Sequent seq = goals.head().sequent();
         Term term = seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
@@ -304,7 +304,7 @@ public class TestApplyTaclet {
             TacletForTests.getSchemaVariables().lookup(new Name("b")), t_c, false,
             proof[0].getServices());
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(2, goals.size(), "Too many or too few goals.");
         Sequent seq1 = goals.head().sequent();
         goals = goals.tail();
@@ -420,7 +420,7 @@ public class TestApplyTaclet {
         assertTrue(app.instantiations().isInstantiated(e2), "#e2 not instantiated");
         assertTrue(app.instantiations().isInstantiated(p1), "#p1 not instantiated");
 
-        ImmutableList<Goal> goals = app.execute(goal, TacletForTests.services);
+        ImmutableList<Goal> goals = app.execute(goal);
 
         assertEquals(1, goals.size(), "Unexpected number of goals");
     }
@@ -444,7 +444,7 @@ public class TestApplyTaclet {
         Goal goal = createGoal(proof[1].root(), tacletIndex);
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pio, null);
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services);
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(2, goals.size(), "Expected two goals");
         assertTrue(
@@ -481,7 +481,7 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pio, null);
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(1, goals.size(), "Expected one goal");
         assertTrue(goals.head().sequent().isEmpty(),
@@ -503,7 +503,7 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pio, null);
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
 
         assertEquals(1, goals.size(), "Expected one goal");
@@ -531,7 +531,7 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pio, null);
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
 
         seq = goals.head().sequent();
@@ -543,7 +543,7 @@ public class TestApplyTaclet {
 
         rApplist = goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pio, null);
 
-        goals = rApplist.head().execute(goal, TacletForTests.services());
+        goals = rApplist.head().execute(goal);
 
         assertEquals(1, goals.size(), "Expected one goal");
 
@@ -581,7 +581,7 @@ public class TestApplyTaclet {
         assertEquals(1, appList.size(), "Expected one match.");
         assertTrue(appList.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = appList.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = appList.head().execute(goal);
         assertEquals(1, goals.size(), "Too many or zero goals.");
         Sequent seq = goals.head().sequent();
         Sequent correctSeq = proof[9].root().sequent();
@@ -628,7 +628,7 @@ public class TestApplyTaclet {
         assertEquals(1, appList.size(), "Expected one match.");
         assertTrue(appList.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = appList.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = appList.head().execute(goal);
         assertEquals(2, goals.size(), "Expected two goals.");
 
         { // Goal one
@@ -661,7 +661,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
         assertEquals(1, goals.size(), "Expected one goal.");
 
         goal = goals.head();
@@ -673,7 +673,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        goals = rApplist.head().execute(goal, TacletForTests.services());
+        goals = rApplist.head().execute(goal);
         assertEquals(1, goals.size(), "Expected one goal.");
 
         Sequent seq = goals.head().sequent();
@@ -700,7 +700,7 @@ public class TestApplyTaclet {
 
         // the bug was: the next method throws the exception
         // java.util.NoSuchElementException
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(1, goals.size(), "Expected one goal.");
 
@@ -732,7 +732,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete.");
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(1, goals.size(), "Expected one goal.");
 
@@ -807,7 +807,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(1, goals.size(), "Expected one goal.");
 
@@ -839,7 +839,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(1, goals.size(), "Expected one goal.");
 
@@ -880,7 +880,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(1, goals.size(), "Expected one goal.");
 
@@ -916,7 +916,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(2, goals.size(), "Expected two goals.");
 
@@ -955,7 +955,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
 
         assertEquals(2, goals.size(), "Expected two goals.");
 
@@ -996,7 +996,7 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
         goal = goals.head();
 
         // end of setup
@@ -1010,7 +1010,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        goals = rApplist.head().execute(goal, TacletForTests.services());
+        goals = rApplist.head().execute(goal);
 
         assertEquals(2, goals.size(), "Expected two goals.");
 
@@ -1056,7 +1056,7 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
         goal = goals.head();
 
         // end of setup
@@ -1070,7 +1070,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        goals = rApplist.head().execute(goal, TacletForTests.services());
+        goals = rApplist.head().execute(goal);
 
         assertEquals(2, goals.size(), "Expected two goals.");
         assertEquals(0, goals.head().sequent().antecedent().size(),
@@ -1115,7 +1115,7 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
         goal = goals.head();
 
         // end of setup
@@ -1129,7 +1129,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        goals = rApplist.head().execute(goal, TacletForTests.services());
+        goals = rApplist.head().execute(goal);
 
         assertEquals(2, goals.size(), "Expected two goals.");
 
@@ -1175,7 +1175,7 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
         goal = goals.head();
 
         // end of setup
@@ -1189,7 +1189,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        goals = rApplist.head().execute(goal, TacletForTests.services());
+        goals = rApplist.head().execute(goal);
 
         assertEquals(2, goals.size(), "Expected two goals.");
 

@@ -53,8 +53,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
                 term.getLabels());
         }
 
-        with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp,
-            services);
+        with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp
+        );
 
         if (!with.sort().extendsTrans(maxSort)) {
             with = services.getTermBuilder().cast(maxSort, with);
@@ -143,17 +143,17 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         if (posOfFind.isInAntec()) {
             addToAntec(add.antecedent(), termLabelState,
                 new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent,
-                whereToAdd, posOfFind, matchCond, goal, ruleApp, services);
+                whereToAdd, posOfFind, matchCond, goal, ruleApp);
             addToSucc(add.succedent(), termLabelState,
                 new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null,
-                posOfFind, matchCond, goal, ruleApp, services);
+                posOfFind, matchCond, goal, ruleApp);
         } else {
             addToAntec(add.antecedent(), termLabelState,
                 new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null,
-                posOfFind, matchCond, goal, ruleApp, services);
+                posOfFind, matchCond, goal, ruleApp);
             addToSucc(add.succedent(), termLabelState,
                 new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, whereToAdd,
-                posOfFind, matchCond, goal, ruleApp, services);
+                posOfFind, matchCond, goal, ruleApp);
         }
     }
 }

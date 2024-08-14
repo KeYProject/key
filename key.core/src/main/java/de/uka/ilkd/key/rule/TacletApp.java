@@ -321,12 +321,12 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * instantiated
      *
      * @param goal the Goal at which the Taclet is applied
-     * @param services the Services encapsulating all java information
      * @return list of new created goals
      */
     @Override
-    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
+    public @Nullable ImmutableList<Goal> execute(Goal goal) {
         var time = System.nanoTime();
+        var services = goal.getOverlayServices();
         var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
         try {
             var timePre = System.nanoTime();
@@ -346,7 +346,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 PERF_PRE.getAndAdd(System.nanoTime() - timePre);
             }
 
-            return taclet().apply(goal, services, this);
+            return taclet().apply(goal, this);
         } finally {
             PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
             PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);

@@ -163,7 +163,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         }
 
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+            instantiate(occurrence.subTerm(), goal);
 
         if (instantiation == null) {
             return false;
@@ -185,17 +185,15 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     }
 
     /**
-     *
      * @param formula the formula on which the rule is to be applied.
-     * @param goal the current goal.
-     * @param services services.
+     * @param goal    the current goal.
      * @return a new instantiation.
      */
-    public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
+    public Instantiation instantiate(final Term formula, final Goal goal) {
         if (formula == getLastFocusTerm()) {
             return getLastInstantiation();
         } else {
-            final Instantiation result = new Instantiator(formula, goal, services).instantiate();
+            final Instantiation result = new Instantiator(formula, goal).instantiate();
             setLastFocusTerm(formula);
             setLastInstantiation(result);
             return result;
@@ -233,13 +231,11 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     protected static final class Instantiator extends AbstractAuxiliaryContractRule.Instantiator {
 
         /**
-         *
          * @param formula the formula on which the rule is to be applied.
-         * @param goal the current goal.
-         * @param services services.
+         * @param goal    the current goal.
          */
-        public Instantiator(final Term formula, final Goal goal, final Services services) {
-            super(formula, goal, services);
+        public Instantiator(final Term formula, final Goal goal) {
+            super(formula, goal);
         }
 
         @Override

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -15,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * rule application with specific information how and where the rule has to be applied
  */
-public interface RuleApp extends org.key_project.ncore.rules.RuleApp, EqualsModProofIrrelevancy {
+public interface RuleApp extends org.key_project.ncore.rules.RuleApp<Goal>, EqualsModProofIrrelevancy {
 
     /**
      * returns the rule of this rule application
@@ -33,15 +32,8 @@ public interface RuleApp extends org.key_project.ncore.rules.RuleApp, EqualsModP
      * instantiated
      *
      * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all java information
      * @return list of new created goals
      */
     @Nullable
-    ImmutableList<Goal> execute(Goal goal, Services services);
-
-    @Nullable
-    default ImmutableList<Goal> execute(Goal goal) {
-        return execute(goal, goal.proof().getServices());
-    }
-
+    ImmutableList<Goal> execute(Goal goal);
 }

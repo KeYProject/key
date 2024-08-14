@@ -868,7 +868,7 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+        public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
                 throws RuleAbortException {
             throw new RuleAbortException("no implementation");
         }

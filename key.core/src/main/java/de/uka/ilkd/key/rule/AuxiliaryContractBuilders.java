@@ -313,17 +313,15 @@ public final class AuxiliaryContractBuilders {
         private final Services services;
 
         /**
-         *
-         * @param goal If this is not null, all created variables are added to it. If it is null,
-         *        the variables are instead added to the {@code services}' namespace.
+         * @param goal                 If this is not null, all created variables are added to it. If it is null,
+         *                             the variables are instead added to the {@code services}' namespace.
          * @param placeholderVariables the placeholders from which to create the variables.
-         * @param services services.
          */
         public VariablesCreatorAndRegistrar(final Goal goal,
-                final BlockContract.Variables placeholderVariables, final Services services) {
+                final Variables placeholderVariables) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
-            this.services = services;
+            this.services = goal.getOverlayServices();
         }
 
         /**

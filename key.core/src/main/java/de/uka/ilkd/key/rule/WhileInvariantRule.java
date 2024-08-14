@@ -704,12 +704,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, final RuleApp ruleApp)
             throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
         LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
         final Sequent applicationSequent = goal.sequent();
+        final var services = goal.getOverlayServices();
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
         final TermBuilder tb = services.getTermBuilder();
 

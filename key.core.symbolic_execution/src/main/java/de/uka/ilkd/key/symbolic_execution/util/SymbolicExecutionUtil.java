@@ -2729,7 +2729,7 @@ public final class SymbolicExecutionUtil {
         if (term != null) {
             SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(new TermLabelState(),
                 null, tacletApp.posInOccurrence(), tacletApp.instantiations(), null,
-                tacletApp.taclet(), tacletApp, services);
+                tacletApp.taclet(), tacletApp);
             term.execPostOrder(visitor);
             return visitor.getTerm();
         } else {

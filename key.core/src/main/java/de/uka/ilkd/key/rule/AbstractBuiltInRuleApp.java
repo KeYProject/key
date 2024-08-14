@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -69,17 +68,17 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * instantiated
      *
      * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all java information
      * @return list of new created goals
      */
     @Override
-    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
+    public @Nullable ImmutableList<Goal> execute(Goal goal) {
         var time = System.nanoTime();
         var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
+        var services = goal.getOverlayServices();
         try {
             goal.addAppliedRuleApp(this);
             try {
-                return Objects.requireNonNull(builtInRule.apply(goal, services, this));
+                return Objects.requireNonNull(builtInRule.apply(goal, this));
             } catch (RuleAbortException rae) {
                 goal.removeLastAppliedRuleApp();
                 goal.node().setAppliedRuleApp(null);

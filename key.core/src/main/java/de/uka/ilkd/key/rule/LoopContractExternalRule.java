@@ -192,7 +192,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             return false;
         } else {
             final Instantiation instantiation =
-                instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+                instantiate(occurrence.subTerm(), goal);
 
             if (instantiation == null) {
                 return false;
@@ -211,20 +211,21 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
-            final RuleApp ruleApp) throws RuleAbortException {
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
+                                              final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractExternalBuiltInRuleApp;
         LoopContractExternalBuiltInRuleApp application =
             (LoopContractExternalBuiltInRuleApp) ruleApp;
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal, services);
+            instantiate(application.posInOccurrence().subTerm(), goal);
         final LoopContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
 
         assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement())
                 || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
 
+        final var services = goal.getOverlayServices();
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
@@ -233,7 +234,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final Map<LocationVariable, JFunction> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables variables =
-            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
+            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
                     .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =

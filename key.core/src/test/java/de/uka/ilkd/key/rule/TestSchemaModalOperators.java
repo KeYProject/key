@@ -174,7 +174,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, services);
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(1, goals.size(),
             "There should be 1 goal for testSchemaModal1 taclet, was " + goals.size());
         Sequent seq = goals.head().sequent();
@@ -208,7 +208,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(1, goals.size(),
             "There should be 1 goal for testSchemaModal2 taclet, was " + goals.size());
         Sequent seq = goals.head().sequent();
@@ -238,7 +238,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
+        ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(3, goals.size(),
             "There should be 3 goals for testSchemaModal3 taclet, was " + goals.size());
         Sequent seq0 = goals.head().sequent();

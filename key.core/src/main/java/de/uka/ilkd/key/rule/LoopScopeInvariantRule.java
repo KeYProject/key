@@ -141,12 +141,12 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         // Initial assertions
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
 
-        LoopInvariantInformation loopInvInfo = doPreparations(goal, services, ruleApp);
+        LoopInvariantInformation loopInvInfo = doPreparations(goal, ruleApp);
 
         ImmutableList<Goal> goals = loopInvInfo.goals();
         Goal initiallyGoal = goals.tail().head();

@@ -122,7 +122,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         try {
             // Extract required Terms from goal
@@ -175,7 +175,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                     .sequent();
             // Compute results and their conditions
             List<ResultsAndCondition> conditionsAndResultsMap =
-                computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
+                computeResultsAndConditions(goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
             ImmutableList<Goal> goals = goal.split(1);
