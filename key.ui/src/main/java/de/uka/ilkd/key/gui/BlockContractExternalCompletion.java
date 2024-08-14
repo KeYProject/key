@@ -44,7 +44,7 @@ public class BlockContractExternalCompletion implements InteractiveRuleApplicati
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation = BlockContractExternalRule.INSTANCE
-                .instantiate(application.posInOccurrence().subTerm(), goal, services);
+                .instantiate(application.posInOccurrence().subTerm(), goal);
         final ImmutableSet<BlockContract> contracts =
             BlockContractExternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<BlockContract> configurator =

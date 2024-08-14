@@ -44,7 +44,7 @@ public class LoopContractExternalCompletion implements InteractiveRuleApplicatio
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation = LoopContractExternalRule.INSTANCE
-                .instantiate(application.posInOccurrence().subTerm(), goal, services);
+                .instantiate(application.posInOccurrence().subTerm(), goal);
         final ImmutableSet<LoopContract> contracts =
             LoopContractExternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<LoopContract> configurator =

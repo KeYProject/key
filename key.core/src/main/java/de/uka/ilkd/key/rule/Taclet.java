@@ -954,8 +954,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
-        return getExecutor().apply(goal, services, tacletApp);
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp tacletApp) {
+        return getExecutor().apply(goal, tacletApp);
     }
 
     public TacletExecutor<? extends Taclet> getExecutor() {

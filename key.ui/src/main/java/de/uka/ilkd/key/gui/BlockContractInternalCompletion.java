@@ -44,7 +44,7 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation = BlockContractInternalRule.INSTANCE
-                .instantiate(application.posInOccurrence().subTerm(), goal, services);
+                .instantiate(application.posInOccurrence().subTerm(), goal);
         final ImmutableSet<BlockContract> contracts =
             BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<BlockContract> configurator =

@@ -65,22 +65,21 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *
-     * @param termLabelState the termlabel state
-     * @param labelHint hints about how to deal with labels
+     * @param termLabelState             the termlabel state
+     * @param labelHint                  hints about how to deal with labels
      * @param applicationPosInOccurrence the application position
-     * @param svInst mapping of schemavariables to their instantiation
-     * @param goal the current goal
-     * @param rule the applied rule
-     * @param ruleApp the rule application
-     * @param services the Services
-     * @param termBuilder the TermBuilder to use (allows to use the non cached version)
+     * @param svInst                     mapping of schemavariables to their instantiation
+     * @param goal                       the current goal
+     * @param rule                       the applied rule
+     * @param ruleApp                    the rule application
+     * @param useTermCache               the TermBuilder to use (allows to use the non cached version)
      */
     private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
-            Rule rule, RuleApp ruleApp, Services services, TermBuilder termBuilder) {
+                                      PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
+                                      Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
-        this.services = services;
-        this.tb = termBuilder;
+        this.services = goal.getOverlayServices();
+        this.tb = services.getTermBuilder(useTermCache);
         this.svInst = svInst;
         this.applicationPosInOccurrence = applicationPosInOccurrence;
         this.rule = rule;
@@ -97,27 +96,26 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *
-     * @param termLabelState the termlabel state
-     * @param labelHint hints about how to deal with labels
+     * @param termLabelState             the termlabel state
+     * @param labelHint                  hints about how to deal with labels
      * @param applicationPosInOccurrence the application position
-     * @param svInst mapping of schemavariables to their instantiation
-     * @param goal the current goal
-     * @param rule the applied rule
-     * @param ruleApp the rule application
-     * @param services the Services
+     * @param svInst                     mapping of schemavariables to their instantiation
+     * @param goal                       the current goal
+     * @param rule                       the applied rule
+     * @param ruleApp                    the rule application
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
-            Rule rule, RuleApp ruleApp, Services services) {
+            Rule rule, RuleApp ruleApp) {
         this(termLabelState, labelHint, applicationPosInOccurrence, svInst, goal, rule, ruleApp,
-            services, services.getTermBuilder());
+                true);
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
-            Services services, TermBuilder termBuilder) {
+                                     PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
+                                     boolean useTermCache) {
         this(termLabelState, labelHint, applicationPosInOccurrence,
-            SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, services);
+            SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, useTermCache);
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {

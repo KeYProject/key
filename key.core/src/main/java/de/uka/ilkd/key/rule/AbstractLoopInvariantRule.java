@@ -30,13 +30,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
+import org.key_project.ncore.rules.RuleAbortException;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
- * {@link #doPreparations(Goal, Services, RuleApp)} directly at the beginning of the
- * {@link #apply(Goal, Services, RuleApp)} method.
+ * {@link #doPreparations(Goal, RuleApp)} directly at the beginning of the
+ * {@link Rule#apply(Goal, RuleApp)} method.
  *
  * @see LoopScopeInvariantRule
  * @see WhileInvariantRule
@@ -66,14 +67,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * new set of goals, that is splitting the current goal is no longer required after calling this
      * method.
      *
-     * @param goal the Goal on which to apply <tt>ruleApp</tt>
-     * @param services the Services with the necessary information about the java programs
+     * @param goal    the Goal on which to apply <tt>ruleApp</tt>
      * @param ruleApp the rule application to be executed
      * @return The {@link LoopInvariantInformation} object containing the data for the application
-     *         of loop invariant rules.
+     * of loop invariant rules.
      */
-    public LoopInvariantInformation doPreparations(Goal goal, Services services, RuleApp ruleApp)
+    public LoopInvariantInformation doPreparations(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
+        final var services = goal.getOverlayServices();
         // Basic objects needed for rule application
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();

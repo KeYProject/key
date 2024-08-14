@@ -129,8 +129,8 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public final @NonNull ImmutableList<Goal> apply(Goal goal, final Services services,
-            RuleApp ruleApp)
+    public final @NonNull ImmutableList<Goal> apply(Goal goal,
+                                                    RuleApp ruleApp)
             throws RuleAbortException {
 
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
@@ -151,6 +151,7 @@ public class MergeRule implements BuiltInRule {
         // order expected by the user.
         final ImmutableList<Goal> newGoals = goal.split(1 + numSideConditionsToProve).reverse();
         final Goal newGoal = newGoals.head();
+        var services = goal.getOverlayServices();
 
         final TermBuilder tb = services.getTermBuilder();
         final MergeProcedure mergeRule = mergeRuleApp.getConcreteRule();

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.HasOrigin;
@@ -15,25 +14,18 @@ import org.jspecify.annotations.NonNull;
 /**
  * This interface has to be implemented by all classes that want to act as a rule in the calculus.
  */
-public interface Rule extends org.key_project.ncore.rules.Rule, HasOrigin {
+public interface Rule extends org.key_project.ncore.rules.Rule<Goal, RuleApp>, HasOrigin {
 
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
-     * @param goal the Goal on which to apply <tt>ruleApp</tt>
-     * @param services the Services with the necessary information about the java programs
+     * @param goal    the Goal on which to apply <tt>ruleApp</tt>
      * @param ruleApp the rule application to be executed
      * @return all open goals below \old(goal.node()), i.e. the goals resulting from the rule
-     *         application
+     * application
      * @throws RuleAbortException when this rule was aborted
      */
     @NonNull
-    ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException;
-
-
-    @NonNull
-    default ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
-        return apply(goal, goal.proof().getServices(), ruleApp);
-    };
 }

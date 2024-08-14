@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SetStatement;
@@ -72,12 +71,13 @@ public final class SetStatementRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof SetStatementBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply SetStatementBuiltInRuleApp");
         }
 
+        final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
         final Term formula = occurrence.subTerm();

@@ -95,8 +95,8 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
-            final RuleApp ruleApp) throws RuleAbortException {
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
+                                              final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 
         assert ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp : //
@@ -121,7 +121,7 @@ public class CloseAfterMerge implements BuiltInRule {
         // node has also been closed, and to remove the mark as linked
         // node if the merge node has been pruned.
         final Node mergeNodeF = closeApp.getCorrespondingMergeNode();
-        services.getProof().addProofTreeListener(new ProofTreeAdapter() {
+        goal.proof().addProofTreeListener(new ProofTreeAdapter() {
 
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
@@ -147,7 +147,7 @@ public class CloseAfterMerge implements BuiltInRule {
         if (generateIsWeakeningGoal) {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(MERGED_NODE_IS_WEAKENING_TITLE);
-
+            var services = goal.getOverlayServices();
             Term isWeakeningForm = getSyntacticWeakeningFormula(closeApp, ruleIsWeakeningGoal);
             isWeakeningForm = TermLabelManager.refactorTerm(termLabelState, services, null,
                 isWeakeningForm, this, ruleIsWeakeningGoal, FINAL_WEAKENING_TERM_HINT, null);

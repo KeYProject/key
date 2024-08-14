@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilde
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -208,21 +209,19 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     /**
-     *
-     * @param goal the current goal.
+     * @param goal     the current goal.
      * @param selfTerm the self term.
      * @param contract the contract being applied.
-     * @param services services.
      * @return the variables for both the current and the next loop iteration.
      */
-    private static LoopContract.Variables[] createVars(final Goal goal, final Term selfTerm,
-            final LoopContract contract, final Services services) {
+    private static AuxiliaryContract.Variables[] createVars(final Goal goal, final Term selfTerm,
+                                                            final LoopContract contract) {
         final LoopContract.Variables variables =
-            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
+            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
                     .createAndRegister(selfTerm, true);
 
         final LoopContract.Variables nextVariables =
-            new VariablesCreatorAndRegistrar(goal, variables, services)
+            new VariablesCreatorAndRegistrar(goal, variables)
                     .createAndRegisterCopies("_NEXT");
         return new LoopContract.Variables[] { variables, nextVariables };
     }
@@ -259,19 +258,20 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
-            final RuleApp ruleApp) throws RuleAbortException {
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
+                                              final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
         LoopContractInternalBuiltInRuleApp application =
             (LoopContractInternalBuiltInRuleApp) ruleApp;
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal, services);
+            instantiate(application.posInOccurrence().subTerm(), goal);
         LoopContract contract = application.getContract();
 
         assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement())
                 || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
 
+        var services = goal.getOverlayServices();
         contract = contract.replaceEnhancedForVariables(contract.getBlock(), services);
         contract.setInstantiationSelf(instantiation.self());
 
@@ -283,7 +283,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         final Map<LocationVariable, JFunction> anonOutHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables[] vars =
-            createVars(goal, instantiation.self(), contract, services);
+            createVars(goal, instantiation.self(), contract);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
             new ConditionsAndClausesBuilder(contract, heaps, vars[0], instantiation.self(),

@@ -8,7 +8,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-public interface RuleApp {
+public interface RuleApp<G extends ProofGoal> {
     /**
      * returns the rule of this rule application
      */
@@ -22,7 +22,7 @@ public interface RuleApp {
      * @return list of new created goals
      */
     @Nullable
-    <G extends ProofGoal> ImmutableList<G> execute(G goal);
+     ImmutableList<G> execute(G goal);
 
     /**
      * returns true if all variables are instantiated

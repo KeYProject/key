@@ -18,7 +18,10 @@ import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -154,7 +157,7 @@ public class RewriteTaclet extends FindTaclet {
      * @return false if vetoing
      */
     private boolean veto(Term t) {
-        return t.freeVars().size() > 0;
+        return !t.freeVars().isEmpty();
     }
 
     /**
@@ -252,7 +255,6 @@ public class RewriteTaclet extends FindTaclet {
         return res;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public RewriteTacletExecutor<? extends RewriteTaclet> getExecutor() {
         return (RewriteTacletExecutor<? extends RewriteTaclet>) executor;
@@ -273,6 +275,4 @@ public class RewriteTaclet extends FindTaclet {
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs, find,
             prefixMap, applicationRestriction, choices, getSurviveSymbExec(), tacletAnnotations);
     }
-
-
 }
