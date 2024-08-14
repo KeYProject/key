@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;

@@ -1,39 +1,38 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule;
+package org.key_project.ncore.rules;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
-
-import org.key_project.logic.HasOrigin;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * This interface has to be implemented by all classes that want to act as a rule in the calculus.
- */
-public interface Rule extends org.key_project.ncore.rules.Rule, HasOrigin {
-
+public interface Rule extends Named {
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
      * @param goal the Goal on which to apply <tt>ruleApp</tt>
-     * @param services the Services with the necessary information about the java programs
      * @param ruleApp the rule application to be executed
      * @return all open goals below \old(goal.node()), i.e. the goals resulting from the rule
      *         application
      * @throws RuleAbortException when this rule was aborted
      */
     @NonNull
-    ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    <G extends ProofGoal> ImmutableList<G> apply(G goal, RuleApp ruleApp)
             throws RuleAbortException;
 
+    /**
+     * the name of the rule
+     */
+    Name name();
 
-    @NonNull
-    default ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
-        return apply(goal, goal.proof().getServices(), ruleApp);
-    };
+    /**
+     * returns the display name of the rule
+     */
+    default String displayName() {
+        return name().toString();
+    }
 }

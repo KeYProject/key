@@ -28,13 +28,13 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -133,7 +133,7 @@ public class CloseAfterMerge implements BuiltInRule {
                 // a closed goal when loading a proof without the GUI (e.g.
                 // in a JUnit test).
 
-                if (e.getGoals().size() == 0 && mergeNodeF.isClosed()) {
+                if (e.getGoals().isEmpty() && mergeNodeF.isClosed()) {
                     // The merged node was closed; now also close this node.
 
                     e.getSource().closeGoal(linkedGoal);
