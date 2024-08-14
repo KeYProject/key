@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -81,7 +81,7 @@ public class TestSyntacticalReplaceVisitor {
     @Test
     public void test1() {
         SyntacticalReplaceVisitor srv = new SyntacticalReplaceVisitor(new TermLabelState(), null,
-            null, insts, null, null, null);
+            null, insts, TacletForTests.createGoal(), null, null);
         rw.execPostOrder(srv);
         assertEquals(srv.getTerm(), t_allxpxpx);
     }
@@ -91,8 +91,9 @@ public class TestSyntacticalReplaceVisitor {
     public void testSubstitutionReplacement() {
         Term orig = TacletForTests.parseTerm("{\\subst s x; f(const)}(\\forall s y; p(x))");
         Term result = TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
+        var goal = TacletForTests.createGoal();
         SyntacticalReplaceVisitor v = new SyntacticalReplaceVisitor(new TermLabelState(), null,
-            null, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null, null);
+            null, SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, null, null);
         orig.execPostOrder(v);
         assertEquals(v.getTerm().sub(0), result.sub(0),
             "Substitution Term not resolved correctly.");
