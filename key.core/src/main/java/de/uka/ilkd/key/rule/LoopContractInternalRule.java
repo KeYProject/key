@@ -209,13 +209,13 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     /**
-     * @param goal     the current goal.
+     * @param goal the current goal.
      * @param selfTerm the self term.
      * @param contract the contract being applied.
      * @return the variables for both the current and the next loop iteration.
      */
     private static AuxiliaryContract.Variables[] createVars(final Goal goal, final Term selfTerm,
-                                                            final LoopContract contract) {
+            final LoopContract contract) {
         final LoopContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
                     .createAndRegister(selfTerm, true);
@@ -259,7 +259,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
     @Override
     public @NonNull ImmutableList<Goal> apply(final Goal goal,
-                                              final RuleApp ruleApp) throws RuleAbortException {
+            final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
         LoopContractInternalBuiltInRuleApp application =
             (LoopContractInternalBuiltInRuleApp) ruleApp;

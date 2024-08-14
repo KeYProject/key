@@ -81,7 +81,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
          * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
          * with the same sequent as the given one.
          *
-         * @param goal    the Goal on which to apply <tt>ruleApp</tt>
+         * @param goal the Goal on which to apply <tt>ruleApp</tt>
          * @param ruleApp the rule application to be executed
          * @return a list with an identical goal as the given <tt>goal</tt>
          */

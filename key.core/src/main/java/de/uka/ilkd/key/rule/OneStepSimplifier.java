@@ -242,7 +242,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifyPos(Goal goal, PosInOccurrence pos,
-                                       int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol) {
         var services = goal.getOverlayServices();
         final ImmutableList<NoPosTacletApp> apps =
             indices[indexNr].getRewriteTaclet(pos, TacletFilter.TRUE, services);
@@ -277,7 +277,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifySub(Goal goal, PosInOccurrence pos,
-                                       int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol) {
         for (int i = 0, n = pos.subTerm().arity(); i < n; i++) {
             SequentFormula result =
                 simplifyPosOrSub(goal, pos.down(i), indexNr, protocol);
@@ -296,7 +296,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifyPosOrSub(Goal goal, PosInOccurrence pos,
-                                            int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol) {
         final Term term = pos.subTerm();
         if (notSimplifiableCaches[indexNr].get(term) != null) {
             return null;
@@ -330,7 +330,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private Term replaceKnownHelper(Map<TermReplacementKey, PosInOccurrence> map, Term in,
             boolean inAntecedent, /* out */ List<PosInOccurrence> ifInsts, Protocol protocol,
-                                    Goal goal, RuleApp ruleApp) {
+            Goal goal, RuleApp ruleApp) {
         var services = goal.getOverlayServices();
         final PosInOccurrence pos = map.get(new TermReplacementKey(in));
         if (pos != null) {
@@ -357,7 +357,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             boolean changed = false;
             for (int i = 0; i < subs.length; i++) {
                 subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol,
-                        goal, ruleApp);
+                    goal, ruleApp);
                 if (subs[i] != in.sub(i)) {
                     changed = true;
                 }
@@ -378,9 +378,9 @@ public final class OneStepSimplifier implements BuiltInRule {
      * "context". The positions of the actually used context formulas are passed out as "ifInsts".
      */
     private SequentFormula replaceKnown(SequentFormula cf, boolean inAntecedent,
-                                        Map<TermReplacementKey, PosInOccurrence> context,
+            Map<TermReplacementKey, PosInOccurrence> context,
             /* out */ List<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
-                                        RuleApp ruleApp) {
+            RuleApp ruleApp) {
         if (context == null) {
             return null;
         }
@@ -431,9 +431,9 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifyConstrainedFormula(SequentFormula cf,
-                                                      boolean inAntecedent, Map<TermReplacementKey, PosInOccurrence> context,
+            boolean inAntecedent, Map<TermReplacementKey, PosInOccurrence> context,
             /* out */ List<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
-                                                      RuleApp ruleApp) {
+            RuleApp ruleApp) {
         SequentFormula result =
             replaceKnown(cf, inAntecedent, context, ifInsts, protocol, goal, ruleApp);
         if (result != null) {
@@ -458,7 +458,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private Instantiation computeInstantiation(PosInOccurrence ossPIO,
-                                               Sequent seq, Protocol protocol, Goal goal, RuleApp ruleApp) {
+            Sequent seq, Protocol protocol, Goal goal, RuleApp ruleApp) {
         // collect context formulas (potential if-insts for replace-known)
         final Map<TermReplacementKey, PosInOccurrence> context =
             new LinkedHashMap<>();
@@ -579,7 +579,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     @Override
     public synchronized @NonNull ImmutableList<Goal> apply(Goal goal,
-                                                           RuleApp ruleApp) {
+            RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp
                 : "The rule app must be suitable for OSS";

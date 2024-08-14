@@ -67,14 +67,14 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * a new term is created by replacing variables of term whose replacement is found in the given
      * SVInstantiations
      *
-     * @param term                       the {@link Term} the syntactical replacement is performed on
-     * @param termLabelState             The {@link TermLabelState} of the current rule application.
-     * @param labelHint                  the hint used to maintain {@link TermLabel}s.
+     * @param term the {@link Term} the syntactical replacement is performed on
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
+     * @param labelHint the hint used to maintain {@link TermLabel}s.
      * @param applicationPosInOccurrence the {@link PosInOccurrence} of the find term in the sequent
-     *                                   this taclet is applied to
-     * @param mc                         the {@link MatchConditions} with all instantiations and the constraint
-     * @param goal                       the {@link Goal} on which this taclet is applied
-     * @param ruleApp                    the {@link RuleApp} with application information
+     *        this taclet is applied to
+     * @param mc the {@link MatchConditions} with all instantiations and the constraint
+     * @param goal the {@link Goal} on which this taclet is applied
+     * @param ruleApp the {@link RuleApp} with application information
      * @return the (partially) instantiated term
      */
     protected Term syntacticalReplace(Term term, TermLabelState termLabelState,
@@ -114,19 +114,19 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * the given constrained formula is instantiated and then the result (usually a complete
      * instantiated formula) is returned.
      *
-     * @param termLabelState             The {@link TermLabelState} of the current rule application.
-     * @param schemaFormula              the SequentFormula to be instantiated
-     * @param matchCond                  the MatchConditions object with the instantiations of the schemavariables,
-     *                                   constraints etc.
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
+     * @param schemaFormula the SequentFormula to be instantiated
+     * @param matchCond the MatchConditions object with the instantiations of the schemavariables,
+     *        constraints etc.
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
-     *                                   rewritten
-     * @param labelHint                  The hint used to maintain {@link TermLabel}s.
+     *        rewritten
+     * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @return the as far as possible instantiated SequentFormula
      */
     private SequentFormula instantiateReplacement(TermLabelState termLabelState,
-                                                  SequentFormula schemaFormula, MatchConditions matchCond,
-                                                  PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint, Goal goal,
-                                                  RuleApp tacletApp) {
+            SequentFormula schemaFormula, MatchConditions matchCond,
+            PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint, Goal goal,
+            RuleApp tacletApp) {
 
         final SVInstantiations svInst = matchCond.getInstantiations();
 
@@ -146,13 +146,13 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     /**
      * instantiates the given semisequent with the instantiations found in Matchconditions
      *
-     * @param semi                       the Semisequent to be instantiated
-     * @param termLabelState             The {@link TermLabelState} of the current rule application.
-     * @param labelHint                  The hint used to maintain {@link TermLabel}s.
+     * @param semi the Semisequent to be instantiated
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
+     * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
-     *                                   rewritten
-     * @param matchCond                  the MatchConditions including the mapping Schemavariables to concrete logic
-     *                                   elements
+     *        rewritten
+     * @param matchCond the MatchConditions including the mapping Schemavariables to concrete logic
+     *        elements
      * @return the instantiated formulas of the semisequent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
@@ -164,7 +164,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(termLabelState, sf,
-                    matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp));
+                matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp));
         }
 
         return replacements;
@@ -198,23 +198,23 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * instantiates the constrained formulas of semisequent <code>semi</code> and adds the
      * instantiatied formulas at the specified position to <code>goal</code>
      *
-     * @param semi                       the Semisequent with the the ConstrainedFormulae to be added
-     * @param termLabelState             The {@link TermLabelState} of the current rule application.
-     * @param currentSequent             the Sequent which is the current (intermediate) result of applying the
-     *                                   taclet
-     * @param pos                        the PosInOccurrence describing the place in the sequent
+     * @param semi the Semisequent with the the ConstrainedFormulae to be added
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
+     *        taclet
+     * @param pos the PosInOccurrence describing the place in the sequent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
-     *                                   rewritten
-     * @param antec                      boolean true(false) if elements have to be added to the antecedent(succedent)
-     *                                   (only looked at if pos == null)
-     * @param labelHint                  The hint used to maintain {@link TermLabel}s. the instantiations of the
-     *                                   schemavariables
-     * @param matchCond                  the MatchConditions containing in particular
+     *        rewritten
+     * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
+     *        (only looked at if pos == null)
+     * @param labelHint The hint used to maintain {@link TermLabel}s. the instantiations of the
+     *        schemavariables
+     * @param matchCond the MatchConditions containing in particular
      */
     private void addToPos(Semisequent semi, TermLabelState termLabelState,
-                          SequentChangeInfo currentSequent, PosInOccurrence pos,
-                          PosInOccurrence applicationPosInOccurrence, boolean antec, TacletLabelHint labelHint,
-                          MatchConditions matchCond, Goal goal, RuleApp tacletApp) {
+            SequentChangeInfo currentSequent, PosInOccurrence pos,
+            PosInOccurrence applicationPosInOccurrence, boolean antec, TacletLabelHint labelHint,
+            MatchConditions matchCond, Goal goal, RuleApp tacletApp) {
 
         final ImmutableList<SequentFormula> replacements =
             instantiateSemisequent(semi, termLabelState, labelHint, applicationPosInOccurrence,
@@ -231,17 +231,17 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * it is added at the head of the antecedent). Of course it has to be ensured that the position
      * information describes one occurrence in the antecedent of the sequent.
      *
-     * @param semi                       the Semisequent with the the ConstrainedFormulae to be added
-     * @param termLabelState             The {@link TermLabelState} of the current rule application.
-     * @param labelHint                  The hint used to maintain {@link TermLabel}s.
-     * @param currentSequent             the Sequent which is the current (intermediate) result of applying the
-     *                                   taclet
-     * @param pos                        the PosInOccurrence describing the place in the sequent or null for head of
-     *                                   antecedent
+     * @param semi the Semisequent with the the ConstrainedFormulae to be added
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
+     * @param labelHint The hint used to maintain {@link TermLabel}s.
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
+     *        taclet
+     * @param pos the PosInOccurrence describing the place in the sequent or null for head of
+     *        antecedent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
-     *                                   rewritten
-     * @param matchCond                  the MatchConditions containing in particular the instantiations of the
-     *                                   schemavariables
+     *        rewritten
+     * @param matchCond the MatchConditions containing in particular the instantiations of the
+     *        schemavariables
      */
     protected void addToAntec(Semisequent semi, TermLabelState termLabelState,
             TacletLabelHint labelHint, SequentChangeInfo currentSequent, PosInOccurrence pos,
