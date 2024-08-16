@@ -21,17 +21,22 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     private Node correspondingNode = null;
 
     /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
+     * @param symbolicState
+     *        The symbolic state (parallel update).
+     * @param pathCondition
+     *        The path condition (formula).
      */
     public SymbolicExecutionState(Term symbolicState, Term pathCondition) {
         super(symbolicState, pathCondition);
     }
 
     /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     * @param correspondingNode The node corresponding to this SE state.
+     * @param symbolicState
+     *        The symbolic state (parallel update).
+     * @param pathCondition
+     *        The path condition (formula).
+     * @param correspondingNode
+     *        The node corresponding to this SE state.
      */
     public SymbolicExecutionState(Term symbolicState, Term pathCondition, Node correspondingNode) {
         this(symbolicState, pathCondition);
@@ -60,7 +65,8 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     }
 
     /**
-     * @param correspondingNode The node corresponding to this SE state.
+     * @param correspondingNode
+     *        The node corresponding to this SE state.
      */
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;
@@ -71,21 +77,20 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
         final Services services = getCorrespondingNode().proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
-            + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
-            + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + ")]";
+                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
+                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + ")]";
     }
 
     /**
      * Removes a trailing newline (\n) char from the given string.
      *
-     * @param str The string to remove the newline char from.
+     * @param str
+     *        The string to remove the newline char from.
      * @return The given string with the removed trailing \n char, or the original string if it does
      *         not end with an \n.
      */
     private String rmN(String str) {
-        if (str.endsWith("\n") && str.length() > 1) {
-            return str.substring(0, str.length() - 1);
-        }
+        if (str.endsWith("\n") && str.length() > 1) { return str.substring(0, str.length() - 1); }
 
         return str;
     }

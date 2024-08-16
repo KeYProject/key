@@ -28,13 +28,13 @@ public class TestZipProofSaving {
     }
 
     private void loadZip(Path fileTarget) throws Exception {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(fileTarget.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(fileTarget);
         env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
     }
 
     private void proveAndSaveZip(Path file, Path fileTarget)
             throws ProblemLoaderException, IOException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
         env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
         GZipProofSaver proofSaver =
             new GZipProofSaver(env.getLoadedProof(), fileTarget.toString(), "n/a");
@@ -45,17 +45,10 @@ public class TestZipProofSaving {
         try {
             byte[] buffer = new byte[4096];
             int read = is.read(buffer);
-            while (read >= 0) {
-                os.write(buffer, 0, read);
-                read = is.read(buffer);
-            }
+            while (read >= 0) { os.write(buffer, 0, read); read = is.read(buffer); }
         } finally {
-            if (is != null) {
-                is.close();
-            }
-            if (os != null) {
-                os.close();
-            }
+            if (is != null) { is.close(); }
+            if (os != null) { os.close(); }
         }
     }
 

@@ -7,10 +7,10 @@ import java.net.URI;
 import java.util.*;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
@@ -64,7 +64,7 @@ public class MissingProofsChecker implements Checker {
             reportContractsWithoutProof(contracts, data);
         } catch (ProofInputException e) {
             throw new ProofManagementException("EnvInput could not be loaded!"
-                + System.lineSeparator() + e.getMessage());
+                    + System.lineSeparator() + e.getMessage());
         }
     }
 

@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.AbstractIntegerLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -164,9 +164,7 @@ public final class IntegerLDT extends LDT {
 
         // initialise caches for function symbols from integerHeader.key
         sharp = addFunction(services, "#");
-        for (int i = 0; i < 10; i++) {
-            numberSymbol[i] = addFunction(services, String.valueOf(i));
-        }
+        for (int i = 0; i < 10; i++) { numberSymbol[i] = addFunction(services, String.valueOf(i)); }
         neglit = addFunction(services, NEGATIVE_LITERAL_STRING);
         numbers = addFunction(services, NUMBERS_NAME.toString());
         assert sharp.sort() == numbers.argSort(0);
@@ -631,8 +629,6 @@ public final class IntegerLDT extends LDT {
     /**
      * Placeholder for the loop index variable in an enhanced for loop over arrays. Follows the
      * proposal by David Cok to adapt JML to Java5.
-     *
-     * @return
      */
     public JFunction getIndex() {
         return index;
@@ -658,7 +654,8 @@ public final class IntegerLDT extends LDT {
     /**
      * in bounds for specification
      *
-     * @param t the type
+     * @param t
+     *        the type
      * @return in range function
      */
     public JFunction getSpecInBounds(Type t) {
@@ -680,7 +677,8 @@ public final class IntegerLDT extends LDT {
     /**
      * Finds the cast to type `t`. This is intended for creating specification only.
      *
-     * @param t the type
+     * @param t
+     *        the type
      * @return the cast
      */
     public JFunction getSpecCast(Type t) {
@@ -709,7 +707,8 @@ public final class IntegerLDT extends LDT {
      * @return the function symbol for the given operation
      */
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public JFunction getFunctionFor(
+            de.uka.ilkd.key.java.ast.expression.Operator op, Services serv,
             ExecutionContext ec) {
         // Dead in all examples, removed in commit 1e72a5709053a87cae8d2
         return null;
@@ -733,7 +732,8 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(
+            de.uka.ilkd.key.java.ast.expression.Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
@@ -741,14 +741,16 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(
+            de.uka.ilkd.key.java.ast.expression.Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(
+            de.uka.ilkd.key.java.ast.expression.Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -776,31 +778,21 @@ public final class IntegerLDT extends LDT {
     public String toNumberString(Term t) {
         StringBuilder sb = new StringBuilder();
         Operator f = t.op();
-        while (isNumberLiteral(f)) {
-            sb.insert(0, f.name().toString().charAt(0));
-            t = t.sub(0);
-            f = t.op();
-        }
+        while (isNumberLiteral(f)) { sb.insert(0, f.name().toString().charAt(0)); t = t.sub(0); f = t.op(); }
 
-        if (f != sharp) {
-            throw new RuntimeException("IntegerLDT: This is not a numeral literal: " + t);
-        }
+        if (f != sharp) { throw new RuntimeException("IntegerLDT: This is not a numeral literal: " + t); }
 
         return sb.toString();
     }
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (!containsFunction((Function) t.op())) {
-            return null;
-        }
+        if (!containsFunction((Function) t.op())) { return null; }
         JFunction f = (JFunction) t.op();
         if (isNumberLiteral(f) || f == numbers || f == charID) {
 
             Term it = t;
-            if (f == charID || f == numbers) {
-                it = it.sub(0);
-            }
+            if (f == charID || f == numbers) { it = it.sub(0); }
 
             return new IntLiteral(toNumberString(it)); // TODO: what if number too large for int?
         }

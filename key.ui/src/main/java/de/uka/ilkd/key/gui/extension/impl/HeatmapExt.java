@@ -27,7 +27,7 @@ import net.miginfocom.layout.CC;
  */
 @KeYGuiExtension.Info(name = "Heatmap", optional = true,
     description = "Colorize the formulae on the sequence based on the most recent changes\n"
-        + "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>",
+            + "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>",
     experimental = false)
 public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
@@ -96,8 +96,8 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
      * Explanation for age textfield
      */
     private static final String TEXTFIELD_LABEL = "Maximum age of highlighted \n"
-        + "terms or formulae, or number of newest terms or formulae\n"
-        + "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
+            + "terms or formulae, or number of newest terms or formulae\n"
+            + "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
 
     private final JSpinner spinnerAge;
 

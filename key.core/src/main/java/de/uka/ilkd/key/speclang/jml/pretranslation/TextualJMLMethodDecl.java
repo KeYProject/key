@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
@@ -30,7 +30,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     public String getParsableDeclaration() {
         String m = modifiers.stream().map(it -> {
-            if (JMLTransformer.javaModifiers.contains(it)) {
+            if (JMLTransformer.JAVA_MODS.contains(it)) {
                 return it.toString();
             } else {
                 JMLModifier jmlModifier = JMLModifier.valueOf(it.name());
@@ -45,8 +45,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         String paramsString = methodDefinition.param_list().param_decl().stream()
                 .map(it -> (it.NULLABLE() != null ? "/*@ nullable @*/"
                         : it.NON_NULL() != null ? "/*@ non_null @*/" : "")
-                    + " " + it.typespec().getText() + " " + it.p.getText()
-                    + StringUtil.repeat("[]", it.LBRACKET().size()))
+                        + " " + it.typespec().getText() + " " + it.p.getText()
+                        + StringUtil.repeat("[]", it.LBRACKET().size()))
                 .collect(Collectors.joining(","));
         return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
             getMethodName(), paramsString);
@@ -71,12 +71,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
         return Objects.equals(methodDefinition, that.methodDefinition);
     }
@@ -87,12 +83,8 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     public int getStateCount() {
-        if (modifiers.contains(JMLModifier.TWO_STATE)) {
-            return 2;
-        }
-        if (modifiers.contains(JMLModifier.NO_STATE)) {
-            return 0;
-        }
+        if (modifiers.contains(JMLModifier.TWO_STATE)) { return 2; }
+        if (modifiers.contains(JMLModifier.NO_STATE)) { return 0; }
         return 1;
     }
 

@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -49,16 +49,12 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
 
-        if (svInst.getInstantiation(invSV) != null) {
-            return matchCond;
-        }
+        if (svInst.getInstantiation(invSV) != null) { return matchCond; }
 
         final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
 
-        if (loopSpec == null) {
-            return null;
-        }
+        if (loopSpec == null) { return null; }
 
         final JavaBlock javaBlock = JavaBlock.createJavaBlock(
             (StatementBlock) svInst.getContextInstantiation().contextProgram());

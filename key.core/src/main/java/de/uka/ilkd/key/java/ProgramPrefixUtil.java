@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
 public class ProgramPrefixUtil {
@@ -31,9 +31,7 @@ public class ProgramPrefixUtil {
         MethodFrame mf = (MethodFrame) (prefix instanceof MethodFrame ? prefix : null);
         while (prefix.hasNextPrefixElement()) {
             prefix = prefix.getNextPrefixElement();
-            if (prefix instanceof MethodFrame) {
-                mf = (MethodFrame) prefix;
-            }
+            if (prefix instanceof MethodFrame) { mf = (MethodFrame) prefix; }
             length++;
         }
         return new ProgramPrefixUtil.ProgramPrefixInfo(length, mf);

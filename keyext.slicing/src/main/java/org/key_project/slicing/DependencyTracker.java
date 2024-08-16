@@ -78,20 +78,17 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Construct a new tracker for a proof.
      * This tracker is added as a RuleAppListener and ProofTreeListener to the proof.
      *
-     * @param proof the proof to track
+     * @param proof
+     *        the proof to track
      */
     public DependencyTracker(Proof proof) {
         this.proof = proof;
         proof.addProofTreeListener(this);
         proof.register(this, DependencyTracker.class);
         // skip further tracking if disabled
-        if (!SlicingSettingsProvider.getSlicingSettings().getAlwaysTrack()) {
-            return;
-        }
+        if (!SlicingSettingsProvider.getSlicingSettings().getAlwaysTrack()) { return; }
         // exotic use case: registering a dependency tracker after the proof is loaded
-        if (proof.countNodes() > 1) {
-            graph.ensureProofIsTracked(proof);
-        }
+        if (proof.countNodes() > 1) { graph.ensureProofIsTracked(proof); }
         proof.addRuleAppListener(this);
     }
 
@@ -99,15 +96,15 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Compute the sequent formulas used by the provided rule application:
      * instantiations for \find, \assume, etc.
      *
-     * @param ruleApp a rule application
-     * @param node node corresponding to the rule application
+     * @param ruleApp
+     *        a rule application
+     * @param node
+     *        node corresponding to the rule application
      * @return all formulas used by the rule application
      */
     private static Set<PosInOccurrence> inputsOfRuleApp(RuleApp ruleApp, Node node) {
         Set<PosInOccurrence> inputs = new HashSet<>();
-        if (ruleApp.posInOccurrence() != null) {
-            inputs.add(ruleApp.posInOccurrence().topLevel());
-        }
+        if (ruleApp.posInOccurrence() != null) { inputs.add(ruleApp.posInOccurrence().topLevel()); }
         inputs.addAll(RuleAppUtil.ifInstsOfRuleApp(ruleApp, node));
         return inputs;
     }
@@ -117,8 +114,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * another previous proof step. Always includes the sequent formulas used to instantiate
      * the \find and \assumes pattern.
      *
-     * @param n node
-     * @param removed formulas removed by this node
+     * @param n
+     *        node
+     * @param removed
+     *        formulas removed by this node
      * @return pairs of graph nodes and whether the graph node was removed
      */
     private List<Pair<GraphNode, Boolean>> inputsOfNode(Node n, Set<PosInOccurrence> removed) {
@@ -153,9 +152,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     added = true;
                     break;
                 }
-                if (loc.size() > 0) {
-                    loc = loc.removeLast();
-                }
+                if (loc.size() > 0) { loc = loc.removeLast(); }
             }
             if (!added) {
                 // should only happen if the formula is the initial proof obligation
@@ -177,16 +174,15 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Get all formulas removed by the provided rule application, i.e. all formulas not present
      * in the replacement nodes.
      *
-     * @param ruleAppInfo some rule application
+     * @param ruleAppInfo
+     *        some rule application
      * @return formulas removed by that rule application
      */
     private Set<PosInOccurrence> formulasRemovedBy(RuleAppInfo ruleAppInfo) {
         Set<PosInOccurrence> removed = new HashSet<>();
         for (NodeReplacement newNode : ruleAppInfo.getReplacementNodes()) {
             newNode.getNodeChanges().forEachRemaining(nodeChange -> {
-                if (nodeChange instanceof NodeChangeRemoveFormula) {
-                    removed.add(nodeChange.getPos());
-                }
+                if (nodeChange instanceof NodeChangeRemoveFormula) { removed.add(nodeChange.getPos()); }
             });
         }
         return removed;
@@ -196,9 +192,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         Set<PosInOccurrence> removed = new HashSet<>();
         // compare parent sequent to new sequent
         Node parent = node.parent();
-        if (parent == null) {
-            return removed;
-        }
+        if (parent == null) { return removed; }
         Sequent seqParent = parent.sequent();
         var seqNew = new IdentityHashSet<>(node.sequent().asList());
         int i = 1;
@@ -216,7 +210,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Get the formulas added by this rule application. Each returned pair is one formula
      * and the ID of the branch it is added to (-1 if the node doesn't branch).
      *
-     * @param ruleAppInfo rule application info
+     * @param ruleAppInfo
+     *        rule application info
      * @return formulas added
      */
     private List<Pair<PosInOccurrence, Integer>> outputsOfNode(RuleAppInfo ruleAppInfo) {
@@ -225,9 +220,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         for (NodeReplacement b : ruleAppInfo.getReplacementNodes()) {
             int id = ruleAppInfo.getReplacementNodes().size() > 1 ? sibling : -1;
             b.getNodeChanges().forEachRemaining(c -> {
-                if (c instanceof NodeChangeAddFormula) {
-                    outputs.add(new Pair<>(c.getPos(), id));
-                }
+                if (c instanceof NodeChangeAddFormula) { outputs.add(new Pair<>(c.getPos(), id)); }
             });
             sibling--;
         }
@@ -325,12 +318,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
 
         // add pseudo nodes so the rule application is always included in the graph
-        if (input.isEmpty()) {
-            input.add(new Pair<>(new PseudoInput(), true));
-        }
-        if (output.isEmpty()) {
-            output.add(new PseudoOutput());
-        }
+        if (input.isEmpty()) { input.add(new Pair<>(new PseudoInput(), true)); }
+        if (output.isEmpty()) { output.add(new PseudoOutput()); }
 
         // add new edges to graph
         graph.addRuleApplication(n, input, output);
@@ -341,12 +330,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Either this method or {@link #ruleApplied(ProofEvent)} needs to be called to track
      * a node in the dependency graph.
      *
-     * @param n the node
+     * @param n
+     *        the node
      */
     public void trackNode(Node n) {
-        if (n.proof() != proof) {
-            throw new IllegalStateException("dependency tracker received node of wrong proof");
-        }
+        if (n.proof() != proof) { throw new IllegalStateException("dependency tracker received node of wrong proof"); }
         RuleApp ruleApp = n.getAppliedRuleApp();
         var goalList = n.children();
 
@@ -409,12 +397,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
 
         // add pseudo nodes so the rule application is always included in the graph
-        if (input.isEmpty()) {
-            input.add(new Pair<>(new PseudoInput(), true));
-        }
-        if (output.isEmpty()) {
-            output.add(new PseudoOutput());
-        }
+        if (input.isEmpty()) { input.add(new Pair<>(new PseudoInput(), true)); }
+        if (output.isEmpty()) { output.add(new PseudoOutput()); }
 
         // add new edges to graph
         graph.addRuleApplication(n, input, output);
@@ -431,8 +415,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Export the dependency graph created by this tracker in DOT format.
      * See {@link DotExporter}.
      *
-     * @param abbreviateFormulas whether to shorten formula labels
-     * @param abbreviateChains whether to reduce long chains to one link
+     * @param abbreviateFormulas
+     *        whether to shorten formula labels
+     * @param abbreviateChains
+     *        whether to reduce long chains to one link
      * @return DOT string
      */
     public String exportDot(boolean abbreviateFormulas, boolean abbreviateChains) {
@@ -443,9 +429,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     /**
      * Export part of the dependency graph around a specific graph node.
      *
-     * @param abbreviateFormulas whether to shorten formula labels
-     * @param omitBranch whether to omit branch labels
-     * @param node graph node to center export around
+     * @param abbreviateFormulas
+     *        whether to shorten formula labels
+     * @param omitBranch
+     *        whether to omit branch labels
+     * @param node
+     *        graph node to center export around
      * @return DOT string
      */
     public String exportDotAround(boolean abbreviateFormulas, boolean omitBranch, GraphNode node) {
@@ -457,8 +446,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Analyze the tracked proof using one or both analysis algorithms.
      * Returns null if the proof is not closed.
      *
-     * @param doDependencyAnalysis whether to apply the dependency analysis algorithm
-     * @param doDeduplicateRuleApps whether to de-duplicate rule applications
+     * @param doDependencyAnalysis
+     *        whether to apply the dependency analysis algorithm
+     * @param doDeduplicateRuleApps
+     *        whether to de-duplicate rule applications
      * @return analysis results (null if proof is not closed)
      */
     public AnalysisResults analyze(boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) {
@@ -477,14 +468,14 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     /**
      * Get the proof step that added a sequent formula to the proof.
      *
-     * @param currentNode the proof node that contains <code>pio</code>
-     * @param pio a sequent formula
+     * @param currentNode
+     *        the proof node that contains <code>pio</code>
+     * @param pio
+     *        a sequent formula
      * @return the node that added this formula, or null
      */
     public Node getNodeThatProduced(Node currentNode, PosInOccurrence pio) {
-        if (proof == null) {
-            return null;
-        }
+        if (proof == null) { return null; }
         GraphNode graphNode = graph.getGraphNode(proof, currentNode.getBranchLocation(), pio);
         Stream<Node> incoming = graph.incomingEdgesOf(graphNode);
         return incoming.findFirst().orElse(null);

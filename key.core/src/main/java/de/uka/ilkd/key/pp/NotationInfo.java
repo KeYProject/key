@@ -429,14 +429,10 @@ public final class NotationInfo {
      */
     Notation getNotation(Operator op) {
         Notation result = notationTable.get(op);
-        if (result != null) {
-            return result;
-        }
+        if (result != null) { return result; }
 
         result = notationTable.get(op.getClass());
-        if (result != null) {
-            return result;
-        }
+        if (result != null) { return result; }
 
         if (op instanceof Modality mod) {
             result = notationTable.get(mod.kind());
@@ -444,38 +440,28 @@ public final class NotationInfo {
                 return result;
             } else {
                 result = notationTable.get(ModalOperatorSV.class);
-                if (result != null) {
-                    return result;
-                }
+                if (result != null) { return result; }
             }
         }
 
         if (op instanceof SchemaVariable) {
             result = notationTable.get(SchemaVariable.class);
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
 
         if (op instanceof IProgramMethod) {
             result = notationTable.get(IProgramMethod.class);
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
 
         if (op instanceof IObserverFunction) {
             result = notationTable.get(IObserverFunction.class);
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
 
         if (op instanceof SortDependingFunction) {
             result = notationTable.get(((SortDependingFunction) op).getKind());
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
 
         return new Notation.FunctionNotation();

@@ -113,14 +113,10 @@ public class ProofDifference {
         }
 
         for (int i = 0; i < matchedLeft.length; i++) {
-            if (!matchedLeft[i]) {
-                pairs.add(new Matching(left.get(i), null, left.get(i).length()));
-            }
+            if (!matchedLeft[i]) { pairs.add(new Matching(left.get(i), null, left.get(i).length())); }
         }
         for (int i = 0; i < matchedRight.length; i++) {
-            if (!matchedRight[i]) {
-                pairs.add(new Matching(null, right.get(i), right.get(i).length()));
-            }
+            if (!matchedRight[i]) { pairs.add(new Matching(null, right.get(i), right.get(i).length())); }
         }
 
         return pairs;
@@ -206,8 +202,8 @@ public class ProofDifference {
     record Matching(String left, String right, int distance) {
 
         @Override
-            public String toString() {
-                return String.format("(%s, %s)", left, right);
-            }
+        public String toString() {
+            return String.format("(%s, %s)", left, right);
         }
+    }
 }

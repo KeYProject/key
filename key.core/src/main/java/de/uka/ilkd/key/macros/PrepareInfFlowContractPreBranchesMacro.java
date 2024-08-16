@@ -48,7 +48,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
     @Override
     public String getDescription() {
         return "Removes the original post condition from information flow "
-            + "contract application pre-branches.";
+                + "contract application pre-branches.";
     }
 
 
@@ -98,9 +98,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             String name = app.rule().name().toString();
-            if (!name.equals("hide_right")) {
-                return true;
-            }
+            if (!name.equals("hide_right")) { return true; }
 
             // approve if
             // - the parent.parent rule application is an information

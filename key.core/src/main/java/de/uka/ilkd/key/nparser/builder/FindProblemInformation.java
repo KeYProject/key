@@ -25,12 +25,8 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
-        if (ctx.profile() != null) {
-            information.setProfile(accept(ctx.profile()));
-        }
-        if (ctx.preferences() != null) {
-            information.setPreferences(accept(ctx.preferences()));
-        }
+        if (ctx.profile() != null) { information.setProfile(accept(ctx.profile())); }
+        if (ctx.preferences() != null) { information.setPreferences(accept(ctx.preferences())); }
         each(ctx.decls(), ctx.problem());
         return null;
     }

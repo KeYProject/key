@@ -35,8 +35,10 @@ class ReferenceSearchTable extends JTable implements TableModel {
     /**
      * Construct a new table.
      *
-     * @param proof proof to analyze
-     * @param mediator the mediator
+     * @param proof
+     *        proof to analyze
+     * @param mediator
+     *        the mediator
      */
     public ReferenceSearchTable(Proof proof, KeYMediator mediator) {
         this.setModel(this);
@@ -77,9 +79,9 @@ class ReferenceSearchTable extends JTable implements TableModel {
     @Override
     public String getColumnName(int column) {
         return switch (column) {
-        case 0 -> "Goal";
-        case 1 -> "Reference";
-        default -> "??";
+            case 0 -> "Goal";
+            case 1 -> "Reference";
+            default -> "??";
         };
     }
 

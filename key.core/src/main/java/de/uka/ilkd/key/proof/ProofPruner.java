@@ -32,7 +32,8 @@ class ProofPruner {
     /**
      * prunes the proof at the given node
      *
-     * @param cuttingPoint the node where to prune
+     * @param cuttingPoint
+     *        the node where to prune
      * @return the subtrees whose common root was the given {@code cuttingPoint}
      */
     public ImmutableList<Node> prune(final Node cuttingPoint) {
@@ -96,16 +97,12 @@ class ProofPruner {
         final Goal firstGoal =
             firstLeaf.isClosed() ? proof.getClosedGoal(firstLeaf) : proof.getOpenGoal(firstLeaf);
         assert firstGoal != null;
-        if (firstLeaf.isClosed()) {
-            proof.reOpenGoal(firstGoal);
-        }
+        if (firstLeaf.isClosed()) { proof.reOpenGoal(firstGoal); }
 
         // TODO: WP: test interplay with merge rules
         // Cutting a linked goal (linked by a "defocusing" merge
         // operation, see {@link MergeRule}) unlinks this goal again.
-        if (firstGoal.isLinked()) {
-            firstGoal.setLinkedGoal(null);
-        }
+        if (firstGoal.isLinked()) { firstGoal.setLinkedGoal(null); }
 
         // Go from the first leaf that has been found to the cutting point. For each node on the
         // path,
@@ -120,9 +117,7 @@ class ProofPruner {
 
             final List<StrategyInfoUndoMethod> undoMethods =
                 visitedNode.getStrategyInfoUndoMethods();
-            for (StrategyInfoUndoMethod undoMethod : undoMethods) {
-                firstGoal.undoStrategyInfoAdd(undoMethod);
-            }
+            for (StrategyInfoUndoMethod undoMethod : undoMethods) { firstGoal.undoStrategyInfoAdd(undoMethod); }
         });
 
 
@@ -155,9 +150,7 @@ class ProofPruner {
         // delete NodeInfo, but preserve potentially existing branch label
         String branchLabel = node.getNodeInfo().getBranchLabel();
         node.clearNodeInfo();
-        if (branchLabel != null) {
-            node.getNodeInfo().setBranchLabel(branchLabel);
-        }
+        if (branchLabel != null) { node.getNodeInfo().setBranchLabel(branchLabel); }
     }
 
     private ImmutableList<Node> cut(Node node) {
@@ -168,9 +161,7 @@ class ProofPruner {
             children = children.append(it.next());
 
         }
-        for (Node child : children) {
-            node.remove(child);
-        }
+        for (Node child : children) { node.remove(child); }
         return children;
     }
 

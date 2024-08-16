@@ -79,9 +79,7 @@ public class SemisequentTacletAppIndex {
      * destructive, use only when constructing new index
      */
     private void removeTermIndices(ImmutableList<SequentFormula> cfmas) {
-        for (SequentFormula cfma : cfmas) {
-            removeTermIndex(cfma);
-        }
+        for (SequentFormula cfma : cfmas) { removeTermIndex(cfma); }
     }
 
     /**
@@ -154,7 +152,8 @@ public class SemisequentTacletAppIndex {
      * Create an index object for the semisequent determined by <code>s</code> and
      * <code>antec</code> that contains term indices for each formula.
      *
-     * @param antec iff true create an index for the antecedent of <code>s</code>, otherwise for the
+     * @param antec
+     *        iff true create an index for the antecedent of <code>s</code>, otherwise for the
      *        succedent
      */
     SemisequentTacletAppIndex(Sequent s, boolean antec, Services services, TacletIndex tacletIndex,
@@ -206,7 +205,8 @@ public class SemisequentTacletAppIndex {
     /**
      * called if a formula has been replaced
      *
-     * @param sci SequentChangeInfo describing the change of the sequent
+     * @param sci
+     *        SequentChangeInfo describing the change of the sequent
      */
     public SemisequentTacletAppIndex sequentChanged(SequentChangeInfo sci, Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
@@ -235,16 +235,15 @@ public class SemisequentTacletAppIndex {
      * Create an index that additionally contains the taclets that are selected by
      * <code>filter</code>
      *
-     * @param filter The taclets that are supposed to be added
+     * @param filter
+     *        The taclets that are supposed to be added
      */
     public SemisequentTacletAppIndex addTaclets(RuleFilter filter, Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         final SemisequentTacletAppIndex result = copy();
         final Iterator<SequentFormula> it = termIndices.keyIterator();
 
-        while (it.hasNext()) {
-            result.addTaclets(filter, it.next(), services, tacletIndex, listener);
-        }
+        while (it.hasNext()) { result.addTaclets(filter, it.next(), services, tacletIndex, listener); }
 
         return result;
     }

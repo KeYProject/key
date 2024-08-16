@@ -9,11 +9,6 @@ public final class ProblemLoaderException extends Exception {
     private static final long serialVersionUID = 5683051720482052601L;
     private final AbstractProblemLoader origin;
 
-    public ProblemLoaderException(AbstractProblemLoader origin, Throwable cause) {
-        super(cause.getMessage(), cause);
-        this.origin = origin;
-    }
-
     public ProblemLoaderException(AbstractProblemLoader origin, String msg, Throwable cause) {
         super(msg, cause);
         this.origin = origin;
@@ -31,9 +26,7 @@ public final class ProblemLoaderException extends Exception {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        if (getMessage() != null) {
-            sb = sb.append(getMessage());
-        }
+        if (getMessage() != null) { sb = sb.append(getMessage()); }
         sb = sb.append(" (");
         if (origin == null) {
             sb = sb.append("unknown origin");

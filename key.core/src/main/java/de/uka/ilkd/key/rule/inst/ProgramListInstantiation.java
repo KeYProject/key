@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -16,7 +16,8 @@ public class ProgramListInstantiation extends InstantiationEntry<ImmutableArray<
     /**
      * creates a new ContextInstantiationEntry
      *
-     * @param pes the ProgramElement array the SchemaVariable is instantiated with
+     * @param pes
+     *        the ProgramElement array the SchemaVariable is instantiated with
      */
     ProgramListInstantiation(ImmutableArray<ProgramElement> pes) {
         super(pes);

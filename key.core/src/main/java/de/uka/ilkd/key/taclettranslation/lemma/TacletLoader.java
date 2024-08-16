@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -71,9 +72,11 @@ public abstract class TacletLoader {
      * Taclets are stored in ImmutableSets which fortunately enough still have a fixed order due to
      * their implementation using immutable lists.
      *
-     * @param initConfig the initial config from which the taclet to prove and all following taclets
+     * @param initConfig
+     *        the initial config from which the taclet to prove and all following taclets
      *        have been removed.
-     * @param tacletToProve the taclet for which PO will be generated. Remove all taclets after this
+     * @param tacletToProve
+     *        the taclet for which PO will be generated. Remove all taclets after this
      *        taclet.
      *
      */
@@ -85,9 +88,7 @@ public abstract class TacletLoader {
         HashMap<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {
-            if (taclet.equals(tacletToProve)) {
-                tacletfound = true;
-            }
+            if (taclet.equals(tacletToProve)) { tacletfound = true; }
 
             if (!tacletfound) {
                 newTaclets = newTaclets.prepend(taclet);
@@ -152,8 +153,9 @@ public abstract class TacletLoader {
                 loader.listener);
         }
 
-        private void prepareKeYFile(File file) throws ProofInputException {
-            KeYFile keyFileDefs = new KeYFile(file.getName(), file, monitor, profile);
+        private void prepareKeYFile(Path file) throws ProofInputException {
+            KeYFile keyFileDefs =
+                new KeYFile(file.getFileName().toString(), file, monitor, profile);
             if (initConfig != null) {
                 problemInitializer.readEnvInput(keyFileDefs, initConfig);
             } else {
@@ -165,13 +167,11 @@ public abstract class TacletLoader {
         public ImmutableList<Taclet> loadTaclets() throws ProofInputException {
 
             // No axioms file:
-            if (initConfig == null) {
-                initConfig = getProofEnvForTaclets().getInitConfigForEnvironment();
-            }
+            if (initConfig == null) { initConfig = getProofEnvForTaclets().getInitConfigForEnvironment(); }
 
             int sizeBefore = initConfig.getTaclets().size();
 
-            prepareKeYFile(fileForTaclets);
+            prepareKeYFile(fileForTaclets.toPath());
 
             ImmutableList<Taclet> listAfter = initConfig.getTaclets();
 
@@ -181,9 +181,7 @@ public abstract class TacletLoader {
         @Override
         public ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
-            for (File f : filesForAxioms) {
-                prepareKeYFile(f);
-            }
+            for (File f : filesForAxioms) { prepareKeYFile(f.toPath()); }
 
             return axioms;
         }
@@ -192,8 +190,7 @@ public abstract class TacletLoader {
         @Override
         public ProofOblInput getTacletFile(Proof proof) {
             String name = proof.name().toString();
-            assert name.startsWith("Taclet: ")
-                    : "This depends (unfortunately) on the name of the proof";
+            assert name.startsWith("Taclet: ") : "This depends (unfortunately) on the name of the proof";
             TacletProofObligationInput result =
                 new TacletProofObligationInput(name.substring(8), null);
             result.setLoadInfo(fileForTaclets, new File("unknown"), filesForAxioms);
@@ -227,8 +224,7 @@ public abstract class TacletLoader {
         @Override
         public ProofOblInput getTacletFile(Proof proof) {
             String name = proof.name().toString();
-            assert name.startsWith("Taclet: ")
-                    : "This depends (unfortunately) on the name of the proof";
+            assert name.startsWith("Taclet: ") : "This depends (unfortunately) on the name of the proof";
             return new TacletProofObligationInput(name.substring(8), null);
         }
 

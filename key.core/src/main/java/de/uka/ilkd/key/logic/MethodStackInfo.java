@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -35,9 +35,7 @@ public class MethodStackInfo implements NameCreationInfo {
             for (int i = prefix.size() - 1; i >= 0; i--) {
                 if (prefix.get(i) instanceof MethodFrame frame) {
                     IProgramMethod method = frame.getProgramMethod();
-                    if (method != null) {
-                        list = list.prepend(method);
-                    }
+                    if (method != null) { list = list.prepend(method); }
                 }
             }
         }
@@ -52,9 +50,7 @@ public class MethodStackInfo implements NameCreationInfo {
             result.append("- ").append(method.getProgramElementName().toString()).append("\n");
         }
 
-        if (result.length() < 1) {
-            return "";
-        }
+        if (result.length() < 1) { return ""; }
 
         result = new StringBuilder(result.substring(0, result.length() - 1));
 

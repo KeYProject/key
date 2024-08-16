@@ -7,9 +7,9 @@ package de.uka.ilkd.key.speclang.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -109,9 +109,7 @@ public abstract class SLResolverManager {
         if (selfVar != null) {
             SLExpression receiver = new SLExpression(tb.var(selfVar), specInClass);
             SLExpression result = resolveExplicit(receiver, name, parameters);
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
 
         // the class where the specification is written can be an implicit type receiver
@@ -133,9 +131,7 @@ public abstract class SLResolverManager {
             throws SLTranslationException {
         for (SLExpressionResolver resolver : resolvers) {
             SLExpression result = resolver.resolve(receiver, name, params);
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
         }
 
         return null;
@@ -153,12 +149,8 @@ public abstract class SLResolverManager {
             result = resolveExplicit(receiver, name, parameters);
         } else {
             result = resolveLocal(name);
-            if (result == null) {
-                result = resolveImplicit(name, parameters);
-            }
-            if (result == null) {
-                result = resolveExplicit(null, name, parameters);
-            }
+            if (result == null) { result = resolveImplicit(name, parameters); }
+            if (result == null) { result = resolveExplicit(null, name, parameters); }
         }
 
         return result;
@@ -172,9 +164,12 @@ public abstract class SLResolverManager {
     /**
      * Resolves arbitrary property calls.
      *
-     * @param receiver the specified explicit receiver, or null
-     * @param name name of the property
-     * @param parameters actual parameters of the property call, or null
+     * @param receiver
+     *        the specified explicit receiver, or null
+     * @param name
+     *        name of the property
+     * @param parameters
+     *        actual parameters of the property call, or null
      * @return corresponding term, type or collection if successful, null otherwise
      */
     public SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
@@ -183,9 +178,7 @@ public abstract class SLResolverManager {
 
         if (isFullyQualified(name)) {
             SLExpression result = resolveIt(receiver, name, parameters);
-            if (result != null) {
-                return result;
-            }
+            if (result != null) { return result; }
             shortName = getShortName(name);
         }
 
@@ -232,9 +225,7 @@ public abstract class SLResolverManager {
      */
     public void putIntoTopLocalVariablesNamespace(ImmutableList<LogicVariable> pvs,
             KeYJavaType kjt) {
-        for (LogicVariable pv : pvs) {
-            putIntoTopLogicVariablesNamespace(pv, kjt);
-        }
+        for (LogicVariable pv : pvs) { putIntoTopLogicVariablesNamespace(pv, kjt); }
     }
 
 
@@ -242,9 +233,7 @@ public abstract class SLResolverManager {
      * Puts a list of local variables into the topmost namespace on the stack.
      */
     public void putIntoTopLocalVariablesNamespace(ImmutableList<? extends LocationVariable> pvs) {
-        for (var pv : pvs) {
-            putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
-        }
+        for (var pv : pvs) { putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType()); }
     }
 
 

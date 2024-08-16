@@ -66,7 +66,8 @@ public abstract class ProofBundleHandler implements Closeable {
     /**
      * Relativies the input path with respect to the bundle root.
      *
-     * @param path the path to relativize, assumed to point to a file in the bundle
+     * @param path
+     *        the path to relativize, assumed to point to a file in the bundle
      * @return the input path relative to the bundle root
      */
     public abstract Path relativize(Path path);
@@ -76,7 +77,8 @@ public abstract class ProofBundleHandler implements Closeable {
      * top-level in the bundle are considered.
      *
      * @return a list of paths to the *.proof files
-     * @throws ProofManagementException if the bundle can not be opened/accessed
+     * @throws ProofManagementException
+     *         if the bundle can not be opened/accessed
      */
     public abstract List<Path> getProofFiles() throws ProofManagementException;
 
@@ -85,7 +87,8 @@ public abstract class ProofBundleHandler implements Closeable {
      * top-level in the bundle are considered.
      *
      * @return a list of paths to the *.key files
-     * @throws IOException if the bundle can not be opened/accessed
+     * @throws IOException
+     *         if the bundle can not be opened/accessed
      */
     public abstract List<Path> getKeYFiles() throws IOException;
 
@@ -94,7 +97,8 @@ public abstract class ProofBundleHandler implements Closeable {
      * inside the <code>src</code> subfolder are considered.
      *
      * @return a list of paths to the source files
-     * @throws IOException if the bundle can not be opened/accessed
+     * @throws IOException
+     *         if the bundle can not be opened/accessed
      */
     public abstract List<Path> getSourceFiles() throws IOException;
 
@@ -104,7 +108,8 @@ public abstract class ProofBundleHandler implements Closeable {
      * "zip" and "jar".
      *
      * @return a list of paths to the classpath files
-     * @throws IOException if the bundle can not be opened/accessed
+     * @throws IOException
+     *         if the bundle can not be opened/accessed
      */
     public abstract List<Path> getClasspathFiles() throws IOException;
 
@@ -113,7 +118,8 @@ public abstract class ProofBundleHandler implements Closeable {
      * if it exists. Otherwise null is returned.
      *
      * @return the bootclasspath or null, if none is specified
-     * @throws IOException if the bundle can not be opened/accessed
+     * @throws IOException
+     *         if the bundle can not be opened/accessed
      */
     public abstract Path getBootclasspath() throws IOException;
 
@@ -121,14 +127,16 @@ public abstract class ProofBundleHandler implements Closeable {
      * Returns a tree of the complete file hierarchy inside the bundle.
      *
      * @return the file tree of the bundle
-     * @throws IOException if the bundle can not be opened/accessed
+     * @throws IOException
+     *         if the bundle can not be opened/accessed
      */
     public abstract PathNode getFileTree() throws IOException;
 
     /**
      * Creates a path to the entry with the given name inside the bundle.
      *
-     * @param entryName the entry name inside the bundle
+     * @param entryName
+     *        the entry name inside the bundle
      * @return the path of the entry
      */
     public abstract Path getPath(String entryName);
@@ -137,10 +145,12 @@ public abstract class ProofBundleHandler implements Closeable {
      * Static factory method to create a ProofBundleHandler based on the type of the proof bundle
      * (zipped bundle or directory).
      *
-     * @param root the path of the proof bundle
+     * @param root
+     *        the path of the proof bundle
      * @return a bundle handler suited for opening the type of proof bundle <code>root</code>
      *         points to.
-     * @throws IOException if the bundle can not be opened/accessed
+     * @throws IOException
+     *         if the bundle can not be opened/accessed
      */
     public static ProofBundleHandler createBundleHandler(Path root) throws IOException {
         if (Files.isDirectory(root)) {
@@ -160,7 +170,8 @@ public abstract class ProofBundleHandler implements Closeable {
         /**
          * Create a new TreeFileVisitor with the given start node.
          *
-         * @param start the root node of the tree
+         * @param start
+         *        the root node of the tree
          */
         public TreeFileVisitor(PathNode start) {
             this.current = start;

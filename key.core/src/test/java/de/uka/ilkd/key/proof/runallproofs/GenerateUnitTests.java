@@ -55,9 +55,7 @@ public class GenerateUnitTests {
         out.mkdirs();
 
         for (var col : collections) {
-            for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
-                createUnitClass(unit);
-            }
+            for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) { createUnitClass(unit); }
         }
     }
 
@@ -100,8 +98,10 @@ public class GenerateUnitTests {
      * Generates the test classes for the given proof collection, and writes the
      * java files.
      *
-     * @param unit a group of proof collection units
-     * @throws IOException if the file is not writable
+     * @param unit
+     *        a group of proof collection units
+     * @throws IOException
+     *         if the file is not writable
      */
     private static void createUnitClass(RunAllProofsTestUnit unit)
             throws IOException {
@@ -110,7 +110,7 @@ public class GenerateUnitTests {
         String className = '_' + name // avoids name clashes, i.e., group "switch"
                 .replaceAll("\\.java", "")
                 .replaceAll("\\.key", "")
-                .replaceAll("[^a-zA-Z0-9]+", "_");
+                .replaceAll("[^a-zA-Z0-9]+", "_").toUpperCase();
 
         ProofCollectionSettings settings = unit.getSettings();
         Map<String, String> vars = new TreeMap<>();
@@ -149,9 +149,7 @@ public class GenerateUnitTests {
                     .replaceAll("\\.key", "")
                     .replaceAll("[^a-zA-Z0-9]+", "_");
 
-            if (usedMethodNames.contains(testName)) {
-                testName += "_" + (++clashCounter);
-            }
+            if (usedMethodNames.contains(testName)) { testName += "_" + (++clashCounter); }
             usedMethodNames.add(testName);
 
             // int timeout = 0; (timeout <= 0 ? parent.timeout : 0)
@@ -164,13 +162,17 @@ public class GenerateUnitTests {
 
             switch (file.getTestProperty()) {
             case PROVABLE -> methods.append("assertProvability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.getAbsolutePath())
+                    .append("\");");
             case NOTPROVABLE -> methods.append("assertUnProvability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.getAbsolutePath())
+                    .append("\");");
             case LOADABLE -> methods.append("assertLoadability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.getAbsolutePath())
+                    .append("\");");
             case NOTLOADABLE -> methods.append("assertUnLoadability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.getAbsolutePath())
+                    .append("\");");
             }
             methods.append("}");
         }
@@ -179,10 +181,7 @@ public class GenerateUnitTests {
         Pattern regex = Pattern.compile("[$](\\w+)");
         Matcher m = regex.matcher(TEMPLATE_CONTENT);
         StringBuilder sb = new StringBuilder();
-        while (m.find()) {
-            String key = m.group(1);
-            m.appendReplacement(sb, vars.getOrDefault(key, "/*not-found*/"));
-        }
+        while (m.find()) { String key = m.group(1); m.appendReplacement(sb, vars.getOrDefault(key, "/*not-found*/")); }
         m.appendTail(sb);
         File folder = new File(outputFolder, packageName.replace('.', '/'));
         folder.mkdirs();

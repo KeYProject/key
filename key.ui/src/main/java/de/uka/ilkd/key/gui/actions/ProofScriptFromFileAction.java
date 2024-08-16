@@ -33,7 +33,8 @@ public class ProofScriptFromFileAction extends AbstractAction {
     /**
      * Instantiates a new proof script from file action.
      *
-     * @param mediator the mediator
+     * @param mediator
+     *        the mediator
      */
     public ProofScriptFromFileAction(KeYMediator mediator) {
         super("Run proof script from file...");
@@ -49,10 +50,8 @@ public class ProofScriptFromFileAction extends AbstractAction {
         } else {
             Proof currentProof = mediator.getSelectedProof();
             if (currentProof != null) {
-                File currentFile = currentProof.getProofFile();
-                if (currentFile != null) {
-                    dir = currentFile.getParentFile();
-                }
+                var currentFile = currentProof.getProofFile();
+                if (currentFile != null) { dir = currentFile.getParent().toFile(); }
             } else {
                 dir = new File(".");
             }

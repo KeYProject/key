@@ -4,9 +4,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -50,9 +47,11 @@ public class TestFile implements Serializable {
      * In order to ensure that the implementation is independent of working directory, this method
      * can be used to return an absolute {@link File} object.
      *
-     * @param baseDirectory Base directory that will be used as start location in case given path
+     * @param baseDirectory
+     *        Base directory that will be used as start location in case given path
      *        name is a relative path.
-     * @param pathName Path whose associated {@link File} object will be returned.
+     * @param pathName
+     *        Path whose associated {@link File} object will be returned.
      * @return {@link File} object pointing to given path name relative to given base directory.
      */
     static File getAbsoluteFile(File baseDirectory, String pathName) {
@@ -99,7 +98,8 @@ public class TestFile implements Serializable {
     /**
      * Returns a {@link File} object that points to the .key file that will be tested.
      *
-     * @throws IOException Is thrown in case given .key-file is not a directory or does not exist.
+     * @throws IOException
+     *         Is thrown in case given .key-file is not a directory or does not exist.
      */
     public File getKeYFile() throws IOException {
         File baseDirectory = settings.getGroupDirectory();
@@ -134,7 +134,8 @@ public class TestFile implements Serializable {
      * @return Returns a {@link TestResult} object, which consists of a boolean value indicating
      *         whether test run was successful and a message string that can be printed out on
      *         command line to inform the user about the test result.
-     * @throws Exception Any exception that may occur during KeY execution will be converted into an
+     * @throws Exception
+     *         Any exception that may occur during KeY execution will be converted into an
      *         {@link Exception} object with original exception as cause.
      */
     public TestResult runKey() throws Exception {
@@ -150,9 +151,7 @@ public class TestFile implements Serializable {
 
             // Name resolution for the available KeY file.
             File keyFile = getKeYFile();
-            if (verbose) {
-                LOGGER.info("Now processing file {}", keyFile);
-            }
+            if (verbose) { LOGGER.info("Now processing file {}", keyFile); }
             // File that the created proof will be saved to.
             File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
 
@@ -195,9 +194,7 @@ public class TestFile implements Serializable {
 
                 // For a reload test we are done at this point. Loading was successful.
                 if (testProperty == TestProperty.LOADABLE) {
-                    if (verbose) {
-                        LOGGER.info("... success: loaded");
-                    }
+                    if (verbose) { LOGGER.info("... success: loaded"); }
                     return getRunAllProofsTestResult(catched, true);
                 }
 
@@ -210,15 +207,11 @@ public class TestFile implements Serializable {
                 }
                 boolean closed = loadedProof.closed();
                 success = (testProperty == TestProperty.PROVABLE) == closed;
-                if (verbose) {
-                    LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
-                }
+                if (verbose) { LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)")); }
 
                 // Write statistics.
                 StatisticsFile statisticsFile = settings.getStatisticsFile();
-                if (statisticsFile != null) {
-                    statisticsFile.appendStatistics(loadedProof, keyFile);
-                }
+                if (statisticsFile != null) { statisticsFile.appendStatistics(loadedProof, keyFile); }
 
                 /*
                  * Testing proof reloading now. Saving and reloading proof only in case it was
@@ -227,17 +220,11 @@ public class TestFile implements Serializable {
                  */
                 reload(verbose, proofFile, loadedProof, success);
             } catch (Throwable t) {
-                if (verbose) {
-                    LOGGER.debug("Exception", t);
-                }
+                if (verbose) { LOGGER.debug("Exception", t); }
                 throw t;
             } finally {
-                if (loadedProof != null) {
-                    loadedProof.dispose();
-                }
-                if (env != null) {
-                    env.dispose();
-                }
+                if (loadedProof != null) { loadedProof.dispose(); }
+                if (env != null) { env.dispose(); }
             }
             return getRunAllProofsTestResult(catched, success);
         }
@@ -252,9 +239,7 @@ public class TestFile implements Serializable {
             // Save the available proof to a temporary file.
             ProofSaver.saveToFile(proofFile, loadedProof);
             reloadProof(proofFile);
-            if (verbose) {
-                LOGGER.debug("... success: reloaded.");
-            }
+            if (verbose) { LOGGER.debug("... success: reloaded."); }
         }
     }
 
@@ -280,7 +265,7 @@ public class TestFile implements Serializable {
      */
     private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
             File keyFile) throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         return new Pair<>(env, env.getProofScript());
     }
 
@@ -288,7 +273,8 @@ public class TestFile implements Serializable {
      * Reload proof that was previously saved at the location corresponding to the given
      * {@link File} object.
      *
-     * @param proofFile File that contains the proof that will be (re-)loaded.
+     * @param proofFile
+     *        File that contains the proof that will be (re-)loaded.
      */
     private void reloadProof(File proofFile) throws Exception {
         /*
@@ -298,15 +284,13 @@ public class TestFile implements Serializable {
         KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
         Proof reloadedProof = null;
         try {
-            proofLoadEnvironment = KeYEnvironment.load(proofFile);
+            proofLoadEnvironment = KeYEnvironment.load(proofFile.toPath());
 
             ReplayResult result = proofLoadEnvironment.getReplayResult();
 
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
-                for (Throwable ex : errorList) {
-                    LOGGER.warn("Replay exception", ex);
-                }
+                for (Throwable ex : errorList) { LOGGER.warn("Replay exception", ex); }
                 throw errorList.get(0);
             }
 
@@ -320,17 +304,13 @@ public class TestFile implements Serializable {
                     .toList();
             assertTrue(reloadedProof.closed(),
                 "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials
-                    + ", replay status: " + result.getStatus());
+                        + ", replay status: " + result.getStatus());
         } catch (Throwable t) {
             throw new Exception(
                 "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
-            if (reloadedProof != null) {
-                reloadedProof.dispose();
-            }
-            if (proofLoadEnvironment != null) {
-                proofLoadEnvironment.dispose();
-            }
+            if (reloadedProof != null) { reloadedProof.dispose(); }
+            if (proofLoadEnvironment != null) { proofLoadEnvironment.dispose(); }
         }
     }
 

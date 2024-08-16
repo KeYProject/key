@@ -34,7 +34,8 @@ public class AppliedRuleAppsNameCache {
     /**
      * Fills the cache value of this instance for node
      *
-     * @param node the node
+     * @param node
+     *        the node
      * @return the value
      */
     private @NonNull HashMap<Name, List<RuleApp>> fillCacheForNode(Node node) {
@@ -69,9 +70,7 @@ public class AppliedRuleAppsNameCache {
                     // If this is an inner node, we hope we will never revisit it, remove it from
                     // the
                     // cache
-                    if (node.parent().childrenCount() <= 1) {
-                        cache.remove(node.parent());
-                    }
+                    if (node.parent().childrenCount() <= 1) { cache.remove(node.parent()); }
                 } else {
                     // Check all earlier rule applications
                     Node current = node;
@@ -103,8 +102,10 @@ public class AppliedRuleAppsNameCache {
      * * Non leaf nodes are not changed, pruning is allowed
      * * If the tree is pruned the removed nodes are discarded and not reused
      *
-     * @param node the node
-     * @param name the name
+     * @param node
+     *        the node
+     * @param name
+     *        the name
      * @return rule apps
      */
     public @NonNull List<RuleApp> get(@NonNull Node node, @NonNull Name name) {
@@ -120,9 +121,7 @@ public class AppliedRuleAppsNameCache {
             readLock.unlock();
         }
 
-        if (nodeCache == null) {
-            nodeCache = fillCacheForNode(node);
-        }
+        if (nodeCache == null) { nodeCache = fillCacheForNode(node); }
 
         List<RuleApp> apps = nodeCache.get(name);
         return apps == null ? Collections.emptyList() : Collections.unmodifiableList(apps);

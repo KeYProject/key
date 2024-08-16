@@ -13,7 +13,8 @@ import org.jspecify.annotations.Nullable;
 /**
  * Hash set using the object's identity instead of their hashcode to determine uniqueness.
  *
- * @param <T> elmeent type
+ * @param <T>
+ *        elmeent type
  * @author Arne Keller
  */
 public final class IdentityHashSet<T extends @Nullable Object> implements Set<T> {
@@ -32,7 +33,8 @@ public final class IdentityHashSet<T extends @Nullable Object> implements Set<T>
     /**
      * Copy provided elements into a new set.
      *
-     * @param list elements to add
+     * @param list
+     *        elements to add
      */
     public IdentityHashSet(ImmutableList<T> list) {
         list.forEach(this::add);
@@ -87,9 +89,7 @@ public final class IdentityHashSet<T extends @Nullable Object> implements Set<T>
     @Override
     public boolean addAll(Collection<? extends T> c) {
         var changed = false;
-        for (T o : c) {
-            changed |= add(o);
-        }
+        for (T o : c) { changed |= add(o); }
         return changed;
     }
 
@@ -101,9 +101,7 @@ public final class IdentityHashSet<T extends @Nullable Object> implements Set<T>
     @Override
     public boolean removeAll(Collection<?> c) {
         var changed = false;
-        for (Object o : c) {
-            changed |= remove(o);
-        }
+        for (Object o : c) { changed |= remove(o); }
         return changed;
     }
 

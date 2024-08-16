@@ -38,7 +38,8 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
      * applicable predicates. The caller is responsible for making sure that none of the predicates
      * is valid.
      *
-     * @param applicablePredicates The predicates to generate the lattice from.
+     * @param applicablePredicates
+     *        The predicates to generate the lattice from.
      */
     public ConjunctivePredicateAbstractionLattice(List<AbstractionPredicate> applicablePredicates) {
         super();
@@ -108,7 +109,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
     @Override
     public String toString() {
         return "Conjunctive Predicate Abstraction Lattice of size " + size() + " with predicates "
-            + predicates.toString();
+                + predicates.toString();
     }
 
     /**
@@ -130,9 +131,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
             // behavior, since the the predicate abstraction lattice is (and
             // should be) never initialized with a null list. The lines below
             // fix this issue locally.
-            if (predicates == null) {
-                predicates = new ArrayList<>();
-            }
+            if (predicates == null) { predicates = new ArrayList<>(); }
         }
 
         /*

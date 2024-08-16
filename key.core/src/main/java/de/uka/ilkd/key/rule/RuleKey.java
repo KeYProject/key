@@ -34,16 +34,10 @@ public class RuleKey {
     }
 
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-        if (o == this) {
-            return true;
-        }
+        if (o == null) { return false; }
+        if (o == this) { return true; }
 
-        if (o.getClass() != this.getClass()) {
-            return false;
-        }
+        if (o.getClass() != this.getClass()) { return false; }
 
         final RuleKey other = (RuleKey) o;
         return name.equals(other.name) && choices.equals(other.choices);

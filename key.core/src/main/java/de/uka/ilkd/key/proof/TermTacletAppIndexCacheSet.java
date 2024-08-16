@@ -149,9 +149,7 @@ public class TermTacletAppIndexCacheSet {
      *         binders binding <code>prefix</code> (which might be empty)
      */
     private ITermTacletAppIndexCache getTopLevelCache(ImmutableList<QuantifiableVariable> prefix) {
-        if (prefix.isEmpty()) {
-            return topLevelCacheEmptyPrefix;
-        }
+        if (prefix.isEmpty()) { return topLevelCacheEmptyPrefix; }
         ITermTacletAppIndexCache res = topLevelCaches.get(prefix);
         if (res == null) {
             res = new TopLevelCache(prefix, cache);
@@ -165,9 +163,7 @@ public class TermTacletAppIndexCacheSet {
      *         <code>prefix</code> (which might be empty)
      */
     private ITermTacletAppIndexCache getBelowProgCache(ImmutableList<QuantifiableVariable> prefix) {
-        if (prefix.isEmpty()) {
-            return belowProgCacheEmptyPrefix;
-        }
+        if (prefix.isEmpty()) { return belowProgCacheEmptyPrefix; }
         ITermTacletAppIndexCache res = belowProgCaches.get(prefix);
         if (res == null) {
             res = new BelowProgCache(prefix, cache);
@@ -182,9 +178,7 @@ public class TermTacletAppIndexCacheSet {
      */
     private ITermTacletAppIndexCache getBelowUpdateCache(
             ImmutableList<QuantifiableVariable> prefix) {
-        if (prefix.isEmpty()) {
-            return belowUpdateCacheEmptyPrefix;
-        }
+        if (prefix.isEmpty()) { return belowUpdateCacheEmptyPrefix; }
         return new BelowUpdateCache(prefix);
     }
 
@@ -194,9 +188,7 @@ public class TermTacletAppIndexCacheSet {
      */
     private boolean isUpdateTargetPos(Term t, int subtermIndex) {
         final Operator op = t.op();
-        if (!(op instanceof UpdateApplication)) {
-            return false;
-        }
+        if (!(op instanceof UpdateApplication)) { return false; }
 
         return subtermIndex == UpdateApplication.targetPos();
     }
@@ -220,18 +212,12 @@ public class TermTacletAppIndexCacheSet {
         }
 
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
-            if (isUpdateTargetPos(t, subtermIndex)) {
-                return getBelowUpdateCache(getExtendedPrefix(t, subtermIndex));
-            }
+            if (isUpdateTargetPos(t, subtermIndex)) { return getBelowUpdateCache(getExtendedPrefix(t, subtermIndex)); }
 
             final Operator op = t.op();
-            if (op instanceof Modality) {
-                return getBelowProgCache(getExtendedPrefix(t, subtermIndex));
-            }
+            if (op instanceof Modality) { return getBelowProgCache(getExtendedPrefix(t, subtermIndex)); }
 
-            if (isAcceptedOperator(op)) {
-                return getTopLevelCache(getExtendedPrefix(t, subtermIndex));
-            }
+            if (isAcceptedOperator(op)) { return getTopLevelCache(getExtendedPrefix(t, subtermIndex)); }
 
             return noCache;
         }
@@ -250,13 +236,9 @@ public class TermTacletAppIndexCacheSet {
 
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             final Operator op = t.op();
-            if (op instanceof Modality) {
-                return getBelowProgCache(getExtendedPrefix(t, subtermIndex));
-            }
+            if (op instanceof Modality) { return getBelowProgCache(getExtendedPrefix(t, subtermIndex)); }
 
-            if (isAcceptedOperator(op)) {
-                return getBelowUpdateCache(getExtendedPrefix(t, subtermIndex));
-            }
+            if (isAcceptedOperator(op)) { return getBelowUpdateCache(getExtendedPrefix(t, subtermIndex)); }
 
             return noCache;
         }
@@ -277,9 +259,7 @@ public class TermTacletAppIndexCacheSet {
         }
 
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
-            if (isAcceptedOperator(t.op())) {
-                return getBelowProgCache(getExtendedPrefix(t, subtermIndex));
-            }
+            if (isAcceptedOperator(t.op())) { return getBelowProgCache(getExtendedPrefix(t, subtermIndex)); }
 
             return noCache;
         }

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -30,9 +30,7 @@ public final class ConstantValue extends AbstractTermTransformer {
 
         if (op instanceof ProgramConstant) {
             Literal lit = ((ProgramConstant) op).getCompileTimeConstant();
-            if (lit != null) {
-                term = services.getTypeConverter().convertToLogicElement(lit);
-            }
+            if (lit != null) { term = services.getTypeConverter().convertToLogicElement(lit); }
         }
 
         return term;

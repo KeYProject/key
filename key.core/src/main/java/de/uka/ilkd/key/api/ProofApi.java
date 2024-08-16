@@ -73,9 +73,7 @@ public class ProofApi {
 
         Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
         OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
-        if (simplifier != null && !simplifier.isShutdown()) {
-            set.addAll(simplifier.getCapturedTaclets());
-        }
+        if (simplifier != null && !simplifier.isShutdown()) { set.addAll(simplifier.getCapturedTaclets()); }
 
         for (final NoPosTacletApp app : set) {
             RuleJustification just = goal.proof().mgt().getJustification(app);

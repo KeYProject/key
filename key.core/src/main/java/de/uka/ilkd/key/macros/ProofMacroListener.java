@@ -42,17 +42,13 @@ public class ProofMacroListener implements ProverTaskListener {
 
     @Override
     public void taskProgress(int position) {
-        if (superordinateListener != null) {
-            superordinateListener.taskProgress(position);
-        }
+        if (superordinateListener != null) { superordinateListener.taskProgress(position); }
     }
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         numOfInvokedMacros--;
-        if (superordinateListener != null) {
-            superordinateListener.taskFinished(info);
-        }
+        if (superordinateListener != null) { superordinateListener.taskFinished(info); }
     }
 
     public int getLevel() {

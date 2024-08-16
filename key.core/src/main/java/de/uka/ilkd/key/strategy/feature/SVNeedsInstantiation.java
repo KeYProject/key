@@ -27,11 +27,7 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         boolean res = super.filter(app, pos, goal, mState);
         if (!res) {
-            for (SchemaVariable sv : app.uninstantiatedVars()) {
-                if (sv.name().equals(svName)) {
-                    return true;
-                }
-            }
+            for (SchemaVariable sv : app.uninstantiatedVars()) { if (sv.name().equals(svName)) { return true; } }
         }
         return false;
     }

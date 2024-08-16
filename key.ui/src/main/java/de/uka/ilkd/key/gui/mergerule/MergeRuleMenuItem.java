@@ -29,10 +29,13 @@ public class MergeRuleMenuItem extends JMenuItem {
     /**
      * Creates a new menu item for the join rule.
      *
-     * @param goal The selected goal.
-     * @param pio The position the join shall be applied to (symbolic state / program counter
+     * @param goal
+     *        The selected goal.
+     * @param pio
+     *        The position the join shall be applied to (symbolic state / program counter
      *        formula).
-     * @param mediator The KeY mediator.
+     * @param mediator
+     *        The KeY mediator.
      */
     public MergeRuleMenuItem(final Goal goal, final PosInOccurrence pio,
             final KeYMediator mediator) {
@@ -61,7 +64,7 @@ public class MergeRuleMenuItem extends JMenuItem {
                         mediator.getUI()
                                 .taskStarted(new DefaultTaskStartedInfo(
                                     TaskKind.Other, "Merging "
-                                        + (completedApp.getMergePartners().size() + 1) + " nodes",
+                                            + (completedApp.getMergePartners().size() + 1) + " nodes",
                                     completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 

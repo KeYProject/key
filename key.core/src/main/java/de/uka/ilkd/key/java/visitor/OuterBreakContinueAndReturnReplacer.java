@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -46,9 +48,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             final LocationVariable returnValue, final LocationVariable exception,
             final Services services) {
         super(block, services);
-        for (Label label : alwaysInnerLabels) {
-            this.labels.push(label);
-        }
+        for (Label label : alwaysInnerLabels) { this.labels.push(label); }
         this.breakOut = new Break(breakOutLabel);
         this.breakFlags = breakFlags;
         this.continueFlags = continueFlags;
@@ -83,25 +83,13 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         } else {
             stack.push(new ExtList());
         }
-        if (node instanceof LoopStatement || node instanceof Switch) {
-            loopAndSwitchCascadeDepth++;
-        }
-        if (node instanceof LabeledStatement) {
-            labels.push(((LabeledStatement) node).getLabel());
-        }
-        if (node instanceof MethodFrame) {
-            frames.push((MethodFrame) node);
-        }
+        if (node instanceof LoopStatement || node instanceof Switch) { loopAndSwitchCascadeDepth++; }
+        if (node instanceof LabeledStatement) { labels.push(((LabeledStatement) node).getLabel()); }
+        if (node instanceof MethodFrame) { frames.push((MethodFrame) node); }
         super.walk(node);
-        if (node instanceof MethodFrame) {
-            frames.pop();
-        }
-        if (node instanceof LabeledStatement) {
-            labels.pop();
-        }
-        if (node instanceof LoopStatement || node instanceof Switch) {
-            loopAndSwitchCascadeDepth--;
-        }
+        if (node instanceof MethodFrame) { frames.pop(); }
+        if (node instanceof LabeledStatement) { labels.pop(); }
+        if (node instanceof LoopStatement || node instanceof Switch) { loopAndSwitchCascadeDepth--; }
     }
 
     @Override
@@ -148,9 +136,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     public void performActionOnReturn(final Return x) {
         if (frames.isEmpty()) {
             final ExtList changeList = stack.peek();
-            if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
-                changeList.removeFirst();
-            }
+            if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
             Statement assignFlag =
                 KeYJavaASTFactory.assign(returnFlag, BooleanLiteral.TRUE, x.getPositionInfo());
             final Statement[] statements;
@@ -288,9 +274,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            if (x.getLabel() != null) {
-                l = (Label) changeList.removeFirst();
-            }
+            if (x.getLabel() != null) { l = (Label) changeList.removeFirst(); }
             addChild(new LabeledStatement(changeList, l, x.getPositionInfo()));
             changed();
         } else {
@@ -370,9 +354,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            if (x.getExpression() != null) {
-                e = (Expression) changeList.removeFirst();
-            }
+            if (x.getExpression() != null) { e = (Expression) changeList.removeFirst(); }
             addChild(new Case(changeList, e, x.getPositionInfo()));
             changed();
         } else {
@@ -428,13 +410,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         Map<ProgramVariable, ProgramVariable> oldFlags = new HashMap<>();
 
         {
-            for (ProgramVariable flag : breakFlags.values()) {
-                addOldFlag(oldFlags, flag);
-            }
+            for (ProgramVariable flag : breakFlags.values()) { addOldFlag(oldFlags, flag); }
 
-            for (ProgramVariable flag : continueFlags.values()) {
-                addOldFlag(oldFlags, flag);
-            }
+            for (ProgramVariable flag : continueFlags.values()) { addOldFlag(oldFlags, flag); }
 
             addOldFlag(oldFlags, returnFlag);
             addOldFlag(oldFlags, exception);
@@ -469,9 +447,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     }
 
     private void addOldFlag(Map<ProgramVariable, ProgramVariable> oldFlags, ProgramVariable flag) {
-        if (flag == null) {
-            return;
-        }
+        if (flag == null) { return; }
 
         oldFlags.put(flag,
             new LocationVariable(
@@ -482,9 +458,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     private void changed() {
         ExtList list = stack.peek();
-        if (list.getFirst() != CHANGED) {
-            list.addFirst(CHANGED);
-        }
+        if (list.getFirst() != CHANGED) { list.addFirst(CHANGED); }
     }
 
     private void addChild(final SourceElement x) {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -23,8 +23,10 @@ public class JavaASTCollector extends JavaASTWalker {
     /**
      * create the JavaASTWalker
      *
-     * @param root the ProgramElement where to begin
-     * @param type the Class representing the type of nodes that have to be collected
+     * @param root
+     *        the ProgramElement where to begin
+     * @param type
+     *        the Class representing the type of nodes that have to be collected
      */
     public JavaASTCollector(ProgramElement root, Class<?> type) {
         super(root);
@@ -35,9 +37,7 @@ public class JavaASTCollector extends JavaASTWalker {
      * the action that is performed just before leaving the node the last time
      */
     protected void doAction(ProgramElement node) {
-        if (type.isInstance(node)) {
-            resultList = resultList.prepend(node);
-        }
+        if (type.isInstance(node)) { resultList = resultList.prepend(node); }
     }
 
     /**

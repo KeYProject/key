@@ -20,8 +20,10 @@ public final class SkolemTermSV extends OperatorSV implements TerminalSyntaxElem
     /**
      * Creates a new schema variable that is used as placeholder for skolem terms.
      *
-     * @param name the Name of the SchemaVariable
-     * @param sort the Sort of the SchemaVariable and the matched type allowed to match a list of
+     * @param name
+     *        the Name of the SchemaVariable
+     * @param sort
+     *        the Sort of the SchemaVariable and the matched type allowed to match a list of
      *        program constructs
      */
     SkolemTermSV(Name name, Sort sort) {

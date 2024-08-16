@@ -7,12 +7,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -72,7 +72,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
                     throw new IllegalStateException(
                         "Use Loop Invariant/Operation Contract rule implementation has changed at node "
-                            + node.serialNr() + ".");
+                                + node.serialNr() + ".");
                 }
                 Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
                 while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
@@ -84,9 +84,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 }
                 // Check modified locations
                 for (Location location : modifiedLocations) {
-                    if (removeRelevant(services, location, relevantLocations, info)) {
-                        accept = true;
-                    }
+                    if (removeRelevant(services, location, relevantLocations, info)) { accept = true; }
                 }
             }
             return accept;

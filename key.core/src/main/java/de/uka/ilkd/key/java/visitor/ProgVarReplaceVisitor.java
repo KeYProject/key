@@ -9,10 +9,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -52,9 +56,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * creates a visitor that replaces the program variables in the given statement by new ones with
      * the same name
      *
-     * @param st the statement where the prog vars are replaced
-     * @param map the HashMap with the replacements
-     * @param services the services instance
+     * @param st
+     *        the statement where the prog vars are replaced
+     * @param map
+     *        the HashMap with the replacements
+     * @param services
+     *        the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st, Map<LocationVariable, LocationVariable> map,
             Services services) {
@@ -66,10 +73,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     /**
      * creates a visitor that replaces the program variables in the given statement
      *
-     * @param st the statement where the prog vars are replaced
-     * @param map the HashMap with the replacements
-     * @param replaceall decides if all variables are to be replaced
-     * @param services the services instance
+     * @param st
+     *        the statement where the prog vars are replaced
+     * @param map
+     *        the HashMap with the replacements
+     * @param replaceall
+     *        decides if all variables are to be replaced
+     * @param services
+     *        the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st, Map<LocationVariable, LocationVariable> map,
             boolean replaceall, Services services) {
@@ -105,9 +116,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             ImmutableArray<VariableSpecification> vspecs = vd.getVariableSpecifications();
             for (int i = 0; i < vspecs.size(); i++) {
                 var pv = (LocationVariable) vspecs.get(i).getProgramVariable();
-                if (!replaceMap.containsKey(pv)) {
-                    replaceMap.put(pv, copy(pv));
-                }
+                if (!replaceMap.containsKey(pv)) { replaceMap.put(pv, copy(pv)); }
             }
         }
         super.walk(node);
@@ -116,7 +125,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     /**
      * the action that is performed just before leaving the node the last time
      *
-     * @param node the node described above
+     * @param node
+     *        the node described above
      */
     @Override
     protected void doAction(ProgramElement node) {
@@ -130,9 +140,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         walk(root());
         ExtList el = stack.peek();
         int i = 0;
-        while (!(el.get(i) instanceof ProgramElement)) {
-            i++;
-        }
+        while (!(el.get(i) instanceof ProgramElement)) { i++; }
         result = (ProgramElement) stack.peek().get(i);
     }
 
@@ -152,9 +160,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     private Term replaceVariablesInTerm(Term t) {
-        if (t == null) {
-            return null;
-        }
+        if (t == null) { return null; }
         if (t.op() instanceof ProgramVariable) {
             if (replaceMap.containsKey(t.op())) {
                 ProgramVariable replacement = replaceMap.get(t.op());
@@ -305,9 +311,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             for (Entry<LocationVariable, Term> h : saveCopy.entrySet()) {
                 LocationVariable pv = h.getKey();
                 final Term t = h.getValue();
-                if (t == null) {
-                    continue;
-                }
+                if (t == null) { continue; }
                 if (replaceMap.containsKey(pv)) {
                     atPres.remove(pv);
                     pv = (LocationVariable) replaceMap.get(pv);
@@ -325,12 +329,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                             Collectors.toCollection(ArrayList::new)));
 
         } else {
-            if (!changed) {
-                return oldContract;
-            }
+            if (!changed) { return oldContract; }
 
             assert false : "ProgVarReplaceVisitor: Unknown type of MergeContract ("
-                + oldContract.getClass().getName() + ")";
+                    + oldContract.getClass().getName() + ")";
         }
 
         // Nothing's changed
@@ -533,9 +535,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     public void performActionOnLoopInvariant(LoopStatement oldLoop, LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
         LoopSpecification inv = services.getSpecificationRepository().getLoopSpec(oldLoop);
-        if (inv == null) {
-            return;
-        }
+        if (inv == null) { return; }
         Term selfTerm = inv.getInternalSelfTerm();
         Map<LocationVariable, Term> atPres = inv.getInternalAtPres();
 
@@ -578,9 +578,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (Entry<LocationVariable, Term> h : saveCopy.entrySet()) {
             LocationVariable pv = h.getKey();
             final Term t = h.getValue();
-            if (t == null) {
-                continue;
-            }
+            if (t == null) { continue; }
             if (replaceMap.containsKey(pv)) {
                 atPres.remove(pv);
                 pv = (LocationVariable) replaceMap.get(pv);
@@ -604,44 +602,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnSetStatement(final SetStatement x) {
-        /*
-         * var spec =
-         * Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
-         * ProgramVariableCollection vars = spec.vars();
-         * Map<LocationVariable, Term> atPres = vars.atPres;
-         * Map<LocationVariable, Term> newAtPres = new LinkedHashMap<>(atPres);
-         * Map<LocationVariable, LocationVariable> atPreVars = vars.atPreVars;
-         * Map<LocationVariable, LocationVariable> newAtPreVars = new LinkedHashMap<>(atPreVars);
-         *
-         * for (Entry<LocationVariable, Term> e : atPres.entrySet()) {
-         * LocationVariable pv = e.getKey();
-         * final Term t = e.getValue();
-         * if (t == null) {
-         * continue;
-         * }
-         * if (replaceMap.containsKey(pv)) {
-         * newAtPres.remove(pv);
-         * pv = (LocationVariable) replaceMap.get(pv);
-         * newAtPreVars.put(pv, atPreVars.get(e.getKey()));
-         * }
-         * newAtPres.put(pv, replaceVariablesInTerm(t));
-         * }
-         * final ProgramVariableCollection newVars =
-         * new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
-         * newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
-         *
-         *
-         * var newTerms = spec.terms().map(this::replaceVariablesInTerm);
-         * var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
-         *
-         * services.getSpecificationRepository().addStatementSpec(x, newSpec);
-         *
-         * /*
-         * if (!newAtPres.equals(vars.atPres)) {
-         * changed();
-         * }
-         * doDefaultAction(x);
-         */
         handleJmlStatements(x, SetStatement::new);
     }
 
@@ -658,9 +618,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (Entry<LocationVariable, Term> e : atPres.entrySet()) {
             LocationVariable pv = e.getKey();
             final Term t = e.getValue();
-            if (t == null) {
-                continue;
-            }
+            if (t == null) { continue; }
 
             if (replaceMap.containsKey(pv)) {
                 newAtPres.remove(pv);

@@ -37,8 +37,10 @@ public class SMTInvokeAction extends MainWindowAction {
      * Create a new SMTInvokeAction belonging to the given MainWindow. The resulting action starts
      * the given solver union.
      *
-     * @param solverUnion the solvers/solver types to be started by this action
-     * @param mainWindow the main window this action belongs to
+     * @param solverUnion
+     *        the solvers/solver types to be started by this action
+     * @param mainWindow
+     *        the main window this action belongs to
      */
     public SMTInvokeAction(SolverTypeCollection solverUnion, MainWindow mainWindow) {
         super(mainWindow);
@@ -91,9 +93,7 @@ public class SMTInvokeAction extends MainWindowAction {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SMTInvokeAction)) {
-            return false;
-        }
+        if (!(obj instanceof SMTInvokeAction)) { return false; }
         return this.solverUnion.equals(((SMTInvokeAction) obj).solverUnion);
     }
 

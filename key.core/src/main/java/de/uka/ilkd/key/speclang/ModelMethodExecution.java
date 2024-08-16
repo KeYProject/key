@@ -6,8 +6,8 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.rule.Taclet;
@@ -50,17 +50,11 @@ public final class ModelMethodExecution extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass()) {
-            return false;
-        }
+        if (o == null || this.getClass() != o.getClass()) { return false; }
         final ModelMethodExecution other = (ModelMethodExecution) o;
 
-        if (!name.equals(other.name)) {
-            return false;
-        }
-        if (!target.equals(other.target)) {
-            return false;
-        }
+        if (!name.equals(other.name)) { return false; }
+        if (!target.equals(other.target)) { return false; }
         return kjt.equals(other.kjt);
     }
 

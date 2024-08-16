@@ -20,8 +20,10 @@ public class FunctionalBlockContractPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already load {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
     @Override
@@ -33,9 +35,7 @@ public class FunctionalBlockContractPOLoader implements ProofObligationLoader {
         int ind = -1;
         for (String tag : FunctionalBlockContractPO.TRANSACTION_TAGS.values()) {
             ind = contractName.indexOf("." + tag);
-            if (ind > 0) {
-                break;
-            }
+            if (ind > 0) { break; }
             proofNum++;
         }
         if (ind == -1) {

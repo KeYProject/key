@@ -5,12 +5,12 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.io.File;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -19,11 +19,11 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * class tests the building of Taclets in TacletBuilders, especially the checking if the
@@ -65,7 +65,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as there are different "
-            + "prefixes at different occurrences");
+                + "prefixes at different occurrences");
         sb.addVarsNotFreeIn(u, (SchemaVariable) b.op());
         sb.addVarsNotFreeIn(v, (SchemaVariable) b.op());
         sb.getTaclet(); // no exception is thrown here anymore
@@ -89,7 +89,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-            + "occurs more than once in the Taclets if and find");
+                + "occurs more than once in the Taclets if and find");
     }
 
     @Test
@@ -111,7 +111,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-            + "occurs more than once in the Taclets if and find");
+                + "occurs more than once in the Taclets if and find");
     }
 
     @Test
@@ -128,31 +128,21 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-            + "occurs more than once in the Taclets if and find");
+                + "occurs more than once in the Taclets if and find");
     }
-
-    private final HelperClassForTests helper = new HelperClassForTests();
 
     public static final String testRules =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "tacletprefix";
 
     @Test
     public void testSchemavariablesInAddrulesRespectPrefix() {
-        try {
-            helper.parseThrowException(
-                new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key"));
-        } catch (BuildingException e) {
-            assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:3"),
-                "Position of error message is wrong.");
-            assertTrue(e.getCause().getMessage().contains(
-                "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
-                "Cause should be prefix error");
-            return;
-        } catch (ProofInputException e) {
-            fail("Unexpected exception");
-        }
-        fail("Expected an invalid prefix exception as the the addrule contains "
-            + "a schemavariable with wrong prefix.");
-
+        var e = Assertions.assertThrows(BuildingException.class,
+            () -> HelperClassForTests.parseThrowException(
+                new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key")));
+        Assertions.assertEquals(Position.newOneBased(9, 3), e.getLocation().getPosition(),
+            "Position of error message is wrong.");
+        assertTrue(e.getCause().getMessage().contains(
+            "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
+            "Cause should be prefix error");
     }
 }

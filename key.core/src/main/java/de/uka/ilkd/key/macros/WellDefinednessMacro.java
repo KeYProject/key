@@ -59,16 +59,12 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (proof == null || proof.isDisposed() || !WellDefinednessCheck.isOn()) {
-            return false;
-        }
+        if (proof == null || proof.isDisposed() || !WellDefinednessCheck.isOn()) { return false; }
         final ContractPO po = proof.getServices().getSpecificationRepository().getPOForProof(proof);
         if (po instanceof WellDefinednessPO) { // applicable for all well-definedness checks
             return true;
         }
-        if (!(po instanceof FunctionalOperationContractPO)) {
-            return false;
-        }
+        if (!(po instanceof FunctionalOperationContractPO)) { return false; }
         for (Goal goal : goals) {
             Node n = goal.node();
             while (n != null) {
@@ -92,8 +88,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name(WellDefinednessStrategy.class.getSimpleName());
 
-        public WellDefinednessStrategy() {
-        }
+        public WellDefinednessStrategy() {}
 
         @Override
         public Name name() {
@@ -118,8 +113,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
-        }
+                RuleAppCostCollector collector) {}
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {

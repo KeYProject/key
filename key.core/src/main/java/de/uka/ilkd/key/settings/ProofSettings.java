@@ -92,24 +92,16 @@ public class ProofSettings {
         this();
         Properties result = new Properties();
         lastLoadedProperties = toCopy.lastLoadedProperties;
-        for (Settings s : toCopy.settings) {
-            s.writeSettings(result);
-        }
-        for (Settings s : settings) {
-            s.readSettings(result);
-        }
+        for (Settings s : toCopy.settings) { s.writeSettings(result); }
+        for (Settings s : settings) { s.readSettings(result); }
     }
 
 
     public void addSettings(Settings settings) {
         this.settings.add(settings);
         settings.addPropertyChangeListener(listener);
-        if (lastLoadedProperties != null) {
-            settings.readSettings(lastLoadedProperties);
-        }
-        if (lastLoadedConfiguration != null) {
-            settings.readSettings(lastLoadedConfiguration);
-        }
+        if (lastLoadedProperties != null) { settings.readSettings(lastLoadedProperties); }
+        if (lastLoadedConfiguration != null) { settings.readSettings(lastLoadedConfiguration); }
     }
 
     /**
@@ -118,17 +110,13 @@ public class ProofSettings {
     @Deprecated
     public Properties getProperties() {
         Properties result = new Properties();
-        for (Settings s : settings) {
-            s.writeSettings(result);
-        }
+        for (Settings s : settings) { s.writeSettings(result); }
         return result;
     }
 
     public Configuration getConfiguration() {
         var config = new Configuration();
-        for (Settings s : settings) {
-            s.writeSettings(config);
-        }
+        for (Settings s : settings) { s.writeSettings(config); }
         return config;
     }
 
@@ -144,9 +132,7 @@ public class ProofSettings {
      */
     public void saveSettings() {
         try {
-            if (!PROVER_CONFIG_FILE_NEW.exists()) {
-                PROVER_CONFIG_FILE.getParentFile().mkdirs();
-            }
+            if (!PROVER_CONFIG_FILE_NEW.exists()) { PROVER_CONFIG_FILE.getParentFile().mkdirs(); }
             try (Writer out = new BufferedWriter(
                 new FileWriter(PROVER_CONFIG_FILE_NEW, StandardCharsets.UTF_8))) {
                 settingsToStream(out);
@@ -195,9 +181,7 @@ public class ProofSettings {
         }
         lastLoadedProperties = props;
         lastLoadedConfiguration = null;
-        for (Settings s : settings) {
-            s.readSettings(props);
-        }
+        for (Settings s : settings) { s.readSettings(props); }
     }
 
     /**
@@ -229,9 +213,7 @@ public class ProofSettings {
      * Used to load Settings from a .key file
      */
     public void loadSettingsFromPropertyString(String s) {
-        if (s == null) {
-            return;
-        }
+        if (s == null) { return; }
         StringReader reader = new StringReader(s);
         loadSettingsFromPropertyStream(reader);
     }
@@ -279,12 +261,11 @@ public class ProofSettings {
     /**
      * Update the proof settings according to the entries on the properties.
      *
-     * @param props a non-<code>null</code> object with KeY properties.
+     * @param props
+     *        a non-<code>null</code> object with KeY properties.
      */
     public void update(Properties props) {
-        for (Settings s : settings) {
-            s.readSettings(props);
-        }
+        for (Settings s : settings) { s.readSettings(props); }
     }
 
 

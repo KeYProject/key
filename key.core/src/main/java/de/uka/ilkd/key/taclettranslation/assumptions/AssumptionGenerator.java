@@ -68,10 +68,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         Collection<Term> result2 = new LinkedList<>();
 
         // step: quantify all free variables.
-        for (Term te : result) {
-            te = quantifyTerm(te, services);
-            result2.add(te);
-        }
+        for (Term te : result) { te = quantifyTerm(te, services); result2.add(te); }
 
         // step: translate the generics sorts.
         result = new LinkedList<>();
@@ -89,7 +86,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * components and assemblies them. After every splitting step the method calls
      * <code>changeTerm</code>. This mechanism can be used to exchange subterms.
      *
-     * @param term the term to rebuild.
+     * @param term
+     *        the term to rebuild.
      * @return returns the new term.
      */
 
@@ -111,9 +109,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         if (term.op() instanceof Quantifier) {
             for (QuantifiableVariable qv : variables) {
-                for (TranslationListener l : listener) {
-                    l.eventQuantifiedVariable(qv);
-                }
+                for (TranslationListener l : listener) { l.eventQuantifiedVariable(qv); }
             }
         }
 
@@ -123,16 +119,12 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     public LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv) {
         LogicVariable res = getLogicVariable(
             new Name(instantiation.name().toString() + "__" + lv.name().toString()), instantiation);
-        for (TranslationListener l : listener) {
-            l.eventSort(instantiation);
-        }
+        for (TranslationListener l : listener) { l.eventSort(instantiation); }
         return res;
     }
 
     public static boolean isAbstractOrInterface(Sort sort, Services services) {
-        if (!isReferenceSort(sort, services)) {
-            return false;
-        }
+        if (!isReferenceSort(sort, services)) { return false; }
         return sort.isAbstract();
 
     }
@@ -157,12 +149,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
             }
         }
 
-        if (term.sort() instanceof GenericSort) {
-            genericSorts.add((GenericSort) term.sort());
-        }
-        for (int i = 0; i < term.arity(); i++) {
-            collectGenerics(term.sub(i), genericSorts);
-        }
+        if (term.sort() instanceof GenericSort) { genericSorts.add((GenericSort) term.sort()); }
+        for (int i = 0; i < term.arity(); i++) { collectGenerics(term.sub(i), genericSorts); }
 
     }
 
@@ -181,8 +169,10 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * 110<br>
      * 111<br>
      *
-     * @param objectCount the number of objects.
-     * @param bucketCount the number of buckets.
+     * @param objectCount
+     *        the number of objects.
+     * @param bucketCount
+     *        the number of buckets.
      * @return an array of dimension objectCount^bucketCount x bucketCount
      */
     public static byte[][] generateReferenceTable(int objectCount, int bucketCount) {
@@ -221,9 +211,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         for (int r = 0; r < referenceTable.length; r++) {
             for (int c = 0; c < referenceTable[r].length; c++) {
                 int index = referenceTable[r][c];
-                if (referenceTable[r][0] == -1) {
-                    break;
-                }
+                if (referenceTable[r][0] == -1) { break; }
 
                 final var a = conditions.containsIsReferenceCondition(genericTable[c]) > 0
                         && !isReferenceSort(instTable[index], services);
@@ -280,7 +268,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     /**
      * Quantifies a term, i.d. every free variable is bounded by a allquantor.
      *
-     * @param term the term to be quantify.
+     * @param term
+     *        the term to be quantify.
      * @return the quantified term.
      */
     protected static Term quantifyTerm(Term term, TermServices services)
@@ -291,7 +280,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
             if (!(qv instanceof LogicVariable)) {
                 throw new IllegalTacletException("Error of translation: "
-                    + "There is a free variable that is not of type LogicVariable: " + qv);
+                        + "There is a free variable that is not of type LogicVariable: " + qv);
             }
 
             term = tb.all(qv, term);
@@ -304,8 +293,10 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * Returns a new logic variable with the given name and sort. If already a logic variable exists
      * with the same name and sort this variable is returned instead of a new logic variable.
      *
-     * @param name name of the logic variable.
-     * @param sort sort of the logic variable.
+     * @param name
+     *        name of the logic variable.
+     * @param sort
+     *        sort of the logic variable.
      * @return logic variable with the given name and sort.
      */
     public LogicVariable getLogicVariable(Name name, Sort sort) {
@@ -368,7 +359,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * Override this method if you want to change the term, i.e. exchanging schema variables for
      * logic variables. See <code>rebuildTerm</code>.
      *
-     * @param term the term to be changed.
+     * @param term
+     *        the term to be changed.
      * @return the new term.
      */
     protected Term changeTerm(Term term) {
@@ -387,9 +379,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         if (term.op() instanceof Quantifier) {
             LinkedList<QuantifiableVariable> list = new LinkedList<>();
 
-            for (QuantifiableVariable qv : term.varsBoundHere(0)) {
-                list.add(getLogicVariable(qv.name(), qv.sort()));
-            }
+            for (QuantifiableVariable qv : term.varsBoundHere(0)) { list.add(getLogicVariable(qv.name(), qv.sort())); }
 
             ImmutableArray<QuantifiableVariable> array = new ImmutableArray<>(list);
 

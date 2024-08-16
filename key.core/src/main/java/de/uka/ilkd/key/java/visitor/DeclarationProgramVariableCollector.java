@@ -7,12 +7,11 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
@@ -49,23 +48,16 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
      * adds the given variable if we are currently at top level
      */
     protected void addVariable(IProgramVariable var) {
-        if (depth() == 1) {
-            result.add(var);
-        }
+        if (depth() == 1) { result.add(var); }
     }
 
-    protected void doDefaultAction(SourceElement x) {
-    }
+    protected void doDefaultAction(SourceElement x) {}
 
     public void performActionOnVariableSpecification(VariableSpecification x) {
         addVariable(x.getProgramVariable());
     }
 
     public void performActionOnFieldSpecification(FieldSpecification x) {
-        addVariable(x.getProgramVariable());
-    }
-
-    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
         addVariable(x.getProgramVariable());
     }
 

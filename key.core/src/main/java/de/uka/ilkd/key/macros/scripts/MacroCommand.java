@@ -34,9 +34,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
         for (ProofMacro proofMacro : loader) {
             String commandName = proofMacro.getScriptCommandName();
-            if (commandName != null) {
-                result.put(commandName, proofMacro);
-            }
+            if (commandName != null) { result.put(commandName, proofMacro); }
         }
 
         return result;
@@ -59,9 +57,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         final Services services = state.getProof().getServices();
         // look up macro name
         ProofMacro macro = macroMap.get(args.macroName);
-        if (macro == null) {
-            throw new ScriptException("Macro '" + args.macroName + "' not found");
-        }
+        if (macro == null) { throw new ScriptException("Macro '" + args.macroName + "' not found"); }
 
         macro.resetParams();
 
@@ -98,9 +94,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             }
 
             final String matchRegEx = args.matches;
-            if (matchRegEx != null) {
-                pio = extractMatchingPio(sequent, matchRegEx, services);
-            }
+            if (matchRegEx != null) { pio = extractMatchingPio(sequent, matchRegEx, services); }
 
             synchronized (macro) {
                 info = macro.applyTo(uiControl, g.node(), pio, uiControl);
@@ -133,9 +127,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                 LogicPrinter.quickPrintTerm(sequent.getFormulabyNr(i).formula(), services))
                         .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
-                if (matched) {
-                    throw new ScriptException("More than one occurrence of a matching term.");
-                }
+                if (matched) { throw new ScriptException("More than one occurrence of a matching term."); }
                 matched = true;
                 pio = new PosInOccurrence(sequent.getFormulabyNr(i), PosInTerm.getTopLevel(),
                     i <= sequent.antecedent().size());
@@ -153,7 +145,8 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     /**
      * Removes spaces and line breaks from the string representation of a term.
      *
-     * @param str The string to "clean up".
+     * @param str
+     *        The string to "clean up".
      * @return The original without spaces and line breaks.
      */
     private static String formatTermString(String str) {

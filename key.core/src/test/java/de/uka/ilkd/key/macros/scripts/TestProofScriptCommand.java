@@ -40,13 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestProofScriptCommand {
     public static List<Arguments> data() throws IOException, URISyntaxException {
         URL url = TestProofScriptCommand.class.getResource("cases");
-        if (url == null) {
-            throw new FileNotFoundException("Cannot find resource 'cases'.");
-        }
+        if (url == null) { throw new FileNotFoundException("Cannot find resource 'cases'."); }
 
-        if (!url.getProtocol().equals("file")) {
-            throw new IOException("Resource should be a file URL not " + url);
-        }
+        if (!url.getProtocol().equals("file")) { throw new IOException("Resource should be a file URL not " + url); }
 
         Path directory = Paths.get(url.toURI());
         assertTrue(Files.isDirectory(directory));
@@ -68,7 +64,7 @@ public class TestProofScriptCommand {
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
         Files.write(tmpKey, lines);
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
         Proof proof = env.getLoadedProof();
 

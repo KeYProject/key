@@ -480,9 +480,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
 
     public SolverTypeCollection computeActiveSolverUnion() {
         // if there is already a solver union configured, return that
-        if (activeSolverUnion.isUsable()) {
-            return activeSolverUnion;
-        }
+        if (activeSolverUnion.isUsable()) { return activeSolverUnion; }
         // otherwise, first try the default solver: Z3
         Optional<SolverTypeCollection> z3 = solverUnions.stream()
                 .filter(x -> x.name().equals("Z3")).findFirst();
@@ -510,9 +508,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
     public Collection<SolverTypeCollection> getUsableSolverUnions(boolean experimental) {
         LinkedList<SolverTypeCollection> unions = new LinkedList<>();
         for (SolverTypeCollection union : getSolverUnions(experimental)) {
-            if (union.isUsable()) {
-                unions.add(union);
-            }
+            if (union.isUsable()) { unions.add(union); }
         }
         return unions;
     }
@@ -524,9 +520,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
 
     public Collection<SolverTypeCollection> getSolverUnions(boolean experimental) {
         LinkedList<SolverTypeCollection> res = new LinkedList<>(solverUnions);
-        if (experimental) {
-            res.addAll(legacyTranslationSolverUnions);
-        }
+        if (experimental) { res.addAll(legacyTranslationSolverUnions); }
         return res;
     }
 

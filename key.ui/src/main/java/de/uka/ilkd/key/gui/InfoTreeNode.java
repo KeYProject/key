@@ -36,8 +36,10 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     }
 
     /**
-     * @param title The name of the node.
-     * @param explanations An XML resource containing node descriptions.
+     * @param title
+     *        The name of the node.
+     * @param explanations
+     *        An XML resource containing node descriptions.
      */
     InfoTreeNode(String title, Properties explanations) {
         super(title);
@@ -60,7 +62,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
         lp.printTaclet(taclet);
         description = lp.result() + "\n\n Defined at:" + taclet.getOrigin()
-            + "\n\n under options:" + taclet.getChoices();
+                + "\n\n under options:" + taclet.getChoices();
     }
 
     InfoTreeNode(String title, String description) {

@@ -54,9 +54,12 @@ public class ShannonTermFeature implements TermFeature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param thenFeature the value of the feature if <code>cond</code> returns zero
-     * @param elseFeature the value of the feature if <code>cond</code> does not return zero
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param thenFeature
+     *        the value of the feature if <code>cond</code> returns zero
+     * @param elseFeature
+     *        the value of the feature if <code>cond</code> does not return zero
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, the value of
      *         <code>elseFeature</code> otherwise
      */
@@ -66,8 +69,10 @@ public class ShannonTermFeature implements TermFeature {
     }
 
     /**
-     * @param cond the feature that decides which value is to be returned
-     * @param thenFeature the value of the feature if <code>cond</code> returns zero
+     * @param cond
+     *        the feature that decides which value is to be returned
+     * @param thenFeature
+     *        the value of the feature if <code>cond</code> returns zero
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */

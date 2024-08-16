@@ -103,13 +103,11 @@ public class JoinDialog extends StdDialog {
 
             public String getPredicateInfo() {
                 return "Decision Formula (true for Goal " + partner.getNode(0).serialNr()
-                    + ", false for Goal " + partner.getNode(1).serialNr() + ")";
+                        + ", false for Goal " + partner.getNode(1).serialNr() + ")";
             }
 
             public String getPredicate(Proof proof) {
-                if (partner.getCommonPredicate() == null) {
-                    return "";
-                }
+                if (partner.getCommonPredicate() == null) { return ""; }
                 LogicPrinter printer =
                     LogicPrinter.purePrinter(new NotationInfo(), proof.getServices());
                 printer.printTerm(partner.getCommonPredicate());
@@ -139,9 +137,7 @@ public class JoinDialog extends StdDialog {
             });
 
 
-            if (!partnerList.isEmpty()) {
-                fill(partnerList, services);
-            }
+            if (!partnerList.isEmpty()) { fill(partnerList, services); }
 
         }
 
@@ -181,9 +177,7 @@ public class JoinDialog extends StdDialog {
         }
 
         private void selectionChanged(int index) {
-            if (index < 0 || index > getChoiceList().getModel().getSize()) {
-                return;
-            }
+            if (index < 0 || index > getChoiceList().getModel().getSize()) { return; }
             ContentItem item = choiceList.getModel().getElementAt(index);
             getSequentViewer2().setSequent(item.getSequent(), proof.getServices());
 
@@ -259,7 +253,7 @@ public class JoinDialog extends StdDialog {
                 getInfoBox()
                         .add(INFO,
                             "Goal " + item.partner.getNode(0).serialNr() + " and " + "Goal "
-                                + item.partner.getNode(1).serialNr() + " cannot be joined.",
+                                    + item.partner.getNode(1).serialNr() + " cannot be joined.",
                             Color.RED);
 
             } else if (reason != null) {
@@ -308,9 +302,7 @@ public class JoinDialog extends StdDialog {
         }
 
         private CheckedUserInput getPredicateInput() {
-            if (predicateInput == null) {
-                predicateInput = new CheckedUserInput(false);
-            }
+            if (predicateInput == null) { predicateInput = new CheckedUserInput(false); }
             return predicateInput;
         }
 

@@ -43,11 +43,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     public Term apply(Term t) {
         Term res;
 
-        if (depth == 0) {
-            if (!getSubstitutedTerm().isRigid()) {
-                findUsedVariables(t);
-            }
-        }
+        if (depth == 0) { if (!getSubstitutedTerm().isRigid()) { findUsedVariables(t); } }
 
         ++depth;
         try {
@@ -56,9 +52,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
             --depth;
         }
 
-        if (createQuantifier && depth == 0) {
-            res = addWarySubst(res);
-        }
+        if (createQuantifier && depth == 0) { res = addWarySubst(res); }
 
         return res;
     }
@@ -107,16 +101,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     protected Term apply1(Term t) {
         // don't move to a different modality level
         if (!getSubstitutedTerm().isRigid()) {
-            if (t.op() instanceof Modality) {
-                return applyOnModality(t);
-            }
-            if (t.op() instanceof UpdateApplication) {
-                return applyOnUpdate(t);
-            }
+            if (t.op() instanceof Modality) { return applyOnModality(t); }
+            if (t.op() instanceof UpdateApplication) { return applyOnUpdate(t); }
         }
-        if (t.op() instanceof Transformer) {
-            return applyOnTransformer(t);
-        }
+        if (t.op() instanceof Transformer) { return applyOnTransformer(t); }
         return super.apply1(t);
     }
 
@@ -156,20 +144,14 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 
         // only the last child is below the update
         final Term target = UpdateApplication.getTarget(t);
-        if (!target.freeVars().contains(getVariable())) {
-            return super.apply1(t);
-        }
+        if (!target.freeVars().contains(getVariable())) { return super.apply1(t); }
 
         final Term[] newSubterms = new Term[t.arity()];
         @SuppressWarnings("unchecked")
         final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[t.arity()];
 
         final int targetPos = UpdateApplication.targetPos();
-        for (int i = 0; i < t.arity(); i++) {
-            if (i != targetPos) {
-                applyOnSubterm(t, i, newSubterms, newBoundVars);
-            }
-        }
+        for (int i = 0; i < t.arity(); i++) { if (i != targetPos) { applyOnSubterm(t, i, newSubterms, newBoundVars); } }
 
         newBoundVars[targetPos] = t.varsBoundHere(targetPos);
         final boolean addSubst = subTermChanges(t.varsBoundHere(targetPos), target);

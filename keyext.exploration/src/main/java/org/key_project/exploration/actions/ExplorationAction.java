@@ -28,8 +28,7 @@ public abstract class ExplorationAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-    }
+    public void actionPerformed(ActionEvent e) {}
 
     Term promptForTerm(MainWindow window, Term term) {
         final String initialValue =
@@ -39,9 +38,7 @@ public abstract class ExplorationAction extends MainWindowAction {
 
         while (result == null) {
             String input = JOptionPane.showInputDialog(window, "Input a formula:", initialValue);
-            if (input == null) {
-                return null;
-            }
+            if (input == null) { return null; }
 
             KeyIO io = new KeyIO(window.getMediator().getServices());
             try {

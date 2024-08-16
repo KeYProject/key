@@ -25,17 +25,13 @@ public abstract class JMLUtils {
     public static @NonNull Set<String> splitJmlMarker(@NonNull String starter) {
         Set<String> features = new TreeSet<>();
         int start = 0;
-        if (starter.startsWith("//") || starter.startsWith("/*")) {
-            start = 2;
-        }
+        if (starter.startsWith("//") || starter.startsWith("/*")) { start = 2; }
         int posAt = starter.indexOf('@');
         int end = posAt >= 0 ? posAt : starter.length();
         String[] markers = starter.substring(start, end).split("(?=[+-])");
         for (String marker : markers) {
             marker = marker.trim();
-            if (!marker.isEmpty()) {
-                features.add(marker.toLowerCase());
-            }
+            if (!marker.isEmpty()) { features.add(marker.toLowerCase()); }
         }
         return features;
     }
@@ -54,14 +50,14 @@ public abstract class JMLUtils {
      * Decides whether the given string is a JML marker that symbolise a recognisable JML comment
      * for the given marker of the {@code tool}. Refer to chapter 4.4. in the jml ref manual.
      *
-     * @param jmlMarkers the marker string at the beginning of an JML comment.
-     * @param tool the marker of the current tool
+     * @param jmlMarkers
+     *        the marker string at the beginning of an JML comment.
+     * @param tool
+     *        the marker of the current tool
      * @return true if the given jml markers represents a KeY-recognisable comment.
      */
     public static boolean isJmlCommentStarter(String jmlMarkers, String tool) {
-        if (hasWhitespaceBeforeAt(jmlMarkers)) {
-            return false;
-        }
+        if (hasWhitespaceBeforeAt(jmlMarkers)) { return false; }
 
         tool = tool.toLowerCase(); // switches are in lower case
         Set<String> switches = splitJmlMarker(jmlMarkers);
@@ -72,9 +68,7 @@ public abstract class JMLUtils {
         boolean wrongMarkerFormat =
             switches.stream().anyMatch(it -> it.charAt(0) != '+' && it.charAt(0) != '-');
 
-        if (disabledCompletely || forbidsGivenTool || wrongMarkerFormat) {
-            return false;
-        }
+        if (disabledCompletely || forbidsGivenTool || wrongMarkerFormat) { return false; }
 
         // +OPENJML excludes KeY except KeY is enabled additionally with +key.
         return !containsPositive || allowsGivenTool;

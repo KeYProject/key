@@ -115,16 +115,14 @@ public class RunAllProofsAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         WindowUserInterfaceControl ui = mainWindow.getUserInterface();
 
-        for (int i = 0; i < files.size(); i++) {
-            LOGGER.info("{}: {}\n", i, files.get(i));
-        }
+        for (int i = 0; i < files.size(); i++) { LOGGER.info("{}: {}\n", i, files.get(i)); }
 
         Runnable runnable = () -> {
             for (File absFile : files) {
                 ui.reportStatus(this, "Run: " + absFile);
                 LOGGER.info("Run: {}", absFile);
                 ProblemLoader problemLoader =
-                    ui.getProblemLoader(absFile, null, null, null, getMediator());
+                    ui.getProblemLoader(absFile.toPath(), null, null, null, getMediator());
                 problemLoader.runSynchronously();
                 LOGGER.info("Loaded: {}", absFile);
 

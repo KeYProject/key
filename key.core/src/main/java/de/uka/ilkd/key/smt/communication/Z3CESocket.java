@@ -22,9 +22,7 @@ public class Z3CESocket extends AbstractSolverSocket {
 
         if (msg.startsWith("(error")) {
             sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
-            if (msg.contains("WARNING:")) {
-                return;
-            }
+            if (msg.contains("WARNING:")) { return; }
             throw new IOException("Error while executing " + getName() + ": " + msg);
         }
         // These two messages are only used to steer the interaction with the solver and are thus
@@ -52,14 +50,11 @@ public class Z3CESocket extends AbstractSolverSocket {
                 pipe.sendMessage("(exit)");
             }
         }
-        case WAIT_FOR_DETAILS -> {
-        }
+        case WAIT_FOR_DETAILS -> {}
         // Currently we rely on the solver to terminate after receiving "(exit)". If this does
         // not work in future, it may be that we have to forcibly close the pipe.
         case WAIT_FOR_QUERY -> {
-            if (!msg.equals("success")) {
-                getQuery().messageIncoming(pipe, msg);
-            }
+            if (!msg.equals("success")) { getQuery().messageIncoming(pipe, msg); }
         }
         case WAIT_FOR_MODEL -> {
             if (msg.equals("endmodel")) {

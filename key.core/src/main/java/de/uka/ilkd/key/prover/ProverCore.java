@@ -21,8 +21,10 @@ public interface ProverCore {
      * starts a proof search for a given goals using the given strategy settings instead the ones
      * configures in the proof
      *
-     * @param proof the Proof instance
-     * @param goal the goal to prove
+     * @param proof
+     *        the Proof instance
+     * @param goal
+     *        the goal to prove
      * @return an information object about the performed work (e.g. number of rules applied)
      */
     ApplyStrategyInfo start(Proof proof, Goal goal);
@@ -31,8 +33,10 @@ public interface ProverCore {
      * starts a proof search for a set of goals using the given strategy settings instead the ones
      * configures in the proof
      *
-     * @param proof the Proof instance
-     * @param goals list of goals to prove
+     * @param proof
+     *        the Proof instance
+     * @param goals
+     *        list of goals to prove
      * @return an information object about the performed work (e.g. number of rules applied)
      */
     ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals);
@@ -41,9 +45,12 @@ public interface ProverCore {
      * starts a proof search for a set of goals using the given strategy settings instead the ones
      * configures in the proof
      *
-     * @param proof the Proof instance
-     * @param goals list of goals to prove
-     * @param stratSet the strategy settings to use
+     * @param proof
+     *        the Proof instance
+     * @param goals
+     *        list of goals to prove
+     * @param stratSet
+     *        the strategy settings to use
      * @return an information object about the performed work (e.g. number of rules applied)
      */
     ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, StrategySettings stratSet);
@@ -53,11 +60,16 @@ public interface ProverCore {
      * may differ to the explicit data. This is discouraged. starts a proof search for a set of
      * goals
      *
-     * @param proof the Proof instance
-     * @param goals list of goals to prove
-     * @param maxSteps an int with the maximal number of rule applications to be performed
-     * @param timeout a long with a timeout when tyo stop the proof search at latest
-     * @param stopAtFirstNonCloseableGoal true if the prover shall stop at the first encountered
+     * @param proof
+     *        the Proof instance
+     * @param goals
+     *        list of goals to prove
+     * @param maxSteps
+     *        an int with the maximal number of rule applications to be performed
+     * @param timeout
+     *        a long with a timeout when tyo stop the proof search at latest
+     * @param stopAtFirstNonCloseableGoal
+     *        true if the prover shall stop at the first encountered
      *        non-closable goal
      * @return an information object about the performed work (e.g. number of rules applied)
      */
@@ -67,14 +79,16 @@ public interface ProverCore {
     /**
      * adds a task listener
      *
-     * @param observer the listener to add
+     * @param observer
+     *        the listener to add
      */
     void addProverTaskObserver(ProverTaskListener observer);
 
     /**
      * removes a task listener
      *
-     * @param observer the listener to remove
+     * @param observer
+     *        the listener to remove
      */
     void removeProverTaskObserver(ProverTaskListener observer);
 

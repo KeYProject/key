@@ -55,7 +55,8 @@ public abstract class ProofTreeViewFilter {
 
     /**
      *
-     * @param node a node.
+     * @param node
+     *        a node.
      * @return {@code true} iff the subtree starting at {@code node} is hidden by an active global
      *         filter.
      */
@@ -71,7 +72,8 @@ public abstract class ProofTreeViewFilter {
 
     /**
      *
-     * @param node a node.
+     * @param node
+     *        a node.
      * @return {@code false} iff the subtree starting at {@code node} is hidden by this filter.
      */
     public abstract boolean showSubtree(Node node);
@@ -91,7 +93,8 @@ public abstract class ProofTreeViewFilter {
     /**
      * Should only be called through GUIProofTreeNode#setFilter().
      *
-     * @param active whether the filter should be activated or deactivated.
+     * @param active
+     *        whether the filter should be activated or deactivated.
      */
     abstract void setActive(boolean active);
 
@@ -115,16 +118,20 @@ public abstract class ProofTreeViewFilter {
          * Decides whether a child should be counted while iterating all children. A child should
          * not be counted if it is hidden by one of the active filters.
          *
-         * @param child a node.
-         * @param parent the node's parent.
-         * @param pos the node's index in the parent's children array (see
+         * @param child
+         *        a node.
+         * @param parent
+         *        the node's parent.
+         * @param pos
+         *        the node's index in the parent's children array (see
          *        {@link TreeNode#getChildAt(int)}.
          */
         protected abstract boolean countChild(GUIProofTreeNode child, TreeNode parent, int pos);
 
         /**
          *
-         * @param parent a node.
+         * @param parent
+         *        a node.
          * @return the number of child nodes, not counting the ones hidden by the active filters.
          * @see #countChild(TreeNode, TreeNode, int)
          */
@@ -133,17 +140,17 @@ public abstract class ProofTreeViewFilter {
             int count = 0;
             for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
                 child = ((TreeNode) parent).getChildAt(i);
-                if (countChild(child, (TreeNode) parent, i)) {
-                    count++;
-                }
+                if (countChild(child, (TreeNode) parent, i)) { count++; }
             }
             return count;
         }
 
         /**
          *
-         * @param parent a node.
-         * @param index an index.
+         * @param parent
+         *        a node.
+         * @param index
+         *        an index.
          * @return the node's {@code index}th child, not counting the ones hidden by the active
          *         filters.
          * @see #countChild(TreeNode, TreeNode, int)
@@ -155,9 +162,7 @@ public abstract class ProofTreeViewFilter {
                 child = ((TreeNode) parent).getChildAt(i);
                 if (countChild(child, (TreeNode) parent, i)) {
                     count++;
-                    if (index == count) {
-                        return child;
-                    }
+                    if (index == count) { return child; }
                 }
             }
             return null;
@@ -165,8 +170,10 @@ public abstract class ProofTreeViewFilter {
 
         /**
          *
-         * @param parent a parent node.
-         * @param child a child node.
+         * @param parent
+         *        a parent node.
+         * @param child
+         *        a child node.
          * @return the child's index after applying all active filters to the children, or
          *         {@code -1} if {@code child} is not a child of {@code parent}.
          */
@@ -176,9 +183,7 @@ public abstract class ProofTreeViewFilter {
             for (int i = 0; i < guiParent.getChildCount(); i++) {
                 if (countChild(guiParent.getChildAt(i), guiParent, i)) {
                     count++;
-                    if (guiParent.getChildAt(i) == child) {
-                        return count;
-                    }
+                    if (guiParent.getChildAt(i) == child) { return count; }
                 }
             }
             return -1;
@@ -189,17 +194,18 @@ public abstract class ProofTreeViewFilter {
          * Decides whether a child should be counted while iterating all children. A child should
          * not be counted if it is hidden by one of the active filters.
          *
-         * @param child a node.
-         * @param parent the node's parent.
-         * @param pos the node's index in the parent's children array (see
+         * @param child
+         *        a node.
+         * @param parent
+         *        the node's parent.
+         * @param pos
+         *        the node's index in the parent's children array (see
          *        {@link TreeNode#getChildAt(int)}.
          */
         protected boolean countChild(TreeNode child, TreeNode parent, int pos) {
             if (child instanceof GUIProofTreeNode) {
                 return countChild((GUIProofTreeNode) child, parent, pos);
-            } else if (child instanceof GUIBranchNode) {
-                return true;
-            }
+            } else if (child instanceof GUIBranchNode) { return true; }
             return true;
         }
     }
@@ -208,9 +214,7 @@ public abstract class ProofTreeViewFilter {
 
         @Override
         protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
-            if (pos == parent.getChildCount() - 1) {
-                return true;
-            }
+            if (pos == parent.getChildCount() - 1) { return true; }
 
             // count if child is inlined because of a hidden subtree
             for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL_GLOBAL_FILTERS) {
@@ -251,13 +255,9 @@ public abstract class ProofTreeViewFilter {
 
         @Override
         protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
-            if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) {
-                return true;
-            }
+            if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) { return true; }
 
-            if (pos == parent.getChildCount() - 1) {
-                return true;
-            }
+            if (pos == parent.getChildCount() - 1) { return true; }
 
             // count if child is inlined because of a hidden subtree
             for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL_GLOBAL_FILTERS) {
@@ -357,11 +357,7 @@ public abstract class ProofTreeViewFilter {
             Proof proof = node.proof();
 
             // Show subtrees with at least one automatic goal.
-            for (Goal goal : proof.getSubtreeGoals(node)) {
-                if (goal.isAutomatic()) {
-                    return true;
-                }
-            }
+            for (Goal goal : proof.getSubtreeGoals(node)) { if (goal.isAutomatic()) { return true; } }
 
             // Also show closed subtrees.
             return proof.getSubtreeGoals(node).isEmpty();

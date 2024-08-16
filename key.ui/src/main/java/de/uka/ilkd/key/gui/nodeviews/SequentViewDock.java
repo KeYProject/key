@@ -79,9 +79,7 @@ public class SequentViewDock extends DefaultMultipleCDockable {
             if (node != null) {
                 // may be necessary to switch to that proof
                 Proof proof = node.proof();
-                if (selectionModel.getSelectedProof() != proof) {
-                    selectionModel.setSelectedProof(proof);
-                }
+                if (selectionModel.getSelectedProof() != proof) { selectionModel.setSelectedProof(proof); }
                 selectionModel.setSelectedNode(node);
             }
         }

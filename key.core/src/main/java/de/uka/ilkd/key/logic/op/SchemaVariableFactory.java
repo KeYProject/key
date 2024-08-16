@@ -20,8 +20,10 @@ public class SchemaVariableFactory {
     /**
      * creates a SchemaVariable representing quantified variables
      *
-     * @param name the Name of the SchemaVariable
-     * @param sort the Sort of the variable the SchemaVariable will be used to represent
+     * @param name
+     *        the Name of the SchemaVariable
+     * @param sort
+     *        the Sort of the variable the SchemaVariable will be used to represent
      * @return the SchemaVariable
      */
     public static VariableSV createVariableSV(Name name, Sort sort) {
@@ -31,10 +33,14 @@ public class SchemaVariableFactory {
     /**
      * creates a SchemaVariable representing a term but not a formula
      *
-     * @param name the Name of the SchemaVariable
-     * @param sort the Sort of the term the SchemaVariable will be used to represent
-     * @param rigidness true iff this SV may only match rigid terms/formulas
-     * @param strictSV boolean indicating if the schemavariable is declared as strict forcing exact
+     * @param name
+     *        the Name of the SchemaVariable
+     * @param sort
+     *        the Sort of the term the SchemaVariable will be used to represent
+     * @param rigidness
+     *        true iff this SV may only match rigid terms/formulas
+     * @param strictSV
+     *        boolean indicating if the schemavariable is declared as strict forcing exact
      *        type match
      * @return the SchemaVariable
      */
@@ -46,7 +52,8 @@ public class SchemaVariableFactory {
     /**
      * creates a SchemaVariable representing an operator
      *
-     * @param name the Name of the SchemaVariable
+     * @param name
+     *        the Name of the SchemaVariable
      * @param modalityKinds
      * @return the SchemaVariable
      */
@@ -64,8 +71,10 @@ public class SchemaVariableFactory {
     /**
      * creates a SchemaVariable representing a formula
      *
-     * @param name the Name of the SchemaVariable
-     * @param rigidness true iff this SV may only match rigid terms/formulas
+     * @param name
+     *        the Name of the SchemaVariable
+     * @param rigidness
+     *        true iff this SV may only match rigid terms/formulas
      * @return the SchemaVariable
      */
     public static FormulaSV createFormulaSV(Name name, boolean rigidness) {

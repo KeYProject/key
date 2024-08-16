@@ -16,5 +16,4 @@ import java.lang.annotation.RetentionPolicy;
  * @see Lookup#inject(Object)
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Inject {
-}
+public @interface Inject {}
