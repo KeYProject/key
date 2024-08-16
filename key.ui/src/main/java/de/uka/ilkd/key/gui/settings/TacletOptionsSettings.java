@@ -45,7 +45,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     private boolean warnNoProof = true;
 
     // to make the "No Proof Loaded" header invisible when a proof is loaded
-    private JLabel lblHead2;
+    private JLabel noProofLoadedHeader;
 
 
     public TacletOptionsSettings() {
@@ -178,12 +178,10 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     protected void layoutHead() {
-        if (warnNoProof) {
-            this.lblHead2 = new JLabel("No Proof loaded. Taclet options may not be parsed.");
-            lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
-            lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
-            pNorth.add(lblHead2);
-        }
+        this.noProofLoadedHeader = new JLabel("No Proof loaded. Taclet options may not be parsed.");
+        noProofLoadedHeader.setIcon(IconFactory.WARNING_INCOMPLETE.get());
+        noProofLoadedHeader.setFont(noProofLoadedHeader.getFont().deriveFont(14f));
+        pNorth.add(noProofLoadedHeader);
 
         JLabel lblHead2 = new JLabel("Taclet options will take effect only on new proofs.");
         lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
@@ -204,14 +202,17 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
         JLabel title = createTitleRow(cat, selectedChoice);
         JPanel selectPanel = new JPanel(new MigLayout(new LC().fillX(), new AC().fill().grow()));
-        ButtonGroup btnGroup = new ButtonGroup();
-        for (ChoiceEntry c : choices) {
-            JRadioButton btn = mkRadioButton(c, btnGroup);
-            if (c.equals(selectedChoice)) {
-                btn.setSelected(true);
+
+        if (!warnNoProof) {
+            ButtonGroup btnGroup = new ButtonGroup();
+            for (ChoiceEntry c : choices) {
+                JRadioButton btn = mkRadioButton(c, btnGroup);
+                if (c.equals(selectedChoice)) {
+                    btn.setSelected(true);
+                }
+                btn.addActionListener(new ChoiceSettingsSetter(title, cat, c));
+                selectPanel.add(btn, new CC().newline());
             }
-            btn.addActionListener(new ChoiceSettingsSetter(title, cat, c));
-            selectPanel.add(btn, new CC().newline());
         }
         selectPanel.add(mkExplanation(explanation), new CC().pad(0, 20, 0, 0).newline());
 
@@ -297,7 +298,13 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return lbl;
     }
 
-    private static String createCatTitleText(String cat, ChoiceEntry entry) {
+    private String createCatTitleText(String cat, ChoiceEntry entry) {
+        // TODO: magic to say what is set in the current proof
+        // if no proof is loaded, we do not want to display current settings
+        if (warnNoProof) {
+            return cat;
+        }
+
         // strip the leading "cat:" from "cat:value"
         return cat + (entry == null ? ""
                 : " (set to '" +
@@ -312,8 +319,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     @Override
     public JPanel getPanel(MainWindow window) {
         warnNoProof = window.getMediator().getSelectedProof() == null;
-        // this makes the wrong lblhead2 invisible
-        this.lblHead2.setVisible(warnNoProof);
+        // this makes the header invisible
+        this.noProofLoadedHeader.setVisible(warnNoProof);
         setChoiceSettings(SettingsManager.getChoiceSettings(window));
         return this;
     }
