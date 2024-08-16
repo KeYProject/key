@@ -19,6 +19,7 @@ import javax.swing.plaf.ColorUIResource;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -46,6 +47,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     // to make the "No Proof Loaded" header invisible when a proof is loaded
     private JLabel noProofLoadedHeader;
+
+    private Proof loadedProof = null;
 
 
     public TacletOptionsSettings() {
@@ -295,11 +298,14 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     private JLabel createTitleRow(String cat, ChoiceEntry entry) {
         JLabel lbl = new JLabel(createCatTitleText(cat, entry));
         lbl.setFont(lbl.getFont().deriveFont(14f));
+
+        // we want to display a warning if the current choice differs from the loaded proof
+        checkForDifferingOptions(lbl, cat, entry);
+
         return lbl;
     }
 
     private String createCatTitleText(String cat, ChoiceEntry entry) {
-        // TODO: magic to say what is set in the current proof
         // if no proof is loaded, we do not want to display current settings
         if (warnNoProof) {
             return cat;
@@ -311,6 +317,34 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                     entry.choice.substring(cat.length() + 1) + "')");
     }
 
+    /**
+     * Checks if the current choice {@code entry} differs from the loaded proof and sets the icon to
+     * show a warning if necessary.
+     *
+     * @param lbl The label to set the icon on
+     * @param cat The category of the choice
+     * @param entry The current choice
+     */
+    private void checkForDifferingOptions(JLabel lbl, String cat, ChoiceEntry entry) {
+        if (loadedProof != null) {
+            String choiceOfLoadedProof =
+                loadedProof.getSettings().getChoiceSettings().getDefaultChoices().get(cat);
+            boolean choiceDiffers = entry != null && !entry.choice.equals(choiceOfLoadedProof);
+            if (choiceDiffers) {
+                lbl.setIcon(IconFactory.WARNING_INCOMPLETE.get());
+                lbl.setHorizontalTextPosition(JLabel.LEFT);
+                lbl.setIconTextGap(10);
+                lbl.setToolTipText(
+                    "<html>The current choice of this option differs from the loaded proof.<br>"
+                        + "The loaded proof uses: " + choiceOfLoadedProof + "</html>");
+
+            } else {
+                lbl.setIcon(null);
+                lbl.setToolTipText(null);
+            }
+        }
+    }
+
     @Override
     public String getDescription() {
         return "Taclet Options";
@@ -318,7 +352,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     @Override
     public JPanel getPanel(MainWindow window) {
-        warnNoProof = window.getMediator().getSelectedProof() == null;
+        loadedProof = window.getMediator().getSelectedProof();
+        warnNoProof = loadedProof == null;
         // this makes the header invisible
         this.noProofLoadedHeader.setVisible(warnNoProof);
         setChoiceSettings(SettingsManager.getChoiceSettings(window));
@@ -503,6 +538,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         public void actionPerformed(ActionEvent e) {
             category2Choice.put(category, choice.choice);
             title.setText(createCatTitleText(category, choice));
+            checkForDifferingOptions(title, category, choice);
             title.repaint();
         }
     }

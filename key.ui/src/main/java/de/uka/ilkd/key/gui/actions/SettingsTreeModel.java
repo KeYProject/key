@@ -47,11 +47,12 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
         if (proofSettings == null) {
             OptionContentNode proofSettingsNode =
-                    generateOptionContentNode("Proof Settings", "There is currently no proof loaded!");
+                generateOptionContentNode("Proof Settings", "There is currently no proof loaded!");
             root.add(proofSettingsNode);
         } else {
             OptionContentNode proofSettingsNode =
-                    generateOptionContentNode("Proof Settings", "These are the proof dependent settings.");
+                generateOptionContentNode("Proof Settings",
+                    "These are the proof dependent settings.");
             root.add(proofSettingsNode);
 
             // ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
@@ -67,7 +68,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         }
 
         OptionContentNode independentSettingsNode = generateOptionContentNode(
-                "Proof-Independent Settings", "These are the proof independent settings.");
+            "Proof-Independent Settings", "These are the proof independent settings.");
         root.add(independentSettingsNode);
 
         Settings generalSettings = independentSettings.getGeneralSettings();
@@ -81,7 +82,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
         Settings viewSettings = independentSettings.getViewSettings();
         independentSettingsNode.add(generateTableNode("View", viewSettings));
         Settings termLabelSettings = independentSettings.getTermLabelSettings();
-        // Previously, the termLabelSettings were added to the proofSettingsNode, but judging by the previous line,
+        // Previously, the termLabelSettings were added to the proofSettingsNode, but judging by the
+        // previous line,
         // it should really be added to the independentSettingsNode
         independentSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
     }
