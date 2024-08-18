@@ -172,7 +172,8 @@ public final class AutoModeAction extends MainWindowAction {
             // This method delegates the request only to the UserInterfaceControl which implements
             // the functionality.
             // No functionality is allowed in this method body!
-            getMediator().getUI().getProofControl().stopAndWaitAutoMode();
+            setEnabled(false);
+            getMediator().getUI().getProofControl().stopAutoMode();
         }
     }
 
