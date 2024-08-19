@@ -16,6 +16,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.key_project.rusty.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 public abstract class MatchSchemaVariableInstruction<SV extends @NonNull OperatorSV>
         extends Instruction<SV> {
     private static final Logger LOGGER =
@@ -39,16 +41,14 @@ public abstract class MatchSchemaVariableInstruction<SV extends @NonNull Operato
 
         final SVInstantiations inst = matchCond.getInstantiations();
 
-        /*
-         * final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
-         * if (t != null) {
-         * if (!t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
-         * return null;
-         * } else {
-         * return matchCond;
-         * }
-         * }
-         */
+        final Term t = inst.getTermInstantiation(op, services);
+        if (t != null) {
+            if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term)) {
+                return null;
+            } else {
+                return matchCond;
+            }
+        }
 
         try {
             return matchCond.setInstantiations(inst.add(op, term, services));

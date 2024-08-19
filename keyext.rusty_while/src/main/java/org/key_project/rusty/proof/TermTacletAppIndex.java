@@ -8,10 +8,10 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PIOPathIterator;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.rule.NoPosTacletApp;
+import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.Taclet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.rusty.rule.TacletApp;
+import org.key_project.util.collection.*;
 
 /**
  * Class whose objects represent an index of taclet apps for one particular position within a
@@ -187,5 +187,75 @@ public class TermTacletAppIndex {
         }
 
         return result;
+    }
+
+    /**
+     * @return all taclet apps for or below the given position
+     */
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos, Services services) {
+        return descend(pos).collectTacletApps(pos, services);
+    }
+
+    /**
+     * Collect all taclet apps that are stored by <code>this</code> (and by the sub-indices of
+     * <code>this</code>). <code>NoPosTacletApp</code>s are converted to <code>PosTacletApp</code>s
+     * using the parameter <code>pos</code>
+     *
+     * @param pos The position of this index
+     * @return a list of all taclet apps
+     */
+    private ImmutableList<TacletApp> collectTacletApps(PosInOccurrence pos,
+            Services services) {
+
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
+
+        final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
+            collectAllTacletAppsHereAndBelow(pos, ImmutableSLList.nil());
+
+        for (final Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
+            result = convert(pair.second, pair.first, result, services);
+        }
+
+        return result;
+    }
+
+    /**
+     * Collect all <code>NoPosTacletApp</code> s that are stored by <code>this</code> (and by the
+     * sub-indices of <code>this</code>).
+     *
+     * @param pos The position of this index
+     * @param collectedApps the {@link ImmutableMap <PosInOccurrence,ImmutableList<NoPosTacletApp>>}
+     *        to which to add the found taclet applications; it must not contain {@code pos} or any
+     *        position below pos as key
+     * @return the resulting list of taclet applications from this and all subterm taclet indices
+     */
+    private ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectAllTacletAppsHereAndBelow(
+            PosInOccurrence pos,
+            ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectedApps) {
+
+        // assert collectedApps.get(pos) == null;
+        collectedApps = collectedApps.prepend(new Pair<>(pos, localTacletApps));
+
+        for (int subterm = 0; subterm < subtermIndices.size(); subterm++) {
+            collectedApps = subtermIndices.get(subterm)
+                    .collectAllTacletAppsHereAndBelow(pos.down(subterm), collectedApps);
+        }
+
+        return collectedApps;
+    }
+
+    private ImmutableList<TacletApp> convert(ImmutableList<? extends RuleApp> rules,
+            PosInOccurrence pos, ImmutableList<TacletApp> convertedApps,
+            Services services) {
+
+        for (final RuleApp app : rules) {
+            final TacletApp tacletApp =
+                TacletAppIndex.createTacletApp((NoPosTacletApp) app, pos, services);
+            if (tacletApp != null) {
+                convertedApps = convertedApps.prepend(tacletApp);
+            }
+        }
+
+        return convertedApps;
     }
 }

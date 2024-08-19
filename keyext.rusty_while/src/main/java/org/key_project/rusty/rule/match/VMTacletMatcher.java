@@ -18,6 +18,8 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.*;
 import org.key_project.util.collection.*;
 
+import static org.key_project.rusty.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 
 public class VMTacletMatcher implements TacletMatcher {
     /** the matcher for the find expression of the taclet */
@@ -246,19 +248,58 @@ public class VMTacletMatcher implements TacletMatcher {
         for (int i = 0, size = context.size(); i < size; i++) {
             if (formula.op() instanceof UpdateApplication) {
                 final Term update = UpdateApplication.getUpdate(formula);
-                final Term ulp = curContext.head();
-                /*
-                 * TODO @ Tobias : if (ulp.equalsModProperty(update, RENAMING_TERM_PROPERTY)
-                 * && ulp.updateApplicationlabels().equals(update.getLabels())) {
-                 * curContext = curContext.tail();
-                 * formula = UpdateApplication.getTarget(formula);
-                 * continue;
-                 * }
-                 */
+                final Term u = curContext.head();
+                if (RENAMING_TERM_PROPERTY.equalsModThisProperty(u, update)) {
+                    curContext = curContext.tail();
+                    formula = UpdateApplication.getTarget(formula);
+                    continue;
+                }
             }
             // update context does not match update prefix of formula
             return null;
         }
         return formula;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public final MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
+            MatchConditions p_matchCond, Services p_services) {
+
+        final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
+        final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
+
+        ImmutableList<MatchConditions> newMC;
+
+        for (final IfFormulaInstantiation candidateInst : p_toMatch) {
+            // Part of fix for #1716: match antecedent with antecedent, succ with succ
+            boolean candidateInAntec = (candidateInst instanceof IfFormulaInstSeq)
+                    // Only IfFormulaInstSeq has inAntec() property ...
+                    && (((IfFormulaInstSeq) candidateInst).inAntec())
+                    || !(candidateInst instanceof IfFormulaInstSeq)
+                            // ... and it seems we don't need the check for other implementations.
+                            // Default: just take the next ante formula, else succ formula
+                            && anteIterator.hasNext();
+
+            Iterator<SequentFormula> itIfSequent = candidateInAntec ? anteIterator : succIterator;
+            // Fix end
+
+            assert itIfSequent.hasNext()
+                    : "toMatch and assumes sequent must have same number of elements";
+            newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
+                itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
+
+            if (newMC.isEmpty()) {
+                return null;
+            }
+
+            p_matchCond = newMC.head();
+        }
+        assert !anteIterator.hasNext() && !succIterator.hasNext()
+                : "toMatch and assumes sequent must have same number of elements";
+
+        return p_matchCond;
     }
 }

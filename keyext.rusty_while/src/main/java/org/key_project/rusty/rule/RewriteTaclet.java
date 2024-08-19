@@ -26,18 +26,18 @@ import org.key_project.util.collection.ImmutableSet;
  * structure described by the term of the find-part.
  */
 public class RewriteTaclet extends FindTaclet {
-    public enum ApplicationRestriction {
+    public record ApplicationRestriction(int value) {
         /** does not pose state restrictions on valid matchings */
-        None(0),
+        public static final int NONE = 0;
         /**
          * all taclet constituents must appear in the same state (and not below a modality (for
          * efficiency reasons))
          */
-        SameUpdateLevel(1),
+        public static final int SAME_UPDATE_LEVEL = 1;
         /**
          * all taclet constituents must be in the same state as the sequent
          */
-        InSequentState(2),
+        public static final int IN_SEQUENT_STATE = 2;
         /**
          * If the surrounding formula has been decomposed completely, the find-term will NOT appear
          * on
@@ -49,7 +49,7 @@ public class RewriteTaclet extends FindTaclet {
          * {@code wellformed(h) <-> wellformed(h2) ==>}
          * has NO antecedent polarity.
          */
-        AntecedentPolarity(4),
+        public static final int ANTECEDENT_POLARITY = 4;
         /**
          * If the surrounding formula has been decomposed completely, the find-term will NOT appear
          * on
@@ -62,27 +62,22 @@ public class RewriteTaclet extends FindTaclet {
          * {@code wellformed(h) <-> wellformed(h2) ==>} has
          * NO succedent polarity.
          */
-        SuccedentPolarity(8);
-
-        // TODO ask: This was final before but we need to change the value
-        private int value;
-
-        ApplicationRestriction(int value) {
-            this.value = value;
-        }
-
-        int getValue() {
-            return value;
-        }
+        public static final int SUCCEDENT_POLARITY = 8;
 
         public boolean matches(ApplicationRestriction o) {
-            return (getValue() & o.getValue()) != 0;
+            return (value() & o.value()) != 0;
         }
 
-        // This is necessary for a passage in TacletPBuilder
-        // Might work, but does not seem reasonable with an enum
-        public void uniteRestrictions(ApplicationRestriction restriction) {
-            this.value |= restriction.getValue();
+        public boolean matches(int value) {
+            return (value() & value) != 0;
+        }
+
+        public ApplicationRestriction combine(ApplicationRestriction restriction) {
+            return new ApplicationRestriction(this.value | restriction.value());
+        }
+
+        public ApplicationRestriction combine(int value) {
+            return new ApplicationRestriction(this.value | value);
         }
     }
 
@@ -90,12 +85,12 @@ public class RewriteTaclet extends FindTaclet {
      * encodes restrictions on the state where a rewrite taclet is applicable If the value is equal
      * to
      * <ul>
-     * <li>{@link RewriteTaclet.ApplicationRestriction#None} no state restrictions are posed</li>
-     * <li>{@link RewriteTaclet.ApplicationRestriction#SameUpdateLevel} then <code>\assumes</code>
+     * <li>{@link RewriteTaclet.ApplicationRestriction#NONE} no state restrictions are posed</li>
+     * <li>{@link RewriteTaclet.ApplicationRestriction#SAME_UPDATE_LEVEL} then <code>\assumes</code>
      * must match on a
      * formula within the same state as <code>\find</code> rsp. <code>\add</code>. For efficiency no
      * modalities are allowed above the <code>\find</code> position</li>
-     * <li>{@link RewriteTaclet.ApplicationRestriction#InSequentState} the <code>\find</code> part
+     * <li>{@link RewriteTaclet.ApplicationRestriction#IN_SEQUENT_STATE} the <code>\find</code> part
      * is only allowed to
      * match on formulas which are evaluated in the same state as the sequent</li>
      * </ul>
@@ -178,16 +173,16 @@ public class RewriteTaclet extends FindTaclet {
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
         StringBuffer res = super.toStringFind(sb);
-        if (getApplicationRestriction().matches(ApplicationRestriction.SameUpdateLevel)) {
+        if (getApplicationRestriction().matches(ApplicationRestriction.SAME_UPDATE_LEVEL)) {
             res.append("\\sameUpdateLevel");
         }
-        if (getApplicationRestriction().matches(ApplicationRestriction.InSequentState)) {
+        if (getApplicationRestriction().matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
             res.append("\\inSequentState");
         }
-        if (getApplicationRestriction().matches(ApplicationRestriction.AntecedentPolarity)) {
+        if (getApplicationRestriction().matches(ApplicationRestriction.ANTECEDENT_POLARITY)) {
             res.append("\\antecedentPolarity");
         }
-        if (getApplicationRestriction().matches(ApplicationRestriction.SuccedentPolarity)) {
+        if (getApplicationRestriction().matches(ApplicationRestriction.SUCCEDENT_POLARITY)) {
             res.append("\\succedentPolarity");
         }
         return res;
@@ -221,15 +216,15 @@ public class RewriteTaclet extends FindTaclet {
             op = t.op();
             if (op instanceof UpdateApplication
                     && it.getChild() == UpdateApplication.targetPos()
-                    && !getApplicationRestriction().matches(ApplicationRestriction.None)) {
-                if (getApplicationRestriction().matches(ApplicationRestriction.InSequentState)
+                    && !getApplicationRestriction().matches(ApplicationRestriction.NONE)) {
+                if (getApplicationRestriction().matches(ApplicationRestriction.IN_SEQUENT_STATE)
                         || veto(t)) {
                     return null;
                 } else {
                     Term update = UpdateApplication.getUpdate(t);
                     svi = svi.addUpdate(update);
                 }
-            } else if (!getApplicationRestriction().matches(ApplicationRestriction.None)
+            } else if (!getApplicationRestriction().matches(ApplicationRestriction.NONE)
                     && (op instanceof Modality)) {
                 return null;
             }
@@ -239,12 +234,12 @@ public class RewriteTaclet extends FindTaclet {
             }
         }
 
-        if (getApplicationRestriction().matches(ApplicationRestriction.None)) {
+        if (getApplicationRestriction().matches(ApplicationRestriction.NONE)) {
             return p_mc;
         }
-        if ((getApplicationRestriction().matches(ApplicationRestriction.AntecedentPolarity)
+        if ((getApplicationRestriction().matches(ApplicationRestriction.ANTECEDENT_POLARITY)
                 && polarity != -1)
-                || (getApplicationRestriction().matches(ApplicationRestriction.SuccedentPolarity)
+                || (getApplicationRestriction().matches(ApplicationRestriction.SUCCEDENT_POLARITY)
                         && polarity != 1)) {
             return null;
         }

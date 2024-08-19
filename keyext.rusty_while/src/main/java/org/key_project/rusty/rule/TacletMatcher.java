@@ -73,4 +73,17 @@ public interface TacletMatcher {
      */
     IfMatchResult matchIf(Iterable<IfFormulaInstantiation> toMatch, Term template,
             MatchConditions matchCond, Services services);
+
+    /**
+     * Match the whole if sequent using the given list of instantiations of all assumes-sequent
+     * formulas,
+     * starting with the instantiations given by p_matchCond.
+     * <p>
+     * PRECONDITION: {@code p_toMatch.size () == ifSequent().size()}
+     * </p>
+     *
+     * @return resulting MatchConditions or null if the given list p_toMatch does not match
+     */
+    MatchConditions matchIf(Iterable<IfFormulaInstantiation> toMatch,
+            MatchConditions matchCond, Services services);
 }

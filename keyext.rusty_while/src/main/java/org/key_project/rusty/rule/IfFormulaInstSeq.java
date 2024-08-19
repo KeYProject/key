@@ -40,7 +40,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     @Override
     public String toString(Services services) {
-        return "TODO";
+        return cf.formula().toString();
     }
 
     /**

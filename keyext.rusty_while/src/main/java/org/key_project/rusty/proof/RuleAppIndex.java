@@ -72,4 +72,21 @@ public class RuleAppIndex {
     public TacletIndex tacletIndex() {
         return tacletIndex;
     }
+
+    /**
+     * returns the rule applications at the given PosInOccurrence and at all Positions below this.
+     * The method calls getTacletAppAt for all the Positions below.
+     *
+     * @param pos the position where to start from
+     * @param services the Services object encapsulating information about the java datastructures
+     *        like (static)types etc.
+     * @return the possible rule applications
+     */
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
+            Services services) {
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
+        result =
+            result.prepend(tacletAppIndex.getTacletAppAtAndBelow(pos, services));
+        return result;
+    }
 }

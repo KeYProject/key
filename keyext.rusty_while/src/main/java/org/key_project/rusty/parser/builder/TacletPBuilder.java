@@ -135,7 +135,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             // if (!axiomMode) {
             // semanticError(ctx, "formula rules are only permitted for \\axioms");
             // }
-            TacletBuilder<?> b = createTacletBuilderFor(null, ApplicationRestriction.None, ctx);
+            TacletBuilder<?> b = createTacletBuilderFor(null, new ApplicationRestriction(ApplicationRestriction.NONE), ctx);
             currentTBuilder.push(b);
             SequentFormula sform = new SequentFormula(form);
             Semisequent semi = new Semisequent(sform);
@@ -164,18 +164,18 @@ public class TacletPBuilder extends ExpressionBuilder {
         // TODO ask about how this should done with the enum
         // does it make sense to use an enum when you change the value to something
         // that no enum element has initially?
-        ApplicationRestriction applicationRestriction = ApplicationRestriction.None;
+        ApplicationRestriction applicationRestriction = new ApplicationRestriction(ApplicationRestriction.NONE);
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
-            applicationRestriction.uniteRestrictions(ApplicationRestriction.SameUpdateLevel);
+            applicationRestriction=  applicationRestriction.combine(ApplicationRestriction.SAME_UPDATE_LEVEL);
         }
         if (!ctx.INSEQUENTSTATE().isEmpty()) {
-            applicationRestriction.uniteRestrictions(ApplicationRestriction.InSequentState);
+            applicationRestriction=   applicationRestriction.combine(ApplicationRestriction.IN_SEQUENT_STATE);
         }
         if (!ctx.ANTECEDENTPOLARITY().isEmpty()) {
-            applicationRestriction.uniteRestrictions(ApplicationRestriction.AntecedentPolarity);
+            applicationRestriction=   applicationRestriction.combine(ApplicationRestriction.ANTECEDENT_POLARITY);
         }
         if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
-            applicationRestriction.uniteRestrictions(ApplicationRestriction.SuccedentPolarity);
+            applicationRestriction=  applicationRestriction.combine(ApplicationRestriction.SUCCEDENT_POLARITY);
         }
         @Nullable
         Object find = accept(ctx.find);
@@ -417,14 +417,14 @@ public class TacletPBuilder extends ExpressionBuilder {
                 AntecTacletBuilder b = new AntecTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
-                    !applicationRestriction.matches(ApplicationRestriction.InSequentState));
+                    !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE));
                 return b;
             } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
                 Term findFma = findSeq.succedent().get(0).formula();
                 SuccTacletBuilder b = new SuccTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
-                    !applicationRestriction.matches(ApplicationRestriction.InSequentState));
+                    !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE));
                 return b;
             } else {
                 semanticError(ctx, "Unknown find-sequent (perhaps null?):" + findSeq);

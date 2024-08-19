@@ -707,4 +707,39 @@ public abstract class TacletApp implements RuleApp {
         return "Application of Taclet " + taclet() + " with " + instantiations() + " and "
             + ifFormulaInstantiations();
     }
+
+    /**
+     * Creates a new Taclet application by matching the given formulas against the formulas of the
+     * assumes-sequent, adding SV instantiations, constraints and metavariables as needed. This will
+     * fail
+     * if the assumes-formulas have already been instantiated.
+     */
+    public TacletApp setIfFormulaInstantiations(ImmutableList<IfFormulaInstantiation> p_list,
+            Services p_services) {
+        if (p_list == null) {
+            // (LG 2022-02-07) Apparently findIfFormulaInstantiations() might return null
+            // instantiations that should actually be nil().
+            // So we replace null with nil() here as a bugfix.
+            p_list = ImmutableSLList.nil();
+        }
+        assert ifInstsCorrectSize(p_list) && ifInstantiations == null
+                : "If instantiations list has wrong size "
+                    + "or the if formulas have already been instantiated";
+
+        MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
+
+        return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
+    }
+
+    /**
+     * check whether the number of if instantiations is correct
+     *
+     * @param list list of instantiations (non-null)
+     * @return true iff the list of if instantiations has the correct size
+     */
+    public boolean ifInstsCorrectSize(ImmutableList<IfFormulaInstantiation> list) {
+        Semisequent antec = taclet().ifSequent().antecedent();
+        Semisequent succ = taclet().ifSequent().succedent();
+        return list.size() == (antec.size() + succ.size());
+    }
 }

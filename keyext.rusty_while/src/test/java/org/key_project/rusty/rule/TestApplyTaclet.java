@@ -18,6 +18,7 @@ import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.util.TacletForTests;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,19 @@ public class TestApplyTaclet {
         "(A -> B) -> (!(!(A -> B)))", "",
         "", "\\<{x=3u32}\\>A",
         "A & B", "",
-        "", ""
+        "", "",
+        "A & (A & B)", "",
+        "f(const)=const", "const=f(f(const))",
+        "f(const)=const",
+        "const=f(const)",
+        "f(const)=const", "A & {i:=0}(const=f(const))",
+        "f(const)=const", "A & {i:=0}(const=f(f(const)))",
+
+        "{i:=0}(f(const)=const)",
+        "{i:=1}(const=f(const)) & \\<{i=2u32}\\>(const=f(const)) " + "& {i:=0}(const=f(const))",
+
+        "{i:=0}(f(const)=const)",
+        "{i:=1}(const=f(const)) & \\<{i=2u32}\\>(const=f(const)) " + "& {i:=0}(const=const)",
     };
     Proof[] proof;
 
@@ -421,5 +434,134 @@ public class TestApplyTaclet {
                     && it.next().formula().equals(TacletForTests.parseTerm("A"))
                     && it.next().formula().equals(TacletForTests.parseTerm("B")),
             "Expected 'A, B ==>', but is " + goals.head().sequent());
+    }
+
+    @Test
+    public void testBugID188() {
+        // bug #188
+
+        NoPosTacletApp al = TacletForTests.getRules().lookup(new Name("and_left"));
+        Sequent seq = proof[7].root().sequent();
+        PosInOccurrence pio =
+            new PosInOccurrence(seq.antecedent().get(0), PosInTerm.getTopLevel(), true);
+
+        TacletIndex tacletIndex = new TacletIndex();
+        tacletIndex.add(al);
+
+        Goal goal = createGoal(proof[7].root(), tacletIndex);
+
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAt(pio, null);
+        ImmutableList<Goal> goals = rApplist.head().execute(goal);
+
+
+        seq = goals.head().sequent();
+        pio = new PosInOccurrence(seq.antecedent().get(1), PosInTerm.getTopLevel(), true);
+        tacletIndex = new TacletIndex();
+        tacletIndex.add(al);
+
+        goal = createGoal(goals.head().getNode(), tacletIndex);
+
+        rApplist = goal.ruleAppIndex().getTacletAppAt(pio, null);
+
+        goals = rApplist.head().execute(goal);
+
+        assertEquals(1, goals.size(), "Expected one goal");
+
+        Iterator<SequentFormula> it = goals.head().sequent().antecedent().iterator();
+
+        assertTrue(
+            goals.head().sequent().antecedent().size() == 2
+                    && goals.head().sequent().succedent().size() == 0
+                    && it.next().formula().equals(TacletForTests.parseTerm("A"))
+                    && it.next().formula().equals(TacletForTests.parseTerm("B")),
+            "Expected 'A, B ==>', but is " + goals.head().sequent());
+    }
+
+    @Test
+    public void testModalityLevel0() {
+        Services services = TacletForTests.services();
+        NoPosTacletApp apply_eq_nonrigid =
+            TacletForTests.getRules().lookup(new Name("apply_eq_nonrigid"));
+        TacletIndex tacletIndex = new TacletIndex();
+        tacletIndex.add(apply_eq_nonrigid);
+        Goal goal = createGoal(proof[8].root(), tacletIndex);
+        PosInOccurrence pos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+            PosInTerm.getTopLevel(), false);
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAtAndBelow(pos, services);
+
+        assertEquals(4, rApplist.size(), "Expected four rule applications.");
+
+        ImmutableList<TacletApp> appList = ImmutableSLList.nil();
+        for (TacletApp aRApplist : rApplist) {
+            appList =
+                appList.prepend(aRApplist.findIfFormulaInstantiations(goal.sequent(), services));
+        }
+
+        assertEquals(1, appList.size(), "Expected one match.");
+        assertTrue(appList.head().complete(), "Rule App should be complete");
+
+        ImmutableList<Goal> goals = appList.head().execute(goal);
+        assertEquals(1, goals.size(), "Too many or zero goals.");
+        Sequent seq = goals.head().sequent();
+        Sequent correctSeq = proof[9].root().sequent();
+        assertEquals(seq, correctSeq, "Wrong result");
+    }
+
+    @Test
+    public void testModalityLevel1() {
+        Services services = TacletForTests.services();
+        NoPosTacletApp apply_eq_nonrigid =
+            TacletForTests.getRules().lookup(new Name("apply_eq_nonrigid"));
+        TacletIndex tacletIndex = new TacletIndex();
+        tacletIndex.add(apply_eq_nonrigid);
+        Goal goal = createGoal(proof[10].root(), tacletIndex);
+        PosInOccurrence pos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+            PosInTerm.getTopLevel(), false);
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAtAndBelow(pos, services);
+
+        assertEquals(3, rApplist.size(), "Expected three rule applications.");
+
+        ImmutableList<TacletApp> appList = ImmutableSLList.nil();
+        Iterator<TacletApp> appIt = rApplist.iterator();
+        while (appIt.hasNext()) {
+            appList =
+                appList.prepend(appIt.next().findIfFormulaInstantiations(goal.sequent(), services));
+        }
+
+        assertEquals(0, appList.size(), "Did not expect a match.");
+
+        Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
+        SequentFormula ifformula = new SequentFormula(ifterm);
+        ImmutableList<IfFormulaInstantiation> ifInsts = ImmutableSLList
+                .<IfFormulaInstantiation>nil().prepend(new IfFormulaInstDirect(ifformula));
+        appIt = rApplist.iterator();
+        while (appIt.hasNext()) {
+            TacletApp a =
+                appIt.next().setIfFormulaInstantiations(ifInsts, TacletForTests.services());
+            if (a != null) {
+                appList = appList.prepend(a);
+            }
+        }
+
+        assertEquals(1, appList.size(), "Expected one match.");
+        assertTrue(appList.head().complete(), "Rule App should be complete");
+
+        ImmutableList<Goal> goals = appList.head().execute(goal);
+        assertEquals(2, goals.size(), "Expected two goals.");
+
+        { // Goal one
+            Sequent correctSeq =
+                proof[11].root().sequent().addFormula(ifformula, true, true).sequent();
+            assertEquals(goals.head().sequent(), correctSeq, "Wrong result");
+        }
+
+        { // Goal two
+            Sequent correctSeq =
+                proof[10].root().sequent().addFormula(ifformula, false, true).sequent();
+            assertEquals(goals.tail().head().sequent(), correctSeq, "Wrong result");
+        }
     }
 }

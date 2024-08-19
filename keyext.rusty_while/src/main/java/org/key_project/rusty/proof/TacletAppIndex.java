@@ -41,6 +41,15 @@ public class TacletAppIndex {
         this.seq = seq;
     }
 
+    static TacletApp createTacletApp(NoPosTacletApp tacletApp, PosInOccurrence pos,
+            Services services) {
+        if (tacletApp.taclet() instanceof FindTaclet) {
+            return tacletApp.setPosInOccurrence(pos, services);
+        } else {
+            return tacletApp;
+        }
+    }
+
     public TacletIndex tacletIndex() {
         return tacletIndex;
     }
@@ -174,5 +183,21 @@ public class TacletAppIndex {
      */
     public void addedNoPosTacletApp(NoPosTacletApp tacletApp) {
         // TODO
+    }
+
+    /**
+     * returns the rule applications at the given PosInOccurrence and at all Positions below this.
+     * The method calls getTacletAppAt for all the Positions below.
+     *
+     * @param pos the position where to start from
+     * @param services the Services object encapsulating information about the java datastructures
+     *        like (static)types etc.
+     * @return the possible rule applications
+     */
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
+            Services services) {
+        final ImmutableList<TacletApp> findTaclets =
+            getIndex(pos).getTacletAppAtAndBelow(pos, services);
+        return prepend(findTaclets, getNoFindTaclet(services));
     }
 }

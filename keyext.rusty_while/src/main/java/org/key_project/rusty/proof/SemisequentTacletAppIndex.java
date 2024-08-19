@@ -9,6 +9,7 @@ import org.key_project.rusty.logic.PosInTerm;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.rule.NoPosTacletApp;
+import org.key_project.rusty.rule.TacletApp;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -79,5 +80,13 @@ public class SemisequentTacletAppIndex {
      */
     private TermTacletAppIndex getTermIndex(PosInOccurrence pos) {
         return termIndices.get(pos.sequentFormula());
+    }
+
+    /**
+     * @return all taclet apps for or below the given position
+     */
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
+            Services services) {
+        return getTermIndex(pos).getTacletAppAtAndBelow(pos, services);
     }
 }
