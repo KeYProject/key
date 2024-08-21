@@ -1,6 +1,6 @@
 package key.isabelletranslation;
 
-public interface IsabelleSolverListener {
+public interface IsabelleSolverListener extends IsabelleLauncherListener {
     void parsingStarted(IsabelleProblem problem);
 
     void parsingFinished(IsabelleProblem problem);

@@ -55,7 +55,7 @@ public class IsabelleTranslator {
         }
         translationPreamble.append("end");
 
-        StringBuilder sequentTranslation = new StringBuilder("theory Translation imports Main KeYTranslations.TranslationPreamble begin").append(LINE_ENDING);
+        StringBuilder sequentTranslation = new StringBuilder(IsabelleTranslationSettings.getInstance().getHeader()).append(LINE_ENDING);
 
         //TODO make this into a tree structure to avoid excessive looping (over sorts) | sort the implementation queue
         Map<Sort, Set<Sort>> sortParentsMap = getSortsParents(masterHandler.getExtraSorts(), masterHandler.getPredefinedSorts());

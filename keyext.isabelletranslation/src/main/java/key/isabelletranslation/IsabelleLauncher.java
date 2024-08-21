@@ -1,5 +1,9 @@
 package key.isabelletranslation;
 
+import de.uka.ilkd.key.gui.smt.ProgressDialog;
+import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import key.isabelletranslation.gui.IsabelleProgressDialog;
 import org.key_project.util.collection.Pair;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.java.JIsabelle;
@@ -15,6 +19,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,11 +29,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
+import key.isabelletranslation.gui.IsabelleProgressModel;
 
 public class IsabelleLauncher {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleLauncher.class);
 
     private final IsabelleTranslationSettings settings;
+    private IsabelleLauncherListener listener;
+
 
     public IsabelleLauncher(@NonNull IsabelleTranslationSettings settings) throws IOException {
         this.settings = settings;
@@ -50,6 +58,7 @@ public class IsabelleLauncher {
     }
 
     public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, long timeoutSeconds, int coreCount) throws IOException {
+        listener.launcherStarted(this, problems);
         ExecutorService executorService = Executors.newFixedThreadPool(coreCount);
         Collection<Callable<List<SledgehammerResult>>> tasks = new LinkedBlockingDeque<>();
         LinkedBlockingDeque<Pair<Isabelle, Theory>> resourceInstances = new LinkedBlockingDeque<>();
@@ -111,5 +120,9 @@ public class IsabelleLauncher {
             throw new IOException("Can't find Isabelle at " + settings.getIsabellePath());
         }
         return isabelle;
+    }
+
+    public void addListener(IsabelleLauncherListener listener) {
+        this.listener = listener;
     }
 }

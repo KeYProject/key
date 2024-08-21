@@ -3,8 +3,14 @@ package key.isabelletranslation;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.unruh.isabelle.control.Isabelle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +18,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TranslationAction extends MainWindowAction {
 
@@ -44,7 +52,32 @@ public class TranslationAction extends MainWindowAction {
 
         writeTranslationFiles(translation);
 
-        SledgehammerResult result = translation.sledgehammer(30);
+        List<IsabelleProblem> list = new ArrayList<>();
+
+        list.add(translation);
+
+        SledgehammerResult result = null;
+            Thread thread = new Thread(() -> {
+
+                IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
+                IsabelleLauncher launcher;
+                try {
+                    launcher = new IsabelleLauncher(IsabelleTranslationSettings.getInstance());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                launcher.addListener(new IsabelleSimpleSolverListener(settings));
+                try {
+                    launcher.try0ThenSledgehammerAllPooled(list, 30, 1);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }, "IsabelleControlThread");
+            thread.start();
+        result = translation.getResult();
+        //SledgehammerResult result = translation.sledgehammer(30);
 
         //TODO needs its own action to enable undo, etc. and naming reworks
         if (result != null && result.isSuccessful()) {
@@ -52,24 +85,6 @@ public class TranslationAction extends MainWindowAction {
             app.tryToInstantiate(mediator.getSelectedGoal());
             mediator.getSelectedGoal().apply(app);
         }
-
-
-
-            /*
-            List<Path> filePaths = new ArrayList<>();
-            filePaths.add(translationFile.toPath());
-
-            Builder<Path, Seq<Path>> builder = Seq.newBuilder();
-            for (Path path : filePaths) {
-                builder.addOne(path);
-            }
-
-
-            Seq<Path> pathSeq = builder.result();
-            //TODO improve concurrency?
-            Thread isabelleJEdit = new Thread(() -> Isabelle.jedit(setup, pathSeq));
-
-            isabelleJEdit.start();*/
     }
 
     protected static void writeTranslationFiles(IsabelleProblem translation) {
