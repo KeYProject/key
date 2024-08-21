@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.key_project.logic.Name;
@@ -20,8 +21,14 @@ import org.key_project.rusty.util.TacletForTests;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
+import org.key_project.util.helper.FindResources;
 
 public class BasicTest {
+
+    @Test
+    void testStandardRuledParses() {
+        TacletForTests.parse(new File("src/main/resources/org/key_project/rusty/proof/rules/standardRustRules.key"));
+    }
 
     @Test
     public void testBasic() {

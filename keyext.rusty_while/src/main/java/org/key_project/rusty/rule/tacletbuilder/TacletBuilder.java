@@ -46,6 +46,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     private static boolean containsFreeVarSV(Term t) {
+        // TODO: Fix this
         for (final QuantifiableVariable var : t.freeVars()) {
             if (var instanceof VariableSV) {
                 return true;

@@ -117,6 +117,11 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
+    public List<Sort> visitExtends_sorts(KeYRustyParser.Extends_sortsContext ctx) {
+        return mapOf(ctx.sortId());
+    }
+
+    @Override
     public List<Sort> visitOneof_sorts(KeYRustyParser.Oneof_sortsContext ctx) {
         return mapOf(ctx.sortId());
     }
