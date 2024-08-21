@@ -1,9 +1,5 @@
 package key.isabelletranslation;
 
-import de.uka.ilkd.key.gui.smt.ProgressDialog;
-import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import key.isabelletranslation.gui.IsabelleProgressDialog;
 import org.key_project.util.collection.Pair;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.java.JIsabelle;
@@ -19,17 +15,16 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
-import key.isabelletranslation.gui.IsabelleProgressModel;
 
 public class IsabelleLauncher {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleLauncher.class);
@@ -57,69 +52,58 @@ public class IsabelleLauncher {
                 .retrieveNow(Implicits.theoryConverter(), isabelle);
     }
 
-    public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, long timeoutSeconds, int coreCount) throws IOException {
+    public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, long timeoutSeconds, int instanceCount) throws IOException {
         listener.launcherStarted(this, problems);
-        ExecutorService executorService = Executors.newFixedThreadPool(coreCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(instanceCount);
         Collection<Callable<List<SledgehammerResult>>> tasks = new LinkedBlockingDeque<>();
-        LinkedBlockingDeque<Pair<Isabelle, Theory>> resourceInstances = new LinkedBlockingDeque<>();
-        LinkedBlockingDeque<IsabelleProblem> problemsQueue = new LinkedBlockingDeque<>(problems);
+        LinkedBlockingDeque<IsabelleSolver> solverQueue = new LinkedBlockingDeque<>();
+
+
+        IsabelleResourceController resourceController = new IsabelleResourceController(instanceCount);
 
         Thread shutdownResources = new Thread(() -> {
-            for (Pair<Isabelle, Theory> resources : resourceInstances) {
-                resources.first.destroy();
-            }
             executorService.shutdown();
+            resourceController.shutdownGracefully();
         });
         Runtime.getRuntime().addShutdownHook(shutdownResources);
 
         if (problems.isEmpty()) {
             return;
         }
+        //Ensure the preamble theory is present
         TranslationAction.writeTranslationFiles(problems.get(0));
 
-        for (int i = 0; i < coreCount; i++) {
-            Isabelle isabelle = startIsabelleInstance();
-            Theory thy0 = beginTheory(settings.getTranslationPath(), isabelle);
-            resourceInstances.add(new Pair<>(isabelle, thy0));
+        problems.forEach((problem) -> {
+            IsabelleSolver solver = new IsabelleSolverInstance(problem, List.of(new IsabelleSolverListener[0]), resourceController);
+            solver.setTimeout(timeoutSeconds);
+            solverQueue.add(solver);
+        });
 
+        Timer timer = new Timer(true);
+
+        for (int i = 0; i < instanceCount; i++) {
             tasks.add(() -> {
-                IsabelleProblem problem;
+                IsabelleSolver solver;
                 Pair<Isabelle, Theory> resources;
-                while ((problem = problemsQueue.poll()) != null && (resources = resourceInstances.poll()) != null) {
-                    problem.try0ThenSledgehammer(resources.first, resources.second, timeoutSeconds);
-                    resourceInstances.add(resources);
+                while ((solver = solverQueue.poll()) != null) {
+                    //IsabelleSolver.IsabelleSolverTimeout solverTimeout = new IsabelleSolver.IsabelleSolverTimeout(solver);
+                    //timer.schedule(null, solver.getTimeout());
+                    solver.start(null, settings);
                 }
                 return null;
             });
         }
 
-        LOGGER.info("Setup complete, solver starting {} problems...", problems.size());
+        LOGGER.info("Setup complete, starting {} problems...", problems.size());
 
         try {
             executorService.invokeAll(tasks);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-            shutdownResources.run();
+            shutdownResources.start();
             Runtime.getRuntime().removeShutdownHook(shutdownResources);
         }
-    }
-
-    private Isabelle startIsabelleInstance() throws IOException {
-        ArrayList<Path> sessionRoots = new ArrayList<>();
-        sessionRoots.add(settings.getTranslationPath());
-        Isabelle isabelle;
-        try {
-            Isabelle.Setup setup = JIsabelle.setupSetLogic("KeYTranslations",
-                    JIsabelle.setupSetSessionRoots(sessionRoots,
-                            JIsabelle.setupSetWorkingDirectory(settings.getTranslationPath(),
-                                    JIsabelle.setup(settings.getIsabellePath()))));
-            isabelle = new Isabelle(setup);
-        } catch (Exception e) {
-            LOGGER.error("Can't find Isabelle at {}", settings.getIsabellePath());
-            throw new IOException("Can't find Isabelle at " + settings.getIsabellePath());
-        }
-        return isabelle;
     }
 
     public void addListener(IsabelleLauncherListener listener) {

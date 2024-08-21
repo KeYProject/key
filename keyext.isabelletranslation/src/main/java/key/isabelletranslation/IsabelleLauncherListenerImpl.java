@@ -1,15 +1,12 @@
 package key.isabelletranslation;
 
-import de.uka.ilkd.key.gui.smt.ProgressDialog;
-import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.smt.SolverLauncher;
 import key.isabelletranslation.gui.IsabelleProgressDialog;
 import key.isabelletranslation.gui.IsabelleProgressModel;
 
 import javax.swing.*;
 import java.util.Collection;
 
-public class IsabelleSimpleSolverListener implements IsabelleLauncherListener {
+public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
     @Override
     public void launcherStopped(IsabelleLauncher launcher, Collection<IsabelleSolverInstance> finishedInstances) {
 
@@ -32,7 +29,7 @@ public class IsabelleSimpleSolverListener implements IsabelleLauncherListener {
 
     }
 
-    public IsabelleSimpleSolverListener(IsabelleTranslationSettings settings) {
+    public IsabelleLauncherListenerImpl(IsabelleTranslationSettings settings) {
 
     }
 
@@ -66,7 +63,7 @@ public class IsabelleSimpleSolverListener implements IsabelleLauncherListener {
 
 
         progressDialog = new IsabelleProgressDialog(progressModel, new IsabelleProgressDialogListenerImpl(launcher), false,
-                RESOLUTION, problems.size(), new String[] {}, (new String[]{"Isabelle"}));
+                RESOLUTION, problems.size(), new String[] {}, "", "Isabelle");
 
 
         SwingUtilities.invokeLater(() -> progressDialog.setVisible(true));

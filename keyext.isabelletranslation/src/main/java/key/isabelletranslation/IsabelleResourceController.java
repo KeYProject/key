@@ -1,6 +1,7 @@
 package key.isabelletranslation;
 
 import de.unruh.isabelle.control.Isabelle;
+import de.unruh.isabelle.control.IsabelleMLException;
 import de.unruh.isabelle.java.JIsabelle;
 import de.unruh.isabelle.mlvalue.ListConverter;
 import de.unruh.isabelle.mlvalue.MLFunction2;
@@ -63,7 +64,7 @@ public class IsabelleResourceController {
     }
 
 
-    public void returnResource(IsabelleResource resource) {
+    public void returnResource(IsabelleSolver returningSolver, IsabelleResource resource) {
         if (resource.isDestroyed()) {
             try {
                 resource = createIsabelleResource();
@@ -74,6 +75,7 @@ public class IsabelleResourceController {
             }
         }
         resource.interrupt();
+        waitingSolvers.remove(returningSolver);
         idleInstances.offer(resource);
     }
 
@@ -124,8 +126,16 @@ public class IsabelleResourceController {
             instance.destroy();
         }
 
-        public void interrupt() {
+        private void interruptIntern() throws IsabelleMLException {
             instance.executeMLCodeNow("error \"Interrupt\"");
+        }
+
+        public void interrupt() {
+            try {
+                interruptIntern();
+            } catch (IsabelleMLException e) {
+                //Always throws this due to the way Isabelle is interrupted.
+            }
         }
     }
 }

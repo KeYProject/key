@@ -39,6 +39,7 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
             }
             List<Action> list = new ArrayList<>();
             list.add(new TranslationAction(MainWindow.getInstance()));
+            list.add(new TranslateAllAction(MainWindow.getInstance()));
             return list;
         }
     };
