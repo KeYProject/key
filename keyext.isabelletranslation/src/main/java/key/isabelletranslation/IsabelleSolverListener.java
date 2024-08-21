@@ -1,29 +1,29 @@
 package key.isabelletranslation;
 
 public interface IsabelleSolverListener extends IsabelleLauncherListener {
-    void parsingStarted(IsabelleProblem problem);
+    void parsingStarted(IsabelleSolver solver, IsabelleProblem problem);
 
-    void parsingFinished(IsabelleProblem problem);
+    void parsingFinished(IsabelleSolver solver, IsabelleProblem problem);
 
-    void parsingFailed(IsabelleProblem problem, Exception e);
+    void parsingFailed(IsabelleSolver solver, IsabelleProblem problem, Exception e);
 
-    void buildingStarted(IsabelleProblem problem);
+    void buildingStarted(IsabelleSolver solver, IsabelleProblem problem);
 
-    void buildingFinished(IsabelleProblem problem);
+    void buildingFinished(IsabelleSolver solver, IsabelleProblem problem);
 
-    void buildingFailed(IsabelleProblem problem, Exception e);
+    void buildingFailed(IsabelleSolver solver, IsabelleProblem problem, Exception e);
 
-    void processStarted(IsabelleProblem problem);
+    void processStarted(IsabelleSolver solver, IsabelleProblem problem);
 
-    void processInterrupted(IsabelleProblem problem, Exception e);
+    void processInterrupted(IsabelleSolver solver, IsabelleProblem problem, Exception e);
 
-    void processStopped(IsabelleProblem problem);
+    void processStopped(IsabelleSolver solver, IsabelleProblem problem);
 
-    void processTimeout(IsabelleProblem problem);
+    void processTimeout(IsabelleSolver solver, IsabelleProblem problem);
 
-    void sledgehammerStarted(IsabelleProblem problem);
+    void sledgehammerStarted(IsabelleSolver solver, IsabelleProblem problem);
 
-    void sledgehammerFinished(IsabelleProblem problem);
+    void sledgehammerFinished(IsabelleSolver solver, IsabelleProblem problem);
 
-    void sledgehammerFailed(IsabelleProblem problem, Exception e);
+    void sledgehammerFailed(IsabelleSolver solver, IsabelleProblem problem, Exception e);
 }
