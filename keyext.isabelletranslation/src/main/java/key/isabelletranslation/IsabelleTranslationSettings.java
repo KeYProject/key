@@ -144,4 +144,8 @@ public class IsabelleTranslationSettings extends AbstractSettings {
         props.set(isabellePathKey, isabellePath.toString());
         props.set(translationPathKey, translationPath.toString());
     }
+
+    public String getHeader() {
+        return "theory Translation imports Main KeYTranslations.TranslationPreamble begin";
+    }
 }

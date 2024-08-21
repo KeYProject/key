@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @KeYGuiExtension.Info(name = "Isabelle Translation", optional = true,
-        experimental = true)
+        experimental = false)
 public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExtension.Settings, KeYGuiExtension.ContextMenu, KeYGuiExtension.Startup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslationExtension.class);
