@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.visitor;
 
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
@@ -29,4 +30,6 @@ public interface Visitor {
     void performActionOnSchemaVariable(SchemaVariable x);
 
     void performActionOnProgramVariable(ProgramVariable x);
+
+    void performActionOnEmptyStatement(EmptyStatement x);
 }

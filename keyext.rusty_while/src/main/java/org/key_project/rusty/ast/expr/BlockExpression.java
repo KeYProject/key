@@ -24,12 +24,16 @@ public class BlockExpression implements Expr {
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        return Objects.requireNonNull(statements.get(n));
+        if (0 <= n && n < statements.size())
+            return Objects.requireNonNull(statements.get(n));
+        if (n == statements.size())
+            return value;
+        throw new IndexOutOfBoundsException("BlockExpression has less than " + n + " children");
     }
 
     @Override
     public int getChildCount() {
-        return statements.size();
+        return statements.size() + 1;
     }
 
     public ImmutableList<? extends Statement> getStatements() {

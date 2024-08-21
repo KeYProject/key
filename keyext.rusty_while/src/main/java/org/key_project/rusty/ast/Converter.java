@@ -11,6 +11,7 @@ import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.Param;
 import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.ast.pat.Pattern;
+import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
@@ -204,6 +205,14 @@ public class Converter {
                 org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
             return new LetStatement(ctx.pattern().accept(patternConverter),
                 ctx.type_().accept(typeConverter), ctx.expr().accept(exprConverter));
+        }
+
+        @Override
+        public Statement visitStmt(org.key_project.rusty.parsing.RustyWhileParser.StmtContext ctx) {
+            if (ctx.SEMI() != null) {
+                return new EmptyStatement();
+            }
+            return super.visitStmt(ctx);
         }
     }
 

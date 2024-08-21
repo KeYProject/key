@@ -175,6 +175,13 @@ public class TacletAppIndex {
         return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, goal, getSequent());
     }
 
+    private void updateIndices(final NoPosTacletApp newTaclet) {
+        antecIndex =
+                antecIndex.addTaclet(newTaclet, getServices(), tacletIndex);
+        succIndex =
+                succIndex.addTaclet(newTaclet, getServices(), tacletIndex);
+    }
+
     /**
      * updates the internal caches after a new Taclet with instantiation information has been added
      * to the TacletIndex.
@@ -182,7 +189,11 @@ public class TacletAppIndex {
      * @param tacletApp the partially instantiated Taclet to add
      */
     public void addedNoPosTacletApp(NoPosTacletApp tacletApp) {
-        // TODO
+        if (tacletApp.taclet() instanceof NoFindTaclet) {
+            return;
+        }
+
+        updateIndices(tacletApp);
     }
 
     /**

@@ -9,6 +9,7 @@ import java.util.Deque;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
@@ -105,6 +106,11 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
+        throw new RuntimeException("TODO @ DD");
+    }
+
+    @Override
+    public void performActionOnEmptyStatement(EmptyStatement x) {
         throw new RuntimeException("TODO @ DD");
     }
 

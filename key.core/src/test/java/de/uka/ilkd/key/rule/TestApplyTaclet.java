@@ -36,21 +36,29 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestApplyTaclet {
 
-    final static String[] strs = { "", "(A -> B) -> (!(!(A -> B)))", "", "\\forall s z; p(z)",
-        "(A -> B) -> (!(!(A -> B)))", "(A -> B) -> (!(!(A -> B)))", "(A -> B) -> (!(!(A -> B)))",
-        "", "",
+    final static String[] strs = {
+        "", "(A -> B) -> (!(!(A -> B)))",
+        "", "\\forall s z; p(z)",
+        "(A -> B) -> (!(!(A -> B)))", "(A -> B) -> (!(!(A -> B)))",
+        "(A -> B) -> (!(!(A -> B)))", "",
+        "",
         "\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>A",
-        "A & B", "", "", // "s{}::isEmpty(sset)",
-        "", // "s{}::size(sset)=0",
-        "A & (A & B)", "", "f(const)=const", "const=f(f(const))", "f(const)=const",
-        "const=f(const)", "f(const)=const", "A & {i:=0}(const=f(const))", "f(const)=const",
-        "A & {i:=0}(const=f(f(const)))", "{i:=0}(f(const)=const)",
+        "A & B", "",
+        "", /* "s{}::isEmpty(sset)", */ "", // "s{}::size(sset)=0",
+        "A & (A & B)", "",
+        "f(const)=const", "const=f(f(const))",
+        "f(const)=const", "const=f(const)",
+        "f(const)=const", "A & {i:=0}(const=f(const))",
+        "f(const)=const", "A & {i:=0}(const=f(f(const)))",
+        "{i:=0}(f(const)=const)",
         "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " + "& {i:=0}(const=f(const))",
         "{i:=0}(f(const)=const)",
-        "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " + "& {i:=0}(const=const)", "",
-        "\\<{ {} {break;} }\\> true", "", "\\<{ {{}} {{break;}} }\\> true", "",
-        "\\<{ try {} catch ( Exception e ) {} catch ( Throwable e ) {} }\\> true", "",
-        "\\<{ try {} catch ( Exception e ) {} try {} catch ( Throwable e ) {} }\\> true", "",
+        "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " + "& {i:=0}(const=const)",
+        "", "\\<{ {} {break;} }\\> true",
+        "", "\\<{ {{}} {{break;}} }\\> true",
+        "", "\\<{ try {} catch ( Exception e ) {} catch ( Throwable e ) {} }\\> true",
+        "", "\\<{ try {} catch ( Exception e ) {} try {} catch ( Throwable e ) {} }\\> true",
+        "",
         "\\<{ try {} catch ( Exception e ) {break;} catch ( Throwable e ) {continue;} }\\> true",
         "",
         "\\<{ try {} catch ( Exception e ) {break;} try {} catch ( Throwable e ) {continue;} }\\> true",
@@ -61,7 +69,10 @@ public class TestApplyTaclet {
         "\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0",
         "",
         "\\<{try{ {} while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0",
-        "", "A", "A", "", "", "B | A", "B & A", "" };
+        "", "A",
+        "A", "",
+        "", "B | A",
+        "B & A", "" };
     Proof[] proof;
 
 

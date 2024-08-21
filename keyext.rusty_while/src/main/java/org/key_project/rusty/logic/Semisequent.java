@@ -233,10 +233,10 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Semisequent)) {
+        if (!(o instanceof Semisequent s)) {
             return false;
         }
-        return seqList.equals(((Semisequent) o).seqList);
+        return seqList.equals(s.seqList);
     }
 
     /** @return String representation of this Semisequent */
