@@ -177,9 +177,9 @@ public class TacletAppIndex {
 
     private void updateIndices(final NoPosTacletApp newTaclet) {
         antecIndex =
-                antecIndex.addTaclet(newTaclet, getServices(), tacletIndex);
+            antecIndex.addTaclet(newTaclet, getServices(), tacletIndex);
         succIndex =
-                succIndex.addTaclet(newTaclet, getServices(), tacletIndex);
+            succIndex.addTaclet(newTaclet, getServices(), tacletIndex);
     }
 
     /**

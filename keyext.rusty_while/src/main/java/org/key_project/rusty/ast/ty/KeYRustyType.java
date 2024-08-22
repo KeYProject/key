@@ -5,9 +5,9 @@ package org.key_project.rusty.ast.ty;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.Services;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.Services;
 
 public class KeYRustyType implements Type {
     /** the AST type */

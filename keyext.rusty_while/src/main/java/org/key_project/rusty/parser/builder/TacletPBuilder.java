@@ -5,12 +5,16 @@ package org.key_project.rusty.parser.builder;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.ty.KeYRustyType;
+import org.key_project.rusty.ast.ty.PrimitiveType;
+import org.key_project.rusty.ast.ty.Type;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
@@ -19,6 +23,9 @@ import org.key_project.rusty.logic.op.sv.SchemaVariableFactory;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.parser.KeYRustyParser;
 import org.key_project.rusty.parser.SchemaVariableModifierSet;
+import org.key_project.rusty.parser.varcond.ArgumentType;
+import org.key_project.rusty.parser.varcond.TacletBuilderCommand;
+import org.key_project.rusty.parser.varcond.TacletBuilderManipulators;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
 import org.key_project.rusty.rule.tacletbuilder.*;
@@ -26,6 +33,7 @@ import org.key_project.rusty.util.parsing.BuildingException;
 import org.key_project.util.collection.*;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -135,7 +143,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             // if (!axiomMode) {
             // semanticError(ctx, "formula rules are only permitted for \\axioms");
             // }
-            TacletBuilder<?> b = createTacletBuilderFor(null, new ApplicationRestriction(ApplicationRestriction.NONE), ctx);
+            TacletBuilder<?> b = createTacletBuilderFor(null,
+                new ApplicationRestriction(ApplicationRestriction.NONE), ctx);
             currentTBuilder.push(b);
             SequentFormula sform = new SequentFormula(form);
             Semisequent semi = new Semisequent(sform);
@@ -164,18 +173,23 @@ public class TacletPBuilder extends ExpressionBuilder {
         // TODO ask about how this should done with the enum
         // does it make sense to use an enum when you change the value to something
         // that no enum element has initially?
-        ApplicationRestriction applicationRestriction = new ApplicationRestriction(ApplicationRestriction.NONE);
+        ApplicationRestriction applicationRestriction =
+            new ApplicationRestriction(ApplicationRestriction.NONE);
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
-            applicationRestriction=  applicationRestriction.combine(ApplicationRestriction.SAME_UPDATE_LEVEL);
+            applicationRestriction =
+                applicationRestriction.combine(ApplicationRestriction.SAME_UPDATE_LEVEL);
         }
         if (!ctx.INSEQUENTSTATE().isEmpty()) {
-            applicationRestriction=   applicationRestriction.combine(ApplicationRestriction.IN_SEQUENT_STATE);
+            applicationRestriction =
+                applicationRestriction.combine(ApplicationRestriction.IN_SEQUENT_STATE);
         }
         if (!ctx.ANTECEDENTPOLARITY().isEmpty()) {
-            applicationRestriction=   applicationRestriction.combine(ApplicationRestriction.ANTECEDENT_POLARITY);
+            applicationRestriction =
+                applicationRestriction.combine(ApplicationRestriction.ANTECEDENT_POLARITY);
         }
         if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
-            applicationRestriction=  applicationRestriction.combine(ApplicationRestriction.SUCCEDENT_POLARITY);
+            applicationRestriction =
+                applicationRestriction.combine(ApplicationRestriction.SUCCEDENT_POLARITY);
         }
         @Nullable
         Object find = accept(ctx.find);
@@ -271,69 +285,104 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
-    // @Override
-    // public Object visitVarexplist(KeYRustyParser.VarexplistContext ctx) {
-    // return mapOf(ctx.varexp());
-    // }
-    //
-    // @Override
-    // public Object visitVarexp(KeYRustyParser.VarexpContext ctx) {
-    // boolean negated = ctx.NOT_() != null;
-    // String name = ctx.varexpId().getText();
-    // List<KeYRustyParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
-    // List<TacletBuilderCommand> suitableManipulators =
-    // TacletBuilderManipulators.getConditionBuildersFor(name);
-    // List<String> parameters =
-    // ctx.parameter.stream().map(Token::getText).collect(Collectors.toList());
-    // boolean applied = false;
-    // Object[] argCache = new Object[arguments.size()];
-    // for (TacletBuilderCommand manipulator : suitableManipulators) {
-    // if (applyManipulator(negated, argCache, manipulator, arguments, parameters)) {
-    // applied = true;
-    // break;
-    // }
-    // }
-    // if (!applied) {
-    // semanticError(ctx, "Could not apply the given variable condition: %s", ctx.getText());
-    // }
-    // return null;
-    // }
-    //
-    // private boolean applyManipulator(boolean negated, Object[] args,
-    // TacletBuilderCommand manipulator, List<KeYRustyParser.Varexp_argumentContext> arguments,
-    // List<String> parameters) {
-    // assert args.length == arguments.size();
-    // ArgumentType[] types = manipulator.getArgumentTypes();
-    //
-    // if (types.length != arguments.size()) {
-    // return false;
-    // }
-    // try {
-    // for (int i = 0; i < arguments.size(); i++) {
-    // args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
-    // }
-    // manipulator.apply(peekTBuilder(), args, parameters, negated);
-    // return true;
-    // } catch (Throwable e) {
-    // return false;
-    // }
-    // }
-    //
-    // private Object evaluateVarcondArgument(ArgumentType expectedType, Object prevValue,
-    // KeYRustyParser.Varexp_argumentContext ctx) {
-    // if (prevValue != null && expectedType.clazz.isAssignableFrom(prevValue.getClass())) {
-    // return prevValue; // previous value is of suitable type, we do not re-evaluate
-    // }
-    //
-    // return switch (expectedType) {
-    // case TYPE_RESOLVER -> buildTypeResolver(ctx);
-    // case SORT -> visitSortId(ctx.term().getText(), ctx.term());
-    //
-    // case VARIABLE -> varId(ctx, ctx.getText());
-    // case STRING -> ctx.getText();
-    // case TERM -> accept(ctx.term());
-    // };
-    // }
+    @Override
+    public Object visitVarexplist(KeYRustyParser.VarexplistContext ctx) {
+        return mapOf(ctx.varexp());
+    }
+
+    @Override
+    public Object visitVarexp(KeYRustyParser.VarexpContext ctx) {
+        boolean negated = ctx.NOT_() != null;
+        String name = ctx.varexpId().getText();
+        List<KeYRustyParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
+        List<TacletBuilderCommand> suitableManipulators =
+            TacletBuilderManipulators.getConditionBuildersFor(name);
+        List<String> parameters =
+            ctx.parameter.stream().map(Token::getText).collect(Collectors.toList());
+        boolean applied = false;
+        Object[] argCache = new Object[arguments.size()];
+        for (TacletBuilderCommand manipulator : suitableManipulators) {
+            if (applyManipulator(negated, argCache, manipulator, arguments, parameters)) {
+                applied = true;
+                break;
+            }
+        }
+        if (!applied) {
+            semanticError(ctx, "Could not apply the given variable condition: %s", ctx.getText());
+        }
+        return null;
+    }
+
+    private boolean applyManipulator(boolean negated, Object[] args,
+            TacletBuilderCommand manipulator, List<KeYRustyParser.Varexp_argumentContext> arguments,
+            List<String> parameters) {
+        assert args.length == arguments.size();
+        ArgumentType[] types = manipulator.getArgumentTypes();
+
+        if (types.length != arguments.size()) {
+            return false;
+        }
+        try {
+            for (int i = 0; i < arguments.size(); i++) {
+                args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
+            }
+            manipulator.apply(peekTBuilder(), args, parameters, negated);
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
+    private Object evaluateVarcondArgument(ArgumentType expectedType, Object prevValue,
+            KeYRustyParser.Varexp_argumentContext ctx) {
+        if (prevValue != null && expectedType.clazz.isAssignableFrom(prevValue.getClass())) {
+            return prevValue; // previous value is of suitable type, we do not re-evaluate
+        }
+
+        return switch (expectedType) {
+        // case TYPE_RESOLVER -> buildTypeResolver(ctx);
+        case SORT -> visitSortId(ctx.term().getText(), ctx.term());
+        case RUST_TYPE -> getOrCreateRustyType(ctx.term().getText(), ctx);
+        case VARIABLE -> varId(ctx, ctx.getText());
+        case STRING -> ctx.getText();
+        case TERM -> accept(ctx.term());
+        };
+    }
+
+    private Sort visitSortId(String text, ParserRuleContext ctx) {
+        String primitiveName = text;
+        Type t = null;
+        if (primitiveName.equals(PrimitiveType.U8.name().toString())
+                || primitiveName.equals(PrimitiveType.U16.name().toString())
+                || primitiveName.equals(PrimitiveType.U32.name().toString())
+                || primitiveName.equals(PrimitiveType.U64.name().toString())
+                || primitiveName.equals(PrimitiveType.U128.name().toString())
+                || primitiveName.equals(PrimitiveType.USIZE.name().toString())
+                || primitiveName.equals(PrimitiveType.I8.name().toString())
+                || primitiveName.equals(PrimitiveType.I16.name().toString())
+                || primitiveName.equals(PrimitiveType.I32.name().toString())
+                || primitiveName.equals(PrimitiveType.I64.name().toString())
+                || primitiveName.equals(PrimitiveType.I128.name().toString())
+                || primitiveName.equals(PrimitiveType.ISIZE.name().toString())) {
+            primitiveName = "int";
+        }
+        Sort s = lookupSort(primitiveName);
+        if (s == null) {
+            semanticError(ctx, "Could not find sort: %s", text);
+        }
+
+        return s;
+    }
+
+    private KeYRustyType getOrCreateRustyType(String sortId, ParserRuleContext ctx) {
+        /*
+         * KeYRustyType t = getJavaInfo().getKeYJavaType(sortId);
+         * if (t != null) {
+         * return t;
+         * }
+         */
+        return new KeYRustyType(visitSortId(sortId, ctx));
+    }
 
 
     // ---------------------------------------------------------------------------

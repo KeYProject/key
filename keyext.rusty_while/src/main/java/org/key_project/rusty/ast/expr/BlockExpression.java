@@ -99,7 +99,7 @@ public class BlockExpression implements Expr, ProgramPrefix {
 
     @Override
     public PosInProgram getFirstActiveChildPos() {
-        //TODO Is this right?
+        // TODO Is this right?
         return PosInProgram.ZERO;
     }
 

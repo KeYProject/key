@@ -4,12 +4,10 @@
 package org.key_project.rusty.rule.match.instructions;
 
 import org.key_project.logic.SyntaxElementCursor;
-import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.logic.RustyBlock;
-import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.rule.MatchConditions;
 
 public class MatchProgramInstruction implements MatchInstruction {

@@ -7,10 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.logic.Name;
-
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+
+import org.jspecify.annotations.NonNull;
 
 public final class PrimitiveType implements Type {
     private static final Map<Name, PrimitiveType> typeMap =
@@ -53,9 +53,10 @@ public final class PrimitiveType implements Type {
     @Override
     public Sort getSort(Services services) {
         return switch (this.name().toString()) {
-            case "U8", "U16", "U32", "U64", "U128", "USIZE", "I8", "I16", "I32", "I64", "I128", "ISIZE" -> services.getNamespaces().sorts().lookup("int");
-            case "BOOL" -> services.getNamespaces().sorts().lookup("bool");
-            default -> throw new RuntimeException("Unknown type " + this);
+        case "U8", "U16", "U32", "U64", "U128", "USIZE", "I8", "I16", "I32", "I64", "I128", "ISIZE" -> services
+                .getNamespaces().sorts().lookup("int");
+        case "BOOL" -> services.getNamespaces().sorts().lookup("bool");
+        default -> throw new RuntimeException("Unknown type " + this);
         };
     }
 }

@@ -267,29 +267,30 @@ public class TermTacletAppIndex {
      *        has to be a top-level term position
      * @return the index object
      */
-    public TermTacletAppIndex addTaclet(NoPosTacletApp newTaclet, PosInOccurrence pos, Services services, TacletIndex tacletIndex) {
+    public TermTacletAppIndex addTaclet(NoPosTacletApp newTaclet, PosInOccurrence pos,
+            Services services, TacletIndex tacletIndex) {
         return addTacletHelp(newTaclet, pos, services, tacletIndex);
     }
 
     private TermTacletAppIndex addTacletHelp(NoPosTacletApp newTaclet, PosInOccurrence pos,
-                                              Services services, TacletIndex tacletIndex) {
+            Services services, TacletIndex tacletIndex) {
         final ImmutableArray<TermTacletAppIndex> newSubIndices =
-                addTacletsSubIndices(newTaclet, pos, services, tacletIndex);
+            addTacletsSubIndices(newTaclet, pos, services, tacletIndex);
 
         final ImmutableList<NoPosTacletApp> additionalApps =
-                getFindTaclet(pos, services, tacletIndex);
+            getFindTaclet(pos, services, tacletIndex);
 
         return new TermTacletAppIndex(term, localTacletApps.prepend(additionalApps), newSubIndices);
     }
 
     private ImmutableArray<TermTacletAppIndex> addTacletsSubIndices(NoPosTacletApp newTaclet,
-                                                                    PosInOccurrence pos, Services services, TacletIndex tacletIndex) {
+            PosInOccurrence pos, Services services, TacletIndex tacletIndex) {
         final TermTacletAppIndex[] result = new TermTacletAppIndex[subtermIndices.size()];
 
         for (int i = 0; i < subtermIndices.size(); i++) {
             final TermTacletAppIndex oldSubIndex = subtermIndices.get(i);
             final TermTacletAppIndex newSubIndex =
-                    oldSubIndex.addTacletHelp(newTaclet, pos.down(i), services, tacletIndex);
+                oldSubIndex.addTacletHelp(newTaclet, pos.down(i), services, tacletIndex);
             result[i] = newSubIndex;
         }
 

@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.expr;
 
-import org.jspecify.annotations.NonNull;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
@@ -17,8 +19,7 @@ import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 
 public class ContextBlockExpression extends BlockExpression {
 
@@ -50,8 +51,8 @@ public class ContextBlockExpression extends BlockExpression {
     @Override
     public String toString() {
         return "{c#\n"
-                + statements.stream().map(s -> "\t" + s.toString()).collect(Collectors.joining("\n"))
-                + "\n#c}";
+            + statements.stream().map(s -> "\t" + s.toString()).collect(Collectors.joining("\n"))
+            + "\n#c}";
     }
 
     /**
@@ -99,7 +100,7 @@ public class ContextBlockExpression extends BlockExpression {
                 start = relPos.get(relPos.depth() - 1);
                 if (relPos.depth() > 1) {
                     firstActiveStatement = (ProgramPrefix) PosInProgram.getProgramAt(relPos.up(),
-                            firstActiveStatement);
+                        firstActiveStatement);
                 }
             }
             newSource = new SourceData(firstActiveStatement, start, services);
@@ -115,7 +116,7 @@ public class ContextBlockExpression extends BlockExpression {
         }
 
         mc =
-                makeContextInfoComplete(mc, newSource, prefix, pos, relPos, src, services);
+            makeContextInfoComplete(mc, newSource, prefix, pos, relPos, src, services);
 
         return mc;
     }
@@ -125,8 +126,8 @@ public class ContextBlockExpression extends BlockExpression {
      * position
      */
     private MatchConditions makeContextInfoComplete(MatchConditions matchCond, SourceData newSource,
-                                                    ProgramPrefix prefix, int pos, PosInProgram relPos, RustyProgramElement src,
-                                                    Services services) {
+            ProgramPrefix prefix, int pos, PosInProgram relPos, RustyProgramElement src,
+            Services services) {
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
 
@@ -138,7 +139,7 @@ public class ContextBlockExpression extends BlockExpression {
 
         /* add context block instantiation */
         matchCond = matchCond.setInstantiations(
-                instantiations.replace(prefixEnd, suffixStart, src, services));
+            instantiations.replace(prefixEnd, suffixStart, src, services));
         return matchCond;
     }
 

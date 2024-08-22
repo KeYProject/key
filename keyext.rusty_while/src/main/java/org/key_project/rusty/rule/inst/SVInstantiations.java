@@ -28,11 +28,11 @@ public class SVInstantiations {
      * a more unified handling (key in map)
      */
     private static final SchemaVariable CONTEXTSV = SchemaVariableFactory.createProgramSV(
-            new Name("Context"), new ProgramSVSort(new Name("ContextStatementBlock")) {
-                public boolean canStandFor(RustyProgramElement pe, Services services) {
-                    return true;
-                }
-            }, false); // just a dummy SV for context
+        new Name("Context"), new ProgramSVSort(new Name("ContextStatementBlock")) {
+            public boolean canStandFor(RustyProgramElement pe, Services services) {
+                return true;
+            }
+        }, false); // just a dummy SV for context
 
     /** the map with the instantiations to logic terms */
     private final ImmutableMap<SchemaVariable, InstantiationEntry<?>> map;
@@ -436,9 +436,9 @@ public class SVInstantiations {
      * @param pe the ProgramElement the context positions are related to
      */
     public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
-                                    RustyProgramElement pe, Services services) {
+            RustyProgramElement pe, Services services) {
         return replace(CONTEXTSV,
-                new ContextInstantiationEntry(prefix, postfix, pe), services);
+            new ContextInstantiationEntry(prefix, postfix, pe), services);
     }
 
     /**
@@ -449,8 +449,9 @@ public class SVInstantiations {
      * @param entry the InstantiationEntry the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
-                                    Services services) {
+            Services services) {
         return new SVInstantiations(map.remove(sv).put(sv, entry),
-                getUpdateContext(), GenericSortInstantiations.EMPTY_INSTANTIATIONS, getGenericSortConditions()).checkSorts(sv, entry, true, services);
+            getUpdateContext(), GenericSortInstantiations.EMPTY_INSTANTIATIONS,
+            getGenericSortConditions()).checkSorts(sv, entry, true, services);
     }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
 
 import org.key_project.rusty.ast.RustyProgramElement;
@@ -20,7 +23,7 @@ public class ContextInstantiationEntry
      * @param pe the ProgramElement the context positions are related to
      */
     ContextInstantiationEntry(PosInProgram pi, PosInProgram omega,
-                              RustyProgramElement pe) {
+            RustyProgramElement pe) {
         super(new ContextBlockExpressionInstantiation(pi, omega, pe));
     }
 

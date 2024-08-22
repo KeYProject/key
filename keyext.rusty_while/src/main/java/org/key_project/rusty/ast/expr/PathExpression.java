@@ -4,7 +4,6 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.visitor.Visitor;
 

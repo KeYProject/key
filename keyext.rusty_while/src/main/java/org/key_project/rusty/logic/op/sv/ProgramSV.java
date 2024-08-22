@@ -13,12 +13,12 @@ import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.ProgramConstruct;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
-
-import org.jspecify.annotations.NonNull;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.ProgramList;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 import static org.key_project.rusty.rule.match.instructions.MatchProgramSVInstruction.convertToLogicElement;
 
@@ -27,7 +27,7 @@ public final class ProgramSV extends OperatorSV
     private final boolean isListSV;
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =
-            new ProgramList(new ImmutableArray<>(new RustyProgramElement[0]));
+        new ProgramList(new ImmutableArray<>(new RustyProgramElement[0]));
 
     /**
      * creates a new SchemaVariable used as a placeholder for program constructs
@@ -102,7 +102,7 @@ public final class ProgramSV extends OperatorSV
         SVInstantiations instantiations = matchCond.getInstantiations();
 
         final java.util.ArrayList<RustyProgramElement> matchedElements =
-                new java.util.ArrayList<>();
+            new java.util.ArrayList<>();
 
         while (src != null) {
             if (!check(src, services)) {
@@ -114,8 +114,8 @@ public final class ProgramSV extends OperatorSV
         }
 
         return addProgramInstantiation(
-                new ProgramList(new ImmutableArray<>(matchedElements)), matchCond,
-                services);
+            new ProgramList(new ImmutableArray<>(matchedElements)), matchCond,
+            services);
     }
 
     /**
@@ -129,8 +129,9 @@ public final class ProgramSV extends OperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>pe</code> or
      *         null if some variable condition would be hurt by the mapping
      */
-    private MatchConditions addProgramInstantiation(RustyProgramElement pe, MatchConditions matchCond,
-                                                    Services services) {
+    private MatchConditions addProgramInstantiation(RustyProgramElement pe,
+            MatchConditions matchCond,
+            Services services) {
         if (matchCond == null) {
             return null;
         }
@@ -170,7 +171,7 @@ public final class ProgramSV extends OperatorSV
      *         or null if some variable condition would be hurt by the mapping
      */
     private MatchConditions addProgramInstantiation(ProgramList list, MatchConditions matchCond,
-                                                    Services services) {
+            Services services) {
         if (matchCond == null) {
             return null;
         }

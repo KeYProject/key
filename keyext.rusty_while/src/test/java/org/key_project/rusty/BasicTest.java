@@ -20,17 +20,18 @@ import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.rusty.util.TacletForTests;
+import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BasicTest {
-    public static final String STANDARD_RUST_RULES_KEY = "src/main/resources/org/key_project/rusty/proof/rules/standardRustRules.key";
+    public static final String STANDARD_RUST_RULES_KEY =
+        "src/main/resources/org/key_project/rusty/proof/rules/standardRustRules.key";
 
     private static Semisequent parseTermForSemisequent(String t) {
         if ("".equals(t)) {
@@ -47,13 +48,13 @@ public class BasicTest {
 
     private static void applyRule(String name, PosInOccurrence pos, Proof proof) {
         NoPosTacletApp rule =
-                TacletForTests.getRules().lookup(new Name(name));
+            TacletForTests.getRules().lookup(new Name(name));
         TacletIndex tacletIndex = new TacletIndex();
         tacletIndex.add(rule);
         var oldGoal = proof.openGoals().head();
         var goal = createGoal(oldGoal.getNode(), tacletIndex);
         ImmutableList<TacletApp> rApplist =
-                goal.ruleAppIndex().getTacletAppAt(pos, null);
+            goal.ruleAppIndex().getTacletAppAt(pos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
@@ -74,15 +75,32 @@ public class BasicTest {
         Semisequent succ = parseTermForSemisequent("\\<{ i = 2u32; i}\\>(i = 2)");
         Sequent s = Sequent.createSequent(antec, succ);
         var proof = new Proof(new Name("Simple"), s, TacletForTests.initConfig());
-        applyRule("assignment", new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(), PosInTerm.getTopLevel(), false), proof);
+        applyRule("assignment",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
         assertEquals(1, proof.openGoals().size(), proof.openGoals().size());
         System.out.println(proof.openGoals().head().sequent());
-        //TODO: fix Term.equals: assertEquals(TacletForTests.parseTerm("{i:=2}\\<{i}\\>(i=2)"), proof.openGoals().head().sequent().succedent().getFirst().formula());
-        applyRule("emptyModality", new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(), PosInTerm.getTopLevel().down(1), false), proof);
+        // TODO: fix Term.equals: assertEquals(TacletForTests.parseTerm("{i:=2}\\<{i}\\>(i=2)"),
+        // proof.openGoals().head().sequent().succedent().getFirst().formula());
+        applyRule("emptyModality",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1), false),
+            proof);
         assertEquals(1, proof.openGoals().size(), proof.openGoals().size());
         System.out.println(proof.openGoals().head().sequent());
-        //applyRule("applyOnRigidFormula", new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-        //        PosInTerm.getTopLevel(), false), proof);
+        applyRule("applyOnRigidFormula",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println(proof.openGoals().head().sequent());
+        applyRule("applyOnRigidTerm",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(0), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println(proof.openGoals().head().sequent());
     }
 
     @Test

@@ -22,7 +22,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -570,14 +569,14 @@ public class TestApplyTaclet {
     public void testModalityLevel2() {
         Services services = TacletForTests.services();
         NoPosTacletApp make_insert_eq_nonrigid =
-                TacletForTests.getRules().lookup(new Name("make_insert_eq_nonrigid"));
+            TacletForTests.getRules().lookup(new Name("make_insert_eq_nonrigid"));
         TacletIndex tacletIndex = new TacletIndex();
         tacletIndex.add(make_insert_eq_nonrigid);
         Goal goal = createGoal(proof[12].root(), tacletIndex);
         PosInOccurrence pos = new PosInOccurrence(goal.sequent().antecedent().getFirst(),
-                PosInTerm.getTopLevel(), true);
+            PosInTerm.getTopLevel(), true);
         ImmutableList<TacletApp> rApplist =
-                goal.ruleAppIndex().getTacletAppAtAndBelow(pos, services);
+            goal.ruleAppIndex().getTacletAppAtAndBelow(pos, services);
 
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
@@ -588,7 +587,7 @@ public class TestApplyTaclet {
         goal = goals.head();
 
         pos = new PosInOccurrence(goal.sequent().succedent().getFirst(), PosInTerm.getTopLevel(),
-                false);
+            false);
         rApplist = goal.ruleAppIndex().getTacletAppAtAndBelow(pos, services);
 
         assertEquals(1, rApplist.size(), "Expected one rule application.");

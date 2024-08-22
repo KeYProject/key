@@ -12,7 +12,6 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.parsing.RustyWhileSchemaParser;
 
 public class SchemaRustyReader extends RustyReader {
     private Namespace<@NonNull SchemaVariable> svNS;

@@ -28,11 +28,10 @@ import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.util.collection.ImmutableSLList;
 
 public class SchemaConverter {
     private Namespace<@NonNull SchemaVariable> svNS;
@@ -46,7 +45,7 @@ public class SchemaConverter {
     private final TypeConverter typeConverter = new TypeConverter(this);
     private final ParamConverter paramConverter = new ParamConverter(this);
 
-    //TODO: Rework this properly
+    // TODO: Rework this properly
     private final Map<String, VariableDeclaration> variables = new HashMap<>();
 
     private final Services services;
@@ -70,7 +69,8 @@ public class SchemaConverter {
 
     private Sort getSort(String name) {
         var decl = getDecl(name);
-        if (decl != null) return decl.getType().getSort(services);
+        if (decl != null)
+            return decl.getType().getSort(services);
         ProgramVariable pv = services.getNamespaces().programVariables().lookup(name);
         assert pv != null : "Unknown pv " + name;
         return pv.sort();
@@ -188,8 +188,10 @@ public class SchemaConverter {
 
             var stmts = stmtsCtx.stmt().stream().map(s -> s.accept(converter.stmtConverter))
                     .collect(ImmutableList.collector());
-            if (stmts.size() == 1 && stmts.get(0) instanceof ProgramSV psv && (psv.sort() == ProgramSVSort.EXPRESSION || psv.sort() == ProgramSVSort.SIMPLE_EXPRESSION
-            || psv.sort() == ProgramSVSort.NONSIMPLEEXPRESSION)) {
+            if (stmts.size() == 1 && stmts.get(0) instanceof ProgramSV psv
+                    && (psv.sort() == ProgramSVSort.EXPRESSION
+                            || psv.sort() == ProgramSVSort.SIMPLE_EXPRESSION
+                            || psv.sort() == ProgramSVSort.NONSIMPLEEXPRESSION)) {
                 return new BlockExpression(ImmutableSLList.nil(), psv);
             }
             var value = stmtsCtx.expr().accept(this);
@@ -202,9 +204,10 @@ public class SchemaConverter {
                 org.key_project.rusty.parsing.RustyWhileSchemaParser.ContextBlockExprContext ctx) {
             var stmtsCtx = ctx.stmts();
 
-            ImmutableList<Statement> stmts = stmtsCtx == null ? ImmutableSLList.nil() : stmtsCtx.stmt().stream().map(s -> s.accept(converter.stmtConverter))
-                    .collect(ImmutableList.collector());
-                return new ContextBlockExpression(stmts);
+            ImmutableList<Statement> stmts = stmtsCtx == null ? ImmutableSLList.nil()
+                    : stmtsCtx.stmt().stream().map(s -> s.accept(converter.stmtConverter))
+                            .collect(ImmutableList.collector());
+            return new ContextBlockExpression(stmts);
         }
 
         @Override
@@ -235,12 +238,12 @@ public class SchemaConverter {
         public ProgramVariable visitPathExpr(
                 org.key_project.rusty.parsing.RustyWhileSchemaParser.PathExprContext ctx) {
             assert ctx.pathExprSegment().size() == 1;
-            var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier().accept(converter.identifierConverter);
+            var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier()
+                    .accept(converter.identifierConverter);
             var sort = converter.getSort(ident.name().toString());
             return new ProgramVariable(
-                    ident.name(),
-                    new KeYRustyType(converter.getDecl(ident.name().toString()).getType(), sort)
-            );
+                ident.name(),
+                new KeYRustyType(converter.getDecl(ident.name().toString()).getType(), sort));
         }
 
         @Override
@@ -281,7 +284,8 @@ public class SchemaConverter {
         }
 
         @Override
-        public Statement visitStmt(org.key_project.rusty.parsing.RustyWhileSchemaParser.StmtContext ctx) {
+        public Statement visitStmt(
+                org.key_project.rusty.parsing.RustyWhileSchemaParser.StmtContext ctx) {
             if (ctx.SEMI() != null) {
                 return new EmptyStatement();
             }

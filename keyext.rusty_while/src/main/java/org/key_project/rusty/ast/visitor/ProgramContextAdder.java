@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.visitor;
+
+import java.rmi.UnexpectedException;
 
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
@@ -9,8 +14,6 @@ import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.rule.inst.ContextBlockExpressionInstantiation;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.rmi.UnexpectedException;
 
 /**
  * A context given as {@link ContextBlockExpressionInstantiation} is wrapped around a given
@@ -32,17 +35,19 @@ public class ProgramContextAdder {
      * wraps the context around the statements found in the putIn block
      */
     public RustyProgramElement start(RustyProgramElement context,
-                                     ContextBlockExpression putIn, ContextBlockExpressionInstantiation ct) {
+            ContextBlockExpression putIn, ContextBlockExpressionInstantiation ct) {
 
         return wrap(context, putIn, ct.prefix().iterator(),
-                ct.suffix());
+            ct.suffix());
     }
 
-    protected RustyProgramElement wrap(RustyProgramElement context, ContextBlockExpression putIn, IntIterator prefixPos, PosInProgram suffix) {
+    protected RustyProgramElement wrap(RustyProgramElement context, ContextBlockExpression putIn,
+            IntIterator prefixPos, PosInProgram suffix) {
         RustyProgramElement body;
-        
-        RustyProgramElement next = prefixPos.hasNext() ? (RustyProgramElement) context.getChild(prefixPos.next()) : null;
-        
+
+        RustyProgramElement next =
+            prefixPos.hasNext() ? (RustyProgramElement) context.getChild(prefixPos.next()) : null;
+
         if (!prefixPos.hasNext()) {
             return createWrapperBody(context, putIn, suffix);
         } else {
@@ -51,7 +56,7 @@ public class ProgramContextAdder {
                 return createBlockExprWrapper(be, body);
             } else {
                 throw new RuntimeException(
-                        new UnexpectedException("Unexpected block type: " + context.getClass()));
+                    new UnexpectedException("Unexpected block type: " + context.getClass()));
             }
         }
     }
@@ -65,9 +70,11 @@ public class ProgramContextAdder {
      * @param replacement the StatementBlock that replaces the first statement of the block
      * @return the resulting statement block
      */
-    private RustyProgramElement createBlockExprWrapper(BlockExpression wrapper, RustyProgramElement replacement) {
+    private RustyProgramElement createBlockExprWrapper(BlockExpression wrapper,
+            RustyProgramElement replacement) {
         int childCount = wrapper.getChildCount();
-        if (childCount <= 1 && replacement instanceof BlockExpression be) return be;
+        if (childCount <= 1 && replacement instanceof BlockExpression be)
+            return be;
         var body = wrapper.getStatements().tail();
         body = body.prepend((Statement) replacement);
         return new BlockExpression(body, wrapper.getValue());
@@ -79,18 +86,21 @@ public class ProgramContextAdder {
      *
      * @param wrapper the RustyProgramElement with the context that has to be wrapped
      *        around the content of <code>putIn</code>
-     * @param putIn the ContextBlockExpression with content that has to be wrapped by the elements hidden in
+     * @param putIn the ContextBlockExpression with content that has to be wrapped by the elements
+     *        hidden in
      *        the context
      * @param suffix the PosInProgram describing the position of the first element before the suffix
      *        of the context
-     * @return the BlockExpression which encloses the content of <code>putIn</code> together with the
+     * @return the BlockExpression which encloses the content of <code>putIn</code> together with
+     *         the
      *         succeeding context elements of the innermost context block (attention: in a
      *         case like <code>{{{oldStmnt; list of further stmnt;}} moreStmnts; }</code> only the
      *         underscored part is returned <code>{{ __{putIn;....}__ }moreStmnts;}</code> adding
      *         the other braces including the <code>moreStmnts;</code> part has to be done
      *         elsewhere.
      */
-    private BlockExpression createWrapperBody(RustyProgramElement wrapper, ContextBlockExpression putIn, PosInProgram suffix) {
+    private BlockExpression createWrapperBody(RustyProgramElement wrapper,
+            ContextBlockExpression putIn, PosInProgram suffix) {
         final int putInLength = putIn.getChildCount();
 
         // ATTENTION: may be -1
@@ -100,7 +110,8 @@ public class ProgramContextAdder {
 
         int childrenToAdd = putInLength + childLeft;
 
-        if (wrapper instanceof BlockExpression) --childrenToAdd;
+        if (wrapper instanceof BlockExpression)
+            --childrenToAdd;
 
         if (childLeft == 0 || lastChild == -1) {
             return putIn;

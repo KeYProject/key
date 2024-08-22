@@ -14,7 +14,6 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.expr.ContextBlockExpression;
 import org.key_project.rusty.ast.visitor.ProgramContextAdder;
 import org.key_project.rusty.ast.visitor.ProgramReplaceVisitor;
@@ -171,7 +170,7 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
 
         if (cie.prefix() != null) {
             return ProgramContextAdder.INSTANCE.start(
-                    cie.contextProgram(), pe, cie.getInstantiation());
+                cie.contextProgram(), pe, cie.getInstantiation());
         }
 
         return pe;

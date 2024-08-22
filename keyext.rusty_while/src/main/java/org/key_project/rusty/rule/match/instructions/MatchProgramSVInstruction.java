@@ -139,7 +139,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
     }
 
     // TODO: Generalize to all operators (once we have them)
-    public static Term convertArithLogicalExpression(ArithLogicalExpression ale, Services services) {
+    public static Term convertArithLogicalExpression(ArithLogicalExpression ale,
+            Services services) {
         var tb = services.getTermBuilder();
         final var subs = new Term[] { convertToLogicElement(ale.left(), services),
             convertToLogicElement(ale.right(), services) };

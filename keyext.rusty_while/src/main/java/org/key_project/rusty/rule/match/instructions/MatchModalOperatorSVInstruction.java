@@ -4,7 +4,6 @@
 package org.key_project.rusty.rule.match.instructions;
 
 import org.key_project.logic.SyntaxElementCursor;
-import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
@@ -17,7 +16,8 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
         this.op = op;
     }
 
-    public MatchConditions match(Modality.RustyModalityKind kind, MatchConditions mc, Services services) {
+    public MatchConditions match(Modality.RustyModalityKind kind, MatchConditions mc,
+            Services services) {
         if (op.getModalities().contains(kind)) {
             return mc.setInstantiations(
                 mc.getInstantiations().add(op, kind, services));
@@ -33,10 +33,11 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
         cursor.goToNext();
         cursor.goToNext();
         var node = cursor.getCurrentNode();
-        if (!(node instanceof Modality.RustyModalityKind kind)) return null;
+        if (!(node instanceof Modality.RustyModalityKind kind))
+            return null;
         var result = match(kind, mc, services);
         if (result != null)
-        cursor.goToNext();
+            cursor.goToNext();
         return result;
     }
 }

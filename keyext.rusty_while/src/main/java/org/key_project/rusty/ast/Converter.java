@@ -35,7 +35,7 @@ public class Converter {
     private final TypeConverter typeConverter = new TypeConverter(this);
     private final ParamConverter paramConverter = new ParamConverter(this);
 
-    //TODO: Rework this properly
+    // TODO: Rework this properly
     private final Map<String, VariableDeclaration> variables = new HashMap<>();
 
     private final Services services;
@@ -58,7 +58,8 @@ public class Converter {
 
     private Sort getSort(String name) {
         var decl = getDecl(name);
-        if (decl != null) return decl.getType().getSort(services);
+        if (decl != null)
+            return decl.getType().getSort(services);
         ProgramVariable pv = services.getNamespaces().programVariables().lookup(name);
         assert pv != null : "Unknown pv " + name;
         return pv.sort();
@@ -152,7 +153,8 @@ public class Converter {
         public Function visitFunction_(
                 org.key_project.rusty.parsing.RustyWhileParser.Function_Context ctx) {
             return new Function(ctx.identifier().accept(converter.identifierConverter).name(),
-                ctx.functionParams().functionParam().stream().map(p -> p.accept(converter.paramConverter))
+                ctx.functionParams().functionParam().stream()
+                        .map(p -> p.accept(converter.paramConverter))
                         .collect(ImmutableList.collector()),
                 ctx.functionRetTy().type_().accept(converter.typeConverter),
                 (BlockExpression) ctx.blockExpr().accept(converter.exprConverter));
@@ -240,14 +242,14 @@ public class Converter {
         public ProgramVariable visitPathExpr(
                 org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
             assert ctx.pathExprSegment().size() == 1;
-            var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier().accept(converter.identifierConverter);
+            var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier()
+                    .accept(converter.identifierConverter);
             var sort = converter.getSort(ident.name().toString());
             VariableDeclaration decl = converter.getDecl(ident.name().toString());
             Type type = decl == null ? null : decl.getType();
             return new ProgramVariable(
-                    ident.name(),
-                    new KeYRustyType(type, sort)
-                );
+                ident.name(),
+                new KeYRustyType(type, sort));
         }
     }
 
@@ -270,8 +272,10 @@ public class Converter {
                 org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
             Pattern pat = ctx.pattern().accept(converter.patternConverter);
             LetStatement letStatement = new LetStatement(pat,
-                    ctx.type_().accept(converter.typeConverter), ctx.expr().accept(converter.exprConverter));
-            if (pat instanceof IdentPattern ip) converter.declareVariable(ip.name().toString(), letStatement);
+                ctx.type_().accept(converter.typeConverter),
+                ctx.expr().accept(converter.exprConverter));
+            if (pat instanceof IdentPattern ip)
+                converter.declareVariable(ip.name().toString(), letStatement);
             return letStatement;
         }
 
