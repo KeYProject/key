@@ -64,5 +64,8 @@ public class HeatmapToggleAction extends MainWindowAction {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(), vs.isHeatmapNewest(),
             vs.getMaxAgeForHeatmap());
+        // this updates the heatmap highlights
+        mainWindow.getCurrentGoalView().getHighlighter().removeAllHighlights();
+        mainWindow.getCurrentGoalView().printSequent();
     }
 }
