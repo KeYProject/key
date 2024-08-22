@@ -4,6 +4,9 @@
 package org.key_project.rusty.ast.ty;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.Services;
 
 public interface Type extends Named {
+    Sort getSort(Services services);
 }

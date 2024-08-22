@@ -228,7 +228,6 @@ public final class ProblemInitializer {
         readLDTIncludes(in, initConfig);
 
         // read normal includes
-        int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile =
                 new KeYFile(fileName, in.get(fileName), envInput.getProfile(), fileRepo);
@@ -251,7 +250,6 @@ public final class ProblemInitializer {
         int i = 0;
 
         for (String name : in.getLDTIncludes()) {
-
             keyFiles[i] =
                 new KeYFile(name, in.get(name), initConfig.getProfile(), fileRepo);
             i++;

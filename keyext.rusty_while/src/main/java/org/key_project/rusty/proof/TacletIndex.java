@@ -281,7 +281,6 @@ public class TacletIndex {
     private ImmutableList<NoPosTacletApp> getTopLevelTaclets(
             HashMap<Object, ImmutableList<NoPosTacletApp>> findTaclets,
             PosInOccurrence pos, Services services) {
-
         assert pos.isTopLevel();
 
         final ImmutableList<NoPosTacletApp> rwTaclets =
@@ -370,7 +369,6 @@ public class TacletIndex {
     private ImmutableList<NoPosTacletApp> getListHelp(
             final HashMap<Object, ImmutableList<NoPosTacletApp>> map, final Term term,
             final boolean ignoreUpdates, final PrefixOccurrences prefixOccurrences) {
-
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
         final Operator op = term.op();
 
@@ -380,7 +378,7 @@ public class TacletIndex {
             res = getRustyTacletList(map, (RustyProgramElement) sb.getChild(0), prefixOccurrences);
         }
 
-        if (term instanceof Modality || op instanceof ProgramVariable) {
+        if (term.op() instanceof Modality || op instanceof ProgramVariable) {
             res = merge(res, map.get(DEFAULT_PROGSV_KEY));
         }
 
@@ -450,7 +448,6 @@ public class TacletIndex {
      * Inner class to track the occurrences of prefix elements in Rust blocks
      */
     private static class PrefixOccurrences {
-
         /**
          * the classes that represent prefix elements of a Rust block
          */

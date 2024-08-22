@@ -8,6 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
+import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.rule.MatchConditions;
 
@@ -22,13 +23,14 @@ public class MatchProgramInstruction implements MatchInstruction {
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions matchConditions,
             Services services) {
-        final var t = (Term) cursor.getCurrentNode();
-        final var mod = (Modality) t.op();
+        final var rb = (RustyBlock) cursor.getCurrentNode();
         final MatchConditions result = pe.match(
-            new SourceData(mod.program().program(), -1, services),
+            new SourceData(rb.program(), -1, services),
             matchConditions);
         if (result != null) {
-            cursor.goToNext();
+            // TODO: Should the cursor be advanced by the match in the PEs?
+            cursor.gotoParent();
+            cursor.gotoNextSibling();
         }
         return result;
     }

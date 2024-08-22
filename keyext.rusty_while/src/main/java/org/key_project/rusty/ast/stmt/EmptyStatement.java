@@ -23,4 +23,9 @@ public class EmptyStatement implements Statement, TerminalSyntaxElement {
     public void visit(Visitor v) {
         v.performActionOnEmptyStatement(this);
     }
+
+    @Override
+    public String toString() {
+        return ";";
+    }
 }

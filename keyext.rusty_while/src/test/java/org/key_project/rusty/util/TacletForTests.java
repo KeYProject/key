@@ -76,7 +76,15 @@ public class TacletForTests {
         parse(new File(standardFile));
     }
 
-    public static void parse(File file) {
+    public static void parse(Profile profile) {
+        parse(new File(standardFile), profile);
+    }
+
+    public static void parse(@NonNull File file) {
+        parse(file, profile);
+    }
+
+    public static void parse(File file, Profile profile) {
         try {
             if (!file.equals(lastFile)) {
                 var envInput = new KeYFileForTests("Test", file, profile);

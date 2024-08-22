@@ -51,3 +51,16 @@ pattern
 schemaVariable
     : SCHEMA_IDENTIFIER
     ;
+
+type_
+   : parenthesizedType
+   | typePath
+   | tupleType
+   | neverType
+   | arrayType
+   | typeOf
+   ;
+
+typeOf
+    : TYPE_OF '(' expr ')'
+    ;

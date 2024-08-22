@@ -7,6 +7,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.Services;
 
 public class KeYRustyType implements Type {
     /** the AST type */
@@ -28,6 +29,11 @@ public class KeYRustyType implements Type {
 
     public KeYRustyType(Sort sort) {
         this.sort = sort;
+    }
+
+    @Override
+    public Sort getSort(Services services) {
+        return sort;
     }
 
     public Sort getSort() {

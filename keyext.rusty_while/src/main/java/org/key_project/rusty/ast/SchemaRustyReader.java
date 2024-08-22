@@ -12,6 +12,7 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.parsing.RustyWhileSchemaParser;
 
 public class SchemaRustyReader extends RustyReader {
     private Namespace<@NonNull SchemaVariable> svNS;
@@ -29,7 +30,7 @@ public class SchemaRustyReader extends RustyReader {
             new org.key_project.rusty.parsing.RustyWhileSchemaLexer(CharStreams.fromString(s));
         var ts = new CommonTokenStream(lexer);
         var parser = new org.key_project.rusty.parsing.RustyWhileSchemaParser(ts);
-        var converter = new SchemaConverter(svNS);
+        var converter = new SchemaConverter(svNS, getServices());
         var block = converter.convertBlockExpr(parser.blockExpr());
         return new RustyBlock(block);
     }

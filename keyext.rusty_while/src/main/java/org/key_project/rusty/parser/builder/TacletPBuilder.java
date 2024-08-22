@@ -67,7 +67,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitRulesOrAxioms(KeYRustyParser.RulesOrAxiomsContext ctx) {
-        // enableJavaSchemaMode();
+        enableRustySchemaMode();
         // if (ctx.RULES() != null) {
         // axiomMode = false;
         // }
@@ -400,7 +400,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         List<Taclet> taclets = mapOf(ctx.taclet());
         return ImmutableList.fromList(taclets);
     }
-
 
     private @NonNull TacletBuilder<?> createTacletBuilderFor(Object find,
             RewriteTaclet.ApplicationRestriction applicationRestriction, ParserRuleContext ctx) {

@@ -4,48 +4,76 @@
 package org.key_project.rusty.ast;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.Param;
 import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.ast.pat.Pattern;
+import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
+import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.ast.ty.PrimitiveType;
 import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.logic.sort.ProgramSVSort;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class SchemaConverter {
     private Namespace<@NonNull SchemaVariable> svNS;
 
-    private final CrateConverter crateConverter;
-    private final ItemConverter itemConverter;
-    private final ExprConverter exprConverter;
-    private final StmtConverter stmtConverter;
-    private final IdentifierConverter identifierConverter;
-    private final PatternConverter patternConverter;
-    private final TypeConverter typeConverter;
-    private final ParamConverter paramConverter;
+    private final CrateConverter crateConverter = new CrateConverter(this);
+    private final ItemConverter itemConverter = new ItemConverter(this);
+    private final ExprConverter exprConverter = new ExprConverter(this);
+    private final StmtConverter stmtConverter = new StmtConverter(this);
+    private final IdentifierConverter identifierConverter = new IdentifierConverter(this);
+    private final PatternConverter patternConverter = new PatternConverter(this);
+    private final TypeConverter typeConverter = new TypeConverter(this);
+    private final ParamConverter paramConverter = new ParamConverter(this);
 
-    public SchemaConverter(Namespace<@NonNull SchemaVariable> svNS) {
+    //TODO: Rework this properly
+    private final Map<String, VariableDeclaration> variables = new HashMap<>();
+
+    private final Services services;
+
+    public SchemaConverter(Namespace<@NonNull SchemaVariable> svNS, Services services) {
         this.svNS = svNS;
-        crateConverter = new CrateConverter(this);
-        itemConverter = new ItemConverter(this);
-        exprConverter = new ExprConverter(this);
-        stmtConverter = new StmtConverter(this);
-        identifierConverter = new IdentifierConverter(this);
-        patternConverter = new PatternConverter(this);
-        typeConverter = new TypeConverter(this);
-        paramConverter = new ParamConverter(this);
+        this.services = services;
+    }
+
+    public Services getServices() {
+        return services;
+    }
+
+    private void declareVariable(String name, VariableDeclaration decl) {
+        variables.put(name, decl);
+    }
+
+    private VariableDeclaration getDecl(String name) {
+        return variables.get(name);
+    }
+
+    private Sort getSort(String name) {
+        var decl = getDecl(name);
+        if (decl != null) return decl.getType().getSort(services);
+        ProgramVariable pv = services.getNamespaces().programVariables().lookup(name);
+        assert pv != null : "Unknown pv " + name;
+        return pv.sort();
     }
 
     public OperatorSV lookupSchemaVariable(String s) {
@@ -160,6 +188,10 @@ public class SchemaConverter {
 
             var stmts = stmtsCtx.stmt().stream().map(s -> s.accept(converter.stmtConverter))
                     .collect(ImmutableList.collector());
+            if (stmts.size() == 1 && stmts.get(0) instanceof ProgramSV psv && (psv.sort() == ProgramSVSort.EXPRESSION || psv.sort() == ProgramSVSort.SIMPLE_EXPRESSION
+            || psv.sort() == ProgramSVSort.NONSIMPLEEXPRESSION)) {
+                return new BlockExpression(ImmutableSLList.nil(), psv);
+            }
             var value = stmtsCtx.expr().accept(this);
 
             return new BlockExpression(stmts, value);
@@ -170,11 +202,9 @@ public class SchemaConverter {
                 org.key_project.rusty.parsing.RustyWhileSchemaParser.ContextBlockExprContext ctx) {
             var stmtsCtx = ctx.stmts();
 
-            var stmts = stmtsCtx.stmt().stream().map(s -> s.accept(converter.stmtConverter))
+            ImmutableList<Statement> stmts = stmtsCtx == null ? ImmutableSLList.nil() : stmtsCtx.stmt().stream().map(s -> s.accept(converter.stmtConverter))
                     .collect(ImmutableList.collector());
-            var value = stmtsCtx.expr().accept(this);
-
-            return new ContextBlockExpression(stmts, value);
+                return new ContextBlockExpression(stmts);
         }
 
         @Override
@@ -202,12 +232,15 @@ public class SchemaConverter {
         }
 
         @Override
-        public PathExpression visitPathExpr(
+        public ProgramVariable visitPathExpr(
                 org.key_project.rusty.parsing.RustyWhileSchemaParser.PathExprContext ctx) {
             assert ctx.pathExprSegment().size() == 1;
-            return new PathExpression(
-                ctx.pathExprSegment(0).pathIdentSegment().identifier()
-                        .accept(converter.identifierConverter));
+            var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier().accept(converter.identifierConverter);
+            var sort = converter.getSort(ident.name().toString());
+            return new ProgramVariable(
+                    ident.name(),
+                    new KeYRustyType(converter.getDecl(ident.name().toString()).getType(), sort)
+            );
         }
 
         @Override
@@ -245,6 +278,14 @@ public class SchemaConverter {
                 org.key_project.rusty.parsing.RustyWhileSchemaParser.SchemaStmtContext ctx) {
             return (ProgramSV) converter
                     .lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
+        }
+
+        @Override
+        public Statement visitStmt(org.key_project.rusty.parsing.RustyWhileSchemaParser.StmtContext ctx) {
+            if (ctx.SEMI() != null) {
+                return new EmptyStatement();
+            }
+            return super.visitStmt(ctx);
         }
     }
 

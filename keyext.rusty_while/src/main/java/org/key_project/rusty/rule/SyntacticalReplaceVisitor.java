@@ -16,6 +16,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.expr.ContextBlockExpression;
+import org.key_project.rusty.ast.visitor.ProgramContextAdder;
 import org.key_project.rusty.ast.visitor.ProgramReplaceVisitor;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.RustyBlock;
@@ -26,6 +27,7 @@ import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
+import org.key_project.rusty.rule.inst.ContextInstantiationEntry;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -161,8 +163,18 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
         }
     }
 
-    private RustyProgramElement addContext(BlockExpression pe) {
-        throw new RuntimeException("TODO @ DD");
+    private RustyProgramElement addContext(ContextBlockExpression pe) {
+        final ContextInstantiationEntry cie = svInst.getContextInstantiation();
+        if (cie == null) {
+            throw new IllegalStateException("Context should also be instantiated");
+        }
+
+        if (cie.prefix() != null) {
+            return ProgramContextAdder.INSTANCE.start(
+                    cie.contextProgram(), pe, cie.getInstantiation());
+        }
+
+        return pe;
     }
 
     private RustyBlock replacePrg(SVInstantiations svInst, RustyBlock rb) {
@@ -175,10 +187,10 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
 
         if (rb.program() instanceof ContextBlockExpression cbe) {
             trans = new ProgramReplaceVisitor(
-                new BlockExpression(cbe.getStatements(), cbe.getValue()),
+                cbe,
                 services, svInst);
             trans.start();
-            result = addContext((BlockExpression) trans.result());
+            result = addContext((ContextBlockExpression) trans.result());
         } else {
             trans = new ProgramReplaceVisitor(rb.program(), services, svInst);
             trans.start();

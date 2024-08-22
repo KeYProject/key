@@ -209,4 +209,9 @@ public final class Goal implements ProofGoal {
     public Services getOverlayServices() {
         return proof().getServices().getOverlay(getLocalNamespaces());
     }
+
+    @Override
+    public String toString() {
+        return node.sequent().toString();
+    }
 }

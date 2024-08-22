@@ -57,9 +57,9 @@ public class VMTacletMatcher implements TacletMatcher {
         boundVars = taclet.getBoundVariables();
         varsNotFreeIn = taclet.varsNotFreeIn();
 
-        if (taclet instanceof FindTaclet) {
-            findExp = ((FindTaclet) taclet).find();
-            ignoreTopLevelUpdates = ((FindTaclet) taclet).ignoreTopLevelUpdates()
+        if (taclet instanceof FindTaclet ft) {
+            findExp = ft.find();
+            ignoreTopLevelUpdates = ft.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
             findMatchProgram = TacletMatchProgram.createProgram(findExp);
 

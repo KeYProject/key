@@ -90,7 +90,6 @@ public class SchemaVariableFactory {
         return new ProgramSV(name, s, listSV);
     }
 
-
     /**
      * creates a SchemaVariable representing a skolem term
      */

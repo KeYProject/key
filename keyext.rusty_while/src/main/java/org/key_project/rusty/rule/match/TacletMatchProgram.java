@@ -140,7 +140,6 @@ public class TacletMatchProgram {
      * @return {@code null} if no match was found or the match result
      */
     public MatchConditions match(Term p_toMatch, MatchConditions p_matchCond, Services services) {
-
         MatchConditions mc = p_matchCond;
 
         final SyntaxElementCursor navi = p_toMatch.getCursor();

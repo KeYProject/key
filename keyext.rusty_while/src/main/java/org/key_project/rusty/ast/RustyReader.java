@@ -14,7 +14,14 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.jspecify.annotations.NonNull;
 
 public class RustyReader {
+    private final Services services;
+
     public RustyReader(Services services, NamespaceSet nss) {
+        this.services = services;
+    }
+
+    public Services getServices() {
+        return services;
     }
 
     public RustyBlock readBlockWithEmptyContext(String s) {
@@ -22,7 +29,8 @@ public class RustyReader {
             new org.key_project.rusty.parsing.RustyWhileLexer(CharStreams.fromString(s));
         var ts = new CommonTokenStream(lexer);
         var parser = new org.key_project.rusty.parsing.RustyWhileParser(ts);
-        var block = Converter.visitBlockExpr(parser.blockExpr());
+        var converter = new Converter(services);
+        var block = converter.visitBlockExpr(parser.blockExpr());
         return new RustyBlock(block);
     }
 

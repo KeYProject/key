@@ -17,11 +17,10 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
         this.op = op;
     }
 
-    public MatchConditions match(Term t, MatchConditions mc, Services services) {
-        if (t.op() instanceof Modality mod
-                && op.getModalities().contains(mod.kind())) {
+    public MatchConditions match(Modality.RustyModalityKind kind, MatchConditions mc, Services services) {
+        if (op.getModalities().contains(kind)) {
             return mc.setInstantiations(
-                mc.getInstantiations().add(op, mod.<Modality.RustyModalityKind>kind(), services));
+                mc.getInstantiations().add(op, kind, services));
         } else {
             return null;
         }
@@ -30,6 +29,14 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions mc,
             Services services) {
-        return match((Term) cursor.getCurrentNode(), mc, services);
+        // TODO: is there a better place for this?
+        cursor.goToNext();
+        cursor.goToNext();
+        var node = cursor.getCurrentNode();
+        if (!(node instanceof Modality.RustyModalityKind kind)) return null;
+        var result = match(kind, mc, services);
+        if (result != null)
+        cursor.goToNext();
+        return result;
     }
 }

@@ -9,15 +9,30 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.logic.op.sv.SchemaVariableFactory;
+import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.util.collection.*;
+
+import static org.key_project.rusty.rule.match.instructions.MatchProgramSVInstruction.convertToLogicElement;
 
 public class SVInstantiations {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
+    /**
+     * the context itself is not realised as a schemavariable, therefore we need here a dummy SV for
+     * a more unified handling (key in map)
+     */
+    private static final SchemaVariable CONTEXTSV = SchemaVariableFactory.createProgramSV(
+            new Name("Context"), new ProgramSVSort(new Name("ContextStatementBlock")) {
+                public boolean canStandFor(RustyProgramElement pe, Services services) {
+                    return true;
+                }
+            }, false); // just a dummy SV for context
 
     /** the map with the instantiations to logic terms */
     private final ImmutableMap<SchemaVariable, InstantiationEntry<?>> map;
@@ -214,6 +229,14 @@ public class SVInstantiations {
     }
 
     /**
+     * returns the instantiation entry for the context "schema variable" or null if non such exists
+     */
+    public ContextInstantiationEntry getContextInstantiation() {
+        final InstantiationEntry<?> entry = getInstantiationEntry(CONTEXTSV);
+        return (ContextInstantiationEntry) entry;
+    }
+
+    /**
      * returns the instantiation of the given SchemaVariable as Term. If the instantiation is a
      * program element it is tried to convert it to a term otherwise an exception is thrown
      *
@@ -227,8 +250,7 @@ public class SVInstantiations {
         } else if (inst instanceof Term) {
             return (Term) inst;
         } else if (inst instanceof RustyProgramElement pe) {
-            // return services.getTypeConverter().convertToLogicElement((ProgramElement) inst, ec);
-            throw new RuntimeException("TODO @ DD");
+            return convertToLogicElement(pe, services);
         } else {
             throw CONVERT_INSTANTIATION_EXCEPTION;
         }
@@ -401,5 +423,34 @@ public class SVInstantiations {
             }
         }
         return true;
+    }
+
+    /**
+     * replaces the given pair in the instantiations. If the context has been instantiated already,
+     * the new pair is taken without a warning.
+     *
+     * @param prefix the PosInProgram describing the position of the first statement after the
+     *        prefix
+     * @param postfix the PosInProgram describing the position of the statement just before the
+     *        postfix
+     * @param pe the ProgramElement the context positions are related to
+     */
+    public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
+                                    RustyProgramElement pe, Services services) {
+        return replace(CONTEXTSV,
+                new ContextInstantiationEntry(prefix, postfix, pe), services);
+    }
+
+    /**
+     * replaces the given pair in the instantiations. If the given SchemaVariable has been
+     * instantiated already, the new pair is taken without a warning.
+     *
+     * @param sv the SchemaVariable to be instantiated
+     * @param entry the InstantiationEntry the SchemaVariable is instantiated with
+     */
+    public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
+                                    Services services) {
+        return new SVInstantiations(map.remove(sv).put(sv, entry),
+                getUpdateContext(), GenericSortInstantiations.EMPTY_INSTANTIATIONS, getGenericSortConditions()).checkSorts(sv, entry, true, services);
     }
 }
