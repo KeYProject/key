@@ -113,4 +113,8 @@ public final class MainFrame extends JPanel {
     public void scrollTo(int y) {
         scrollPane.getVerticalScrollBar().setValue(y);
     }
+
+    public Component getContent() {
+        return content;
+    }
 }

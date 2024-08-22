@@ -1254,6 +1254,15 @@ public final class MainWindow extends JFrame {
         mainFrame.scrollTo(y);
     }
 
+    /**
+     * Get the main frame for access to the sequent view
+     *
+     * @return the container for this main window.
+     */
+    public MainFrame getMainFrame() {
+        return mainFrame;
+    }
+
     void displayResults(String message) {
         LOGGER.debug("displaying results: {}", message);
         setStatusLine(message);
