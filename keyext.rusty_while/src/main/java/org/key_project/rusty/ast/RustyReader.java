@@ -24,19 +24,39 @@ public class RustyReader {
         return services;
     }
 
-    public RustyBlock readBlockWithEmptyContext(String s) {
+    /**
+     * parses a given RustyBlock using the context to determine the right references
+     *
+     * @param block a String describing a java block
+     * @param context recoder.java.CompilationUnit in which the block has to be interprested
+     * @return the parsed and resolved JavaBlock
+     */
+    public RustyBlock readBlock(String block, Context context) {
+        var fn = context.buildFunction(block);
         var lexer =
-            new org.key_project.rusty.parsing.RustyWhileLexer(CharStreams.fromString(s));
+            new org.key_project.rusty.parsing.RustyWhileLexer(CharStreams.fromString(fn));
         var ts = new CommonTokenStream(lexer);
         var parser = new org.key_project.rusty.parsing.RustyWhileParser(ts);
         var converter = new Converter(services);
-        var block = converter.visitBlockExpr(parser.blockExpr());
-        return new RustyBlock(block);
+        var converted = converter.convertFunction(parser.function_());
+        return new RustyBlock(converted.body());
+    }
+
+    public RustyBlock readBlockWithEmptyContext(String s) {
+        return readBlock(s, createEmptyContext());
     }
 
     public RustyBlock readBlockWithProgramVariables(Namespace<@NonNull ProgramVariable> varNS,
             String s) {
-        // TODO: Work with context
-        return readBlockWithEmptyContext(s);
+        return readBlock(s, new Context(varNS));
+    }
+
+    /**
+     * creates an empty compilation unit with a temporary name.
+     *
+     * @return the new recoder.java.CompilationUnit
+     */
+    public Context createEmptyContext() {
+        return new Context(new Namespace<>());
     }
 }

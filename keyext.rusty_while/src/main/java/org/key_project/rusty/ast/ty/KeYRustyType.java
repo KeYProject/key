@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.ty;
 
+import java.util.Objects;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
@@ -55,5 +57,21 @@ public class KeYRustyType implements Type {
     @Override
     public @NonNull Name name() {
         return rustyType == null ? sort.name() : rustyType.name();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+        try {
+            return Objects.equals(rustyType, ((KeYRustyType) o).rustyType)
+                    && Objects.equals(sort, ((KeYRustyType) o).sort);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

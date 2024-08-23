@@ -24,13 +24,21 @@ public class SchemaRustyReader extends RustyReader {
         this.svNS = ns;
     }
 
-    public RustyBlock readBlockWithEmptyContext(String s) {
+    /**
+     * parses a given RustyBlock using the context to determine the right references
+     *
+     * @param block a String describing a java block
+     * @param context recoder.java.CompilationUnit in which the block has to be interprested
+     * @return the parsed and resolved JavaBlock
+     */
+    public RustyBlock readBlock(String block, Context context) {
+        var fn = context.buildFunction(block);
         var lexer =
-            new org.key_project.rusty.parsing.RustyWhileSchemaLexer(CharStreams.fromString(s));
+            new org.key_project.rusty.parsing.RustyWhileSchemaLexer(CharStreams.fromString(fn));
         var ts = new CommonTokenStream(lexer);
         var parser = new org.key_project.rusty.parsing.RustyWhileSchemaParser(ts);
         var converter = new SchemaConverter(svNS, getServices());
-        var block = converter.convertBlockExpr(parser.blockExpr());
-        return new RustyBlock(block);
+        var converted = converter.convertFunction(parser.function_());
+        return new RustyBlock(converted.body());
     }
 }

@@ -53,13 +53,13 @@ public class BasicTest {
         tacletIndex.add(rule);
         var oldGoal = proof.openGoals().head();
         var goal = createGoal(oldGoal.getNode(), tacletIndex);
+        proof.setOpenGoals(ImmutableList.of(goal));
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(pos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
-        proof.replace(oldGoal, goals);
+        goal.apply(rApp);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class BasicTest {
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false),
             proof);
-        assertEquals(1, proof.openGoals().size(), proof.openGoals().size());
+        assertEquals(1, proof.openGoals().size());
         System.out.println(proof.openGoals().head().sequent());
         // TODO: fix Term.equals: assertEquals(TacletForTests.parseTerm("{i:=2}\\<{i}\\>(i=2)"),
         // proof.openGoals().head().sequent().succedent().getFirst().formula());
@@ -87,7 +87,7 @@ public class BasicTest {
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1), false),
             proof);
-        assertEquals(1, proof.openGoals().size(), proof.openGoals().size());
+        assertEquals(1, proof.openGoals().size());
         System.out.println(proof.openGoals().head().sequent());
         applyRule("applyOnRigidFormula",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
@@ -95,12 +95,43 @@ public class BasicTest {
             proof);
         assertEquals(1, proof.openGoals().size());
         System.out.println(proof.openGoals().head().sequent());
-        applyRule("applyOnRigidTerm",
+        applyRule("applyOnPV",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(0), false),
             proof);
         assertEquals(1, proof.openGoals().size());
         System.out.println(proof.openGoals().head().sequent());
+        applyRule("applyOnRigidTerm",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println(proof.openGoals().head().sequent());
+        applyRule("applyOnRigidTerm",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1).down(0), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println(proof.openGoals().head().sequent());
+        applyRule("simplifyUpdate1",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1).down(0).down(0), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println(proof.openGoals().head().sequent());
+        applyRule("eqClose",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println(proof.openGoals().head().sequent());
+        applyRule("closeTrue",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(0, proof.openGoals().size());
+        assertTrue(proof.closed());
+        System.out.println("Proof successful!");
     }
 
     @Test

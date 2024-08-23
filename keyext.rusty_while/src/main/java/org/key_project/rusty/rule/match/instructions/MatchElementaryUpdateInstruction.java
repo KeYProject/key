@@ -5,7 +5,6 @@ package org.key_project.rusty.rule.match.instructions;
 
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
-import org.key_project.logic.op.Operator;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -33,13 +32,14 @@ public class MatchElementaryUpdateInstruction extends Instruction<@NonNull Eleme
     @Override
     public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
             Services services) {
-        final Operator instantiationCandidateOp = instantiationCandidate.op();
+        return match((ElementaryUpdate) instantiationCandidate.op(), matchCond, services);
+    }
+
+    public MatchConditions match(ElementaryUpdate instantiationCandidateOp,
+            MatchConditions matchCond,
+            Services services) {
         if (instantiationCandidateOp != op) {
-            if (instantiationCandidateOp instanceof ElementaryUpdate instElUpdate) {
-                matchCond = leftHandSide.match(instElUpdate.lhs(), matchCond, services);
-            } else {
-                matchCond = null;
-            }
+            matchCond = leftHandSide.match(instantiationCandidateOp.lhs(), matchCond, services);
         }
         return matchCond;
     }
@@ -47,10 +47,14 @@ public class MatchElementaryUpdateInstruction extends Instruction<@NonNull Eleme
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions matchConditions,
             Services services) {
+        cursor.goToNext();
+        var node = cursor.getCurrentNode();
+        if (!(node instanceof ElementaryUpdate eu))
+            return null;
         final MatchConditions result =
-            match((Term) cursor.getCurrentNode(), matchConditions, services);
+            match(eu, matchConditions, services);
         if (result != null) {
-            cursor.goToNext();
+            cursor.gotoNextSibling();
         }
         return result;
     }

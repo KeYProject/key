@@ -47,6 +47,7 @@ public class SchemaConverter {
 
     // TODO: Rework this properly
     private final Map<String, VariableDeclaration> variables = new HashMap<>();
+    private final Map<VariableDeclaration, ProgramVariable> programVariables = new HashMap<>();
 
     private final Services services;
 
@@ -61,10 +62,16 @@ public class SchemaConverter {
 
     private void declareVariable(String name, VariableDeclaration decl) {
         variables.put(name, decl);
+        programVariables.put(decl, new ProgramVariable(new Name(name),
+            new KeYRustyType(decl.getType().getSort(services))));
     }
 
     private VariableDeclaration getDecl(String name) {
         return variables.get(name);
+    }
+
+    private ProgramVariable getProgramVariable(String name) {
+        return programVariables.get(getDecl(name));
     }
 
     private Sort getSort(String name) {
@@ -95,6 +102,11 @@ public class SchemaConverter {
     public BlockExpression convertBlockExpr(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.BlockExprContext ctx) {
         return (BlockExpression) ctx.accept(exprConverter);
+    }
+
+    public Function convertFunction(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.Function_Context ctx) {
+        return itemConverter.visitFunction_(ctx);
     }
 
     private static class CrateConverter
@@ -131,12 +143,18 @@ public class SchemaConverter {
         @Override
         public Function visitFunction_(
                 org.key_project.rusty.parsing.RustyWhileSchemaParser.Function_Context ctx) {
-            return new Function(ctx.identifier().accept(converter.identifierConverter).name(),
-                ctx.functionParams().functionParam().stream()
-                        .map(p -> p.accept(converter.paramConverter))
-                        .collect(ImmutableList.collector()),
-                ctx.functionRetTy().type_().accept(converter.typeConverter),
-                (BlockExpression) ctx.blockExpr().accept(converter.exprConverter));
+            Name name = ctx.identifier().accept(converter.identifierConverter).name();
+            ImmutableList<Param> params = ctx.functionParams() == null ? ImmutableSLList.nil()
+                    : ctx.functionParams().functionParam().stream()
+                            .map(p -> p.accept(converter.paramConverter))
+                            .collect(ImmutableList.collector());
+            Type returnType = ctx.functionRetTy().type_().accept(converter.typeConverter);
+            BlockExpression body =
+                (BlockExpression) ctx.blockExpr().accept(converter.exprConverter);
+            return new Function(name,
+                params,
+                returnType,
+                body);
         }
     }
 
@@ -240,10 +258,9 @@ public class SchemaConverter {
             assert ctx.pathExprSegment().size() == 1;
             var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier()
                     .accept(converter.identifierConverter);
-            var sort = converter.getSort(ident.name().toString());
-            return new ProgramVariable(
-                ident.name(),
-                new KeYRustyType(converter.getDecl(ident.name().toString()).getType(), sort));
+            var pv = converter.getProgramVariable(ident.name().toString());
+            assert pv != null;
+            return pv;
         }
 
         @Override
@@ -271,9 +288,13 @@ public class SchemaConverter {
         @Override
         public Statement visitLetStmt(
                 org.key_project.rusty.parsing.RustyWhileSchemaParser.LetStmtContext ctx) {
-            return new LetStatement(ctx.pattern().accept(converter.patternConverter),
+            Pattern pat = ctx.pattern().accept(converter.patternConverter);
+            LetStatement letStatement = new LetStatement(pat,
                 ctx.type_().accept(converter.typeConverter),
                 ctx.expr().accept(converter.exprConverter));
+            if (pat instanceof IdentPattern ip)
+                converter.declareVariable(ip.name().toString(), letStatement);
+            return letStatement;
         }
 
         @Override

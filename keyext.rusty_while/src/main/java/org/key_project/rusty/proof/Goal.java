@@ -11,6 +11,7 @@ import org.key_project.rusty.logic.SequentChangeInfo;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.Taclet;
+import org.key_project.rusty.rule.TacletApp;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -88,6 +89,41 @@ public final class Goal implements ProofGoal {
 
     public Sequent sequent() {
         return getNode().sequent();
+    }
+
+    /**
+     * Perform the provided rule application on this goal.
+     * Returns the new goal(s), if any.
+     * The state of the proof is also updated.
+     *
+     * @param ruleApp the rule app
+     * @return new goal(s)
+     */
+    public ImmutableList<Goal> apply(final RuleApp ruleApp) {
+        final Proof proof = proof();
+
+        /*
+         * wrap the services object into an overlay such that any addition to local symbols is
+         * caught.
+         */
+        final ImmutableList<Goal> goalList;
+        goalList = ruleApp.execute(this);
+        // can be null when the taclet failed to apply (RuleAbortException)
+        if (goalList == null) {
+            return null;
+        }
+
+        if (goalList.isEmpty()) {
+            proof.closeGoal(this);
+        } else {
+            proof.replace(this, goalList);
+            if (ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()) {
+                // the first new goal is the one to be closed
+                proof.closeGoal(goalList.head());
+            }
+        }
+
+        return goalList;
     }
 
     /**

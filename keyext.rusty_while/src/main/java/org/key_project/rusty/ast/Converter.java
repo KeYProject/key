@@ -24,6 +24,7 @@ import org.key_project.rusty.ast.ty.PrimitiveType;
 import org.key_project.rusty.ast.ty.Type;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class Converter {
     private final CrateConverter crateConverter = new CrateConverter(this);
@@ -37,6 +38,7 @@ public class Converter {
 
     // TODO: Rework this properly
     private final Map<String, VariableDeclaration> variables = new HashMap<>();
+    private final Map<VariableDeclaration, ProgramVariable> programVariables = new HashMap<>();
 
     private final Services services;
 
@@ -48,12 +50,23 @@ public class Converter {
         return services;
     }
 
-    private void declareVariable(String name, VariableDeclaration decl) {
+    private void declareVariable(String name, LetStatement decl) {
         variables.put(name, decl);
+        programVariables.put(decl, new ProgramVariable(new Name(name),
+            new KeYRustyType(decl.getType().getSort(services))));
+    }
+
+    private void declareVariable(String name, Param decl) {
+        variables.put(name, decl);
+        programVariables.put(decl, services.getNamespaces().programVariables().lookup(name));
     }
 
     private VariableDeclaration getDecl(String name) {
         return variables.get(name);
+    }
+
+    private ProgramVariable getProgramVariable(String name) {
+        return programVariables.get(getDecl(name));
     }
 
     private Sort getSort(String name) {
@@ -120,6 +133,11 @@ public class Converter {
         return typeConverter.visitTypePath(ctx);
     }
 
+    public Function convertFunction(
+            org.key_project.rusty.parsing.RustyWhileParser.Function_Context ctx) {
+        return itemConverter.visitFunction_(ctx);
+    }
+
     private static class CrateConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Crate> {
         private final Converter converter;
@@ -152,12 +170,18 @@ public class Converter {
         @Override
         public Function visitFunction_(
                 org.key_project.rusty.parsing.RustyWhileParser.Function_Context ctx) {
-            return new Function(ctx.identifier().accept(converter.identifierConverter).name(),
-                ctx.functionParams().functionParam().stream()
-                        .map(p -> p.accept(converter.paramConverter))
-                        .collect(ImmutableList.collector()),
-                ctx.functionRetTy().type_().accept(converter.typeConverter),
-                (BlockExpression) ctx.blockExpr().accept(converter.exprConverter));
+            Name name = ctx.identifier().accept(converter.identifierConverter).name();
+            ImmutableList<Param> params = ctx.functionParams() == null ? ImmutableSLList.nil()
+                    : ctx.functionParams().functionParam().stream()
+                            .map(p -> p.accept(converter.paramConverter))
+                            .collect(ImmutableList.collector());
+            Type returnType = ctx.functionRetTy().type_().accept(converter.typeConverter);
+            BlockExpression body =
+                (BlockExpression) ctx.blockExpr().accept(converter.exprConverter);
+            return new Function(name,
+                params,
+                returnType,
+                body);
         }
     }
 
@@ -244,12 +268,9 @@ public class Converter {
             assert ctx.pathExprSegment().size() == 1;
             var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier()
                     .accept(converter.identifierConverter);
-            var sort = converter.getSort(ident.name().toString());
-            VariableDeclaration decl = converter.getDecl(ident.name().toString());
-            Type type = decl == null ? null : decl.getType();
-            return new ProgramVariable(
-                ident.name(),
-                new KeYRustyType(type, sort));
+            var pv = converter.getProgramVariable(ident.name().toString());
+            assert pv != null;
+            return pv;
         }
     }
 
@@ -371,8 +392,10 @@ public class Converter {
         @Override
         public Param visitFunctionParamPattern(
                 org.key_project.rusty.parsing.RustyWhileParser.FunctionParamPatternContext ctx) {
-            return new Param(ctx.pattern().accept(converter.patternConverter),
+            Param param = new Param(ctx.pattern().accept(converter.patternConverter),
                 ctx.type_().accept(converter.typeConverter));
+            converter.declareVariable(((IdentPattern) param.getPattern()).name().toString(), param);
+            return param;
         }
     }
 }
