@@ -357,7 +357,7 @@ public class OriginTermLabel implements TermLabel {
             return new Origin(SpecType.NONE);
         }
 
-        return new FileOrigin(commonSpecType, commonFileName.getPath(), commonLine);
+        return new FileOrigin(commonSpecType, commonFileName, commonLine);
     }
 
     /**
@@ -737,19 +737,12 @@ public class OriginTermLabel implements TermLabel {
          * @param fileName the file the term originates from.
          * @param line the line in the file.
          */
-        public FileOrigin(SpecType specType, String fileName, int line) {
+        public FileOrigin(SpecType specType, URI fileName, int line) {
             super(specType);
 
-            assert fileName != null;
             assert line >= 0;
 
-            // wrap fileName into URI
-            // bugfix #1622: do not interpret "<unknown>" as file name
-            if (fileName.equals("no file") || fileName.equals("<unknown>")) {
-                this.fileName = null;
-            } else {
-                this.fileName = new File(fileName).toURI();
-            }
+            this.fileName = fileName;
             this.line = line;
         }
 

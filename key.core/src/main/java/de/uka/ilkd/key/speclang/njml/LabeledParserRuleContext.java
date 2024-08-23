@@ -10,7 +10,10 @@ import javax.annotation.Nullable;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
+import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.ParserRuleContext;
+
+import java.net.URI;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.
@@ -42,7 +45,7 @@ public class LabeledParserRuleContext {
 
     private static TermLabel constructTermLabel(ParserRuleContext ctx,
             OriginTermLabel.SpecType specType) {
-        String filename = ctx.start.getTokenSource().getSourceName();
+        URI filename = MiscTools.getURIFromTokenSource(ctx.start.getTokenSource());
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);
         return new OriginTermLabel(origin);

@@ -155,6 +155,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         res.put("classAxioms", new OriginalValue(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, StrategyProperties.CLASS_AXIOM_FREE, StrategyProperties.CLASS_AXIOM_OFF));
         res.put("dependencies", new OriginalValue(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON, StrategyProperties.DEP_OFF));
         res.put("proofSplitting", new OriginalValue(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL, StrategyProperties.SPLITTING_OFF));
+        res.put("", new OriginalValue(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED, StrategyProperties.QUERY_OFF));
         return res;
     }
 
