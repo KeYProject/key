@@ -210,8 +210,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 errors.add(e);
             }
         }
-        case MERGE_ABSTRACTION_PREDICATES -> ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates =
-            str;
+        case MERGE_ABSTRACTION_PREDICATES ->
+            ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates =
+                str;
         case MERGE_USER_CHOICES -> ((BuiltinRuleInformation) ruleInfo).currUserChoices = str;
         case NOTES -> {
             ruleInfo.notes = str;
