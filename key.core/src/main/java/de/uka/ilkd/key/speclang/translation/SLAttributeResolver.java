@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -135,6 +136,11 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     if (attribute.isStatic()) {
                         attributeTerm =
                             services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);
+                    } else if (attribute.isFinal() &&
+                            FinalHeapResolver.recallIsFinalEnabled()) {
+                        attributeTerm = services.getTermBuilder().finalDot(attribute.sort(),
+                            recTerm,
+                            fieldSymbol);
                     } else {
                         attributeTerm =
                             services.getTermBuilder().dot(attribute.sort(), recTerm, fieldSymbol);
