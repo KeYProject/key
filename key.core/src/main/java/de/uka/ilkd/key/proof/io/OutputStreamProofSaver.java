@@ -209,7 +209,13 @@ public class OutputStreamProofSaver {
                 }
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
-                printer.printSemisequent(problemSeq.succedent());
+                if (problemSeq.antecedent().isEmpty() && problemSeq.succedent().size() == 1) {
+                    // Problem statement is a single formula ...
+                    printer.printSemisequent(problemSeq.succedent());
+                } else {
+                    // Problem statement is a proper sequent ...
+                    printer.printSequent(problemSeq);
+                }
                 ps.println(printer.result());
                 ps.println("}\n");
             }

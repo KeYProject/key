@@ -16,7 +16,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
@@ -35,22 +34,10 @@ import org.slf4j.LoggerFactory;
  */
 public final class CurrentGoalView extends SequentView implements Autoscroll {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 8494000234215913553L;
 
-    public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
-
-    public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
-
-    private static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
-
-    public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 104));
+    // The color constants that used to be here have been moved to SequentView to collect them in
+    // one place.
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
 
@@ -169,7 +156,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
                 // be a starting place to find the mistake.
                 range = new Range(range.start() + 1, range.end() + 1);
 
-                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
+                Object tag = createColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
             }
@@ -203,7 +190,6 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             return;
         }
         var time = System.nanoTime();
-        getHighlighter().removeAllHighlights();
 
         removeMouseListener(listener);
 

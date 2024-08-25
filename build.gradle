@@ -334,6 +334,8 @@ subprojects {
             targetExclude 'build/**'
 
             // allows us to use spotless:off / spotless:on to keep pre-formatted sections
+            // MU: Only ... because of the eclipse(...) below, it is "@formatter:off" and "@formatter:on"
+            // that must be used instead.
             toggleOffOn()
 
             removeUnusedImports()

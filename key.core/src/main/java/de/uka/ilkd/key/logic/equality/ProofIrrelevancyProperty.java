@@ -8,10 +8,12 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.util.EqualityUtils;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
+
 
 /**
  * A property that can be used in
@@ -104,7 +106,8 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        int hashcode = Objects.hash(term.op(), hashCodeIterable(term.subs()),
+        int hashcode = Objects.hash(term.op(),
+            EqualityUtils.hashCodeModPropertyOfIterable(PROOF_IRRELEVANCY_PROPERTY, term.subs()),
             EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
 
         // part from LabeledTermImpl
@@ -116,30 +119,5 @@ public class ProofIrrelevancyProperty implements Property<Term> {
             }
         }
         return hashcode;
-    }
-
-    // -------------------------- Utility methods --------------------------------- //
-
-    /**
-     * Compute the hashcode mod proof irrelevancy of an iterable of terms using the elements'
-     * {@link EqualsModProperty} implementation.
-     *
-     * @param iter iterable of terms
-     * @return combined hashcode
-     */
-    public static int hashCodeIterable(Iterable<? extends Term> iter) {
-        // adapted from Arrays.hashCode
-        if (iter == null) {
-            return 0;
-        }
-
-        int result = 1;
-
-        for (Term element : iter) {
-            result = 31 * result + (element == null ? 0
-                    : element.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY));
-        }
-
-        return result;
     }
 }
