@@ -166,7 +166,6 @@ public abstract class TacletExecutor<T extends Taclet> {
      */
     protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, Services services,
             MatchConditions matchCond) {
-
         for (Taclet tacletToAdd : rules) {
             final Node n = goal.getNode();
             tacletToAdd = tacletToAdd
@@ -297,7 +296,6 @@ public abstract class TacletExecutor<T extends Taclet> {
     private void addToPos(Semisequent semi, SequentChangeInfo currentSequent, PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, boolean antec,
             MatchConditions matchCond, Goal goal, Services services, RuleApp tacletApp) {
-
         final ImmutableList<SequentFormula> replacements =
             instantiateSemisequent(semi, applicationPosInOccurrence,
                 matchCond, goal, tacletApp, services);
@@ -324,7 +322,6 @@ public abstract class TacletExecutor<T extends Taclet> {
             SequentFormula schemaFormula, Services services, MatchConditions matchCond,
             PosInOccurrence applicationPosInOccurrence, Goal goal,
             RuleApp tacletApp) {
-
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(),
@@ -373,10 +370,8 @@ public abstract class TacletExecutor<T extends Taclet> {
      * @return the instantiated formulas of the semisequent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
-
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             RuleApp tacletApp, Services services) {
-
         ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
         for (SequentFormula sf : semi) {

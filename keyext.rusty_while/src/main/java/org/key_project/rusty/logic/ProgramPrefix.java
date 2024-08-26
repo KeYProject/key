@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
  * this interface is implemented by program elements that may be matched by the inactive program
  * prefix
  */
-public interface ProgramPrefix {
+public interface ProgramPrefix extends RustyProgramElement {
     /** return true if there is a next prefix element */
     boolean hasNextPrefixElement();
 

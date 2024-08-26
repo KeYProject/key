@@ -26,7 +26,8 @@ public class Test {
             var crate = parser.crate();
             System.out.println(crate.item(0).function_().blockExpr().stmts().expr().getText());
             System.out.println(crate.getText());
-            var converted = Converter.convertCrate(crate);
+            var converter = new Converter(new Services());
+            var converted = converter.convertCrate(crate);
             System.out.println(converted);
         } catch (IOException e) {
             throw new RuntimeException(e);

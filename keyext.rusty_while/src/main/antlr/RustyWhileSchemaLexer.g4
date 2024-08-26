@@ -12,3 +12,7 @@ CONTEXT_START
 CONTEXT_END
     : '#c'
     ;
+
+TYPE_OF
+    : 's#typeof'
+    ;

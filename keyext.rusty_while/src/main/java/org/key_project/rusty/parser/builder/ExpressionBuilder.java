@@ -42,7 +42,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public record BoundVar(Name name, Sort sort) {}
 
     private boolean rustySchemaModeAllowed;
-    private List<BoundVar> boundVars = new ArrayList<>();
+    private List<BoundVariable> boundVars = new ArrayList<>();
 
     public ExpressionBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -486,8 +486,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         return null;
     }
 
-    private BoundVar bindVar(String name, Sort sort) {
-        BoundVar e = new BoundVar(new Name(name), sort);
+    private BoundVariable bindVar(String name, Sort sort) {
+        var e = new BoundVariable(new Name(name), sort);
         boundVars.add(e);
         return e;
     }
@@ -642,7 +642,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     }
                 }
             } catch (Exception e) {
-                if (cleanRusty.startsWith("{..")) {// do not fallback
+                if (cleanRusty.startsWith("{c#")) {// do not fallback
                     throw e;
                 }
             }
@@ -718,11 +718,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.EXISTS() != null) {
             op = Quantifier.EX;
         }
-        List<@NonNull BoundVar> vars = accept(ctx.bound_variables());
-        var bound = new QuantifiableVariable[vars.size()];
+        List<@NonNull BoundVariable> vars = accept(ctx.bound_variables());
+        assert vars != null;
+        var bound = new ImmutableArray<QuantifiableVariable>(vars);
         Term a1 = accept(ctx.sub);
         Term a = getTermFactory().createTerm(op, new ImmutableArray<>(a1),
-            new ImmutableArray<>(bound));
+            bound);
         unbindVars(orig);
         unbindVars(vars);
         return a;
@@ -941,7 +942,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return super.lookupVarfuncId(ctx, varfuncName, sortName, sort);
     }
 
-    private void unbindVars(List<@NonNull BoundVar> vars) {
+    private void unbindVars(List<@NonNull BoundVariable> vars) {
         boundVars.removeAll(vars);
     }
 }

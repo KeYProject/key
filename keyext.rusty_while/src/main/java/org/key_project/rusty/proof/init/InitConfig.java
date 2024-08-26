@@ -184,8 +184,10 @@ public class InitConfig {
             ic.setSettings(new ProofSettings());// settings));
         }
 
-        // TODO add copies once more fields of InitConfig are added
-
+        ic.setTaclet2Builder(
+            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
+        ic.taclets = taclets;
+        ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
         return ic;
     }
 

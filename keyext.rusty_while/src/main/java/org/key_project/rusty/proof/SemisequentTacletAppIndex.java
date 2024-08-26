@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
+import java.util.Iterator;
+
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.PosInTerm;
@@ -88,5 +90,36 @@ public class SemisequentTacletAppIndex {
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
             Services services) {
         return getTermIndex(pos).getTacletAppAtAndBelow(pos, services);
+    }
+
+    /**
+     * Create an index that additionally contains the taclet
+     */
+    public SemisequentTacletAppIndex addTaclet(NoPosTacletApp newTaclet, Services services,
+            TacletIndex tacletIndex) {
+        final SemisequentTacletAppIndex result = copy();
+        final Iterator<SequentFormula> it = termIndices.keyIterator();
+
+        while (it.hasNext()) {
+            result.addTaclet(newTaclet, it.next(), services, tacletIndex);
+        }
+
+        return result;
+    }
+
+    /**
+     * Update the index for the given formula, which is supposed to be an element of the map
+     * <code>termIndices</code>, by adding the taclets that are selected by <code>filter</code>
+     * Note: destructive, use only when constructing new index
+     */
+    private void addTaclet(NoPosTacletApp newTaclet, SequentFormula cfma, Services services,
+            TacletIndex tacletIndex) {
+        final TermTacletAppIndex oldIndex = termIndices.get(cfma);
+        assert oldIndex != null : "Term index that is supposed to be updated " + "does not exist";
+
+        final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
+
+        termIndices = termIndices.put(cfma,
+            oldIndex.addTaclet(newTaclet, pos, services, tacletIndex));
     }
 }

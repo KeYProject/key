@@ -6,6 +6,7 @@ package org.key_project.rusty.ast.visitor;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -87,5 +88,10 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
         doDefaultAction((ProgramSV) x);
+    }
+
+    @Override
+    public void performActionOnEmptyStatement(EmptyStatement x) {
+        doDefaultAction(x);
     }
 }

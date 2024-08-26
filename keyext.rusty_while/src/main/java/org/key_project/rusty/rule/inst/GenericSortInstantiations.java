@@ -178,7 +178,6 @@ public final class GenericSortInstantiations {
         return p_s;
     }
 
-
     /** exception thrown if no solution exists */
     private final static GenericSortException UNSATISFIABLE_SORT_CONSTRAINTS =
         new GenericSortException("Conditions for generic sorts could not be solved: ",
@@ -213,7 +212,6 @@ public final class GenericSortInstantiations {
 
         return res;
     }
-
 
     private static final class FailException extends Exception {
         @Serial

@@ -10,8 +10,6 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 
 public record PathExpression(Identifier var) implements Expr {
-
-
     @Override
     public @NonNull SyntaxElement getChild(int n) {
         if (n == 0) {

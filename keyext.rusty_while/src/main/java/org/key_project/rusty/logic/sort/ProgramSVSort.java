@@ -10,10 +10,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.expr.Expr;
-import org.key_project.rusty.ast.expr.IntegerLiteralExpression;
-import org.key_project.rusty.ast.expr.LiteralExpression;
-import org.key_project.rusty.ast.expr.NegationExpression;
+import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -24,7 +21,7 @@ public abstract class ProgramSVSort extends SortImpl {
     // ----------- Types of Expression Program SVs ----------------------------
     public static final ProgramSVSort LEFT_HAND_SIDE = new LeftHandSideSort();
     public static final ProgramSVSort VARIABLE = new ProgramVariableSort();
-    public static final ProgramSVSort SIMPLEEXPRESSION = new SimpleExpressionSort();
+    public static final ProgramSVSort SIMPLE_EXPRESSION = new SimpleExpressionSort();
     public static final ProgramSVSort NONSIMPLEEXPRESSION = new NonSimpleExpressionSort();
     public static final ProgramSVSort EXPRESSION = new ExpressionSort();
 
@@ -70,7 +67,8 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(RustyProgramElement pe, Services services) {
-            return pe instanceof ProgramVariable;
+            // TODO: unify PathExpr and PV?
+            return pe instanceof ProgramVariable || pe instanceof PathExpression;
         }
     }
 
@@ -133,7 +131,7 @@ public abstract class ProgramSVSort extends SortImpl {
         public boolean canStandFor(RustyProgramElement check, Services services) {
             if (!(check instanceof Expr))
                 return false;
-            return !SIMPLEEXPRESSION.canStandFor(check, services);
+            return !SIMPLE_EXPRESSION.canStandFor(check, services);
         }
     }
 
@@ -141,7 +139,6 @@ public abstract class ProgramSVSort extends SortImpl {
      * This sort represents a type of program schema variables that match on all expressions only.
      */
     private static class ExpressionSort extends ProgramSVSort {
-
         public ExpressionSort() {
             super(new Name("Expression"));
         }

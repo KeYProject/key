@@ -119,7 +119,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
     }
 
     // TODO: Move to suitable class
-    private Term convertToLogicElement(RustyProgramElement pe, Services services) {
+    public static Term convertToLogicElement(RustyProgramElement pe, Services services) {
         var tb = services.getTermBuilder();
         if (pe instanceof ProgramVariable pv) {
             return tb.var(pv);
@@ -134,12 +134,13 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
             return convertArithLogicalExpression(ale, services);
         }
         throw new IllegalArgumentException(
-            "TypeConverter: Unknown or not convertible ProgramElement " + pe + " of type "
+            "Unknown or not convertible ProgramElement " + pe + " of type "
                 + pe.getClass());
     }
 
     // TODO: Generalize to all operators (once we have them)
-    private Term convertArithLogicalExpression(ArithLogicalExpression ale, Services services) {
+    public static Term convertArithLogicalExpression(ArithLogicalExpression ale,
+            Services services) {
         var tb = services.getTermBuilder();
         final var subs = new Term[] { convertToLogicElement(ale.left(), services),
             convertToLogicElement(ale.right(), services) };
@@ -153,7 +154,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
             "could not handle" + " this operator: " + op);
     }
 
-    private LDT getResponsibleLDT(ArithLogicalExpression.Operator op, Term[] subs,
+    public static LDT getResponsibleLDT(ArithLogicalExpression.Operator op, Term[] subs,
             Services services) {
         for (LDT ldt : services.getLDTs()) {
             if (ldt.isResponsible(op, subs, services)) {
@@ -163,7 +164,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
         return null;
     }
 
-    private Term convertLiteralExpression(LiteralExpression lit, Services services) {
+    public static Term convertLiteralExpression(LiteralExpression lit, Services services) {
         LDT ldt = services.getLDTs().get(lit.getLDTName());
         if (ldt != null) {
             return ldt.translateLiteral(lit, services);

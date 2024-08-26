@@ -4,96 +4,163 @@
 package org.key_project.rusty.ast;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.Param;
 import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.ast.pat.Pattern;
+import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
+import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.ast.ty.PrimitiveType;
 import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class Converter {
-    private static final CrateConverter crateConverter = new CrateConverter();
-    private static final ItemConverter itemConverter = new ItemConverter();
-    private static final ExprConverter exprConverter = new ExprConverter();
-    private static final StmtConverter stmtConverter = new StmtConverter();
-    private static final IdentifierConverter identifierConverter = new IdentifierConverter();
-    private static final PatternConverter patternConverter = new PatternConverter();
-    private static final TypeConverter typeConverter = new TypeConverter();
-    private static final ParamConverter paramConverter = new ParamConverter();
+    private final CrateConverter crateConverter = new CrateConverter(this);
+    private final ItemConverter itemConverter = new ItemConverter(this);
+    private final ExprConverter exprConverter = new ExprConverter(this);
+    private final StmtConverter stmtConverter = new StmtConverter(this);
+    private final IdentifierConverter identifierConverter = new IdentifierConverter(this);
+    private final PatternConverter patternConverter = new PatternConverter(this);
+    private final TypeConverter typeConverter = new TypeConverter(this);
+    private final ParamConverter paramConverter = new ParamConverter(this);
 
-    public static Crate convertCrate(
+    // TODO: Rework this properly
+    private final Map<String, VariableDeclaration> variables = new HashMap<>();
+    private final Map<VariableDeclaration, ProgramVariable> programVariables = new HashMap<>();
+
+    private final Services services;
+
+    public Converter(Services services) {
+        this.services = services;
+    }
+
+    public Services getServices() {
+        return services;
+    }
+
+    private void declareVariable(String name, LetStatement decl) {
+        variables.put(name, decl);
+        programVariables.put(decl, new ProgramVariable(new Name(name),
+            new KeYRustyType(decl.getType().getSort(services))));
+    }
+
+    private void declareVariable(String name, Param decl) {
+        variables.put(name, decl);
+        programVariables.put(decl, services.getNamespaces().programVariables().lookup(name));
+    }
+
+    private VariableDeclaration getDecl(String name) {
+        return variables.get(name);
+    }
+
+    private ProgramVariable getProgramVariable(String name) {
+        return programVariables.get(getDecl(name));
+    }
+
+    private Sort getSort(String name) {
+        var decl = getDecl(name);
+        if (decl != null)
+            return decl.getType().getSort(services);
+        ProgramVariable pv = services.getNamespaces().programVariables().lookup(name);
+        assert pv != null : "Unknown pv " + name;
+        return pv.sort();
+    }
+
+    public Crate convertCrate(
             org.key_project.rusty.parsing.RustyWhileParser.CrateContext ctx) {
         return ctx.accept(crateConverter);
     }
 
-    public static Expr visitAssignmentExpression(
+    public Expr visitAssignmentExpression(
             org.key_project.rusty.parsing.RustyWhileParser.AssignmentExpressionContext ctx) {
         return exprConverter.visitAssignmentExpression(ctx);
     }
 
-    public static Expr visitBlockExpr(
+    public Expr visitBlockExpr(
             org.key_project.rusty.parsing.RustyWhileParser.BlockExprContext ctx) {
         return exprConverter.visitBlockExpr(ctx);
     }
 
-    public static Expr visitLiteralExpr(
+    public Expr visitLiteralExpr(
             org.key_project.rusty.parsing.RustyWhileParser.LiteralExprContext ctx) {
         return exprConverter.visitLiteralExpr(ctx);
     }
 
-    public static Expr visitPathExpr(
+    public Expr visitPathExpr(
             org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
         return exprConverter.visitPathExpr(ctx);
     }
 
-    public static Statement visitExprStmt(
+    public Statement visitExprStmt(
             org.key_project.rusty.parsing.RustyWhileParser.ExprStmtContext ctx) {
         return stmtConverter.visitExprStmt(ctx);
     }
 
-    public static Statement visitLetStmt(
+    public Statement visitLetStmt(
             org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
         return stmtConverter.visitLetStmt(ctx);
     }
 
-    public static Identifier visitIdentifier(
+    public Identifier visitIdentifier(
             org.key_project.rusty.parsing.RustyWhileParser.IdentifierContext ctx) {
         return identifierConverter.visitIdentifier(ctx);
     }
 
-    public static Pattern visitPattern(
+    public Pattern visitPattern(
             org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
         return patternConverter.visitPattern(ctx);
     }
 
-    public static Type convertParenthesizedType(
+    public Type convertParenthesizedType(
             org.key_project.rusty.parsing.RustyWhileParser.ParenthesizedTypeContext ctx) {
         return typeConverter.visitParenthesizedType(ctx);
     }
 
-    public static Type convertTypePath(
+    public Type convertTypePath(
             org.key_project.rusty.parsing.RustyWhileParser.TypePathContext ctx) {
         return typeConverter.visitTypePath(ctx);
     }
 
+    public Function convertFunction(
+            org.key_project.rusty.parsing.RustyWhileParser.Function_Context ctx) {
+        return itemConverter.visitFunction_(ctx);
+    }
+
     private static class CrateConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Crate> {
+        private final Converter converter;
+
+        CrateConverter(Converter converter) {
+            this.converter = converter;
+        }
+
         @Override
         public Crate visitCrate(org.key_project.rusty.parsing.RustyWhileParser.CrateContext ctx) {
-            return new Crate(ctx.item().stream().map(i -> i.accept(itemConverter))
+            return new Crate(ctx.item().stream().map(i -> i.accept(converter.itemConverter))
                     .collect(ImmutableList.collector()));
         }
     }
 
     private static class ItemConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Item> {
+        private final Converter converter;
+
+        ItemConverter(Converter converter) {
+            this.converter = converter;
+        }
+
         @Override
         public Item visitItem(org.key_project.rusty.parsing.RustyWhileParser.ItemContext ctx) {
             // TODO: Rework
@@ -103,16 +170,29 @@ public class Converter {
         @Override
         public Function visitFunction_(
                 org.key_project.rusty.parsing.RustyWhileParser.Function_Context ctx) {
-            return new Function(ctx.identifier().accept(identifierConverter).name(),
-                ctx.functionParams().functionParam().stream().map(p -> p.accept(paramConverter))
-                        .collect(ImmutableList.collector()),
-                ctx.functionRetTy().type_().accept(typeConverter),
-                (BlockExpression) ctx.blockExpr().accept(exprConverter));
+            Name name = ctx.identifier().accept(converter.identifierConverter).name();
+            ImmutableList<Param> params = ctx.functionParams() == null ? ImmutableSLList.nil()
+                    : ctx.functionParams().functionParam().stream()
+                            .map(p -> p.accept(converter.paramConverter))
+                            .collect(ImmutableList.collector());
+            Type returnType = ctx.functionRetTy().type_().accept(converter.typeConverter);
+            BlockExpression body =
+                (BlockExpression) ctx.blockExpr().accept(converter.exprConverter);
+            return new Function(name,
+                params,
+                returnType,
+                body);
         }
     }
 
     private static class ExprConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Expr> {
+        private final Converter converter;
+
+        ExprConverter(Converter converter) {
+            this.converter = converter;
+        }
+
         @Override
         public Expr visitArithmeticOrLogicalExpression(
                 org.key_project.rusty.parsing.RustyWhileParser.ArithmeticOrLogicalExpressionContext ctx) {
@@ -151,7 +231,7 @@ public class Converter {
                 org.key_project.rusty.parsing.RustyWhileParser.BlockExprContext ctx) {
             var stmtsCtx = ctx.stmts();
 
-            var stmts = stmtsCtx.stmt().stream().map(s -> s.accept(stmtConverter))
+            var stmts = stmtsCtx.stmt().stream().map(s -> s.accept(converter.stmtConverter))
                     .collect(ImmutableList.collector());
             var value = stmtsCtx.expr().accept(this);
 
@@ -183,32 +263,60 @@ public class Converter {
         }
 
         @Override
-        public PathExpression visitPathExpr(
+        public ProgramVariable visitPathExpr(
                 org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
             assert ctx.pathExprSegment().size() == 1;
-            return new PathExpression(
-                ctx.pathExprSegment(0).pathIdentSegment().identifier().accept(identifierConverter));
+            var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier()
+                    .accept(converter.identifierConverter);
+            var pv = converter.getProgramVariable(ident.name().toString());
+            assert pv != null;
+            return pv;
         }
     }
 
     private static class StmtConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Statement> {
+        private final Converter converter;
+
+        StmtConverter(Converter converter) {
+            this.converter = converter;
+        }
+
         @Override
         public Statement visitExprStmt(
                 org.key_project.rusty.parsing.RustyWhileParser.ExprStmtContext ctx) {
-            return new ExpressionStatement(ctx.expr().accept(exprConverter));
+            return new ExpressionStatement(ctx.expr().accept(converter.exprConverter));
         }
 
         @Override
         public Statement visitLetStmt(
                 org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
-            return new LetStatement(ctx.pattern().accept(patternConverter),
-                ctx.type_().accept(typeConverter), ctx.expr().accept(exprConverter));
+            Pattern pat = ctx.pattern().accept(converter.patternConverter);
+            LetStatement letStatement = new LetStatement(pat,
+                ctx.type_().accept(converter.typeConverter),
+                ctx.expr().accept(converter.exprConverter));
+            if (pat instanceof IdentPattern ip)
+                converter.declareVariable(ip.name().toString(), letStatement);
+            return letStatement;
+        }
+
+        @Override
+        public Statement visitStmt(org.key_project.rusty.parsing.RustyWhileParser.StmtContext ctx) {
+            if (ctx.SEMI() != null) {
+                return new EmptyStatement();
+            }
+            return super.visitStmt(ctx);
         }
     }
 
     private static class IdentifierConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Identifier> {
+        private final Converter converter;
+
+        IdentifierConverter(Converter converter) {
+            this.converter = converter;
+        }
+
         @Override
         public Identifier visitIdentifier(
                 org.key_project.rusty.parsing.RustyWhileParser.IdentifierContext ctx) {
@@ -218,16 +326,28 @@ public class Converter {
 
     private static class PatternConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Pattern> {
+        private final Converter converter;
+
+        PatternConverter(Converter converter) {
+            this.converter = converter;
+        }
+
         @Override
         public Pattern visitPattern(
                 org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
             return new IdentPattern(ctx.KW_MUT() != null,
-                ctx.identifier().accept(identifierConverter));
+                ctx.identifier().accept(converter.identifierConverter));
         }
     }
 
     private static class TypeConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Type> {
+        private final Converter converter;
+
+        TypeConverter(Converter converter) {
+            this.converter = converter;
+        }
+
         @Override
         public Type visitParenthesizedType(
                 org.key_project.rusty.parsing.RustyWhileParser.ParenthesizedTypeContext ctx) {
@@ -263,11 +383,19 @@ public class Converter {
 
     private static class ParamConverter
             extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Param> {
+        private final Converter converter;
+
+        ParamConverter(Converter converter) {
+            this.converter = converter;
+        }
+
         @Override
         public Param visitFunctionParamPattern(
                 org.key_project.rusty.parsing.RustyWhileParser.FunctionParamPatternContext ctx) {
-            return new Param(ctx.pattern().accept(patternConverter),
-                ctx.type_().accept(typeConverter));
+            Param param = new Param(ctx.pattern().accept(converter.patternConverter),
+                ctx.type_().accept(converter.typeConverter));
+            converter.declareVariable(((IdentPattern) param.getPattern()).name().toString(), param);
+            return param;
         }
     }
 }

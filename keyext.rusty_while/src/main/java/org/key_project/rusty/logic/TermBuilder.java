@@ -42,6 +42,10 @@ public class TermBuilder {
         return tf.createTerm(v);
     }
 
+    public Term var(BoundVariable v) {
+        return tf.createTerm(v);
+    }
+
     public Term var(ProgramVariable v) {
         return tf.createTerm(v);
     }

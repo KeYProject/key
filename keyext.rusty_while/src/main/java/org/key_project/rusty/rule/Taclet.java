@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -357,6 +358,25 @@ public abstract class Taclet implements Rule {
         }
         contextIsInPrefix = false;
         return false;
+    }
+
+    /**
+     * Find a schema variable that could be used to choose a name for an instantiation (a new
+     * variable or constant) of "p"
+     *
+     * @return a schema variable that is substituted by "p" somewhere in this taclet (that is, these
+     *         schema variables occur as arguments of a substitution operator)
+     */
+    public SchemaVariable getNameCorrespondent(SchemaVariable p, Services services) {
+        // should be synchronized
+        if (svNameCorrespondences == null) {
+            final SVNameCorrespondenceCollector c =
+                new SVNameCorrespondenceCollector();
+            c.visit(this, true);
+            svNameCorrespondences = c.getCorrespondences();
+        }
+
+        return svNameCorrespondences.get(p);
     }
 
     /**
