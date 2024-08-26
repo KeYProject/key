@@ -141,39 +141,15 @@ public class BasicTest {
         TacletForTests.parse();
         assert TacletForTests.services().getNamespaces().programVariables()
                 .lookup(new Name("i")) != null;
-
         var services = TacletForTests.services();
-        var tb = services.getTermBuilder();
-
-        var example = """
-                {a = a + b;
-                b = a - b;
-                a = a - b;
-                1u32
-                }""";
-        var lexer =
-            new org.key_project.rusty.parsing.RustyWhileLexer(CharStreams.fromString(example));
-        var ts = new CommonTokenStream(lexer);
-        var parser = new org.key_project.rusty.parsing.RustyWhileParser(ts);
-        var converter = new Converter(services);
-        var block = converter.visitBlockExpr(parser.blockExpr());
-
         var intSort = services.getNamespaces().sorts().lookup("int");
         var intType = new KeYRustyType(intSort);
+        var i_old = new ProgramVariable(new Name("i_old"), intSort, intType);
+        var j_old = new ProgramVariable(new Name("j_old"), intSort, intType);
+        TacletForTests.services().getNamespaces().programVariables().add(i_old);
+        TacletForTests.services().getNamespaces().programVariables().add(j_old);
 
-        var a = new ProgramVariable(new Name("a"), intSort, intType);
-        var b = new ProgramVariable(new Name("b"), intSort, intType);
-        var a_old = new ProgramVariable(new Name("a_old"), intSort, intType);
-        var b_old = new ProgramVariable(new Name("b_old"), intSort, intType);
-
-        services.getNamespaces().programVariables()
-                .add(Arrays.stream(new ProgramVariable[] { a, a_old, b, b_old }).toList());
-
-        var mod = tb.dia(new RustyBlock(block),
-            tb.and(tb.equals(tb.var(a), tb.var(b_old)), tb.equals(tb.var(b), tb.var(a_old))));
-        var t = tb.imp(
-            tb.and(tb.equals(tb.var(a), tb.var(a_old)), tb.equals(tb.var(b), tb.var(b_old))),
-            mod); // a = a_old && b = b_old -> <example> a = b_old && b = a_old
+        var t = TacletForTests.parseTerm("i=i_old & j=j_old -> \\<{i = i + j; j = i - j; i = i - j; 1u32}\\>(i = j_old & j = i_old)");
         System.out.println(t);
 
 

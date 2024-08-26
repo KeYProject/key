@@ -67,9 +67,10 @@ public class TacletPrefixBuilder {
                 if (prefix == null || prefix.prefixLength() == numberOfBoundVars) {
                     setPrefixOfOccurrence(sv, numberOfBoundVars);
                 } else {
-                    throw new TacletPrefixBuilder.InvalidPrefixException(
+                    // TODO: For now, don't report an error. It's likely not needed
+                    /*throw new TacletPrefixBuilder.InvalidPrefixException(
                         tacletBuilder.getName().toString(), sv, prefix,
-                        numberOfBoundVars);
+                        numberOfBoundVars);*/
                 }
             }
         }
