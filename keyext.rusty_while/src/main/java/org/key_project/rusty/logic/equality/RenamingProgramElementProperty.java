@@ -23,11 +23,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link RenamingProgramElementProperty#RENAMING_PROGRAM_ELEMENT_PROPERTY} and is used
-     * as
-     * a parameter for
-     * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
+     * can be accessed through {@link RenamingProgramElementProperty#RENAMING_PROGRAM_ELEMENT_PROPERTY}.
      */
     private RenamingProgramElementProperty() {}
 

@@ -25,8 +25,7 @@ public class RenamingTermProperty implements Property<Term> {
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY} and is used as a
-     * parameter for {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
+     * can be accessed through {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}.
      */
     private RenamingTermProperty() {}
 
