@@ -12,7 +12,6 @@ import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.rule.MatchConditions;
-import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
@@ -64,9 +63,9 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
         return new MatchProgramInstruction(prg);
     }
 
-    public static MatchInstruction matchAndBindVariables(
-            ImmutableArray<? extends QuantifiableVariable> boundVars) {
-        return new BindVariablesInstruction(boundVars);
+    public static MatchInstruction matchAndBindVariable(
+            QuantifiableVariable var) {
+        return BindVariablesInstruction.create(var);
     }
 
     public static MatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {

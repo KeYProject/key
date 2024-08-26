@@ -10,6 +10,7 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.logic.Subst;
 import org.key_project.rusty.logic.TermBuilder;
 
 /**
@@ -57,11 +58,9 @@ public class SubstOp extends AbstractOperator {
     }
 
     public Term apply(Term term, TermBuilder tb) {
-        QuantifiableVariable v = term.varsBoundHere(1).get(0);
-        // WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0), tb);
-        // return cfSubst.apply(term.sub(1));
-        // TODO
-        return term;
+        var v = (BoundVariable) term.varsBoundHere(1).get(0);
+        var cfSubst = new Subst(v, term.sub(0), tb);
+        return cfSubst.apply(term.sub(1));
     }
 
     @Override

@@ -31,7 +31,7 @@ public class TestApplyTaclet {
         "", "\\forall s z; p(z)",
         "(A -> B) -> (!(!(A -> B)))", "(A -> B) -> (!(!(A -> B)))",
         "(A -> B) -> (!(!(A -> B)))", "",
-        "", "\\<{x=3u32}\\>A",
+        "", "\\<{i=3u32}\\>A",
         "A & B", "",
         "", "",
         "A & (A & B)", "",
@@ -167,10 +167,10 @@ public class TestApplyTaclet {
         ImmutableList<Goal> goals = rApp.execute(goal);
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");
         Sequent seq = goals.head().sequent();
-        assertEquals(seq.antecedent(), Semisequent.EMPTY_SEMISEQUENT,
+        assertEquals(Semisequent.EMPTY_SEMISEQUENT, seq.antecedent(),
             "Wrong antecedent after all-right");
-        assertEquals(seq.succedent().getFirst().formula().op(),
-            TacletForTests.getFunctions().lookup(new Name("p")),
+        assertEquals(TacletForTests.getFunctions().lookup(new Name("p")),
+            seq.succedent().getFirst().formula().op(),
             "Wrong succedent after all-right (op mismatch)");
     }
 

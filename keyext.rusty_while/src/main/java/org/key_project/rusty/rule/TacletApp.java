@@ -5,15 +5,21 @@ package org.key_project.rusty.rule;
 
 import java.util.*;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.op.BoundVariable;
 import org.key_project.rusty.logic.op.LogicVariable;
+import org.key_project.rusty.logic.op.RFunction;
 import org.key_project.rusty.logic.op.sv.*;
+import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.proof.Goal;
+import org.key_project.rusty.proof.VariableNameProposer;
 import org.key_project.rusty.rule.inst.*;
 import org.key_project.util.collection.*;
 
@@ -187,8 +193,7 @@ public abstract class TacletApp implements RuleApp {
      */
     protected static SVInstantiations resolveCollisionVarSV(Taclet taclet, SVInstantiations insts,
             Services services) {
-
-        HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<>();
+        HashMap<BoundVariable, SchemaVariable> collMap = new LinkedHashMap<>();
 
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             insts.pairIterator();
@@ -198,7 +203,7 @@ public abstract class TacletApp implements RuleApp {
                 SchemaVariable varSV = pair.key();
                 Term value = (Term) pair.value().getInstantiation();
                 if (!collMap.containsKey(value.op())) {
-                    collMap.put((LogicVariable) value.op(), varSV);
+                    collMap.put((BoundVariable) value.op(), varSV);
                 } else {
                     insts = replaceInstantiation(taclet, insts, varSV, services);
                 }
@@ -446,85 +451,68 @@ public abstract class TacletApp implements RuleApp {
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable variable : uninstantiatedVars()) {
-            /*
-             * if (!(variable instanceof OperatorSV operatorSv)) {
-             * continue;
-             * }
-             * if (operatorSv.arity() != 0) {
-             * continue;
-             * }
-             *
-             * if (operatorSv.sort() == ProgramSVSort.VARIABLE) {
-             * String proposal =
-             * varNamer.getSuggestiveNameProposalForProgramVariable(operatorSv, this,
-             * services, proposals);
-             * RustyProgramElement pe =
-             * app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
-             * app = app.addCheckedInstantiation(operatorSv, pe, services, true);
-             * proposals = proposals.append(proposal);
-             * } else if (operatorSv.sort() == ProgramSVSort.LABEL) {
-             * boolean nameclash;
-             * do {
-             * String proposal =
-             * VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services,
-             * null, proposals);
-             * ProgramElement pe =
-             * app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
-             * proposals = proposals.prepend(proposal);
-             * try {
-             * app = app.addCheckedInstantiation(operatorSv, pe, services, true);
-             * } catch (IllegalInstantiationException iie) {
-             * // name clash
-             * nameclash = true;
-             * }
-             * // FIXME: This loop is never executed more than once
-             * // The following line might belong to the try-block.
-             * // Leave it untouched, however, since no problems
-             * // reported with this established code. MU 10-2012
-             * nameclash = false;
-             * } while (nameclash);
-             * } else if (operatorSv instanceof SkolemTermSV) {
-             * // if the sort of the schema variable is generic,
-             * // ensure that it is instantiated
-             * app = forceGenericSortInstantiation(app, operatorSv, services);
-             * if (app == null) {
-             * return null;
-             * }
-             *
-             * String proposal =
-             * VariableNameProposer.DEFAULT.getProposal(app, operatorSv, services, null,
-             * proposals);
-             *
-             * proposals = proposals.append(proposal);
-             *
-             * app = app.createSkolemConstant(proposal, operatorSv, true, services);
-             * } else if (operatorSv instanceof VariableSV) {
-             * // if the sort of the schema variable is generic,
-             * // ensure that it is instantiated
-             * app = forceGenericSortInstantiation(app, operatorSv, services);
-             * if (app == null) {
-             * return null;
-             * }
-             *
-             * String proposal;
-             * Collection<String> conflictNames = collectClashNames(operatorSv, services);
-             * do {
-             * proposal =
-             * VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services, null,
-             * proposals);
-             * proposals = proposals.prepend(proposal);
-             * } while (conflictNames.contains(proposal));
-             *
-             * LogicVariable v =
-             * new LogicVariable(new Name(proposal), getRealSort(operatorSv, services));
-             *
-             * app = app.addCheckedInstantiation(operatorSv, tb.var(v), services, true);
-             * } else {
-             * if (force) {
-             * return null;
-             * }
-             * }
-             */
+
+            if (!(variable instanceof OperatorSV operatorSv)) {
+                continue;
+            }
+            if (operatorSv.arity() != 0) {
+                continue;
+            }
+
+            if (operatorSv.sort() == ProgramSVSort.VARIABLE) {
+                /*
+                 * String proposal =
+                 * varNamer.getSuggestiveNameProposalForProgramVariable(operatorSv, this,
+                 * services, proposals);
+                 * RustyProgramElement pe =
+                 * app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
+                 * app = app.addCheckedInstantiation(operatorSv, pe, services, true);
+                 * proposals = proposals.append(proposal);
+                 */
+            } else if (operatorSv instanceof SkolemTermSV) {
+                // if the sort of the schema variable is generic,
+                // ensure that it is instantiated
+                app = forceGenericSortInstantiation(app, operatorSv, services);
+                if (app == null) {
+                    return null;
+                }
+
+                String proposal =
+                    VariableNameProposer.DEFAULT.getProposal(app, operatorSv, services, null,
+                        proposals);
+
+                proposals = proposals.append(proposal);
+
+                app = app.createSkolemConstant(proposal, operatorSv, true, services);
+            } else if (operatorSv instanceof VariableSV) {
+                // if the sort of the schema variable is generic,
+                // ensure that it is instantiated
+                app = forceGenericSortInstantiation(app, operatorSv, services);
+                if (app == null) {
+                    return null;
+                }
+
+                String proposal;
+                Collection<String> conflictNames = collectClashNames(operatorSv, services);
+                do {
+                    proposal =
+                        VariableNameProposer.DEFAULT.getProposal(this, operatorSv, services, null,
+                            proposals);
+                    proposals = proposals.prepend(proposal);
+                } while (conflictNames.contains(proposal));
+
+                throw new RuntimeException("TODO @ DD: Implement VarSV inst");
+
+                // LogicVariable v =
+                // new LogicVariable(-1, getRealSort(operatorSv));
+
+                // app = app.addCheckedInstantiation(operatorSv, tb.var(v), services, true);
+            } else {
+                if (force) {
+                    return null;
+                }
+            }
+
         }
         return app;
     }
@@ -683,6 +671,35 @@ public abstract class TacletApp implements RuleApp {
         }
 
         return res;
+    }
+
+    /**
+     * Create a new constant named "instantiation" and instantiate "sv" with. This constant will
+     * later (by "createSkolemFunctions") be replaced by a function having the occurring
+     * metavariables as arguments
+     *
+     * @param services the Services class allowing access to the type model
+     */
+    public TacletApp createSkolemConstant(String instantiation, OperatorSV sv,
+            boolean interesting, Services services) {
+        return createSkolemConstant(instantiation, sv, getRealSort(sv), interesting,
+            services);
+    }
+
+    public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv, Sort sort,
+            boolean interesting, Services services) {
+        final RFunction c =
+            new RFunction(new Name(instantiation), sort, true, new Sort[0]);
+        return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
+    }
+
+    /**
+     * @return p_s iff p_s is not a generic sort, the concrete sort p_s is instantiated with
+     *         currently otherwise
+     * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
+     */
+    public Sort getRealSort(OperatorSV p_sv) {
+        return instantiations().getGenericSortInstantiations().getRealSort(p_sv);
     }
 
     /**

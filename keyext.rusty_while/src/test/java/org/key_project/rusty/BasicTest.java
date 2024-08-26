@@ -64,6 +64,7 @@ public class BasicTest {
 
     @Test
     void testStandardRuledParses() {
+        TacletForTests.clear();
         TacletForTests.parse(new File(STANDARD_RUST_RULES_KEY));
     }
 

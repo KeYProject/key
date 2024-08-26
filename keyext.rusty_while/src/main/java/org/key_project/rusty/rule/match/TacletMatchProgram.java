@@ -95,12 +95,6 @@ public class TacletMatchProgram {
     private static void createProgram(Term pattern, ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
-        final ImmutableArray<? extends QuantifiableVariable> boundVars = pattern.boundVars();
-
-        if (!boundVars.isEmpty()) {
-            program.add(Instruction.matchAndBindVariables(boundVars));
-        }
-
         if (op instanceof SchemaVariable sv) {
             program.add(getMatchInstructionForSV(sv));
         } /*
@@ -120,6 +114,13 @@ public class TacletMatchProgram {
             program.add(Instruction.matchProgram(patternPrg));
         } else {
             program.add(Instruction.matchOp(op));
+        }
+
+        final ImmutableArray<? extends QuantifiableVariable> boundVars = pattern.boundVars();
+        if (!boundVars.isEmpty()) {
+            for (int i = 0; i < boundVars.size(); i++) {
+                program.add(Instruction.matchAndBindVariable(boundVars.get(i)));
+            }
         }
 
         for (int i = 0; i < pattern.arity(); i++) {

@@ -22,6 +22,7 @@ import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
+import org.key_project.rusty.logic.op.SubstOp;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -214,19 +215,13 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
     }
 
     private Term resolveSubst(Term t) {
-        /*
-         * TODO: if (t.op() instanceof SubstOp) {
-         * Term resolved = ((SubstOp) t.op()).apply(t, tb);
-         * resolved = tb.label(resolved, t.sub(1).getLabels());
-         * if (t.hasLabels()) {
-         * resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved,
-         * rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
-         * }
-         * return resolved;
-         * } else {
-         */
-        return t;
-        // }
+        if (t.op() instanceof SubstOp) {
+            Term resolved = ((SubstOp) t.op()).apply(t, tb);
+            return resolved;
+        } else {
+
+            return t;
+        }
     }
 
     private Term[] neededSubs(int n) {

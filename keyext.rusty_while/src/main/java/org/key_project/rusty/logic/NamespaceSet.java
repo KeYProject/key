@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -77,6 +79,39 @@ public class NamespaceSet {
         sorts().add(ns.sorts());
         ruleSets().add(ns.ruleSets());
         functions().add(ns.functions());
+    }
+
+    /**
+     * returns all namespaces in an array
+     */
+    private Namespace<?>[] asArray() {
+        return new Namespace[] { variables(), programVariables(), sorts(), ruleSets(), functions(),
+        };
+    }
+
+    /**
+     * looks up if the given name is found in one of the namespaces and returns the named object or
+     * null if no object with the same name has been found
+     */
+    public Named lookup(Name name) {
+        final Namespace<?>[] spaces = asArray();
+        return lookup(name, spaces);
+    }
+
+    /**
+     * @param name
+     * @param spaces
+     * @return the element with the given name if found in the given namespaces, otherwise
+     *         <tt>null</tt>
+     */
+    private Named lookup(Name name, final Namespace<?>[] spaces) {
+        for (Namespace<?> space : spaces) {
+            final Named n = space.lookup(name);
+            if (n != null) {
+                return n;
+            }
+        }
+        return null;
     }
 
     public NamespaceSet copy() {
