@@ -186,17 +186,17 @@ public class RenamingTermProperty implements Property<Term> {
      * updated
      * {@link NameAbstractionTable} or {@link #FAILED} if the {@link RustyBlock}s are not equal.
      *
-     * @param jb0 the first {@link RustyBlock} to compare
-     * @param jb1 the second {@link RustyBlock} to compare
+     * @param rb0 the first {@link RustyBlock} to compare
+     * @param rb1 the second {@link RustyBlock} to compare
      * @param nat the {@link NameAbstractionTable} used for the comparison
      * @return the updated {@link NameAbstractionTable} if the {@link RustyBlock}s are equal modulo
      *         renaming or {@link #FAILED} if they are not
      */
-    private static NameAbstractionTable handleRusty(RustyBlock jb0, RustyBlock jb1,
+    private static NameAbstractionTable handleRusty(RustyBlock rb0, RustyBlock rb1,
             NameAbstractionTable nat) {
-        if (!jb0.isEmpty() || !jb1.isEmpty()) {
+        if (!rb0.isEmpty() || !rb1.isEmpty()) {
             nat = checkNat(nat);
-            if (RustyBlocksNotEqualModRenaming(jb0, jb1, nat)) {
+            if (RustyBlocksNotEqualModRenaming(rb0, rb1, nat)) {
                 return FAILED;
             }
         }

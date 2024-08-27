@@ -28,6 +28,10 @@ public class NegationExpression implements Expr {
         this.expr = expr;
     }
 
+    public Operator getOperator() {
+        return op;
+    }
+
     @Override
     public String toString() {
         return op.toString() + expr;

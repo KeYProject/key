@@ -9,7 +9,9 @@ import java.util.Map;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
+import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.expr.NegationExpression;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.logic.NameAbstractionTable;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -23,12 +25,14 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed through {@link RenamingProgramElementProperty#RENAMING_PROGRAM_ELEMENT_PROPERTY}.
+     * can be accessed through
+     * {@link RenamingProgramElementProperty#RENAMING_PROGRAM_ELEMENT_PROPERTY}.
      */
     private RenamingProgramElementProperty() {}
 
     /**
-     * Checks if {@code rpe2} is a source element syntactically equal to {@code rpe1} modulo
+     * Checks if {@code rpe2} is a {@link RustyProgramElement} syntactically equal to {@code rpe1}
+     * modulo
      * renaming.
      * <p>
      * When this method is supplied with a {@link NameAbstractionTable}, it will use this table to
@@ -60,13 +64,17 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             // First nodes can never be null as cursor is initialized with 'this'
             next1 = c1.getCurrentNode();
             next2 = c2.getCurrentNode();
-            // Handle special cases of prior equalsModRenaming implementation
             if (next1 instanceof LetStatement ls) {
                 if (!handleLetStatement(ls, next2, nat)) {
                     return false;
                 }
-            } else if (next1 instanceof ProgramVariable || next1 instanceof Name) {
-                if (!handleProgramVariableOrElementName(next1, next2, nat)) {
+            } else if (next1 instanceof ProgramVariable || next1 instanceof Name
+                    || next1 instanceof Identifier) {
+                if (!handleProgramVariableOrName(next1, next2, nat)) {
+                    return false;
+                }
+            } else if (next1 instanceof NegationExpression ne) {
+                if (!handleNegationExpression(ne, next2)) {
                     return false;
                 }
             } else if (next1.getChildCount() > 0) {
@@ -139,19 +147,11 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      *         method
      */
     private boolean handleStandard(SyntaxElement se1, SyntaxElement se2) {
-        /*
-         * As the prior implementations of equalsModRenaming for RustyProgramElements were mostly
-         * the same
-         * as their normal equals methods, we decided to move equalsModRenaming completely into the
-         * equals method and handle the special cases separately while walking through the tree that
-         * is a RustyProgramElement.
-         */
         return se1.equals(se2);
     }
 
     /**
-     * Handles the special case of comparing a {@link } to a
-     * {@link SyntaxElement}.
+     * Handles the special case of comparing a {@link } to a {@link SyntaxElement}.
      *
      * @param rnte the rusty program element with children to be compared
      * @param se the {@link SyntaxElement} to be compared
@@ -161,11 +161,10 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     private boolean handleRustyNonTerminalProgramElement(SyntaxElement rnte,
             SyntaxElement se) {
         /*
-         * A TODO ProgramElement is a special case of a RustyProgramElement, as we must
-         * not
-         * traverse the children recursively through the normal equals method. This is the case
-         * as we might have to add some entries of children nodes to a NameAbstractionTable so
-         * that they can be compared later on by the TreeWalker.
+         * In the case of non-terminal RustyProgramElements, we must not traverse the children
+         * recursively through the normal equals method. This is the case as we might have to
+         * add some entries of children nodes to a NameAbstractionTable so that they can be
+         * compared later on.
          */
         if (se == rnte) {
             return true;
@@ -174,6 +173,25 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             return false;
         }
         return rnte.getChildCount() == se.getChildCount();
+    }
+
+    /**
+     * Handles the special case of comparing a {@link NegationExpression} to a
+     * {@link SyntaxElement}.
+     *
+     * @param ne the {@link NegationExpression} to be compared
+     * @param se the {@link SyntaxElement} to be compared
+     * @return {@code true} iff {@code se} is of the same class as {@code ne} and they use the same
+     *         operator
+     */
+    private boolean handleNegationExpression(NegationExpression ne, SyntaxElement se) {
+        if (se == ne) {
+            return true;
+        }
+        if (se.getClass() != ne.getClass()) {
+            return false;
+        }
+        return ne.getOperator().equals(((NegationExpression) se).getOperator());
     }
 
     /**
@@ -227,7 +245,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      *        and {@code se2} have the same abstract name
      * @return {@code true} iff {@code se1} and {@code se2} have the same abstract name
      */
-    private boolean handleProgramVariableOrElementName(SyntaxElement se1, SyntaxElement se2,
+    private boolean handleProgramVariableOrName(SyntaxElement se1, SyntaxElement se2,
             NameAbstractionTable nat) {
         /*
          * A ProgramVariable or a ProgramElementName is a special case of a RustyProgramElement and
@@ -235,12 +253,12 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
          * of the main reasons for equalsModRenaming. Equality here comes down to checking the
          * abstract name of the elements in a NAT.
          */
+        if (se1 == se2) {
+            return true;
+        }
         if (se1.getClass() != se2.getClass()) {
             return false;
         }
-        // We can cast here as se1 is either a ProgramVariable or a ProgramElementName
-        // (this method is only called for these two classes in equalsModThisProperty)
-        // and se2 is of the same class as se1
         return nat.sameAbstractName((RustyProgramElement) se1, (RustyProgramElement) se2);
     }
 
