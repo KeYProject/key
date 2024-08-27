@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 public class FinalHeapResolver {
 
     private static final ThreadLocal<Boolean> finalEnabledVariable = new ThreadLocal<>();
+    private static String OPTION = "finalFields";
 
     public static boolean isFinalEnabled(InitConfig initConfig) {
         ProofSettings settings = initConfig.getSettings();
@@ -20,8 +22,8 @@ public class FinalHeapResolver {
     }
 
     public static boolean isFinalEnabled(ProofSettings settings) {
-        return settings.getChoiceSettings().getDefaultChoices().get("finalFields")
-                .equals("finalFields:immutable");
+        return settings.getChoiceSettings().getDefaultChoices().get(OPTION)
+                .equals(OPTION + ":immutable");
     }
 
     public static boolean recallIsFinalEnabled() {
@@ -35,6 +37,41 @@ public class FinalHeapResolver {
     public static void rememberIfFinalEnabled(InitConfig initConfig) {
         finalEnabledVariable.set(isFinalEnabled(initConfig));
     }
+
+
+
+//    // see WellDefinednessCheck.isOn()
+//    public static boolean isFinalEnabled() {
+//        final String setting =
+//                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
+//        if(setting == null) {
+//            throw new RuntimeException("The setting for the wdProofs-option is not set.");
+//        } else if (setting.equals(OPTION + ":immutable")) {
+//            return true;
+//        } else if (setting.equals(OPTION + ":other")) {
+//            return false;
+//        } else {
+//            throw new RuntimeException(
+//                    "The setting for the wdProofs-option is not valid: " + setting);
+//        }
+//        return bool.booleanValue();
+//    }
+//
+//    // see above ... I doubt that this works ...
+//    public static boolean isFinalEnabled(Services services) {
+//        final String setting =
+//                services.getProof().getSettings().getChoiceSettings().getDefaultChoices().get(OPTION);
+//        if(setting == null) {
+//            throw new RuntimeException("The setting for the wdProofs-option is not set.");
+//        } else if (setting.equals(OPTION + ":immutable")) {
+//            return true;
+//        } else if (setting.equals(OPTION + ":other")) {
+//            return false;
+//        } else {
+//            throw new RuntimeException(
+//                    "The setting for the wdProofs-option is not valid: " + setting);
+//        }
+//    }
 
     // private final Services services;
     //

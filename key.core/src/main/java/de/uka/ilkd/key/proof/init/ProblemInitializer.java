@@ -599,7 +599,7 @@ public final class ProblemInitializer {
             // done
             proofCreated(pa);
             return pa;
-        } catch (ProofInputException e) {
+        } catch (Exception e) {
             reportException(po, e);
             throw e;
         } finally {
