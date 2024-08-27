@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * Instances of this interface are used to customize and extend the behavior of a
@@ -30,9 +31,11 @@ public interface POExtension {
      *
      * @param proofConfig The {@link InitConfig} to use.
      * @param services The {@link Services} to use.
+     * @param selfTerm The {@link ProgramVariable} representing the current receiver object.
      * @param postTerm The post condition to modify.
      * @return The modified post condition or the original post condition if no modifications were
      *         performed.
      */
-    Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm);
+    Term modifyPostTerm(InitConfig proofConfig, Services services, ProgramVariable selfTerm,
+            Term postTerm);
 }
