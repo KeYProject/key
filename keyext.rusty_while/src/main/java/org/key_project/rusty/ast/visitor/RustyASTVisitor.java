@@ -163,7 +163,7 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     }
 
     @Override
-    public void performActionOnFieldStructExpression(FieldStructExpression x) {
+    public void performActionOnFieldStructExpression(StructStructExpression x) {
         doDefaultAction(x);
     }
 
@@ -234,6 +234,46 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnUnitStructExpression(UnitStructExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnEnumVariantStruct(EnumVariantStruct x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnIfExpression(IfExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnIfLetExpression(IfLetExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnInfiniteLoop(InfiniteLoopExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnIteratorLoopExpression(IteratorLoopExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnMatchArm(MatchArm x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnMatchExpression(MatchExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnPredicatePatternLoopExpression(PredicatePatternLoopExpression x) {
         doDefaultAction(x);
     }
 }

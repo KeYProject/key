@@ -35,7 +35,7 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
     }
 
     public enum Operator {
-        Plus, Minus, Multiply, Divide, And, Or, Xor, Shl, Shr;
+        Plus, Minus, Multiply, Divide, Modulo, And, Or, Xor, Shl, Shr;
 
         @Override
         public String toString() {
@@ -44,6 +44,7 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
                 case Minus -> "-=";
                 case Multiply -> "*=";
                 case Divide -> "/=";
+                case Modulo -> "%=";
                 case And -> "&=";
                 case Or -> "|=";
                 case Xor -> "^=";

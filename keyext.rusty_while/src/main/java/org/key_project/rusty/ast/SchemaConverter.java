@@ -32,7 +32,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class SchemaConverter {
     private Namespace<@NonNull SchemaVariable> svNS;
@@ -76,6 +78,10 @@ public class SchemaConverter {
         return programVariables.get(getDecl(path));
     }
 
+    private Label getLabel(String name) {
+        throw new UnsupportedOperationException("TODO @ DD : implement getLabel");
+    }
+
     public OperatorSV lookupSchemaVariable(String s) {
         OperatorSV sv;
         SchemaVariable n = svNS.lookup(new Name(s));
@@ -87,14 +93,14 @@ public class SchemaConverter {
         return sv;
     }
 
-    public Crate convertCrate(
+    private Crate convertCrate(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.CrateContext ctx) {
         return new Crate(ctx.item().stream().map(this::convertItem)
                 .collect(ImmutableList.collector()));
     }
 
 
-    public Item convertItem(org.key_project.rusty.parsing.RustyWhileSchemaParser.ItemContext ctx) {
+    private Item convertItem(org.key_project.rusty.parsing.RustyWhileSchemaParser.ItemContext ctx) {
         // TODO: Rework
         return convertFunction(ctx.function_());
     }
@@ -114,21 +120,194 @@ public class SchemaConverter {
             body);
     }
 
-    public Expr convertExpr(org.key_project.rusty.parsing.RustyWhileSchemaParser.ExprContext ctx) {
+    private Expr convertExpr(org.key_project.rusty.parsing.RustyWhileSchemaParser.ExprContext ctx) {
         if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.LiteralExpressionContext lit)
             return convertLiteralExpr(lit.literalExpr());
         if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.PathExpressionContext path)
             return convertPathExpr(path.pathExpr());
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.MethodCallExpressionContext x)
+            return convertMethodCallExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.FieldExpressionContext x)
+            return convertFieldExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.TupleIndexingExpressionContext x)
+            return convertTupleIndexingExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.CallExpressionContext x)
+            return convertCallExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.IndexExpressionContext x)
+            return convertIndexExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ErrorPropagationExpressionContext x)
+            return convertErrorPropagationExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.BorrowExpressionContext x)
+            return convertBorrowExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.DereferenceExpressionContext x)
+            return convertDereferenceExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.NegationExpressionContext x)
+            return convertNegationExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.TypeCastExpressionContext x)
+            return convertTypeCastExpression(x);
         if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ArithmeticOrLogicalExpressionContext ale)
             return convertArithmeticOrLogicalExpression(ale);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ComparisonExpressionContext x)
+            return convertComparisonExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.LazyBooleanExpressionContext x)
+            return convertLazyBooleanExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.RangeExpressionContext x)
+            return convertRangeExpression(x);
         if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.AssignmentExpressionContext ae)
             return convertAssignmentExpression(ae);
-        if (ctx instanceof RustyWhileSchemaParser.SchemaVarExpressionContext  se)
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.CompoundAssignmentExpressionContext x)
+            return convertCompoundAssignmentExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ContinueExpressionContext x)
+            return convertContinueExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.BreakExpressionContext x)
+            return convertBreakExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ReturnExpressionContext x)
+            return convertReturnExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.GroupedExpressionContext x)
+            return convertGroupedExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ArrayExpressionContext x)
+            if (x.arrayElements() == null || x.arrayElements().SEMI() == null)
+                return convertEnumeratedArrayExpression(x);
+            else
+                return convertRepeatedArrayExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.TupleExpressionContext x)
+            return convertTupleExpression(x);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.StructExpression_Context x) {
+            if (x.structExpr().structExprUnit() != null)
+                return convertUnitStructExpression(x.structExpr().structExprUnit());
+            if (x.structExpr().structExprTuple() != null)
+                return convertTupleStructExpression(x.structExpr().structExprTuple());
+            if (x.structExpr().structExprStruct() != null)
+                return convertStructStructExpression(x.structExpr().structExprStruct());
+        }
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.EnumerationVariantExpression_Context x) {
+            if (x.enumerationVariantExpr().enumExprStruct() != null)
+                return convertEnumVariantStruct(x.enumerationVariantExpr().enumExprStruct());
+            if (x.enumerationVariantExpr().enumExprTuple() != null)
+                return convertEnumVariantTuple(x.enumerationVariantExpr().enumExprTuple());
+            if (x.enumerationVariantExpr().enumExprFieldless() != null)
+                return convertEnumVariantFieldless(x.enumerationVariantExpr().enumExprFieldless());
+        }
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ClosureExpression_Context x)
+            return convertClosureExpression(x.closureExpr());
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ExpressionWithBlock_Context x)
+            return convertExprWithBlock(x.exprWithBlock());
+        if (ctx instanceof RustyWhileSchemaParser.SchemaVarExpressionContext se)
             return convertSchemaVarExpression(se);
-        throw new IllegalArgumentException("TODO @ DD: handle " + ctx.getText());
+        throw new UnsupportedOperationException(
+            "Unknown expr: " + ctx.getText() + " class: " + ctx.getClass());
     }
 
-    public Expr convertArithmeticOrLogicalExpression(
+    private Expr convertLiteralExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.LiteralExprContext ctx) {
+        if (ctx.KW_TRUE() != null)
+            return new BooleanLiteralExpression(true);
+        if (ctx.KW_FALSE() != null)
+            return new BooleanLiteralExpression(false);
+        var intLit = ctx.INTEGER_LITERAL();
+        if (intLit != null) {
+            var text = intLit.getText();
+            var signed = text.contains("i");
+            var split = text.split("[ui]");
+            var size = split[split.length - 1];
+            var suffix = IntegerLiteralExpression.IntegerSuffix.get(signed, size);
+            var lit = split[0];
+
+            var value = new BigInteger(
+                lit);
+            return new IntegerLiteralExpression(value, suffix);
+        }
+
+        throw new IllegalArgumentException("Expected boolean or integer literal");
+    }
+
+    private ProgramVariable convertPathExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.PathExprContext ctx) {
+        if (ctx.qualifiedPathInExpr() != null)
+            throw new IllegalArgumentException("TODO @ DD: Qual path");
+        else {
+            var pieCtx = ctx.pathInExpr();
+            var segments =
+                pieCtx.pathExprSegment().stream().map(this::convertPathExprSegment).toList();
+            var pie = new PathInExpression(new ImmutableArray<>(segments));
+            return Objects.requireNonNull(getProgramVariable(pie));
+        }
+    }
+
+    private MethodCallExpression convertMethodCallExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.MethodCallExpressionContext ctx) {
+        var callee = convertExpr(ctx.expr());
+        var seg = convertPathExprSegment(ctx.pathExprSegment());
+        ImmutableArray<Expr> params = ctx.callParams() == null ? new ImmutableArray<>()
+                : new ImmutableArray<>(
+                    ctx.callParams().expr().stream().map(this::convertExpr).toList());
+        return new MethodCallExpression(callee, seg, params);
+    }
+
+    private FieldExpression convertFieldExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.FieldExpressionContext ctx) {
+        var base = convertExpr(ctx.expr());
+        var ident = convertIdentifier(ctx.identifier());
+        return new FieldExpression(base, ident);
+    }
+
+    private TupleIndexingExpression convertTupleIndexingExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.TupleIndexingExpressionContext ctx) {
+        var base = convertExpr(ctx.expr());
+        int idx = Integer.parseInt(ctx.tupleIndex().INTEGER_LITERAL().getText());
+        return new TupleIndexingExpression(base, idx);
+    }
+
+    private CallExpression convertCallExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.CallExpressionContext ctx) {
+        var callee = convertExpr(ctx.expr());
+        ImmutableArray<Expr> params = ctx.callParams() == null ? new ImmutableArray<>()
+                : new ImmutableArray<>(
+                    ctx.callParams().expr().stream().map(this::convertExpr).toList());
+        return new CallExpression(callee, params);
+    }
+
+    private IndexExpression convertIndexExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.IndexExpressionContext ctx) {
+        var base = convertExpr(ctx.expr(0));
+        var idx = convertExpr(ctx.expr(1));
+        return new IndexExpression(base, idx);
+    }
+
+    private ErrorPropagationExpression convertErrorPropagationExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ErrorPropagationExpressionContext ctx) {
+        var base = convertExpr(ctx.expr());
+        return new ErrorPropagationExpression(base);
+    }
+
+    private BorrowExpression convertBorrowExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.BorrowExpressionContext ctx) {
+        var base = convertExpr(ctx.expr());
+        return new BorrowExpression(ctx.ANDAND() != null, ctx.KW_MUT() != null, base);
+    }
+
+    private DereferenceExpression convertDereferenceExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.DereferenceExpressionContext ctx) {
+        var base = convertExpr(ctx.expr());
+        return new DereferenceExpression(base);
+    }
+
+    private NegationExpression convertNegationExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.NegationExpressionContext ctx) {
+        var base = convertExpr(ctx.expr());
+        var op =
+            ctx.NOT() != null ? NegationExpression.Operator.Not : NegationExpression.Operator.Neg;
+        return new NegationExpression(base, op);
+    }
+
+    private TypeCastExpression convertTypeCastExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.TypeCastExpressionContext ctx) {
+        var base = convertExpr(ctx.expr());
+        var ty = convertTypeNoBounds(ctx.typeNoBounds());
+        return new TypeCastExpression(base, ty);
+    }
+
+    private Expr convertArithmeticOrLogicalExpression(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.ArithmeticOrLogicalExpressionContext ctx) {
         ArithLogicalExpression.Operator op = null;
         if (ctx.AND() != null)
@@ -152,6 +331,45 @@ public class SchemaConverter {
             convertExpr(ctx.expr(1)));
     }
 
+    private ComparisonExpression convertComparisonExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ComparisonExpressionContext ctx) {
+        var left = convertExpr(ctx.expr(0));
+        var right = convertExpr(ctx.expr(1));
+        var opCtx = ctx.comparisonOperator();
+        var op = opCtx.EQEQ() != null ? ComparisonExpression.Operator.Equal
+                : opCtx.GT() != null ? ComparisonExpression.Operator.Greater
+                        : opCtx.LT() != null ? ComparisonExpression.Operator.Less
+                                : opCtx.NE() != null ? ComparisonExpression.Operator.NotEqual
+                                        : opCtx.GE() != null
+                                                ? ComparisonExpression.Operator.GreaterOrEqual
+                                                : opCtx.LE() != null
+                                                        ? ComparisonExpression.Operator.LessOrEqual
+                                                        : null;
+        assert op != null;
+        return new ComparisonExpression(left, op, right);
+    }
+
+    private LazyBooleanExpression convertLazyBooleanExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.LazyBooleanExpressionContext ctx) {
+        var left = convertExpr(ctx.expr(0));
+        var right = convertExpr(ctx.expr(1));
+        var op = ctx.ANDAND() != null ? LazyBooleanExpression.Operator.And
+                : LazyBooleanExpression.Operator.Or;
+        return new LazyBooleanExpression(left, op, right);
+    }
+
+    private RangeExpression convertRangeExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.RangeExpressionContext ctx) {
+        var left =
+            ctx.getChild(
+                0) instanceof org.key_project.rusty.parsing.RustyWhileSchemaParser.ExprContext e
+                        ? convertExpr(e)
+                        : null;
+        var right = left == null ? convertExpr(ctx.expr(0)) : convertExpr(ctx.expr(1));
+        var inclusive = ctx.DOTDOTEQ() != null;
+        return new RangeExpression(left, right, inclusive);
+    }
+
     public AssignmentExpression convertAssignmentExpression(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.AssignmentExpressionContext ctx) {
         var lhs = convertExpr(ctx.expr(0));
@@ -159,21 +377,148 @@ public class SchemaConverter {
         return new AssignmentExpression(lhs, rhs);
     }
 
-    public BlockExpression convertBlockExpr(org.key_project.rusty.parsing.RustyWhileSchemaParser.BlockExprContext ctx) {
+    private CompoundAssignmentExpression convertCompoundAssignmentExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.CompoundAssignmentExpressionContext ctx) {
+        var left = convertExpr(ctx.expr(0));
+        var right = convertExpr(ctx.expr(1));
+        var opCtx = ctx.compoundAssignOperator();
+        var op = opCtx.PLUSEQ() != null ? CompoundAssignmentExpression.Operator.Plus
+                : opCtx.MINUSEQ() != null ? CompoundAssignmentExpression.Operator.Minus
+                        : opCtx.STAREQ() != null ? CompoundAssignmentExpression.Operator.Divide
+                                : opCtx.PERCENTEQ() != null
+                                        ? CompoundAssignmentExpression.Operator.Modulo
+                                        : opCtx.ANDEQ() != null
+                                                ? CompoundAssignmentExpression.Operator.And
+                                                : opCtx.OREQ() != null
+                                                        ? CompoundAssignmentExpression.Operator.Or
+                                                        : opCtx.CARETEQ() != null
+                                                                ? CompoundAssignmentExpression.Operator.Xor
+                                                                : opCtx.SHLEQ() != null
+                                                                        ? CompoundAssignmentExpression.Operator.Shl
+                                                                        : CompoundAssignmentExpression.Operator.Shr;
+        return new CompoundAssignmentExpression(left, op, right);
+    }
+
+    private ContinueExpression convertContinueExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ContinueExpressionContext ctx) {
+        var label = ctx.LIFETIME_OR_LABEL() != null ? convertLabel(ctx.LIFETIME_OR_LABEL()) : null;
+        var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
+        return new ContinueExpression(label, expr);
+    }
+
+    private BreakExpression convertBreakExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.BreakExpressionContext ctx) {
+        var label = ctx.LIFETIME_OR_LABEL() != null ? convertLabel(ctx.LIFETIME_OR_LABEL()) : null;
+        var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
+        return new BreakExpression(label, expr);
+    }
+
+    private ReturnExpression convertReturnExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ReturnExpressionContext ctx) {
+        var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
+        return new ReturnExpression(expr);
+    }
+
+    private GroupedExpression convertGroupedExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.GroupedExpressionContext ctx) {
+        return new GroupedExpression(convertExpr(ctx.expr()));
+    }
+
+    private EnumeratedArrayExpression convertEnumeratedArrayExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ArrayExpressionContext ctx) {
+        if (ctx.arrayElements() == null)
+            return new EnumeratedArrayExpression(new ImmutableArray<>());
+        assert ctx.arrayElements().SEMI() == null;
+        return new EnumeratedArrayExpression(new ImmutableArray<>(
+            ctx.arrayElements().expr().stream().map(this::convertExpr).toList()));
+    }
+
+    private RepeatedArrayExpression convertRepeatedArrayExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ArrayExpressionContext ctx) {
+        return new RepeatedArrayExpression(convertExpr(ctx.arrayElements().expr(0)),
+            convertExpr(ctx.arrayElements().expr(1)));
+    }
+
+    private TupleExpression convertTupleExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.TupleExpressionContext ctx) {
+        if (ctx.tupleElements() == null)
+            return TupleExpression.UNIT;
+        return new TupleExpression(new ImmutableArray<>(
+            ctx.tupleElements().expr().stream().map(this::convertExpr).toList()));
+    }
+
+    private UnitStructExpression convertUnitStructExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.StructExprUnitContext ctx) {
+        throw new UnsupportedOperationException("TODO @ DD: Unit struct expr");
+    }
+
+    private TupleStructExpression convertTupleStructExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.StructExprTupleContext ctx) {
+        throw new UnsupportedOperationException("TODO @ DD: Tuple struct expr");
+    }
+
+    private StructStructExpression convertStructStructExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.StructExprStructContext ctx) {
+        throw new UnsupportedOperationException("TODO @ DD: Field struct expr");
+    }
+
+    private EnumVariantFieldless convertEnumVariantFieldless(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.EnumExprFieldlessContext ctx) {
+        throw new UnsupportedOperationException("TODO @ DD: Fieldless enum variant expr");
+    }
+
+    private EnumVariantTuple convertEnumVariantTuple(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.EnumExprTupleContext ctx) {
+        throw new UnsupportedOperationException("TODO @ DD: Tuple enum variant expr");
+    }
+
+    private EnumVariantStruct convertEnumVariantStruct(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.EnumExprStructContext ctx) {
+        throw new UnsupportedOperationException("TODO @ DD: Struct enum variant expr");
+    }
+
+    private ClosureExpression convertClosureExpression(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ClosureExprContext ctx) {
+        ImmutableArray<ClosureParam> params =
+            ctx.closureParameters() == null ? new ImmutableArray<>()
+                    : new ImmutableArray<>(ctx.closureParameters().closureParam().stream()
+                            .map(this::convertClosureParam).toList());
+        var ty = ctx.typeNoBounds() == null ? null : convertTypeNoBounds(ctx.typeNoBounds());
+        var body = ctx.expr() == null ? convertBlockExpr(ctx.blockExpr()) : convertExpr(ctx.expr());
+        return new ClosureExpression(ctx.KW_MOVE() != null, params, ty, body);
+    }
+
+    private Expr convertExprWithBlock(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ExprWithBlockContext ctx) {
+        if (ctx.blockExpr() != null)
+            return convertBlockExpr(ctx.blockExpr());
+        if (ctx.loopExpr() != null)
+            return convertLoopExpr(ctx.loopExpr());
+        if (ctx.ifExpr() != null)
+            return convertIfExpr(ctx.ifExpr());
+        if (ctx.ifLetExpr() != null)
+            return convertIfLetExpr(ctx.ifLetExpr());
+        return convertMatchExpr(ctx.matchExpr());
+    }
+
+    private BlockExpression convertBlockExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.BlockExprContext ctx) {
         if (ctx instanceof RustyWhileSchemaParser.ContextBlockExprContext cctx) {
             return convertContextBlockExpr(cctx);
         }
         return convertStandardBlockExpr((RustyWhileSchemaParser.StandardBlockExprContext) ctx);
     }
 
-    public BlockExpression convertStandardBlockExpr(
+    private BlockExpression convertStandardBlockExpr(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.StandardBlockExprContext ctx) {
         var stmtsCtx = ctx.stmts();
 
         var stmts = stmtsCtx.stmt().stream().map(this::convertStmt)
                 .collect(ImmutableList.collector());
-        if (stmts.size() == 1 && stmts.get(0) instanceof ProgramSV psv && (psv.sort() == ProgramSVSort.EXPRESSION || psv.sort() == ProgramSVSort.SIMPLE_EXPRESSION
-                || psv.sort() == ProgramSVSort.NONSIMPLEEXPRESSION)) {
+        if (stmts.size() == 1 && stmts.get(0) instanceof ProgramSV psv
+                && (psv.sort() == ProgramSVSort.EXPRESSION
+                        || psv.sort() == ProgramSVSort.SIMPLE_EXPRESSION
+                        || psv.sort() == ProgramSVSort.NONSIMPLEEXPRESSION)) {
             return new BlockExpression(ImmutableSLList.nil(), psv);
         }
         var value = convertExpr(stmtsCtx.expr());
@@ -181,7 +526,7 @@ public class SchemaConverter {
         return new BlockExpression(stmts, value);
     }
 
-    public ContextBlockExpression convertContextBlockExpr(
+    private ContextBlockExpression convertContextBlockExpr(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.ContextBlockExprContext ctx) {
         var stmtsCtx = ctx.stmts();
 
@@ -191,53 +536,124 @@ public class SchemaConverter {
         return new ContextBlockExpression(stmts);
     }
 
-    public Expr convertLiteralExpr(
-            org.key_project.rusty.parsing.RustyWhileSchemaParser.LiteralExprContext ctx) {
-        if (ctx.KW_TRUE() != null)
-            return new BooleanLiteralExpression(true);
-        if (ctx.KW_FALSE() != null)
-            return new BooleanLiteralExpression(false);
-        var intLit = ctx.INTEGER_LITERAL();
-        if (intLit != null) {
-            var text = intLit.getText();
-            var signed = text.contains("i");
-            var split = text.split("[ui]");
-            var size = split[split.length - 1];
-            var suffix = IntegerLiteralExpression.IntegerSuffix.get(signed, size);
-            var lit = split[0];
-
-            var value = new BigInteger(
-                lit);
-            return new IntegerLiteralExpression(value, suffix);
-        }
-
-        throw new IllegalArgumentException("Expected boolean or integer literal");
-    }
-
-    public ProgramVariable convertPathExpr(
-            org.key_project.rusty.parsing.RustyWhileSchemaParser.PathExprContext ctx) {
-        if (ctx.qualifiedPathInExpr() != null)
-            throw new IllegalArgumentException("TODO @ DD: Qual path");
-        else {
-            var pieCtx = ctx.pathInExpr();
-            var segments =
-                pieCtx.pathExprSegment().stream().map(this::convertPathExprSegment).toList();
-            var pie = new PathInExpression(new ImmutableArray<>(segments));
-            return Objects.requireNonNull(getProgramVariable(pie));
-        }
-    }
-
     public Expr convertSchemaVarExpression(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.SchemaVarExpressionContext ctx) {
         return (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
     }
 
-    public Statement convertExprStmt(
+    private LoopExpression convertLoopExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.LoopExprContext ctx) {
+        var label =
+            ctx.loopLabel() == null ? null : convertLabel(ctx.loopLabel().LIFETIME_OR_LABEL());
+        if (ctx.infiniteLoopExpr() != null)
+            return convertInfiniteLoopExpr(ctx.infiniteLoopExpr(), label);
+        if (ctx.predicateLoopExpr() != null)
+            return convertPredicateLoopExpr(ctx.predicateLoopExpr(), label);
+        if (ctx.predicatePatternLoopExpr() != null)
+            return convertPredicatePatternLoopExpr(ctx.predicatePatternLoopExpr(), label);
+        if (ctx.iteratorLoopExpr() != null)
+            return convertIteratorLoopExpr(ctx.iteratorLoopExpr(), label);
+        throw new UnsupportedOperationException("Unknown loop: " + ctx.getText());
+    }
+
+    private InfiniteLoopExpression convertInfiniteLoopExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.InfiniteLoopExprContext ctx,
+            @Nullable Label label) {
+        return new InfiniteLoopExpression(label, convertBlockExpr(ctx.blockExpr()));
+    }
+
+    private PredicateLoopExpression convertPredicateLoopExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.PredicateLoopExprContext ctx,
+            @Nullable Label label) {
+        return new PredicateLoopExpression(label, convertExpr(ctx.expr()),
+            convertBlockExpr(ctx.blockExpr()));
+    }
+
+    private PredicatePatternLoopExpression convertPredicatePatternLoopExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.PredicatePatternLoopExprContext ctx,
+            @Nullable Label label) {
+        return new PredicatePatternLoopExpression(label, convertPattern(ctx.pattern()),
+            convertExpr(ctx.expr()), convertBlockExpr(ctx.blockExpr()));
+    }
+
+    private IteratorLoopExpression convertIteratorLoopExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.IteratorLoopExprContext ctx,
+            @Nullable Label label) {
+        return new IteratorLoopExpression(label, convertPattern(ctx.pattern()),
+            convertExpr(ctx.expr()), convertBlockExpr(ctx.blockExpr()));
+    }
+
+    private IfExpression convertIfExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.IfExprContext ctx) {
+        var cond = convertExpr(ctx.expr());
+        var then = convertBlockExpr(ctx.blockExpr(0));
+        var else_ = ctx.blockExpr().size() > 1 ? convertBlockExpr(ctx.blockExpr(1))
+                : ctx.ifExpr() != null ? convertIfExpr(ctx.ifExpr())
+                        : null;
+        return new IfExpression(cond, then, else_);
+    }
+
+    private IfLetExpression convertIfLetExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.IfLetExprContext ctx) {
+        var pat = convertPattern(ctx.pattern());
+        var expr = convertExpr(ctx.expr());
+        var then = convertBlockExpr(ctx.blockExpr(0));
+        var else_ = ctx.blockExpr().size() > 1 ? convertBlockExpr(ctx.blockExpr(1))
+                : ctx.ifExpr() != null ? convertIfExpr(ctx.ifExpr())
+                        : ctx.ifLetExpr() != null ? convertIfLetExpr(ctx.ifLetExpr()) : null;
+        return new IfLetExpression(pat, expr, then, else_);
+    }
+
+    private MatchExpression convertMatchExpr(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.MatchExprContext ctx) {
+        var expr = convertExpr(ctx.expr());
+        ImmutableArray<MatchArm> arms = ctx.matchArms() == null ? new ImmutableArray<>()
+                : convertMatchArms(ctx.matchArms());
+        return new MatchExpression(expr, arms);
+    }
+
+    private ImmutableArray<MatchArm> convertMatchArms(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.MatchArmsContext ctx) {
+        if (ctx.expr() != null) {
+            var arms = new MatchArm[ctx.matchArm().size()];
+            for (int i = 0; i < ctx.matchArm().size() - 1; i++) {
+                var armCtx = ctx.matchArm().get(i);
+                var pat = convertPattern(armCtx.pattern());
+                var expr = armCtx.matchArmGuard() == null ? null
+                        : convertExpr(armCtx.matchArmGuard().expr());
+                var armExprCtx = ctx.matchArmExpression(i);
+                var body = armExprCtx.expr() != null ? convertExpr(armExprCtx.expr())
+                        : convertExprWithBlock(armExprCtx.exprWithBlock());
+                arms[i] = new MatchArm(pat, expr, body);
+            }
+            var armCtx = ctx.matchArm().get(arms.length - 1);
+            var pat = convertPattern(armCtx.pattern());
+            var expr =
+                armCtx.matchArmGuard() == null ? null : convertExpr(armCtx.matchArmGuard().expr());
+            arms[arms.length - 1] = new MatchArm(pat, expr, convertExpr(ctx.expr()));
+            return new ImmutableArray<>(arms);
+        } else {
+            var arms = new MatchArm[ctx.matchArm().size()];
+            for (int i = 0; i < ctx.matchArm().size(); i++) {
+                var armCtx = ctx.matchArm().get(i);
+                var pat = convertPattern(armCtx.pattern());
+                var expr = armCtx.matchArmGuard() == null ? null
+                        : convertExpr(armCtx.matchArmGuard().expr());
+                var armExprCtx = ctx.matchArmExpression(i);
+                var body = armExprCtx.expr() != null ? convertExpr(armExprCtx.expr())
+                        : convertExprWithBlock(armExprCtx.exprWithBlock());
+                arms[i] = new MatchArm(pat, expr, body);
+            }
+            return new ImmutableArray<>(arms);
+        }
+    }
+
+    private Statement convertExprStmt(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.ExprStmtContext ctx) {
         return new ExpressionStatement(convertExpr(ctx.expr()));
     }
 
-    public Statement convertLetStmt(
+    private Statement convertLetStmt(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.LetStmtContext ctx) {
         Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
         LetStatement letStatement = new LetStatement(pat,
@@ -247,7 +663,7 @@ public class SchemaConverter {
         return letStatement;
     }
 
-    public Statement convertStmt(
+    private Statement convertStmt(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.StmtContext ctx) {
         if (ctx.SEMI() != null) {
             return new EmptyStatement();
@@ -263,17 +679,17 @@ public class SchemaConverter {
         throw new IllegalArgumentException("Expected statement, got: " + ctx.getText());
     }
 
-    public Statement convertSchemaStmt(
+    private Statement convertSchemaStmt(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.SchemaStmtContext ctx) {
         return (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
     }
 
-    public Identifier convertIdentifier(
+    private Identifier convertIdentifier(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.IdentifierContext ctx) {
         return new Identifier(new Name(ctx.getText()));
     }
 
-    public Pattern convertPattern(
+    private Pattern convertPattern(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.PatternContext ctx) {
         var alts = ctx.patternNoTopAlt();
         if (alts.size() == 1) {
@@ -302,37 +718,44 @@ public class SchemaConverter {
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
     }
 
-    public Type convertType(org.key_project.rusty.parsing.RustyWhileSchemaParser.Type_Context ctx) {
+    private Type convertType(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.Type_Context ctx) {
         if (ctx.typeNoBounds() != null) {
-            var ty = ctx.typeNoBounds();
-            if (ty.parenthesizedType() != null)
-                return convertParenthesizedType(ty.parenthesizedType());
-            if (ty.traitObjectTypeOneBound() != null)
-                return convertTraitObjectOneBound(ty.traitObjectTypeOneBound());
-            if (ty.typePath() != null)
-                return convertTypePath(ty.typePath());
-            if (ty.tupleType() != null)
-                throw new IllegalArgumentException("TODO @ DD");
-            if (ty.neverType() != null)
-                throw new IllegalArgumentException("TODO @ DD");
+            return convertTypeNoBounds(ctx.typeNoBounds());
         }
         throw new IllegalArgumentException("Unknown type " + ctx.getText());
     }
 
-    public Type convertParenthesizedType(
+    private Type convertTypeNoBounds(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.TypeNoBoundsContext ctx) {
+        if (ctx.parenthesizedType() != null)
+            return convertParenthesizedType(ctx.parenthesizedType());
+        if (ctx.traitObjectTypeOneBound() != null)
+            return convertTraitObjectOneBound(ctx.traitObjectTypeOneBound());
+        if (ctx.typePath() != null)
+            return convertTypePath(ctx.typePath());
+        if (ctx.tupleType() != null)
+            throw new IllegalArgumentException("TODO @ DD");
+        if (ctx.neverType() != null)
+            throw new IllegalArgumentException("TODO @ DD");
+        throw new IllegalArgumentException("Unknown type " + ctx.getText());
+    }
+
+    private Type convertParenthesizedType(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.ParenthesizedTypeContext ctx) {
         return convertType(ctx.type_());
     }
 
-    private Type convertTraitObjectOneBound(RustyWhileSchemaParser.TraitObjectTypeOneBoundContext ctx) {
-        var tbCtx =ctx.traitBound();
+    private Type convertTraitObjectOneBound(
+            RustyWhileSchemaParser.TraitObjectTypeOneBoundContext ctx) {
+        var tbCtx = ctx.traitBound();
         if (ctx.KW_DYN() == null && tbCtx.QUESTION() == null && tbCtx.forLifetimes() == null) {
             return convertTypePath(tbCtx.typePath());
         }
         throw new IllegalArgumentException("TODO @ DD");
     }
 
-    public PrimitiveType convertTypePath(
+    private PrimitiveType convertTypePath(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.TypePathContext ctx) {
         assert ctx.typePathSegment().size() == 1;
         var text = ctx.typePathSegment(0).pathIdentSegment().identifier().getText();
@@ -357,9 +780,10 @@ public class SchemaConverter {
         };
     }
 
-    public ImmutableArray<FunctionParam> convertFunctionParams(
+    private ImmutableArray<FunctionParam> convertFunctionParams(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.FunctionParamsContext ctx) {
-        if (ctx == null) return new ImmutableArray<>();
+        if (ctx == null)
+            return new ImmutableArray<>();
         List<FunctionParam> params = new LinkedList<>();
         if (ctx.selfParam() != null) {
             params.add(convertSelfParam(ctx.selfParam()));
@@ -370,7 +794,7 @@ public class SchemaConverter {
         return new ImmutableArray<>(params);
     }
 
-    public SelfParam convertSelfParam(
+    private SelfParam convertSelfParam(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.SelfParamContext ctx) {
         if (ctx.shorthandSelf() != null) {
             var shortSelf = ctx.shorthandSelf();
@@ -382,7 +806,7 @@ public class SchemaConverter {
         }
     }
 
-    public FunctionParamPattern convertFunctionParamPattern(
+    private FunctionParamPattern convertFunctionParamPattern(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.FunctionParamPatternContext ctx) {
         FunctionParamPattern param = new FunctionParamPattern(convertPattern(ctx.pattern()),
             convertType(ctx.type_()));
@@ -390,13 +814,24 @@ public class SchemaConverter {
         return param;
     }
 
-    public PathExprSegment convertPathExprSegment(
+    private PathExprSegment convertPathExprSegment(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.PathExprSegmentContext ctx) {
         return new PathExprSegment(convertPathIdentSegment(ctx.pathIdentSegment()));
     }
 
-    public PathIdentSegment convertPathIdentSegment(
+    private PathIdentSegment convertPathIdentSegment(
             org.key_project.rusty.parsing.RustyWhileSchemaParser.PathIdentSegmentContext ctx) {
         return new PathIdentSegment(convertIdentifier(ctx.identifier()));
+    }
+
+    private Label convertLabel(TerminalNode l) {
+        return getLabel(l.getText().substring(1));
+    }
+
+    private ClosureParam convertClosureParam(
+            org.key_project.rusty.parsing.RustyWhileSchemaParser.ClosureParamContext ctx) {
+        var pat = convertPattern(ctx.pattern());
+        var ty = ctx.type_() == null ? null : convertType(ctx.type_());
+        return new ClosureParam(pat, ty);
     }
 }

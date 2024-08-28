@@ -4,13 +4,12 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-public record MethodCallExpression(Expr callee, Identifier method, ImmutableArray<Expr> params) implements Expr {
+public record MethodCallExpression(Expr callee, org.key_project.rusty.ast.PathExprSegment method, ImmutableArray<Expr> params) implements Expr {
     @Override
     public void visit(Visitor v) {
         v.performActionOnMethodCall(this);

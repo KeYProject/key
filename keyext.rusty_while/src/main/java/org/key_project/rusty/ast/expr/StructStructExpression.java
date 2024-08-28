@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-public record FieldStructExpression(PathInExpression path,ImmutableArray<StructExprField>fields,boolean withRest)implements Expr{@Override public void visit(Visitor v){v.performActionOnFieldStructExpression(this);}
+public record StructStructExpression(PathInExpression path, ImmutableArray<StructExprField>fields, boolean withRest)implements Expr{@Override public void visit(Visitor v){v.performActionOnFieldStructExpression(this);}
 
 @Override public @NonNull SyntaxElement getChild(int n){if(n==0){return path;}return Objects.requireNonNull(fields.get(n-1));}
 

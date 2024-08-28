@@ -81,7 +81,7 @@ public interface Visitor {
 
     void performActionOnUnitStructExpression(UnitStructExpression x);
 
-    void performActionOnFieldStructExpression(FieldStructExpression x);
+    void performActionOnFieldStructExpression(StructStructExpression x);
 
     void performActionOnEnumVariantFieldless(EnumVariantFieldless x);
 
@@ -90,4 +90,20 @@ public interface Visitor {
     void performActionOnClosureExpression(ClosureExpression x);
 
     void performActionOnSelfParam(SelfParam x);
+
+    void performActionOnEnumVariantStruct(EnumVariantStruct x);
+
+    void performActionOnInfiniteLoop(InfiniteLoopExpression x);
+
+    void performActionOnPredicatePatternLoopExpression(PredicatePatternLoopExpression x);
+
+    void performActionOnIteratorLoopExpression(IteratorLoopExpression x);
+
+    void performActionOnIfExpression(IfExpression x);
+
+    void performActionOnMatchExpression(MatchExpression x);
+
+    void performActionOnMatchArm(MatchArm x);
+
+    void performActionOnIfLetExpression(IfLetExpression x);
 }

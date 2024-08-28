@@ -12,6 +12,12 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NonNull;
 
 public record TupleExpression(ImmutableArray<Expr> elements) implements Expr {
+    public static TupleExpression UNIT = new TupleExpression(new ImmutableArray<>());
+
+    public boolean isUnit() {
+        return this == UNIT;
+    }
+
     @Override
     public void visit(Visitor v) {
 v.performActionOnTupleExpression(this);
