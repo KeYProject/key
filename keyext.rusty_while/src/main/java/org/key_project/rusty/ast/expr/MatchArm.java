@@ -15,4 +15,14 @@ public record MatchArm(Pattern pattern,@Nullable Expr guard,Expr body)implements
 
 @Override public @NonNull SyntaxElement getChild(int n){if(n==0){return pattern;}if(guard!=null){if(n==1){return guard;}--n;}if(n==1){return body;}throw new IndexOutOfBoundsException("MatchArm has only "+getChildCount()+" children");}
 
-@Override public int getChildCount(){return 2+(guard==null?0:1);}}
+@Override public int getChildCount(){return 2+(guard==null?0:1);}
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(pattern);
+        if (guard != null) {sb.append(" if ").append(guard);}
+        sb.append(" => ").append(body);
+        return "";
+    }
+}

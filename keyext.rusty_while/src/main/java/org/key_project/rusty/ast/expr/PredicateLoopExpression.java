@@ -29,4 +29,12 @@ public record PredicateLoopExpression(@Nullable Label label, Expr pred, BlockExp
     public int getChildCount() {
         return 2;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (label != null) sb.append(label).append(": ");
+        sb.append("while ").append(pred).append(' ').append(body);
+        return sb.toString();
+    }
 }

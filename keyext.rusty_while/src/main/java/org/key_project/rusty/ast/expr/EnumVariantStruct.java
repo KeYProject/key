@@ -16,4 +16,18 @@ public record EnumVariantStruct(PathInExpression path,ImmutableArray<EnumExprFie
 
 @Override public @NonNull SyntaxElement getChild(int n){if(n==0)return path;--n;return Objects.requireNonNull(fields.get(n));}
 
-@Override public int getChildCount(){return 1+fields.size();}}
+@Override public int getChildCount(){return 1+fields.size();}
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(path).append(" {\n");
+        for (int i = 0; i < fields.size(); ++i) {
+            if (i > 0) {
+                sb.append(",\n");
+            }
+            sb.append('\t').append(fields.get(i));
+        }
+        return sb.toString();
+    }
+}

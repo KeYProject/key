@@ -15,4 +15,17 @@ public record MatchExpression(Expr expr,ImmutableArray<MatchArm>arms)implements 
 
 @Override public @NonNull SyntaxElement getChild(int n){if(n==0)return expr;return Objects.requireNonNull(arms.get(n-1));}
 
-@Override public int getChildCount(){return 1+arms.size();}}
+@Override public int getChildCount(){return 1+arms.size();}
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("match (").append(expr).append(") {\n");
+        for (int i = 0; i < arms.size(); i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(arms.get(i));
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+}

@@ -14,4 +14,13 @@ public record InfiniteLoopExpression(@Nullable Label label,BlockExpression body)
 
 @Override public @NonNull SyntaxElement getChild(int n){if(n==0&&label!=null)return label;if(n==0)return body;throw new IndexOutOfBoundsException("Infinite loop expression has only 1 child");}
 
-@Override public int getChildCount(){return 1;}}
+@Override public int getChildCount(){return 1;}
+
+    @Override
+    public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (label != null) sb.append(label).append(": ");
+    sb.append("loop ").append(body);
+        return sb.toString();
+    }
+}

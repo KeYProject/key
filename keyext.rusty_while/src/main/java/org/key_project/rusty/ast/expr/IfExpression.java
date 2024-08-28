@@ -27,4 +27,12 @@ public record IfExpression(Expr condition, BlockExpression thenExpr, @Nullable E
     public int getChildCount() {
         return 2 + (elseExpr == null ? 0 : 1);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("if ").append(condition).append(thenExpr);
+        if (elseExpr != null) sb.append(" else ").append(elseExpr);
+        return sb.toString();
+    }
 }

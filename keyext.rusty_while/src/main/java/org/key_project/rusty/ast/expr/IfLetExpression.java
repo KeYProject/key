@@ -29,4 +29,14 @@ public record IfLetExpression(Pattern pattern, Expr expr, BlockExpression then, 
     public int getChildCount() {
         return 3 + (elseExpr == null ? 0 : 1);
     }
+
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("if let ").append(pattern).append(" = ").append(expr).append(then);
+            if (elseExpr != null) sb.append(" else ").append(elseExpr);
+            return sb.toString();
+        }
+
 }
