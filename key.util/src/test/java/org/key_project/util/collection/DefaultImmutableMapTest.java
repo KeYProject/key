@@ -5,6 +5,8 @@ package org.key_project.util.collection;
 
 import java.util.Iterator;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DefaultImmutableMapTest {
 
-    private ImmutableMap<String, Integer> map;
+    private @MonotonicNonNull ImmutableMap<String, Integer> map;
 
     @BeforeEach
     public void setUp() {
@@ -21,12 +23,16 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testPutAndGet() {
+        assertNotNull(map);
         map = map.put("one", 1);
-        assertEquals(1, map.get("one"));
+        Integer one = map.get("one");
+        assertNotNull(one);
+        assertEquals(1, one);
     }
 
     @Test
     public void testSize() {
+        assertNotNull(map);
         assertEquals(0, map.size());
         map = map.put("one", 1);
         assertEquals(1, map.size());
@@ -40,6 +46,7 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testIsEmpty() {
+        assertNotNull(map);
         assertTrue(map.isEmpty());
         map = map.put("one", 1);
         assertFalse(map.isEmpty());
@@ -47,6 +54,7 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testContainsKey() {
+        assertNotNull(map);
         map = map.put("one", 1);
         assertTrue(map.containsKey("one"));
         assertFalse(map.containsKey("two"));
@@ -54,6 +62,7 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testContainsValue() {
+        assertNotNull(map);
         map = map.put("one", 1);
         assertTrue(map.containsValue(1));
         assertFalse(map.containsValue(2));
@@ -61,6 +70,7 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testRemove() {
+        assertNotNull(map);
         map = map.put("one", 1);
         map = map.remove("one");
         assertFalse(map.containsKey("one"));
@@ -75,6 +85,7 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testRemoveAll() {
+        assertNotNull(map);
         map = map.put("one", 1);
         map = map.put("two", 1);
         map = map.removeAll(1);
@@ -84,6 +95,7 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testKeyIterator() {
+        assertNotNull(map);
         map = map.put("one", 1);
         map = map.put("two", 2);
         Iterator<String> iterator = map.keyIterator();
@@ -96,6 +108,7 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testValueIterator() {
+        assertNotNull(map);
         map = map.put("one", 1);
         map = map.put("two", 2);
         Iterator<Integer> iterator = map.valueIterator();
@@ -108,6 +121,7 @@ public class DefaultImmutableMapTest {
 
     @Test
     public void testIterator() {
+        assertNotNull(map);
         map = map.put("one", 1);
         map = map.put("two", 2);
         Iterator<ImmutableMapEntry<String, Integer>> iterator = map.iterator();
