@@ -22,10 +22,11 @@ public class NegationExpression implements Expr {
     }
 
     private final Expr expr;
-    Operator op;
+    private final Operator op;
 
-    public NegationExpression(Expr expr) {
+    public NegationExpression(Expr expr, Operator op) {
         this.expr = expr;
+        this.op = op;
     }
 
     @Override

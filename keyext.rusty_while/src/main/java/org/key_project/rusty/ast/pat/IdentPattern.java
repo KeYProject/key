@@ -11,10 +11,12 @@ import org.key_project.rusty.ast.Identifier;
 import org.jspecify.annotations.NonNull;
 
 public class IdentPattern implements Pattern, Named {
+    private final boolean reference;
     private final boolean mutable;
     private final Identifier ident;
 
-    public IdentPattern(boolean mutable, Identifier ident) {
+    public IdentPattern(boolean reference, boolean mutable, Identifier ident) {
+        this.reference = reference;
         this.mutable = mutable;
         this.ident = ident;
     }
@@ -29,6 +31,10 @@ public class IdentPattern implements Pattern, Named {
 
     public boolean isMutable() {
         return mutable;
+    }
+
+    public boolean isReference() {
+        return reference;
     }
 
     @Override

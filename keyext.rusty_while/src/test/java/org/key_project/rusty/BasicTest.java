@@ -4,10 +4,8 @@
 package org.key_project.rusty;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.ast.Converter;
 import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -22,8 +20,6 @@ import org.key_project.rusty.rule.TacletApp;
 import org.key_project.rusty.util.TacletForTests;
 import org.key_project.util.collection.ImmutableList;
 
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -149,7 +145,8 @@ public class BasicTest {
         TacletForTests.services().getNamespaces().programVariables().add(i_old);
         TacletForTests.services().getNamespaces().programVariables().add(j_old);
 
-        var t = TacletForTests.parseTerm("i=i_old & j=j_old -> \\<{i = i + j; j = i - j; i = i - j; 1u32}\\>(i = j_old & j = i_old)");
+        var t = TacletForTests.parseTerm(
+            "i=i_old & j=j_old -> \\<{i = i + j; j = i - j; i = i - j; 1u32}\\>(i = j_old & j = i_old)");
         System.out.println(t);
 
 

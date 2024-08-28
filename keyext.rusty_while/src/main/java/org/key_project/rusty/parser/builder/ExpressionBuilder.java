@@ -642,7 +642,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     }
                 }
             } catch (Exception e) {
-                if (cleanRusty.startsWith("{c#")) {// do not fallback
+                if (cleanRusty.startsWith("{c#") || cleanRusty.contains("s#")) {// do not fallback
                     throw e;
                 }
             }

@@ -4,8 +4,10 @@
 package org.key_project.rusty.ast.visitor;
 
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.fn.SelfParam;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -92,6 +94,146 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnEmptyStatement(EmptyStatement x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnBorrowExpression(BorrowExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnBreakExpression(BreakExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnCallExpression(CallExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnClosureExpression(ClosureExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnComparisonExpression(ComparisonExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnContinueExpression(ContinueExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnDereferenceExpression(DereferenceExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnEnumeratedArrayExpression(EnumeratedArrayExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnEnumVariantFieldless(EnumVariantFieldless x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnEnumVariantTuple(EnumVariantTuple x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnErrorPropagationExpression(ErrorPropagationExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnFieldExpression(FieldExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnFieldStructExpression(FieldStructExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnGroupedExpression(GroupedExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnIndexExpression(IndexExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnLazyBooleanExpression(LazyBooleanExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnMethodCall(MethodCallExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnPathInExpression(PathInExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnRangeExpression(RangeExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnRepeatedArrayExpression(RepeatedArrayExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnReturnExpression(ReturnExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSelfParam(SelfParam x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnTupleExpression(TupleExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnTupleIndexingExpression(TupleIndexingExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnTupleStructExpression(TupleStructExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnTypeCastExpression(TypeCastExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnUnitStructExpression(UnitStructExpression x) {
         doDefaultAction(x);
     }
 }

@@ -4,17 +4,16 @@
 package org.key_project.rusty.ast;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
-import org.key_project.rusty.ast.fn.Param;
-import org.key_project.rusty.ast.pat.IdentPattern;
-import org.key_project.rusty.ast.pat.Pattern;
+import org.key_project.rusty.ast.fn.FunctionParam;
+import org.key_project.rusty.ast.fn.FunctionParamPattern;
+import org.key_project.rusty.ast.fn.SelfParam;
+import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
@@ -23,19 +22,11 @@ import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.ast.ty.PrimitiveType;
 import org.key_project.rusty.ast.ty.Type;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.parsing.RustyWhileParser;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 public class Converter {
-    private final CrateConverter crateConverter = new CrateConverter(this);
-    private final ItemConverter itemConverter = new ItemConverter(this);
-    private final ExprConverter exprConverter = new ExprConverter(this);
-    private final StmtConverter stmtConverter = new StmtConverter(this);
-    private final IdentifierConverter identifierConverter = new IdentifierConverter(this);
-    private final PatternConverter patternConverter = new PatternConverter(this);
-    private final TypeConverter typeConverter = new TypeConverter(this);
-    private final ParamConverter paramConverter = new ParamConverter(this);
-
     // TODO: Rework this properly
     private final Map<String, VariableDeclaration> variables = new HashMap<>();
     private final Map<VariableDeclaration, ProgramVariable> programVariables = new HashMap<>();
@@ -50,352 +41,299 @@ public class Converter {
         return services;
     }
 
-    private void declareVariable(String name, LetStatement decl) {
-        variables.put(name, decl);
-        programVariables.put(decl, new ProgramVariable(new Name(name),
-            new KeYRustyType(decl.getType().getSort(services))));
+    private void declareVariable(Pattern pat, LetStatement decl) {
+        if (pat instanceof IdentPattern ip) {
+            Name name = ip.name();
+            variables.put(name.toString(), decl);
+            programVariables.put(decl, new ProgramVariable(name,
+                new KeYRustyType(decl.getType().getSort(services))));
+        }
     }
 
-    private void declareVariable(String name, Param decl) {
+    private void declareVariable(String name, FunctionParamPattern decl) {
         variables.put(name, decl);
         programVariables.put(decl, services.getNamespaces().programVariables().lookup(name));
     }
 
-    private VariableDeclaration getDecl(String name) {
-        return variables.get(name);
+    private VariableDeclaration getDecl(PathInExpression path) {
+        // TODO: For now, only use local vars, i.e., ignore all but the last segment
+        return variables.get(path.segments().last().segment().ident().name().toString());
     }
 
-    private ProgramVariable getProgramVariable(String name) {
-        return programVariables.get(getDecl(name));
+    private ProgramVariable getProgramVariable(PathInExpression path) {
+        return programVariables.get(getDecl(path));
     }
 
-    private Sort getSort(String name) {
-        var decl = getDecl(name);
-        if (decl != null)
-            return decl.getType().getSort(services);
-        ProgramVariable pv = services.getNamespaces().programVariables().lookup(name);
-        assert pv != null : "Unknown pv " + name;
-        return pv.sort();
+    public Crate convertCrate(org.key_project.rusty.parsing.RustyWhileParser.CrateContext ctx) {
+        return new Crate(ctx.item().stream().map(this::convertItem)
+                .collect(ImmutableList.collector()));
     }
 
-    public Crate convertCrate(
-            org.key_project.rusty.parsing.RustyWhileParser.CrateContext ctx) {
-        return ctx.accept(crateConverter);
-    }
 
-    public Expr visitAssignmentExpression(
-            org.key_project.rusty.parsing.RustyWhileParser.AssignmentExpressionContext ctx) {
-        return exprConverter.visitAssignmentExpression(ctx);
-    }
-
-    public Expr visitBlockExpr(
-            org.key_project.rusty.parsing.RustyWhileParser.BlockExprContext ctx) {
-        return exprConverter.visitBlockExpr(ctx);
-    }
-
-    public Expr visitLiteralExpr(
-            org.key_project.rusty.parsing.RustyWhileParser.LiteralExprContext ctx) {
-        return exprConverter.visitLiteralExpr(ctx);
-    }
-
-    public Expr visitPathExpr(
-            org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
-        return exprConverter.visitPathExpr(ctx);
-    }
-
-    public Statement visitExprStmt(
-            org.key_project.rusty.parsing.RustyWhileParser.ExprStmtContext ctx) {
-        return stmtConverter.visitExprStmt(ctx);
-    }
-
-    public Statement visitLetStmt(
-            org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
-        return stmtConverter.visitLetStmt(ctx);
-    }
-
-    public Identifier visitIdentifier(
-            org.key_project.rusty.parsing.RustyWhileParser.IdentifierContext ctx) {
-        return identifierConverter.visitIdentifier(ctx);
-    }
-
-    public Pattern visitPattern(
-            org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
-        return patternConverter.visitPattern(ctx);
-    }
-
-    public Type convertParenthesizedType(
-            org.key_project.rusty.parsing.RustyWhileParser.ParenthesizedTypeContext ctx) {
-        return typeConverter.visitParenthesizedType(ctx);
-    }
-
-    public Type convertTypePath(
-            org.key_project.rusty.parsing.RustyWhileParser.TypePathContext ctx) {
-        return typeConverter.visitTypePath(ctx);
+    public Item convertItem(org.key_project.rusty.parsing.RustyWhileParser.ItemContext ctx) {
+        // TODO: Rework
+        return convertFunction(ctx.function_());
     }
 
     public Function convertFunction(
             org.key_project.rusty.parsing.RustyWhileParser.Function_Context ctx) {
-        return itemConverter.visitFunction_(ctx);
+        Name name = convertIdentifier(ctx.identifier()).name();
+        ImmutableArray<FunctionParam> params =
+            convertFunctionParams(ctx.functionParams());
+        Type returnType = convertType(ctx.functionRetTy().type_());
+        BlockExpression body =
+            convertBlockExpr(ctx.blockExpr());
+        return new Function(name,
+            params,
+            returnType,
+            body);
     }
 
-    private static class CrateConverter
-            extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Crate> {
-        private final Converter converter;
+    public Expr convertExpr(org.key_project.rusty.parsing.RustyWhileParser.ExprContext ctx) {
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileParser.LiteralExpressionContext lit)
+            return convertLiteralExpr(lit.literalExpr());
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileParser.PathExpressionContext path)
+            return convertPathExpr(path.pathExpr());
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileParser.ArithmeticOrLogicalExpressionContext ale)
+            return convertArithmeticOrLogicalExpression(ale);
+        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileParser.AssignmentExpressionContext ae)
+            return convertAssignmentExpression(ae);
+        throw new IllegalArgumentException("TODO @ DD: handle " + ctx.getText());
+    }
 
-        CrateConverter(Converter converter) {
-            this.converter = converter;
+    public Expr convertArithmeticOrLogicalExpression(
+            org.key_project.rusty.parsing.RustyWhileParser.ArithmeticOrLogicalExpressionContext ctx) {
+        ArithLogicalExpression.Operator op = null;
+        if (ctx.AND() != null)
+            op = ArithLogicalExpression.Operator.BitwiseAnd;
+        if (ctx.OR() != null)
+            op = ArithLogicalExpression.Operator.BitwiseOr;
+        if (ctx.CARET() != null)
+            op = ArithLogicalExpression.Operator.BitwiseXor;
+        if (ctx.PLUS() != null)
+            op = ArithLogicalExpression.Operator.Plus;
+        if (ctx.MINUS() != null)
+            op = ArithLogicalExpression.Operator.Minus;
+        if (ctx.PERCENT() != null)
+            op = ArithLogicalExpression.Operator.Modulo;
+        if (ctx.STAR() != null)
+            op = ArithLogicalExpression.Operator.Multiply;
+        if (ctx.SLASH() != null)
+            op = ArithLogicalExpression.Operator.Divide;
+        assert op != null;
+        return new ArithLogicalExpression(convertExpr(ctx.expr(0)), op,
+            convertExpr(ctx.expr(1)));
+    }
+
+    public AssignmentExpression convertAssignmentExpression(
+            org.key_project.rusty.parsing.RustyWhileParser.AssignmentExpressionContext ctx) {
+        var lhs = convertExpr(ctx.expr(0));
+        var rhs = convertExpr(ctx.expr(1));
+        return new AssignmentExpression(lhs, rhs);
+    }
+
+    public BlockExpression convertBlockExpr(
+            org.key_project.rusty.parsing.RustyWhileParser.BlockExprContext ctx) {
+        var stmtsCtx = ctx.stmts();
+
+        var stmts = stmtsCtx.stmt().stream().map(this::convertStmt)
+                .collect(ImmutableList.collector());
+        var value = convertExpr(stmtsCtx.expr());
+
+        return new BlockExpression(stmts, value);
+    }
+
+    public Expr convertLiteralExpr(
+            org.key_project.rusty.parsing.RustyWhileParser.LiteralExprContext ctx) {
+        if (ctx.KW_TRUE() != null)
+            return new BooleanLiteralExpression(true);
+        if (ctx.KW_FALSE() != null)
+            return new BooleanLiteralExpression(false);
+        var intLit = ctx.INTEGER_LITERAL();
+        if (intLit != null) {
+            var text = intLit.getText();
+            var signed = text.contains("i");
+            var split = text.split("[ui]");
+            var size = split[split.length - 1];
+            var suffix = IntegerLiteralExpression.IntegerSuffix.get(signed, size);
+            var lit = split[0];
+
+            var value = new BigInteger(
+                lit);
+            return new IntegerLiteralExpression(value, suffix);
         }
 
-        @Override
-        public Crate visitCrate(org.key_project.rusty.parsing.RustyWhileParser.CrateContext ctx) {
-            return new Crate(ctx.item().stream().map(i -> i.accept(converter.itemConverter))
-                    .collect(ImmutableList.collector()));
+        throw new IllegalArgumentException("Expected boolean or integer literal");
+    }
+
+    public ProgramVariable convertPathExpr(
+            org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
+        if (ctx.qualifiedPathInExpr() != null)
+            throw new IllegalArgumentException("TODO @ DD: Qual path");
+        else {
+            var pieCtx = ctx.pathInExpr();
+            var segments =
+                pieCtx.pathExprSegment().stream().map(this::convertPathExprSegment).toList();
+            var pie = new PathInExpression(new ImmutableArray<>(segments));
+            return Objects.requireNonNull(getProgramVariable(pie));
         }
     }
 
-    private static class ItemConverter
-            extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Item> {
-        private final Converter converter;
-
-        ItemConverter(Converter converter) {
-            this.converter = converter;
-        }
-
-        @Override
-        public Item visitItem(org.key_project.rusty.parsing.RustyWhileParser.ItemContext ctx) {
-            // TODO: Rework
-            return ctx.function_().accept(this);
-        }
-
-        @Override
-        public Function visitFunction_(
-                org.key_project.rusty.parsing.RustyWhileParser.Function_Context ctx) {
-            Name name = ctx.identifier().accept(converter.identifierConverter).name();
-            ImmutableList<Param> params = ctx.functionParams() == null ? ImmutableSLList.nil()
-                    : ctx.functionParams().functionParam().stream()
-                            .map(p -> p.accept(converter.paramConverter))
-                            .collect(ImmutableList.collector());
-            Type returnType = ctx.functionRetTy().type_().accept(converter.typeConverter);
-            BlockExpression body =
-                (BlockExpression) ctx.blockExpr().accept(converter.exprConverter);
-            return new Function(name,
-                params,
-                returnType,
-                body);
-        }
+    public Statement convertExprStmt(
+            org.key_project.rusty.parsing.RustyWhileParser.ExprStmtContext ctx) {
+        return new ExpressionStatement(convertExpr(ctx.expr()));
     }
 
-    private static class ExprConverter
-            extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Expr> {
-        private final Converter converter;
+    public Statement convertLetStmt(
+            org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
+        Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
+        LetStatement letStatement = new LetStatement(pat,
+            convertType(ctx.type_()),
+            convertExpr(ctx.expr()));
+        declareVariable(pat, letStatement);
+        return letStatement;
+    }
 
-        ExprConverter(Converter converter) {
-            this.converter = converter;
+    public Statement convertStmt(org.key_project.rusty.parsing.RustyWhileParser.StmtContext ctx) {
+        if (ctx.SEMI() != null) {
+            return new EmptyStatement();
         }
+        if (ctx.item() != null)
+            return convertItem(ctx.item());
+        if (ctx.letStmt() != null)
+            return convertLetStmt(ctx.letStmt());
+        if (ctx.exprStmt() != null)
+            return convertExprStmt(ctx.exprStmt());
+        throw new IllegalArgumentException("Expected statement, got: " + ctx.getText());
+    }
 
-        @Override
-        public Expr visitArithmeticOrLogicalExpression(
-                org.key_project.rusty.parsing.RustyWhileParser.ArithmeticOrLogicalExpressionContext ctx) {
-            ArithLogicalExpression.Operator op = null;
-            if (ctx.AND() != null)
-                op = ArithLogicalExpression.Operator.BitwiseAnd;
-            if (ctx.OR() != null)
-                op = ArithLogicalExpression.Operator.BitwiseOr;
-            if (ctx.CARET() != null)
-                op = ArithLogicalExpression.Operator.BitwiseXor;
-            if (ctx.PLUS() != null)
-                op = ArithLogicalExpression.Operator.Plus;
-            if (ctx.MINUS() != null)
-                op = ArithLogicalExpression.Operator.Minus;
-            if (ctx.PERCENT() != null)
-                op = ArithLogicalExpression.Operator.Modulo;
-            if (ctx.STAR() != null)
-                op = ArithLogicalExpression.Operator.Multiply;
-            if (ctx.SLASH() != null)
-                op = ArithLogicalExpression.Operator.Divide;
-            assert op != null;
-            return new ArithLogicalExpression(ctx.expr(0).accept(this), op,
-                ctx.expr(1).accept(this));
+    public Identifier convertIdentifier(
+            org.key_project.rusty.parsing.RustyWhileParser.IdentifierContext ctx) {
+        return new Identifier(new Name(ctx.getText()));
+    }
+
+    public Pattern convertPattern(
+            org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
+        var alts = ctx.patternNoTopAlt();
+        if (alts.size() == 1) {
+            return convertPatternNoTopAlt(alts.get(0));
         }
+        return new AltPattern(
+            new ImmutableArray<>(alts.stream().map(this::convertPatternNoTopAlt).toList()));
+    }
 
-        @Override
-        public AssignmentExpression visitAssignmentExpression(
-                org.key_project.rusty.parsing.RustyWhileParser.AssignmentExpressionContext ctx) {
-            var lhs = ctx.expr(0).accept(this);
-            var rhs = ctx.expr(1).accept(this);
-            return new AssignmentExpression(lhs, rhs);
-        }
-
-        @Override
-        public BlockExpression visitBlockExpr(
-                org.key_project.rusty.parsing.RustyWhileParser.BlockExprContext ctx) {
-            var stmtsCtx = ctx.stmts();
-
-            var stmts = stmtsCtx.stmt().stream().map(s -> s.accept(converter.stmtConverter))
-                    .collect(ImmutableList.collector());
-            var value = stmtsCtx.expr().accept(this);
-
-            return new BlockExpression(stmts, value);
-        }
-
-        @Override
-        public Expr visitLiteralExpr(
-                org.key_project.rusty.parsing.RustyWhileParser.LiteralExprContext ctx) {
-            if (ctx.KW_TRUE() != null)
-                return new BooleanLiteralExpression(true);
-            if (ctx.KW_FALSE() != null)
-                return new BooleanLiteralExpression(false);
-            var intLit = ctx.INTEGER_LITERAL();
-            if (intLit != null) {
-                var text = intLit.getText();
-                var signed = text.contains("i");
-                var split = text.split("[ui]");
-                var size = split[split.length - 1];
-                var suffix = IntegerLiteralExpression.IntegerSuffix.get(signed, size);
-                var lit = split[0];
-
-                var value = new BigInteger(
-                    lit);
-                return new IntegerLiteralExpression(value, suffix);
+    private Pattern convertPatternNoTopAlt(RustyWhileParser.PatternNoTopAltContext ctx) {
+        if (ctx.patternWithoutRange() != null) {
+            var pat = ctx.patternWithoutRange();
+            if (pat.literalPattern() != null) {
+                return new LiteralPattern();
             }
-
-            throw new IllegalArgumentException("Expected boolean or integer literal");
-        }
-
-        @Override
-        public ProgramVariable visitPathExpr(
-                org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
-            assert ctx.pathExprSegment().size() == 1;
-            var ident = ctx.pathExprSegment(0).pathIdentSegment().identifier()
-                    .accept(converter.identifierConverter);
-            var pv = converter.getProgramVariable(ident.name().toString());
-            assert pv != null;
-            return pv;
-        }
-    }
-
-    private static class StmtConverter
-            extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Statement> {
-        private final Converter converter;
-
-        StmtConverter(Converter converter) {
-            this.converter = converter;
-        }
-
-        @Override
-        public Statement visitExprStmt(
-                org.key_project.rusty.parsing.RustyWhileParser.ExprStmtContext ctx) {
-            return new ExpressionStatement(ctx.expr().accept(converter.exprConverter));
-        }
-
-        @Override
-        public Statement visitLetStmt(
-                org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
-            Pattern pat = ctx.pattern().accept(converter.patternConverter);
-            LetStatement letStatement = new LetStatement(pat,
-                ctx.type_().accept(converter.typeConverter),
-                ctx.expr().accept(converter.exprConverter));
-            if (pat instanceof IdentPattern ip)
-                converter.declareVariable(ip.name().toString(), letStatement);
-            return letStatement;
-        }
-
-        @Override
-        public Statement visitStmt(org.key_project.rusty.parsing.RustyWhileParser.StmtContext ctx) {
-            if (ctx.SEMI() != null) {
-                return new EmptyStatement();
+            if (pat.identifierPattern() != null) {
+                return new IdentPattern(pat.identifierPattern().KW_REF() != null,
+                    pat.identifierPattern().KW_MUT() != null,
+                    convertIdentifier(pat.identifierPattern().identifier()));
             }
-            return super.visitStmt(ctx);
+            if (pat.wildcardPattern() != null) {
+                return WildCardPattern.WILDCARD;
+            }
+        }
+        throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
+    }
+
+    public Type convertType(org.key_project.rusty.parsing.RustyWhileParser.Type_Context ctx) {
+        if (ctx.typeNoBounds() != null) {
+            var ty = ctx.typeNoBounds();
+            if (ty.parenthesizedType() != null)
+                return convertParenthesizedType(ty.parenthesizedType());
+            if (ty.traitObjectTypeOneBound() != null)
+                return convertTraitObjectOneBound(ty.traitObjectTypeOneBound());
+            if (ty.typePath() != null)
+                return convertTypePath(ty.typePath());
+            if (ty.tupleType() != null)
+                throw new IllegalArgumentException("TODO @ DD");
+            if (ty.neverType() != null)
+                throw new IllegalArgumentException("TODO @ DD");
+        }
+        throw new IllegalArgumentException("Unknown type " + ctx.getText());
+    }
+
+    public Type convertParenthesizedType(
+            org.key_project.rusty.parsing.RustyWhileParser.ParenthesizedTypeContext ctx) {
+        return convertType(ctx.type_());
+    }
+
+    private Type convertTraitObjectOneBound(org.key_project.rusty.parsing.RustyWhileParser.TraitObjectTypeOneBoundContext ctx) {
+        var tbCtx =ctx.traitBound();
+        if (ctx.KW_DYN() == null && tbCtx.QUESTION() == null && tbCtx.forLifetimes() == null) {
+            return convertTypePath(tbCtx.typePath());
+        }
+        throw new IllegalArgumentException("TODO @ DD");
+    }
+
+    public Type convertTypePath(
+            org.key_project.rusty.parsing.RustyWhileParser.TypePathContext ctx) {
+        assert ctx.typePathSegment().size() == 1;
+        var text = ctx.typePathSegment(0).pathIdentSegment().identifier().getText();
+        return switch (text) {
+        case "bool" -> PrimitiveType.BOOL;
+        case "u8" -> PrimitiveType.U8;
+        case "u16" -> PrimitiveType.U16;
+        case "u32" -> PrimitiveType.U32;
+        case "u64" -> PrimitiveType.U64;
+        case "u128" -> PrimitiveType.U128;
+        case "usize" -> PrimitiveType.USIZE;
+        case "i8" -> PrimitiveType.I8;
+        case "i16" -> PrimitiveType.I16;
+        case "i32" -> PrimitiveType.I32;
+        case "i64" -> PrimitiveType.I64;
+        case "i128" -> PrimitiveType.I128;
+        case "isize" -> PrimitiveType.ISIZE;
+        case "char" -> PrimitiveType.CHAR;
+        case "str" -> PrimitiveType.STR;
+        case "!" -> PrimitiveType.NEVER;
+        default -> throw new IllegalArgumentException("Unknown type '" + text + "'");
+        };
+    }
+
+    public ImmutableArray<FunctionParam> convertFunctionParams(
+            org.key_project.rusty.parsing.RustyWhileParser.FunctionParamsContext ctx) {
+        if (ctx == null) return new ImmutableArray<>();
+        List<FunctionParam> params = new LinkedList<>();
+        if (ctx.selfParam() != null) {
+            params.add(convertSelfParam(ctx.selfParam()));
+        }
+        for (var param : ctx.functionParam()) {
+            params.add(convertFunctionParamPattern(param.functionParamPattern()));
+        }
+        return new ImmutableArray<>(params);
+    }
+
+    public SelfParam convertSelfParam(
+            org.key_project.rusty.parsing.RustyWhileParser.SelfParamContext ctx) {
+        if (ctx.shorthandSelf() != null) {
+            var shortSelf = ctx.shorthandSelf();
+            return new SelfParam(shortSelf.AND() != null, shortSelf.KW_MUT() != null, null);
+        } else {
+            var self = ctx.typedSelf();
+            return new SelfParam(/* TODO */ false, self.KW_MUT() != null,
+                convertType(self.type_()));
         }
     }
 
-    private static class IdentifierConverter
-            extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Identifier> {
-        private final Converter converter;
-
-        IdentifierConverter(Converter converter) {
-            this.converter = converter;
-        }
-
-        @Override
-        public Identifier visitIdentifier(
-                org.key_project.rusty.parsing.RustyWhileParser.IdentifierContext ctx) {
-            return new Identifier(new Name(ctx.getText()));
-        }
+    public FunctionParamPattern convertFunctionParamPattern(
+            org.key_project.rusty.parsing.RustyWhileParser.FunctionParamPatternContext ctx) {
+        FunctionParamPattern param = new FunctionParamPattern(convertPattern(ctx.pattern()),
+            convertType(ctx.type_()));
+        declareVariable(((IdentPattern) param.getPattern()).name().toString(), param);
+        return param;
     }
 
-    private static class PatternConverter
-            extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Pattern> {
-        private final Converter converter;
-
-        PatternConverter(Converter converter) {
-            this.converter = converter;
-        }
-
-        @Override
-        public Pattern visitPattern(
-                org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
-            return new IdentPattern(ctx.KW_MUT() != null,
-                ctx.identifier().accept(converter.identifierConverter));
-        }
+    public PathExprSegment convertPathExprSegment(RustyWhileParser.PathExprSegmentContext ctx) {
+        return new PathExprSegment(convertPathIdentSegment(ctx.pathIdentSegment()));
     }
 
-    private static class TypeConverter
-            extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Type> {
-        private final Converter converter;
-
-        TypeConverter(Converter converter) {
-            this.converter = converter;
-        }
-
-        @Override
-        public Type visitParenthesizedType(
-                org.key_project.rusty.parsing.RustyWhileParser.ParenthesizedTypeContext ctx) {
-            return ctx.type_().accept(this);
-        }
-
-        @Override
-        public Type visitTypePath(
-                org.key_project.rusty.parsing.RustyWhileParser.TypePathContext ctx) {
-            assert ctx.typePathSegment().size() == 1;
-            var text = ctx.typePathSegment(0).pathIdentSegment().identifier().getText();
-            return switch (text) {
-            case "bool" -> PrimitiveType.BOOL;
-            case "u8" -> PrimitiveType.U8;
-            case "u16" -> PrimitiveType.U16;
-            case "u32" -> PrimitiveType.U32;
-            case "u64" -> PrimitiveType.U64;
-            case "u128" -> PrimitiveType.U128;
-            case "usize" -> PrimitiveType.USIZE;
-            case "i8" -> PrimitiveType.I8;
-            case "i16" -> PrimitiveType.I16;
-            case "i32" -> PrimitiveType.I32;
-            case "i64" -> PrimitiveType.I64;
-            case "i128" -> PrimitiveType.I128;
-            case "isize" -> PrimitiveType.ISIZE;
-            case "char" -> PrimitiveType.CHAR;
-            case "str" -> PrimitiveType.STR;
-            case "!" -> PrimitiveType.NEVER;
-            default -> throw new IllegalArgumentException("Unknown type '" + text + "'");
-            };
-        }
-    }
-
-    private static class ParamConverter
-            extends org.key_project.rusty.parsing.RustyWhileParserBaseVisitor<Param> {
-        private final Converter converter;
-
-        ParamConverter(Converter converter) {
-            this.converter = converter;
-        }
-
-        @Override
-        public Param visitFunctionParamPattern(
-                org.key_project.rusty.parsing.RustyWhileParser.FunctionParamPatternContext ctx) {
-            Param param = new Param(ctx.pattern().accept(converter.patternConverter),
-                ctx.type_().accept(converter.typeConverter));
-            converter.declareVariable(((IdentPattern) param.getPattern()).name().toString(), param);
-            return param;
-        }
+    public PathIdentSegment convertPathIdentSegment(
+            org.key_project.rusty.parsing.RustyWhileParser.PathIdentSegmentContext ctx) {
+        return new PathIdentSegment(convertIdentifier(ctx.identifier()));
     }
 }

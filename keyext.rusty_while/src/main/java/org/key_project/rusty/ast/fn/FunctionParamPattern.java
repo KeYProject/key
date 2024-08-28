@@ -4,19 +4,17 @@
 package org.key_project.rusty.ast.fn;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.VariableDeclaration;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public class Param implements RustyProgramElement, VariableDeclaration {
+public class FunctionParamPattern implements FunctionParam {
     private final Pattern pattern;
     private final Type type;
 
-    public Param(Pattern pattern, Type type) {
+    public FunctionParamPattern(Pattern pattern, Type type) {
         this.pattern = pattern;
         this.type = type;
     }

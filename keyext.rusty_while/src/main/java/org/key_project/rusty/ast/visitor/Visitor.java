@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.visitor;
 
+import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.fn.SelfParam;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -32,4 +34,60 @@ public interface Visitor {
     void performActionOnProgramVariable(ProgramVariable x);
 
     void performActionOnEmptyStatement(EmptyStatement x);
+
+    void performActionOnMethodCall(MethodCallExpression x);
+
+    void performActionOnFieldExpression(FieldExpression x);
+
+    void performActionOnTupleIndexingExpression(TupleIndexingExpression x);
+
+    void performActionOnCallExpression(CallExpression x);
+
+    void performActionOnIndexExpression(IndexExpression x);
+
+    void performActionOnErrorPropagationExpression(ErrorPropagationExpression x);
+
+    void performActionOnBorrowExpression(BorrowExpression x);
+
+    void performActionOnDereferenceExpression(DereferenceExpression x);
+
+    void performActionOnTypeCastExpression(TypeCastExpression x);
+
+    void performActionOnComparisonExpression(ComparisonExpression x);
+
+    void performActionOnRangeExpression(RangeExpression x);
+
+    void performActionOnLazyBooleanExpression(LazyBooleanExpression x);
+
+    void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x);
+
+    void performActionOnContinueExpression(ContinueExpression x);
+
+    void performActionOnBreakExpression(BreakExpression x);
+
+    void performActionOnReturnExpression(ReturnExpression x);
+
+    void performActionOnGroupedExpression(GroupedExpression x);
+
+    void performActionOnEnumeratedArrayExpression(EnumeratedArrayExpression x);
+
+    void performActionOnRepeatedArrayExpression(RepeatedArrayExpression x);
+
+    void performActionOnTupleExpression(TupleExpression x);
+
+    void performActionOnPathInExpression(PathInExpression x);
+
+    void performActionOnTupleStructExpression(TupleStructExpression x);
+
+    void performActionOnUnitStructExpression(UnitStructExpression x);
+
+    void performActionOnFieldStructExpression(FieldStructExpression x);
+
+    void performActionOnEnumVariantFieldless(EnumVariantFieldless x);
+
+    void performActionOnEnumVariantTuple(EnumVariantTuple x);
+
+    void performActionOnClosureExpression(ClosureExpression x);
+
+    void performActionOnSelfParam(SelfParam x);
 }

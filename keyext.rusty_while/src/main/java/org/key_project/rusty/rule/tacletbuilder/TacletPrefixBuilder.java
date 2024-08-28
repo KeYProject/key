@@ -68,9 +68,11 @@ public class TacletPrefixBuilder {
                     setPrefixOfOccurrence(sv, numberOfBoundVars);
                 } else {
                     // TODO: For now, don't report an error. It's likely not needed
-                    /*throw new TacletPrefixBuilder.InvalidPrefixException(
-                        tacletBuilder.getName().toString(), sv, prefix,
-                        numberOfBoundVars);*/
+                    /*
+                     * throw new TacletPrefixBuilder.InvalidPrefixException(
+                     * tacletBuilder.getName().toString(), sv, prefix,
+                     * numberOfBoundVars);
+                     */
                 }
             }
         }

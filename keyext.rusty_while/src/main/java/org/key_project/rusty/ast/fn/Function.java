@@ -13,11 +13,10 @@ import org.key_project.rusty.ast.Item;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.ty.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
-import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-public record Function(Name name, ImmutableList<Param> params, Type returnType,
+public record Function(Name name, org.key_project.util.collection.ImmutableArray<FunctionParam> params, Type returnType,
                        BlockExpression body) implements Item, Named {
 
     @Override
@@ -38,7 +37,7 @@ public record Function(Name name, ImmutableList<Param> params, Type returnType,
     @Override
     public String toString() {
         return "fn " + name() + "("
-                + params.map(Param::toString).stream().collect(Collectors.joining(", ")) + ") -> "
+                + params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ") -> "
                 + returnType + " " + body;
     }
 
