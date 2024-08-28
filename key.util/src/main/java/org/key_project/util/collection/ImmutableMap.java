@@ -5,6 +5,7 @@ package org.key_project.util.collection;
 
 import java.util.Iterator;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -14,7 +15,7 @@ import org.jspecify.annotations.Nullable;
  * @param <S> the type of keys for this map
  * @param <T> the type of contained mapped values
  */
-public interface ImmutableMap<S, T extends @Nullable Object>
+public interface ImmutableMap<S extends @NonNull Object, T extends @Nullable Object>
         extends Iterable<ImmutableMapEntry<S, T>> {
 
     /**
