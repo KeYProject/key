@@ -1,7 +1,7 @@
-parser grammar RustyWhileParser;
+parser grammar RustyParser;
 
 
-options { tokenVocab = RustyWhileLexer; }
+options { tokenVocab = RustyLexer; }
 @ header
 {
 package org.key_project.rusty.parsing;

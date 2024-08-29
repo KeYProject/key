@@ -1,8 +1,8 @@
-parser grammar RustyWhileSchemaParser;
+parser grammar RustySchemaParser;
 
-import RustyWhileParser;
+import RustyParser;
 
-options { tokenVocab = RustyWhileSchemaLexer; }
+options { tokenVocab = RustySchemaLexer; }
 blockExpr
    : '{' 'c#' stmts? '#c' '}' # ContextBlockExpr
    | '{' stmts? '}' # StandardBlockExpr

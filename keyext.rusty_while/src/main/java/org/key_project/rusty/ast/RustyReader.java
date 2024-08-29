@@ -34,9 +34,9 @@ public class RustyReader {
     public RustyBlock readBlock(String block, Context context) {
         var fn = context.buildFunction(block);
         var lexer =
-            new org.key_project.rusty.parsing.RustyWhileLexer(CharStreams.fromString(fn));
+            new org.key_project.rusty.parsing.RustyLexer(CharStreams.fromString(fn));
         var ts = new CommonTokenStream(lexer);
-        var parser = new org.key_project.rusty.parsing.RustyWhileParser(ts);
+        var parser = new org.key_project.rusty.parsing.RustyParser(ts);
         var converter = new Converter(services);
         var converted = converter.convertFunction(parser.function_());
         return new RustyBlock(converted.body());

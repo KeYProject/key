@@ -22,7 +22,7 @@ import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.ast.ty.PrimitiveType;
 import org.key_project.rusty.ast.ty.Type;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.parsing.RustyWhileParser;
+import org.key_project.rusty.parsing.RustyParser;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -71,19 +71,19 @@ public class Converter {
         throw new UnsupportedOperationException("TODO @ DD : implement getLabel");
     }
 
-    public Crate convertCrate(org.key_project.rusty.parsing.RustyWhileParser.CrateContext ctx) {
+    public Crate convertCrate(org.key_project.rusty.parsing.RustyParser.CrateContext ctx) {
         return new Crate(ctx.item().stream().map(this::convertItem)
                 .collect(ImmutableList.collector()));
     }
 
 
-    private Item convertItem(org.key_project.rusty.parsing.RustyWhileParser.ItemContext ctx) {
+    private Item convertItem(org.key_project.rusty.parsing.RustyParser.ItemContext ctx) {
         // TODO: Rework
         return convertFunction(ctx.function_());
     }
 
     public Function convertFunction(
-            org.key_project.rusty.parsing.RustyWhileParser.Function_Context ctx) {
+            org.key_project.rusty.parsing.RustyParser.Function_Context ctx) {
         Name name = convertIdentifier(ctx.identifier()).name();
         ImmutableArray<FunctionParam> params =
             convertFunctionParams(ctx.functionParams());
@@ -96,59 +96,59 @@ public class Converter {
             body);
     }
 
-    private Expr convertExpr(org.key_project.rusty.parsing.RustyWhileParser.ExprContext ctx) {
-        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileParser.LiteralExpressionContext lit)
+    private Expr convertExpr(org.key_project.rusty.parsing.RustyParser.ExprContext ctx) {
+        if (ctx instanceof org.key_project.rusty.parsing.RustyParser.LiteralExpressionContext lit)
             return convertLiteralExpr(lit.literalExpr());
-        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileParser.PathExpressionContext path)
+        if (ctx instanceof org.key_project.rusty.parsing.RustyParser.PathExpressionContext path)
             return convertPathExpr(path.pathExpr());
-        if (ctx instanceof RustyWhileParser.MethodCallExpressionContext x)
+        if (ctx instanceof RustyParser.MethodCallExpressionContext x)
             return convertMethodCallExpression(x);
-        if (ctx instanceof RustyWhileParser.FieldExpressionContext x)
+        if (ctx instanceof RustyParser.FieldExpressionContext x)
             return convertFieldExpression(x);
-        if (ctx instanceof RustyWhileParser.TupleIndexingExpressionContext x)
+        if (ctx instanceof RustyParser.TupleIndexingExpressionContext x)
             return convertTupleIndexingExpression(x);
-        if (ctx instanceof RustyWhileParser.CallExpressionContext x)
+        if (ctx instanceof RustyParser.CallExpressionContext x)
             return convertCallExpression(x);
-        if (ctx instanceof RustyWhileParser.IndexExpressionContext x)
+        if (ctx instanceof RustyParser.IndexExpressionContext x)
             return convertIndexExpression(x);
-        if (ctx instanceof RustyWhileParser.ErrorPropagationExpressionContext x)
+        if (ctx instanceof RustyParser.ErrorPropagationExpressionContext x)
             return convertErrorPropagationExpression(x);
-        if (ctx instanceof RustyWhileParser.BorrowExpressionContext x)
+        if (ctx instanceof RustyParser.BorrowExpressionContext x)
             return convertBorrowExpression(x);
-        if (ctx instanceof RustyWhileParser.DereferenceExpressionContext x)
+        if (ctx instanceof RustyParser.DereferenceExpressionContext x)
             return convertDereferenceExpression(x);
-        if (ctx instanceof RustyWhileParser.NegationExpressionContext x)
+        if (ctx instanceof RustyParser.NegationExpressionContext x)
             return convertNegationExpression(x);
-        if (ctx instanceof RustyWhileParser.TypeCastExpressionContext x)
+        if (ctx instanceof RustyParser.TypeCastExpressionContext x)
             return convertTypeCastExpression(x);
-        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileParser.ArithmeticOrLogicalExpressionContext ale)
+        if (ctx instanceof org.key_project.rusty.parsing.RustyParser.ArithmeticOrLogicalExpressionContext ale)
             return convertArithmeticOrLogicalExpression(ale);
-        if (ctx instanceof RustyWhileParser.ComparisonExpressionContext x)
+        if (ctx instanceof RustyParser.ComparisonExpressionContext x)
             return convertComparisonExpression(x);
-        if (ctx instanceof RustyWhileParser.LazyBooleanExpressionContext x)
+        if (ctx instanceof RustyParser.LazyBooleanExpressionContext x)
             return convertLazyBooleanExpression(x);
-        if (ctx instanceof RustyWhileParser.RangeExpressionContext x)
+        if (ctx instanceof RustyParser.RangeExpressionContext x)
             return convertRangeExpression(x);
-        if (ctx instanceof org.key_project.rusty.parsing.RustyWhileParser.AssignmentExpressionContext ae)
+        if (ctx instanceof org.key_project.rusty.parsing.RustyParser.AssignmentExpressionContext ae)
             return convertAssignmentExpression(ae);
-        if (ctx instanceof RustyWhileParser.CompoundAssignmentExpressionContext x)
+        if (ctx instanceof RustyParser.CompoundAssignmentExpressionContext x)
             return convertCompoundAssignmentExpression(x);
-        if (ctx instanceof RustyWhileParser.ContinueExpressionContext x)
+        if (ctx instanceof RustyParser.ContinueExpressionContext x)
             return convertContinueExpression(x);
-        if (ctx instanceof RustyWhileParser.BreakExpressionContext x)
+        if (ctx instanceof RustyParser.BreakExpressionContext x)
             return convertBreakExpression(x);
-        if (ctx instanceof RustyWhileParser.ReturnExpressionContext x)
+        if (ctx instanceof RustyParser.ReturnExpressionContext x)
             return convertReturnExpression(x);
-        if (ctx instanceof RustyWhileParser.GroupedExpressionContext x)
+        if (ctx instanceof RustyParser.GroupedExpressionContext x)
             return convertGroupedExpression(x);
-        if (ctx instanceof RustyWhileParser.ArrayExpressionContext x)
+        if (ctx instanceof RustyParser.ArrayExpressionContext x)
             if (x.arrayElements() == null || x.arrayElements().SEMI() == null)
                 return convertEnumeratedArrayExpression(x);
             else
                 return convertRepeatedArrayExpression(x);
-        if (ctx instanceof RustyWhileParser.TupleExpressionContext x)
+        if (ctx instanceof RustyParser.TupleExpressionContext x)
             return convertTupleExpression(x);
-        if (ctx instanceof RustyWhileParser.StructExpression_Context x) {
+        if (ctx instanceof RustyParser.StructExpression_Context x) {
             if (x.structExpr().structExprUnit() != null)
                 return convertUnitStructExpression(x.structExpr().structExprUnit());
             if (x.structExpr().structExprTuple() != null)
@@ -156,7 +156,7 @@ public class Converter {
             if (x.structExpr().structExprStruct() != null)
                 return convertStructStructExpression(x.structExpr().structExprStruct());
         }
-        if (ctx instanceof RustyWhileParser.EnumerationVariantExpression_Context x) {
+        if (ctx instanceof RustyParser.EnumerationVariantExpression_Context x) {
             if (x.enumerationVariantExpr().enumExprStruct() != null)
                 return convertEnumVariantStruct(x.enumerationVariantExpr().enumExprStruct());
             if (x.enumerationVariantExpr().enumExprTuple() != null)
@@ -164,16 +164,16 @@ public class Converter {
             if (x.enumerationVariantExpr().enumExprFieldless() != null)
                 return convertEnumVariantFieldless(x.enumerationVariantExpr().enumExprFieldless());
         }
-        if (ctx instanceof RustyWhileParser.ClosureExpression_Context x)
+        if (ctx instanceof RustyParser.ClosureExpression_Context x)
             return convertClosureExpression(x.closureExpr());
-        if (ctx instanceof RustyWhileParser.ExpressionWithBlock_Context x)
+        if (ctx instanceof RustyParser.ExpressionWithBlock_Context x)
             return convertExprWithBlock(x.exprWithBlock());
         throw new UnsupportedOperationException(
             "Unknown expr: " + ctx.getText() + " class: " + ctx.getClass());
     }
 
     private Expr convertLiteralExpr(
-            org.key_project.rusty.parsing.RustyWhileParser.LiteralExprContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.LiteralExprContext ctx) {
         if (ctx.KW_TRUE() != null)
             return new BooleanLiteralExpression(true);
         if (ctx.KW_FALSE() != null)
@@ -196,7 +196,7 @@ public class Converter {
     }
 
     private ProgramVariable convertPathExpr(
-            org.key_project.rusty.parsing.RustyWhileParser.PathExprContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.PathExprContext ctx) {
         if (ctx.qualifiedPathInExpr() != null)
             throw new IllegalArgumentException("TODO @ DD: Qual path");
         else {
@@ -209,7 +209,7 @@ public class Converter {
     }
 
     private MethodCallExpression convertMethodCallExpression(
-            RustyWhileParser.MethodCallExpressionContext ctx) {
+            RustyParser.MethodCallExpressionContext ctx) {
         var callee = convertExpr(ctx.expr());
         var seg = convertPathExprSegment(ctx.pathExprSegment());
         ImmutableArray<Expr> params = ctx.callParams() == null ? new ImmutableArray<>()
@@ -218,20 +218,20 @@ public class Converter {
         return new MethodCallExpression(callee, seg, params);
     }
 
-    private FieldExpression convertFieldExpression(RustyWhileParser.FieldExpressionContext ctx) {
+    private FieldExpression convertFieldExpression(RustyParser.FieldExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
         var ident = convertIdentifier(ctx.identifier());
         return new FieldExpression(base, ident);
     }
 
     private TupleIndexingExpression convertTupleIndexingExpression(
-            RustyWhileParser.TupleIndexingExpressionContext ctx) {
+            RustyParser.TupleIndexingExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
         int idx = Integer.parseInt(ctx.tupleIndex().INTEGER_LITERAL().getText());
         return new TupleIndexingExpression(base, idx);
     }
 
-    private CallExpression convertCallExpression(RustyWhileParser.CallExpressionContext ctx) {
+    private CallExpression convertCallExpression(RustyParser.CallExpressionContext ctx) {
         var callee = convertExpr(ctx.expr());
         ImmutableArray<Expr> params = ctx.callParams() == null ? new ImmutableArray<>()
                 : new ImmutableArray<>(
@@ -239,31 +239,31 @@ public class Converter {
         return new CallExpression(callee, params);
     }
 
-    private IndexExpression convertIndexExpression(RustyWhileParser.IndexExpressionContext ctx) {
+    private IndexExpression convertIndexExpression(RustyParser.IndexExpressionContext ctx) {
         var base = convertExpr(ctx.expr(0));
         var idx = convertExpr(ctx.expr(1));
         return new IndexExpression(base, idx);
     }
 
     private ErrorPropagationExpression convertErrorPropagationExpression(
-            RustyWhileParser.ErrorPropagationExpressionContext ctx) {
+            RustyParser.ErrorPropagationExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
         return new ErrorPropagationExpression(base);
     }
 
-    private BorrowExpression convertBorrowExpression(RustyWhileParser.BorrowExpressionContext ctx) {
+    private BorrowExpression convertBorrowExpression(RustyParser.BorrowExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
         return new BorrowExpression(ctx.ANDAND() != null, ctx.KW_MUT() != null, base);
     }
 
     private DereferenceExpression convertDereferenceExpression(
-            RustyWhileParser.DereferenceExpressionContext ctx) {
+            RustyParser.DereferenceExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
         return new DereferenceExpression(base);
     }
 
     private NegationExpression convertNegationExpression(
-            RustyWhileParser.NegationExpressionContext ctx) {
+            RustyParser.NegationExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
         var op =
             ctx.NOT() != null ? NegationExpression.Operator.Not : NegationExpression.Operator.Neg;
@@ -271,14 +271,14 @@ public class Converter {
     }
 
     private TypeCastExpression convertTypeCastExpression(
-            RustyWhileParser.TypeCastExpressionContext ctx) {
+            RustyParser.TypeCastExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
         var ty = convertTypeNoBounds(ctx.typeNoBounds());
         return new TypeCastExpression(base, ty);
     }
 
     private Expr convertArithmeticOrLogicalExpression(
-            org.key_project.rusty.parsing.RustyWhileParser.ArithmeticOrLogicalExpressionContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.ArithmeticOrLogicalExpressionContext ctx) {
         ArithLogicalExpression.Operator op = null;
         if (ctx.AND() != null)
             op = ArithLogicalExpression.Operator.BitwiseAnd;
@@ -302,7 +302,7 @@ public class Converter {
     }
 
     private ComparisonExpression convertComparisonExpression(
-            RustyWhileParser.ComparisonExpressionContext ctx) {
+            RustyParser.ComparisonExpressionContext ctx) {
         var left = convertExpr(ctx.expr(0));
         var right = convertExpr(ctx.expr(1));
         var opCtx = ctx.comparisonOperator();
@@ -320,7 +320,7 @@ public class Converter {
     }
 
     private LazyBooleanExpression convertLazyBooleanExpression(
-            RustyWhileParser.LazyBooleanExpressionContext ctx) {
+            RustyParser.LazyBooleanExpressionContext ctx) {
         var left = convertExpr(ctx.expr(0));
         var right = convertExpr(ctx.expr(1));
         var op = ctx.ANDAND() != null ? LazyBooleanExpression.Operator.And
@@ -328,23 +328,23 @@ public class Converter {
         return new LazyBooleanExpression(left, op, right);
     }
 
-    private RangeExpression convertRangeExpression(RustyWhileParser.RangeExpressionContext ctx) {
+    private RangeExpression convertRangeExpression(RustyParser.RangeExpressionContext ctx) {
         var left =
-            ctx.getChild(0) instanceof RustyWhileParser.ExprContext e ? convertExpr(e) : null;
+            ctx.getChild(0) instanceof RustyParser.ExprContext e ? convertExpr(e) : null;
         var right = left == null ? convertExpr(ctx.expr(0)) : convertExpr(ctx.expr(1));
         var inclusive = ctx.DOTDOTEQ() != null;
         return new RangeExpression(left, right, inclusive);
     }
 
     private AssignmentExpression convertAssignmentExpression(
-            org.key_project.rusty.parsing.RustyWhileParser.AssignmentExpressionContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.AssignmentExpressionContext ctx) {
         var lhs = convertExpr(ctx.expr(0));
         var rhs = convertExpr(ctx.expr(1));
         return new AssignmentExpression(lhs, rhs);
     }
 
     private CompoundAssignmentExpression convertCompoundAssignmentExpression(
-            RustyWhileParser.CompoundAssignmentExpressionContext ctx) {
+            RustyParser.CompoundAssignmentExpressionContext ctx) {
         var left = convertExpr(ctx.expr(0));
         var right = convertExpr(ctx.expr(1));
         var opCtx = ctx.compoundAssignOperator();
@@ -366,30 +366,30 @@ public class Converter {
     }
 
     private ContinueExpression convertContinueExpression(
-            RustyWhileParser.ContinueExpressionContext ctx) {
+            RustyParser.ContinueExpressionContext ctx) {
         var label = ctx.LIFETIME_OR_LABEL() != null ? convertLabel(ctx.LIFETIME_OR_LABEL()) : null;
         var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
         return new ContinueExpression(label, expr);
     }
 
-    private BreakExpression convertBreakExpression(RustyWhileParser.BreakExpressionContext ctx) {
+    private BreakExpression convertBreakExpression(RustyParser.BreakExpressionContext ctx) {
         var label = ctx.LIFETIME_OR_LABEL() != null ? convertLabel(ctx.LIFETIME_OR_LABEL()) : null;
         var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
         return new BreakExpression(label, expr);
     }
 
-    private ReturnExpression convertReturnExpression(RustyWhileParser.ReturnExpressionContext ctx) {
+    private ReturnExpression convertReturnExpression(RustyParser.ReturnExpressionContext ctx) {
         var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
         return new ReturnExpression(expr);
     }
 
     private GroupedExpression convertGroupedExpression(
-            RustyWhileParser.GroupedExpressionContext ctx) {
+            RustyParser.GroupedExpressionContext ctx) {
         return new GroupedExpression(convertExpr(ctx.expr()));
     }
 
     private EnumeratedArrayExpression convertEnumeratedArrayExpression(
-            RustyWhileParser.ArrayExpressionContext ctx) {
+            RustyParser.ArrayExpressionContext ctx) {
         if (ctx.arrayElements() == null)
             return new EnumeratedArrayExpression(new ImmutableArray<>());
         assert ctx.arrayElements().SEMI() == null;
@@ -398,12 +398,12 @@ public class Converter {
     }
 
     private RepeatedArrayExpression convertRepeatedArrayExpression(
-            RustyWhileParser.ArrayExpressionContext ctx) {
+            RustyParser.ArrayExpressionContext ctx) {
         return new RepeatedArrayExpression(convertExpr(ctx.arrayElements().expr(0)),
             convertExpr(ctx.arrayElements().expr(1)));
     }
 
-    private TupleExpression convertTupleExpression(RustyWhileParser.TupleExpressionContext ctx) {
+    private TupleExpression convertTupleExpression(RustyParser.TupleExpressionContext ctx) {
         if (ctx.tupleElements() == null)
             return TupleExpression.UNIT;
         return new TupleExpression(new ImmutableArray<>(
@@ -411,34 +411,34 @@ public class Converter {
     }
 
     private UnitStructExpression convertUnitStructExpression(
-            RustyWhileParser.StructExprUnitContext ctx) {
+            RustyParser.StructExprUnitContext ctx) {
         throw new UnsupportedOperationException("TODO @ DD: Unit struct expr");
     }
 
     private TupleStructExpression convertTupleStructExpression(
-            RustyWhileParser.StructExprTupleContext ctx) {
+            RustyParser.StructExprTupleContext ctx) {
         throw new UnsupportedOperationException("TODO @ DD: Tuple struct expr");
     }
 
     private StructStructExpression convertStructStructExpression(
-            RustyWhileParser.StructExprStructContext ctx) {
+            RustyParser.StructExprStructContext ctx) {
         throw new UnsupportedOperationException("TODO @ DD: Field struct expr");
     }
 
     private EnumVariantFieldless convertEnumVariantFieldless(
-            RustyWhileParser.EnumExprFieldlessContext ctx) {
+            RustyParser.EnumExprFieldlessContext ctx) {
         throw new UnsupportedOperationException("TODO @ DD: Fieldless enum variant expr");
     }
 
-    private EnumVariantTuple convertEnumVariantTuple(RustyWhileParser.EnumExprTupleContext ctx) {
+    private EnumVariantTuple convertEnumVariantTuple(RustyParser.EnumExprTupleContext ctx) {
         throw new UnsupportedOperationException("TODO @ DD: Tuple enum variant expr");
     }
 
-    private EnumVariantStruct convertEnumVariantStruct(RustyWhileParser.EnumExprStructContext ctx) {
+    private EnumVariantStruct convertEnumVariantStruct(RustyParser.EnumExprStructContext ctx) {
         throw new UnsupportedOperationException("TODO @ DD: Struct enum variant expr");
     }
 
-    private ClosureExpression convertClosureExpression(RustyWhileParser.ClosureExprContext ctx) {
+    private ClosureExpression convertClosureExpression(RustyParser.ClosureExprContext ctx) {
         ImmutableArray<ClosureParam> params =
             ctx.closureParameters() == null ? new ImmutableArray<>()
                     : new ImmutableArray<>(ctx.closureParameters().closureParam().stream()
@@ -448,7 +448,7 @@ public class Converter {
         return new ClosureExpression(ctx.KW_MOVE() != null, params, ty, body);
     }
 
-    private Expr convertExprWithBlock(RustyWhileParser.ExprWithBlockContext ctx) {
+    private Expr convertExprWithBlock(RustyParser.ExprWithBlockContext ctx) {
         if (ctx.blockExpr() != null)
             return convertBlockExpr(ctx.blockExpr());
         if (ctx.loopExpr() != null)
@@ -461,7 +461,7 @@ public class Converter {
     }
 
     private BlockExpression convertBlockExpr(
-            org.key_project.rusty.parsing.RustyWhileParser.BlockExprContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.BlockExprContext ctx) {
         var stmtsCtx = ctx.stmts();
 
         var stmts = stmtsCtx.stmt().stream().map(this::convertStmt)
@@ -471,7 +471,7 @@ public class Converter {
         return new BlockExpression(stmts, value);
     }
 
-    private LoopExpression convertLoopExpr(RustyWhileParser.LoopExprContext ctx) {
+    private LoopExpression convertLoopExpr(RustyParser.LoopExprContext ctx) {
         var label =
             ctx.loopLabel() == null ? null : convertLabel(ctx.loopLabel().LIFETIME_OR_LABEL());
         if (ctx.infiniteLoopExpr() != null)
@@ -486,29 +486,29 @@ public class Converter {
     }
 
     private InfiniteLoopExpression convertInfiniteLoopExpr(
-            RustyWhileParser.InfiniteLoopExprContext ctx, @Nullable Label label) {
+            RustyParser.InfiniteLoopExprContext ctx, @Nullable Label label) {
         return new InfiniteLoopExpression(label, convertBlockExpr(ctx.blockExpr()));
     }
 
     private PredicateLoopExpression convertPredicateLoopExpr(
-            RustyWhileParser.PredicateLoopExprContext ctx, @Nullable Label label) {
+            RustyParser.PredicateLoopExprContext ctx, @Nullable Label label) {
         return new PredicateLoopExpression(label, convertExpr(ctx.expr()),
             convertBlockExpr(ctx.blockExpr()));
     }
 
     private PredicatePatternLoopExpression convertPredicatePatternLoopExpr(
-            RustyWhileParser.PredicatePatternLoopExprContext ctx, @Nullable Label label) {
+            RustyParser.PredicatePatternLoopExprContext ctx, @Nullable Label label) {
         return new PredicatePatternLoopExpression(label, convertPattern(ctx.pattern()),
             convertExpr(ctx.expr()), convertBlockExpr(ctx.blockExpr()));
     }
 
     private IteratorLoopExpression convertIteratorLoopExpr(
-            RustyWhileParser.IteratorLoopExprContext ctx, @Nullable Label label) {
+            RustyParser.IteratorLoopExprContext ctx, @Nullable Label label) {
         return new IteratorLoopExpression(label, convertPattern(ctx.pattern()),
             convertExpr(ctx.expr()), convertBlockExpr(ctx.blockExpr()));
     }
 
-    private IfExpression convertIfExpr(RustyWhileParser.IfExprContext ctx) {
+    private IfExpression convertIfExpr(RustyParser.IfExprContext ctx) {
         var cond = convertExpr(ctx.expr());
         var then = convertBlockExpr(ctx.blockExpr(0));
         var else_ = ctx.blockExpr().size() > 1 ? convertBlockExpr(ctx.blockExpr(1))
@@ -517,7 +517,7 @@ public class Converter {
         return new IfExpression(cond, then, else_);
     }
 
-    private IfLetExpression convertIfLetExpr(RustyWhileParser.IfLetExprContext ctx) {
+    private IfLetExpression convertIfLetExpr(RustyParser.IfLetExprContext ctx) {
         var pat = convertPattern(ctx.pattern());
         var expr = convertExpr(ctx.expr());
         var then = convertBlockExpr(ctx.blockExpr(0));
@@ -527,14 +527,14 @@ public class Converter {
         return new IfLetExpression(pat, expr, then, else_);
     }
 
-    private MatchExpression convertMatchExpr(RustyWhileParser.MatchExprContext ctx) {
+    private MatchExpression convertMatchExpr(RustyParser.MatchExprContext ctx) {
         var expr = convertExpr(ctx.expr());
         ImmutableArray<MatchArm> arms = ctx.matchArms() == null ? new ImmutableArray<>()
                 : convertMatchArms(ctx.matchArms());
         return new MatchExpression(expr, arms);
     }
 
-    private ImmutableArray<MatchArm> convertMatchArms(RustyWhileParser.MatchArmsContext ctx) {
+    private ImmutableArray<MatchArm> convertMatchArms(RustyParser.MatchArmsContext ctx) {
         if (ctx.expr() != null) {
             var arms = new MatchArm[ctx.matchArm().size()];
             for (int i = 0; i < ctx.matchArm().size() - 1; i++) {
@@ -570,12 +570,12 @@ public class Converter {
     }
 
     private Statement convertExprStmt(
-            org.key_project.rusty.parsing.RustyWhileParser.ExprStmtContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.ExprStmtContext ctx) {
         return new ExpressionStatement(convertExpr(ctx.expr()));
     }
 
     private Statement convertLetStmt(
-            org.key_project.rusty.parsing.RustyWhileParser.LetStmtContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.LetStmtContext ctx) {
         Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
         LetStatement letStatement = new LetStatement(pat,
             convertType(ctx.type_()),
@@ -584,7 +584,7 @@ public class Converter {
         return letStatement;
     }
 
-    private Statement convertStmt(org.key_project.rusty.parsing.RustyWhileParser.StmtContext ctx) {
+    private Statement convertStmt(org.key_project.rusty.parsing.RustyParser.StmtContext ctx) {
         if (ctx.SEMI() != null) {
             return new EmptyStatement();
         }
@@ -598,12 +598,12 @@ public class Converter {
     }
 
     private Identifier convertIdentifier(
-            org.key_project.rusty.parsing.RustyWhileParser.IdentifierContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.IdentifierContext ctx) {
         return new Identifier(new Name(ctx.getText()));
     }
 
     private Pattern convertPattern(
-            org.key_project.rusty.parsing.RustyWhileParser.PatternContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.PatternContext ctx) {
         var alts = ctx.patternNoTopAlt();
         if (alts.size() == 1) {
             return convertPatternNoTopAlt(alts.get(0));
@@ -612,7 +612,7 @@ public class Converter {
             new ImmutableArray<>(alts.stream().map(this::convertPatternNoTopAlt).toList()));
     }
 
-    private Pattern convertPatternNoTopAlt(RustyWhileParser.PatternNoTopAltContext ctx) {
+    private Pattern convertPatternNoTopAlt(RustyParser.PatternNoTopAltContext ctx) {
         if (ctx.patternWithoutRange() != null) {
             var pat = ctx.patternWithoutRange();
             if (pat.literalPattern() != null) {
@@ -630,14 +630,14 @@ public class Converter {
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
     }
 
-    private Type convertType(org.key_project.rusty.parsing.RustyWhileParser.Type_Context ctx) {
+    private Type convertType(org.key_project.rusty.parsing.RustyParser.Type_Context ctx) {
         if (ctx.typeNoBounds() != null) {
             return convertTypeNoBounds(ctx.typeNoBounds());
         }
         throw new IllegalArgumentException("Unknown type " + ctx.getText());
     }
 
-    private Type convertTypeNoBounds(RustyWhileParser.TypeNoBoundsContext ctx) {
+    private Type convertTypeNoBounds(RustyParser.TypeNoBoundsContext ctx) {
         if (ctx.parenthesizedType() != null)
             return convertParenthesizedType(ctx.parenthesizedType());
         if (ctx.traitObjectTypeOneBound() != null)
@@ -652,12 +652,12 @@ public class Converter {
     }
 
     private Type convertParenthesizedType(
-            org.key_project.rusty.parsing.RustyWhileParser.ParenthesizedTypeContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.ParenthesizedTypeContext ctx) {
         return convertType(ctx.type_());
     }
 
     private Type convertTraitObjectOneBound(
-            org.key_project.rusty.parsing.RustyWhileParser.TraitObjectTypeOneBoundContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.TraitObjectTypeOneBoundContext ctx) {
         var tbCtx = ctx.traitBound();
         if (ctx.KW_DYN() == null && tbCtx.QUESTION() == null && tbCtx.forLifetimes() == null) {
             return convertTypePath(tbCtx.typePath());
@@ -666,7 +666,7 @@ public class Converter {
     }
 
     private Type convertTypePath(
-            org.key_project.rusty.parsing.RustyWhileParser.TypePathContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.TypePathContext ctx) {
         assert ctx.typePathSegment().size() == 1;
         var text = ctx.typePathSegment(0).pathIdentSegment().identifier().getText();
         return switch (text) {
@@ -691,7 +691,7 @@ public class Converter {
     }
 
     private ImmutableArray<FunctionParam> convertFunctionParams(
-            org.key_project.rusty.parsing.RustyWhileParser.FunctionParamsContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.FunctionParamsContext ctx) {
         if (ctx == null)
             return new ImmutableArray<>();
         List<FunctionParam> params = new LinkedList<>();
@@ -705,7 +705,7 @@ public class Converter {
     }
 
     private SelfParam convertSelfParam(
-            org.key_project.rusty.parsing.RustyWhileParser.SelfParamContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.SelfParamContext ctx) {
         if (ctx.shorthandSelf() != null) {
             var shortSelf = ctx.shorthandSelf();
             return new SelfParam(shortSelf.AND() != null, shortSelf.KW_MUT() != null, null);
@@ -717,19 +717,19 @@ public class Converter {
     }
 
     private FunctionParamPattern convertFunctionParamPattern(
-            org.key_project.rusty.parsing.RustyWhileParser.FunctionParamPatternContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.FunctionParamPatternContext ctx) {
         FunctionParamPattern param = new FunctionParamPattern(convertPattern(ctx.pattern()),
             convertType(ctx.type_()));
         declareVariable(((IdentPattern) param.getPattern()).name().toString(), param);
         return param;
     }
 
-    private PathExprSegment convertPathExprSegment(RustyWhileParser.PathExprSegmentContext ctx) {
+    private PathExprSegment convertPathExprSegment(RustyParser.PathExprSegmentContext ctx) {
         return new PathExprSegment(convertPathIdentSegment(ctx.pathIdentSegment()));
     }
 
     private PathIdentSegment convertPathIdentSegment(
-            org.key_project.rusty.parsing.RustyWhileParser.PathIdentSegmentContext ctx) {
+            org.key_project.rusty.parsing.RustyParser.PathIdentSegmentContext ctx) {
         return new PathIdentSegment(convertIdentifier(ctx.identifier()));
     }
 
@@ -737,7 +737,7 @@ public class Converter {
         return getLabel(l.getText().substring(1));
     }
 
-    private ClosureParam convertClosureParam(RustyWhileParser.ClosureParamContext ctx) {
+    private ClosureParam convertClosureParam(RustyParser.ClosureParamContext ctx) {
         var pat = convertPattern(ctx.pattern());
         var ty = ctx.type_() == null ? null : convertType(ctx.type_());
         return new ClosureParam(pat, ty);

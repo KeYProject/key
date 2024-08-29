@@ -34,9 +34,9 @@ public class SchemaRustyReader extends RustyReader {
     public RustyBlock readBlock(String block, Context context) {
         var fn = context.buildFunction(block);
         var lexer =
-            new org.key_project.rusty.parsing.RustyWhileSchemaLexer(CharStreams.fromString(fn));
+            new org.key_project.rusty.parsing.RustySchemaLexer(CharStreams.fromString(fn));
         var ts = new CommonTokenStream(lexer);
-        var parser = new org.key_project.rusty.parsing.RustyWhileSchemaParser(ts);
+        var parser = new org.key_project.rusty.parsing.RustySchemaParser(ts);
         var converter = new SchemaConverter(svNS, getServices());
         var converted = converter.convertFunction(parser.function_());
         return new RustyBlock(converted.body());

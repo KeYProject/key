@@ -1,6 +1,6 @@
-lexer grammar RustyWhileSchemaLexer;
+lexer grammar RustySchemaLexer;
 
-import RustyWhileLexer;
+import RustyLexer;
 
 SCHEMA_IDENTIFIER
     : 's#' NON_KEYWORD_IDENTIFIER

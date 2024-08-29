@@ -9,8 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.key_project.rusty.ast.Converter;
-import org.key_project.rusty.parsing.RustyWhileLexer;
-import org.key_project.rusty.parsing.RustyWhileParser;
+import org.key_project.rusty.parsing.RustyLexer;
+import org.key_project.rusty.parsing.RustyParser;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -20,9 +20,9 @@ public class Test {
         try {
             var example = Files.readString(Paths.get("keyext.rusty_while/examples/basic.rs"),
                 Charset.defaultCharset());
-            var lexer = new RustyWhileLexer(CharStreams.fromString(example));
+            var lexer = new RustyLexer(CharStreams.fromString(example));
             var ts = new CommonTokenStream(lexer);
-            var parser = new RustyWhileParser(ts);
+            var parser = new RustyParser(ts);
             var crate = parser.crate();
             System.out.println(crate.item(0).function_().blockExpr().stmts().expr().getText());
             System.out.println(crate.getText());

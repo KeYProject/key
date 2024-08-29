@@ -1,4 +1,4 @@
-lexer grammar RustyWhileLexer;
+lexer grammar RustyLexer;
 
 @ header
 {
