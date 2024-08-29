@@ -8,12 +8,13 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.Strings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-public class ImmutableArray<S extends @Nullable Object> implements java.lang.Iterable<S>, java.io.Serializable {
+public class ImmutableArray<S extends @Nullable Object>
+        implements java.lang.Iterable<S>, java.io.Serializable {
 
     private static final long serialVersionUID = -9041545065066866250L;
 

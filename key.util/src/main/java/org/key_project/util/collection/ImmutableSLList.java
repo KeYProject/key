@@ -98,7 +98,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             // @ assert !rest.isEmpty();
             T head = rest.head();
             // Somehow the nullness checker needs this cast to be explicit.
-            result[i] = (S)type.cast(head);
+            result[i] = (S) type.cast(head);
             rest = rest.tail();
         }
         return result;

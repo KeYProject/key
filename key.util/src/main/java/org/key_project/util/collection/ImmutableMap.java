@@ -36,7 +36,8 @@ public interface ImmutableMap<S extends @NonNull Object, T extends @Nullable Obj
      * @return the value to which the specified key is mapped, or {@code null} if this map contains
      *         no mapping for the key
      */
-    @Nullable T get(S key);
+    @Nullable
+    T get(S key);
 
     /**
      * Returns the number of entries in this map.

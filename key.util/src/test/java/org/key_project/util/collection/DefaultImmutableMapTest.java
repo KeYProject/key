@@ -6,7 +6,6 @@ package org.key_project.util.collection;
 import java.util.Iterator;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
