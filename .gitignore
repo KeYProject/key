@@ -72,4 +72,4 @@ scripts/tools/checkstyle/key_checks_incremental.xml
 checkstyle-diff.txt
 /key.ncore/src/main/gen/
 /key.ncore/src/main/antlr/KeYLexer.tokens
-/keyext.rusty_while/src/main/gen/
+/keyext.rusty/src/main/gen/
