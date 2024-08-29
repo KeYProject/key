@@ -15,7 +15,7 @@ include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
 include 'keyext.caching'
-include 'keyext.rusty_while'
+include 'keyext.rusty'
 
 // ENABLE NULLNESS here or on the CLI
 // This flag is activated to enable the checker framework.
