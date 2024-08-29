@@ -67,13 +67,10 @@ public class HeatmapToggleAction extends MainWindowAction {
         vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(), vs.isHeatmapNewest(),
             vs.getMaxAgeForHeatmap());
         // this updates the heatmap highlights
-        mainWindow.getCurrentGoalView().getHighlighter().removeAllHighlights();
-        mainWindow.getCurrentGoalView().printSequent();
-        Component component = mainWindow.getMainFrame().getContent();
-        if (component instanceof SequentView) {
-            SequentView seqView = (SequentView) component;
-            seqView.getHighlighter().removeAllHighlights();
-            seqView.printSequent();
+        SequentView sequentView = mainWindow.getMainFrame().getSequentView();
+        if (sequentView != null) {
+            sequentView.getHighlighter().removeAllHighlights();
+            sequentView.printSequent();
         }
     }
 }

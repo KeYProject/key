@@ -1223,7 +1223,7 @@ public final class MainWindow extends JFrame {
         }
 
         Runnable sequentUpdater = () -> {
-            mainFrame.setContent(newSequentView);
+            mainFrame.setSequentView(newSequentView);
             // always does printSequent if on the event thread
             sequentViewSearchBar.setSequentView(newSequentView);
         };
