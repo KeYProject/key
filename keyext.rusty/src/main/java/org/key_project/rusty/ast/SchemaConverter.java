@@ -536,7 +536,7 @@ public class SchemaConverter {
         return new ContextBlockExpression(stmts);
     }
 
-    public Expr convertSchemaVarExpression(
+    public ProgramSV convertSchemaVarExpression(
             org.key_project.rusty.parsing.RustySchemaParser.SchemaVarExpressionContext ctx) {
         return (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
     }
