@@ -74,9 +74,9 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.13")
-        implementation("org.slf4j:slf4j-api:2.0.13")
-        testImplementation("ch.qos.logback:logback-classic:1.5.6")
+        implementation("org.slf4j:slf4j-api:2.0.16")
+        implementation("org.slf4j:slf4j-api:2.0.16")
+        testImplementation("ch.qos.logback:logback-classic:1.5.7")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
@@ -89,12 +89,12 @@ subprojects {
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.6")
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.3'
+        testImplementation("ch.qos.logback:logback-classic:1.5.7")
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.0'
         testImplementation project(':key.util')
 
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
     }
 
     tasks.withType(JavaCompile) {
