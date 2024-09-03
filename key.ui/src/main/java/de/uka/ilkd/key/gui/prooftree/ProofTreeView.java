@@ -178,11 +178,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             @Override
             public String getToolTipText(MouseEvent mouseEvent) {
-                /* For performance reasons, we want to make sure that the tooltips are only rendered
+                /*
+                 * For performance reasons, we want to make sure that the tooltips are only rendered
                  * when they are really needed. Therefore, they are now lazily generated and can
-                 * also be disabled completely. */
+                 * also be disabled completely.
+                 */
                 if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                    .isShowProofTreeTooltips()) {
+                        .isShowProofTreeTooltips()) {
                     return null;
                 }
                 TreePath path = delegateView.getPathForLocation(mouseEvent.getX(),
@@ -1294,6 +1296,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         /**
          * Creates a new Style object and fills it for the given node.
+         *
          * @param node the tree node
          * @return the created Style with all the info about the node
          */

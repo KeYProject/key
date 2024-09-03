@@ -1461,7 +1461,8 @@ public final class MainWindow extends JFrame {
     }
 
     public void setShowProofTreeTooltip(Object source) {
-        toogleProofTreeTooltipAction.actionPerformed(new ActionEvent(proofTreeView, ActionEvent.ACTION_PERFORMED, ""));
+        toogleProofTreeTooltipAction
+                .actionPerformed(new ActionEvent(proofTreeView, ActionEvent.ACTION_PERFORMED, ""));
     }
 
     public AutoModeAction getAutoModeAction() {
