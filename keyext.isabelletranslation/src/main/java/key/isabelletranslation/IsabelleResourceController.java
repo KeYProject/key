@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 public class IsabelleResourceController {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleResourceController.class);
@@ -32,14 +32,36 @@ public class IsabelleResourceController {
 
     private Collection<IsabelleSolver> waitingSolvers;
 
+    private final int numberOfInstances;
 
 
-    public IsabelleResourceController(int numberOfInstances) throws IOException {
+    private final ExecutorService instanceCreatorService;
+
+
+
+    public IsabelleResourceController(int numberOfInstances) {
         settings = IsabelleTranslationSettings.getInstance();
         idleInstances = new LinkedBlockingQueue<>(numberOfInstances);
         waitingSolvers = new HashSet<>();
+        this.numberOfInstances = numberOfInstances;
+        instanceCreatorService = Executors.newFixedThreadPool(numberOfInstances);
+    }
+
+    public void init() throws IOException {
+        Collection<Callable<java.util.List<SledgehammerResult>>> tasks = new LinkedBlockingDeque<>();
         for (int i = 0; i < numberOfInstances; i++) {
-            idleInstances.add(createIsabelleResource());
+            tasks.add(() -> {
+                idleInstances.add(createIsabelleResource());
+                return null;
+            });
+        }
+
+        try {
+            instanceCreatorService.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            if (!isShutdown) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -51,18 +73,14 @@ public class IsabelleResourceController {
     public void shutdownGracefully() {
         isShutdown = true;
 
+        instanceCreatorService.shutdownNow();
+
         waitingSolvers.forEach((x) -> x.interrupt(IsabelleSolver.ReasonOfInterruption.Exception));
         waitingSolvers.clear();
 
         idleInstances.forEach(IsabelleResource::destroy);
         idleInstances.clear();
     }
-
-    public static IsabelleResource createIsabelleResourceFromInstance(Isabelle isabelle, IsabelleTranslationSettings settings) {
-        Theory theory = beginTheory(isabelle, settings);
-        return new IsabelleResource(isabelle, theory);
-    }
-
 
     public void returnResource(IsabelleSolver returningSolver, IsabelleResource resource) {
         if (resource.isDestroyed()) {
@@ -80,9 +98,25 @@ public class IsabelleResourceController {
     }
 
     private IsabelleResource createIsabelleResource() throws IOException {
-        Isabelle isabelleInstance = startIsabelleInstance();
-        Theory theory = beginTheory(isabelleInstance, settings);
-        return new IsabelleResource(isabelleInstance, theory);
+        Callable<IsabelleResource> creationTask = () -> {
+            Isabelle isabelleInstance = startIsabelleInstance();
+            Theory theory = beginTheory(isabelleInstance, settings);
+            return new IsabelleResource(isabelleInstance, theory);
+        };
+        try {
+            return instanceCreatorService.submit(creationTask).get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof IOException) {
+                throw (IOException) e.getCause();
+            }
+            LOGGER.error("Error during Isabelle setup");
+            throw new RuntimeException(e);
+        } catch (RejectedExecutionException e) {
+            //IsabelleResourceController is shutdown
+            return null;
+        }
     }
 
     private Isabelle startIsabelleInstance() throws IOException {
@@ -109,9 +143,13 @@ public class IsabelleResourceController {
         MLFunction2<String, Position, TheoryHeader> header_read = MLValue.compileFunction("fn (text,pos) => Thy_Header.read pos text", isabelle,
                 de.unruh.isabelle.mlvalue.Implicits.stringConverter(), Implicits.positionConverter(), Implicits.theoryHeaderConverter());
 
+
+
         TheoryHeader header = header_read.apply(settings.getHeader(), Position.none(isabelle), isabelle, de.unruh.isabelle.mlvalue.Implicits.stringConverter(), Implicits.positionConverter())
                 .retrieveNow(Implicits.theoryHeaderConverter(), isabelle);
         Path topDir = settings.getTranslationPath();
+
+
         return begin_theory.apply(topDir, header, header.imports(isabelle).map((String name) -> Theory.apply(name, isabelle)), isabelle,
                         Implicits.pathConverter(), Implicits.theoryHeaderConverter(), new ListConverter<>(Implicits.theoryConverter()))
                 .retrieveNow(Implicits.theoryConverter(), isabelle);
