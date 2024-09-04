@@ -74,7 +74,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
      */
     private long timeout = -1;
 
-    private IsabelleResourceController resourceController;
+    private final IsabelleResourceController resourceController;
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSolver.class);
@@ -91,6 +91,11 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     @Override
     public int getSolverIndex() {
         return solverIndex;
+    }
+
+    @Override
+    public ReasonOfInterruption getReasonOfInterruption() {
+        return reasonOfInterruption;
     }
 
     @Override
