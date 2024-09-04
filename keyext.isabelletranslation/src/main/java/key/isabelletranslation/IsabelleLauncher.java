@@ -67,6 +67,8 @@ public class IsabelleLauncher {
         });
         Runtime.getRuntime().addShutdownHook(shutdownResources);
 
+        resourceController.init();
+
         if (problems.isEmpty()) {
             return;
         }
