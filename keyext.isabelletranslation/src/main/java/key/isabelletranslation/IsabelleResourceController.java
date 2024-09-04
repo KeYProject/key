@@ -48,20 +48,8 @@ public class IsabelleResourceController {
     }
 
     public void init() throws IOException {
-        Collection<Callable<java.util.List<SledgehammerResult>>> tasks = new LinkedBlockingDeque<>();
         for (int i = 0; i < numberOfInstances; i++) {
-            tasks.add(() -> {
-                idleInstances.add(createIsabelleResource());
-                return null;
-            });
-        }
-
-        try {
-            instanceCreatorService.invokeAll(tasks);
-        } catch (InterruptedException e) {
-            if (!isShutdown) {
-                throw new RuntimeException(e);
-            }
+            idleInstances.add(createIsabelleResource());
         }
     }
 

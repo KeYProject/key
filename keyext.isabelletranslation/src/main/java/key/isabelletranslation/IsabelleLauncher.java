@@ -1,5 +1,6 @@
 package key.isabelletranslation;
 
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.Pair;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.pure.Theory;
@@ -24,6 +25,7 @@ public class IsabelleLauncher {
 
 
     private final LinkedBlockingDeque<IsabelleSolver> solverQueue = new LinkedBlockingDeque<>();
+    private final Collection<IsabelleSolver> solverSet = new HashSet<>();
 
 
     public IsabelleLauncher(@NonNull IsabelleTranslationSettings settings) throws IOException {
@@ -31,12 +33,9 @@ public class IsabelleLauncher {
     }
 
     public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, long timeoutSeconds, int instanceCount) throws IOException {
-        listener.launcherStarted(this, problems);
-        ExecutorService executorService = Executors.newFixedThreadPool(instanceCount);
-        Collection<Callable<List<SledgehammerResult>>> tasks = new LinkedBlockingDeque<>();
-
-
         IsabelleResourceController resourceController = new IsabelleResourceController(instanceCount);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(instanceCount);
 
         shutdownResources = new Thread(() -> {
             executorService.shutdown();
@@ -44,7 +43,17 @@ public class IsabelleLauncher {
         });
         Runtime.getRuntime().addShutdownHook(shutdownResources);
 
+        for (int i = 0; i < problems.size(); i++) {
+            IsabelleSolver solver = new IsabelleSolverInstance(problems.get(i), List.of(new IsabelleSolverListener[0]), i, resourceController);
+            solver.setTimeout(timeoutSeconds);
+            solverQueue.add(solver);
+            solverSet.add(solver);
+        }
+
+        listener.launcherStarted(this, solverSet);
+
         resourceController.init();
+        listener.launcherPreparationFinished(this, solverSet);
 
         if (problems.isEmpty()) {
             return;
@@ -52,28 +61,8 @@ public class IsabelleLauncher {
         //Ensure the preamble theory is present
         TranslationAction.writeTranslationFiles(problems.get(0));
 
-        problems.forEach((problem) -> {
-            IsabelleSolver solver = new IsabelleSolverInstance(problem, List.of(new IsabelleSolverListener[0]), resourceController);
-            solver.setTimeout(timeoutSeconds);
-            solverQueue.add(solver);
-        });
 
-        Timer timer = new Timer(true);
-
-        for (int i = 0; i < instanceCount; i++) {
-            tasks.add(() -> {
-                IsabelleSolver solver;
-                Pair<Isabelle, Theory> resources;
-                while ((solver = solverQueue.poll()) != null) {
-                    //IsabelleSolver.IsabelleSolverTimeout solverTimeout = new IsabelleSolver.IsabelleSolverTimeout(solver);
-                    //timer.schedule(null, solver.getTimeout());
-                    runningSolvers.add(solver);
-                    solver.start(null, settings);
-                    runningSolvers.remove(solver);
-                }
-                return null;
-            });
-        }
+        Collection<Callable<List<SledgehammerResult>>> tasks = launchSolverInstances(instanceCount);
 
         LOGGER.info("Setup complete, starting {} problems...", problems.size());
 
@@ -87,6 +76,23 @@ public class IsabelleLauncher {
         } finally {
             shutdown();
         }
+    }
+
+    private @NotNull Collection<Callable<List<SledgehammerResult>>> launchSolverInstances(int instanceCount) {
+        Collection<Callable<List<SledgehammerResult>>> tasks = new LinkedBlockingDeque<>();
+
+        for (int i = 0; i < instanceCount; i++) {
+            tasks.add(() -> {
+                IsabelleSolver solver;
+                while ((solver = solverQueue.poll()) != null) {
+                    runningSolvers.add(solver);
+                    solver.start(null, settings);
+                    runningSolvers.remove(solver);
+                }
+                return null;
+            });
+        }
+        return tasks;
     }
 
     private void shutdown() {

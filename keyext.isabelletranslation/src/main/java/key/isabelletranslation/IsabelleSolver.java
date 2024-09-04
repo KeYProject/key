@@ -5,12 +5,14 @@ import de.unruh.isabelle.control.Isabelle;
 import java.util.TimerTask;
 
 public interface IsabelleSolver {
+    int getSolverIndex();
+
     enum ReasonOfInterruption {
         User, Timeout, Exception, NoInterruption
     }
 
     enum SolverState{
-        Waiting, StartingIsabelle, Building, Parsing, Running, Stopped
+        Waiting, Preparing, Parsing, Running, Stopped
     }
 
     String name();
