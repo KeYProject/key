@@ -24,21 +24,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class IsabelleProblem {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleProblem.class);
     private final Goal goal;
     private SledgehammerResult result = null;
     private final String preamble;
     private final String sequentTranslation;
-    private final Collection<IsabelleSolverListener> listeners = new HashSet<>();
+    private final String name;
 
     public IsabelleProblem(Goal goal, String preamble, String sequentTranslation) {
         this.goal = goal;
         this.preamble = preamble;
         this.sequentTranslation = sequentTranslation;
-    }
-
-    public void addListener(IsabelleSolverListener listener) {
-        listeners.add(listener);
+        this.name = "Goal " + goal.node().serialNr();
     }
 
     public Goal getGoal() {
@@ -51,6 +47,10 @@ public class IsabelleProblem {
 
     public String getPreamble() {
         return preamble;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public SledgehammerResult getResult() {
