@@ -37,9 +37,6 @@ public interface IsabelleSolver {
 
     void start(IsabelleSolverTimeout timeout, IsabelleTranslationSettings settings);
 
-
-    void start(IsabelleSolverTimeout timeout, Isabelle isabelleInstance);
-
     String getRawSolverOutput();
 
     String getRawSolverInput();
