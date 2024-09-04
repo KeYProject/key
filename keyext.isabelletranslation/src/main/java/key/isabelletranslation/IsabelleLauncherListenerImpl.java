@@ -2,16 +2,26 @@ package key.isabelletranslation;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import key.isabelletranslation.gui.IsabelleProgressDialog;
 import key.isabelletranslation.gui.IsabelleProgressModel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Timer;
 import java.util.Collection;
 import java.util.TimerTask;
 
 public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
     private final Timer timer = new Timer();
+    private int finishedCounter = 0;
+
+
+    private final static ColorSettings.ColorProperty RED =
+            ColorSettings.define("[solverListener]red", "", new Color(180, 43, 43));
+
+    private final static ColorSettings.ColorProperty GREEN =
+            ColorSettings.define("[solverListener]green", "", new Color(43, 180, 43));
 
     @Override
     public void launcherStopped(IsabelleLauncher launcher, Collection<IsabelleSolver> finishedInstances) {
@@ -59,6 +69,62 @@ public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
         }
     }
 
+    private void stopped(IsabelleSolver solver) {
+
+        int x = 0;
+        int y = solver.getSolverIndex();
+
+        if (!problemProcessed[x][y]) {
+            finishedCounter++;
+            progressDialog.setProgress(finishedCounter);
+            JProgressBar bar = progressDialog.getProgressBar();
+            bar.setValue(finishedCounter);
+            setProgressText(finishedCounter);
+            problemProcessed[x][y] = true;
+        }
+
+        if (solver.wasInterrupted()) {
+            interrupted(solver);
+        } else if (solver.getFinalResult().isSuccessful()) {
+            successfullyStopped(solver, x, y);
+        } else {
+            unknownStopped(x, y);
+        }
+    }
+
+    private void interrupted(IsabelleSolver solver) {
+        IsabelleSolver.ReasonOfInterruption reason = solver.getReasonOfInterruption();
+        int x = 0;
+        int y = solver.getSolverIndex();
+        switch (reason) {
+            case Exception -> {
+                progressModel.setProgress(0, x, y);
+                progressModel.setTextColor(RED.get(), x, y);
+                progressModel.setText("Exception!", x, y);
+            }
+            case NoInterruption -> throw new RuntimeException("This position should not be reachable!");
+            case Timeout -> {
+                progressModel.setProgress(0, x, y);
+                progressModel.setText("Timeout.", x, y);
+            }
+            case User -> progressModel.setText("Interrupted by user.", x, y);
+        }
+    }
+
+    private void successfullyStopped(IsabelleSolver solver, int x, int y) {
+        //TODO add time information
+
+        progressModel.setProgress(0, x, y);
+        progressModel.setTextColor(GREEN.get(), x, y);
+        progressModel.setText("Valid", x, y);
+    }
+
+    private void unknownStopped(int x, int y) {
+        progressModel.setProgress(0, x, y);
+        progressModel.setTextColor(Color.BLUE, x, y);
+        progressModel.setText("Unknown.", x, y);
+    }
+
     private void setProgressText(int value) {
         JProgressBar bar = progressDialog.getProgressBar();
         if (bar.getMaximum() == 1) {
@@ -88,7 +154,7 @@ public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
 
     private Collection<IsabelleSolver> solvers;
     private IsabelleProgressModel progressModel;
-    private boolean[] problemProcessed;
+    private boolean[][] problemProcessed;
     private IsabelleProgressDialog progressDialog;
 
     private void prepareDialog(Collection<IsabelleSolver> solvers, final IsabelleLauncher launcher) {
@@ -104,7 +170,7 @@ public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
         }
 
         progressModel.addColumn(new IsabelleProgressModel.TitleColumn(captions));
-        problemProcessed = new boolean[solvers.size()];
+        problemProcessed = new boolean[1][solvers.size()];
         progressModel.addColumn(new IsabelleProgressModel.ProcessColumn(solvers.size()));
 
 
@@ -146,10 +212,6 @@ public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
             }
         };
 
-    }
-
-    private void stopped(IsabelleSolver solver) {
-        progressModel.setText("Stopped...", 0, solver.getSolverIndex());
     }
 
     private void running(IsabelleSolver solver) {

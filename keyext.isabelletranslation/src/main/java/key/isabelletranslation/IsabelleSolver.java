@@ -7,6 +7,8 @@ import java.util.TimerTask;
 public interface IsabelleSolver {
     int getSolverIndex();
 
+    ReasonOfInterruption getReasonOfInterruption();
+
     enum ReasonOfInterruption {
         User, Timeout, Exception, NoInterruption
     }

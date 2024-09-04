@@ -48,8 +48,7 @@ public class TranslationAction extends MainWindowAction {
 
         list.add(translation);
 
-        SledgehammerResult result = null;
-            Thread thread = new Thread(() -> {
+        Thread thread = new Thread(() -> {
 
                 IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
                 IsabelleLauncher launcher;
@@ -66,7 +65,7 @@ public class TranslationAction extends MainWindowAction {
                     throw new RuntimeException(e);
                 }
 
-            }, "IsabelleControlThread");
+            }, "IsabelleLauncherThread");
             thread.start();
     }
 
