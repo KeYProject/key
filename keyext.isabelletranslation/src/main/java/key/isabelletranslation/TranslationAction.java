@@ -44,8 +44,6 @@ public class TranslationAction extends MainWindowAction {
             return;
         }
 
-        writeTranslationFiles(translation);
-
         List<IsabelleProblem> list = new ArrayList<>();
 
         list.add(translation);
@@ -56,7 +54,7 @@ public class TranslationAction extends MainWindowAction {
                 IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
                 IsabelleLauncher launcher;
                 try {
-                    launcher = new IsabelleLauncher(IsabelleTranslationSettings.getInstance());
+                    launcher = new IsabelleLauncher(settings);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -70,15 +68,6 @@ public class TranslationAction extends MainWindowAction {
 
             }, "IsabelleControlThread");
             thread.start();
-        result = translation.getResult();
-        //SledgehammerResult result = translation.sledgehammer(30);
-
-        //TODO needs its own action to enable undo, etc. and naming reworks
-        if (result != null && result.isSuccessful()) {
-            IBuiltInRuleApp app = SMTRuleApp.RULE.createApp("Isabelle " + result.getSuccessfulTactic());
-            app.tryToInstantiate(mediator.getSelectedGoal());
-            mediator.getSelectedGoal().apply(app);
-        }
     }
 
     protected static void writeTranslationFiles(IsabelleProblem translation) {
