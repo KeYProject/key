@@ -24,13 +24,13 @@ import java.util.concurrent.*;
 
 public class IsabelleResourceController {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleResourceController.class);
-    private LinkedBlockingQueue<IsabelleResource> idleInstances;
+    private final LinkedBlockingQueue<IsabelleResource> idleInstances;
 
-    private IsabelleTranslationSettings settings;
+    private final IsabelleTranslationSettings settings;
 
     private boolean isShutdown = false;
 
-    private Collection<IsabelleSolver> waitingSolvers;
+    private final Collection<IsabelleSolver> waitingSolvers;
 
     private final int numberOfInstances;
 
@@ -83,6 +83,8 @@ public class IsabelleResourceController {
     }
 
     public void returnResource(IsabelleSolver returningSolver, IsabelleResource resource) {
+        assert resource != null;
+
         if (resource.isDestroyed()) {
             try {
                 resource = createIsabelleResource();
