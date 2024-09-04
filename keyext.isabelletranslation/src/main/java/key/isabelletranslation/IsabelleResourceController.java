@@ -49,13 +49,18 @@ public class IsabelleResourceController {
 
     public void init() throws IOException {
         for (int i = 0; i < numberOfInstances; i++) {
-            idleInstances.add(createIsabelleResource());
+            IsabelleResource newResource = createIsabelleResource();
+            if (!isShutdown() && newResource != null) {
+                idleInstances.add(newResource);
+            }
         }
     }
 
     public IsabelleResource getIsabelleResource(IsabelleSolver requestingSolver) throws InterruptedException {
         waitingSolvers.add(requestingSolver);
-        return idleInstances.take();
+        IsabelleResource freeResource = idleInstances.take();
+        waitingSolvers.remove(requestingSolver);
+        return freeResource;
     }
 
     public void shutdownGracefully() {
@@ -73,6 +78,14 @@ public class IsabelleResourceController {
     public void returnResource(IsabelleSolver returningSolver, IsabelleResource resource) {
         assert resource != null;
 
+        if (isShutdown()) {
+            if (!resource.isDestroyed()) {
+                //TODO some kind of race condition happens here
+                resource.destroy();
+            }
+            return;
+        }
+
         if (resource.isDestroyed()) {
             try {
                 resource = createIsabelleResource();
@@ -81,10 +94,14 @@ public class IsabelleResourceController {
                 shutdownGracefully();
                 LOGGER.error(e.getMessage());
             }
+        } else {
+            resource.interrupt();
         }
-        resource.interrupt();
-        waitingSolvers.remove(returningSolver);
         idleInstances.offer(resource);
+    }
+
+    public boolean isShutdown() {
+        return isShutdown;
     }
 
     private IsabelleResource createIsabelleResource() throws IOException {
@@ -96,10 +113,14 @@ public class IsabelleResourceController {
         try {
             return instanceCreatorService.submit(creationTask).get();
         } catch (InterruptedException e) {
+            shutdownGracefully();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             if (e.getCause() instanceof IOException) {
                 throw (IOException) e.getCause();
+            }
+            if (isShutdown()) {
+                return null;
             }
             LOGGER.error("Error during Isabelle setup");
             throw new RuntimeException(e);
@@ -150,7 +171,7 @@ public class IsabelleResourceController {
             return instance.isDestroyed();
         }
 
-        public void destroy() {
+        void destroy() {
             instance.destroy();
         }
 

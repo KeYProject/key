@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.Collection;
 import java.util.TimerTask;
 
-public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
+public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherListener {
     private final Timer timer = new Timer();
     private int finishedCounter = 0;
 
@@ -127,25 +127,23 @@ public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
 
     private void setProgressText(int value) {
         JProgressBar bar = progressDialog.getProgressBar();
-        if (bar.getMaximum() == 1) {
             if (value == -1) {
                 bar.setString("Preparing...");
                 bar.setStringPainted(true);
-                return;
+            } else if (value == bar.getMaximum()){
+                bar.setString("Finished.");
+                bar.setStringPainted(true);
+            } else {
+                bar.setString("Processed " + value + " of " + bar.getMaximum() + " problems.");
+                bar.setStringPainted(true);
             }
-            bar.setString(value == 0 ? "Processing..." : "Finished.");
-            bar.setStringPainted(true);
-        } else {
-            bar.setString("Processed " + value + " of " + bar.getMaximum() + " problems.");
-            bar.setStringPainted(true);
-        }
     }
 
     protected void discardEvent(IsabelleLauncher launcher) {
 
     }
 
-    public IsabelleLauncherListenerImpl(IsabelleTranslationSettings settings) {
+    public IsabelleLauncherProgressDialogMediator(IsabelleTranslationSettings settings) {
 
     }
 

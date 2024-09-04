@@ -3,8 +3,6 @@ package key.isabelletranslation;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.smt.SMTRuleApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +56,7 @@ public class TranslationAction extends MainWindowAction {
                     throw new RuntimeException(e);
                 }
 
-                launcher.addListener(new IsabelleLauncherListenerImpl(settings));
+                launcher.addListener(new IsabelleLauncherProgressDialogMediator(settings));
                 try {
                     launcher.try0ThenSledgehammerAllPooled(list, 30, 1);
                 } catch (IOException e) {
