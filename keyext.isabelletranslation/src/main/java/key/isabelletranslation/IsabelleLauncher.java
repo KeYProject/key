@@ -109,5 +109,10 @@ public class IsabelleLauncher {
     public void stopAll(IsabelleSolver.ReasonOfInterruption reasonOfInterruption) {
         shutdown();
         runningSolvers.forEach((solver) -> solver.interrupt(reasonOfInterruption));
+        solverQueue.forEach((solver) -> solver.interrupt(reasonOfInterruption));
+
+        runningSolvers.clear();
+        solverQueue.clear();
+        listener.launcherStopped(this, solverSet);
     }
 }

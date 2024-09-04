@@ -129,13 +129,13 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
             thread.interrupt();
         }
         if (isabelleResource != null) {
-            shutdownAndReturnResource();
+            returnResource();
         }
     }
 
-    private void shutdownAndReturnResource() {
-        isabelleResource.interrupt();
+    private void returnResource() {
         resourceController.returnResource(this, isabelleResource);
+        isabelleResource = null;
     }
 
     private void setSolverState(SolverState solverState) {
@@ -316,7 +316,9 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
             this.result = result;
             notifyProcessTimeout();
         } catch (InterruptedException exception) {
-            interrupt(ReasonOfInterruption.Exception);
+            if (reasonOfInterruption == ReasonOfInterruption.NoInterruption) {
+                interrupt(ReasonOfInterruption.Exception);
+            }
             result = new SledgehammerResult(Option.apply(null));
             this.result = result;
             notifySledgehammerError(exception);
