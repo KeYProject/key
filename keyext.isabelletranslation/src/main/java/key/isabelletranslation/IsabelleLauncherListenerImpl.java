@@ -18,7 +18,7 @@ public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
     }
 
     protected void stopEvent(IsabelleLauncher launcher) {
-
+        launcher.stopAll(IsabelleSolver.ReasonOfInterruption.User);
     }
 
     protected void applyEvent(IsabelleLauncher launcher) {

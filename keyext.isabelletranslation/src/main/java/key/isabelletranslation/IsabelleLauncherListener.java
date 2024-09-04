@@ -1,9 +1,5 @@
 package key.isabelletranslation;
 
-import key.isabelletranslation.gui.IsabelleProgressDialog;
-import key.isabelletranslation.gui.IsabelleProgressModel;
-
-import javax.swing.*;
 import java.util.Collection;
 
 public interface IsabelleLauncherListener {
