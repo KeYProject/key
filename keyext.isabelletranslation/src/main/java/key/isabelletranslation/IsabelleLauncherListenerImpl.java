@@ -49,7 +49,7 @@ public class IsabelleLauncherListenerImpl implements IsabelleLauncherListener {
 
         int i = 0;
         for (IsabelleProblem problem : problems) {
-            captions[i] = "Problem " + i;
+            captions[i] = problem.getName();
             i++;
         }
 
