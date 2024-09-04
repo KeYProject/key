@@ -1,9 +1,6 @@
 package key.isabelletranslation;
 
-import com.sun.java.accessibility.util.TopLevelWindowListener;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.unruh.isabelle.control.Isabelle;
-import de.unruh.isabelle.java.JIsabelle;
 import de.unruh.isabelle.mlvalue.*;
 import de.unruh.isabelle.pure.Implicits;
 import de.unruh.isabelle.pure.Theory;
@@ -19,11 +16,9 @@ import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -181,14 +176,6 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
         //TODO probably want asynchronous behavior
         //Thread.start();
         run();
-    }
-
-    @Override
-    public void start(IsabelleSolverTimeout timeout, Isabelle isabelleInstance) {
-        thread = new Thread(this, "IsabelleSolverInstance");
-        isabelleResource = IsabelleResourceController.createIsabelleResourceFromInstance(isabelleInstance, isabelleSettings);
-        this.solverTimeout = timeout;
-        thread.start();
     }
 
     @Override
