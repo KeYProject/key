@@ -164,6 +164,8 @@ public final class MainWindow extends JFrame {
         new ToggleSequentViewTooltipAction(this);
     private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
         new ToggleSourceViewTooltipAction(this);
+    private final ToggleProofTreeTooltipAction toogleProofTreeTooltipAction =
+        new ToggleProofTreeTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     private boolean frozen = false;
     /**
@@ -930,6 +932,7 @@ public final class MainWindow extends JFrame {
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
         view.add(new JCheckBoxMenuItem(toggleSequentViewTooltipAction));
         view.add(new JCheckBoxMenuItem(toggleSourceViewTooltipAction));
+        view.add(new JCheckBoxMenuItem(toogleProofTreeTooltipAction));
 
         view.addSeparator();
         {
@@ -1455,6 +1458,11 @@ public final class MainWindow extends JFrame {
 
     public boolean isShowTacletInfo() {
         return mainFrame.isShowTacletInfo();
+    }
+
+    public void setShowProofTreeTooltip(Object source) {
+        toogleProofTreeTooltipAction
+                .actionPerformed(new ActionEvent(proofTreeView, ActionEvent.ACTION_PERFORMED, ""));
     }
 
     public AutoModeAction getAutoModeAction() {
