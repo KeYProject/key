@@ -91,6 +91,22 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
     }
 
     @Override
+    public void performActionOnContextBlockExpression(ContextBlockExpression x) {
+        ExtList changeList = stack.peek();
+        if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            if (!preservesPositionInfo) {
+                // TODO changeList.removeFirstOccurrence(PositionInfo.class);
+            }
+            var newBlock = new ContextBlockExpression(changeList);
+            addChild(newBlock);
+            changed();
+        } else {
+            doDefaultAction(x);
+        }
+    }
+
+    @Override
     public void performActionOnBooleanLiteralExpression(BooleanLiteralExpression x) {
         throw new RuntimeException("TODO @ DD");
     }

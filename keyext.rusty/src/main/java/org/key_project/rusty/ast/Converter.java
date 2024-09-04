@@ -571,7 +571,9 @@ public class Converter {
 
     private Statement convertExprStmt(
             org.key_project.rusty.parsing.RustyParser.ExprStmtContext ctx) {
-        return new ExpressionStatement(convertExpr(ctx.expr()));
+        if (ctx.expr() != null)
+            return new ExpressionStatement(convertExpr(ctx.expr()));
+        return new ExpressionStatement(convertExprWithBlock(ctx.exprWithBlock()));
     }
 
     private Statement convertLetStmt(

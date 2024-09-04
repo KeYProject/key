@@ -4,12 +4,13 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.ElseBranch;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record IfExpression(Expr condition, BlockExpression thenExpr, @Nullable Expr elseExpr) implements Expr {
+public record IfExpression(Expr condition, ThenBranch thenExpr, @Nullable ElseBranch elseExpr) implements Expr, ElseBranch {
     @Override
     public void visit(Visitor v) {
         v.performActionOnIfExpression(this);

@@ -24,6 +24,7 @@ public abstract class ProgramSVSort extends SortImpl {
     public static final ProgramSVSort SIMPLE_EXPRESSION = new SimpleExpressionSort();
     public static final ProgramSVSort NONSIMPLEEXPRESSION = new NonSimpleExpressionSort();
     public static final ProgramSVSort EXPRESSION = new ExpressionSort();
+    public static final ProgramSVSort BLOCK_EXPRESSION = new BlockExpressionSort();
 
     // ----------- Types of Statement Program SVs -----------------------------
     public static final ProgramSVSort STATEMENT = new StatementSort();
@@ -150,6 +151,21 @@ public abstract class ProgramSVSort extends SortImpl {
         @Override
         public boolean canStandFor(RustyProgramElement pe, Services services) {
             return pe instanceof Expr;
+        }
+    }
+
+    private static class BlockExpressionSort extends ProgramSVSort {
+        public BlockExpressionSort() {
+            super(new Name("BlockExpression"));
+        }
+
+        protected BlockExpressionSort(Name n) {
+            super(n);
+        }
+
+        @Override
+        public boolean canStandFor(RustyProgramElement check, Services services) {
+            return check instanceof BlockExpression;
         }
     }
 

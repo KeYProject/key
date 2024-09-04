@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.ElseBranch;
 import org.key_project.rusty.ast.ProgramPrefixUtil;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.visitor.Visitor;
@@ -19,7 +20,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-public class BlockExpression implements Expr, ProgramPrefix {
+public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBranch {
     protected final ImmutableList<Statement> statements;
     protected final Expr value;
     private final int prefixLength;

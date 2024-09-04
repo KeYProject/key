@@ -9,7 +9,8 @@ blockExpr
    ;
 
 expr
-   : literalExpr # LiteralExpression
+   : schemaVariable # SchemaVarExpression
+   | literalExpr # LiteralExpression
    | pathExpr # PathExpression
    | expr DOT pathExprSegment LPAREN callParams? RPAREN # MethodCallExpression
    | expr DOT identifier # FieldExpression
@@ -47,7 +48,6 @@ expr
    | enumerationVariantExpr # EnumerationVariantExpression_
    | closureExpr # ClosureExpression_
    | exprWithBlock # ExpressionWithBlock_
-   | schemaVariable # SchemaVarExpression
    ;
 
 stmt
@@ -85,6 +85,10 @@ typeNoBounds
    | qualifiedPathInType
    | bareFunctionType
    | typeOf
+   ;
+
+ifExpr
+   : 'if' expr (thenBlock=blockExpr | thenSV=schemaVariable) ('else' (elseBlock=blockExpr | elseIf=ifExpr | elseSV=schemaVariable))?
    ;
 
 typeOf

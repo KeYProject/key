@@ -19,6 +19,7 @@ import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.rusty.util.TacletForTests;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,13 +44,24 @@ public class BasicTest {
     }
 
     private static void applyRule(String name, PosInOccurrence pos, Proof proof) {
+        applyRule(name, pos, proof, 0);
+    }
+
+    private static void applyRule(String name, PosInOccurrence pos, Proof proof, int index) {
         NoPosTacletApp rule =
             TacletForTests.getRules().lookup(new Name(name));
         TacletIndex tacletIndex = new TacletIndex();
         tacletIndex.add(rule);
-        var oldGoal = proof.openGoals().head();
-        var goal = createGoal(oldGoal.getNode(), tacletIndex);
-        proof.setOpenGoals(ImmutableList.of(goal));
+        var oldGoals = proof.openGoals();
+        var goal = createGoal(oldGoals.get(index).getNode(), tacletIndex);
+        ImmutableList<Goal> newGoals = ImmutableSLList.nil();
+        for (int i = 0; i < oldGoals.size(); ++i) {
+            if (i == index)
+                newGoals = newGoals.append(goal);
+            else
+                newGoals = newGoals.append(oldGoals.get(i));
+        }
+        proof.setOpenGoals(newGoals);
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(pos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
@@ -129,6 +141,39 @@ public class BasicTest {
         assertEquals(0, proof.openGoals().size());
         assertTrue(proof.closed());
         System.out.println("Proof successful!");
+    }
+
+    @Test
+    void testIf() {
+        TacletForTests.clear();
+        TacletForTests.parse(new RustProfile());
+        Semisequent antec = parseTermForSemisequent("");
+        Semisequent succ =
+            parseTermForSemisequent("\\<{ b = false; if b {i = 3u32} else {i = 2u32} i}\\>(i = 2)");
+        Sequent s = Sequent.createSequent(antec, succ);
+        var proof = new Proof(new Name("Simple"), s, TacletForTests.initConfig());
+        applyRule("assignment",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("After assignment:\n" + proof.openGoals().head().sequent());
+        applyRule("ifElseSplit",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After ifElseSplit:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
+
+        // Sub goal 1
+        applyRule("emptyBlock",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After emptyBlock:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
     }
 
     @Test

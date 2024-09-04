@@ -586,10 +586,14 @@ public class SchemaConverter {
     private IfExpression convertIfExpr(
             org.key_project.rusty.parsing.RustySchemaParser.IfExprContext ctx) {
         var cond = convertExpr(ctx.expr());
-        var then = convertBlockExpr(ctx.blockExpr(0));
-        var else_ = ctx.blockExpr().size() > 1 ? convertBlockExpr(ctx.blockExpr(1))
-                : ctx.ifExpr() != null ? convertIfExpr(ctx.ifExpr())
-                        : null;
+        ThenBranch then = ctx.thenBlock != null ? convertBlockExpr(ctx.thenBlock)
+                : (ProgramSV) lookupSchemaVariable(ctx.thenSV.getText().substring(2));
+        ElseBranch else_ = ctx.elseBlock != null ? convertBlockExpr(ctx.elseBlock)
+                : ctx.elseIf != null ? convertIfExpr(ctx.ifExpr())
+                        : ctx.elseSV != null
+                                ? (ProgramSV) lookupSchemaVariable(
+                                    ctx.elseSV.getText().substring(2))
+                                : null;
         return new IfExpression(cond, then, else_);
     }
 
@@ -650,7 +654,9 @@ public class SchemaConverter {
 
     private Statement convertExprStmt(
             org.key_project.rusty.parsing.RustySchemaParser.ExprStmtContext ctx) {
-        return new ExpressionStatement(convertExpr(ctx.expr()));
+        if (ctx.expr() != null)
+            return new ExpressionStatement(convertExpr(ctx.expr()));
+        return new ExpressionStatement(convertExprWithBlock(ctx.exprWithBlock()));
     }
 
     private Statement convertLetStmt(

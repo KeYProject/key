@@ -10,6 +10,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
+import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.IntIterator;
@@ -17,6 +18,7 @@ import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.logic.ProgramPrefix;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.SVInstantiations;
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -31,6 +33,22 @@ public class ContextBlockExpression extends BlockExpression {
     public ContextBlockExpression(ImmutableList<Statement> statements) {
         super(statements, null);
         patternPrefixLength = this.getPrefixLength();
+    }
+
+    public ContextBlockExpression(ExtList children) {
+        super(convertExtList(children), null);
+        patternPrefixLength = this.getPrefixLength();
+    }
+
+    private static ImmutableList<Statement> convertExtList(ExtList children) {
+        var stmts = ImmutableList.of(children.collect(Statement.class));
+        var expr = children.get(Expr.class);
+        if (expr instanceof BlockExpression || expr instanceof IfExpression
+                || expr instanceof IfLetExpression
+                || expr instanceof MatchExpression) {
+            stmts = stmts.append(new ExpressionStatement(expr));
+        }
+        return stmts;
     }
 
     @Override
