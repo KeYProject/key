@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.builder.TacletPBuilder;
 import org.key_project.rusty.rule.VariableCondition;
 import org.key_project.rusty.rule.tacletbuilder.TacletBuilder;
+
 
 /**
  * This class manages the register of various factories for the different built-in
@@ -57,12 +59,37 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder SIMPLIFY_ITE_UPDATE =
         new ConstructorBasedBuilder("simplifyIfThenElseUpdate",
             SimplifyIfThenElseUpdateCondition.class, FSV, USV, USV, FSV, SV);
+    public static AbstractTacletBuilderCommand NEW_TYPE_OF =
+        new AbstractTacletBuilderCommand("newTypeOf", SV, SV) {
+            @Override
+            public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
+                    List<String> parameters, boolean negated) {
+                if (negated) {
+                    throw new IllegalArgumentException("Negation is not supported");
+                }
+                tacletBuilder.addVarsNew((SchemaVariable) arguments[0],
+                    (SchemaVariable) arguments[1]);
+
+            }
+        };
+    public static final AbstractTacletBuilderCommand NEW_RUSTY_TYPE =
+        new AbstractTacletBuilderCommand("new", SV, KRT) {
+            @Override
+            public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
+                    List<String> parameters, boolean negated) {
+                if (negated) {
+                    throw new IllegalArgumentException("Negation is not supported");
+                }
+                var krt = (KeYRustyType) arguments[1];
+                tacletBuilder.addVarsNew((SchemaVariable) arguments[0], krt);
+            }
+        };
 
     private static final List<TacletBuilderCommand> tacletBuilderCommands = new ArrayList<>(2);
 
     static {
         register(APPLY_UPDATE_ON_RIGID, NEW_DEPENDING_ON, EQUAL_UNIQUE,
-            DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE);
+            DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, NEW_TYPE_OF, NEW_RUSTY_TYPE);
     }
 
     /**

@@ -713,9 +713,15 @@ public class SchemaConverter {
                 return new LiteralPattern();
             }
             if (pat.identifierPattern() != null) {
-                return new IdentPattern(pat.identifierPattern().KW_REF() != null,
-                    pat.identifierPattern().KW_MUT() != null,
-                    convertIdentifier(pat.identifierPattern().identifier()));
+                boolean reference = pat.identifierPattern().KW_REF() != null;
+                boolean mutable = pat.identifierPattern().KW_MUT() != null;
+                if (pat.identifierPattern().identifier() != null) {
+                    return new IdentPattern(reference,
+                        mutable,
+                        convertIdentifier(pat.identifierPattern().identifier()));
+                }
+                return new SchemaVarPattern(reference, mutable, lookupSchemaVariable(
+                    pat.identifierPattern().schemaVariable().getText().substring(2)));
             }
             if (pat.wildcardPattern() != null) {
                 return WildCardPattern.WILDCARD;
@@ -740,6 +746,10 @@ public class SchemaConverter {
             return convertTraitObjectOneBound(ctx.traitObjectTypeOneBound());
         if (ctx.typePath() != null)
             return convertTypePath(ctx.typePath());
+        if (ctx.typeOf() != null) {
+            var sv = (ProgramSV) convertExpr(ctx.typeOf().expr());
+            return new KeYRustyType(sv.sort());
+        }
         if (ctx.tupleType() != null)
             throw new IllegalArgumentException("TODO @ DD");
         if (ctx.neverType() != null)

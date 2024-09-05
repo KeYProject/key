@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -120,6 +121,17 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     public void addVarsNew(SchemaVariable v, SchemaVariable peerSV) {
         addVarsNew(new NewVarcond(v, peerSV));
+    }
+
+    /**
+     * adds a new <I>new</I> variable to the variable conditions of the Taclet: v is new and has the
+     * given type
+     */
+    public void addVarsNew(SchemaVariable v, KeYRustyType type) {
+        if (type == null) {
+            throw new NullPointerException("given type is null");
+        }
+        addVarsNew(new NewVarcond(v, type));
     }
 
     /**
