@@ -1,6 +1,7 @@
 package key.isabelletranslation;
 
 import de.unruh.isabelle.control.Isabelle;
+import de.unruh.isabelle.control.IsabelleMLException;
 import de.unruh.isabelle.mlvalue.*;
 import de.unruh.isabelle.pure.Implicits;
 import de.unruh.isabelle.pure.Theory;
@@ -171,7 +172,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
     @Override
     public boolean wasInterrupted() {
-        return reasonOfInterruption != ReasonOfInterruption.NoInterruption;
+        return Thread.currentThread().isInterrupted();
     }
 
     @Override
@@ -181,13 +182,17 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
     @Override
     public void start(IsabelleSolverTimeout timeout, IsabelleTranslationSettings settings) {
-        thread = new Thread(this, "IsabelleSolverInstance");
+        thread = new Thread(this, "IsabelleSolverInstance: " + getProblem().getName());
         this.solverTimeout = timeout;
         isabelleSettings = settings;
 
         //TODO probably want asynchronous behavior
-        //Thread.start();
-        run();
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            thread.interrupt();
+        }
     }
 
     @Override
@@ -212,60 +217,117 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
         try {
             isabelleResource = resourceController.getIsabelleResource(this);
         } catch (InterruptedException e) {
-            this.interrupt(ReasonOfInterruption.Exception);
             notifyProcessError(e);
+            return;
         }
 
 
         notifyProcessStarted();
         Isabelle isabelle = isabelleResource.instance();
-        Theory thy0 = isabelleResource.theory();
-
-        MLFunction2<Theory, String, List<Tuple2<Transition, String>>> parse_text = MLValue.compileFunction("""
-                        fn (thy, text) => let
-                        val transitions = Outer_Syntax.parse_text thy (K thy) Position.start text
-                        fun addtext symbols [tr] =
-                              [(tr, implode symbols)]
-                          | addtext _ [] = []
-                          | addtext symbols (tr::nextTr::trs) = let
-                              val (this,rest) = Library.chop (Position.distance_of (Toplevel.pos_of tr, Toplevel.pos_of nextTr) |> Option.valOf) symbols
-                              in (tr, implode this) :: addtext rest (nextTr::trs) end
-                        in addtext (Symbol.explode text) transitions end""", isabelle,
-                Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())));
-
-        MLFunction3<Object, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction("fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle,
-                de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
-
 
         ToplevelState toplevel = ToplevelState.apply(isabelle);
         LOGGER.info("Parsing theory for: " + problem.getName());
         setSolverState(SolverState.Parsing);
         notifyParsingStarted();
         try {
-            java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
-            parse_text.apply(thy0, getProblem().getSequentTranslation(), isabelle,
-                            Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
-                    .retrieveNow(new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())), isabelle)
-                    .foreach(transitionsAndTexts::add);
-
-            for (Tuple2<Transition, String> transitionAndText : transitionsAndTexts) {
-                //println(s"""Transition: "${text.strip}"""")
-                toplevel = command_exception.apply(Boolean.TRUE, transitionAndText._1(), toplevel, isabelle,
-                                de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter())
-                        .retrieveNow(Implicits.toplevelStateConverter(), isabelle);
-            }
-        } catch (Exception e) {
-            isabelleResource.destroy();
+            toplevel = parseTheory(toplevel, isabelleResource);
+        } catch (InterruptedException e) {
+            setSolverState(SolverState.Stopped);
+            notifyParsingError(e);
+            returnResource();
+            return;
+        } catch (IsabelleMLException e) {
+            setSolverState(SolverState.Stopped);
+            returnResource();
             notifyParsingError(e);
             return;
         }
         notifyParsingFinished();
         LOGGER.debug("Finished Parsing");
 
+        setSolverState(SolverState.Running);
+        notifySledgehammerStarted();
+
+        try {
+            this.result = sledgehammer(isabelleResource, toplevel);
+            notifySledgehammerFinished();
+        } catch (TimeoutException e) {
+            setReasonOfInterruption(ReasonOfInterruption.Timeout);
+            this.result = new SledgehammerResult(Option.apply(new Tuple2<>("timeout", "timeout")));
+            notifySledgehammerFinished();
+        } catch (InterruptedException e) {
+            notifySledgehammerError(e);
+        } catch (IsabelleMLException e) {
+            setReasonOfInterruption(ReasonOfInterruption.Exception);
+            notifySledgehammerError(e);
+        } finally {
+            returnResource();
+            getProblem().setResult(this.result);
+            setSolverState(SolverState.Stopped);
+            notifyProcessFinished();
+            LOGGER.info("Sledgehammer result: {}", this.result);
+        }
+    }
+
+    private ToplevelState parseTheory(ToplevelState toplevel, IsabelleResourceController.IsabelleResource resource) throws InterruptedException, IsabelleMLException {
+        ToplevelState result = toplevel;
+        Isabelle isabelle = resource.instance();
+        Theory thy0 = resource.theory();
+
+        if (wasInterrupted()) {
+            throw new InterruptedException();
+        }
+        MLFunction2<Theory, String, List<Tuple2<Transition, String>>> parse_text = MLValue.compileFunction("""
+                            fn (thy, text) => let
+                            val transitions = Outer_Syntax.parse_text thy (K thy) Position.start text
+                            fun addtext symbols [tr] =
+                                  [(tr, implode symbols)]
+                              | addtext _ [] = []
+                              | addtext symbols (tr::nextTr::trs) = let
+                                  val (this,rest) = Library.chop (Position.distance_of (Toplevel.pos_of tr, Toplevel.pos_of nextTr) |> Option.valOf) symbols
+                                  in (tr, implode this) :: addtext rest (nextTr::trs) end
+                            in addtext (Symbol.explode text) transitions end""", isabelle,
+                    Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())));
+
+        if (wasInterrupted()) {
+            throw new InterruptedException();
+        }
+        MLFunction3<Object, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction("fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle,
+                de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
+
+        java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
+        Future<List<Tuple2<Transition, String>>> transitionList = parse_text.apply(thy0, getProblem().getSequentTranslation(), isabelle,
+                        Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
+                .retrieve(new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())), isabelle);
+        try {
+            Await.result(transitionList, Duration.create(1, TimeUnit.HOURS))
+                    .foreach(transitionsAndTexts::add);
+        } catch (TimeoutException e) {
+            //Should not be reached
+            throw new RuntimeException(e);
+        }
+
+        for (Tuple2<Transition, String> transitionAndText : transitionsAndTexts) {
+            //println(s"""Transition: "${text.strip}"""")
+            if (reasonOfInterruption != ReasonOfInterruption.NoInterruption) {
+                throw new InterruptedException();
+            }
+            result = command_exception.apply(Boolean.TRUE, transitionAndText._1(), result, isabelle,
+                            de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter())
+                        .retrieveNow(Implicits.toplevelStateConverter(), isabelle);
+        }
+        return result;
+    }
+
+
+    private SledgehammerResult sledgehammer(IsabelleResourceController.IsabelleResource resource, ToplevelState toplevel)
+                throws TimeoutException, InterruptedException, IsabelleMLException {
+        Isabelle isabelle = resource.instance();
+        Theory thy0 = resource.theory();
+
         String sledgehammer = thy0.importMLStructureNow("Sledgehammer", isabelle);
         String Sledgehammer_Commands = thy0.importMLStructureNow("Sledgehammer_Commands", isabelle);
         String Sledgehammer_Prover = thy0.importMLStructureNow("Sledgehammer_Prover", isabelle);
-
         MLFunction4<ToplevelState, Theory, scala.collection.immutable.List<String>, scala.collection.immutable.List<String>, Tuple2<Object, Tuple2<String, scala.collection.immutable.List<String>>>> normal_with_Sledgehammer =
                 MLValue.compileFunction(
                         """
@@ -296,57 +358,19 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
                         new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                         (new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter())))));
 
+
         Builder<String, List<String>> listBuilder = scala.collection.immutable.List.newBuilder();
         scala.collection.immutable.List<String> emptyList = listBuilder.result();
 
         SledgehammerResult result = null;
-        setSolverState(SolverState.Running);
-        notifySledgehammerStarted();
-        try {
-            Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
+        Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
                     .retrieve(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
-            Tuple2<Object, Tuple2<String, List<String>>> resultFutureCollect = Await.result(resultFuture, Duration.create(getTimeout(), TimeUnit.SECONDS));
-            result = new SledgehammerResult(Option.apply(new Tuple2<>(resultFutureCollect._2()._1(), resultFutureCollect._2()._2().head())));
-            this.result = result;
-        } catch (TimeoutException exception) {
-            interrupt(ReasonOfInterruption.Timeout);
-            result = new SledgehammerResult(Option.apply(new Tuple2<>("timeout", "timeout")));
-            this.result = result;
-            notifyProcessTimeout();
-        } catch (InterruptedException exception) {
-            if (reasonOfInterruption == ReasonOfInterruption.NoInterruption) {
-                interrupt(ReasonOfInterruption.Exception);
-            }
-            result = new SledgehammerResult(Option.apply(null));
-            this.result = result;
-            notifySledgehammerError(exception);
-            notifyProcessError(exception);
-        } catch (Exception exception) {
-            interrupt(ReasonOfInterruption.Exception);
-            if (exception.getMessage().contains("Timeout after")) {
-                result = new SledgehammerResult(Option.apply(new Tuple2<>("timeout", "timeout")));
-                this.result = result;
-                notifyProcessTimeout();
-            } else {
-                LOGGER.error("Exception during Sledgehammer {}", exception.getMessage());
-                exception.printStackTrace();
-                result = new SledgehammerResult(Option.apply(null));
-                this.result = result;
-                notifySledgehammerError(exception);
-                notifyProcessError(exception);
-            }
-        }
-        getProblem().setResult(this.result);
-        resourceController.returnResource(this, isabelleResource);
-
-        setSolverState(SolverState.Stopped);
-        notifySledgehammerFinished();
-
-        notifyProcessFinished();
-
-        LOGGER.info("Sledgehammer result: " + this.result);
+        Tuple2<Object, Tuple2<String, List<String>>> resultFutureCollect = Await.result(resultFuture, Duration.create(getTimeout(), TimeUnit.SECONDS));
+        result = new SledgehammerResult(Option.apply(new Tuple2<>(resultFutureCollect._2()._1(), resultFutureCollect._2()._2().head())));
+        this.result = result;
+        return this.result;
     }
 
 

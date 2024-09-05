@@ -38,7 +38,7 @@ public class IsabelleLauncher {
         ExecutorService executorService = Executors.newFixedThreadPool(instanceCount);
 
         shutdownResources = new Thread(() -> {
-            executorService.shutdown();
+            executorService.shutdownNow();
             resourceController.shutdownGracefully();
         });
         Runtime.getRuntime().addShutdownHook(shutdownResources);
