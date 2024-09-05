@@ -36,6 +36,6 @@ public class ExpressionStatement implements Statement {
 
     @Override
     public void visit(Visitor v) {
-        expression.visit(v);
+        v.performActionOnExpressionStatement(this);
     }
 }

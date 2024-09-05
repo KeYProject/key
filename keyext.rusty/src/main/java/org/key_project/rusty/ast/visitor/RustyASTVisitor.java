@@ -9,6 +9,7 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.SelfParam;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
+import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -274,6 +275,11 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnPredicatePatternLoopExpression(PredicatePatternLoopExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnExpressionStatement(ExpressionStatement x) {
         doDefaultAction(x);
     }
 }

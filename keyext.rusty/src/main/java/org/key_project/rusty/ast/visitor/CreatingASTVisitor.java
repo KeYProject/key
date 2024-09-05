@@ -10,6 +10,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
+import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
@@ -133,7 +134,20 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
 
     @Override
     public void performActionOnEmptyStatement(EmptyStatement x) {
-        throw new RuntimeException("TODO @ DD");
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnExpressionStatement(ExpressionStatement x) {
+        ExtList changeList = stack.peek();
+        if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            Expr expr = changeList.removeFirstOccurrence(Expr.class);
+            addChild(new ExpressionStatement(expr));
+            changed();
+        } else {
+            doDefaultAction(x);
+        }
     }
 
     protected void changed() {

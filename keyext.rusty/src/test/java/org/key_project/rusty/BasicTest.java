@@ -174,6 +174,92 @@ public class BasicTest {
         assertEquals(2, proof.openGoals().size());
         System.out.println("After emptyBlock:\n" + proof.openGoals().head().sequent());
         System.out.println(proof.openGoals().get(1).sequent());
+        applyRule("assignment",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After assignment:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
+        applyRule("emptyModality",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1).down(1), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After emptyModality:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
+        applyRule("simplifyUpdate2",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After simplifyUpdate2:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
+        applyRule("applyOnRigidFormula",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After applyOnRigidFormula:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
+        applyRule("applyOnPV",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(0), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After applyOnPV:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
+        applyRule("simplifyUpdate1",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After simplifyUpdate1:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
+        applyRule("eqClose",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After eqClose:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
+        applyRule("closeTrue",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("After closeTrue:\n" + proof.openGoals().head().sequent());
+
+        // Subgoal 2
+        applyRule("applyOnRigidFormula",
+            new PosInOccurrence(proof.openGoals().head().sequent().antecedent().getFirst(),
+                PosInTerm.getTopLevel(), true),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("After applyOnRigidFormula:\n" + proof.openGoals().head().sequent());
+        applyRule("applyOnPV",
+            new PosInOccurrence(proof.openGoals().head().sequent().antecedent().getFirst(),
+                PosInTerm.getTopLevel().down(0), true),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("After applyOnPV:\n" + proof.openGoals().head().sequent());
+        applyRule("simplifyUpdate1",
+            new PosInOccurrence(proof.openGoals().head().sequent().antecedent().getFirst(),
+                PosInTerm.getTopLevel().down(1), true),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("After simplifyUpdate1:\n" + proof.openGoals().head().sequent());
+        applyRule("bool_not_equal_2",
+            new PosInOccurrence(proof.openGoals().head().sequent().antecedent().getFirst(),
+                PosInTerm.getTopLevel(), true),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("After bool_not_equal_2:\n" + proof.openGoals().head().sequent());
+        applyRule("closeFalse",
+            new PosInOccurrence(proof.openGoals().head().sequent().antecedent().getFirst(),
+                PosInTerm.getTopLevel(), true),
+            proof);
+        assertEquals(0, proof.openGoals().size());
     }
 
     @Test
