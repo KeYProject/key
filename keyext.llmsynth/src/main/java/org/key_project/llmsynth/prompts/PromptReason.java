@@ -1,20 +1,39 @@
 package org.key_project.llmsynth.prompts;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * If a prompt strategy is invoked, it has a reason.
  * This encodes the reason via subclasses, but also allows access to previous prompts in the conversation history.
  */
 public class PromptReason {
+    @JsonInclude
+    public String description;
+//    @JsonBackReference
+    @JsonIgnore
     PromptReason parent = null;
+//    @JsonManagedReference
+    @JsonIgnore
+    List<PromptResult> reactions = new ArrayList<>();
 
-    // The prompt that was rejected
-    PromptResult result = null;
+//    @JsonManagedReference
+    @JsonIgnore
+    PromptResult result = null; // The prompt that was rejected
+    @JsonIgnore
     int depth = 0;
 
-    public PromptReason() {
+    public PromptReason(String description) {
+        this.description = description;
     }
 
-    public PromptReason(PromptReason parent) {
+    public PromptReason(String description, PromptReason parent) {
+        this(description);
         this.parent = parent;
         this.depth = parent.depth + 1;
     }
@@ -23,6 +42,7 @@ public class PromptReason {
      *
      * @return The length of history
      */
+    @JsonIgnore
     public int getDepth() {
         return depth;
     }
@@ -31,6 +51,7 @@ public class PromptReason {
      *
      * @return The previous prompt (and why it failed)
      */
+    @JsonIgnore
     public PromptReason getParent() {
         return parent;
     }
@@ -50,6 +71,7 @@ public class PromptReason {
      *
      * @return The prompt that failed to verify
      */
+    @JsonIgnore
     public Prompt getPrompt() {
         return result.getPrompt();
     }
@@ -58,7 +80,17 @@ public class PromptReason {
      *
      * @return The answer to the prompt that failed to verify
      */
+    @JsonIgnore
     public PromptAnswer getAnswer() {
         return result.getAnswer();
+    }
+
+    public void addReaction(PromptResult result) {
+        reactions.add(result);
+    }
+
+    @JsonIgnore
+    public List<PromptResult> getReactions() {
+        return reactions;
     }
 }

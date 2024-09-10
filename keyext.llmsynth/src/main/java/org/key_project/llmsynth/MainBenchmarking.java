@@ -7,13 +7,19 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.key_project.llmsynth.benchmarks.*;
+import org.key_project.llmsynth.benchmarks.dto.SearchNode;
 import org.key_project.llmsynth.benchmarks.legacy.*;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
 import org.key_project.llmsynth.oracles.OracleGpt3_5_Turbo;
 
+import org.key_project.llmsynth.prompts.*;
+import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -25,11 +31,48 @@ public class MainBenchmarking {
     //private static final int ATTEMPTS = 3;
     private static final int ATTEMPTS = 1;
 
+    private static PromptAnswer qa(PromptType typ, String q, String a) {
+        return new PromptAnswer(Prompt.from(typ, q), a);
+    }
+
+    private static void serialize_example() {
+        // TODO: give reasons and do proper rejections
+        PromptAnswer a1 = qa(PromptType.USER, "some root-string", "some inconspicuous answer");
+        PromptResult r1 = PromptResult.reject(a1, new WrongJML("test", null));
+
+        PromptAnswer a2_l = qa(PromptType.USER, "left leaf", "very left");
+        PromptResult r2_l = PromptResult.reject(a2_l, new NoJMLInRegion());
+
+        PromptAnswer a2_r = qa(PromptType.USER,"right leaf", "very right");
+        PromptResult r2_r = PromptResult.accept(a2_r);
+
+        PromptAnswer a3 = qa(PromptType.USER, "left final leaf", "some addition");
+        PromptResult r3 = PromptResult.reject(a3, new UnknownReason(null));
+
+        FirstPrompt p1 = new FirstPrompt(0);
+        p1.addReaction(r1);
+        r1.getReason().addReaction(r2_l);
+        r1.getReason().addReaction(r2_r);
+        r2_l.getReason().addReaction(r3);
+
+        SearchNode root = SearchNode.treeFromFirstPrompt(p1);
+        ObjectMapper om = new ObjectMapper();
+        try {
+            String serialized = om.writeValueAsString(root);
+            System.out.println(serialized);
+        } catch (JsonProcessingException e) {
+            System.err.println(e);
+        }
+        System.exit(0);
+    }
+
     public static void main(String[] args) {
-        File benchmark_dir = new File(args[0]);
+        File benchmark_dir = args.length > 0 ? new File(args[0]) : new File("");
         File benchmark_dir_contract = new File(benchmark_dir, "contracts");
         File benchmark_dir_subcontracts = new File(benchmark_dir, "subcontracts");
         File benchmark_dir_invariants = new File(benchmark_dir, "invariants");
+
+        serialize_example();
 
         File benchmark_filter = new File(args[1]);
         // Read lines of benchmark_filter into a list

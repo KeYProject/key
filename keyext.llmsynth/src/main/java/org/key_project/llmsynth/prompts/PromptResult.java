@@ -1,12 +1,22 @@
 package org.key_project.llmsynth.prompts;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * A class encoding the verification status of a PromptAnswer.
  * A PromptAnswer may be accepted or rejected.
  */
 public class PromptResult {
+    @JsonProperty("prompt")
     private final PromptAnswer answer;
+    @JsonProperty("status")
     private final PromptStatus status;
+
+    @JsonInclude(Include.NON_NULL)
     private final PromptReason reason; // only set, when status == REJECT
 
     private PromptResult(PromptAnswer answer, PromptStatus status, PromptReason reason) {
@@ -38,8 +48,14 @@ public class PromptResult {
      *
      * @return If the prompt was verified successfully.
      */
+    @JsonIgnore
     public boolean isAccepted() {
         return status == PromptStatus.ACCEPTED;
+    }
+
+    @JsonIgnore
+    public PromptStatus getStatus() {
+        return status;
     }
 
     /**
@@ -60,7 +76,7 @@ public class PromptResult {
 
     /**
      *
-     * @return
+     * @return The prompt that was sent to the oracle
      */
     public Prompt getPrompt() {
         return getAnswer().getPrompt();

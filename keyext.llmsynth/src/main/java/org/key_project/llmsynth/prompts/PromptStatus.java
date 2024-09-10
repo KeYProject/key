@@ -3,7 +3,7 @@ package org.key_project.llmsynth.prompts;
 /**
  * The verification status of a Prompt
  */
-enum PromptStatus {
+public enum PromptStatus {
     /**
      * Verification has not yet been tried
      */
