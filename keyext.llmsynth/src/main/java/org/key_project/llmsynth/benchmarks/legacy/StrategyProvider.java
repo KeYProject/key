@@ -2,6 +2,7 @@ package org.key_project.llmsynth.benchmarks.legacy;
 
 import org.key_project.llmsynth.benchmarks.LLMChoice;
 import org.key_project.llmsynth.benchmarks.LLMTask;
+import org.key_project.llmsynth.prompts.Prompt;
 import org.key_project.llmsynth.prompts.*;
 
 import java.util.function.Function;
@@ -20,7 +21,7 @@ public interface StrategyProvider<TTask extends LLMTask, TData> {
      * @param task The task to be solved
      * @return A strategy that aims to solve the provided task
      */
-    IPromptStrategy<TData> selectStrategy(LLMChoice oracle, TTask task);
+    ISearchStrategy<TData> selectStrategy(LLMChoice oracle, TTask task);
 
     /**
      *
@@ -34,7 +35,7 @@ public interface StrategyProvider<TTask extends LLMTask, TData> {
      * @param task The task to be solved
      * @return A verificator that can test, if a suggested solution solves the benchmark
      */
-    Function<PromptAnswer, PromptResult> createDefaultVerificator(LLMChoice oracle, TTask task);
+    Function<Prompt, VerificationResult> createDefaultVerificator(LLMChoice oracle, TTask task);
 
     /**
      *
@@ -45,8 +46,8 @@ public interface StrategyProvider<TTask extends LLMTask, TData> {
     static <TTask extends LLMTask, T> StrategyProvider<TTask, T> getDefault() {
         return new StrategyProvider<>() {
             @Override
-            public IPromptStrategy<T> selectStrategy(LLMChoice oracle, TTask task) {
-                return PromptStrategy.getDefault();
+            public ISearchStrategy<T> selectStrategy(LLMChoice oracle, TTask task) {
+                return SearchStrategy.getDefault();
             }
 
             @Override
@@ -55,7 +56,7 @@ public interface StrategyProvider<TTask extends LLMTask, TData> {
             }
 
             @Override
-            public Function<PromptAnswer, PromptResult> createDefaultVerificator(LLMChoice oracle, TTask task) {
+            public Function<Prompt, VerificationResult> createDefaultVerificator(LLMChoice oracle, TTask task) {
                 return null;
             }
         };

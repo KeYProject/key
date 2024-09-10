@@ -3,30 +3,32 @@ package org.key_project.llmsynth.benchmarks.legacy;
 import org.key_project.llmsynth.ClassInfo;
 import org.key_project.llmsynth.MethodInfo;
 import org.key_project.llmsynth.Nothing;
+import org.key_project.llmsynth.SearchNode;
 import org.key_project.llmsynth.prompts.*;
 import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 
 import java.util.List;
 import java.util.function.Supplier;
 
-public class LegacySpecifyLoopinvariantStrategy implements IPromptStrategy<Nothing>, LegacyVisitor<Nothing> {
+// todo: make this not inherit from DecorateLegacy
+public class LegacySpecifyLoopinvariantStrategy extends DecorateLegacy<Nothing> implements ISearchStrategy<Nothing>, LegacyVisitor<Nothing> {
     private final ClassInfo clazz;
     private final MethodInfo method;
-    private final IPromptStrategy<Nothing> fallback;
 
     public LegacySpecifyLoopinvariantStrategy(ClassInfo clazz, MethodInfo method) {
+        super(SearchStrategy.getDefault());
         this.clazz = clazz;
         this.method = method;
-        this.fallback = PromptStrategy.getDefault();
     }
-    public LegacySpecifyLoopinvariantStrategy(ClassInfo clazz, MethodInfo method, IPromptStrategy<Nothing> fallback) {
+
+    public LegacySpecifyLoopinvariantStrategy(ClassInfo clazz, MethodInfo method, ISearchStrategy<Nothing> fallback) {
+        super(fallback);
         this.clazz = clazz;
         this.method = method;
-        this.fallback = fallback;
     }
 
     @Override
-    public Iterable<Prompt> reason(UnknownReason reason, Nothing o, Supplier<PromptBuilder> newBuilder) {
+    public Iterable<SearchNode<Nothing>> reason(UnknownReason reason, Nothing o, Supplier<SearchNodeBuilder<Nothing>> newBuilder) {
         var b = newBuilder.get();
         b.textln("Could you rephrase your solution? Please provide a valid JML loop invariant.");
         if (reason.getException() != null) {
@@ -37,7 +39,7 @@ public class LegacySpecifyLoopinvariantStrategy implements IPromptStrategy<Nothi
     }
 
     @Override
-    public Iterable<Prompt> reason(WrongJML reason, Nothing o, Supplier<PromptBuilder> newBuilder) {
+    public Iterable<SearchNode<Nothing>> reason(WrongJML reason, Nothing o, Supplier<SearchNodeBuilder<Nothing>> newBuilder) {
         var b = newBuilder.get();
         b.text("The provided JML loop invariant does not solve the task for '").text(method.getName()).textln("'.");
 
@@ -50,14 +52,14 @@ public class LegacySpecifyLoopinvariantStrategy implements IPromptStrategy<Nothi
     }
 
     @Override
-    public Iterable<Prompt> reason(InvalidJava reason, Nothing o, Supplier<PromptBuilder> newBuilder) {
+    public Iterable<SearchNode<Nothing>> reason(InvalidJava reason, Nothing o, Supplier<SearchNodeBuilder<Nothing>> newBuilder) {
         var b = newBuilder.get();
         b.textln("The provided code is not a valid loop-invariant");
         return List.of(b.build());
     }
 
     @Override
-    public Iterable<Prompt> reason(NoJMLInRegion reason, Nothing o, Supplier<PromptBuilder> newBuilder) {
+    public Iterable<SearchNode<Nothing>> reason(NoJMLInRegion reason, Nothing o, Supplier<SearchNodeBuilder<Nothing>> newBuilder) {
         var b = newBuilder.get();
         b.text("Please write the loop invariant directly above the first loop construct of '")
                 .text(method.getName()).textln("'");
@@ -65,7 +67,7 @@ public class LegacySpecifyLoopinvariantStrategy implements IPromptStrategy<Nothi
     }
 
     @Override
-    public Iterable<Prompt> reason(NoJMlInSearchLocations reason, Nothing o, Supplier<PromptBuilder> newBuilder) {
+    public Iterable<SearchNode<Nothing>> reason(NoJMlInSearchLocations reason, Nothing o, Supplier<SearchNodeBuilder<Nothing>> newBuilder) {
         var b = newBuilder.get();
         b.text("Please write the loop invariant directly above the first loop construct of '")
                 .text(method.getName()).textln("'");
@@ -73,7 +75,7 @@ public class LegacySpecifyLoopinvariantStrategy implements IPromptStrategy<Nothi
     }
 
     @Override
-    public Iterable<Prompt> reason(FirstPrompt reason, Nothing o, Supplier<PromptBuilder> newBuilder) {
+    public Iterable<SearchNode<Nothing>> reason(FirstPrompt reason, Nothing o, Supplier<SearchNodeBuilder<Nothing>> newBuilder) {
         var b = newBuilder.get();
         b.textln("Given the following Java class:");
         b.classTextInQuotes(clazz);
@@ -81,13 +83,5 @@ public class LegacySpecifyLoopinvariantStrategy implements IPromptStrategy<Nothi
                 .text(method.getName())
                 .textln("'");
         return List.of(b.build());
-    }
-
-    public Iterable<Prompt> apply(PromptReason r, Nothing o, Supplier<PromptBuilder> newBuilder) {
-        if (r instanceof  LegacyReasons) {
-            return ((LegacyReasons) r).dispatch(this, o, newBuilder);
-        } else {
-            return fallback.apply(r, o, newBuilder);
-        }
     }
 }

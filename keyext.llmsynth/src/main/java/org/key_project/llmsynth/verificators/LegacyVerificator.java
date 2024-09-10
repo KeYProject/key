@@ -1,18 +1,14 @@
 package org.key_project.llmsynth.verificators;
 
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import jdk.dynalink.linker.MethodHandleTransformer;
-import org.key_project.llmsynth.ClassInfo;
-import org.key_project.llmsynth.MethodInfo;
 import org.key_project.llmsynth.benchmarks.LLMChoice;
+import org.key_project.llmsynth.prompts.Prompt;
 import org.key_project.llmsynth.benchmarks.legacy.*;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
 import org.key_project.llmsynth.old_unused.Gpt3Prompt;
-import org.key_project.llmsynth.prompts.PromptAnswer;
 import org.key_project.llmsynth.prompts.PromptReason;
-import org.key_project.llmsynth.prompts.PromptResult;
+import org.key_project.llmsynth.prompts.VerificationResult;
 
 
 import java.nio.file.Path;
@@ -21,7 +17,7 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class LegacyVerificator implements Function<PromptAnswer, PromptResult> {
+public class LegacyVerificator implements Function<Prompt, VerificationResult> {
     List<String> classLines;
     String methodName;
     boolean isCtor;
@@ -104,8 +100,8 @@ public class LegacyVerificator implements Function<PromptAnswer, PromptResult> {
     }
 
 
-    public PromptResult verify(PromptAnswer answer) {
-        String content = answer.getContent();
+    public VerificationResult verify(Prompt prompt) {
+        String content = prompt.output;
 
         String methodToSearch = subfun != null ? subfun : methodName;
         ;
@@ -138,7 +134,7 @@ public class LegacyVerificator implements Function<PromptAnswer, PromptResult> {
 
         // Prepare the result
         if (keyVerifiedSuccessfully) {
-            return PromptResult.accept(answer);
+            return VerificationResult.accept(prompt);
         } else {
             PromptReason reason;
             switch (failureReason) {
@@ -164,11 +160,11 @@ public class LegacyVerificator implements Function<PromptAnswer, PromptResult> {
                 default:
                     throw new RuntimeException("Unknown legacy reason");
             }
-            return PromptResult.reject(answer, reason);
+            return VerificationResult.reject(prompt, reason);
         }
     }
 
-    public PromptResult apply(PromptAnswer answer) {
+    public VerificationResult apply(Prompt answer) {
         return verify(answer);
     }
 

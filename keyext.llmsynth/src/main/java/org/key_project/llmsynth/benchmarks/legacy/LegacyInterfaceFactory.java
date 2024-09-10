@@ -4,13 +4,12 @@ import org.key_project.llmsynth.Nothing;
 import org.key_project.llmsynth.benchmarks.LLMChoice;
 import org.key_project.llmsynth.benchmarks.LLMTask;
 
+import org.key_project.llmsynth.prompts.Prompt;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
-import org.key_project.llmsynth.prompts.IPromptStrategy;
-import org.key_project.llmsynth.prompts.PromptAnswer;
-import org.key_project.llmsynth.prompts.PromptReason;
-import org.key_project.llmsynth.prompts.PromptResult;
+import org.key_project.llmsynth.prompts.ISearchStrategy;
+import org.key_project.llmsynth.prompts.VerificationResult;
 import org.key_project.llmsynth.verificators.LegacyVerificator;
 
 import java.nio.file.Path;
@@ -22,15 +21,15 @@ import java.util.function.Function;
  */
 public final class LegacyInterfaceFactory {
     public final class SP<TTask extends LLMTask> implements StrategyProvider<TTask, Nothing> {
-        BiFunction<LLMChoice, TTask, IPromptStrategy<Nothing>>  mkstrategy;
-        BiFunction<LLMChoice, TTask, Function<PromptAnswer, PromptResult>> mkverificator;
+        BiFunction<LLMChoice, TTask, ISearchStrategy<Nothing>>  mkstrategy;
+        BiFunction<LLMChoice, TTask, Function<Prompt, VerificationResult>> mkverificator;
 
-        public SP(BiFunction<LLMChoice, TTask, IPromptStrategy<Nothing>> mkstrategy, BiFunction<LLMChoice, TTask, Function<PromptAnswer, PromptResult>> mkverificator) {
+        public SP(BiFunction<LLMChoice, TTask, ISearchStrategy<Nothing>> mkstrategy, BiFunction<LLMChoice, TTask, Function<Prompt, VerificationResult>> mkverificator) {
             this.mkstrategy = mkstrategy;
             this.mkverificator = mkverificator;
         }
 
-        public IPromptStrategy<Nothing> selectStrategy(LLMChoice oracle, TTask task) {
+        public ISearchStrategy<Nothing> selectStrategy(LLMChoice oracle, TTask task) {
             return mkstrategy.apply(oracle, task);
         }
 
@@ -38,7 +37,7 @@ public final class LegacyInterfaceFactory {
             return Nothing.getInstance();
         }
 
-        public Function<PromptAnswer, PromptResult> createDefaultVerificator(LLMChoice oracle, TTask task) {
+        public Function<Prompt, VerificationResult> createDefaultVerificator(LLMChoice oracle, TTask task) {
             return mkverificator.apply(oracle, task);
         }
     }
@@ -87,15 +86,15 @@ public final class LegacyInterfaceFactory {
         return Nothing.getInstance();
     }
 
-    private IPromptStrategy<Nothing> specFunctionStrategy(LLMChoice oracle, TaskSpecifyFunction task) {
+    private ISearchStrategy<Nothing> specFunctionStrategy(LLMChoice oracle, TaskSpecifyFunction task) {
         return new LegacySpecifyTopLevelStrategy(task.classInfo, task.methodInfo);
     }
 
-    private IPromptStrategy<Nothing> specSubcontractStrategy(LLMChoice oracle, TaskSpecifySubcontract task) {
+    private ISearchStrategy<Nothing> specSubcontractStrategy(LLMChoice oracle, TaskSpecifySubcontract task) {
         return new LegacySpecifySubcontractStrategy(task.classInfo, task.methodInfo, task.subMethodInfo);
     }
 
-    private IPromptStrategy<Nothing> specLoopinvariantStrategy(LLMChoice oracle, TaskSpecifyLoopInvariant task) {
+    private ISearchStrategy<Nothing> specLoopinvariantStrategy(LLMChoice oracle, TaskSpecifyLoopInvariant task) {
         return new LegacySpecifyLoopinvariantStrategy(task.classInfo, task.methodInfo);
     }
 }

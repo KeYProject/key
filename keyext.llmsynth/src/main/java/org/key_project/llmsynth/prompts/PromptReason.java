@@ -1,12 +1,8 @@
 package org.key_project.llmsynth.prompts;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.key_project.llmsynth.ISearchNode;
 
 /**
  * If a prompt strategy is invoked, it has a reason.
@@ -17,14 +13,9 @@ public class PromptReason {
     public String description;
 //    @JsonBackReference
     @JsonIgnore
-    PromptReason parent = null;
+    ISearchNode node = null;
 //    @JsonManagedReference
-    @JsonIgnore
-    List<PromptResult> reactions = new ArrayList<>();
 
-//    @JsonManagedReference
-    @JsonIgnore
-    PromptResult result = null; // The prompt that was rejected
     @JsonIgnore
     int depth = 0;
 
@@ -32,10 +23,10 @@ public class PromptReason {
         this.description = description;
     }
 
-    public PromptReason(String description, PromptReason parent) {
+    public PromptReason(String description, ISearchNode node) {
         this(description);
-        this.parent = parent;
-        this.depth = parent.depth + 1;
+        this.node = node;
+        this.depth = node.getParent().getReason().depth + 1;
     }
 
     /**
@@ -52,19 +43,14 @@ public class PromptReason {
      * @return The previous prompt (and why it failed)
      */
     @JsonIgnore
-    public PromptReason getParent() {
-        return parent;
+    public PromptReason getPreviousReason() {
+        return node.getParent().getReason();
     }
 
-    public void setParent(PromptReason parent) {
-        assert this.parent == null;
-        this.parent = parent;
-        this.depth = parent.depth+1;
-    }
-
-    public void setResult(PromptResult r) {
-        assert r.getReason() == this;
-        this.result = r;
+    public void setNode(ISearchNode node) {
+        assert this.node == null;
+        this.node = node;
+        this.depth = node.getParent().getReason().depth+1;
     }
 
     /**
@@ -73,24 +59,7 @@ public class PromptReason {
      */
     @JsonIgnore
     public Prompt getPrompt() {
-        return result.getPrompt();
+        return node.getPrompt();
     }
 
-    /**
-     *
-     * @return The answer to the prompt that failed to verify
-     */
-    @JsonIgnore
-    public PromptAnswer getAnswer() {
-        return result.getAnswer();
-    }
-
-    public void addReaction(PromptResult result) {
-        reactions.add(result);
-    }
-
-    @JsonIgnore
-    public List<PromptResult> getReactions() {
-        return reactions;
-    }
 }

@@ -1,7 +1,7 @@
 package org.key_project.llmsynth.benchmarks.legacy;
 
-import org.key_project.llmsynth.prompts.Prompt;
-import org.key_project.llmsynth.prompts.PromptBuilder;
+import org.key_project.llmsynth.SearchNode;
+import org.key_project.llmsynth.prompts.SearchNodeBuilder;
 import org.key_project.llmsynth.prompts.PromptReason;
 
 import java.util.function.Supplier;
@@ -13,5 +13,5 @@ public abstract class LegacyReasons extends PromptReason {
     public LegacyReasons(String name) {
         super(name);
     }
-    public abstract <T> Iterable<Prompt> dispatch(LegacyVisitor<T> visitor, T o, Supplier<PromptBuilder> newBuilder);
+    public abstract <T> Iterable<SearchNode<T>> dispatch(LegacyVisitor<T> visitor, T o, Supplier<SearchNodeBuilder<T>> newBuilder);
 }

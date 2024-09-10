@@ -9,9 +9,8 @@ import java.util.function.BiConsumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.key_project.llmsynth.benchmarks.*;
-import org.key_project.llmsynth.benchmarks.dto.SearchNode;
+import org.key_project.llmsynth.prompts.Prompt;
 import org.key_project.llmsynth.benchmarks.legacy.*;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
@@ -31,31 +30,28 @@ public class MainBenchmarking {
     //private static final int ATTEMPTS = 3;
     private static final int ATTEMPTS = 1;
 
-    private static PromptAnswer qa(PromptType typ, String q, String a) {
-        return new PromptAnswer(Prompt.from(typ, q), a);
-    }
-
+    //         return new SearchNode(List.of(p -> p.println(s)), a -> VerificationResult.reject(a, new DirectPrompt()), typ, false);
     private static void serialize_example() {
         // TODO: give reasons and do proper rejections
-        PromptAnswer a1 = qa(PromptType.USER, "some root-string", "some inconspicuous answer");
-        PromptResult r1 = PromptResult.reject(a1, new WrongJML("test", null));
+        Prompt a1 = new Prompt(PromptType.USER, "some root-string", "some inconspicuous answer");
+        SearchNode<Nothing> r1 = new SearchNode<>(a1, PromptStatus.REJECTED, new WrongJML("test", null));
 
-        PromptAnswer a2_l = qa(PromptType.USER, "left leaf", "very left");
-        PromptResult r2_l = PromptResult.reject(a2_l, new NoJMLInRegion());
+        Prompt a2_l = new Prompt(PromptType.USER, "left leaf", "very left");
+        SearchNode<Nothing> r2_l = new SearchNode<>(a2_l, PromptStatus.REJECTED, new NoJMLInRegion());
 
-        PromptAnswer a2_r = qa(PromptType.USER,"right leaf", "very right");
-        PromptResult r2_r = PromptResult.accept(a2_r);
+        Prompt a2_r = new Prompt(PromptType.USER,"right leaf", "very right");
+        SearchNode<Nothing> r2_r = new SearchNode<>(a2_r, PromptStatus.ACCEPTED, null);
 
-        PromptAnswer a3 = qa(PromptType.USER, "left final leaf", "some addition");
-        PromptResult r3 = PromptResult.reject(a3, new UnknownReason(null));
+        Prompt a3 = new Prompt(PromptType.USER, "left final leaf", "some addition");
+        SearchNode<Nothing> r3 = new SearchNode<>(a3, PromptStatus.REJECTED, new UnknownReason(null));
 
-        FirstPrompt p1 = new FirstPrompt(0);
-        p1.addReaction(r1);
-        r1.getReason().addReaction(r2_l);
-        r1.getReason().addReaction(r2_r);
-        r2_l.getReason().addReaction(r3);
+        SearchNode<Nothing> root = new SearchNode<>(new FirstPrompt(0));
+        // todo: make sure that the parent is set?
+        root.reactions.add(r1);
+        r1.reactions.add(r2_l);
+        r1.reactions.add(r2_r);
+        r2_l.reactions.add(r3);
 
-        SearchNode root = SearchNode.treeFromFirstPrompt(p1);
         ObjectMapper om = new ObjectMapper();
         try {
             String serialized = om.writeValueAsString(root);

@@ -4,7 +4,6 @@ import org.key_project.llmsynth.ClassInfo;
 import org.key_project.llmsynth.LLMTaskTag;
 import org.key_project.llmsynth.MethodInfo;
 import org.key_project.llmsynth.benchmarks.LLMTask;
-import org.key_project.llmsynth.prompts.PromptStrategy;
 
 /**
  * Specify a contract for a method called from a method with a contract that is already provided.

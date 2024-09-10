@@ -6,8 +6,6 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
 import io.reactivex.Flowable;
-import org.key_project.llmsynth.prompts.Prompt;
-import org.key_project.llmsynth.prompts.PromptAnswer;
 import org.key_project.llmsynth.prompts.PromptMessage;
 import org.key_project.llmsynth.prompts.PromptType;
 
@@ -23,21 +21,31 @@ public class OpenAIEndpoint implements OracleEndpoint {
 
     OpenAiService service;
     String gpt_model;
-    HashMap<PromptAnswer, ChatMessage> buf_ans = new HashMap<>();
-    HashMap<Prompt, ChatMessage> buf_pmp = new HashMap<>();
+    String token = null;
 
     public OpenAIEndpoint(OpenAiService service, String gpt_model) {
         this.service = service;
         this.gpt_model = gpt_model;
     }
 
-    public OpenAIEndpoint(String  token, String gpt_model) {
+    public OpenAIEndpoint(String token, String gpt_model) {
         this(new OpenAiService(token), gpt_model);
+        this.token = token;
     }
 
 
     public static OpenAIEndpoint forGpt_3_5_Turbo(String token) {
-        return new OpenAIEndpoint(new OpenAiService(token), MODEL_3_5_TURBO);
+        return new OpenAIEndpoint(token, MODEL_3_5_TURBO);
+    }
+
+    public void shutdown() {
+        service.shutdownExecutor();
+    }
+
+    public void resetConnection() {
+        this.shutdown();
+        if (token == null) throw new UnsupportedOperationException("No token was probided during construction to reestablish a connection with");
+        this.service = new OpenAiService(this.token);
     }
 
     @Override
@@ -53,27 +61,16 @@ public class OpenAIEndpoint implements OracleEndpoint {
                 .blockingGet()
                 .getAccumulatedMessage();
 
-        // todo: put this in dedicated class?
-        return new PromptMessage() {
-            @Override
-            public String getContent() {
-                return answer.getContent();
-            }
-
-            @Override
-            public PromptType getMessageType() {
-                return PromptType.ASSISTANT;
-            }
-        };
+        return new PromptMessage(PromptType.ASSISTANT, answer.getContent());
     }
 
     private String mkRole(PromptType promptType) {
-        switch (promptType) {
-            case USER: return ChatMessageRole.USER.value();
-            case SYSTEM: return ChatMessageRole.SYSTEM.value();
-            case ASSISTANT: return ChatMessageRole.ASSISTANT.value();
-            default: throw new RuntimeException("Unknown prompt type");
-        }
+        return switch (promptType) {
+            case USER -> ChatMessageRole.USER.value();
+            case SYSTEM -> ChatMessageRole.SYSTEM.value();
+            case ASSISTANT -> ChatMessageRole.ASSISTANT.value();
+            default -> throw new RuntimeException("Unknown prompt type");
+        };
     }
 
     private ChatMessage convert(PromptMessage message) {

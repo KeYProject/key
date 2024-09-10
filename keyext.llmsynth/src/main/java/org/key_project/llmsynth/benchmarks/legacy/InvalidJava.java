@@ -1,7 +1,7 @@
 package org.key_project.llmsynth.benchmarks.legacy;
 
-import org.key_project.llmsynth.prompts.Prompt;
-import org.key_project.llmsynth.prompts.PromptBuilder;
+import org.key_project.llmsynth.SearchNode;
+import org.key_project.llmsynth.prompts.SearchNodeBuilder;
 
 import java.util.function.Supplier;
 
@@ -20,7 +20,7 @@ public class InvalidJava extends LegacyReasons {
     }
 
     @Override
-    public <T> Iterable<Prompt> dispatch(LegacyVisitor<T> visitor, T o, Supplier<PromptBuilder> newBuilder) {
+    public <T> Iterable<SearchNode<T>> dispatch(LegacyVisitor<T> visitor, T o, Supplier<SearchNodeBuilder<T>> newBuilder) {
         return visitor.reason(this, o, newBuilder);
     }
 }

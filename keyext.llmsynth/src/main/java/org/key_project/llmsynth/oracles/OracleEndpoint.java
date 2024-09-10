@@ -1,7 +1,5 @@
 package org.key_project.llmsynth.oracles;
 
-import org.key_project.llmsynth.prompts.Prompt;
-import org.key_project.llmsynth.prompts.PromptAnswer;
 import org.key_project.llmsynth.prompts.PromptMessage;
 
 import java.util.List;

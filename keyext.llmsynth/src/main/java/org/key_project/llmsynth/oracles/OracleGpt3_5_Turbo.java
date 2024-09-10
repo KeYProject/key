@@ -3,22 +3,12 @@ package org.key_project.llmsynth.oracles;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.service.OpenAiService;
 import io.reactivex.Flowable;
+import org.key_project.llmsynth.ISearchNode;
 import org.key_project.llmsynth.prompts.Prompt;
-import org.key_project.llmsynth.prompts.PromptAnswer;
-import org.key_project.llmsynth.prompts.PromptReason;
+import org.key_project.llmsynth.prompts.PromptMessage;
+import org.key_project.llmsynth.prompts.PromptType;
 
 import java.util.*;
-import java.util.stream.Stream;
-
-class MessageBuffer {
-    public ChatMessage prompt;
-    public ChatMessage answer;
-
-    public MessageBuffer(ChatMessage prompt, ChatMessage answer) {
-        this.prompt = prompt;
-        this.answer = answer;
-    }
-}
 
 public class OracleGpt3_5_Turbo {
     public static boolean print_Messages = false;
@@ -26,7 +16,6 @@ public class OracleGpt3_5_Turbo {
 
     private final String token;
 
-    private final Map<Prompt, List<ChatMessage>> history = new HashMap<>();
     private final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), "");
 
     public OracleGpt3_5_Turbo(String token) {
@@ -44,32 +33,33 @@ public class OracleGpt3_5_Turbo {
         this.service = new OpenAiService(this.token);
     }
 
-    public PromptAnswer answerPrompt(PromptReason generatedFrom, Prompt prompt) {
-        ChatMessage question = convert(prompt);
-        ChatMessage answer = null;
+    public void answerPromptOnNode(ISearchNode node) {
+        Prompt prompt = node.getPrompt();
+        if (prompt.isAnswered()) throw new IllegalArgumentException("The prompt is already answered");
+
+        PromptMessage question = node.getPrompt().getInputMessage();
+        List<PromptMessage> messages = new ArrayList<>();
+
+        ISearchNode current = node;
+        while (current.useForHistory()) {
+            current = current.getParent();
+            if (current == null) return;
+            messages.add(current.getPrompt().getOutputMessage());
+            messages.add(current.getPrompt().getInputMessage());
+        }
+        Collections.reverse(messages);
+        messages.add(prompt.getInputMessage());
+
+
         int requestCount = 0;
+
+        ChatMessage answer = null;
         do {
             try {
-                final boolean[] previousWasStop = {true};
-                // todo: hasNext isn't nececcarily correct
-                List<ChatMessage> chats = Stream.iterate(generatedFrom, pr -> pr.getParent() != null, PromptReason::getParent)
-                        .takeWhile(pr -> {
-                            boolean sentinel = previousWasStop[0];
-                            previousWasStop[0] = !pr.getPrompt().hasRemoveHistoryFlag();
-                            return sentinel;
-                        })
-                        .map(PromptReason::getPrompt)
-                        .map(history::get)
-                        .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
-                // todo: ^  the list can be buffered to save allocationss (maximum depth of the tree is known)
+                ChatCompletionRequest ccr = createCompletionRequest(messages);
 
-                // todo: the answers to the prompt may not be in the right order here
-                chats.add(systemMessage);
-                Collections.reverse(chats);
-                chats.add(question);
-
-                ChatCompletionRequest ccr = createCompletionRequest(chats);
                 Flowable<ChatCompletionChunk> flowable = service.streamChatCompletion(ccr);
+
                 answer = service
                         .mapStreamToAccumulator(flowable)
                         .lastElement()
@@ -81,31 +71,51 @@ public class OracleGpt3_5_Turbo {
             }
         } while (answer == null && requestCount++ < 3);
 
-        history.put(prompt, List.of(answer, question));
+        prompt.output = answer.getContent();
 
         if (print_Messages) {
             System.out.println("=============================================================");
-            System.out.println(prompt.toString());
+            System.out.println(prompt.input);
             System.out.println("-------------------------------------------------------------");
-            System.out.println(answer.getContent());
+            System.out.println(prompt.output);
         }
-        return new PromptAnswer(prompt, answer.getContent());
     }
 
-    private ChatMessage convert(Prompt prompt) {
-        var text = prompt.toString();
+
+    private ChatMessage fromInput(Prompt node) {
+        var text = node.toString();
         return new ChatMessage(ChatMessageRole.USER.value(), text);
     }
 
-    private ChatCompletionRequest createCompletionRequest(List<ChatMessage> messages) {
+    private ChatMessage fromOutput(Prompt node) {
+        var text = node.toString();
+        return new ChatMessage(ChatMessageRole.USER.value(), text);
+    }
+
+    private ChatCompletionRequest createCompletionRequest(List<PromptMessage> messages) {
+        List<ChatMessage> chats = messages.stream().map(this::convert).toList();
         return ChatCompletionRequest
                 .builder()
                 .model("gpt-3.5-turbo-0125")
                 //.model("gpt-4o")
-                .messages(messages)
+                .messages(chats)
                 .n(1)
                 .maxTokens(512)
                 .logitBias(new HashMap<>())
                 .build();
+    }
+
+    private String mkRole(PromptType promptType) {
+        return switch (promptType) {
+            case USER -> ChatMessageRole.USER.value();
+            case SYSTEM -> ChatMessageRole.SYSTEM.value();
+            case ASSISTANT -> ChatMessageRole.ASSISTANT.value();
+            default -> throw new RuntimeException("Unknown prompt type");
+        };
+    }
+
+    private ChatMessage convert(PromptMessage message) {
+        var typ = mkRole(message.getMessageType());
+        return new ChatMessage(typ, message.getContent());
     }
 }
