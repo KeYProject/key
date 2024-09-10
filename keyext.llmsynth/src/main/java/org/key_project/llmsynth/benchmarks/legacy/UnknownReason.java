@@ -13,7 +13,7 @@ public class UnknownReason extends LegacyReasons {
     private Exception exception;
 
     public UnknownReason(Exception failureException) {
-        super();
+        super("unknown reason");
         this.exception = failureException;
     }
 

@@ -14,7 +14,7 @@ public class WrongJML extends LegacyReasons {
     private String jml;
 
     public WrongJML(String jml, Exception failureException) {
-        super();
+        super("wrong jml");
         this.jml = jml;
         this.exception = failureException;
     }

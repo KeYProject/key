@@ -19,6 +19,7 @@ public class FirstPrompt extends LegacyReasons {
     private final int trialNumber;
 
     public FirstPrompt(int trialNumber) {
+        super("first prompt");
         this.trialNumber = trialNumber;
     }
 

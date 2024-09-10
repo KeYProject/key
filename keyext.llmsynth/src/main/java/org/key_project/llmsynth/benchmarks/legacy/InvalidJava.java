@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 public class InvalidJava extends LegacyReasons {
     private Exception exception;
     public InvalidJava(Exception failureException) {
-        super();
+        super("invalid java");
         this.exception = failureException;
     }
 

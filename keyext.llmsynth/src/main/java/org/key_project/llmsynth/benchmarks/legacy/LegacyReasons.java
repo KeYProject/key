@@ -10,5 +10,8 @@ import java.util.function.Supplier;
  * Reasons used in the old design
  */
 public abstract class LegacyReasons extends PromptReason {
+    public LegacyReasons(String name) {
+        super(name);
+    }
     public abstract <T> Iterable<Prompt> dispatch(LegacyVisitor<T> visitor, T o, Supplier<PromptBuilder> newBuilder);
 }
