@@ -68,7 +68,7 @@ public class MainBenchmarking {
         File benchmark_dir_subcontracts = new File(benchmark_dir, "subcontracts");
         File benchmark_dir_invariants = new File(benchmark_dir, "invariants");
 
-        serialize_example();
+        //serialize_example();
 
         File benchmark_filter = new File(args[1]);
         // Read lines of benchmark_filter into a list

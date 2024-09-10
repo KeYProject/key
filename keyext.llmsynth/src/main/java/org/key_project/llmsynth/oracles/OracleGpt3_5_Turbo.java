@@ -43,7 +43,7 @@ public class OracleGpt3_5_Turbo {
         ISearchNode current = node;
         while (current.useForHistory()) {
             current = current.getParent();
-            if (current == null) return;
+            if (current == null || current.getPrompt() == null) return;
             messages.add(current.getPrompt().getOutputMessage());
             messages.add(current.getPrompt().getInputMessage());
         }
