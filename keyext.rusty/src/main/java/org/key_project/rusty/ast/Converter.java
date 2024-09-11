@@ -579,9 +579,11 @@ public class Converter {
     private Statement convertLetStmt(
             org.key_project.rusty.parsing.RustyParser.LetStmtContext ctx) {
         Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
+        Type type = convertType(ctx.type_());
+        Expr init = ctx.expr() == null ? null : convertExpr(ctx.expr());
         LetStatement letStatement = new LetStatement(pat,
-            convertType(ctx.type_()),
-            convertExpr(ctx.expr()));
+            type,
+            init);
         declareVariable(pat, letStatement);
         return letStatement;
     }

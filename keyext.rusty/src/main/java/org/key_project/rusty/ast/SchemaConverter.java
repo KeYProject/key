@@ -326,6 +326,10 @@ public class SchemaConverter {
             op = ArithLogicalExpression.Operator.Multiply;
         if (ctx.SLASH() != null)
             op = ArithLogicalExpression.Operator.Divide;
+        if (ctx.shl() != null)
+            op = ArithLogicalExpression.Operator.Shl;
+        if (ctx.shr() != null)
+            op = ArithLogicalExpression.Operator.Shr;
         assert op != null;
         return new ArithLogicalExpression(convertExpr(ctx.expr(0)), op,
             convertExpr(ctx.expr(1)));
@@ -662,9 +666,11 @@ public class SchemaConverter {
     private Statement convertLetStmt(
             org.key_project.rusty.parsing.RustySchemaParser.LetStmtContext ctx) {
         Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
+        Type type = convertType(ctx.type_());
+        Expr init = ctx.expr() == null ? null : convertExpr(ctx.expr());
         LetStatement letStatement = new LetStatement(pat,
-            convertType(ctx.type_()),
-            convertExpr(ctx.expr()));
+            type,
+            init);
         declareVariable(pat, letStatement);
         return letStatement;
     }

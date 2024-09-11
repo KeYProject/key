@@ -473,12 +473,12 @@ comparisonOperator
 
 shl
    : LT
-   {_input.LA(1) == '<'}? LT
+   {_input.LA(1) == LT}? LT
    ;
 
 shr
    : GT
-   {_input.LA(1) == '<'}? GT
+   {_input.LA(1) == GT}? GT
    ;
 
 compoundAssignOperator

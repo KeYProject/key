@@ -11,7 +11,7 @@ import org.jspecify.annotations.NonNull;
 public record ArithLogicalExpression(Expr left,org.key_project.rusty.ast.expr.ArithLogicalExpression.Operator op,Expr right)implements Expr{
 
 public enum Operator {
-    Plus, Minus, Multiply, Divide, Modulo, BitwiseAnd, BitwiseOr, BitwiseXor;
+    Plus, Minus, Multiply, Divide, Modulo, BitwiseAnd, BitwiseOr, BitwiseXor, Shl, Shr;
 
     @Override
     public String toString() {
@@ -24,6 +24,8 @@ public enum Operator {
         case BitwiseAnd -> "&";
         case BitwiseOr -> "|";
         case BitwiseXor -> "^";
+        case Shl -> "<<";
+        case Shr -> ">>";
         };
     }
 
