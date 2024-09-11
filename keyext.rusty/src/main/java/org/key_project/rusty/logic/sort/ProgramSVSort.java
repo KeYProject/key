@@ -22,9 +22,13 @@ public abstract class ProgramSVSort extends SortImpl {
     public static final ProgramSVSort LEFT_HAND_SIDE = new LeftHandSideSort();
     public static final ProgramSVSort VARIABLE = new ProgramVariableSort();
     public static final ProgramSVSort SIMPLE_EXPRESSION = new SimpleExpressionSort();
-    public static final ProgramSVSort NONSIMPLEEXPRESSION = new NonSimpleExpressionSort();
+    public static final ProgramSVSort NON_SIMPLE_EXPRESSION = new NonSimpleExpressionSort();
     public static final ProgramSVSort EXPRESSION = new ExpressionSort();
     public static final ProgramSVSort BLOCK_EXPRESSION = new BlockExpressionSort();
+    public static final ProgramSVSort BOOL_EXPRESSION = new BoolExpressionSort();
+    public static final ProgramSVSort SIMPLE_BOOL_EXPRESSION = new SimpleBoolExpressionSort();
+    public static final ProgramSVSort NON_SIMPLE_BOOL_EXPRESSION =
+        new NonSimpleBoolExpressionSort();
 
     // ----------- Types of Statement Program SVs -----------------------------
     public static final ProgramSVSort STATEMENT = new StatementSort();
@@ -216,5 +220,43 @@ public abstract class ProgramSVSort extends SortImpl {
 
     public static Map<Name, ProgramSVSort> name2sort() {
         return NAME2SORT;
+    }
+
+    private static final class BoolExpressionSort extends ProgramSVSort {
+        public BoolExpressionSort() {
+            super(new Name("BoolExpression"));
+        }
+
+        @Override
+        public boolean canStandFor(RustyProgramElement check, Services services) {
+            if (!(check instanceof Expr))
+                return false;
+            // TODO: check type here
+            return true;
+        }
+    }
+
+    private static final class SimpleBoolExpressionSort extends ProgramSVSort {
+        public SimpleBoolExpressionSort() {
+            super(new Name("SimpleBoolExpression"));
+        }
+
+        @Override
+        public boolean canStandFor(RustyProgramElement check, Services services) {
+            return SIMPLE_EXPRESSION.canStandFor(check, services)
+                    && BOOL_EXPRESSION.canStandFor(check, services);
+        }
+    }
+
+    private static final class NonSimpleBoolExpressionSort extends ProgramSVSort {
+        public NonSimpleBoolExpressionSort() {
+            super(new Name("NonSimpleBoolExpression"));
+        }
+
+        @Override
+        public boolean canStandFor(RustyProgramElement check, Services services) {
+            return NON_SIMPLE_EXPRESSION.canStandFor(check, services)
+                    && BOOL_EXPRESSION.canStandFor(check, services);
+        }
     }
 }

@@ -519,10 +519,13 @@ public class SchemaConverter {
 
         var stmts = stmtsCtx.stmt().stream().map(this::convertStmt)
                 .collect(ImmutableList.collector());
-        if (stmts.get(stmts.size() - 1) instanceof ProgramSV psv
+        if (!stmts.isEmpty() && stmts.get(stmts.size() - 1) instanceof ProgramSV psv
                 && (psv.sort() == ProgramSVSort.EXPRESSION
                         || psv.sort() == ProgramSVSort.SIMPLE_EXPRESSION
-                        || psv.sort() == ProgramSVSort.NONSIMPLEEXPRESSION)) {
+                        || psv.sort() == ProgramSVSort.NON_SIMPLE_EXPRESSION
+                        || psv.sort() == ProgramSVSort.BOOL_EXPRESSION
+                        || psv.sort() == ProgramSVSort.SIMPLE_BOOL_EXPRESSION
+                        || psv.sort() == ProgramSVSort.NON_SIMPLE_BOOL_EXPRESSION)) {
             ImmutableList<Statement> firstStmts = ImmutableSLList.nil();
             for (int i = 0; i < stmts.size() - 1; i++) {
                 firstStmts = firstStmts.append(stmts.get(i));
