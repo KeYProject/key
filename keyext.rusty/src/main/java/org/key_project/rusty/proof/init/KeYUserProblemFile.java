@@ -4,11 +4,16 @@
 package org.key_project.rusty.proof.init;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.parser.KeYAst;
+import org.key_project.rusty.parser.ProofReplayer;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.ProofAggregate;
+import org.key_project.rusty.proof.io.IProofFileParser;
 import org.key_project.rusty.proof.io.KeYFile;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
 import org.key_project.rusty.settings.Configuration;
@@ -16,6 +21,9 @@ import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.rusty.speclang.SLEnvInput;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
 
 public class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     private Sequent problem = null;
@@ -141,5 +149,22 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     @Override
     public boolean implies(ProofOblInput po) {
         return equals(po);
+    }
+
+    /**
+     * Reads a saved proof of a .key file.
+     */
+    public void readProof(IProofFileParser prl) throws IOException {
+        KeYAst.File ctx = getParseContext();
+        Token token = ctx.findProof();
+        if (token != null) {
+            CharStream stream = file.getCharStream();
+            // also pass the file to be able to produce exceptions with locations
+            try {
+                ProofReplayer.run(token, stream, prl, file.url().toURI());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ import org.key_project.rusty.settings.Configuration;
 import org.key_project.rusty.settings.ProofSettings;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.jspecify.annotations.NonNull;
@@ -64,6 +65,14 @@ public abstract class KeYAst<T extends ParserRuleContext> {
             FindProblemInformation fpi = new FindProblemInformation();
             ctx.accept(fpi);
             return fpi.getProblemInformation();
+        }
+
+        public Token findProof() {
+            KeYRustyParser.ProofContext a = ctx.proof();
+            if (a != null) {
+                return a.PROOF().getSymbol();
+            }
+            return null;
         }
     }
 
