@@ -50,6 +50,11 @@ public class Proof implements ProofObject<Goal>, Named {
     private InitConfig initConfig;
 
     /**
+     * declarations &c, read from a problem file or otherwise
+     */
+    private String problemHeader = "";
+
+    /**
      * constructs a new empty proof with name
      */
     private Proof(Name name, InitConfig initConfig) {
@@ -112,6 +117,10 @@ public class Proof implements ProofObject<Goal>, Named {
 
     public void setRoot(Node root) {
         this.root = root;
+    }
+
+    public String header() {
+        return problemHeader;
     }
 
     public ImmutableList<Goal> getOpenGoals() {

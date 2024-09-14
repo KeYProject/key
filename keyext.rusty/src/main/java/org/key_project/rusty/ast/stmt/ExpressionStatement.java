@@ -24,6 +24,10 @@ public class ExpressionStatement implements Statement {
         throw new IndexOutOfBoundsException("ExpressionStatement has only one child.");
     }
 
+    public Expr getExpression() {
+        return expression;
+    }
+
     @Override
     public int getChildCount() {
         return 1;

@@ -311,6 +311,29 @@ public class Sequent implements Iterable<SequentFormula> {
             composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
+    /**
+     * Computes the position of the given sequent formula on the proof sequent, starting with one
+     * for the very first sequent formula.
+     *
+     * @param inAntec a boolean stating whether we search in the antecedent or the succedent
+     * @param cfma the given sequent formula
+     * @return an integer strictly greater than zero for the position of the given sequent formula
+     *         on the proof sequent.
+     */
+    public int formulaNumberInSequent(boolean inAntec, SequentFormula cfma) {
+        int n = inAntec ? 0 : antecedent.size();
+        final Iterator<SequentFormula> formIter =
+            inAntec ? antecedent.iterator() : succedent.iterator();
+        while (formIter.hasNext()) {
+            n++;
+            if (formIter.next().equals(cfma)) {
+                return n;
+            }
+        }
+        throw new RuntimeException(
+            "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
+    }
+
     private static final class NILSequent extends Sequent {
         private static final NILSequent INSTANCE = new NILSequent();
 

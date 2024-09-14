@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
 
-public class Node {
+public class Node implements Iterable<Node> {
     /** the proof the node belongs to */
     private final Proof proof;
 
@@ -147,6 +147,10 @@ public class Node {
         return children.size();
     }
 
+    public RuleApp getAppliedRuleApp() {
+        return appliedRuleApp;
+    }
+
     /**
      * adds a new NoPosTacletApp to the set of available NoPosTacletApps at this node
      *
@@ -183,6 +187,23 @@ public class Node {
 
     public boolean isClosed() {
         return closed;
+    }
+
+    /**
+     * @return an iterator for the direct children of this node.
+     */
+    public Iterator<Node> childrenIterator() {
+        return new NodeIterator(children.iterator());
+    }
+
+    /**
+     * Returns an iterator over this node's children. Use {@link #leavesIterator()} if you need to
+     * iterate over leaves instead.
+     *
+     * @return iterator over children.
+     */
+    public Iterator<Node> iterator() {
+        return childrenIterator();
     }
 
     /**

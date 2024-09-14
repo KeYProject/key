@@ -4,6 +4,7 @@
 package org.key_project.rusty;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.ast.ty.KeYRustyType;
@@ -14,6 +15,7 @@ import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.proof.init.RustProfile;
+import org.key_project.rusty.proof.io.ProofSaver;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.TacletApp;
@@ -141,6 +143,11 @@ public class BasicTest {
         assertEquals(0, proof.openGoals().size());
         assertTrue(proof.closed());
         System.out.println("Proof successful!");
+        try {
+            ProofSaver.saveToFile(new File("simple.proof"), proof);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

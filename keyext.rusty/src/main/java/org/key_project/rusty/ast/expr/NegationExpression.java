@@ -29,6 +29,14 @@ public class NegationExpression implements Expr {
         this.op = op;
     }
 
+    public Operator getOp() {
+        return op;
+    }
+
+    public Expr getExpr() {
+        return expr;
+    }
+
     @Override
     public String toString() {
         return op.toString() + expr;

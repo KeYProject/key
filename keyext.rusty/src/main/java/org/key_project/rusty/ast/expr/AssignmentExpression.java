@@ -28,6 +28,14 @@ public class AssignmentExpression implements Expr {
         };
     }
 
+    public Expr getLhs() {
+        return lhs;
+    }
+
+    public Expr getRhs() {
+        return rhs;
+    }
+
     @Override
     public int getChildCount() {
         return 2;

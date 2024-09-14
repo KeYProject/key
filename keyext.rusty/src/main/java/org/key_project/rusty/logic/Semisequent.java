@@ -384,6 +384,16 @@ public class Semisequent implements Iterable<SequentFormula> {
         return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
     }
 
+    /**
+     * checks if the {@link SequentFormula} occurs in this Semisequent (identity check)
+     *
+     * @param sequentFormula the {@link SequentFormula} to look for
+     * @return true iff. sequentFormula has been found in this Semisequent
+     */
+    public boolean contains(SequentFormula sequentFormula) {
+        return indexOf(sequentFormula) != -1;
+    }
+
     // inner class used to represent an empty semisequent
     private static class Empty extends Semisequent {
 
