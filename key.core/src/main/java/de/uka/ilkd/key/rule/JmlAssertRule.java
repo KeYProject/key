@@ -132,7 +132,7 @@ public final class JmlAssertRule implements BuiltInRule {
         final ImmutableList<Goal> result;
         if (kind == Kind.ASSERT) {
             result = goal.split(2);
-            setUpValidityRule(result.tail().head(), occurrence, update, condition, tb);
+            setUpValidityRule(result.tail().head(), label, occurrence, update, condition, tb);
         } else if (kind == Kind.ASSUME) {
             result = goal.split(1);
         } else {
@@ -144,9 +144,13 @@ public final class JmlAssertRule implements BuiltInRule {
         return result;
     }
 
-    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update,
+    private void setUpValidityRule(Goal goal, String label, PosInOccurrence occurrence, Term update,
                                    Term condition, TermBuilder tb) {
-        goal.setBranchLabel("Validity");
+        if (label != null) {
+            goal.setBranchLabel("Validity (" + label + ")");
+        } else {
+            goal.setBranchLabel("Validity");
+        }
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
@@ -159,6 +163,7 @@ public final class JmlAssertRule implements BuiltInRule {
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
         if (label != null) {
+            goal.setBranchLabel("Usage (" + label + ")");
             NoFindTacletBuilder bld = new NoFindTacletBuilder();
             Semisequent ante = new Semisequent(new SequentFormula(tb.apply(update, condition)));
             bld.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(Sequent.createAnteSequent(ante), ImmutableList.of(), Sequent.EMPTY_SEQUENT));

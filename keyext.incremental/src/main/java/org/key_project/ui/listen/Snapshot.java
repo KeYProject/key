@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 class Snapshot {
 
-    private static Pattern SCRIPT_PATTERN = Pattern.compile(
+    private static final Pattern SCRIPT_PATTERN = Pattern.compile(
             "/\\*@\\s*assert\\s+([A-Za-z0-9_]+)\\s*:[^{}]+\\\\by\\s*\\{(.*?)\\}\\s*;\\s*@?\\*/",
             Pattern.DOTALL);
 
@@ -39,9 +39,12 @@ class Snapshot {
         return result;
     }
 
+    // collects all named assertions with script and populates the maps
     private void handleJavaFile(File javaFile) throws IOException {
         String content = Files.readString(javaFile.toPath());
         Matcher matcher = SCRIPT_PATTERN.matcher(content);
+
+        // find all scripts in the file, put them into scriptMap and remember their positions
         LinkedList<Pair<Integer, Integer>> removals = new LinkedList<>();
         while(matcher.find()) {
             String scriptName = matcher.group(1);
@@ -53,6 +56,7 @@ class Snapshot {
             removals.addFirst(new Pair<>(matcher.start(2), matcher.end(2)));
         }
 
+        // replace the script parts (remembered positions) in the file with placeholders
         StringBuilder sb = new StringBuilder(content);
         for (Pair<Integer, Integer> removal : removals) {
             sb.replace(removal.first, removal.second, "<script>");

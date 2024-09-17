@@ -16,7 +16,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IssueDialog;
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -50,7 +53,8 @@ import org.slf4j.LoggerFactory;
     experimental = false,
     optional = true,
     priority = 10000)
-public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtension.Toolbar, KeYGuiExtension.Startup {
+public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtension.Toolbar,
+    KeYGuiExtension.Startup, KeYSelectionListener {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(IncrementalScriptExtension.class);
 
@@ -61,7 +65,32 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
     private Snapshot snapshot;
     private MainWindow mainWindow;
 
+    @Override
+    public void selectedNodeChanged(KeYSelectionEvent e) {
+        // nothing to do
+    }
+
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        // TODO: this only partially works at the moment!
+        // use information from originally loaded key file for incremental script reloading
+        Proof p = mainWindow.getMediator().getSelectedProof();
+        File f = p.getProofFile();
+        if (f != null && (f.toString().endsWith(".proof") || f.toString().endsWith(".key"))) {
+            if (keyFile == null) {
+            keyFile = f.getAbsolutePath();
+
+            try {
+                snapshot = Snapshot.fromFile(keyFile);
+                snapshot.setProof(p);
+            } catch (ProofInputException | IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            }
+        }
+    }
     private class ChooseFile extends MainWindowAction {
+
         public ChooseFile(MainWindow mainWindow) {
             super(mainWindow);
             setName("Choose file");
@@ -70,8 +99,8 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                JFileChooser chooser = new JFileChooser();
-                chooser.addChoosableFileFilter(new FileNameExtensionFilter("KeY files", "key"));
+                KeYFileChooser chooser = KeYFileChooser.getFileChooser("Select file to load");
+                chooser.setFileFilter(KeYFileChooser.KEY_FILTER);
                 int returnVal = chooser.showOpenDialog(null);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     keyFile = chooser.getSelectedFile().getAbsolutePath();
@@ -103,6 +132,7 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
         }
     }
 
+    // compare scripts, reload file if necessary, prune assertions and re-apply scripts (if changed)
     private void refreshProof() throws ProofInputException, IOException, ScriptException {
         Snapshot newSnapshot = Snapshot.fromFile(keyFile);
         if (!snapshot.equalsOutsideScripts(newSnapshot)) {
@@ -122,6 +152,7 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
         }
     }
 
+    // for changed scripts: prune back to assertion node and re-run
     private void applyScripts(Map<String, String> newScripts) throws IOException, ScriptException {
         List<Node> todo = new LinkedList<>();
         Proof proof = snapshot.getProof();
@@ -133,7 +164,7 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
             if(assertion == null || assertion.getOptLabel() == null ||
                     !newScripts.containsKey(assertion.getOptLabel()) ||
                     node.parent().child(0) != node) {
-                // This is not the first child of an assertion node
+                // This is not the first child of an assertion node -> descend in proof tree
                 for (int i = 0; i < node.childrenCount(); i++) {
                     todo.add(node.child(i));
                 }
@@ -154,7 +185,7 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
             LOGGER.info("Running script");
             LOGGER.info(renderedProof);
             try {
-                pse.execute((AbstractUserInterfaceControl) mainWindow.getUserInterface(), proof);
+                pse.execute(mainWindow.getUserInterface(), proof);
             } catch (ScriptException e) {
                 int line = e.getLocation() == null ? 0 : e.getLocation().getLine();
                 throw new ScriptException("Failed to run the following script in line " +
@@ -201,5 +232,6 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         this.mainWindow = window;
+        mediator.addKeYSelectionListenerChecked(this);
     }
 }

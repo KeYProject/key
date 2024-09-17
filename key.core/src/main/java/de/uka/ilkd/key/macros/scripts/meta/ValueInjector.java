@@ -11,12 +11,17 @@ import java.util.Map;
 import java.util.Optional;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
  * @version 1 (29.03.17)
  */
 public class ValueInjector {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValueInjector.class);
+
     /**
      * A default instance
      *
@@ -145,8 +150,8 @@ public class ValueInjector {
                 .filter(it -> !usedKeys.contains(it) && !"#literal".equals(it))
                 .findAny();
         if (unused.isPresent()) {
-//            throw new UnknownArgumentException("Unknown argument '" + unused.get() +
-//                    "' for command of class " + command.getClass().getSimpleName());
+            LOGGER.warn("Unknown argument '" + unused.get() +
+                    "' for command of class " + command.getClass().getSimpleName());
         }
 
         return obj;
