@@ -4,18 +4,15 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.net.URL;
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.parser.Location;
 
 /**
@@ -54,6 +51,13 @@ public class ProofScriptInputAction extends AbstractAction {
             super(mainWindow, "Enter proof script");
 
             JTextArea textArea = new JTextArea();
+            Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+            if (font == null) {
+                // make sure a monospaced font is used
+                font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+            }
+            textArea.setFont(font);
+
             JButton okButton = new JButton("OK");
 
             okButton.addActionListener(event -> {
