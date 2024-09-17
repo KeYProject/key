@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableSLList;
 public class RustProfile implements Profile {
     public static final String NAME = "Rust Profile";
 
-    public static RustProfile defaultInstance;
+    private static RustProfile defaultInstance;
 
     // maybe move these fields to abstract parent AbstractProfile
     private final RuleCollection standardRules;
@@ -26,6 +26,12 @@ public class RustProfile implements Profile {
         this("standardRustRules.key");
     }
 
+    public static RustProfile getDefaultInstance() {
+        if (defaultInstance == null) {
+            defaultInstance = new RustProfile();
+        }
+        return defaultInstance;
+    }
 
     @Override
     public RuleCollection getStandardRules() {

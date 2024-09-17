@@ -6,6 +6,7 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 public interface TacletMatcher {
@@ -86,4 +87,10 @@ public interface TacletMatcher {
      */
     MatchConditions matchIf(Iterable<IfFormulaInstantiation> toMatch,
             MatchConditions matchCond, Services services);
+
+    MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchConditions,
+            Services services);
+
+    MatchConditions matchSV(SchemaVariable sv, RustyProgramElement pe,
+            MatchConditions matchConditions, Services services);
 }

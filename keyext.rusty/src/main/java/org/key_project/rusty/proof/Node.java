@@ -14,6 +14,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.jspecify.annotations.Nullable;
 
 public class Node implements Iterable<Node> {
+    private static final String NODES = "nodes";
+
     /** the proof the node belongs to */
     private final Proof proof;
 
@@ -27,6 +29,13 @@ public class Node implements Iterable<Node> {
     private boolean closed = false;
 
     private RuleApp appliedRuleApp;
+
+    /**
+     * Serial number of this proof node.
+     * For each proof, serial numbers are assigned to nodes as they are created:
+     * the first step is assigned number 0, the next step number 1, and so on.
+     */
+    private final int serialNr;
 
     /**
      * Sibling number of this proof node.
@@ -47,6 +56,7 @@ public class Node implements Iterable<Node> {
      */
     public Node(Proof proof) {
         this.proof = proof;
+        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
     }
 
     /**
@@ -95,6 +105,10 @@ public class Node implements Iterable<Node> {
         return proof;
     }
 
+    public int getSerialNr() {
+        return serialNr;
+    }
+
     /**
      * Makes the given node a child of this node.
      *
@@ -120,6 +134,34 @@ public class Node implements Iterable<Node> {
 
         Collections.addAll(children, newChildren);
         children.trimToSize();
+    }
+
+    /**
+     *
+     * @param i an index (starting at 0).
+     * @return the i-th child of this node.
+     */
+    public Node child(int i) {
+        return children.get(i);
+    }
+
+    /**
+     * @param child a child of this node.
+     * @return the number of the node <code>child</code>, if it is a child of this node (starting
+     *         with <code>0</code>), <code>-1</code> otherwise
+     */
+    public int getChildNr(Node child) {
+        int res = 0;
+        final Iterator<Node> it = childrenIterator();
+
+        while (it.hasNext()) {
+            if (it.next() == child) {
+                return res;
+            }
+            ++res;
+        }
+
+        return -1;
     }
 
     public StringBuffer getUniqueTacletId() {
@@ -197,6 +239,13 @@ public class Node implements Iterable<Node> {
     }
 
     /**
+     * @return an iterator for all nodes in the subtree (including this node).
+     */
+    public Iterator<Node> subtreeIterator() {
+        return new SubtreeIterator(this);
+    }
+
+    /**
      * Returns an iterator over this node's children. Use {@link #leavesIterator()} if you need to
      * iterate over leaves instead.
      *
@@ -236,5 +285,17 @@ public class Node implements Iterable<Node> {
      */
     public Iterator<Node> leavesIterator() {
         return new NodeIterator(getLeaves().iterator());
+    }
+
+    /**
+     * @return number of nodes in the subtree below this node.
+     */
+    public int countNodes() {
+        Iterator<Node> it = subtreeIterator();
+        int res = 0;
+        for (; it.hasNext(); it.next()) {
+            res++;
+        }
+        return res;
     }
 }

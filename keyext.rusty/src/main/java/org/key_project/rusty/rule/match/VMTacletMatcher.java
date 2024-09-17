@@ -11,12 +11,16 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.UpdateApplication;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.*;
+import org.key_project.rusty.rule.match.instructions.MatchSchemaVariableInstruction;
 import org.key_project.util.collection.*;
+
+import org.jspecify.annotations.NonNull;
 
 import static org.key_project.rusty.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -301,5 +305,34 @@ public class VMTacletMatcher implements TacletMatcher {
                 : "toMatch and assumes sequent must have same number of elements";
 
         return p_matchCond;
+    }
+
+    @Override
+    public MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchCond,
+            Services services) {
+        final MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> instr =
+            TacletMatchProgram.getMatchInstructionForSV(sv);
+
+        matchCond = instr.match(term, matchCond, services);
+
+        if (matchCond != null) {
+            matchCond = checkVariableConditions(sv, term, matchCond, services);
+        }
+
+        return matchCond;
+    }
+
+    @Override
+    public MatchConditions matchSV(SchemaVariable sv, RustyProgramElement pe,
+            MatchConditions matchCond, Services services) {
+        final MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> instr =
+            TacletMatchProgram.getMatchInstructionForSV(sv);
+        matchCond = instr.match(pe, matchCond, services);
+
+        if (matchCond != null) {
+            matchCond = checkConditions(matchCond, services);
+        }
+
+        return matchCond;
     }
 }

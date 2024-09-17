@@ -5,16 +5,14 @@ package org.key_project.rusty.proof.init;
 
 
 
+import java.io.IOException;
 import java.util.*;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.proof.ProofAggregate;
-import org.key_project.rusty.proof.io.EnvInput;
-import org.key_project.rusty.proof.io.KeYFile;
-import org.key_project.rusty.proof.io.LDTInput;
-import org.key_project.rusty.proof.io.RuleSource;
+import org.key_project.rusty.proof.io.*;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -52,6 +50,11 @@ public final class ProblemInitializer {
     // --------------------------------------------------------------------------
     // internal methods
     // --------------------------------------------------------------------------
+
+
+    public void setFileRepo(FileRepo fileRepo) {
+        this.fileRepo = fileRepo;
+    }
 
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
         InitConfig currentBaseConfig = baseConfig != null ? baseConfig.copy() : null;
@@ -292,8 +295,50 @@ public final class ProblemInitializer {
         initConfig.getServices().getNamespaces().setVariables(newVarNS);
     }
 
+    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
+            throws ProofInputException {
+        // progressStarted(this);
+        try {
+            // read problem
+            // reportStatus("Loading problem \"" + po.name() + "\"");
+            po.readProblem();
+            ProofAggregate pa = po.getPO();
+            // final work
+            // setUpProofHelper(po, pa);
+
+            /*
+             * if (Debug.ENABLE_DEBUG) {
+             * print(pa.getFirstProof());
+             * }
+             */
+
+            // done
+            // proofCreated(pa);
+            return pa;
+        } catch (ProofInputException e) {
+            // reportException(po, e);
+            throw e;
+        } finally {
+            // progressStopped(this);
+        }
+    }
+
     // TODO see how and when a prover is started
     public ProofAggregate startProver(KeYUserProblemFile file) {
         return null;
+    }
+
+    public void tryReadProof(IProofFileParser pfp, KeYUserProblemFile kupf)
+            throws ProofInputException {
+        // reportStatus("Loading proof", kupf.getNumberOfChars());
+        try {
+            kupf.readProof(pfp);
+            // setProgress(kupf.getNumberOfChars() / 2);
+        } catch (IOException e) {
+            throw new ProofInputException(e);
+        } finally {
+            kupf.close();
+            // setProgress(kupf.getNumberOfChars());
+        }
     }
 }

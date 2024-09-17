@@ -93,7 +93,9 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         SLEnvInput slEnvInput = new SLEnvInput(readRustPath(),
             getProfile(), null);
         slEnvInput.setInitConfig(initConfig);
-        warnings = warnings.union(slEnvInput.read());
+        ImmutableSet<String> read = slEnvInput.read();
+        if (read != null)
+            warnings = warnings.union(read);
 
         // read taclets
         // TODO: warnings = warnings.add(getPositionedStrings(readRules()));
@@ -143,7 +145,8 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      */
     @Override
     public Profile getProfile() {
-        return null;
+        // TODO
+        return RustProfile.getDefaultInstance();
     }
 
     @Override

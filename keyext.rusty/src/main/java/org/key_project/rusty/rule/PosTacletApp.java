@@ -110,6 +110,12 @@ public class PosTacletApp extends TacletApp {
         return varsBoundAboveFindPos(taclet(), posInOccurrence());
     }
 
+    @Override
+    public TacletApp addInstantiation(SVInstantiations svi, Services services) {
+        return createPosTacletApp((FindTaclet) taclet(), svi.union(instantiations(), services),
+            ifFormulaInstantiations(), posInOccurrence(), services);
+    }
+
     /**
      * resolves collisions with the context in an SVInstantiation
      *
@@ -206,4 +212,6 @@ public class PosTacletApp extends TacletApp {
                 posInOccurrence(), services);
         }
     }
+
+
 }

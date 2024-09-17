@@ -4,10 +4,9 @@
 package org.key_project.rusty.proof.init;
 
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -49,6 +48,9 @@ public class InitConfig {
     private FileRepo fileRepo;
 
     private String originalKeYFileName;
+
+    /** HashMap for quick lookups taclet name->taclet */
+    private Map<Name, Taclet> activatedTacletCache = null;
 
 
     // -------------------------------------------------------------------------
@@ -114,6 +116,14 @@ public class InitConfig {
 
     public ImmutableList<Taclet> getTaclets() {
         return taclets;
+    }
+
+    public FileRepo getFileRepo() {
+        return fileRepo;
+    }
+
+    public void setFileRepo(FileRepo fileRepo) {
+        this.fileRepo = fileRepo;
     }
 
     /**
@@ -193,5 +203,33 @@ public class InitConfig {
 
     public TacletIndex createTacletIndex() {
         return new TacletIndex(taclets);
+    }
+
+    public Taclet lookupActiveTaclet(Name name) {
+        if (activatedTacletCache == null) {
+            fillActiveTacletCache();
+        }
+        return activatedTacletCache.get(name);
+    }
+
+    /**
+     * fills the active taclet cache
+     */
+    private void fillActiveTacletCache() {
+        if (activatedTacletCache != null) {
+            return;
+        }
+        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<>();
+        for (Taclet t : taclets) {
+            TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
+            if (b != null) {
+                t = b.getTaclet();
+            }
+
+            if (t != null) {
+                tacletCache.put(t.name(), t);
+            }
+        }
+        activatedTacletCache = Collections.unmodifiableMap(tacletCache);
     }
 }

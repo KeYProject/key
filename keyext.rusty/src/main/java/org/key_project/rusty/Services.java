@@ -5,11 +5,15 @@ package org.key_project.rusty;
 
 
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import org.key_project.logic.LogicServices;
 import org.key_project.rusty.ldt.LDTs;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.TermFactory;
+import org.key_project.rusty.proof.Counter;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.init.Profile;
 
@@ -26,13 +30,20 @@ public class Services implements LogicServices {
     private Proof proof;
     private Profile profile;
 
+    /**
+     * map of names to counters
+     */
+    private final HashMap<String, Counter> counters;
+
     public Services() {
         this.tf = new TermFactory();
         this.tb = new TermBuilder(tf, this);
+        counters = new LinkedHashMap<>();
     }
 
     public Services(Profile profile) {
         this();
+        assert profile != null;
         this.profile = profile;
     }
 
@@ -43,6 +54,7 @@ public class Services implements LogicServices {
         this.tb = services.tb;
         this.proof = services.proof;
         this.profile = services.profile;
+        this.counters = services.counters;
     }
 
     public NamespaceSet getNamespaces() {
@@ -83,6 +95,30 @@ public class Services implements LogicServices {
 
     public Profile getProfile() {
         return profile;
+    }
+
+    /**
+     * returns an existing named counter, creates a new one otherwise
+     */
+    public Counter getCounter(String name) {
+        Counter c = counters.get(name);
+        if (c != null) {
+            return c;
+        }
+        c = new Counter(name);
+        counters.put(name, c);
+        return c;
+    }
+
+    /**
+     * Reset all counters associated with this service.
+     * Only use this method if the proof is empty!
+     */
+    public void resetCounters() {
+        if (proof.root().childrenCount() > 0) {
+            throw new IllegalStateException("tried to reset counters on non-empty proof");
+        }
+        counters.clear();
     }
 
     /**

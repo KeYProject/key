@@ -12,6 +12,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.BoundVariable;
 import org.key_project.rusty.logic.op.LogicVariable;
@@ -393,7 +394,7 @@ public abstract class TacletApp implements RuleApp {
             final SchemaVariable sv = svIt.next();
             if (sv instanceof SkolemTermSV) {
                 final Term inst = (Term) insts.getInstantiation(sv);
-                final Namespace<Function> functions = nss.functions();
+                final Namespace<@NonNull Function> functions = nss.functions();
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
@@ -758,5 +759,149 @@ public abstract class TacletApp implements RuleApp {
         Semisequent antec = taclet().ifSequent().antecedent();
         Semisequent succ = taclet().ifSequent().succedent();
         return list.size() == (antec.size() + succ.size());
+    }
+
+    /**
+     * creates a new Tacletapp where the SchemaVariable sv is instantiated with the given term.
+     * Sort equality is checked. If the check fails an IllegalArgumentException is thrown.
+     *
+     * @param sv the SchemaVariable to be instantiated
+     * @param term the Term the SchemaVariable is instantiated with
+     * @param services the services object
+     * @param interesting whether instantiations for this schema variable should be kept in the list
+     *        of "interesting" instantiations
+     * @return the new TacletApp
+     */
+    public TacletApp addCheckedInstantiation(SchemaVariable sv, Term term, Services services,
+            boolean interesting) {
+        // TODO
+        // if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
+        // throw new IllegalInstantiationException("Could not add " + "the instantiation of " + sv
+        // + " because " + term + " is no variable.");
+        // }
+        //
+        // final MatchConditions newMC =
+        // taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
+        //
+        // if (newMC == null) {
+        // throw new IllegalInstantiationException(
+        // "Instantiation " + term + " of " + sv
+        // + " does not satisfy the variable conditions");
+        // }
+        //
+        // SVInstantiations svInst = newMC.getInstantiations();
+        // if (interesting) {
+        // svInst = svInst.makeInteresting(sv, services);
+        // }
+        //
+        // return addInstantiation(svInst, services);
+        return addInstantiation(sv, term, interesting, services);
+    }
+
+    /**
+     * creates a new variable namespace by adding names of the instantiations of the schema
+     * variables in the context of the given schema variable and (if the TacletApp's prefix has the
+     * context flag set) by adding names of the logic variables of the context.
+     *
+     * @param sv the schema variable to be considered
+     * @param var_ns the old variable namespace
+     * @return the new created variable namespace
+     */
+    public Namespace<@NonNull QuantifiableVariable> extendVarNamespaceForSV(
+            Namespace<@NonNull QuantifiableVariable> var_ns, SchemaVariable sv) {
+        Namespace<@NonNull QuantifiableVariable> ns = new Namespace<>(var_ns);
+        // for (SchemaVariable schemaVariable : taclet().getPrefix(sv).prefix()) {
+        // LogicVariable var =
+        // (LogicVariable) ((Term) instantiations().getInstantiation(schemaVariable)).op();
+        // ns.add(var);
+        // }
+        if (taclet().getPrefix(sv).context()) {
+            for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
+                ns.add(quantifiableVariable);
+            }
+        }
+        return ns;
+    }
+
+    protected abstract ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv);
+
+    /**
+     * creates a new Taclet application containing all the instantiations given by the
+     * SVInstantiations
+     *
+     * @param svi the SVInstantiations whose entries are the needed instantiations
+     * @return the new Taclet application
+     */
+    public abstract TacletApp addInstantiation(SVInstantiations svi, Services services);
+
+    public RustyProgramElement getProgramElement(String instantiation, ProgramSV sv,
+            Services services) {
+        Sort svSort = sv.sort();
+        // if (svSort == ProgramSVSort.VARIABLE) {
+        // NewVarcond nvc = taclet.varDeclaredNew(sv);
+        // if (nvc != null) {
+        // KeYRustyType krt;
+        // Object o = nvc.getTypeDefiningObject();
+        // if (o instanceof SchemaVariable peerSV) {
+        // final TypeConverter tc = services.getTypeConverter();
+        // final Object peerInst = instantiations().getInstantiation(peerSV);
+        // if (peerInst instanceof TypeReference) {
+        // krt = ((TypeReference) peerInst).getKeYJavaType();
+        // } else {
+        // Expr peerInstExpr;
+        // if (peerInst instanceof Term) {
+        // peerInstExpr = tc.convertToProgramElement((Term) peerInst);
+        // } else {
+        // peerInstExpr = (Expr) peerInst;
+        // }
+        // krt = tc.getKeYJavaType(peerInstExpr,
+        // instantiations().getContextInstantiation().activeStatementContext());
+        // }
+        // } else {
+        // krt = (KeYRustyType) o;
+        // }
+        // assert krt != null : "could not find krt for: " + o;
+        // return new ProgramVariable(VariableNamer.parseName(instantiation), krt);
+        // }
+        // }
+        return null;
+    }
+
+    /**
+     * checks if the instantiation of <code>sv</code> with <code>pe</code> is possible. If the
+     * resulting instantiation is valid a new taclet application with an extended instantiation
+     * mapping is created and returned. Otherwise, an exception is thrown.
+     *
+     * @param sv the SchemaVariable to be instantiated
+     * @param pe the ProgramElement the SV is instantiated with
+     * @param services the Services
+     * @param interesting a boolean marking if the instantiation of this sv needs to be saved for
+     *        later proof loading (<code>interesting==true</code>) or if it can be derived
+     *        deterministically (e.g. by matching) ( <code>interesting==false</code>)
+     * @return a new taclet application equal to this one but including the newly added
+     *         instantiation entry <code>(sv, pe)</code>, if the instantiation results in a valid
+     *         taclet application otherwise an exception is thrown
+     * @throws IllegalInstantiationException exception thrown if <code>sv</code> cannot be
+     *         instantiated with <code>pe</code> no matter if in general or due to side conditions
+     *         posed by this particular application
+     *
+     */
+    public TacletApp addCheckedInstantiation(SchemaVariable sv, RustyProgramElement pe,
+            Services services, boolean interesting) {
+
+        final MatchConditions cond =
+            taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
+
+        if (cond == null) {
+            throw new IllegalInstantiationException(
+                "SchemaVariable " + sv + " could not be matched with program element " + pe
+                    + " under the provided constraints " + matchConditions);
+        } else {
+            SVInstantiations svInst = cond.getInstantiations();
+            // if (interesting) {
+            // svInst = svInst.makeInteresting(sv, services);
+            // }
+            return addInstantiation(svInst, services);
+        }
     }
 }

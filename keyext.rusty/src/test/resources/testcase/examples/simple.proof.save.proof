@@ -1,0 +1,14 @@
+\profile "Rust Profile";
+
+\problem {
+\<{
+  i = 2_u32;
+  i
+}\> i = Z(2(#))
+}
+
+\proof {
+(branch "dummy ID"
+ (opengoal "==>  \\<{    i = 2_u32;    i  }\\> i = Z(2(#))")
+)
+}

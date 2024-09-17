@@ -5,11 +5,14 @@ package org.key_project.rusty.rule;
 
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.rule.inst.SVInstantiations;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 public class NoPosTacletApp extends TacletApp {
     /**
@@ -236,5 +239,16 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public String toString() {
         return super.toString() + " at " + posInOccurrence();
+    }
+
+    @Override
+    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
+        return DefaultImmutableSet.nil();
+    }
+
+    @Override
+    public TacletApp addInstantiation(SVInstantiations svi, Services services) {
+        return new NoPosTacletApp(taclet(), svi.union(instantiations(), services),
+            ifFormulaInstantiations());
     }
 }

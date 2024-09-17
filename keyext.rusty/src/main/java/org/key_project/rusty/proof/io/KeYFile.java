@@ -26,6 +26,7 @@ import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.init.ProofInputException;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
 import org.key_project.rusty.rule.Taclet;
+import org.key_project.rusty.settings.Configuration;
 import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.rusty.util.parsing.BuildingIssue;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -348,7 +349,7 @@ public class KeYFile implements EnvInput {
         return null;
     }
 
-    public Object getProofObligation() {
+    public Configuration getProofObligation() {
         return null;
     }
 

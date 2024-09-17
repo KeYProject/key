@@ -267,6 +267,11 @@ public class BasicTest {
                 PosInTerm.getTopLevel(), true),
             proof);
         assertEquals(0, proof.openGoals().size());
+        try {
+            ProofSaver.saveToFile(new File("if.proof"), proof);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
