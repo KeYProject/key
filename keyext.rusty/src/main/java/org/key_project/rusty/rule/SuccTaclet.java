@@ -70,8 +70,9 @@ public class SuccTaclet extends FindTaclet {
 
     @Override
     public SuccTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new SuccTaclet(new Name(s), applPart, goalTemplates(), attrs, find,

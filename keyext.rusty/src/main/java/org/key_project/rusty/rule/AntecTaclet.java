@@ -68,8 +68,9 @@ public class AntecTaclet extends FindTaclet {
 
     @Override
     public AntecTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new AntecTaclet(new Name(s), applPart, goalTemplates(), attrs, find,

@@ -66,8 +66,9 @@ public class NoFindTaclet extends Taclet {
 
     @Override
     public NoFindTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new NoFindTaclet(new Name(s), applPart, goalTemplates(), attrs,

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.sequent;
 
-import org.jspecify.annotations.NonNull;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import java.util.Iterator;
+
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Subclasses must add {@code create} methods

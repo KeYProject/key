@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.sequent;
 
-import org.jspecify.annotations.NonNull;
+import java.util.Iterator;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.Iterator;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Subclasses must add static EMPTY_SEMISEQUENT
@@ -142,10 +143,11 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
      */
     private SemisequentChangeInfo removeRedundance(int idx, SequentFormula sequentFormula) {
         return insertAndRemoveRedundancyHelper(idx, sequentFormula,
-                createSemisequentChangeInfo(seqList), null);
+            createSemisequentChangeInfo(seqList), null);
     }
 
-    protected abstract SemisequentChangeInfo createSemisequentChangeInfo(ImmutableList<SequentFormula> seqList);
+    protected abstract SemisequentChangeInfo createSemisequentChangeInfo(
+            ImmutableList<SequentFormula> seqList);
 
     /**
      * . inserts new ConstrainedFormulas starting at index idx and removes duplicates, perform

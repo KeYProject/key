@@ -48,7 +48,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * declared as skolem term SV.
      */
     private String getNameProposalForSkolemTermVariable(SchemaVariable p_var,
-                                                        Services services, ImmutableList<String> previousProposals) {
+            Services services, ImmutableList<String> previousProposals) {
         return getNameProposalForSkolemTermVariable(
             createBaseNameProposalBasedOnCorrespondence(p_var), services,
             previousProposals);
