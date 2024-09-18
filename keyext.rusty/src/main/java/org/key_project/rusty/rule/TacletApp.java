@@ -409,7 +409,7 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff the if-instantiation list is not null or no if sequent is needed
      */
     public boolean ifInstsComplete() {
-        return ifInstantiations != null || taclet().ifSequent().isEmpty();
+        return ifInstantiations != null || taclet().assumesSequent().isEmpty();
     }
 
     public PosTacletApp setPosInOccurrence(PosInOccurrence pos, Services services) {
@@ -595,13 +595,13 @@ public abstract class TacletApp implements RuleApp {
     public ImmutableList<TacletApp> findIfFormulaInstantiations(Sequent seq, Services services) {
         // TODO Why not return just the list of IfFormulaInstantiations?
 
-        if (taclet().ifSequent().isEmpty()) {
+        if (taclet().assumesSequent().isEmpty()) {
             return ImmutableSLList.<TacletApp>nil().prepend(this);
         }
 
         return findIfFormulaInstantiationsHelp(
-            createSemisequentList(taclet().ifSequent().succedent()),
-            createSemisequentList(taclet().ifSequent().antecedent()),
+            createSemisequentList(taclet().assumesSequent().succedent()),
+            createSemisequentList(taclet().assumesSequent().antecedent()),
             IfFormulaInstSeq.createList(seq, false, services),
             IfFormulaInstSeq.createList(seq, true, services),
             ImmutableSLList.nil(), matchConditions(), services);
@@ -756,8 +756,8 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff the list of if instantiations has the correct size
      */
     public boolean ifInstsCorrectSize(ImmutableList<IfFormulaInstantiation> list) {
-        Semisequent antec = taclet().ifSequent().antecedent();
-        Semisequent succ = taclet().ifSequent().succedent();
+        Semisequent antec = taclet().assumesSequent().antecedent();
+        Semisequent succ = taclet().assumesSequent().succedent();
         return list.size() == (antec.size() + succ.size());
     }
 

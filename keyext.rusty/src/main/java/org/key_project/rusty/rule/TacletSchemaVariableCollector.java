@@ -169,7 +169,7 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
      *        false) or if the visitor descends into them (iff true)
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
-        visit(taclet.ifSequent());
+        visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
     }

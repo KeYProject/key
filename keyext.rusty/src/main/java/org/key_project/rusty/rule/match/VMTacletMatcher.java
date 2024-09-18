@@ -57,7 +57,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
     public VMTacletMatcher(Taclet taclet) {
         varconditions = taclet.getVariableConditions();
-        assumesSequent = taclet.ifSequent();
+        assumesSequent = taclet.assumesSequent();
         boundVars = taclet.getBoundVariables();
         varsNotFreeIn = taclet.varsNotFreeIn();
 

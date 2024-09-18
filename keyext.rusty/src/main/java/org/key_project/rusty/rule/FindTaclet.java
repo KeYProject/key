@@ -103,7 +103,7 @@ public abstract class FindTaclet extends Taclet {
         if (tacletAsString == null) {
             StringBuffer sb = new StringBuffer();
             sb = sb.append(name()).append(" {\n");
-            sb = toStringIf(sb);
+            sb = toStringAssumes(sb);
             sb = toStringFind(sb);
             sb = toStringVarCond(sb);
             sb = toStringGoalTemplates(sb);
@@ -117,7 +117,7 @@ public abstract class FindTaclet extends Taclet {
     /**
      * @return Set of schemavariables of the {@code if} and the (optional) {@code find} part
      */
-    public ImmutableSet<SchemaVariable> getIfFindVariables() {
+    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
         if (ifFindVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             find().execPostOrder(svc);

@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -35,7 +34,7 @@ public class VariableNameProposer implements InstantiationProposer {
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {
-            return getNameProposalForSkolemTermVariable(app, var, services,
+            return getNameProposalForSkolemTermVariable(var, services,
                 previousProposals);
         } else if (var instanceof VariableSV) {
             return getNameProposalForVariableSV(var, previousProposals);
@@ -48,10 +47,10 @@ public class VariableNameProposer implements InstantiationProposer {
      * Generates a proposal for the instantiation of the given term schema variable, which is
      * declared as skolem term SV.
      */
-    private String getNameProposalForSkolemTermVariable(TacletApp p_app, SchemaVariable p_var,
-            Services services, ImmutableList<String> previousProposals) {
+    private String getNameProposalForSkolemTermVariable(SchemaVariable p_var,
+                                                        Services services, ImmutableList<String> previousProposals) {
         return getNameProposalForSkolemTermVariable(
-            createBaseNameProposalBasedOnCorrespondence(p_app, p_var, services), services,
+            createBaseNameProposalBasedOnCorrespondence(p_var), services,
             previousProposals);
     }
 
@@ -59,23 +58,9 @@ public class VariableNameProposer implements InstantiationProposer {
      * Find a name for the variable <code>p_var</code>, based on the result of
      * <code>Taclet.getNameCorrespondent</code>
      */
-    protected static String createBaseNameProposalBasedOnCorrespondence(TacletApp p_app,
-            SchemaVariable p_var, Services services) {
-        final String result;
-        final SchemaVariable v = p_app.taclet().getNameCorrespondent(p_var, services);
-        if (v != null && p_app.instantiations().isInstantiated(v)) {
-
-            final Object inst = p_app.instantiations().getInstantiation(v);
-
-            if (inst instanceof Term t) {
-                result = t.op().name().toString();
-            } else {
-                result = String.valueOf(inst);
-            }
-        } else {
-            // ... otherwise use the name of the SkolemTermSV
-            result = String.valueOf(p_var.name());
-        }
+    protected static String createBaseNameProposalBasedOnCorrespondence(SchemaVariable p_var) {
+        // Use the name of the SkolemTermSV
+        final String result = String.valueOf(p_var.name());
 
         // remove characters that should better not turn up in identifiers
         // more or less a HACK

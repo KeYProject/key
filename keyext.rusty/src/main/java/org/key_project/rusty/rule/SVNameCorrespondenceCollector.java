@@ -90,7 +90,7 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
         SchemaVariable findSV = null;
-        visit(taclet.ifSequent());
+        visit(taclet.assumesSequent());
         if (taclet instanceof FindTaclet) {
             final Term findTerm = ((FindTaclet) taclet).find();
             findTerm.execPostOrder(this);

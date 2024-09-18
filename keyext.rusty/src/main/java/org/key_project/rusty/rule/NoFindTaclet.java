@@ -49,7 +49,7 @@ public class NoFindTaclet extends Taclet {
      * @return Set of schemavariables of {@code if} and the (optional) find part
      */
     @Override
-    public ImmutableSet<SchemaVariable> getIfFindVariables() {
+    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
         return getIfVariables();
     }
 
@@ -66,7 +66,7 @@ public class NoFindTaclet extends Taclet {
 
     @Override
     public NoFindTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
+        final TacletApplPart applPart = new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
             varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 

@@ -1,25 +1,19 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.rusty.rule;
-
-import java.util.Iterator;
+package org.key_project.ncore.rules;
 
 import org.key_project.logic.Term;
-import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
-import org.key_project.rusty.logic.op.Junctor;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.proof.Goal;
-import org.key_project.rusty.proof.Node;
-import org.key_project.rusty.rule.inst.GenericSortCondition;
-import org.key_project.rusty.rule.inst.SVInstantiations;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
+import org.key_project.ncore.proof.ProofGoal;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-public abstract class TacletExecutor<T extends Taclet> {
+import java.util.Iterator;
+
+public abstract class TacletExecutor<Goal extends ProofGoal,
+        App extends RuleApp<Goal>, T extends Taclet<Goal, App>> {
     private static final String AUTO_NAME = "_taclet";
 
     protected final T taclet;
@@ -55,8 +49,8 @@ public abstract class TacletExecutor<T extends Taclet> {
      *         obligation for the to be proven formulas of the assumes goal
      */
     protected ImmutableList<SequentChangeInfo> checkIfGoals(Goal p_goal,
-            ImmutableList<IfFormulaInstantiation> p_list, MatchConditions p_matchCond,
-            int p_numberOfNewGoals) {
+                                                            ImmutableList<IfFormulaInstantiation> p_list, MatchConditions p_matchCond,
+                                                            int p_numberOfNewGoals) {
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
 

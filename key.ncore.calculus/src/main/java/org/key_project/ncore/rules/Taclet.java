@@ -1,28 +1,23 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.rusty.rule;
+package org.key_project.ncore.rules;
 
-import java.util.Iterator;
-
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.proof.Goal;
-import org.key_project.rusty.rule.match.VMTacletMatcher;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
+import org.key_project.ncore.proof.ProofGoal;
+import org.key_project.ncore.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import java.util.Iterator;
 
 import static org.key_project.util.Strings.formatAsList;
 
-public abstract class Taclet implements Rule {
+public abstract class Taclet<G extends ProofGoal, App extends RuleApp<G>>implements Rule<G, App> {
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
     /** unique name of the taclet */
@@ -94,7 +89,7 @@ public abstract class Taclet implements Rule {
     /**
      * The taclet executor
      */
-    protected TacletExecutor<? extends Taclet> executor;
+    protected TacletExecutor<G, App, ? extends Taclet<G, App>> executor;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -107,10 +102,10 @@ public abstract class Taclet implements Rule {
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            boolean surviveSmbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                     ImmutableList<TacletGoalTemplate> goalTemplates,
+                     TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                     boolean surviveSmbExec,
+                     ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
         this.name = name;
         assumesSequent = applPart.assumesSequent();
@@ -149,9 +144,9 @@ public abstract class Taclet implements Rule {
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                     ImmutableList<TacletGoalTemplate> goalTemplates,
+                     TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                     ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, prefixMap, false,
             tacletAnnotations);
     }
