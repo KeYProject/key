@@ -19,7 +19,8 @@ import org.jspecify.annotations.NonNull;
 
 import static org.key_project.util.Strings.formatAsList;
 
-public abstract class Taclet<G extends ProofGoal, App extends RuleApp<G>> implements Rule<G, App> {
+public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends RuleApp<G>>
+        implements Rule<G, App> {
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
     /** unique name of the taclet */
@@ -322,38 +323,38 @@ public abstract class Taclet<G extends ProofGoal, App extends RuleApp<G>> implem
 
     StringBuffer toStringAssumes(StringBuffer sb) {
         if (!assumesSequent.isEmpty()) {
-            sb = sb.append("\\assumes (").append(assumesSequent).append(") ");
-            sb = sb.append("\n");
+            sb.append("\\assumes (").append(assumesSequent).append(") ");
+            sb.append("\n");
         }
         return sb;
     }
 
     StringBuffer toStringVarCond(StringBuffer sb) {
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
-            sb = sb.append("\\varcond(");
+            sb.append("\\varcond(");
 
             int countVarsNew = varsNew.size() - 1;
             for (final NewVarcond nvc : varsNew) {
-                sb = sb.append(nvc);
+                sb.append(nvc);
                 if (countVarsNew > 0 || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
-                    sb = sb.append(", ");
+                    sb.append(", ");
                 }
                 --countVarsNew;
             }
 
             int countVarsNotFreeIn = varsNotFreeIn.size() - 1;
             for (NotFreeIn pair : varsNotFreeIn) {
-                sb = sb.append("\\notFreeIn(").append(pair.first()).append(", ")
+                sb.append("\\notFreeIn(").append(pair.first()).append(", ")
                         .append(pair.second()).append(")");
                 if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) {
-                    sb = sb.append(", ");
+                    sb.append(", ");
                 }
                 --countVarsNotFreeIn;
             }
 
             sb.append(formatAsList(variableConditions, "", ", ", ""));
 
-            sb = sb.append(")\n");
+            sb.append(")\n");
         }
         return sb;
     }
@@ -391,7 +392,7 @@ public abstract class Taclet<G extends ProofGoal, App extends RuleApp<G>> implem
         if (tacletAsString == null) {
             // FIXME this essentially reimplements PrettyPrinter::printTaclet
             StringBuffer sb = new StringBuffer();
-            sb = sb.append(name()).append(" {\n");
+            sb.append(name()).append(" {\n");
             sb = toStringAssumes(sb);
             sb = toStringVarCond(sb);
             sb = toStringGoalTemplates(sb);

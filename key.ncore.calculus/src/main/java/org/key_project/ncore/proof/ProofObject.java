@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.proof;
 
+import org.key_project.logic.LogicServices;
+
 /**
  * <p>
  * A proof object provides an interface to the current proof status.
@@ -14,7 +16,7 @@ package org.key_project.ncore.proof;
  * goals.
  * </p>
  */
-public interface ProofObject<G extends ProofGoal> {
+public interface ProofObject<G extends ProofGoal<G>> {
     /**
      * returns an iterable collection of open goals
      *
@@ -43,4 +45,6 @@ public interface ProofObject<G extends ProofGoal> {
      * @param goalToClose the goal to close
      */
     void closeGoal(G goalToClose);
+
+    LogicServices getServices();
 }
