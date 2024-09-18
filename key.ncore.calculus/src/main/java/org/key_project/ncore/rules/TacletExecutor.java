@@ -16,7 +16,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-public abstract class TacletExecutor<Goal extends ProofGoal, App extends RuleApp<Goal>, T extends Taclet<Goal, App>> {
+import org.jspecify.annotations.NonNull;
+
+public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends RuleApp<Goal>, T extends Taclet<Goal, App>> {
     private static final String AUTO_NAME = "_taclet";
 
     protected final T taclet;
@@ -34,7 +36,7 @@ public abstract class TacletExecutor<Goal extends ProofGoal, App extends RuleApp
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
-    public abstract ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
+    public abstract ImmutableList<Goal> apply(Goal goal, App ruleApp);
 
     /**
      * Search for formulas within p_list that have to be proved by an explicit assumes-goal, i.e.
@@ -76,7 +78,6 @@ public abstract class TacletExecutor<Goal extends ProofGoal, App extends RuleApp
                     assumesPart = inst.getSequentFormula().formula();
 
                     // negate formulas of the assumes-succedent
-                    final LogicServices services = p_goal.proof().getServices();
                     if (i <= 0) {
                         assumesPart = not(assumesPart);
                     }
@@ -166,47 +167,9 @@ public abstract class TacletExecutor<Goal extends ProofGoal, App extends RuleApp
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      */
-    protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, LogicServices services,
-            MatchConditions matchCond) {
-        for (Taclet tacletToAdd : rules) {
-            final Node n = goal.getNode();
-            tacletToAdd = tacletToAdd
-                    .setName(tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId());
-
-
-            // the new Taclet may contain variables with a known
-            // instantiation. These must be used by the new Taclet and all
-            // further rules it contains in the addrules-sections. Therefore all
-            // appearing (including the addrules) SchemaVariables have to be
-            // collected, then it is looked if an instantiation is known and if
-            // positive the instantiation is memorized. At last the Taclet with
-            // its required instantiations is handed over to the goal, where a
-            // new TacletApp should be built including the necessary instantiation
-            // information
-
-            SVInstantiations neededInstances = SVInstantiations.EMPTY_SVINSTANTIATIONS
-                    .addUpdateList(matchCond.getInstantiations().getUpdateContext());
-
-            final TacletSchemaVariableCollector collector = new TacletSchemaVariableCollector();
-            collector.visit(tacletToAdd, true);// true, because
-            // descend into addrules
-            for (SchemaVariable sv : collector.vars()) {
-                if (matchCond.getInstantiations().isInstantiated(sv)) {
-                    neededInstances = neededInstances.add(sv,
-                        matchCond.getInstantiations().getInstantiationEntry(sv), services);
-                }
-            }
-
-            final ImmutableList<GenericSortCondition> cs =
-                matchCond.getInstantiations().getGenericSortInstantiations().toConditions();
-
-            for (final GenericSortCondition gsc : cs) {
-                neededInstances = neededInstances.add(gsc, services);
-            }
-
-            goal.addTaclet(tacletToAdd, neededInstances, true);
-        }
-    }
+    protected abstract void applyAddrule(ImmutableList<Taclet<Goal, App>> rules, Goal goal,
+            LogicServices services,
+            MatchConditions matchCond);
 
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
             SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,

@@ -3,5 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.proof;
 
-public interface ProofGoal {
+import org.key_project.ncore.sequent.Sequent;
+
+public interface ProofGoal<G extends ProofGoal<G>> {
+    ProofObject<G> proof();
+
+    Sequent sequent();
 }
