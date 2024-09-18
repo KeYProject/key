@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.key_project.rusty.ast.ty.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 public class NewVarcond {

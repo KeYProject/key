@@ -11,6 +11,8 @@ import org.key_project.rusty.ast.fn.SelfParam;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.Statement;
+import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -531,5 +533,15 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnExpressionStatement(ExpressionStatement x) {
         x.getExpression().visit(this);
         layouter.print(";");
+    }
+
+    @Override
+    public void performActionOnPrimitiveRustType(PrimitiveRustType x) {
+        layouter.print(x.type().toString());
+    }
+
+    @Override
+    public void performActionOnSchemaRustType(SchemaRustType x) {
+        layouter.print("s#" + x.type().toString());
     }
 }

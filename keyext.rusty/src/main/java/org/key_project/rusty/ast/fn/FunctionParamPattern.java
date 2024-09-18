@@ -5,20 +5,12 @@ package org.key_project.rusty.ast.fn;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.pat.Pattern;
-import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public class FunctionParamPattern implements FunctionParam {
-    private final Pattern pattern;
-    private final Type type;
-
-    public FunctionParamPattern(Pattern pattern, Type type) {
-        this.pattern = pattern;
-        this.type = type;
-    }
-
+public record FunctionParamPattern(Pattern pattern, RustType type) implements FunctionParam {
     @Override
     public int getChildCount() {
         return 1;
@@ -29,15 +21,10 @@ public class FunctionParamPattern implements FunctionParam {
         if (n == 0) {
             return pattern;
         }
-        throw new IndexOutOfBoundsException("Param has only one child");
-    }
-
-    public Pattern getPattern() {
-        return pattern;
-    }
-
-    public Type getType() {
-        return type;
+        if (n == 1) {
+            return type;
+        }
+        throw new IndexOutOfBoundsException("Param has only 2 children");
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.rusty.ast.ty.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.sv.ProgramSV;

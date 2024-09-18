@@ -9,6 +9,8 @@ import java.util.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.FunctionParam;
@@ -19,9 +21,9 @@ import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
-import org.key_project.rusty.ast.ty.KeYRustyType;
-import org.key_project.rusty.ast.ty.PrimitiveType;
-import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.RustType;
+import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -59,14 +61,14 @@ public class SchemaConverter {
             Name name = ip.name();
             variables.put(name.toString(), decl);
             programVariables.put(decl, new ProgramVariable(name,
-                new KeYRustyType(decl.getType().getSort(services))));
+                new KeYRustyType(decl.type().getSort(services))));
         }
     }
 
     private void declareVariable(String name, VariableDeclaration decl) {
         variables.put(name, decl);
         programVariables.put(decl, new ProgramVariable(new Name(name),
-            new KeYRustyType(decl.getType().getSort(services))));
+            new KeYRustyType(decl.type().getSort(services))));
     }
 
     private VariableDeclaration getDecl(PathInExpression path) {
@@ -110,7 +112,7 @@ public class SchemaConverter {
         Name name = convertIdentifier(ctx.identifier()).name();
         ImmutableArray<FunctionParam> params =
             convertFunctionParams(ctx.functionParams());
-        Type returnType = convertType(ctx.functionRetTy().type_());
+        RustType returnType = convertType(ctx.functionRetTy().type_());
         BlockExpression body =
             convertBlockExpr(
                 ctx.blockExpr());
@@ -673,7 +675,7 @@ public class SchemaConverter {
     private Statement convertLetStmt(
             org.key_project.rusty.parsing.RustySchemaParser.LetStmtContext ctx) {
         Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
-        Type type = convertType(ctx.type_());
+        RustType type = convertType(ctx.type_());
         Expr init = ctx.expr() == null ? null : convertExpr(ctx.expr());
         LetStatement letStatement = new LetStatement(pat,
             type,
@@ -743,7 +745,7 @@ public class SchemaConverter {
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
     }
 
-    private Type convertType(
+    private RustType convertType(
             org.key_project.rusty.parsing.RustySchemaParser.Type_Context ctx) {
         if (ctx.typeNoBounds() != null) {
             return convertTypeNoBounds(ctx.typeNoBounds());
@@ -751,7 +753,7 @@ public class SchemaConverter {
         throw new IllegalArgumentException("Unknown type " + ctx.getText());
     }
 
-    private Type convertTypeNoBounds(
+    private RustType convertTypeNoBounds(
             org.key_project.rusty.parsing.RustySchemaParser.TypeNoBoundsContext ctx) {
         if (ctx.parenthesizedType() != null)
             return convertParenthesizedType(ctx.parenthesizedType());
@@ -761,7 +763,7 @@ public class SchemaConverter {
             return convertTypePath(ctx.typePath());
         if (ctx.typeOf() != null) {
             var sv = (ProgramSV) convertExpr(ctx.typeOf().expr());
-            return new KeYRustyType(sv.sort());
+            return new TypeOf(sv);
         }
         if (ctx.tupleType() != null)
             throw new IllegalArgumentException("TODO @ DD");
@@ -770,12 +772,12 @@ public class SchemaConverter {
         throw new IllegalArgumentException("Unknown type " + ctx.getText());
     }
 
-    private Type convertParenthesizedType(
+    private RustType convertParenthesizedType(
             org.key_project.rusty.parsing.RustySchemaParser.ParenthesizedTypeContext ctx) {
         return convertType(ctx.type_());
     }
 
-    private Type convertTraitObjectOneBound(
+    private RustType convertTraitObjectOneBound(
             RustySchemaParser.TraitObjectTypeOneBoundContext ctx) {
         var tbCtx = ctx.traitBound();
         if (ctx.KW_DYN() == null && tbCtx.QUESTION() == null && tbCtx.forLifetimes() == null) {
@@ -784,11 +786,11 @@ public class SchemaConverter {
         throw new IllegalArgumentException("TODO @ DD");
     }
 
-    private PrimitiveType convertTypePath(
+    private PrimitiveRustType convertTypePath(
             org.key_project.rusty.parsing.RustySchemaParser.TypePathContext ctx) {
         assert ctx.typePathSegment().size() == 1;
         var text = ctx.typePathSegment(0).pathIdentSegment().identifier().getText();
-        return switch (text) {
+        var pt = switch (text) {
         case "bool" -> PrimitiveType.BOOL;
         case "u8" -> PrimitiveType.U8;
         case "u16" -> PrimitiveType.U16;
@@ -807,6 +809,7 @@ public class SchemaConverter {
         case "!" -> PrimitiveType.NEVER;
         default -> throw new IllegalArgumentException("Unknown type '" + text + "'");
         };
+        return new PrimitiveRustType(pt);
     }
 
     private ImmutableArray<FunctionParam> convertFunctionParams(
@@ -839,7 +842,7 @@ public class SchemaConverter {
             org.key_project.rusty.parsing.RustySchemaParser.FunctionParamPatternContext ctx) {
         FunctionParamPattern param = new FunctionParamPattern(convertPattern(ctx.pattern()),
             convertType(ctx.type_()));
-        declareVariable(((IdentPattern) param.getPattern()).name().toString(), param);
+        declareVariable(((IdentPattern) param.pattern()).name().toString(), param);
         return param;
     }
 

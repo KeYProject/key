@@ -11,12 +11,12 @@ import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Item;
 import org.key_project.rusty.ast.expr.BlockExpression;
-import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record Function(Name name, org.key_project.util.collection.ImmutableArray<FunctionParam> params, Type returnType,
+public record Function(Name name, org.key_project.util.collection.ImmutableArray<FunctionParam> params, RustType returnType,
                        BlockExpression body) implements Item, Named {
 
     @Override
@@ -29,7 +29,8 @@ public record Function(Name name, org.key_project.util.collection.ImmutableArray
         if (0 <= n && n < params.size())
             return Objects.requireNonNull(params.get(n));
         n -= params.size();
-        if (n == 0)
+        if (n == 0) return returnType;
+        if (n == 1)
             return body;
         throw new IndexOutOfBoundsException("No child at index " + n);
     }

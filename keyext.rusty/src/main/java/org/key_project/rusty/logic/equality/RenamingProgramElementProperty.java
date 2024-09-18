@@ -117,7 +117,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             if (next instanceof LetStatement ls) {
                 hashCode = 31 * hashCode + ls.getChildCount();
                 hashCode =
-                    31 * hashCode + 17 * ((ls.getType() == null) ? 0 : ls.getType().hashCode());
+                    31 * hashCode + 17 * ((ls.type() == null) ? 0 : ls.type().hashCode());
                 absMap.add(ls);
             } else if (next instanceof ProgramVariable || next instanceof Name) {
                 hashCode = 31 * hashCode + absMap.getAbstractName((RustyProgramElement) next);
@@ -207,12 +207,12 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
         if (ls.getChildCount() != se.getChildCount()) {
             return false;
         }
-        if (ls.getType() != null) {
-            if (!ls.getType().equals(other.getType())) {
+        if (ls.type() != null) {
+            if (!ls.type().equals(other.type())) {
                 return false;
             }
         } else {
-            if (other.getType() != null) {
+            if (other.type() != null) {
                 return false;
             }
         }

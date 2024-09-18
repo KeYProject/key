@@ -16,7 +16,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.ty.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.ProgramVariable;

@@ -10,6 +10,8 @@ import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.SelfParam;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
+import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -280,6 +282,16 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnExpressionStatement(ExpressionStatement x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnPrimitiveRustType(PrimitiveRustType x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSchemaRustType(SchemaRustType x) {
         doDefaultAction(x);
     }
 }

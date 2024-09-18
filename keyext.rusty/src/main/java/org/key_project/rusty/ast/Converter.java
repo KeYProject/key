@@ -8,6 +8,8 @@ import java.util.*;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.FunctionParam;
@@ -18,9 +20,8 @@ import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
-import org.key_project.rusty.ast.ty.KeYRustyType;
-import org.key_project.rusty.ast.ty.PrimitiveType;
-import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.parsing.RustyParser;
 import org.key_project.util.collection.ImmutableArray;
@@ -49,7 +50,7 @@ public class Converter {
             Name name = ip.name();
             variables.put(name.toString(), decl);
             programVariables.put(decl, new ProgramVariable(name,
-                new KeYRustyType(decl.getType().getSort(services))));
+                new KeYRustyType(decl.type().getSort(services))));
         }
     }
 
@@ -87,7 +88,7 @@ public class Converter {
         Name name = convertIdentifier(ctx.identifier()).name();
         ImmutableArray<FunctionParam> params =
             convertFunctionParams(ctx.functionParams());
-        Type returnType = convertType(ctx.functionRetTy().type_());
+        RustType returnType = convertRustType(ctx.functionRetTy().type_());
         BlockExpression body =
             convertBlockExpr(ctx.blockExpr());
         return new Function(name,
@@ -579,7 +580,7 @@ public class Converter {
     private Statement convertLetStmt(
             org.key_project.rusty.parsing.RustyParser.LetStmtContext ctx) {
         Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
-        Type type = convertType(ctx.type_());
+        RustType type = convertRustType(ctx.type_());
         Expr init = ctx.expr() == null ? null : convertExpr(ctx.expr());
         LetStatement letStatement = new LetStatement(pat,
             type,
@@ -634,14 +635,14 @@ public class Converter {
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
     }
 
-    private Type convertType(org.key_project.rusty.parsing.RustyParser.Type_Context ctx) {
+    private RustType convertRustType(org.key_project.rusty.parsing.RustyParser.Type_Context ctx) {
         if (ctx.typeNoBounds() != null) {
             return convertTypeNoBounds(ctx.typeNoBounds());
         }
         throw new IllegalArgumentException("Unknown type " + ctx.getText());
     }
 
-    private Type convertTypeNoBounds(RustyParser.TypeNoBoundsContext ctx) {
+    private RustType convertTypeNoBounds(RustyParser.TypeNoBoundsContext ctx) {
         if (ctx.parenthesizedType() != null)
             return convertParenthesizedType(ctx.parenthesizedType());
         if (ctx.traitObjectTypeOneBound() != null)
@@ -655,12 +656,12 @@ public class Converter {
         throw new IllegalArgumentException("Unknown type " + ctx.getText());
     }
 
-    private Type convertParenthesizedType(
+    private RustType convertParenthesizedType(
             org.key_project.rusty.parsing.RustyParser.ParenthesizedTypeContext ctx) {
-        return convertType(ctx.type_());
+        return convertRustType(ctx.type_());
     }
 
-    private Type convertTraitObjectOneBound(
+    private RustType convertTraitObjectOneBound(
             org.key_project.rusty.parsing.RustyParser.TraitObjectTypeOneBoundContext ctx) {
         var tbCtx = ctx.traitBound();
         if (ctx.KW_DYN() == null && tbCtx.QUESTION() == null && tbCtx.forLifetimes() == null) {
@@ -669,11 +670,11 @@ public class Converter {
         throw new IllegalArgumentException("TODO @ DD");
     }
 
-    private Type convertTypePath(
+    private RustType convertTypePath(
             org.key_project.rusty.parsing.RustyParser.TypePathContext ctx) {
         assert ctx.typePathSegment().size() == 1;
         var text = ctx.typePathSegment(0).pathIdentSegment().identifier().getText();
-        return switch (text) {
+        var pt = switch (text) {
         case "bool" -> PrimitiveType.BOOL;
         case "u8" -> PrimitiveType.U8;
         case "u16" -> PrimitiveType.U16;
@@ -692,6 +693,7 @@ public class Converter {
         case "!" -> PrimitiveType.NEVER;
         default -> throw new IllegalArgumentException("Unknown type '" + text + "'");
         };
+        return new PrimitiveRustType(pt);
     }
 
     private ImmutableArray<FunctionParam> convertFunctionParams(
@@ -716,15 +718,15 @@ public class Converter {
         } else {
             var self = ctx.typedSelf();
             return new SelfParam(/* TODO */ false, self.KW_MUT() != null,
-                convertType(self.type_()));
+                convertRustType(self.type_()));
         }
     }
 
     private FunctionParamPattern convertFunctionParamPattern(
             org.key_project.rusty.parsing.RustyParser.FunctionParamPatternContext ctx) {
         FunctionParamPattern param = new FunctionParamPattern(convertPattern(ctx.pattern()),
-            convertType(ctx.type_()));
-        declareVariable(((IdentPattern) param.getPattern()).name().toString(), param);
+            convertRustType(ctx.type_()));
+        declareVariable(((IdentPattern) param.pattern()).name().toString(), param);
         return param;
     }
 
@@ -743,7 +745,7 @@ public class Converter {
 
     private ClosureParam convertClosureParam(RustyParser.ClosureParamContext ctx) {
         var pat = convertPattern(ctx.pattern());
-        var ty = ctx.type_() == null ? null : convertType(ctx.type_());
+        var ty = ctx.type_() == null ? null : convertRustType(ctx.type_());
         return new ClosureParam(pat, ty);
     }
 }

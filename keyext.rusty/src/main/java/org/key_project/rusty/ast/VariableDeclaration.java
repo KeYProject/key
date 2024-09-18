@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast;
 
-import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.ty.RustType;
 
 public interface VariableDeclaration {
-    Type getType();
+    RustType type();
 }

@@ -1,34 +1,35 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.rusty.ast.expr;
+package org.key_project.rusty.ast.ty;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.ast.ty.RustType;
+import org.key_project.rusty.ast.abstraction.SchemaType;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record TypeCastExpression(Expr expr, RustType ty) implements Expr {
+/**
+ * A schema variable standing for a type in SchemaRust
+ */
+public record SchemaRustType(SchemaType type) implements RustType {
     @Override
     public void visit(Visitor v) {
-        v.performActionOnTypeCastExpression(this);
+        v.performActionOnSchemaRustType(this);
     }
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0) {return expr;}
-        if (n == 1) {return ty;}
-        throw new IndexOutOfBoundsException("TypeCastExpression has only 2 children");
+        throw new IndexOutOfBoundsException(getClass() + " has no children");
     }
 
     @Override
     public int getChildCount() {
-        return 2;
+        return 0;
     }
 
     @Override
     public String toString() {
-        return expr + " as " + ty;
+        return type.toString();
     }
 }

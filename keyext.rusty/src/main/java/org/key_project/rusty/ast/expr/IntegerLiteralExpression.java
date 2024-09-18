@@ -72,7 +72,7 @@ public class IntegerLiteralExpression extends LiteralExpression {
 
     @Override
     public String toString() {
-        return value + "_" + suffix.toString();
+        return value + suffix.toString();
     }
 
     @Override

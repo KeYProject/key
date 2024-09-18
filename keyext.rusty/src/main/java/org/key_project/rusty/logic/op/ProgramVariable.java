@@ -10,8 +10,8 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.ast.SourceData;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.expr.Expr;
-import org.key_project.rusty.ast.ty.KeYRustyType;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.rule.MatchConditions;
 

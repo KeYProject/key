@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.ast.ty.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Goal;

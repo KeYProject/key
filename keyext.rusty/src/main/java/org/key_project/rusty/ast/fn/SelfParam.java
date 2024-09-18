@@ -4,18 +4,21 @@
 package org.key_project.rusty.ast.fn;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.ast.ty.Type;
+import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record SelfParam(boolean reference,boolean mut,@Nullable Type ty)implements FunctionParam{@Override public void visit(Visitor v){v.performActionOnSelfParam(this);}
+public record SelfParam(boolean reference,boolean mut,@Nullable RustType ty)implements FunctionParam{@Override public void visit(Visitor v){v.performActionOnSelfParam(this);}
 
-@Override public @NonNull SyntaxElement getChild(int n){throw new UnsupportedOperationException();}
+@Override public @NonNull SyntaxElement getChild(int n){
+    if (n == 0) return ty;
+    throw new IndexOutOfBoundsException(getClass() + " has 1 child");
+}
 
-@Override public int getChildCount(){return 0;}
+@Override public int getChildCount(){return 1;}
 
-@Override public Type getType(){
+@Override public RustType type(){
 // TODO
 return ty;}}

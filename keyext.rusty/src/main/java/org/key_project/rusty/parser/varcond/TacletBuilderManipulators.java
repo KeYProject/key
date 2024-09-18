@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.key_project.rusty.ast.ty.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.builder.TacletPBuilder;
 import org.key_project.rusty.rule.VariableCondition;
