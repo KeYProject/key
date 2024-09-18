@@ -10,7 +10,6 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.*;
 
-import static org.key_project.rusty.rule.match.instructions.MatchProgramSVInstruction.convertToLogicElement;
 
 public class SVInstantiations {
     /** the empty instantiation */
