@@ -15,6 +15,9 @@ import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.parser.Location;
 
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
+
 /**
  * The Class ProofScriptInputAction.
  *
@@ -57,6 +60,8 @@ public class ProofScriptInputAction extends AbstractAction {
                 font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
             }
             textArea.setFont(font);
+            JScrollPane scroll = new JScrollPane (textArea, VERTICAL_SCROLLBAR_AS_NEEDED,
+                HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
             JButton okButton = new JButton("OK");
 
@@ -74,7 +79,7 @@ public class ProofScriptInputAction extends AbstractAction {
             });
 
             setLayout(new BorderLayout());
-            add(textArea, BorderLayout.CENTER);
+            add(scroll, BorderLayout.CENTER);
             add(okButton, BorderLayout.PAGE_END);
 
             setSize(new Dimension(mainWindow.getWidth() / 3, mainWindow.getHeight() / 2));

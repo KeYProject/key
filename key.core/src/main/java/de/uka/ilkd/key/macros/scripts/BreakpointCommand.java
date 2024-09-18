@@ -12,17 +12,13 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
  * Halts the script if some condition is not met.
  *
  * @author lanzinger
- *
- * @deprecated  The name of this command is like to change since "assert" should
- * be used for a more general purpose. You may find that this is called
- * "assertOpenGoals".
  */
-public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
+public class BreakpointCommand extends AbstractCommand<BreakpointCommand.Parameters> {
 
     /**
      * Instantiates a new assert command.
      */
-    public AssertCommand() {
+    public BreakpointCommand() {
         super(Parameters.class);
     }
 
@@ -51,7 +47,7 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
 
     @Override
     public String getName() {
-        return "assert";
+        return "breakpoint";
     }
 
     /**

@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtension.Toolbar,
     KeYGuiExtension.Startup, KeYSelectionListener {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(IncrementalScriptExtension.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncrementalScriptExtension.class);
 
     private static final ProofMacro MACRO = new ScriptAwareMacro();
     private static final Name JML_ASSERT = new Name("JML assert");
@@ -100,7 +100,7 @@ public class IncrementalScriptExtension implements KeYGuiExtension, KeYGuiExtens
         public void actionPerformed(ActionEvent e) {
             try {
                 KeYFileChooser chooser = KeYFileChooser.getFileChooser("Select file to load");
-                chooser.setFileFilter(KeYFileChooser.KEY_FILTER);
+                chooser.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
                 int returnVal = chooser.showOpenDialog(null);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     keyFile = chooser.getSelectedFile().getAbsolutePath();
