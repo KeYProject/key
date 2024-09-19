@@ -11,7 +11,10 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.expr.ArithLogicalExpression;
+import org.key_project.rusty.ast.expr.ComparisonExpression;
 import org.key_project.rusty.ast.expr.NegationExpression;
+import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.logic.NameAbstractionTable;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -64,8 +67,8 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             // First nodes can never be null as cursor is initialized with 'this'
             next1 = c1.getCurrentNode();
             next2 = c2.getCurrentNode();
-            if (next1 instanceof LetStatement ls) {
-                if (!handleLetStatement(ls, next2, nat)) {
+            if (next1 instanceof IdentPattern ip) {
+                if (!handleIdentPattern(ip, next2, nat)) {
                     return false;
                 }
             } else if (next1 instanceof ProgramVariable || next1 instanceof Name
@@ -75,6 +78,14 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
                 }
             } else if (next1 instanceof NegationExpression ne) {
                 if (!handleNegationExpression(ne, next2)) {
+                    return false;
+                }
+            } else if (next1 instanceof ComparisonExpression ce) {
+                if (!handleComparisonExpression(ce, next2)) {
+                    return false;
+                }
+            } else if (next1 instanceof ArithLogicalExpression ale) {
+                if (!handleArithLogicalExpression(ale, next2)) {
                     return false;
                 }
             } else if (next1.getChildCount() > 0) {
@@ -107,7 +118,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
          * Currently, the best approach seems to be to walk through the RustyProgramElement with a
          * SyntaxElementCursor and sum up hash codes.
          */
-
+        //TODO: change hashCode to reflect the equalsModThisProperty method
         NameAbstractionMap absMap = new NameAbstractionMap();
 
         int hashCode = 1;
@@ -176,6 +187,43 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     }
 
     /**
+     * Handles the special case of comparing an {@link ArithLogicalExpression} to a
+     * {@link SyntaxElement}.
+     *
+     * @param ale the {@link ArithLogicalExpression} to be compared
+     * @param se the {@link SyntaxElement} to be compared
+     * @return {@code true} iff {@code se} is of the same class as {@code ale} and they use the same
+     *         operator
+     */
+    private boolean handleArithLogicalExpression(ArithLogicalExpression ale, SyntaxElement se) {
+        if (se == ale) {
+            return true;
+        }
+        if (se.getClass() != ale.getClass()) {
+            return false;
+        }
+        return ale.op().equals(((ArithLogicalExpression) se).op());
+    }
+
+    /**
+     * Handles the special case of comparing a {@link ComparisonExpression} to a {@link SyntaxElement}.
+     *
+     * @param ce the {@link ComparisonExpression} to be compared
+     * @param se the {@link SyntaxElement} to be compared
+     * @return {@code true} iff {@code se} is of the same class as {@code ce} and they use the same
+     *         operator
+     */
+    private boolean handleComparisonExpression(ComparisonExpression ce, SyntaxElement se) {
+        if (se == ce) {
+            return true;
+        }
+        if (se.getClass() != ce.getClass()) {
+            return false;
+        }
+        return ce.op().equals(((ComparisonExpression) se).op());
+    }
+
+    /**
      * Handles the special case of comparing a {@link NegationExpression} to a
      * {@link SyntaxElement}.
      *
@@ -191,46 +239,37 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
         if (se.getClass() != ne.getClass()) {
             return false;
         }
-        return ne.getOperator().equals(((NegationExpression) se).getOperator());
+        return ne.getOp().equals(((NegationExpression) se).getOp());
     }
 
     /**
-     * Handles the special case of comparing a {@link LetStatement} to a
+     * Handles the special case of comparing a {@link IdentPattern} to a
      * {@link SyntaxElement}.
      *
-     * @param ls the {@link LetStatement} to be compared
+     * @param ip the {@link IdentPattern} to be compared
      * @param se the {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} the variable of {@code vs} should be added to
      * @return {@code true} iff {@code se} is of the same class as {@code vs} and has the same
      *         number of children, dimensions and type
      */
-    private boolean handleLetStatement(LetStatement ls, SyntaxElement se,
+    private boolean handleIdentPattern(IdentPattern ip, SyntaxElement se,
             NameAbstractionTable nat) {
         /*
          * A VariableSpecification is a special case of a JavaNonTerminalProgramElement similar to
          * LabeledStatement, but we also need to check the dimensions and type of the
          * VariableSpecification.
          */
-        if (se == ls) {
+        if (se == ip) {
             return true;
         }
-        if (se.getClass() != ls.getClass()) {
+        if (se.getClass() != ip.getClass()) {
             return false;
         }
-        final LetStatement other = (LetStatement) se;
-        if (ls.getChildCount() != se.getChildCount()) {
+        final IdentPattern other = (IdentPattern) se;
+        if (ip.isMutable() != other.isMutable() || ip.isReference() != other.isReference()) {
             return false;
         }
-        if (ls.type() != null) {
-            if (!ls.type().equals(other.type())) {
-                return false;
-            }
-        } else {
-            if (other.type() != null) {
-                return false;
-            }
-        }
-        nat.add(ls.getPattern(), other.getPattern());
+        nat.add(ip, other);
         return true;
     }
 

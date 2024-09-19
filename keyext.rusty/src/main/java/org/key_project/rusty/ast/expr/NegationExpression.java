@@ -37,10 +37,6 @@ public class NegationExpression implements Expr {
         return expr;
     }
 
-    public Operator getOperator() {
-        return op;
-    }
-
     @Override
     public String toString() {
         return op.toString() + expr;
