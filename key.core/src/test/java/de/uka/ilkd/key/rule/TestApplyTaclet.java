@@ -1230,4 +1230,27 @@ public class TestApplyTaclet {
     }
 
 
+    @Test
+    void daniel() {
+        Services services = TacletForTests.services();
+        NoPosTacletApp emptyMod = TacletForTests.getRules().lookup("TesTApplyTaclet_emptyModality");
+        var tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add(emptyMod);
+        Semisequent antec = parseTermForSemisequent("");
+        Semisequent succ = parseTermForSemisequent("{i:=2}\\<{}\\>(i = 2)");
+        Sequent s = Sequent.createSequent(antec, succ);
+        var proof = new Proof("Simple", TacletForTests.initConfig());
+        proof.setRoot(new Node(proof, s));
+        var goal = createGoal(proof.root(), tacletIndex);
+        var pos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+            PosInTerm.getTopLevel().down(1), false);
+        ImmutableList<TacletApp> rApplist =
+            goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pos, services);
+        assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
+        RuleApp rApp = rApplist.head();
+        assertTrue(rApp.complete(), "Rule App should be complete");
+        ImmutableList<Goal> goals = rApp.execute(goal);
+        assertEquals(1, goals.size());
+        System.out.println(goals.head());
+    }
 }

@@ -10,6 +10,6 @@ public interface KeYConstants {
         KeYResourceManager.getManager().getVersion() + " (internal: " + INTERNAL_VERSION + ")";
 
     String COPYRIGHT = UnicodeHelper.COPYRIGHT + " Copyright 2001"
-        + UnicodeHelper.ENDASH + "2023 " + "Karlsruhe Institute of Technology, "
+        + UnicodeHelper.ENDASH + "2024 " + "Karlsruhe Institute of Technology, "
         + "Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
 }

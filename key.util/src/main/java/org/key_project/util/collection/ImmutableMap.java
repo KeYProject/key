@@ -5,59 +5,115 @@ package org.key_project.util.collection;
 
 import java.util.Iterator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
- * This interface has to be implemented by a Class providing a persistent Map.
+ * An immutable data structure mapping keys to values. The map is not modified by any operation
+ * after creation.
+ *
+ * @param <S> the type of keys for this map
+ * @param <T> the type of contained mapped values
  */
-public interface ImmutableMap<S, T>
+public interface ImmutableMap<S extends @NonNull Object, T extends @Nullable Object>
         extends Iterable<ImmutableMapEntry<S, T>> {
 
     /**
-     * adds a mapping {@code <key,val>} to the Map (old map is not modified) if key exists old entry
-     * has to
-     * be removed
+     * Adds a mapping {@code <key, value>} to the map (old map is not modified)
      *
+     * If the key exists, the old entry will be overwritten.
+     *
+     * @param key the key with which the specified value is to be associated
+     * @param value the value to be associated with the specified key
      * @return the new mapping
      */
     ImmutableMap<S, T> put(S key, T value);
 
-    /** @return value of type <T> that is mapped by key of type<S> */
+    /**
+     * Retrieves the value mapped to the specified key in this map.
+     *
+     * @param key the key whose associated value is to be returned
+     * @return the value to which the specified key is mapped, or {@code null} if this map contains
+     *         no mapping for the key
+     */
+    @Nullable
     T get(S key);
 
-    /** @return number of entries as int */
+    /**
+     * Returns the number of entries in this map.
+     *
+     * @return the number of entries in this map
+     */
     int size();
 
-    /** @return true iff the map is empty */
+    /**
+     * Returns {@code true} if this map contains no entries.
+     *
+     * @return {@code true} if this map contains no entries
+     */
     boolean isEmpty();
 
-    /** @return true iff the map includes key */
+    /**
+     * Returns {@code true} if this map contains a mapping for the specified key.
+     *
+     * @param key the key whose presence in this map is to be tested
+     * @return {@code true} if this map contains a mapping for the specified key
+     */
     boolean containsKey(S key);
 
-    /** @return true iff the map includes value */
+    /**
+     * Returns {@code true} if this map maps one or more keys to the specified value.
+     *
+     * Comparison is modulo {@link Object#equals(Object)}.
+     *
+     * @param value the value whose presence in this map is to be tested
+     * @return {@code true} if this map maps one or more keys to the specified value
+     */
     boolean containsValue(T value);
 
     /**
-     * removes mapping (key,...) from map
+     * Removes the mapping for a key from this map if it is present.
      *
-     * @return the new map (the same if key is not in the map)
+     * @param key the key whose mapping is to be removed from the map
+     * @return the new map (the same if the key is not in the map)
      */
     ImmutableMap<S, T> remove(S key);
 
     /**
-     * removes all mappings (...,value) from map
+     * Removes all mappings for the specified value from this map.
      *
-     * @return the new map (the same if value is not mapped)
+     * Comparison is modulo {@link Object#equals(Object)}.
+     *
+     * @param value the value whose mappings are to be removed from the map
+     * @return the new map (the same if the value is not mapped)
      */
     ImmutableMap<S, T> removeAll(T value);
 
-    /** @return iterator about all keys */
+    /**
+     * Returns an iterator over the keys in this map.
+     *
+     * The order is most recent first.
+     *
+     * @return an iterator over the keys in this map
+     */
     Iterator<S> keyIterator();
 
-    /** @return iterator about all values */
+    /**
+     * Returns an iterator over the values in this map.
+     *
+     * If a value is contained multiple times, it will be returned multiple times.
+     * The order is most recent first.
+     *
+     * @return an iterator over the values in this map
+     */
     Iterator<T> valueIterator();
 
-    /** @return iterator for entries */
+
+    /**
+     * Returns an iterator over the entries in this map.
+     * The order is most recent first.
+     *
+     * @return an iterator over the entries in this map
+     */
     Iterator<ImmutableMapEntry<S, T>> iterator();
-
-
 }

@@ -1,0 +1,26 @@
+\profile "Rust Profile";
+
+\programVariables {
+    int i;
+}
+
+\problem {
+    \<{
+        i = 2u32;
+        i
+    }\> i = 2
+}
+
+\proof {
+    (branch "dummy ID"
+        (rule "assignment" (formula "1"))
+        (rule "emptyModality" (formula "1") (term "1"))
+        (rule "applyOnRigidFormula" (formula "1"))
+        (rule "applyOnPV" (formula "1") (term "0"))
+        (rule "applyOnRigidTerm" (formula "1") (term "1"))
+        (rule "applyOnRigidTerm" (formula "1") (term "0,1"))
+        (rule "simplifyUpdate1" (formula "1") (term "0,0,1"))
+        (rule "eqClose" (formula "1"))
+        (rule "closeTrue" (formula "1"))
+    )
+}
