@@ -33,6 +33,9 @@ public class TestCaseRunner extends JFrame {
                 "indexToPowerOf2",
                 "basicEx0",
                 "basicMltpArrDiffIndex",
+                "basicMDArray0",
+                "basicMDArray",
+                "basicMDArray42",
                 "correlation_init_array",
                 "correlation_print_array",
                 "gem_ver_scope_1"
@@ -64,12 +67,10 @@ public class TestCaseRunner extends JFrame {
 
     private void runTest() {
         String selectedTestCase = (String) testCaseComboBox.getSelectedItem();
-        boolean isRelaxed = relaxedCheckBox.isSelected();
+        boolean relaxed = relaxedCheckBox.isSelected();
 
-        // Run the test case
-        String output = executeTest(selectedTestCase, isRelaxed);
+        String output = executeTest(selectedTestCase, relaxed);
 
-        // Display the output in the text area
         outputTextArea.setText(output);
     }
 
@@ -77,20 +78,39 @@ public class TestCaseRunner extends JFrame {
         String relaxedText = relaxed ? " (relaxed)" : "";
         String result = "Output of " + testCase + relaxedText + ": " + System.lineSeparator() + System.lineSeparator();
 
-        String fullTestName = testCase;
-        if (relaxed) {
-            //TODO: ???????
-        }
-
+        long timeTaken = -1;
         try {
-            Method test = tpc.getClass().getMethod(fullTestName);
-            result += test.invoke(tpc).toString();
+            Method test = tpc.getClass().getMethod(testCase, boolean.class);
+
+            long start = System.currentTimeMillis();
+            result += test.invoke(tpc, relaxed).toString();
+            long end = System.currentTimeMillis();
+            timeTaken = end - start;
         } catch (NoSuchMethodException e) {
-            System.out.println("No such testcase: " + testCase);
+            try {
+                Method test = tpc.getClass().getMethod(testCase);
+
+                //don't show relaxed if there is no relaxed version to run
+                result = result.replace(" (relaxed)", "");
+
+                long start = System.currentTimeMillis();
+                result += test.invoke(tpc).toString();
+                long end = System.currentTimeMillis();
+                timeTaken = end - start;
+            } catch (NoSuchMethodException e2) {
+                System.out.println("No such testcase: " + testCase);
+            } catch (Exception e2) {
+                e.printStackTrace();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        if (timeTaken != -1) {
+            result += System.lineSeparator() + System.lineSeparator() + "Loop Invariant Generation took " + timeTaken + " ms";
+        } else {
+            result += "Encountered an error while executing this test case";
+        }
         return result;
     }
 
