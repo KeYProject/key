@@ -213,7 +213,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 var extns = result.extendVarNamespaceForSV(services.getNamespaces().variables(), sv);
                 var nss = services.getNamespaces().copy();
                 nss.setVariables(extns);
-                Term inst = toTerm(nss, strInst);
+                Term inst = toTerm(services, nss, strInst);
                 result = result.addInstantiation(sv, inst, true, services);
             }
         }
@@ -239,8 +239,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return result;
     }
 
-    private Term toTerm(NamespaceSet nss, String string) {
-        Services services = proof.getServices();
+    private Term toTerm(Services services, NamespaceSet nss, String string) {
         var parser = new KeyIO(services, nss);
         return parser.parseExpression(string);
     }
@@ -426,7 +425,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
                     SchemaVariable sv = it.next();
-                    Term userInst = toTerm(services.getNamespaces(),
+                    Term userInst = toTerm(services, services.getNamespaces(),
                             p.instantiations.get(sv.name().toString()));
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
