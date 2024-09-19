@@ -4,6 +4,7 @@
 
 package de.uka.ilkd.key.macros.scripts;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,9 +17,13 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.scripts.meta.Description;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.Goal;
@@ -199,12 +204,16 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         for (SchemaVariable sv : result.uninstantiatedVars()) {
             if (result.isInstantiationRequired(sv)) {
-                Term inst = p.instantiations.get(sv.name().toString());
-                if (inst == null) {
+                String strInst = p.instantiations.get(sv.name().toString());
+                if (strInst == null) {
                     throw new ScriptException(
-                        "missing instantiation for " + sv);
+                            "missing instantiation for " + sv);
                 }
 
+                var extns = result.extendVarNamespaceForSV(services.getNamespaces().variables(), sv);
+                var nss = services.getNamespaces().copy();
+                nss.setVariables(extns);
+                Term inst = toTerm(nss, strInst);
                 result = result.addInstantiation(sv, inst, true, services);
             }
         }
@@ -228,6 +237,12 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         return result;
+    }
+
+    private Term toTerm(NamespaceSet nss, String string) {
+        Services services = proof.getServices();
+        var parser = new KeyIO(services, nss);
+        return parser.parseExpression(string);
     }
 
     private TacletApp makeNoFindTacletApp(Taclet taclet) {
@@ -411,7 +426,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
                     SchemaVariable sv = it.next();
-                    Term userInst = p.instantiations.get(sv.name().toString());
+                    Term userInst = toTerm(services.getNamespaces(),
+                            p.instantiations.get(sv.name().toString()));
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
@@ -470,8 +486,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         public String matches = null;
         @Option(value = "assumes", required = false, help = "The assumptions that must be satisfied for the rule to be applied.")
         public Sequent assumes = null;
-        @Varargs(as = Term.class, prefix = "inst_")
-        public Map<String, Term> instantiations = new HashMap<>();
+        @Varargs(as = String.class, prefix = "inst_")
+        public Map<String, String> instantiations = new HashMap<>();
     }
 
     private static class TacletNameFilter extends TacletFilter {
