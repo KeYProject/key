@@ -425,8 +425,11 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
                     SchemaVariable sv = it.next();
-                    Term userInst = toTerm(services, services.getNamespaces(),
-                            p.instantiations.get(sv.name().toString()));
+                    String str = p.instantiations.get(sv.name().toString());
+                    Term userInst = null;
+                    if(str != null) {
+                        userInst = toTerm(services, services.getNamespaces(), str);
+                    }
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
