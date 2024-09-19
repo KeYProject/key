@@ -24,6 +24,7 @@ import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.Goal;
@@ -153,8 +154,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
     }
 
-    private TacletApp instantiateTacletApp(final Parameters p,
-            final EngineState state, final Proof proof, final TacletApp theApp)
+    private TacletApp instantiateTacletApp(final Parameters p, final EngineState state,
+                                           final Proof proof, final TacletApp theApp)
             throws ScriptException {
         TacletApp result = theApp;
 
@@ -163,7 +164,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 .findIfFormulaInstantiations(
                     state.getFirstOpenAutomaticGoal().sequent(), services);
 
-        assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates, services));
+        assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates, services, state));
 
         if (assumesCandidates.size() == 0) {
             throw new ScriptException("No \\assumes instantiation");
@@ -210,10 +211,12 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                             "missing instantiation for " + sv);
                 }
 
-                var extns = result.extendVarNamespaceForSV(services.getNamespaces().variables(), sv);
-                var nss = services.getNamespaces().copy();
+                var varNS = state.getFirstOpenAutomaticGoal().getLocalNamespaces().variables();
+                var extns = result.extendVarNamespaceForSV(varNS, sv);
+                var nss = state.getFirstOpenAutomaticGoal().getLocalNamespaces().copy();
                 nss.setVariables(extns);
-                Term inst = toTerm(services, nss, strInst);
+
+                Term inst = toTerm(services, nss, strInst, state.getAbbreviations());
                 result = result.addInstantiation(sv, inst, true, services);
             }
         }
@@ -239,8 +242,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return result;
     }
 
-    private Term toTerm(Services services, NamespaceSet nss, String string) {
+    private static Term toTerm(Services services, NamespaceSet nss, String string, AbbrevMap abm) {
         var parser = new KeyIO(services, nss);
+        parser.setAbbrevMap(abm);
         return parser.parseExpression(string);
     }
 
@@ -282,7 +286,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             throws ScriptException {
 
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
-        List<TacletApp> matchingApps = filterList(p, allApps, state.getProof().getServices());
+        List<TacletApp> matchingApps = filterList(p, allApps, state.getProof().getServices(), state);
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -411,7 +415,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      * Filter those apps from a list that are according to the parameters.
      */
     private List<TacletApp> filterList(Parameters p,
-                                       ImmutableList<TacletApp> list, Services services) {
+                                       ImmutableList<TacletApp> list, Services services, EngineState state)
+        throws ScriptException {
         List<TacletApp> matchingApps = new ArrayList<>();
         TermComparisonWithHoles tc = new TermComparisonWithHoles(services);
 
@@ -428,7 +433,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                     String str = p.instantiations.get(sv.name().toString());
                     Term userInst = null;
                     if(str != null) {
-                        userInst = toTerm(services, services.getNamespaces(), str);
+                        var nss = state.getFirstOpenAutomaticGoal().getLocalNamespaces();
+                        userInst = toTerm(services, nss, str, state.getAbbreviations());
                     }
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
