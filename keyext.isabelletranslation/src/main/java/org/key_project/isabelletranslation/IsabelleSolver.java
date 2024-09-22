@@ -43,7 +43,7 @@ public interface IsabelleSolver {
 
     String getRawSolverInput();
 
-    SledgehammerResult getFinalResult();
+    IsabelleResult getFinalResult();
 
 
         class IsabelleSolverTimeout extends TimerTask {
