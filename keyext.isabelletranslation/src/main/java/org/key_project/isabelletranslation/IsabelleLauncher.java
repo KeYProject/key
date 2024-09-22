@@ -41,7 +41,7 @@ public class IsabelleLauncher {
         Runtime.getRuntime().addShutdownHook(shutdownResources);
 
         for (int i = 0; i < problems.size(); i++) {
-            IsabelleSolver solver = new IsabelleSolverInstance(problems.get(i), List.of(new IsabelleSolverListener[0]), i, resourceController);
+            IsabelleSolver solver = new IsabelleSolverInstance(problems.get(i), List.of(new IsabelleSolverListener[0]), i, resourceController, settings);
             solver.setTimeout(timeoutSeconds);
             solverQueue.add(solver);
             solverSet.add(solver);
@@ -59,7 +59,7 @@ public class IsabelleLauncher {
         TranslationAction.writeTranslationFiles(problems.get(0));
 
 
-        Collection<Callable<List<SledgehammerResult>>> tasks = launchSolverInstances(instanceCount);
+        Collection<Callable<List<IsabelleResult>>> tasks = launchSolverInstances(instanceCount);
 
         LOGGER.info("Setup complete, starting {} problems...", problems.size());
 
@@ -75,8 +75,8 @@ public class IsabelleLauncher {
         }
     }
 
-    private @NotNull Collection<Callable<List<SledgehammerResult>>> launchSolverInstances(int instanceCount) {
-        Collection<Callable<List<SledgehammerResult>>> tasks = new LinkedBlockingDeque<>();
+    private @NotNull Collection<Callable<List<IsabelleResult>>> launchSolverInstances(int instanceCount) {
+        Collection<Callable<List<IsabelleResult>>> tasks = new LinkedBlockingDeque<>();
 
         for (int i = 0; i < instanceCount; i++) {
             tasks.add(() -> {

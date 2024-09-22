@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 
 public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     private final int solverIndex;
-    private SledgehammerResult result;
+    private IsabelleResult result;
 
     private IsabelleResourceController.IsabelleResource isabelleResource;
 
@@ -81,12 +81,13 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSolver.class);
     private Collection<IsabelleSolverListener> listeners;
 
-    public IsabelleSolverInstance(IsabelleProblem problem, Collection<IsabelleSolverListener> listeners, int solverIndex, IsabelleResourceController resourceController) {
+    public IsabelleSolverInstance(IsabelleProblem problem, Collection<IsabelleSolverListener> listeners, int solverIndex, IsabelleResourceController resourceController, IsabelleTranslationSettings settings) {
         this.problem = problem;
         this.solverIndex = solverIndex;
         this.listeners = new HashSet<>();
         this.listeners.addAll(listeners);
         this.resourceController = resourceController;
+        this.isabelleSettings = settings;
     }
 
     @Override
@@ -197,7 +198,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
     @Override
     public String getRawSolverOutput() {
-        return problem.getResult().result().toString();
+        return problem.getResult().getSuccessfulTactic();
     }
 
     @Override
@@ -206,7 +207,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     }
 
     @Override
-    public SledgehammerResult getFinalResult() {
+    public IsabelleResult getFinalResult() {
         return problem.getResult();
     }
 
@@ -253,7 +254,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
             notifySledgehammerFinished();
         } catch (TimeoutException e) {
             setReasonOfInterruption(ReasonOfInterruption.Timeout);
-            this.result = new SledgehammerResult(Option.apply(new Tuple2<>("timeout", "timeout")));
+            this.result = IsabelleResult.getTimeoutResult(042);
             notifySledgehammerFinished();
         } catch (InterruptedException e) {
             notifySledgehammerError(e);
@@ -320,7 +321,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     }
 
 
-    private SledgehammerResult sledgehammer(IsabelleResourceController.IsabelleResource resource, ToplevelState toplevel)
+    private IsabelleResult sledgehammer(IsabelleResourceController.IsabelleResource resource, ToplevelState toplevel)
                 throws TimeoutException, InterruptedException, IsabelleMLException {
         Isabelle isabelle = resource.instance();
         Theory thy0 = resource.theory();
@@ -340,7 +341,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
                                            val ctxt = Proof.context_of p_state;
                                            val params =\s""" + Sledgehammer_Commands + """
                                 .default_params thy
-                                                [("timeout",\"""" + getTimeout() + """
+                                                [("timeout",\"""" + 2 + """
                                 "),("verbose","true"),("provers", "cvc4 verit z3 e spass vampire zipperposition")];
                                 val results =\s"""
                                 + sledgehammer + """
@@ -362,13 +363,20 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
         Builder<String, List<String>> listBuilder = scala.collection.immutable.List.newBuilder();
         scala.collection.immutable.List<String> emptyList = listBuilder.result();
 
-        SledgehammerResult result = null;
+        IsabelleResult result = null;
         Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
                     .retrieve(new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), new Tuple2Converter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))), isabelle);
         Tuple2<Object, Tuple2<String, List<String>>> resultFutureCollect = Await.result(resultFuture, Duration.create(getTimeout(), TimeUnit.SECONDS));
-        result = new SledgehammerResult(Option.apply(new Tuple2<>(resultFutureCollect._2()._1(), resultFutureCollect._2()._2().head())));
+
+        boolean successful = (boolean) resultFutureCollect._1();
+
+        if (successful) {
+            result = IsabelleResult.getSuccessResult(resultFutureCollect._2()._1(), 042);
+        } else {
+            result = IsabelleResult.getTimeoutResult(042);
+        }
         this.result = result;
         return this.result;
     }

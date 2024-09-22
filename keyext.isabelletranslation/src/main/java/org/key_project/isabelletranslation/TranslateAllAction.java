@@ -48,7 +48,7 @@ public class TranslateAllAction extends MainWindowAction {
 
         writeTranslationFiles(translations.get(0));
 
-        SledgehammerResult result = null;
+        IsabelleResult result = null;
         Thread thread = new Thread(() -> {
 
             IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
