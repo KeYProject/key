@@ -35,7 +35,7 @@ public class BooleanLiteralExpression extends LiteralExpression {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) {
+        if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
         return value == (((BooleanLiteralExpression) obj).value);
