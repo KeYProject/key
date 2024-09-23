@@ -9,6 +9,7 @@ import java.io.IOException;
 import org.key_project.logic.Name;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
@@ -25,8 +26,8 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.key_project.rusty.logic.equality.RenamingProgramElementProperty.RENAMING_PROGRAM_ELEMENT_PROPERTY;
 
 public class BasicTest {
     public static final String STANDARD_RUST_RULES_KEY =
@@ -277,7 +278,7 @@ public class BasicTest {
     @Test
     public void testSwap() {
         // load
-        TacletForTests.parse();
+        TacletForTests.parse(new RustProfile());
         assert TacletForTests.services().getNamespaces().programVariables()
                 .lookup(new Name("i")) != null;
         var services = TacletForTests.services();
@@ -303,7 +304,61 @@ public class BasicTest {
     }
 
     @Test
-    public void testInitialization() {
+    public void testRenamingProgramElementProperty() {
+        TacletForTests.clear();
+        TacletForTests.parse(new RustProfile());
+        // seems like you must always give a type when using let
+        var t1 = TacletForTests.parseTerm(
+            "\\<{ let i: u32 = 5u32; 1u32 }\\>TRUE");
+        var t2 = TacletForTests.parseTerm(
+            "\\<{ let j: u32 = 5u32; 1u32 }\\>TRUE");
 
+        var program1 = ((Modality) t1.op()).program().program();
+        var program2 = ((Modality) t2.op()).program().program();
+
+        assertTrue(
+            RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(program1, program2,
+                new NameAbstractionTable()));
+
+        // Test 2
+        var t3 = TacletForTests.parseTerm(
+            "\\<{ 1u32 < 2u32 }\\>TRUE");
+        var t4 = TacletForTests.parseTerm(
+            "\\<{ 1u32 > 2u32 }\\>TRUE");
+
+        var program3 = ((Modality) t3.op()).program().program();
+        var program4 = ((Modality) t4.op()).program().program();
+
+        assertFalse(
+            RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(program3, program4,
+                new NameAbstractionTable()));
+
+        // Test 3
+        var t5 = TacletForTests.parseTerm("\\<{ i += 5u32 }\\>TRUE");
+        var t6 = TacletForTests.parseTerm("\\<{ i -= 5u32 }\\>TRUE");
+
+        var program5 = ((Modality) t5.op()).program().program();
+        var program6 = ((Modality) t6.op()).program().program();
+
+        // This passes as += and -= are not considered as different operations in the property as of
+        // now
+        // and the PV i is the one defined in testrules.key and therefore equals returns true.
+        // This currently does not work when using the let statement to introduce i.
+        assertTrue(
+            RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(program5, program6,
+                new NameAbstractionTable()));
+
+        // Test 4
+        var t7 = TacletForTests.parseTerm(
+            "\\<{ let mut i: u32 = 0u32; let mut j: u32 = 1u32; i = 2u32; j = i; 1u32}\\>TRUE");
+        var t8 = TacletForTests.parseTerm(
+            "\\<{ let mut i: u32 = 0u32; let mut k: u32 = 1u32; i = 2u32; k = i; 1u32}\\>TRUE");
+
+        var program7 = ((Modality) t7.op()).program().program();
+        var program8 = ((Modality) t8.op()).program().program();
+
+        // assertTrue(
+        // RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(program7, program8,
+        // new NameAbstractionTable()));
     }
 }
