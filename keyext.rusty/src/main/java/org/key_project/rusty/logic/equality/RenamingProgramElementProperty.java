@@ -118,7 +118,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
          * Currently, the best approach seems to be to walk through the RustyProgramElement with a
          * SyntaxElementCursor and sum up hash codes.
          */
-        //TODO: change hashCode to reflect the equalsModThisProperty method
+        // TODO: change hashCode to reflect the equalsModThisProperty method
         NameAbstractionMap absMap = new NameAbstractionMap();
 
         int hashCode = 1;
@@ -206,7 +206,8 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     }
 
     /**
-     * Handles the special case of comparing a {@link ComparisonExpression} to a {@link SyntaxElement}.
+     * Handles the special case of comparing a {@link ComparisonExpression} to a
+     * {@link SyntaxElement}.
      *
      * @param ce the {@link ComparisonExpression} to be compared
      * @param se the {@link SyntaxElement} to be compared
@@ -269,7 +270,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
         if (ip.isMutable() != other.isMutable() || ip.isReference() != other.isReference()) {
             return false;
         }
-        nat.add(ip, other);
+        nat.add((Identifier) ip.getChild(0), (Identifier) other.getChild(0));
         return true;
     }
 
