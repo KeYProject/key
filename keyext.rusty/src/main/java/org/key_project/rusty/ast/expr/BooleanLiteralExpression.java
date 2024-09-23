@@ -33,6 +33,13 @@ public class BooleanLiteralExpression extends LiteralExpression {
         return "" + value;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+        return value == (((BooleanLiteralExpression) obj).value);
+    }
 
     @Override
     public Name getLDTName() {

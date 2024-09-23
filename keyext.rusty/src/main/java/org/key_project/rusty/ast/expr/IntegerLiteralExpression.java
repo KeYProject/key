@@ -76,6 +76,15 @@ public class IntegerLiteralExpression extends LiteralExpression {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+        return value.equals(((IntegerLiteralExpression) obj).value)
+                && suffix.equals(((IntegerLiteralExpression) obj).suffix);
+    }
+
+    @Override
     public Name getLDTName() {
         return IntLDT.NAME;
     }
