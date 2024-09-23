@@ -30,12 +30,16 @@ public class IsabelleLauncher {
     }
 
     public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, long timeoutSeconds, int instanceCount) throws IOException {
+        if (problems.isEmpty()) {
+            return;
+        }
+
         IsabelleResourceController resourceController = new IsabelleResourceController(instanceCount);
 
         ExecutorService executorService = Executors.newFixedThreadPool(instanceCount);
 
         shutdownResources = new Thread(() -> {
-            executorService.shutdownNow();
+            executorService.shutdown();
             resourceController.shutdownGracefully();
         });
         Runtime.getRuntime().addShutdownHook(shutdownResources);
@@ -52,9 +56,7 @@ public class IsabelleLauncher {
         resourceController.init();
         listener.launcherPreparationFinished(this, solverSet);
 
-        if (problems.isEmpty()) {
-            return;
-        }
+
         //Ensure the preamble theory is present
         TranslationAction.writeTranslationFiles(problems.get(0));
 
@@ -105,11 +107,14 @@ public class IsabelleLauncher {
 
     public void stopAll(IsabelleSolver.ReasonOfInterruption reasonOfInterruption) {
         shutdown();
-        runningSolvers.forEach((solver) -> solver.interrupt(reasonOfInterruption));
         solverQueue.forEach((solver) -> solver.interrupt(reasonOfInterruption));
-
-        runningSolvers.clear();
         solverQueue.clear();
+
+
+        runningSolvers.forEach((solver) -> solver.interrupt(reasonOfInterruption));
+        runningSolvers.clear();
+
+
         listener.launcherStopped(this, solverSet);
     }
 }
