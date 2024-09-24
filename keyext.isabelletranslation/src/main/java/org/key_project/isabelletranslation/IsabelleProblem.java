@@ -4,7 +4,6 @@ import de.uka.ilkd.key.proof.Goal;
 
 public class IsabelleProblem {
     private final Goal goal;
-    private IsabelleResult result = null;
     private final String preamble;
     private final String sequentTranslation;
     private final String name;
@@ -30,13 +29,5 @@ public class IsabelleProblem {
 
     public String getName() {
         return name;
-    }
-
-    public IsabelleResult getResult() {
-        return result;
-    }
-
-    protected void setResult(IsabelleResult result) {
-        this.result = result;
     }
 }
