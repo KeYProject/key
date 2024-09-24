@@ -72,7 +72,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         // ensure that the goal closing does not lag the UI
         mediator.stopInterface(true);
         try {
-            //TODO create own close action
+            new ProofApplyUserAction(mediator, proof, solvers).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
             //switch to new open goal
