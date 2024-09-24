@@ -61,11 +61,6 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     private IsabelleTranslationSettings isabelleSettings;
 
     /**
-     * Stores the translation of the problem that is associated with this solver
-     */
-    private String problemString = "NOT YET COMPUTED";
-
-    /**
      * If there was an exception while executing the solver it is stored in this attribute.
      */
     private Throwable exception;
@@ -75,11 +70,15 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
      */
     private long timeout = -1;
 
+    private long startTime;
+
+    private long computationTime;
+
     private final IsabelleResourceController resourceController;
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSolver.class);
-    private Collection<IsabelleSolverListener> listeners;
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSolverInstance.class);
+    private final Collection<IsabelleSolverListener> listeners;
 
     public IsabelleSolverInstance(IsabelleProblem problem, Collection<IsabelleSolverListener> listeners, int solverIndex, IsabelleResourceController resourceController, IsabelleTranslationSettings settings) {
         this.problem = problem;
@@ -102,7 +101,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
     @Override
     public String name() {
-        return "Isabelle";
+        return "Isabelle Solver: " + problem.getName();
     }
 
     @Override
@@ -123,6 +122,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     @Override
     public void interrupt(ReasonOfInterruption reason) {
         setReasonOfInterruption(reason);
+        this.result = IsabelleResult.getErrorResult(new TimeoutException());
         setSolverState(SolverState.Stopped);
         if (solverTimeout != null) {
             solverTimeout.cancel();
@@ -150,10 +150,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
     @Override
     public long getStartTime() {
-        if (solverTimeout == null) {
-            return -1;
-        }
-        return solverTimeout.scheduledExecutionTime();
+        return startTime;
     }
 
     @Override
@@ -198,7 +195,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
     @Override
     public String getRawSolverOutput() {
-        return problem.getResult().getSuccessfulTactic();
+        return result.getSuccessfulTactic();
     }
 
     @Override
@@ -208,7 +205,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
     @Override
     public IsabelleResult getFinalResult() {
-        return problem.getResult();
+        return this.result;
     }
 
     @Override
@@ -224,6 +221,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
 
         notifyProcessStarted();
+        startTime = System.currentTimeMillis();
         Isabelle isabelle = isabelleResource.instance();
 
         ToplevelState toplevel = ToplevelState.apply(isabelle);
@@ -251,22 +249,26 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
         try {
             this.result = sledgehammer(isabelleResource, toplevel);
+            computationTime = System.currentTimeMillis() - startTime;
             notifySledgehammerFinished();
         } catch (TimeoutException e) {
             setReasonOfInterruption(ReasonOfInterruption.Timeout);
-            this.result = IsabelleResult.getTimeoutResult(042);
+            computationTime = System.currentTimeMillis() - startTime;
+            this.result = IsabelleResult.getTimeoutResult(computationTime);
             notifySledgehammerFinished();
         } catch (InterruptedException e) {
+            this.result = IsabelleResult.getErrorResult(e);
             notifySledgehammerError(e);
         } catch (IsabelleMLException e) {
+            this.result = IsabelleResult.getErrorResult(e);
             setReasonOfInterruption(ReasonOfInterruption.Exception);
             notifySledgehammerError(e);
         } finally {
             returnResource();
-            getProblem().setResult(this.result);
+            //getProblem().setResult(this.result);
             setSolverState(SolverState.Stopped);
             notifyProcessFinished();
-            LOGGER.info("Sledgehammer result: {}", this.result);
+            LOGGER.info("Sledgehammer result: {}", this.result.getDescription());
         }
     }
 
@@ -341,7 +343,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
                                            val ctxt = Proof.context_of p_state;
                                            val params =\s""" + Sledgehammer_Commands + """
                                 .default_params thy
-                                                [("timeout",\"""" + 2 + """
+                                                [("timeout",\"""" + timeout + """
                                 "),("verbose","true"),("provers", "cvc4 verit z3 e spass vampire zipperposition")];
                                 val results =\s"""
                                 + sledgehammer + """
@@ -363,7 +365,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
         Builder<String, List<String>> listBuilder = scala.collection.immutable.List.newBuilder();
         scala.collection.immutable.List<String> emptyList = listBuilder.result();
 
-        IsabelleResult result = null;
+        IsabelleResult result;
         Future<Tuple2<Object, Tuple2<String, List<String>>>> resultFuture = normal_with_Sledgehammer.apply(toplevel, thy0, emptyList, emptyList, isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                             new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()))
@@ -373,14 +375,18 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
         boolean successful = (boolean) resultFutureCollect._1();
 
         if (successful) {
-            result = IsabelleResult.getSuccessResult(resultFutureCollect._2()._1(), 042);
+            result = IsabelleResult.getSuccessResult(resultFutureCollect._2()._2().head(), computationTime);
         } else {
-            result = IsabelleResult.getTimeoutResult(042);
+            result = IsabelleResult.getTimeoutResult(computationTime);
         }
         this.result = result;
         return this.result;
     }
 
+    @Override
+    public long getComputationTime() {
+        return computationTime;
+    }
 
 
     private void notifyParsingStarted() {

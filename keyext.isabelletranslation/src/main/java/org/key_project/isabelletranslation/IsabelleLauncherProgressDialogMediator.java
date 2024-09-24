@@ -118,7 +118,10 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
                 progressModel.setProgress(0, x, y);
                 progressModel.setText("Timeout.", x, y);
             }
-            case User -> progressModel.setText("Interrupted by user.", x, y);
+            case User -> {
+                progressModel.setProgress(0, x, y);
+                progressModel.setText("Interrupted by user.", x, y);
+            }
         }
     }
 
@@ -127,7 +130,18 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
 
         progressModel.setProgress(0, x, y);
         progressModel.setTextColor(GREEN.get(), x, y);
-        progressModel.setText("Valid", x, y);
+
+        String timeInfo = getTimeInSecAsString(solver.getComputationTime());
+
+        progressModel.setText("Valid (" + timeInfo + ")", x, y);
+    }
+
+    String getTimeInSecAsString(long timeToSolve) {
+        long intPart = timeToSolve / 1000;
+        long decPart = timeToSolve % 1000;
+        String decString = decPart >= 100 ? Long.toString(decPart)
+                : decPart >= 10 ? "0" + decPart : "00" + decPart;
+        return intPart + "." + decString + "s";
     }
 
     private void unknownStopped(int x, int y) {
@@ -226,7 +240,26 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     }
 
     private void running(IsabelleSolver solver) {
-        progressModel.setText("Running...", 0, solver.getSolverIndex());
+        long progress = calculateProgress(solver);
+        progressModel.setProgress((int) progress, 0, solver.getSolverIndex());
+
+        float remainingTime = calculateRemainingTime(solver);
+        progressModel.setText(remainingTime + " sec.", 0, solver.getSolverIndex());
+    }
+
+    private long calculateProgress(IsabelleSolver solver) {
+        long maxTime = solver.getTimeout() * 1000;
+        long startTime = solver.getStartTime();
+        long currentTime = System.currentTimeMillis();
+
+        return RESOLUTION - ((currentTime - startTime) * RESOLUTION) / maxTime;
+    }
+
+    private float calculateRemainingTime(IsabelleSolver solver) {
+        long timeoutTime = solver.getStartTime() + solver.getTimeout() * 1000;
+        long currentTime = System.currentTimeMillis();
+        long temp = (timeoutTime - currentTime) / 100;
+        return Math.max((float) temp / 10.0f, 0);
     }
 
     private void parsing(IsabelleSolver solver) {

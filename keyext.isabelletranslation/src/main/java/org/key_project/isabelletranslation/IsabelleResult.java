@@ -1,10 +1,24 @@
 package org.key_project.isabelletranslation;
 
 public class IsabelleResult {
+    public String getDescription() {
+        return this.type.getDescription();
+    }
+
     enum Type {
-        SUCCESS,
-        ERROR,
-        TIMEOUT
+        SUCCESS ("Success"),
+        ERROR ("Error"),
+        TIMEOUT ("Timeout");
+
+        Type(String description) {
+            this.description = description;
+        }
+
+        private final String description;
+
+        public String getDescription() {
+            return description;
+        }
     }
 
 
