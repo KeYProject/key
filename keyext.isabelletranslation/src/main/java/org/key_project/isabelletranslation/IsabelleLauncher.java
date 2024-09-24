@@ -75,6 +75,8 @@ public class IsabelleLauncher {
         } finally {
             shutdown();
         }
+
+        listener.launcherStopped(this, solverSet);
     }
 
     private @NotNull Collection<Callable<List<IsabelleResult>>> launchSolverInstances(int instanceCount) {
