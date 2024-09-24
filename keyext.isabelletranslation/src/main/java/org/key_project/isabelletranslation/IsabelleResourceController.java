@@ -80,7 +80,6 @@ public class IsabelleResourceController {
 
         if (isShutdown()) {
             if (!resource.isDestroyed()) {
-                //TODO some kind of race condition happens here
                 resource.destroy();
             }
             return;

@@ -27,6 +27,8 @@ public interface IsabelleSolver {
 
     long getStartTime();
 
+    long getComputationTime();
+
     long getTimeout();
 
     void setTimeout(long timeout);

@@ -246,7 +246,7 @@ class ProgressTable extends JTable {
             content.add(Box.createHorizontalStrut(2));
             content.add(getProgressBar());
             content.add(Box.createHorizontalStrut(2));
-            content.add(getInfoButton());
+            //content.add(getInfoButton());
             content.add(Box.createHorizontalStrut(2));
             this.add(content);
             this.add(Box.createVerticalStrut(2));
