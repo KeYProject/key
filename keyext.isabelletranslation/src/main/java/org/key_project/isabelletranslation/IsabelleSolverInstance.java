@@ -9,7 +9,6 @@ import de.unruh.isabelle.pure.ToplevelState;
 import de.unruh.isabelle.pure.Transition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Option;
 import scala.Tuple2;
 import scala.collection.immutable.List;
 import scala.collection.mutable.Builder;
