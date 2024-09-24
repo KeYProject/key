@@ -3,8 +3,10 @@ package org.key_project.isabelletranslation;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.proof.Proof;
 import org.key_project.isabelletranslation.gui.IsabelleProgressDialog;
 import org.key_project.isabelletranslation.gui.IsabelleProgressModel;
+import org.key_project.isabelletranslation.gui.ProofApplyUserAction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,16 +18,25 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     private final Timer timer = new Timer();
     private int finishedCounter = 0;
 
+    private final Proof proof;
+    private final IsabelleTranslationSettings settings;
+
 
     private final static ColorSettings.ColorProperty RED =
-            ColorSettings.define("[solverListener]red", "", new Color(180, 43, 43));
+            ColorSettings.define("[isabelleDialog]red", "", new Color(180, 43, 43));
 
     private final static ColorSettings.ColorProperty GREEN =
-            ColorSettings.define("[solverListener]green", "", new Color(43, 180, 43));
+            ColorSettings.define("[isabelleDialog]green", "", new Color(43, 180, 43));
 
     @Override
     public void launcherStopped(IsabelleLauncher launcher, Collection<IsabelleSolver> finishedInstances) {
+        timer.cancel();
 
+        progressModel.setEditable(true);
+        refreshDialog();
+        progressDialog.setModus(IsabelleProgressDialog.Modus.SOLVERS_DONE);
+
+        //TODO automatic closing of goals without apply button?
     }
 
     @Override
@@ -140,11 +151,13 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     }
 
     protected void discardEvent(IsabelleLauncher launcher) {
-
+        launcher.stopAll(IsabelleSolver.ReasonOfInterruption.User);
+        progressDialog.dispose();
     }
 
-    public IsabelleLauncherProgressDialogMediator(IsabelleTranslationSettings settings) {
-
+    public IsabelleLauncherProgressDialogMediator(IsabelleTranslationSettings settings, Proof proof) {
+        this.settings = settings;
+        this.proof = proof;
     }
 
 
@@ -221,7 +234,6 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     }
 
     private void waiting(IsabelleSolver solver) {
-        progressModel.setText("Waiting...", 0, solver.getSolverIndex());
     }
 
     private void preparing(IsabelleSolver solver) {
@@ -243,7 +255,6 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         public void infoButtonClicked(int column, int row) {
             //SolverListener.InternSMTProblem problem = getProblem(column, row);
             //showInformation(problem);
-
         }
 
         @Override
@@ -254,7 +265,6 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         @Override
         public void applyButtonClicked() {
             applyEvent(launcher);
-
         }
 
         @Override
