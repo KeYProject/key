@@ -71,9 +71,8 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
                 if (!handleIdentPattern(ip, next2, nat)) {
                     return false;
                 }
-            } else if (next1 instanceof ProgramVariable || next1 instanceof Name
-                    || next1 instanceof Identifier) {
-                if (!handleProgramVariableOrName(next1, next2, nat)) {
+            } else if (next1 instanceof ProgramVariable || next1 instanceof Identifier) {
+                if (!handleProgramVariableOrIdentifier(next1, next2, nat)) {
                     return false;
                 }
             } else if (next1 instanceof NegationExpression ne) {
@@ -255,11 +254,6 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      */
     private boolean handleIdentPattern(IdentPattern ip, SyntaxElement se,
             NameAbstractionTable nat) {
-        /*
-         * A VariableSpecification is a special case of a JavaNonTerminalProgramElement similar to
-         * LabeledStatement, but we also need to check the dimensions and type of the
-         * VariableSpecification.
-         */
         if (se == ip) {
             return true;
         }
@@ -270,36 +264,45 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
         if (ip.isMutable() != other.isMutable() || ip.isReference() != other.isReference()) {
             return false;
         }
-        nat.add((Identifier) ip.getChild(0), (Identifier) other.getChild(0));
+
+        // Once Rust programs are parsed with the Rust Parser, this should be changed to not just
+        // use the name of the Identifier
+        Name ipName = ((Identifier) ip.getChild(0)).name();
+        Name otherName = ((Identifier) other.getChild(0)).name();
+        nat.add(ipName, otherName);
         return true;
     }
 
     /**
-     * Handles the special case of comparing a {@link ProgramVariable} or a
-     * {@link Name} to a {@link SyntaxElement}.
+     * Handles the special case of comparing a {@link ProgramVariable} or an
+     * {@link Identifier} to a {@link SyntaxElement}.
      *
-     * @param se1 the first {@link SyntaxElement} which is either a {@link ProgramVariable} or a
-     *        {@link Name}
+     * @param se1 the first {@link SyntaxElement} which is either a {@link ProgramVariable} or an
+     *        {@link Identifier}
      * @param se2 the second {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} that should be used to check whether {@code se1}
      *        and {@code se2} have the same abstract name
      * @return {@code true} iff {@code se1} and {@code se2} have the same abstract name
      */
-    private boolean handleProgramVariableOrName(SyntaxElement se1, SyntaxElement se2,
+    private boolean handleProgramVariableOrIdentifier(SyntaxElement se1, SyntaxElement se2,
             NameAbstractionTable nat) {
-        /*
-         * A ProgramVariable or a ProgramElementName is a special case of a RustyProgramElement and
-         * one
-         * of the main reasons for equalsModRenaming. Equality here comes down to checking the
-         * abstract name of the elements in a NAT.
-         */
         if (se1 == se2) {
             return true;
         }
         if (se1.getClass() != se2.getClass()) {
             return false;
         }
-        return nat.sameAbstractName((RustyProgramElement) se1, (RustyProgramElement) se2);
+
+        Name name1, name2;
+        if (se1 instanceof ProgramVariable pv) {
+            name1 = pv.name();
+            name2 = ((ProgramVariable) se2).name();
+        } else {
+            name1 = ((Identifier) se1).name();
+            name2 = ((Identifier) se2).name();
+        }
+
+        return nat.sameAbstractName(name1, name2);
     }
 
 
