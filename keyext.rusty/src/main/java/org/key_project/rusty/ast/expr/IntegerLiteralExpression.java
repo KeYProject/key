@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -82,6 +83,11 @@ public class IntegerLiteralExpression extends LiteralExpression {
         }
         return value.equals(((IntegerLiteralExpression) obj).value)
                 && suffix.equals(((IntegerLiteralExpression) obj).suffix);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, suffix);
     }
 
     @Override

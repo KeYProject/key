@@ -10,6 +10,8 @@ import org.key_project.rusty.ldt.BoolLDT;
 
 import org.jspecify.annotations.NonNull;
 
+import java.util.Objects;
+
 public class BooleanLiteralExpression extends LiteralExpression {
     private final boolean value;
 
@@ -39,6 +41,11 @@ public class BooleanLiteralExpression extends LiteralExpression {
             return false;
         }
         return value == (((BooleanLiteralExpression) obj).value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Boolean.hashCode(value);
     }
 
     @Override
