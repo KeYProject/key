@@ -11,9 +11,6 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.expr.ArithLogicalExpression;
-import org.key_project.rusty.ast.expr.ComparisonExpression;
-import org.key_project.rusty.ast.expr.NegationExpression;
 import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.logic.NameAbstractionTable;
@@ -73,18 +70,6 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
                 }
             } else if (next1 instanceof ProgramVariable || next1 instanceof Identifier) {
                 if (!handleProgramVariableOrIdentifier(next1, next2, nat)) {
-                    return false;
-                }
-            } else if (next1 instanceof NegationExpression ne) {
-                if (!handleNegationExpression(ne, next2)) {
-                    return false;
-                }
-            } else if (next1 instanceof ComparisonExpression ce) {
-                if (!handleComparisonExpression(ce, next2)) {
-                    return false;
-                }
-            } else if (next1 instanceof ArithLogicalExpression ale) {
-                if (!handleArithLogicalExpression(ale, next2)) {
                     return false;
                 }
             } else if (next1.getChildCount() > 0) {
@@ -183,63 +168,6 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             return false;
         }
         return rnte.getChildCount() == se.getChildCount();
-    }
-
-    /**
-     * Handles the special case of comparing an {@link ArithLogicalExpression} to a
-     * {@link SyntaxElement}.
-     *
-     * @param ale the {@link ArithLogicalExpression} to be compared
-     * @param se the {@link SyntaxElement} to be compared
-     * @return {@code true} iff {@code se} is of the same class as {@code ale} and they use the same
-     *         operator
-     */
-    private boolean handleArithLogicalExpression(ArithLogicalExpression ale, SyntaxElement se) {
-        if (se == ale) {
-            return true;
-        }
-        if (se.getClass() != ale.getClass()) {
-            return false;
-        }
-        return ale.op().equals(((ArithLogicalExpression) se).op());
-    }
-
-    /**
-     * Handles the special case of comparing a {@link ComparisonExpression} to a
-     * {@link SyntaxElement}.
-     *
-     * @param ce the {@link ComparisonExpression} to be compared
-     * @param se the {@link SyntaxElement} to be compared
-     * @return {@code true} iff {@code se} is of the same class as {@code ce} and they use the same
-     *         operator
-     */
-    private boolean handleComparisonExpression(ComparisonExpression ce, SyntaxElement se) {
-        if (se == ce) {
-            return true;
-        }
-        if (se.getClass() != ce.getClass()) {
-            return false;
-        }
-        return ce.op().equals(((ComparisonExpression) se).op());
-    }
-
-    /**
-     * Handles the special case of comparing a {@link NegationExpression} to a
-     * {@link SyntaxElement}.
-     *
-     * @param ne the {@link NegationExpression} to be compared
-     * @param se the {@link SyntaxElement} to be compared
-     * @return {@code true} iff {@code se} is of the same class as {@code ne} and they use the same
-     *         operator
-     */
-    private boolean handleNegationExpression(NegationExpression ne, SyntaxElement se) {
-        if (se == ne) {
-            return true;
-        }
-        if (se.getClass() != ne.getClass()) {
-            return false;
-        }
-        return ne.getOp().equals(((NegationExpression) se).getOp());
     }
 
     /**
