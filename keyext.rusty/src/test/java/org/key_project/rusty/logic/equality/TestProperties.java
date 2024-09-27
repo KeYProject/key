@@ -65,7 +65,9 @@ public class TestProperties {
                         programs.program2,
                         new NameAbstractionTable()),
                     "Same operators and expressions should be equal");
-                assertEquals(programs.program1.hashCode(), programs.program2.hashCode(),
+                assertEquals(
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program1),
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program2),
                     "Hashcodes should be equal for equal programs");
 
             }
@@ -92,7 +94,9 @@ public class TestProperties {
                         programs.program2,
                         new NameAbstractionTable()),
                     "Same operators and expressions should be equal");
-                assertEquals(programs.program1.hashCode(), programs.program2.hashCode(),
+                assertEquals(
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program1),
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program2),
                     "Hashcodes should be equal for equal programs");
             }
 
@@ -130,7 +134,9 @@ public class TestProperties {
                         programs.program2,
                         new NameAbstractionTable()),
                     "Same operators and expressions should be equal");
-                assertEquals(programs.program1.hashCode(), programs.program2.hashCode(),
+                assertEquals(
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program1),
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program2),
                     "Hashcodes should be equal for equal programs");
             }
         }
@@ -157,7 +163,9 @@ public class TestProperties {
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
                         new NameAbstractionTable()));
-                assertEquals(programs.program1.hashCode(), programs.program2.hashCode(),
+                assertEquals(
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program1),
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program2),
                     "Hashcodes should be equal for equal programs");
             }
         }
@@ -174,7 +182,9 @@ public class TestProperties {
                         programs.program2,
                         new NameAbstractionTable()),
                     "Singular let statement with different names should be equal modulo renaming");
-                assertEquals(programs.program1.hashCode(), programs.program2.hashCode(),
+                assertEquals(
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program1),
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program2),
                     "Hashcodes should be equal for equal programs");
             }
 
@@ -188,7 +198,9 @@ public class TestProperties {
                         programs.program2,
                         new NameAbstractionTable()),
                     "Programs should be equal as only the variable name differs");
-                assertEquals(programs.program1.hashCode(), programs.program2.hashCode(),
+                assertEquals(
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program1),
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program2),
                     "Hashcodes should be equal for equal programs");
             }
 
@@ -202,7 +214,9 @@ public class TestProperties {
                         programs.program2,
                         new NameAbstractionTable()),
                     "Programs should be equal as i is shadowed by the second declaration and j is never used");
-                assertEquals(programs.program1.hashCode(), programs.program2.hashCode(),
+                assertEquals(
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program1),
+                    RENAMING_PROGRAM_ELEMENT_PROPERTY.hashCodeModThisProperty(programs.program2),
                     "Hashcodes should be equal for equal programs");
             }
         }

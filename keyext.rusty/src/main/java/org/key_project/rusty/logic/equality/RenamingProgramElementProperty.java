@@ -12,7 +12,6 @@ import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.pat.IdentPattern;
-import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.logic.NameAbstractionTable;
 import org.key_project.rusty.logic.op.ProgramVariable;
 
@@ -113,17 +112,17 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             // First node can never be null as cursor is initialized with 'this'
             next = c.getCurrentNode();
             // Handle special cases so that hashCodeModThisProperty follows equalsModThisProperty
-            if (next instanceof LetStatement ls) {
-                hashCode = 31 * hashCode + ls.getChildCount();
-                hashCode =
-                    31 * hashCode + 17 * ((ls.type() == null) ? 0 : ls.type().hashCode());
-                absMap.add(ls);
-            } else if (next instanceof ProgramVariable || next instanceof Name) {
-                hashCode = 31 * hashCode + absMap.getAbstractName((RustyProgramElement) next);
+            if (next instanceof IdentPattern ip) {
+                hashCode = 31 * hashCode + (ip.isMutable() ? 1 : 0);
+                hashCode = 31 * hashCode + (ip.isReference() ? 1 : 0);
+                absMap.add(((Identifier) ip.getChild(0)).name());
+            } else if (next instanceof ProgramVariable || next instanceof Identifier) {
+                Name name =
+                    next instanceof ProgramVariable pv ? pv.name() : ((Identifier) next).name();
+                hashCode = 31 * hashCode + absMap.getAbstractName(name);
             } else if (next.getChildCount() > 0) {
                 hashCode = 31 * hashCode + next.getChildCount();
             } else {
-                // In the standard case, we just use the default hashCode implementation
                 hashCode = 31 * hashCode + next.hashCode();
             }
             // walk to the next nodes in the tree
@@ -237,7 +236,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     /* ---------- End of helper methods for special cases in equalsModThisProperty ---------- */
 
     /**
-     * A helper class to map {@link RustyProgramElement}s to an abstract name.
+     * A helper class to map {@link Name}s to an abstract name.
      * <p>
      * As names are abstracted from in this property, we need to give named elements abstract names
      * for them to be used in the hash code. This approach is similar to
@@ -246,35 +245,34 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      * then used as the abstract name.
      */
     private static class NameAbstractionMap {
-        /**
-         * The map that associates {@link RustyProgramElement}s with their abstract names.
-         */
-        private final Map<RustyProgramElement, Integer> map = new HashMap<>();
+        private int nextAbstractName = 0;
 
         /**
-         * Adds a {@link RustyProgramElement} to the map.
-         *
-         * @param element the {@link RustyProgramElement} to be added
+         * The map that associates {@link Name}s with their abstract names.
          */
-        public void add(RustyProgramElement element) {
-            map.put(element, map.size());
+        private final Map<Name, Integer> map = new HashMap<>();
+
+        /**
+         * Adds a {@link Name} to the map.
+         *
+         * @param name the {@link Name} to be added
+         */
+        public void add(Name name) {
+            map.put(name, nextAbstractName++);
         }
 
         /**
-         * Returns the abstract name of a {@link RustyProgramElement} or {@code -1} if the element
-         * is not
-         * in the map.
-         * <p>
-         * A common case for a look-up of an element that is not in the map, is a built-in datatype,
-         * e.g., the {@link Name} {@code int}.
+         * Returns the abstract name of a {@link Name} or {@code -1} if the element
+         * is not in the map.
+         * ee
          *
-         * @param element the {@link RustyProgramElement} whose abstract name should be returned
-         * @return the abstract name of the {@link RustyProgramElement} or {@code -1} if the element
+         * @param name the {@link Name} whose abstract name should be returned
+         * @return the abstract name of the {@link Name} or {@code -1} if the element
          *         is
          *         not in the map
          */
-        public int getAbstractName(RustyProgramElement element) {
-            final Integer result = map.get(element);
+        public int getAbstractName(Name name) {
+            final Integer result = map.get(name);
             return result != null ? result : -1;
         }
     }
