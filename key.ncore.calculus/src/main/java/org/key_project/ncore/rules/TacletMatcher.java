@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.rules;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 public interface TacletMatcher {
     /**
@@ -24,7 +26,7 @@ public interface TacletMatcher {
      * @return the found schema variable mapping or <code>null</code> if the matching failed
      */
     MatchConditions matchFind(Term term, MatchConditions matchCond,
-            Services services);
+            LogicServices services);
 
     /**
      * checks if the conditions for a correct instantiation are satisfied
@@ -38,7 +40,7 @@ public interface TacletMatcher {
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
     MatchConditions checkVariableConditions(SchemaVariable var,
-            SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services);
+                                            SyntaxElement instantiationCandidate, MatchConditions matchCond, LogicServices services);
 
     /**
      * checks the provided matches against the variable conditions of this taclet It returns the
@@ -47,11 +49,11 @@ public interface TacletMatcher {
      * <code>null</code> is returned
      *
      * @param matchConditions the matches to be checked
-     * @param services the {@link Services}
+     * @param services the {@link LogicServices}
      * @return the resulting match conditions or <code>null</code> if given matches do not satisfy
      *         the taclet's variable conditions
      */
-    MatchConditions checkConditions(MatchConditions matchConditions, Services services);
+    MatchConditions checkConditions(MatchConditions matchConditions, LogicServices services);
 
     /**
      * Match the given template (which is probably a formula of the assumes-sequent) against a list
@@ -64,13 +66,13 @@ public interface TacletMatcher {
      * @param matchCond already performed instantiations
      * @param services the Services object encapsulating information about the Rust datastructures
      *        like (static)types etc.
-     * @return Two lists (in an {@link IfMatchResult} object), containing the elements of
+     * @return Two lists (in an {@link AssumesMatchResult} object), containing the elements of
      *         {@code p_toMatch} that
      *         could successfully be matched against p_template, and the corresponding
      *         MatchConditions.
      */
-    IfMatchResult matchIf(Iterable<IfFormulaInstantiation> toMatch, Term template,
-            MatchConditions matchCond, Services services);
+    AssumesMatchResult matchIf(Iterable<AssumesFormulaInstantiation> toMatch, Term template,
+            MatchConditions matchCond, LogicServices services);
 
     /**
      * Match the whole if sequent using the given list of instantiations of all assumes-sequent
@@ -82,12 +84,9 @@ public interface TacletMatcher {
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
-    MatchConditions matchIf(Iterable<IfFormulaInstantiation> toMatch,
-            MatchConditions matchCond, Services services);
+    MatchConditions matchIf(Iterable<AssumesFormulaInstantiation> toMatch,
+            MatchConditions matchCond, LogicServices services);
 
     MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchConditions,
-            Services services);
-
-    MatchConditions matchSV(SchemaVariable sv, RustyProgramElement pe,
-            MatchConditions matchConditions, Services services);
+            LogicServices services);
 }

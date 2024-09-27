@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.rules;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-public interface RuleApp<G extends ProofGoal> {
+public interface RuleApp<G extends @NonNull ProofGoal<G>, App extends @NonNull RuleApp<G, App>> {
     /**
      * returns the rule of this rule application
      */
-    Rule rule();
+    Rule<G, App> rule();
 
     /**
      * applies the specified rule at the specified position if all schema variables have been

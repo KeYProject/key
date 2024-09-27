@@ -19,7 +19,7 @@ import org.jspecify.annotations.NonNull;
 
 import static org.key_project.util.Strings.formatAsList;
 
-public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends RuleApp<G>>
+public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNull RuleApp<G, App>>
         implements Rule<G, App> {
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
@@ -75,8 +75,8 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends RuleAp
 
     protected String tacletAsString;
 
-    /** Set of schemavariables of the {@code if} part */
-    private ImmutableSet<SchemaVariable> ifVariables = null;
+    /** Set of schemavariables of the {@code assumes} part */
+    private ImmutableSet<SchemaVariable> assumesVariables = null;
 
     private final Trigger trigger;
 
@@ -131,7 +131,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends RuleAp
         return trigger;
     }
 
-    public final TacletMatcher getMatcher() {
+    public TacletMatcher getMatcher() {
         return matcher;
     }
 
