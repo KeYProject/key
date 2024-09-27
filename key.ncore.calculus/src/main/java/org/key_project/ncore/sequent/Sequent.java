@@ -18,7 +18,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
     private final Semisequent succedent;
 
     /** creates new Sequent with antecedence and succedence */
-    private Sequent(Semisequent antecedent, Semisequent succedent) {
+    protected Sequent(Semisequent antecedent, Semisequent succedent) {
         assert !antecedent.isEmpty() || !succedent.isEmpty();
         this.antecedent = antecedent;
         this.succedent = succedent;
@@ -105,7 +105,6 @@ public abstract class Sequent implements Iterable<SequentFormula> {
      *         have been added or removed
      */
     public SequentChangeInfo addFormula(SequentFormula cf, boolean antec, boolean first) {
-
         final Semisequent seq = antec ? antecedent : succedent;
 
         final SemisequentChangeInfo semiCI = first ? seq.insertFirst(cf) : seq.insertLast(cf);

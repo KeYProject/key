@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
-public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends RuleApp<Goal>, T extends Taclet<Goal, App>> {
+public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp<Goal, App>, T extends Taclet<Goal, App>> {
     private static final String AUTO_NAME = "_taclet";
 
     protected final T taclet;
@@ -293,16 +293,12 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             applicationPosInOccurrence, matchCond,
             goal, tacletApp, services);
 
-        if (!svInst.getUpdateContext().isEmpty()) {
-            instantiatedFormula =
-                applyUpdatePairsSequential(svInst.getUpdateContext(), instantiatedFormula);
-        }
+        instantiatedFormula = applyContextUpdate(svInst, instantiatedFormula);
 
         return new SequentFormula(instantiatedFormula);
     }
 
-    protected abstract Term applyUpdatePairsSequential(ImmutableList<Term> updatesCtx,
-            Term formula);
+    protected abstract Term applyContextUpdate(SVInstantiations svInst, Term formula);
 
     /**
      * a new term is created by replacing variables of term whose replacement is found in the given

@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.rules;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * The instantiations of a schemavariable can be restricted on rule scope by attaching conditions on
@@ -27,6 +29,6 @@ public interface VariableCondition {
      *         otherwise
      */
     MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond,
-            Services services);
+                          MatchConditions matchCond,
+                          LogicServices services);
 }
