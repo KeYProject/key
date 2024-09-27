@@ -28,4 +28,9 @@ public class TermSV extends OperatorSV implements TerminalSyntaxElement {
     public @NonNull String toString() {
         return toString(sort() + " term");
     }
+
+    @Override
+    public boolean isTerm() {
+        return true;
+    }
 }

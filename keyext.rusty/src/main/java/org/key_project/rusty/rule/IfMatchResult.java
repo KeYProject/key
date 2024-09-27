@@ -6,7 +6,6 @@ package org.key_project.rusty.rule;
 import org.key_project.util.collection.ImmutableList;
 
 public class IfMatchResult {
-
     /**
      * List of matching formulas and list of corresponding match conditions.
      */
@@ -29,5 +28,4 @@ public class IfMatchResult {
     public ImmutableList<MatchConditions> getMatchConditions() {
         return mcCandidates;
     }
-
 }

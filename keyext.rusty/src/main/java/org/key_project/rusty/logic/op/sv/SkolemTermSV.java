@@ -27,4 +27,9 @@ public class SkolemTermSV extends OperatorSV implements TerminalSyntaxElement {
     public @NonNull String toString() {
         return toString(sort() + " skolem term");
     }
+
+    @Override
+    public boolean isSkolemTerm() {
+        return true;
+    }
 }

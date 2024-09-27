@@ -7,7 +7,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 public abstract class SemisequentChangeInfo {
-
     /** contains the added formulas to the semisequent */
     private ImmutableList<SequentFormula> added = ImmutableSLList.nil();
     /** contains the removed formulas from the semisequent */
@@ -32,7 +31,7 @@ public abstract class SemisequentChangeInfo {
         this.modifiedSemisequent = formulas;
     }
 
-    private SemisequentChangeInfo(SemisequentChangeInfo o) {
+    protected SemisequentChangeInfo(SemisequentChangeInfo o) {
         this.added = o.added;
         this.removed = o.removed;
         this.modified = o.modified;
@@ -42,6 +41,10 @@ public abstract class SemisequentChangeInfo {
     }
 
     public abstract SemisequentChangeInfo copy();
+
+    protected ImmutableList<SequentFormula> modifiedSemisequent() {
+        return modifiedSemisequent;
+    }
 
     /**
      * returns true if the semisequent has changed

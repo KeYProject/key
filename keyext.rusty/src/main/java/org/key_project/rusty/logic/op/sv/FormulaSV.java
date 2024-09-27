@@ -22,4 +22,9 @@ public class FormulaSV extends OperatorSV implements TerminalSyntaxElement {
     public @NonNull String toString() {
         return toString("formula");
     }
+
+    @Override
+    public boolean isFormula() {
+        return true;
+    }
 }

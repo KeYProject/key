@@ -13,49 +13,16 @@ import org.key_project.logic.Term;
  * class by providing a way to add additional annotations or to cache local information about the
  * formula.
  */
-public class SequentFormula {
-    private final Term term;
-
-    /**
-     * Cached value for {@link #hashCode()}.
-     */
-    private final int hashCode;
-
+public class SequentFormula extends org.key_project.ncore.sequent.SequentFormula {
     /**
      * creates a new SequentFormula
      *
      * @param term a Term of sort {@link RustyDLTheory#FORMULA}
      */
     public SequentFormula(Term term) {
+        super(term);
         if (term.sort() != RustyDLTheory.FORMULA) {
             throw new RuntimeException("A Term instead of a formula: " + term);
         }
-        this.term = term;
-        this.hashCode = term.hashCode() * 13;
-    }
-
-    /** @return the stored Term */
-    public Term formula() {
-        return term;
-    }
-
-    /** String representation */
-    public String toString() {
-        return term.toString();
-    }
-
-    /** equal if terms and constraints are equal */
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj instanceof SequentFormula cmp) {
-            return term.equals(cmp.formula());
-        }
-        return false;
-    }
-
-    public int hashCode() {
-        return hashCode;
     }
 }

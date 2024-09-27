@@ -3,16 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-public interface RuleApp extends org.key_project.ncore.rules.RuleApp<Goal> {
+public interface RuleApp<App extends @NonNull RuleApp<App>> extends org.key_project.ncore.rules.RuleApp<@NonNull Goal, App> {
     /**
      * returns the rule of this rule application
      */
+    @Override
     Rule rule();
 
     /**
@@ -28,14 +30,16 @@ public interface RuleApp extends org.key_project.ncore.rules.RuleApp<Goal> {
      * @param goal the Goal where to apply the rule
      * @return list of new created goals
      */
+    @Override
     @Nullable
-    ImmutableList<Goal> execute(Goal goal);
+    ImmutableList<Goal> execute(@NonNull Goal goal);
 
     /**
      * returns true if all variables are instantiated
      *
      * @return true if all variables are instantiated
      */
+    @Override
     boolean complete();
 
     /**

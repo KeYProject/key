@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.rules.tacletbuilder;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.ncore.proof.ProofGoal;
@@ -19,7 +20,7 @@ import org.key_project.util.collection.ImmutableSet;
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
-public abstract class TacletGoalTemplate<G extends ProofGoal, App extends RuleApp<G>> {
+public abstract class TacletGoalTemplate<G extends @NonNull ProofGoal<G>, App extends @NonNull RuleApp<G, App>> {
     /** stores sequent that is one of the new goals */
     private final Sequent addedSeq;
 

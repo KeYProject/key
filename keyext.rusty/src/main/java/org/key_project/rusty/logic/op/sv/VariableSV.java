@@ -26,4 +26,9 @@ public class VariableSV extends OperatorSV implements QuantifiableVariable, Term
     public @NonNull String toString() {
         return toString("variable");
     }
+
+    @Override
+    public boolean isVariable() {
+        return true;
+    }
 }
