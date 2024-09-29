@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
@@ -91,8 +93,7 @@ public class BasicTest {
             proof);
         assertEquals(1, proof.openGoals().size());
         System.out.println(proof.openGoals().head().sequent());
-        // TODO: fix Term.equals: assertEquals(TacletForTests.parseTerm("{i:=2}\\<{i}\\>(i=2)"),
-        // proof.openGoals().head().sequent().succedent().getFirst().formula());
+        assertEquals(TacletForTests.parseTerm("{i:=2}\\<{i}\\>(i=2)"), proof.openGoals().head().sequent().succedent().getFirst().formula());
         applyRule("emptyModality",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1), false),

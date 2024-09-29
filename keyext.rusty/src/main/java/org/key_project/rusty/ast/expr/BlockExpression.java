@@ -70,6 +70,30 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        BlockExpression other = (BlockExpression) obj;
+        if (value == null && other.value != null || value != null && !value.equals(other.value)) {
+            return false;
+        }
+        return statements.equals(other.statements) && prefixLength == other.prefixLength;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashcode = 5;
+        hashcode = 31 * hashcode + statements.hashCode();
+        hashcode = 31 * hashcode + (value == null ? 0 : value.hashCode());
+        hashcode = 31 * hashcode + prefixLength;
+        return hashcode;
+    }
+
+    @Override
     public void visit(Visitor v) {
         v.performActionOnBlockExpression(this);
     }
