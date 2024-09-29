@@ -4,7 +4,6 @@
 package org.key_project.rusty.ast.expr;
 
 import java.math.BigInteger;
-import java.util.Objects;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -78,16 +77,23 @@ public class IntegerLiteralExpression extends LiteralExpression {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        return value.equals(((IntegerLiteralExpression) obj).value)
-                && suffix.equals(((IntegerLiteralExpression) obj).suffix);
+        final var other = (IntegerLiteralExpression) obj;
+        return value.equals(other.value)
+                && suffix.equals(other.suffix);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value, suffix);
+        int hashcode = 5;
+        hashcode = 31 * hashcode + value.hashCode();
+        hashcode = 31 * hashcode + suffix.hashCode();
+        return hashcode;
     }
 
     @Override

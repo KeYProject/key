@@ -56,6 +56,30 @@ public class LetStatement implements Statement, VariableDeclaration {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        final var other = (LetStatement) obj;
+        if (init == null && other.init != null || init != null && !init.equals(other.init)) {
+            return false;
+        }
+        return pat.equals(other.pat) && type.equals(other.type);
+    }
+
+    @Override
+    public int hashCode() {
+        int hashcode = 5;
+        hashcode = 31 * hashcode + pat.hashCode();
+        hashcode = 31 * hashcode + type.hashCode();
+        hashcode = 31 * hashcode + (init == null ? 0 : init.hashCode());
+        return hashcode;
+    }
+
+    @Override
     public void visit(Visitor v) {
         throw new RuntimeException("TODO @ DD");
     }

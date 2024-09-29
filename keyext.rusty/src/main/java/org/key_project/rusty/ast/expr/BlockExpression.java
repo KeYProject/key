@@ -77,7 +77,7 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        BlockExpression other = (BlockExpression) obj;
+        final var other = (BlockExpression) obj;
         if (value == null && other.value != null || value != null && !value.equals(other.value)) {
             return false;
         }
