@@ -10,7 +10,6 @@ import org.key_project.rusty.ldt.BoolLDT;
 
 import org.jspecify.annotations.NonNull;
 
-import java.util.Objects;
 
 public class BooleanLiteralExpression extends LiteralExpression {
     private final boolean value;
