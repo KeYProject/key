@@ -97,11 +97,6 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     // be passed to the method and hash codes can take previous usage of variables into account.
     @Override
     public int hashCodeModThisProperty(RustyProgramElement RustyProgramElement) {
-        /*
-         * Currently, the best approach seems to be to walk through the RustyProgramElement with a
-         * SyntaxElementCursor and sum up hash codes.
-         */
-        // TODO: change hashCode to reflect the equalsModThisProperty method
         NameAbstractionMap absMap = new NameAbstractionMap();
 
         int hashCode = 1;
