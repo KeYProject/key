@@ -164,9 +164,9 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnAssignmentExpression(AssignmentExpression x) {
-        x.getLhs().visit(this);
+        x.lhs().visit(this);
         layouter.print(" = ");
-        x.getRhs().visit(this);
+        x.rhs().visit(this);
     }
 
     private void beginBlock() {
@@ -226,7 +226,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnNegationExpression(NegationExpression x) {
-        printUnaryOperator(x.getOp().toString(), true, x.getExpr());
+        printUnaryOperator(x.op().toString(), true, x.expr());
     }
 
     @Override

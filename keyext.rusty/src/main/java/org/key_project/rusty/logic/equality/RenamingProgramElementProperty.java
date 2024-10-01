@@ -9,8 +9,9 @@ import java.util.Map;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
+import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.stmt.LetStatement;
+import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.logic.NameAbstractionTable;
 import org.key_project.rusty.logic.op.ProgramVariable;
 
@@ -23,16 +24,14 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link RenamingProgramElementProperty#RENAMING_PROGRAM_ELEMENT_PROPERTY} and is used
-     * as
-     * a parameter for
-     * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
+     * can be accessed through
+     * {@link RenamingProgramElementProperty#RENAMING_PROGRAM_ELEMENT_PROPERTY}.
      */
     private RenamingProgramElementProperty() {}
 
     /**
-     * Checks if {@code rpe2} is a source element syntactically equal to {@code rpe1} modulo
+     * Checks if {@code rpe2} is a {@link RustyProgramElement} syntactically equal to {@code rpe1}
+     * modulo
      * renaming.
      * <p>
      * When this method is supplied with a {@link NameAbstractionTable}, it will use this table to
@@ -64,13 +63,12 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             // First nodes can never be null as cursor is initialized with 'this'
             next1 = c1.getCurrentNode();
             next2 = c2.getCurrentNode();
-            // Handle special cases of prior equalsModRenaming implementation
-            if (next1 instanceof LetStatement ls) {
-                if (!handleLetStatement(ls, next2, nat)) {
+            if (next1 instanceof IdentPattern ip) {
+                if (!handleIdentPattern(ip, next2, nat)) {
                     return false;
                 }
-            } else if (next1 instanceof ProgramVariable || next1 instanceof Name) {
-                if (!handleProgramVariableOrElementName(next1, next2, nat)) {
+            } else if (next1 instanceof ProgramVariable || next1 instanceof Identifier) {
+                if (!handleProgramVariableOrIdentifier(next1, next2, nat)) {
                     return false;
                 }
             } else if (next1.getChildCount() > 0) {
@@ -99,11 +97,6 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     // be passed to the method and hash codes can take previous usage of variables into account.
     @Override
     public int hashCodeModThisProperty(RustyProgramElement RustyProgramElement) {
-        /*
-         * Currently, the best approach seems to be to walk through the RustyProgramElement with a
-         * SyntaxElementCursor and sum up hash codes.
-         */
-
         NameAbstractionMap absMap = new NameAbstractionMap();
 
         int hashCode = 1;
@@ -114,17 +107,17 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             // First node can never be null as cursor is initialized with 'this'
             next = c.getCurrentNode();
             // Handle special cases so that hashCodeModThisProperty follows equalsModThisProperty
-            if (next instanceof LetStatement ls) {
-                hashCode = 31 * hashCode + ls.getChildCount();
-                hashCode =
-                    31 * hashCode + 17 * ((ls.type() == null) ? 0 : ls.type().hashCode());
-                absMap.add(ls);
-            } else if (next instanceof ProgramVariable || next instanceof Name) {
-                hashCode = 31 * hashCode + absMap.getAbstractName((RustyProgramElement) next);
+            if (next instanceof IdentPattern ip) {
+                hashCode = 31 * hashCode + (ip.isMutable() ? 1 : 0);
+                hashCode = 31 * hashCode + (ip.isReference() ? 1 : 0);
+                absMap.add(((Identifier) ip.getChild(0)).name());
+            } else if (next instanceof ProgramVariable || next instanceof Identifier) {
+                Name name =
+                    next instanceof ProgramVariable pv ? pv.name() : ((Identifier) next).name();
+                hashCode = 31 * hashCode + absMap.getAbstractName(name);
             } else if (next.getChildCount() > 0) {
                 hashCode = 31 * hashCode + next.getChildCount();
             } else {
-                // In the standard case, we just use the default hashCode implementation
                 hashCode = 31 * hashCode + next.hashCode();
             }
             // walk to the next nodes in the tree
@@ -143,19 +136,11 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      *         method
      */
     private boolean handleStandard(SyntaxElement se1, SyntaxElement se2) {
-        /*
-         * As the prior implementations of equalsModRenaming for RustyProgramElements were mostly
-         * the same
-         * as their normal equals methods, we decided to move equalsModRenaming completely into the
-         * equals method and handle the special cases separately while walking through the tree that
-         * is a RustyProgramElement.
-         */
         return se1.equals(se2);
     }
 
     /**
-     * Handles the special case of comparing a {@link } to a
-     * {@link SyntaxElement}.
+     * Handles the special case of comparing a {@link } to a {@link SyntaxElement}.
      *
      * @param rnte the rusty program element with children to be compared
      * @param se the {@link SyntaxElement} to be compared
@@ -165,11 +150,10 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     private boolean handleRustyNonTerminalProgramElement(SyntaxElement rnte,
             SyntaxElement se) {
         /*
-         * A TODO ProgramElement is a special case of a RustyProgramElement, as we must
-         * not
-         * traverse the children recursively through the normal equals method. This is the case
-         * as we might have to add some entries of children nodes to a NameAbstractionTable so
-         * that they can be compared later on by the TreeWalker.
+         * In the case of non-terminal RustyProgramElements, we must not traverse the children
+         * recursively through the normal equals method. This is the case as we might have to
+         * add some entries of children nodes to a NameAbstractionTable so that they can be
+         * compared later on.
          */
         if (se == rnte) {
             return true;
@@ -181,78 +165,73 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     }
 
     /**
-     * Handles the special case of comparing a {@link LetStatement} to a
+     * Handles the special case of comparing a {@link IdentPattern} to a
      * {@link SyntaxElement}.
      *
-     * @param ls the {@link LetStatement} to be compared
+     * @param ip the {@link IdentPattern} to be compared
      * @param se the {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} the variable of {@code vs} should be added to
      * @return {@code true} iff {@code se} is of the same class as {@code vs} and has the same
      *         number of children, dimensions and type
      */
-    private boolean handleLetStatement(LetStatement ls, SyntaxElement se,
+    private boolean handleIdentPattern(IdentPattern ip, SyntaxElement se,
             NameAbstractionTable nat) {
-        /*
-         * A VariableSpecification is a special case of a JavaNonTerminalProgramElement similar to
-         * LabeledStatement, but we also need to check the dimensions and type of the
-         * VariableSpecification.
-         */
-        if (se == ls) {
+        if (se == ip) {
             return true;
         }
-        if (se.getClass() != ls.getClass()) {
+        if (se.getClass() != ip.getClass()) {
             return false;
         }
-        final LetStatement other = (LetStatement) se;
-        if (ls.getChildCount() != se.getChildCount()) {
+        final IdentPattern other = (IdentPattern) se;
+        if (ip.isMutable() != other.isMutable() || ip.isReference() != other.isReference()) {
             return false;
         }
-        if (ls.type() != null) {
-            if (!ls.type().equals(other.type())) {
-                return false;
-            }
-        } else {
-            if (other.type() != null) {
-                return false;
-            }
-        }
-        nat.add(ls.getPattern(), other.getPattern());
+
+        // Once Rust programs are parsed with the Rust Parser, this should be changed to not just
+        // use the name of the Identifier
+        Name ipName = ((Identifier) ip.getChild(0)).name();
+        Name otherName = ((Identifier) other.getChild(0)).name();
+        nat.add(ipName, otherName);
         return true;
     }
 
     /**
-     * Handles the special case of comparing a {@link ProgramVariable} or a
-     * {@link Name} to a {@link SyntaxElement}.
+     * Handles the special case of comparing a {@link ProgramVariable} or an
+     * {@link Identifier} to a {@link SyntaxElement}.
      *
-     * @param se1 the first {@link SyntaxElement} which is either a {@link ProgramVariable} or a
-     *        {@link Name}
+     * @param se1 the first {@link SyntaxElement} which is either a {@link ProgramVariable} or an
+     *        {@link Identifier}
      * @param se2 the second {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} that should be used to check whether {@code se1}
      *        and {@code se2} have the same abstract name
      * @return {@code true} iff {@code se1} and {@code se2} have the same abstract name
      */
-    private boolean handleProgramVariableOrElementName(SyntaxElement se1, SyntaxElement se2,
+    private boolean handleProgramVariableOrIdentifier(SyntaxElement se1, SyntaxElement se2,
             NameAbstractionTable nat) {
-        /*
-         * A ProgramVariable or a ProgramElementName is a special case of a RustyProgramElement and
-         * one
-         * of the main reasons for equalsModRenaming. Equality here comes down to checking the
-         * abstract name of the elements in a NAT.
-         */
+        if (se1 == se2) {
+            return true;
+        }
         if (se1.getClass() != se2.getClass()) {
             return false;
         }
-        // We can cast here as se1 is either a ProgramVariable or a ProgramElementName
-        // (this method is only called for these two classes in equalsModThisProperty)
-        // and se2 is of the same class as se1
-        return nat.sameAbstractName((RustyProgramElement) se1, (RustyProgramElement) se2);
+
+        Name name1, name2;
+        if (se1 instanceof ProgramVariable pv) {
+            name1 = pv.name();
+            name2 = ((ProgramVariable) se2).name();
+        } else {
+            name1 = ((Identifier) se1).name();
+            name2 = ((Identifier) se2).name();
+        }
+
+        return nat.sameAbstractName(name1, name2);
     }
 
 
     /* ---------- End of helper methods for special cases in equalsModThisProperty ---------- */
 
     /**
-     * A helper class to map {@link RustyProgramElement}s to an abstract name.
+     * A helper class to map {@link Name}s to an abstract name.
      * <p>
      * As names are abstracted from in this property, we need to give named elements abstract names
      * for them to be used in the hash code. This approach is similar to
@@ -261,35 +240,34 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
      * then used as the abstract name.
      */
     private static class NameAbstractionMap {
-        /**
-         * The map that associates {@link RustyProgramElement}s with their abstract names.
-         */
-        private final Map<RustyProgramElement, Integer> map = new HashMap<>();
+        private int nextAbstractName = 0;
 
         /**
-         * Adds a {@link RustyProgramElement} to the map.
-         *
-         * @param element the {@link RustyProgramElement} to be added
+         * The map that associates {@link Name}s with their abstract names.
          */
-        public void add(RustyProgramElement element) {
-            map.put(element, map.size());
+        private final Map<Name, Integer> map = new HashMap<>();
+
+        /**
+         * Adds a {@link Name} to the map.
+         *
+         * @param name the {@link Name} to be added
+         */
+        public void add(Name name) {
+            map.put(name, nextAbstractName++);
         }
 
         /**
-         * Returns the abstract name of a {@link RustyProgramElement} or {@code -1} if the element
-         * is not
-         * in the map.
-         * <p>
-         * A common case for a look-up of an element that is not in the map, is a built-in datatype,
-         * e.g., the {@link Name} {@code int}.
+         * Returns the abstract name of a {@link Name} or {@code -1} if the element
+         * is not in the map.
+         * ee
          *
-         * @param element the {@link RustyProgramElement} whose abstract name should be returned
-         * @return the abstract name of the {@link RustyProgramElement} or {@code -1} if the element
+         * @param name the {@link Name} whose abstract name should be returned
+         * @return the abstract name of the {@link Name} or {@code -1} if the element
          *         is
          *         not in the map
          */
-        public int getAbstractName(RustyProgramElement element) {
-            final Integer result = map.get(element);
+        public int getAbstractName(Name name) {
+            final Integer result = map.get(name);
             return result != null ? result : -1;
         }
     }

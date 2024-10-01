@@ -25,8 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BasicTest {
     public static final String STANDARD_RUST_RULES_KEY =
@@ -92,8 +91,8 @@ public class BasicTest {
             proof);
         assertEquals(1, proof.openGoals().size());
         System.out.println(proof.openGoals().head().sequent());
-        // TODO: fix Term.equals: assertEquals(TacletForTests.parseTerm("{i:=2}\\<{i}\\>(i=2)"),
-        // proof.openGoals().head().sequent().succedent().getFirst().formula());
+        assertEquals(TacletForTests.parseTerm("{i:=2}\\<{i}\\>(i=2)"),
+            proof.openGoals().head().sequent().succedent().getFirst().formula());
         applyRule("emptyModality",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1), false),
@@ -277,7 +276,7 @@ public class BasicTest {
     @Test
     public void testSwap() {
         // load
-        TacletForTests.parse();
+        TacletForTests.parse(new RustProfile());
         assert TacletForTests.services().getNamespaces().programVariables()
                 .lookup(new Name("i")) != null;
         var services = TacletForTests.services();
@@ -300,10 +299,5 @@ public class BasicTest {
 
         p.getRoot().sequent().succedent().getFirst().formula();
         // continue manual proof like for example in TestApplyTaclet
-    }
-
-    @Test
-    public void testInitialization() {
-
     }
 }
