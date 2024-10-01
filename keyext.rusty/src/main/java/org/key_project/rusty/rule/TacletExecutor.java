@@ -216,9 +216,10 @@ public abstract class TacletExecutor<T extends Taclet> {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {
             final var inst = (ProgramVariable) matchCond.getInstantiations().getInstantiation(sv);
-// if the goal already contains the variable to be added
+            // if the goal already contains the variable to be added
             // (not just a variable with the same name), then there is nothing to do
-            Collection<ProgramVariable> progVars = goal.getLocalNamespaces().programVariables().elements();
+            Collection<ProgramVariable> progVars =
+                goal.getLocalNamespaces().programVariables().elements();
             if (progVars.contains(inst)) {
                 continue;
             }

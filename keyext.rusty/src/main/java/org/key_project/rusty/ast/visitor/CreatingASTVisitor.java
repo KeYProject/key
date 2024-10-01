@@ -9,7 +9,6 @@ import java.util.Deque;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
-import org.key_project.rusty.ast.pat.SchemaVarPattern;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;

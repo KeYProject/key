@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -10,9 +13,6 @@ import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.InstantiationProposer;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.util.collection.ImmutableList;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 
 /**
@@ -34,7 +34,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected final Services services;
     protected HashMap<ProgramVariable, ProgramVariable> renamingHistory =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -74,7 +74,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the renamed version of the var parameter
      */
     public abstract ProgramVariable rename(ProgramVariable var, Goal goal,
-                                           PosInOccurrence posOfFind);
+            PosInOccurrence posOfFind);
 
     public HashMap<ProgramVariable, ProgramVariable> getRenamingMap() {
         return renamingHistory;

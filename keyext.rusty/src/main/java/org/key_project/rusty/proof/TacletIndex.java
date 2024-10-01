@@ -485,7 +485,7 @@ public class TacletIndex {
             noFindList = noFindList.removeAll(tacletApp);
         } else {
             // should never be reached
-            //Debug.fail("Tried to remove an unknown type of Taclet");
+            // Debug.fail("Tried to remove an unknown type of Taclet");
         }
 
         if (tacletApp.instantiations() != SVInstantiations.EMPTY_SVINSTANTIATIONS) {
@@ -495,7 +495,7 @@ public class TacletIndex {
     }
 
     private void removeFromMap(NoPosTacletApp tacletApp,
-                               HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
+            HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
         Object op = getIndexObj((FindTaclet) tacletApp.taclet());
         ImmutableList<NoPosTacletApp> opList = map.get(op);
         if (opList != null) {

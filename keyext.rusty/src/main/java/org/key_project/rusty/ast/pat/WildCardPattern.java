@@ -4,10 +4,9 @@
 package org.key_project.rusty.ast.pat;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.ast.expr.Expr;
-import org.key_project.rusty.ast.visitor.Visitor;
 
 public class WildCardPattern implements Pattern {
     public static WildCardPattern WILDCARD = new WildCardPattern();

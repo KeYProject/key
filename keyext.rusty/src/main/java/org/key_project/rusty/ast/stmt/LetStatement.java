@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.stmt;
 
-import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.VariableDeclaration;
@@ -11,10 +10,10 @@ import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ast.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.ExtList;
 
 public class LetStatement implements Statement, VariableDeclaration {
     private final Pattern pat;
@@ -36,9 +35,15 @@ public class LetStatement implements Statement, VariableDeclaration {
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0) {return pat;}
-        if (n == 1) {return type;}
-        if (n == 2 && init != null) {return init;}
+        if (n == 0) {
+            return pat;
+        }
+        if (n == 1) {
+            return type;
+        }
+        if (n == 2 && init != null) {
+            return init;
+        }
         throw new IndexOutOfBoundsException("LetStatement has " + getChildCount() + " children");
     }
 

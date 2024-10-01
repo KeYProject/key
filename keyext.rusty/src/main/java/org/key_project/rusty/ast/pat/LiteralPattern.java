@@ -4,7 +4,6 @@
 package org.key_project.rusty.ast.pat;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 public record LiteralPattern() implements Pattern {

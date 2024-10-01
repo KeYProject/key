@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
-
-import org.key_project.rusty.ast.RustyProgramElement;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.key_project.rusty.ast.RustyProgramElement;
 
 public abstract class RenamingTable {
     public abstract RustyProgramElement getRenaming(RustyProgramElement pe);
@@ -15,7 +18,7 @@ public abstract class RenamingTable {
         }
         if (hmap.size() == 1) {
             Map.Entry<? extends RustyProgramElement, ? extends RustyProgramElement> entry =
-                    hmap.entrySet().iterator().next();
+                hmap.entrySet().iterator().next();
             return new SingleRenamingTable(entry.getKey(), entry.getValue());
         } else {
             return new MultiRenamingTable(hmap);

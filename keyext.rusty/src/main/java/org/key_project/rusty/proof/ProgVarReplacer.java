@@ -1,9 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
+
+import java.util.Iterator;
+import java.util.Map;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
@@ -16,9 +21,6 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.inst.*;
 import org.key_project.util.collection.*;
-
-import java.util.Iterator;
-import java.util.Map;
 
 public final class ProgVarReplacer {
     /**
@@ -74,8 +76,8 @@ public final class ProgVarReplacer {
 
             if (newInsts != insts) {
                 NoPosTacletApp newNoPosTacletApp =
-                        NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
-                                noPosTacletApp.ifFormulaInstantiations(), services);
+                    NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
+                        noPosTacletApp.ifFormulaInstantiations(), services);
                 appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
                 appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
             }
@@ -105,11 +107,13 @@ public final class ProgVarReplacer {
                 if (newPe != pe) {
                     ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
                     result = result.replace(cie.prefix(), cie.suffix(),
-                            newPe, services);
+                        newPe, services);
                 }
-            } /*else if (ie instanceof OperatorInstantiation) {
-                /* nothing to be done (currently) */
-            /*}*/ else if (ie instanceof ProgramInstantiation) {
+            } /*
+               * else if (ie instanceof OperatorInstantiation) {
+               * /* nothing to be done (currently)
+               */
+            /* } */ else if (ie instanceof ProgramInstantiation) {
                 var pe = (RustyProgramElement) inst;
                 RustyProgramElement newPe = replace(pe);
                 if (newPe != pe) {
@@ -191,7 +195,8 @@ public final class ProgVarReplacer {
         }
 
         if (changedSubTerm || changedOp) {
-            result = services.getTermFactory().createTerm(op, newSubTerms, (ImmutableArray<QuantifiableVariable>) t.boundVars());
+            result = services.getTermFactory().createTerm(op, newSubTerms,
+                (ImmutableArray<QuantifiableVariable>) t.boundVars());
         }
         return result;
     }
@@ -209,7 +214,7 @@ public final class ProgVarReplacer {
         Sequent newSequent = Sequent.createSequent(newAntecedent, newSuccedent);
 
         SequentChangeInfo result =
-                SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
+            SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
         return result;
     }
 
@@ -266,8 +271,8 @@ public final class ProgVarReplacer {
      */
     private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
         final Term newTerm = services.getTermBuilder().elementary(
-                map.get(((ElementaryUpdate) t.op()).lhs()),
-                standardReplace(t.sub(0)));
+            map.get(((ElementaryUpdate) t.op()).lhs()),
+            standardReplace(t.sub(0)));
         return newTerm;
     }
 

@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.visitor;
+
+import java.util.Map;
 
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.ExtList;
-
-import java.util.Map;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a number of program
@@ -29,8 +32,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param map the HashMap with the replacements
      * @param services the services instance
      */
-    public ProgVarReplaceVisitor(RustyProgramElement st, Map<ProgramVariable, ProgramVariable> map, boolean replaceallbynew,
-                                 Services services) {
+    public ProgVarReplaceVisitor(RustyProgramElement st, Map<ProgramVariable, ProgramVariable> map,
+            boolean replaceallbynew,
+            Services services) {
         super(st, true, services);
         this.replaceallbynew = replaceallbynew;
         this.replaceMap = map;
@@ -72,5 +76,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             changed();
         } else {
             doDefaultAction(x);
-        }    }
+        }
+    }
 }

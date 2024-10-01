@@ -4,8 +4,6 @@
 package org.key_project.rusty.ast.pat;
 
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.expr.Expr;
-import org.key_project.rusty.ast.visitor.Visitor;
 
 public interface Pattern extends RustyProgramElement {
 }

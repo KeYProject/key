@@ -7,9 +7,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Identifier;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.rusty.ast.visitor.Visitor;
 
 public class IdentPattern implements Pattern, Named {
     private final boolean reference;

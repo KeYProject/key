@@ -6,7 +6,6 @@ package org.key_project.rusty.ast.visitor;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.AssignmentExpression;
-import org.key_project.rusty.ast.expr.ContextBlockExpression;
 import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.pat.SchemaVarPattern;
@@ -103,7 +102,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
             addChild(pe);
         } else {
             throw new IllegalStateException(
-                    "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);
+                "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);
         }
         changed();
     }

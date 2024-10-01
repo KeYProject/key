@@ -9,10 +9,10 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.SchemaType;
 import org.key_project.rusty.ast.visitor.Visitor;
-
-import org.jspecify.annotations.NonNull;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.SVInstantiations;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A schema variable standing for a type in SchemaRust

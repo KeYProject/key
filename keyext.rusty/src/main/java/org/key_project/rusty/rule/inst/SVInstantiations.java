@@ -474,7 +474,7 @@ public class SVInstantiations {
      * @param pes the ArrayOf<t> the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ImmutableArray<RustyProgramElement> pes,
-                                    Services services) {
+            Services services) {
         return replace(sv, new ProgramListInstantiation(pes), services);
     }
 
