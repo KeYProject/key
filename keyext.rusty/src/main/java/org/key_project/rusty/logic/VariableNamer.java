@@ -4,10 +4,15 @@
 package org.key_project.rusty.logic;
 
 import org.key_project.rusty.Services;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.InstantiationProposer;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 
 /**
@@ -28,6 +33,8 @@ public abstract class VariableNamer implements InstantiationProposer {
      * pointer to services object
      */
     protected final Services services;
+    protected HashMap<ProgramVariable, ProgramVariable> renamingHistory =
+            new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -54,5 +61,22 @@ public abstract class VariableNamer implements InstantiationProposer {
             return getProposal(app, sv, services, null, previousProposals);
         }
         return proposal;
+    }
+
+    /**
+     * intended to be called when symbolically executing a variable declaration; resolves any naming
+     * conflicts between the new variable and other global variables by renaming the new variable
+     * and / or other variables
+     *
+     * @param var the new program variable
+     * @param goal the goal
+     * @param posOfFind the PosInOccurrence of the currently executed program
+     * @return the renamed version of the var parameter
+     */
+    public abstract ProgramVariable rename(ProgramVariable var, Goal goal,
+                                           PosInOccurrence posOfFind);
+
+    public HashMap<ProgramVariable, ProgramVariable> getRenamingMap() {
+        return renamingHistory;
     }
 }

@@ -4,9 +4,13 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.util.ExtList;
+
+import java.util.Arrays;
 
 public class AssignmentExpression implements Expr {
     private final Expr lhs;
@@ -15,6 +19,14 @@ public class AssignmentExpression implements Expr {
     public AssignmentExpression(Expr lhs, Expr rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
+    }
+
+    public AssignmentExpression(ExtList changeList) {
+        Pattern pat = changeList.removeFirstOccurrence(Pattern.class);
+            Expr[] exprs = changeList.collect(Expr.class);
+            assert exprs.length == 2 : Arrays.toString(exprs);
+            lhs = exprs[0];
+            rhs = exprs[1];
     }
 
 

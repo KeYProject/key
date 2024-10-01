@@ -394,6 +394,17 @@ public class Semisequent implements Iterable<SequentFormula> {
         return indexOf(sequentFormula) != -1;
     }
 
+    /**
+     * replaces the <tt>idx</tt>-th formula by <tt>sequentFormula</tt>
+     *
+     * @param idx the int with the position of the formula to be replaced
+     * @param sequentFormula the SequentFormula replacing the formula at the given position
+     * @return a SemisequentChangeInfo containing the new sequent and a diff to the old one
+     */
+    public SemisequentChangeInfo replace(int idx, SequentFormula sequentFormula) {
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), null);
+    }
+
     // inner class used to represent an empty semisequent
     private static class Empty extends Semisequent {
 

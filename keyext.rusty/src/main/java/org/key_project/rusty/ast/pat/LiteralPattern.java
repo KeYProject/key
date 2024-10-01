@@ -4,6 +4,8 @@
 package org.key_project.rusty.ast.pat;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.expr.Expr;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public record LiteralPattern() implements Pattern {
     @Override
@@ -14,5 +16,10 @@ public record LiteralPattern() implements Pattern {
     @Override
     public int getChildCount() {
         return 0;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnLiteralPattern(this);
     }
 }

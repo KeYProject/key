@@ -5,10 +5,12 @@ package org.key_project.rusty.proof;
 
 import java.util.*;
 
+import org.key_project.rusty.logic.RenamingTable;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
@@ -50,6 +52,7 @@ public class Node implements Iterable<Node> {
      */
     private ImmutableSet<NoPosTacletApp> localIntroducedRules =
         DefaultImmutableSet.nil();
+    private ImmutableList<RenamingTable> renamings;
 
     /**
      * creates an empty node that is root and leaf.
@@ -297,5 +300,9 @@ public class Node implements Iterable<Node> {
             res++;
         }
         return res;
+    }
+
+    public void setRenamings(ImmutableList<RenamingTable> list) {
+        renamings = list;
     }
 }

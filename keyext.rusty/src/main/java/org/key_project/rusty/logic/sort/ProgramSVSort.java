@@ -12,6 +12,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.stmt.Statement;
+import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 
@@ -197,8 +198,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(RustyProgramElement check, Services services) {
-            // TODO
-            return false;
+            return check instanceof RustType;
         }
     }
 

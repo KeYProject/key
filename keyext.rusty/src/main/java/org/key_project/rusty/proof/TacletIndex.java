@@ -445,6 +445,70 @@ public class TacletIndex {
     }
 
     /**
+     * returns a list with all partial instantiated no pos taclet apps
+     *
+     * @return list with all partial instantiated NoPosTacletApps
+     */
+    public ImmutableList<NoPosTacletApp> getPartialInstantiatedApps() {
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
+        for (NoPosTacletApp partialInstantiatedRuleApp : partialInstantiatedRuleApps) {
+            result = result.prepend(partialInstantiatedRuleApp);
+        }
+        return result;
+    }
+
+    /**
+     * removes the given NoPosTacletApps from this index
+     *
+     * @param tacletAppList the NoPosTacletApps to be removed
+     */
+    public void removeTaclets(Iterable<NoPosTacletApp> tacletAppList) {
+        for (final NoPosTacletApp tacletApp : tacletAppList) {
+            remove(tacletApp);
+        }
+    }
+
+    /**
+     * removes a Taclet with the given instantiation information from this index.
+     *
+     * @param tacletApp the Taclet and its instantiation info to be removed
+     */
+    public void remove(NoPosTacletApp tacletApp) {
+        Taclet rule = tacletApp.taclet();
+        if (rule instanceof RewriteTaclet) {
+            removeFromMap(tacletApp, rwList);
+        } else if (rule instanceof AntecTaclet) {
+            removeFromMap(tacletApp, antecList);
+        } else if (rule instanceof SuccTaclet) {
+            removeFromMap(tacletApp, succList);
+        } else if (rule instanceof NoFindTaclet) {
+            noFindList = noFindList.removeAll(tacletApp);
+        } else {
+            // should never be reached
+            //Debug.fail("Tried to remove an unknown type of Taclet");
+        }
+
+        if (tacletApp.instantiations() != SVInstantiations.EMPTY_SVINSTANTIATIONS) {
+            // Debug.assertTrue(partialInstantiatedRuleApps.contains(tacletApp));
+            partialInstantiatedRuleApps.remove(tacletApp);
+        }
+    }
+
+    private void removeFromMap(NoPosTacletApp tacletApp,
+                               HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
+        Object op = getIndexObj((FindTaclet) tacletApp.taclet());
+        ImmutableList<NoPosTacletApp> opList = map.get(op);
+        if (opList != null) {
+            opList = opList.removeAll(tacletApp);
+            if (opList.isEmpty()) {
+                map.remove(op);
+            } else {
+                map.put(op, opList);
+            }
+        }
+    }
+
+    /**
      * Inner class to track the occurrences of prefix elements in Rust blocks
      */
     private static class PrefixOccurrences {

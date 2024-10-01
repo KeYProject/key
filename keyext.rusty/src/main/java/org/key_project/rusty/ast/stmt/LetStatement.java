@@ -14,6 +14,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.ExtList;
 
 public class LetStatement implements Statement, VariableDeclaration {
     private final Pattern pat;
@@ -26,20 +27,24 @@ public class LetStatement implements Statement, VariableDeclaration {
         this.init = init;
     }
 
+    public LetStatement(ExtList changeList) {
+        pat = changeList.removeFirstOccurrence(Pattern.class);
+        type = changeList.removeFirstOccurrence(RustType.class);
+        init = changeList.removeFirstOccurrence(Expr.class);
+    }
+
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        return switch (n) {
-        case 0 -> pat;
-        case 1 -> type;
-        case 2 -> Objects.requireNonNull(init);
-        default -> throw new IndexOutOfBoundsException("LetStatement has three children");
-        };
+        if (n == 0) {return pat;}
+        if (n == 1) {return type;}
+        if (n == 2 && init != null) {return init;}
+        throw new IndexOutOfBoundsException("LetStatement has " + getChildCount() + " children");
     }
 
     @Override
     public int getChildCount() {
-        return 3;
+        return init == null ? 2 : 3;
     }
 
     public RustType type() {
@@ -50,6 +55,14 @@ public class LetStatement implements Statement, VariableDeclaration {
         return pat;
     }
 
+    public boolean hasInit() {
+        return init != null;
+    }
+
+    public Expr getInit() {
+        return init;
+    }
+
     @Override
     public String toString() {
         return "let " + pat + ": " + type + " = " + init;
@@ -57,6 +70,6 @@ public class LetStatement implements Statement, VariableDeclaration {
 
     @Override
     public void visit(Visitor v) {
-        throw new RuntimeException("TODO @ DD");
+        v.performActionOnLetStatement(this);
     }
 }

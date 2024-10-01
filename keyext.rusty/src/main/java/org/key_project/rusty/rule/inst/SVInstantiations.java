@@ -454,4 +454,38 @@ public class SVInstantiations {
             getUpdateContext(), GenericSortInstantiations.EMPTY_INSTANTIATIONS,
             getGenericSortConditions()).checkSorts(sv, entry, true, services);
     }
+
+    /**
+     * replaces the given pair in the instantiations. If the given SchemaVariable has been
+     * instantiated already, the new pair is taken without a warning.
+     *
+     * @param sv the SchemaVariable to be instantiated
+     * @param pe the ProgramElement the SchemaVariable is instantiated with
+     */
+    public SVInstantiations replace(SchemaVariable sv, RustyProgramElement pe, Services services) {
+        return replace(sv, new ProgramInstantiation(pe), services);
+    }
+
+    /**
+     * replaces the given pair in the instantiations. If the given SchemaVariable has been
+     * instantiated already, the new pair is taken without a warning.
+     *
+     * @param sv the SchemaVariable to be instantiated
+     * @param pes the ArrayOf<t> the SchemaVariable is instantiated with
+     */
+    public SVInstantiations replace(SchemaVariable sv, ImmutableArray<RustyProgramElement> pes,
+                                    Services services) {
+        return replace(sv, new ProgramListInstantiation(pes), services);
+    }
+
+    /**
+     * replaces the given pair in the instantiations. If the given SchemaVariable has been
+     * instantiated already, the new pair is taken without a warning.
+     *
+     * @param sv the SchemaVariable to be instantiated
+     * @param term the Term the SchemaVariable is instantiated with
+     */
+    public SVInstantiations replace(SchemaVariable sv, Term term, Services services) {
+        return replace(sv, new TermInstantiation(sv, term), services);
+    }
 }

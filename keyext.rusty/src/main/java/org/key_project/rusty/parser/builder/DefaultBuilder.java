@@ -39,6 +39,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         this.nss = nss;
     }
 
+    @Override
+    public List<String> visitPvset(KeYRustyParser.PvsetContext ctx) {
+        return mapOf(ctx.varId());
+    }
+
     protected Named lookup(Name n) {
         final Namespace<?>[] lookups =
             { programVariables(), variables(), functions() };

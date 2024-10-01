@@ -3,15 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.Junctor;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
+import org.key_project.rusty.proof.ProgVarReplacer;
 import org.key_project.rusty.rule.inst.GenericSortCondition;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -209,7 +213,45 @@ public abstract class TacletExecutor<T extends Taclet> {
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
             SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
             Services services, MatchConditions matchCond) {
-        // TODO @ DD
+        ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
+        for (final SchemaVariable sv : pvs) {
+            final var inst = (ProgramVariable) matchCond.getInstantiations().getInstantiation(sv);
+// if the goal already contains the variable to be added
+            // (not just a variable with the same name), then there is nothing to do
+            Collection<ProgramVariable> progVars = goal.getLocalNamespaces().programVariables().elements();
+            if (progVars.contains(inst)) {
+                continue;
+            }
+            final VariableNamer vn = services.getVariableNamer();
+            final ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
+            goal.addProgramVariable(renamedInst);
+            services.addNameProposal(renamedInst.name());
+
+            final HashMap<ProgramVariable, ProgramVariable> renamingMap = vn.getRenamingMap();
+            if (!renamingMap.isEmpty()) {
+                // execute renaming
+                final ProgVarReplacer pvr = new ProgVarReplacer(renamingMap, services);
+
+                // globals
+                // we do not need to do the old assignment
+                // goal.setGlobalProgVars(pvr.replace(Immutables.createSetFrom(progVars)));
+                // as the following assertions ensure it would have no effect anyway.
+                assert renamingMap.size() == 1;
+                assert renamingMap.get(inst) == renamedInst;
+                assert !progVars.contains(inst);
+
+                // taclet apps
+                pvr.replace(goal.ruleAppIndex().tacletIndex());
+
+                // sequent
+                currentSequent.combine(pvr.replace(currentSequent.sequent()));
+
+                final RenamingTable rt = RenamingTable.getRenamingTable(vn.getRenamingMap());
+
+                renamings = renamings.append(rt);
+            }
+        }
+        goal.getNode().setRenamings(renamings);
     }
 
     /**

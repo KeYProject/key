@@ -275,6 +275,22 @@ public class BasicTest {
     }
 
     @Test
+    public void testLet() {
+        TacletForTests.clear();
+        TacletForTests.parse(new RustProfile());
+        Semisequent antec = parseTermForSemisequent("");
+        Semisequent succ =
+                parseTermForSemisequent("\\<{ let n: u32 = 2u32; n }\\>(i = 2)");
+        Sequent s = Sequent.createSequent(antec, succ);
+        var proof = new Proof(new Name("Let"), s, TacletForTests.initConfig());
+        applyRule("letIdentPatAssign",
+                new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                        PosInTerm.getTopLevel(), false),
+                proof);
+        assertEquals(1, proof.openGoals().size());
+    }
+
+    @Test
     public void testSwap() {
         // load
         TacletForTests.parse();

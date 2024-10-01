@@ -8,8 +8,10 @@ import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.SelfParam;
+import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
+import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
@@ -543,5 +545,51 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnSchemaRustType(SchemaRustType x) {
         layouter.print("s#" + x.type().toString());
+    }
+
+    @Override
+    public void performActionOnLetStatement(LetStatement x) {
+        layouter.keyWord("let").print(" ");
+        x.getPattern().visit(this);
+        layouter.print(": ");
+        x.type().visit(this);
+        if (x.hasInit()) {
+            layouter.print(" = ");
+            x.getInit().visit(this);
+        }
+        layouter.print(";");
+    }
+
+    @Override
+    public void performActionOnIdentPattern(IdentPattern x) {
+        if (x.isReference()) {
+            layouter.keyWord("ref");
+            layouter.print(" ");
+        }
+        if (x.isMutable()) {
+            layouter.keyWord("mut");
+            layouter.print(" ");
+        }
+        layouter.print(x.name().toString());
+    }
+
+    @Override
+    public void performActionOnSchemaVarPattern(SchemaVarPattern x) {
+
+    }
+
+    @Override
+    public void performActionOnLiteralPattern(LiteralPattern x) {
+
+    }
+
+    @Override
+    public void performActionOnAltPattern(AltPattern x) {
+
+    }
+
+    @Override
+    public void performActionOnWildCardPattern(WildCardPattern x) {
+
     }
 }

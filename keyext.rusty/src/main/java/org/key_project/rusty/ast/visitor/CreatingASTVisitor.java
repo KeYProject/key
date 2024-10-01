@@ -9,8 +9,10 @@ import java.util.Deque;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.pat.SchemaVarPattern;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
+import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
@@ -72,7 +74,13 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
 
     @Override
     public void performActionOnAssignmentExpression(AssignmentExpression x) {
-        throw new RuntimeException("TODO @ DD");
+        var def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new AssignmentExpression(changeList);
+            }
+        };
+        def.doAction(x);
     }
 
     @Override
@@ -148,6 +156,17 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
         } else {
             doDefaultAction(x);
         }
+    }
+
+    @Override
+    public void performActionOnLetStatement(LetStatement x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new LetStatement(changeList);
+            }
+        };
+        def.doAction(x);
     }
 
     protected void changed() {

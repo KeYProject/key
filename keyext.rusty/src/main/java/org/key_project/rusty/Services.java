@@ -9,10 +9,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.Name;
 import org.key_project.rusty.ldt.LDTs;
-import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.TermBuilder;
-import org.key_project.rusty.logic.TermFactory;
+import org.key_project.rusty.logic.*;
 import org.key_project.rusty.proof.Counter;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.init.Profile;
@@ -29,6 +28,11 @@ public class Services implements LogicServices {
 
     private Proof proof;
     private Profile profile;
+
+    /**
+     * variable namer for inner renaming
+     */
+    private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
 
     /**
      * map of names to counters
@@ -135,5 +139,13 @@ public class Services implements LogicServices {
         Services result = new Services(this);
         result.setNamespaces(namespaces);
         return result;
+    }
+
+    public VariableNamer getVariableNamer() {
+        return innerVarNamer;
+    }
+
+    public void addNameProposal(Name name) {
+        // TODO @ DD
     }
 }

@@ -8,6 +8,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentChangeInfo;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.Taclet;
@@ -249,5 +250,9 @@ public final class Goal implements ProofGoal {
     @Override
     public String toString() {
         return node.sequent().toString();
+    }
+
+    public void addProgramVariable(ProgramVariable pv) {
+        localNamespaces.programVariables().addSafely(pv);
     }
 }

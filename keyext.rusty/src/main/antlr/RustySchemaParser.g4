@@ -85,6 +85,7 @@ typeNoBounds
    | qualifiedPathInType
    | bareFunctionType
    | typeOf
+   | schemaVariable
    ;
 
 ifExpr

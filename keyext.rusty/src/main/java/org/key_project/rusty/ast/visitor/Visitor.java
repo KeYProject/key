@@ -6,8 +6,10 @@ package org.key_project.rusty.ast.visitor;
 import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.SelfParam;
+import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
+import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -115,4 +117,16 @@ public interface Visitor {
     void performActionOnPrimitiveRustType(PrimitiveRustType x);
 
     void performActionOnSchemaRustType(SchemaRustType x);
+
+    void performActionOnLetStatement(LetStatement x);
+
+    void performActionOnIdentPattern(IdentPattern x);
+
+    void performActionOnSchemaVarPattern(SchemaVarPattern x);
+
+    void performActionOnLiteralPattern(LiteralPattern x);
+
+    void performActionOnAltPattern(AltPattern x);
+
+    void performActionOnWildCardPattern(WildCardPattern x);
 }

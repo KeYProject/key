@@ -45,7 +45,6 @@ public interface RustyProgramElement extends SyntaxElement {
      */
     default MatchConditions matchChildren(SourceData source, MatchConditions matchCond,
             int offset) {
-
         for (int i = offset, sz = getChildCount(); i < sz; i++) {
             var child = (RustyProgramElement) getChild(i);
             matchCond = child.match(source, matchCond);

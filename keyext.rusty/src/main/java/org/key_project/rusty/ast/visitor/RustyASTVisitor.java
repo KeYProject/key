@@ -8,8 +8,10 @@ import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.SelfParam;
+import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
+import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -292,6 +294,36 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnSchemaRustType(SchemaRustType x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnLetStatement(LetStatement x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnIdentPattern(IdentPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSchemaVarPattern(SchemaVarPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnLiteralPattern(LiteralPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnAltPattern(AltPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnWildCardPattern(WildCardPattern x) {
         doDefaultAction(x);
     }
 }

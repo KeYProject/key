@@ -9,6 +9,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Identifier;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public class IdentPattern implements Pattern, Named {
     private final boolean reference;
@@ -52,5 +53,10 @@ public class IdentPattern implements Pattern, Named {
         if (mutable)
             return "mut " + ident.toString();
         return ident.toString();
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnIdentPattern(this);
     }
 }

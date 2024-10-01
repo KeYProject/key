@@ -6,6 +6,8 @@ package org.key_project.rusty.ast.pat;
 import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.rusty.ast.expr.Expr;
+import org.key_project.rusty.ast.visitor.Visitor;
 
 public class WildCardPattern implements Pattern {
     public static WildCardPattern WILDCARD = new WildCardPattern();
@@ -21,5 +23,10 @@ public class WildCardPattern implements Pattern {
     @Override
     public int getChildCount() {
         return 0;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnWildCardPattern(this);
     }
 }

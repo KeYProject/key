@@ -11,6 +11,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
+import org.key_project.rusty.ast.abstraction.SchemaType;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.FunctionParam;
@@ -23,6 +24,7 @@ import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
 import org.key_project.rusty.ast.ty.RustType;
+import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
@@ -769,6 +771,10 @@ public class SchemaConverter {
             throw new IllegalArgumentException("TODO @ DD");
         if (ctx.neverType() != null)
             throw new IllegalArgumentException("TODO @ DD");
+        if (ctx.schemaVariable() != null) {
+            var sv = (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
+            return new SchemaRustType(new SchemaType(sv));
+        }
         throw new IllegalArgumentException("Unknown type " + ctx.getText());
     }
 

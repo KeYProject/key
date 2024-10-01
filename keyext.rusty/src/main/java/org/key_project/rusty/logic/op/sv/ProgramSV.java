@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op.sv;
 
+import jdk.jshell.spi.ExecutionControl;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
@@ -10,6 +11,7 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
+import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.ProgramConstruct;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
@@ -76,7 +78,6 @@ public final class ProgramSV extends OperatorSV
         final Object instant = instantiations.getInstantiation(this);
         if (instant == null || instant.equals(src)
                 || (instant instanceof Term t && t.op().equals(src))) {
-
             matchCond = addProgramInstantiation(src, matchCond, services);
 
             if (matchCond == null) {

@@ -5,6 +5,12 @@ package org.key_project.rusty.ast.visitor;
 
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.expr.AssignmentExpression;
+import org.key_project.rusty.ast.expr.ContextBlockExpression;
+import org.key_project.rusty.ast.pat.IdentPattern;
+import org.key_project.rusty.ast.pat.Pattern;
+import org.key_project.rusty.ast.pat.SchemaVarPattern;
+import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.ExtList;
@@ -61,6 +67,45 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     @Override
     protected void doDefaultAction(RustyProgramElement x) {
         addChild(x);
+    }
+
+    @Override
+    public void performActionOnAssignmentExpression(AssignmentExpression x) {
+        ExtList changeList = stack.peek();
+        if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            Pattern pat = changeList.removeFirstOccurrence(Pattern.class);
+            if (pat != null) {
+                if (pat instanceof IdentPattern ip) {
+                    var pv = services.getNamespaces().programVariables().lookup(ip.name());
+                    stack.pop();
+                    var el = new ExtList();
+                    assert pv != null;
+                    el.add(pv);
+                    el.addAll(changeList);
+                    stack.push(el);
+                }
+            }
+        }
+        super.performActionOnAssignmentExpression(x);
+    }
+
+    @Override
+    public void performActionOnSchemaVarPattern(SchemaVarPattern x) {
+
+    }
+
+    @Override
+    public void performActionOnSchemaRustType(SchemaRustType x) {
+        var sv = x.type().sv();
+        final Object inst = svinsts.getInstantiation(sv);
+        if (inst instanceof RustyProgramElement pe) {
+            addChild(pe);
+        } else {
+            throw new IllegalStateException(
+                    "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);
+        }
+        changed();
     }
 
     @Override
