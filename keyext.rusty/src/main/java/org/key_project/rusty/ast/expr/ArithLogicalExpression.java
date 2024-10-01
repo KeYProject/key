@@ -10,7 +10,7 @@ import org.jspecify.annotations.NonNull;
 
 public record ArithLogicalExpression(Expr left,org.key_project.rusty.ast.expr.ArithLogicalExpression.Operator op,Expr right)implements Expr{
 
-public enum Operator {
+public enum Operator implements SyntaxElement {
     Plus, Minus, Multiply, Divide, Modulo, BitwiseAnd, BitwiseOr, BitwiseXor, Shl, Shr;
 
     @Override
@@ -29,7 +29,17 @@ public enum Operator {
         };
     }
 
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Operator has no children");
     }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+}
 
     @Override
     public String toString() {
@@ -45,9 +55,10 @@ public enum Operator {
     public @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
         case 0 -> left;
-        case 1 -> right;
+        case 1 -> op;
+        case 2 -> right;
         default -> throw new IndexOutOfBoundsException(
-            "ArithLogicalExpression has only 2 children");
+            "ArithLogicalExpression has only 3 children");
         };
     }
 

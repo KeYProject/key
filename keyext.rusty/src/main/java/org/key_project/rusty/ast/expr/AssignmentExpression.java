@@ -12,14 +12,7 @@ import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NonNull;
 
-public class AssignmentExpression implements Expr {
-    private final Expr lhs;
-    private final Expr rhs;
-
-    public AssignmentExpression(Expr lhs, Expr rhs) {
-        this.lhs = lhs;
-        this.rhs = rhs;
-    }
+public record AssignmentExpression(Expr lhs, Expr rhs) implements Expr {
 
     public AssignmentExpression(ExtList changeList) {
         Pattern pat = changeList.removeFirstOccurrence(Pattern.class);
@@ -33,19 +26,11 @@ public class AssignmentExpression implements Expr {
     @Override
     public @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
-        case 0 -> lhs;
-        case 1 -> rhs;
-        default -> throw new IndexOutOfBoundsException(
-            "AssignmentExpression has only two children");
+            case 0 -> lhs;
+            case 1 -> rhs;
+            default -> throw new IndexOutOfBoundsException(
+                    "AssignmentExpression has only two children");
         };
-    }
-
-    public Expr getLhs() {
-        return lhs;
-    }
-
-    public Expr getRhs() {
-        return rhs;
     }
 
     @Override

@@ -18,9 +18,10 @@ public record ComparisonExpression(Expr left, Operator op, Expr right) implement
     public @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
             case 0 -> left;
-            case 1 -> right;
+            case 1 -> op;
+            case 2 -> right;
             default -> throw new IndexOutOfBoundsException(
-                    "ComparisonExpression has only 2 children");
+                    "ComparisonExpression has only 3 children");
         };
     }
 
@@ -34,7 +35,7 @@ public record ComparisonExpression(Expr left, Operator op, Expr right) implement
         return left + " " + op + " " + right;
     }
 
-    public enum Operator {
+    public enum Operator implements SyntaxElement {
         Equal, NotEqual, Greater, Less, GreaterOrEqual, LessOrEqual;
 
         @Override
@@ -47,5 +48,15 @@ public record ComparisonExpression(Expr left, Operator op, Expr right) implement
                 case GreaterOrEqual -> ">=";
                 case LessOrEqual -> "<=";
             };
+        }
+
+        @Override
+        public SyntaxElement getChild(int n) {
+            throw new IndexOutOfBoundsException("Operator has no children");
+        }
+
+        @Override
+        public int getChildCount() {
+            return 0;
         }
     }}

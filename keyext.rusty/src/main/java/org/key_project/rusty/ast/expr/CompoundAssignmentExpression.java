@@ -18,9 +18,10 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
     public @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
             case 0 -> left;
-            case 1 -> right;
+            case 1 -> op;
+            case 2 -> right;
             default -> throw new IndexOutOfBoundsException(
-                    "CompoundAssignmentExpression has only 2 children");
+                    "CompoundAssignmentExpression has only 3 children");
         };
     }
 
@@ -34,7 +35,7 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
         return left + " " + op + " " + right;
     }
 
-    public enum Operator {
+    public enum Operator implements SyntaxElement {
         Plus, Minus, Multiply, Divide, Modulo, And, Or, Xor, Shl, Shr;
 
         @Override
@@ -51,5 +52,15 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
                 case Shl -> "<<=";
                 case Shr -> ">>=";
             };
+        }
+
+        @Override
+        public SyntaxElement getChild(int n) {
+            throw new IndexOutOfBoundsException("Operator has no children");
+        }
+
+        @Override
+        public int getChildCount() {
+            return 0;
         }
     }}

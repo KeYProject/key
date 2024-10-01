@@ -76,6 +76,27 @@ public class IntegerLiteralExpression extends LiteralExpression {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        final var other = (IntegerLiteralExpression) obj;
+        return value.equals(other.value)
+                && suffix.equals(other.suffix);
+    }
+
+    @Override
+    public int hashCode() {
+        int hashcode = 5;
+        hashcode = 31 * hashcode + value.hashCode();
+        hashcode = 31 * hashcode + suffix.hashCode();
+        return hashcode;
+    }
+
+    @Override
     public Name getLDTName() {
         return IntLDT.NAME;
     }

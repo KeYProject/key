@@ -39,6 +39,22 @@ public class ExpressionStatement implements Statement {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        return expression.equals(((ExpressionStatement) obj).expression);
+    }
+
+    @Override
+    public int hashCode() {
+        return 17 * expression.hashCode() + 31;
+    }
+
+    @Override
     public void visit(Visitor v) {
         v.performActionOnExpressionStatement(this);
     }

@@ -8,33 +8,29 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public class NegationExpression implements Expr {
-    public enum Operator {
-        Neg, Not;
+public record NegationExpression(Expr expr,org.key_project.rusty.ast.expr.NegationExpression.Operator op)implements Expr{
 
-        @Override
-        public String toString() {
-            return switch (this) {
-            case Neg -> "!";
-            case Not -> "~";
-            };
-        }
+public enum Operator implements SyntaxElement {
+    Neg, Not;
+
+    @Override
+    public String toString() {
+        return switch (this) {
+        case Neg -> "!";
+        case Not -> "~";
+        };
     }
 
-    private final Expr expr;
-    private final Operator op;
-
-    public NegationExpression(Expr expr, Operator op) {
-        this.expr = expr;
-        this.op = op;
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Operator has no children");
     }
 
-    public Operator getOp() {
-        return op;
+    @Override
+    public int getChildCount() {
+        return 0;
     }
 
-    public Expr getExpr() {
-        return expr;
     }
 
     @Override
@@ -44,16 +40,16 @@ public class NegationExpression implements Expr {
 
     @Override
     public int getChildCount() {
-        return 1;
+        return 2;
     }
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0) {
-            return expr;
-        }
-        throw new IndexOutOfBoundsException(
-            "NegationExpression has only 1 children");
+        return switch (n) {
+        case 0 -> op;
+        case 1 -> expr;
+        default -> throw new IndexOutOfBoundsException("NegationExpression has only 2 children");
+        };
     }
 
     @Override

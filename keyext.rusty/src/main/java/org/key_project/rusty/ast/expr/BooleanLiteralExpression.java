@@ -10,6 +10,7 @@ import org.key_project.rusty.ldt.BoolLDT;
 
 import org.jspecify.annotations.NonNull;
 
+
 public class BooleanLiteralExpression extends LiteralExpression {
     private final boolean value;
 
@@ -33,6 +34,21 @@ public class BooleanLiteralExpression extends LiteralExpression {
         return "" + value;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        return value == (((BooleanLiteralExpression) obj).value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Boolean.hashCode(value);
+    }
 
     @Override
     public Name getLDTName() {

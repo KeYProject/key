@@ -59,4 +59,26 @@ public class IdentPattern implements Pattern, Named {
     public void visit(Visitor v) {
         v.performActionOnIdentPattern(this);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        final var other = (IdentPattern) obj;
+        return reference == other.reference && mutable == other.mutable
+                && ident.equals(other.ident);
+    }
+
+    @Override
+    public int hashCode() {
+        int hashcode = 5;
+        hashcode = 31 * hashcode + Boolean.hashCode(reference);
+        hashcode = 31 * hashcode + Boolean.hashCode(mutable);
+        hashcode = 31 * hashcode + ident.hashCode();
+        return hashcode;
+    }
 }
