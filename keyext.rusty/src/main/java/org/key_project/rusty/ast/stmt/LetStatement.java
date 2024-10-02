@@ -70,7 +70,12 @@ public class LetStatement implements Statement, VariableDeclaration {
 
     @Override
     public String toString() {
-        return "let " + pat + ": " + type + " = " + init;
+        var sb = new StringBuilder();
+        sb.append("let ").append(pat).append(": ").append(type);
+        if (hasInit()) {
+            sb.append(" = ").append(init);
+        }
+        return sb.append(';').toString();
     }
 
     @Override

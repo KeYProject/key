@@ -83,6 +83,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
                     el.add(pv);
                     el.addAll(changeList);
                     stack.push(el);
+                    changed();
                 }
             }
         }

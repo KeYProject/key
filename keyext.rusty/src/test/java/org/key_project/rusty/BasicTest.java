@@ -287,6 +287,7 @@ public class BasicTest {
                 PosInTerm.getTopLevel(), false),
             proof);
         assertEquals(1, proof.openGoals().size());
+        System.out.println("After letIdentPatAssign:\n" + proof.openGoals().head().sequent());
     }
 
     @Test
