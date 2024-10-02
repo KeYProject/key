@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.pat.Pattern;
@@ -12,7 +13,14 @@ import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NonNull;
 
-public record AssignmentExpression(Expr lhs, Expr rhs) implements Expr {
+public final class AssignmentExpression implements Expr {
+    private final Expr lhs;
+    private final Expr rhs;
+
+    public AssignmentExpression(Expr lhs, Expr rhs) {
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
 
     public AssignmentExpression(ExtList changeList) {
         Pattern pat = changeList.removeFirstOccurrence(Pattern.class);
@@ -26,10 +34,10 @@ public record AssignmentExpression(Expr lhs, Expr rhs) implements Expr {
     @Override
     public @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
-            case 0 -> lhs;
-            case 1 -> rhs;
-            default -> throw new IndexOutOfBoundsException(
-                    "AssignmentExpression has only two children");
+        case 0 -> lhs;
+        case 1 -> rhs;
+        default -> throw new IndexOutOfBoundsException(
+            "AssignmentExpression has only two children");
         };
     }
 
@@ -47,4 +55,29 @@ public record AssignmentExpression(Expr lhs, Expr rhs) implements Expr {
     public void visit(Visitor v) {
         v.performActionOnAssignmentExpression(this);
     }
+
+    public Expr lhs() {
+        return lhs;
+    }
+
+    public Expr rhs() {
+        return rhs;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || obj.getClass() != this.getClass())
+            return false;
+        var that = (AssignmentExpression) obj;
+        return Objects.equals(this.lhs, that.lhs) &&
+                Objects.equals(this.rhs, that.rhs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lhs, rhs);
+    }
+
 }

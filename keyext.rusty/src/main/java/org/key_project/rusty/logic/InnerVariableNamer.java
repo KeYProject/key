@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
+import org.key_project.logic.Name;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -18,7 +19,15 @@ public class InnerVariableNamer extends VariableNamer {
 
     @Override
     public ProgramVariable rename(ProgramVariable var, Goal goal, PosInOccurrence posOfFind) {
-        return null;
+        String name = var.name().toString();
+        int idx = 0;
+        Name newName = null;
+
+        do {
+            newName = new Name(name + "_" + idx);
+        } while (services.getNamespaces().lookup(newName) != null);
+
+        return new ProgramVariable(newName, var.getKeYRustyType());
     }
 
 

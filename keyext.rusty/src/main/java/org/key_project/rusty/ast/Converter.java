@@ -36,6 +36,13 @@ public class Converter {
     private final Map<VariableDeclaration, ProgramVariable> programVariables = new HashMap<>();
 
     private final Services services;
+    /**
+     * Whether the converter is in declaration mode, i.e., any IdentPattern encountered must create
+     * a new PV.
+     */
+    private boolean inDeclarationMode = false;
+    private ProgramVariable declaredVariable = null;
+    private KeYRustyType declaredType = null;
 
     public Converter(Services services) {
         this.services = services;
@@ -66,6 +73,14 @@ public class Converter {
 
     private ProgramVariable getProgramVariable(PathInExpression path) {
         return programVariables.get(getDecl(path));
+    }
+
+    private ProgramVariable getProgramVariable(Identifier path) {
+        return programVariables.get(getDecl(path));
+    }
+
+    private VariableDeclaration getDecl(Identifier path) {
+        return variables.get(path.name().toString());
     }
 
     private Label getLabel(String name) {
@@ -579,13 +594,19 @@ public class Converter {
 
     private Statement convertLetStmt(
             org.key_project.rusty.parsing.RustyParser.LetStmtContext ctx) {
-        Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
         RustType type = convertRustType(ctx.type_());
+        declaredType = new KeYRustyType(type.getSort(services));
+        inDeclarationMode = true;
+        Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
+        inDeclarationMode = false;
         Expr init = ctx.expr() == null ? null : convertExpr(ctx.expr());
         LetStatement letStatement = new LetStatement(pat,
             type,
             init);
-        declareVariable(pat, letStatement);
+        variables.put(declaredVariable.name().toString(), letStatement);
+        programVariables.put(letStatement, declaredVariable);
+        declaredVariable = null;
+        declaredType = null;
         return letStatement;
     }
 
@@ -624,9 +645,19 @@ public class Converter {
                 return new LiteralPattern();
             }
             if (pat.identifierPattern() != null) {
+                var ident = convertIdentifier(pat.identifierPattern().identifier());
+                ProgramVariable pv;
+                if (inDeclarationMode) {
+                    assert declaredType != null;
+                    assert declaredVariable == null;
+                    declaredVariable = new ProgramVariable(ident.name(), declaredType);
+                    pv = declaredVariable;
+                } else {
+                    pv = getProgramVariable(ident);
+                }
                 return new IdentPattern(pat.identifierPattern().KW_REF() != null,
                     pat.identifierPattern().KW_MUT() != null,
-                    convertIdentifier(pat.identifierPattern().identifier()));
+                    pv);
             }
             if (pat.wildcardPattern() != null) {
                 return WildCardPattern.WILDCARD;

@@ -48,6 +48,13 @@ public class SchemaConverter {
     private final Map<VariableDeclaration, ProgramVariable> programVariables = new HashMap<>();
 
     private final Services services;
+    /**
+     * Whether the converter is in declaration mode, i.e., any IdentPattern encountered must create
+     * a new PV.
+     */
+    private boolean inDeclarationMode = false;
+    private ProgramVariable declaredVariable = null;
+    private KeYRustyType declaredType = null;
 
     public SchemaConverter(Namespace<@NonNull SchemaVariable> svNS, Services services) {
         this.svNS = svNS;
@@ -82,6 +89,14 @@ public class SchemaConverter {
         return programVariables.get(getDecl(path));
     }
 
+    private ProgramVariable getProgramVariable(Identifier path) {
+        return programVariables.get(getDecl(path));
+    }
+
+    private VariableDeclaration getDecl(Identifier path) {
+        return variables.get(path.name().toString());
+    }
+
     private Label getLabel(String name) {
         throw new UnsupportedOperationException("TODO @ DD : implement getLabel");
     }
@@ -114,7 +129,7 @@ public class SchemaConverter {
         Name name = convertIdentifier(ctx.identifier()).name();
         ImmutableArray<FunctionParam> params =
             convertFunctionParams(ctx.functionParams());
-        RustType returnType = convertType(ctx.functionRetTy().type_());
+        RustType returnType = convertRustType(ctx.functionRetTy().type_());
         BlockExpression body =
             convertBlockExpr(
                 ctx.blockExpr());
@@ -676,13 +691,21 @@ public class SchemaConverter {
 
     private Statement convertLetStmt(
             org.key_project.rusty.parsing.RustySchemaParser.LetStmtContext ctx) {
+        RustType type = convertRustType(ctx.type_());
+        declaredType = new KeYRustyType(type.getSort(services));
+        inDeclarationMode = true;
         Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
-        RustType type = convertType(ctx.type_());
+        inDeclarationMode = false;
         Expr init = ctx.expr() == null ? null : convertExpr(ctx.expr());
         LetStatement letStatement = new LetStatement(pat,
             type,
             init);
-        declareVariable(pat, letStatement);
+        if (!(pat instanceof SchemaVarPattern)) {
+            variables.put(declaredVariable.name().toString(), letStatement);
+            programVariables.put(letStatement, declaredVariable);
+        }
+        declaredVariable = null;
+        declaredType = null;
         return letStatement;
     }
 
@@ -733,9 +756,17 @@ public class SchemaConverter {
                 boolean reference = pat.identifierPattern().KW_REF() != null;
                 boolean mutable = pat.identifierPattern().KW_MUT() != null;
                 if (pat.identifierPattern().identifier() != null) {
-                    return new IdentPattern(reference,
-                        mutable,
-                        convertIdentifier(pat.identifierPattern().identifier()));
+                    var ident = convertIdentifier(pat.identifierPattern().identifier());
+                    ProgramVariable pv;
+                    if (inDeclarationMode) {
+                        assert declaredType != null;
+                        assert declaredVariable == null;
+                        declaredVariable = new ProgramVariable(ident.name(), declaredType);
+                        pv = declaredVariable;
+                    } else {
+                        pv = getProgramVariable(ident);
+                    }
+                    return new IdentPattern(reference, mutable, pv);
                 }
                 return new SchemaVarPattern(reference, mutable, lookupSchemaVariable(
                     pat.identifierPattern().schemaVariable().getText().substring(2)));
@@ -747,7 +778,7 @@ public class SchemaConverter {
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
     }
 
-    private RustType convertType(
+    private RustType convertRustType(
             org.key_project.rusty.parsing.RustySchemaParser.Type_Context ctx) {
         if (ctx.typeNoBounds() != null) {
             return convertTypeNoBounds(ctx.typeNoBounds());
@@ -780,7 +811,7 @@ public class SchemaConverter {
 
     private RustType convertParenthesizedType(
             org.key_project.rusty.parsing.RustySchemaParser.ParenthesizedTypeContext ctx) {
-        return convertType(ctx.type_());
+        return convertRustType(ctx.type_());
     }
 
     private RustType convertTraitObjectOneBound(
@@ -840,14 +871,14 @@ public class SchemaConverter {
         } else {
             var self = ctx.typedSelf();
             return new SelfParam(/* TODO */ false, self.KW_MUT() != null,
-                convertType(self.type_()));
+                convertRustType(self.type_()));
         }
     }
 
     private FunctionParamPattern convertFunctionParamPattern(
             org.key_project.rusty.parsing.RustySchemaParser.FunctionParamPatternContext ctx) {
         FunctionParamPattern param = new FunctionParamPattern(convertPattern(ctx.pattern()),
-            convertType(ctx.type_()));
+            convertRustType(ctx.type_()));
         declareVariable(((IdentPattern) param.pattern()).name().toString(), param);
         return param;
     }
@@ -869,7 +900,7 @@ public class SchemaConverter {
     private ClosureParam convertClosureParam(
             org.key_project.rusty.parsing.RustySchemaParser.ClosureParamContext ctx) {
         var pat = convertPattern(ctx.pattern());
-        var ty = ctx.type_() == null ? null : convertType(ctx.type_());
+        var ty = ctx.type_() == null ? null : convertRustType(ctx.type_());
         return new ClosureParam(pat, ty);
     }
 }

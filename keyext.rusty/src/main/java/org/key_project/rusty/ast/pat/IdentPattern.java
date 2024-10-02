@@ -6,26 +6,26 @@ package org.key_project.rusty.ast.pat;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.visitor.Visitor;
+import org.key_project.rusty.logic.op.ProgramVariable;
 
 import org.jspecify.annotations.NonNull;
 
 public class IdentPattern implements Pattern, Named {
     private final boolean reference;
     private final boolean mutable;
-    private final Identifier ident;
+    private final ProgramVariable pv;
 
-    public IdentPattern(boolean reference, boolean mutable, Identifier ident) {
+    public IdentPattern(boolean reference, boolean mutable, ProgramVariable pv) {
         this.reference = reference;
         this.mutable = mutable;
-        this.ident = ident;
+        this.pv = pv;
     }
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
         if (n == 0) {
-            return ident;
+            return pv;
         }
         throw new IndexOutOfBoundsException("IdentPattern has only one child");
     }
@@ -40,7 +40,7 @@ public class IdentPattern implements Pattern, Named {
 
     @Override
     public @NonNull Name name() {
-        return ident.name();
+        return pv.name();
     }
 
     @Override
@@ -48,11 +48,19 @@ public class IdentPattern implements Pattern, Named {
         return 1;
     }
 
+    public ProgramVariable programVariable() {
+        return pv;
+    }
+
     @Override
     public String toString() {
+        var sb = new StringBuilder();
+        if (reference) {
+            sb.append("&");
+        }
         if (mutable)
-            return "mut " + ident.toString();
-        return ident.toString();
+            sb.append("mut ");
+        return sb.append(pv).toString();
     }
 
     @Override
@@ -70,7 +78,7 @@ public class IdentPattern implements Pattern, Named {
         }
         final var other = (IdentPattern) obj;
         return reference == other.reference && mutable == other.mutable
-                && ident.equals(other.ident);
+                && pv == other.pv;
     }
 
     @Override
@@ -78,7 +86,7 @@ public class IdentPattern implements Pattern, Named {
         int hashcode = 5;
         hashcode = 31 * hashcode + Boolean.hashCode(reference);
         hashcode = 31 * hashcode + Boolean.hashCode(mutable);
-        hashcode = 31 * hashcode + ident.hashCode();
+        hashcode = 31 * hashcode + pv.hashCode();
         return hashcode;
     }
 }

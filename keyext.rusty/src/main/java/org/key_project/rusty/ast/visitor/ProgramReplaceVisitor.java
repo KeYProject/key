@@ -76,7 +76,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
             Pattern pat = changeList.removeFirstOccurrence(Pattern.class);
             if (pat != null) {
                 if (pat instanceof IdentPattern ip) {
-                    var pv = services.getNamespaces().programVariables().lookup(ip.name());
+                    var pv = ip.programVariable();
                     stack.pop();
                     var el = new ExtList();
                     assert pv != null;

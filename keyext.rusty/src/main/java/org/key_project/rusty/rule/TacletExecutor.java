@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.Junctor;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -215,7 +216,9 @@ public abstract class TacletExecutor<T extends Taclet> {
             Services services, MatchConditions matchCond) {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {
-            final var inst = (ProgramVariable) matchCond.getInstantiations().getInstantiation(sv);
+            final var instObj = matchCond.getInstantiations().getInstantiation(sv);
+            final var inst = instObj instanceof IdentPattern ip ? ip.programVariable()
+                    : (ProgramVariable) instObj;
             // if the goal already contains the variable to be added
             // (not just a variable with the same name), then there is nothing to do
             Collection<ProgramVariable> progVars =
@@ -257,10 +260,10 @@ public abstract class TacletExecutor<T extends Taclet> {
 
     /**
      * adds SequentFormula to antecedent depending on position information (if none is handed over
-     * it is added at the head of the antecedent). Of course it has to be ensured that the position
+     * it is added at the head of the antecedent). Of course, it has to be ensured that the position
      * information describes one occurrence in the antecedent of the sequent.
      *
-     * @param semi the Semisequent with the the ConstrainedFormulae to be added
+     * @param semi the Semisequent with the ConstrainedFormulae to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the
      *        taclet
      * @param pos the PosInOccurrence describing the place in the sequent or null for head of
