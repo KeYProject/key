@@ -40,7 +40,10 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
-public class ProofTreePopupFactory {
+/**
+ * Factory for popup menus on proof nodes in the {@link ProofTreeView}.
+ */
+public final class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
     public static final FeatureSettings.Feature FEATURE_DELAY_CUT =
         createFeature("DELAY_CUT", "Activates the delayed cut rule.");
