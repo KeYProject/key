@@ -93,7 +93,7 @@ public class KeYMediator {
     /**
      * boolean flag indicating if the GUI is in auto mode
      */
-    private boolean inAutoMode = false;
+    private volatile boolean inAutoMode;
 
     /**
      * Currently activated listeners for user actions. Notified whenever a user action is applied.
@@ -511,13 +511,12 @@ public class KeYMediator {
 
     public synchronized void startInterface(boolean fullStop) {
         final boolean b = fullStop;
-        Runnable interfaceSignaller = () -> {
+        SwingUtilities.invokeLater(() -> {
             if (b) {
                 inAutoMode = false;
             }
             ui.notifyAutomodeStopped();
-        };
-        ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
+        });
     }
 
     /**
@@ -665,7 +664,7 @@ public class KeYMediator {
         public void proofGoalsAdded(ProofTreeEvent e) {
             ImmutableList<Goal> newGoals = e.getGoals();
             // Check for a closed goal ...
-            if (newGoals.size() == 0) {
+            if (newGoals.isEmpty()) {
                 // No new goals have been generated ...
                 closedAGoal();
             }
