@@ -56,9 +56,9 @@ public class TranslationAction extends MainWindowAction {
                     throw new RuntimeException(e);
                 }
 
-                launcher.addListener(new IsabelleLauncherProgressDialogMediator(settings, mediator.getSelectedProof()));
+                launcher.addListener(new IsabelleLauncherProgressDialogMediator(mediator.getSelectedProof()));
                 try {
-                    launcher.try0ThenSledgehammerAllPooled(list, 30, 1);
+                    launcher.try0ThenSledgehammerAllPooled(list, settings.getTimeout(), 1);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -74,10 +74,9 @@ public class TranslationAction extends MainWindowAction {
             Files.createDirectories(translationFile.toPath().getParent());
             Files.write(translationPreambleFile.toPath(), translation.getPreamble().getBytes());
             Files.write(translationFile.toPath(), translation.getSequentTranslation().getBytes());
-            LOGGER.info("Saved to: " + translationFile.toPath() + " and " + translationPreambleFile.toPath());
+            LOGGER.info("Saved to: {} and {}", translationFile.toPath(), translationPreambleFile.toPath());
         } catch (IOException e) {
             LOGGER.error("Failed to save translation", e);
-            return;
         }
     }
 }

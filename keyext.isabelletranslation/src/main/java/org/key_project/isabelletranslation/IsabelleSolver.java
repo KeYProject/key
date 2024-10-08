@@ -1,14 +1,16 @@
 package org.key_project.isabelletranslation;
 
-import java.util.TimerTask;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.Callable;
 
-public interface IsabelleSolver {
+public interface IsabelleSolver extends Callable<IsabelleResult> {
     int getSolverIndex();
 
     ReasonOfInterruption getReasonOfInterruption();
 
     enum ReasonOfInterruption {
-        User, Timeout, Exception, NoInterruption
+        User, NoInterruption
     }
 
     enum SolverState{
@@ -25,40 +27,22 @@ public interface IsabelleSolver {
 
     void interrupt(ReasonOfInterruption reason);
 
-    long getStartTime();
+    Instant getStartTime();
 
-    long getComputationTime();
+    Duration getComputationTime();
 
-    long getTimeout();
+    int getTimeout();
 
-    void setTimeout(long timeout);
+    void setTimeout(int timeout);
 
     SolverState getState();
 
-    boolean wasInterrupted();
-
     boolean isRunning();
-
-    void start(IsabelleSolverTimeout timeout, IsabelleTranslationSettings settings);
 
     String getRawSolverOutput();
 
     String getRawSolverInput();
 
     IsabelleResult getFinalResult();
-
-
-        class IsabelleSolverTimeout extends TimerTask {
-            private final IsabelleSolver solver;
-
-            public IsabelleSolverTimeout(IsabelleSolver solver) {
-                this.solver = solver;
-            }
-
-            @Override
-            public void run() {
-                solver.interrupt(ReasonOfInterruption.Timeout);
-            }
-        }
 
 }

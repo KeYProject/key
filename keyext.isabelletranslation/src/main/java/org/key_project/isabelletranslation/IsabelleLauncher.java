@@ -1,6 +1,5 @@
 package org.key_project.isabelletranslation;
 
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class IsabelleLauncher {
+public class IsabelleLauncher implements IsabelleSolverListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleLauncher.class);
 
     private final IsabelleTranslationSettings settings;
@@ -17,26 +16,29 @@ public class IsabelleLauncher {
 
     private Thread shutdownResources;
 
+    private ExecutorService executorService;
+
 
     private final List<IsabelleSolver> runningSolvers = Collections.synchronizedList(new ArrayList<>());
 
 
     private final LinkedBlockingDeque<IsabelleSolver> solverQueue = new LinkedBlockingDeque<>();
     private final Collection<IsabelleSolver> solverSet = new HashSet<>();
+    private IsabelleSolver.ReasonOfInterruption reasonOfInterruption;
 
 
     public IsabelleLauncher(@NonNull IsabelleTranslationSettings settings) throws IOException {
         this.settings = settings;
     }
 
-    public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, long timeoutSeconds, int instanceCount) throws IOException {
+    public void try0ThenSledgehammerAllPooled(List<IsabelleProblem> problems, int timeoutSeconds, int instanceCount) throws IOException {
         if (problems.isEmpty()) {
             return;
         }
 
         IsabelleResourceController resourceController = new IsabelleResourceController(instanceCount);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(instanceCount);
+        executorService = Executors.newFixedThreadPool(instanceCount);
 
         shutdownResources = new Thread(() -> {
             executorService.shutdown();
@@ -45,8 +47,9 @@ public class IsabelleLauncher {
         Runtime.getRuntime().addShutdownHook(shutdownResources);
 
         for (int i = 0; i < problems.size(); i++) {
-            IsabelleSolver solver = new IsabelleSolverInstance(problems.get(i), List.of(new IsabelleSolverListener[0]), i, resourceController, settings);
+            IsabelleSolver solver = new IsabelleSledgehammerSolver(problems.get(i), List.of(this), i, resourceController, settings);
             solver.setTimeout(timeoutSeconds);
+
             solverQueue.add(solver);
             solverSet.add(solver);
         }
@@ -60,13 +63,10 @@ public class IsabelleLauncher {
         //Ensure the preamble theory is present
         TranslationAction.writeTranslationFiles(problems.get(0));
 
-
-        Collection<Callable<List<IsabelleResult>>> tasks = launchSolverInstances(instanceCount);
-
         LOGGER.info("Setup complete, starting {} problems...", problems.size());
 
         try {
-            executorService.invokeAll(tasks);
+            executorService.invokeAll(solverQueue);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (RejectedExecutionException e) {
@@ -77,23 +77,6 @@ public class IsabelleLauncher {
         }
 
         listener.launcherStopped(this, solverSet);
-    }
-
-    private @NotNull Collection<Callable<List<IsabelleResult>>> launchSolverInstances(int instanceCount) {
-        Collection<Callable<List<IsabelleResult>>> tasks = new LinkedBlockingDeque<>();
-
-        for (int i = 0; i < instanceCount; i++) {
-            tasks.add(() -> {
-                IsabelleSolver solver;
-                while ((solver = solverQueue.poll()) != null) {
-                    runningSolvers.add(solver);
-                    solver.start(null, settings);
-                    runningSolvers.remove(solver);
-                }
-                return null;
-            });
-        }
-        return tasks;
     }
 
     private void shutdown() {
@@ -108,15 +91,41 @@ public class IsabelleLauncher {
     }
 
     public void stopAll(IsabelleSolver.ReasonOfInterruption reasonOfInterruption) {
+        this.reasonOfInterruption = reasonOfInterruption;
+
         shutdown();
-        solverQueue.forEach((solver) -> solver.interrupt(reasonOfInterruption));
+
+        executorService.shutdownNow();
+
+        solverQueue.forEach(solver -> solver.interrupt(reasonOfInterruption));
         solverQueue.clear();
 
-
-        runningSolvers.forEach((solver) -> solver.interrupt(reasonOfInterruption));
+        runningSolvers.forEach(solver -> {
+            if (reasonOfInterruption != null) {
+                solver.interrupt(reasonOfInterruption);
+            }
+        });
         runningSolvers.clear();
 
-
         listener.launcherStopped(this, solverSet);
+    }
+
+    @Override
+    public void processStarted(IsabelleSolver solver, IsabelleProblem problem) {
+        runningSolvers.add(solver);
+        solverQueue.remove(solver);
+    }
+
+    @Override
+    public void processError(IsabelleSolver solver, IsabelleProblem problem, Exception e) {
+        runningSolvers.remove(solver);
+        if (reasonOfInterruption != null) {
+            solver.interrupt(reasonOfInterruption);
+        }
+    }
+
+    @Override
+    public void processStopped(IsabelleSolver solver, IsabelleProblem problem) {
+        runningSolvers.remove(solver);
     }
 }

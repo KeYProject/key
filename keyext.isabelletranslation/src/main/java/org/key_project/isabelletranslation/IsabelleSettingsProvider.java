@@ -7,8 +7,13 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.Configuration;
 
 import javax.swing.*;
+import java.math.RoundingMode;
 
 public class IsabelleSettingsProvider extends SettingsPanel implements SettingsProvider {
+    public static final String INFO_TIMEOUT_FIELD =
+            """
+                    Timeout for the external solvers in seconds. Fractions of a second are allowed. Example: 6.5
+                    """;
     private static final String infoTranslationPathPanel =
             """
                     Choose where the isabelle translation files are stored.
@@ -20,6 +25,8 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
 
     private final JTextField translationPathPanel;
     private final JTextField isabellePathPanel;
+    private final JSpinner timeoutField;
+    private final IsabelleTranslationSettings settings;
 
     public IsabelleSettingsProvider() {
         super();
@@ -28,6 +35,8 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
                 "Isabelle settings are stored in: " + IsabelleTranslationSettings.SETTINGS_FILE_NEW.getAbsolutePath());
         translationPathPanel = createTranslationPathPanel();
         isabellePathPanel = createIsabellePathPanel();
+        timeoutField = createTimeoutField();
+        this.settings = IsabelleTranslationSettings.getInstance();
     }
 
     @Override
@@ -42,16 +51,30 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         return this;
     }
 
-    protected JTextField createTranslationPathPanel() {
+    private JTextField createTranslationPathPanel() {
         return addFileChooserPanel("Store translation to file:", "", infoTranslationPathPanel,
                 true, e -> {
                 });
     }
 
-    protected JTextField createIsabellePathPanel() {
+    private JTextField createIsabellePathPanel() {
         return addFileChooserPanel("Isabelle folder:", "", infoIsabellePathPanel,
                 true, e -> {
                 });
+    }
+
+    private JSpinner createTimeoutField() {
+        // Use doubles so that the formatter doesn't make every entered String into integers.
+        // [see NumberFormatter#stringToValue()].
+        JSpinner timeoutSpinner = addNumberField("Timeout:", 1, Integer.MAX_VALUE, 1,
+                INFO_TIMEOUT_FIELD,
+                e -> settings.setTimeout(e.intValue()));
+        // Set the editor so that entered Strings only have three decimal places.
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(timeoutSpinner, "#");
+        // Use floor rounding to be consistent with the value that will be set for the timeout.
+        editor.getFormat().setRoundingMode(RoundingMode.FLOOR);
+        timeoutSpinner.setEditor(editor);
+        return timeoutSpinner;
     }
 
     @Override
@@ -59,6 +82,6 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         Configuration newConfig = new Configuration();
         newConfig.set(IsabelleTranslationSettings.translationPathKey, translationPathPanel.getText());
         newConfig.set(IsabelleTranslationSettings.isabellePathKey, isabellePathPanel.getText());
-        IsabelleTranslationSettings.getInstance().readSettings(newConfig);
+        settings.readSettings(newConfig);
     }
 }

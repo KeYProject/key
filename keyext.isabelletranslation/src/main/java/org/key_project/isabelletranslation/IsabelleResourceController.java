@@ -49,8 +49,8 @@ public class IsabelleResourceController {
 
     public void init() throws IOException {
         for (int i = 0; i < numberOfInstances; i++) {
-            IsabelleResource newResource = createIsabelleResource();
-            if (!isShutdown() && newResource != null) {
+            if (!isShutdown()) {
+                IsabelleResource newResource = createIsabelleResource();
                 idleInstances.add(newResource);
             }
         }
@@ -68,7 +68,7 @@ public class IsabelleResourceController {
 
         instanceCreatorService.shutdownNow();
 
-        waitingSolvers.forEach((x) -> x.interrupt(IsabelleSolver.ReasonOfInterruption.Exception));
+        waitingSolvers.forEach((x) -> x.interrupt(IsabelleSolver.ReasonOfInterruption.User));
         waitingSolvers.clear();
 
         idleInstances.forEach(IsabelleResource::destroy);
@@ -118,14 +118,10 @@ public class IsabelleResourceController {
             if (e.getCause() instanceof IOException) {
                 throw (IOException) e.getCause();
             }
-            if (isShutdown()) {
-                return null;
-            }
             LOGGER.error("Error during Isabelle setup");
             throw new RuntimeException(e);
         } catch (RejectedExecutionException e) {
-            //IsabelleResourceController is shutdown
-            return null;
+            throw new RuntimeException("Unreachable code during Isabelle instance creation");
         }
     }
 
@@ -178,7 +174,7 @@ public class IsabelleResourceController {
             instance.executeMLCodeNow("error \"Interrupt\"");
         }
 
-        public void interrupt() {
+        private void interrupt() {
             try {
                 interruptIntern();
             } catch (IsabelleMLException e) {

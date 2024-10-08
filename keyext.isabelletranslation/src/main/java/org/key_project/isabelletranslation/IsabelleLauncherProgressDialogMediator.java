@@ -10,16 +10,19 @@ import org.key_project.isabelletranslation.gui.ProofApplyUserAction;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.DecimalFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Timer;
 import java.util.Collection;
 import java.util.TimerTask;
 
 public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherListener {
+    private static final DecimalFormat remainingTimeFormat = new DecimalFormat("#.#");
     private final Timer timer = new Timer();
     private int finishedCounter = 0;
 
     private final Proof proof;
-    private final IsabelleTranslationSettings settings;
 
 
     private final static ColorSettings.ColorProperty RED =
@@ -27,6 +30,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
 
     private final static ColorSettings.ColorProperty GREEN =
             ColorSettings.define("[isabelleDialog]green", "", new Color(43, 180, 43));
+    private boolean userStopFlag = false;
 
     @Override
     public void launcherStopped(IsabelleLauncher launcher, Collection<IsabelleSolver> finishedInstances) {
@@ -35,8 +39,6 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         progressModel.setEditable(true);
         refreshDialog();
         progressDialog.setModus(IsabelleProgressDialog.Modus.SOLVERS_DONE);
-
-        //TODO automatic closing of goals without apply button?
     }
 
     @Override
@@ -58,6 +60,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     }
 
     protected void stopEvent(IsabelleLauncher launcher) {
+        userStopFlag = true;
         launcher.stopAll(IsabelleSolver.ReasonOfInterruption.User);
     }
 
@@ -81,7 +84,6 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     }
 
     private void stopped(IsabelleSolver solver) {
-
         int x = 0;
         int y = solver.getSolverIndex();
 
@@ -94,54 +96,54 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
             problemProcessed[x][y] = true;
         }
 
-        if (solver.wasInterrupted()) {
-            interrupted(solver);
-        } else if (solver.getFinalResult().isSuccessful()) {
-            successfullyStopped(solver, x, y);
-        } else {
-            unknownStopped(x, y);
+        IsabelleResult result = solver.getFinalResult();
+
+        switch (result.getType()) {
+            case INTERRUPTED:
+                interrupted(solver, x, y);
+                break;
+            case SUCCESS:
+                successfullyStopped(solver, x, y);
+                break;
+            case ERROR:
+                encounteredError(solver, x, y);
+                break;
+            case TIMEOUT:
+                timedOut(solver, x, y);
+                break;
+            default:
+                unknownStopped(x, y);
+                break;
         }
     }
 
-    private void interrupted(IsabelleSolver solver) {
-        IsabelleSolver.ReasonOfInterruption reason = solver.getReasonOfInterruption();
-        int x = 0;
-        int y = solver.getSolverIndex();
-        switch (reason) {
-            case Exception -> {
-                progressModel.setProgress(0, x, y);
-                progressModel.setTextColor(RED.get(), x, y);
-                progressModel.setText("Exception!", x, y);
-            }
-            case NoInterruption -> throw new RuntimeException("This position should not be reachable!");
-            case Timeout -> {
-                progressModel.setProgress(0, x, y);
-                progressModel.setText("Timeout.", x, y);
-            }
-            case User -> {
-                progressModel.setProgress(0, x, y);
-                progressModel.setText("Interrupted by user.", x, y);
-            }
+    private void interrupted(IsabelleSolver solver, int x, int y) {
+        if (userStopFlag) {
+            progressModel.setProgress(0, x, y);
+            progressModel.setText("Interrupted by user.", x, y);
+        } else {
+            throw new RuntimeException("This position should not be reachable!");
         }
     }
 
     private void successfullyStopped(IsabelleSolver solver, int x, int y) {
-        //TODO add time information
-
         progressModel.setProgress(0, x, y);
         progressModel.setTextColor(GREEN.get(), x, y);
 
-        String timeInfo = getTimeInSecAsString(solver.getComputationTime());
+        String timeInfo = solver.getComputationTime().toMillis() / 1000d + "s";
 
         progressModel.setText("Valid (" + timeInfo + ")", x, y);
     }
 
-    String getTimeInSecAsString(long timeToSolve) {
-        long intPart = timeToSolve / 1000;
-        long decPart = timeToSolve % 1000;
-        String decString = decPart >= 100 ? Long.toString(decPart)
-                : decPart >= 10 ? "0" + decPart : "00" + decPart;
-        return intPart + "." + decString + "s";
+    private void encounteredError(IsabelleSolver solver, int x, int y) {
+        progressModel.setProgress(0, x, y);
+        progressModel.setTextColor(RED.get(), x, y);
+        progressModel.setText("Exception!", x, y);
+    }
+
+    private void timedOut(IsabelleSolver solver, int x, int y) {
+        progressModel.setProgress(0, x, y);
+        progressModel.setText("Interrupted by User.", x, y);
     }
 
     private void unknownStopped(int x, int y) {
@@ -153,7 +155,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     private void setProgressText(int value) {
         JProgressBar bar = progressDialog.getProgressBar();
             if (value == -1) {
-                bar.setString("Preparing...");
+                bar.setString("Preparing... (this might take a few seconds)");
                 bar.setStringPainted(true);
             } else if (value == bar.getMaximum()){
                 bar.setString("Finished.");
@@ -169,8 +171,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         progressDialog.dispose();
     }
 
-    public IsabelleLauncherProgressDialogMediator(IsabelleTranslationSettings settings, Proof proof) {
-        this.settings = settings;
+    public IsabelleLauncherProgressDialogMediator(Proof proof) {
         this.proof = proof;
     }
 
@@ -212,30 +213,25 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         }
     }
 
-    private boolean refreshProgressOfSolver(IsabelleSolver solver) {
+    private void refreshProgressOfSolver(IsabelleSolver solver) {
         IsabelleSolver.SolverState state = solver.getState();
-        return switch (state) {
+        switch (state) {
             case Preparing -> {
                 preparing(solver);
-                yield true;
             }
             case Parsing -> {
                 parsing(solver);
-                yield true;
             }
             case Running -> {
                 running(solver);
-                yield true;
             }
             case Stopped -> {
                 stopped(solver);
-                yield false;
             }
             case Waiting -> {
                 waiting(solver);
-                yield true;
             }
-        };
+        }
 
     }
 
@@ -244,22 +240,19 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         progressModel.setProgress((int) progress, 0, solver.getSolverIndex());
 
         float remainingTime = calculateRemainingTime(solver);
-        progressModel.setText(remainingTime + " sec.", 0, solver.getSolverIndex());
+        progressModel.setText(remainingTimeFormat.format(remainingTime) + " sec.", 0, solver.getSolverIndex());
     }
 
     private long calculateProgress(IsabelleSolver solver) {
-        long maxTime = solver.getTimeout() * 1000;
-        long startTime = solver.getStartTime();
-        long currentTime = System.currentTimeMillis();
+        Duration maxDuration = Duration.ofSeconds(solver.getTimeout());
+        Instant startTime = solver.getStartTime();
 
-        return RESOLUTION - ((currentTime - startTime) * RESOLUTION) / maxTime;
+        return RESOLUTION * (Duration.between(startTime, Instant.now()).toMillis() / maxDuration.toMillis());
     }
 
     private float calculateRemainingTime(IsabelleSolver solver) {
-        long timeoutTime = solver.getStartTime() + solver.getTimeout() * 1000;
-        long currentTime = System.currentTimeMillis();
-        long temp = (timeoutTime - currentTime) / 100;
-        return Math.max((float) temp / 10.0f, 0);
+        Instant timeoutTime = solver.getStartTime().plusSeconds(solver.getTimeout());
+        return Duration.between(Instant.now(), timeoutTime).toMillis() / 1000f;
     }
 
     private void parsing(IsabelleSolver solver) {
@@ -286,8 +279,6 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
 
         @Override
         public void infoButtonClicked(int column, int row) {
-            //SolverListener.InternSMTProblem problem = getProblem(column, row);
-            //showInformation(problem);
         }
 
         @Override

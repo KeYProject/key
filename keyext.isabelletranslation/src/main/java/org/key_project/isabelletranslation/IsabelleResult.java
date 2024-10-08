@@ -1,14 +1,22 @@
 package org.key_project.isabelletranslation;
 
+import java.time.Duration;
+
 public class IsabelleResult {
     public String getDescription() {
         return this.type.getDescription();
     }
 
-    enum Type {
+    public Type getType() {
+        return this.type;
+    }
+
+    public enum Type {
         SUCCESS ("Success"),
         ERROR ("Error"),
-        TIMEOUT ("Timeout");
+        TIMEOUT ("Timeout"),
+        INTERRUPTED("Interrupted"),
+        UNKNOWN ("Unknown");
 
         Type(String description) {
             this.description = description;
@@ -25,13 +33,13 @@ public class IsabelleResult {
 
     private final Type type;
 
-    private final long computationTime;
+    private final Duration computationTime;
 
     private final String successfulTactic;
 
     private final Exception exception;
 
-    private IsabelleResult(Type type, long computationTime, String successfulTactic, Exception exception) {
+    private IsabelleResult(Type type, Duration computationTime, String successfulTactic, Exception exception) {
         this.type = type;
         this.computationTime = computationTime;
         this.successfulTactic = successfulTactic;
@@ -42,16 +50,24 @@ public class IsabelleResult {
         return type == Type.SUCCESS;
     }
 
-    public static IsabelleResult getTimeoutResult(long computationTime) {
+    public static IsabelleResult getTimeoutResult(Duration computationTime) {
         return new IsabelleResult(Type.TIMEOUT, computationTime, null, null);
     }
 
     public static IsabelleResult getErrorResult(Exception exception) {
-        return new IsabelleResult(Type.ERROR, -1, null, exception);
+        return new IsabelleResult(Type.ERROR, null, null, exception);
     }
 
-    public static IsabelleResult getSuccessResult(String successfulTactic, long computationTime) {
+    public static IsabelleResult getSuccessResult(String successfulTactic, Duration computationTime) {
         return new IsabelleResult(Type.SUCCESS, computationTime, successfulTactic, null);
+    }
+
+    public static IsabelleResult getInterruptedResult() {
+        return new IsabelleResult(Type.INTERRUPTED, null, null, null);
+    }
+
+    public static IsabelleResult getUnknownResult() {
+        return new IsabelleResult(Type.UNKNOWN, null, null, null);
     }
 
     public boolean isError() {
@@ -62,7 +78,7 @@ public class IsabelleResult {
         return type == Type.TIMEOUT;
     }
 
-    public long getComputationTime() {
+    public Duration getComputationTime() {
         return this.computationTime;
     }
 

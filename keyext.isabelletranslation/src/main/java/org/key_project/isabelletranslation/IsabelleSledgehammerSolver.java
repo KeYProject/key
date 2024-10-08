@@ -16,13 +16,14 @@ import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
+public class IsabelleSledgehammerSolver implements IsabelleSolver {
     private final int solverIndex;
     private IsabelleResult result;
 
@@ -32,17 +33,6 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
      * The SMT problem that is related to this solver
      */
     private final IsabelleProblem problem;
-
-    /**
-     * The thread that is associated with this solver.
-     */
-    private Thread thread;
-
-    /**
-     * The timeout that is associated with this solver. Represents the timertask that is started
-     * when the solver is started.
-     */
-    private IsabelleSolverTimeout solverTimeout;
 
     /**
      * stores the reason for interruption if present (e.g. User, Timeout, Exception)
@@ -57,7 +47,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     /**
      * Stores the settings that are used for the execution.
      */
-    private IsabelleTranslationSettings isabelleSettings;
+    private final IsabelleTranslationSettings isabelleSettings;
 
     /**
      * If there was an exception while executing the solver it is stored in this attribute.
@@ -67,25 +57,26 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     /**
      * The timeout in seconds for this SMT solver run.
      */
-    private long timeout = -1;
+    private int timeout;
 
-    private long startTime;
+    private Instant startTime;
 
-    private long computationTime;
+    private java.time.Duration computationTime;
 
     private final IsabelleResourceController resourceController;
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSolverInstance.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSledgehammerSolver.class);
     private final Collection<IsabelleSolverListener> listeners;
 
-    public IsabelleSolverInstance(IsabelleProblem problem, Collection<IsabelleSolverListener> listeners, int solverIndex, IsabelleResourceController resourceController, IsabelleTranslationSettings settings) {
+    public IsabelleSledgehammerSolver(IsabelleProblem problem, Collection<IsabelleSolverListener> listeners, int solverIndex, IsabelleResourceController resourceController, IsabelleTranslationSettings settings) {
         this.problem = problem;
         this.solverIndex = solverIndex;
         this.listeners = new HashSet<>();
         this.listeners.addAll(listeners);
         this.resourceController = resourceController;
         this.isabelleSettings = settings;
+        this.timeout = isabelleSettings.getTimeout();
     }
 
     @Override
@@ -121,20 +112,17 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     @Override
     public void interrupt(ReasonOfInterruption reason) {
         setReasonOfInterruption(reason);
-        this.result = IsabelleResult.getErrorResult(new TimeoutException());
-        setSolverState(SolverState.Stopped);
-        if (solverTimeout != null) {
-            solverTimeout.cancel();
-        }
-        if (thread != null) {
-            thread.interrupt();
-        }
+        this.result = IsabelleResult.getInterruptedResult();
         if (isabelleResource != null) {
             returnResource();
         }
+        setSolverState(SolverState.Stopped);
     }
 
     private void returnResource() {
+        if (isabelleResource == null) {
+            return;
+        }
         resourceController.returnResource(this, isabelleResource);
         isabelleResource = null;
     }
@@ -148,17 +136,17 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     }
 
     @Override
-    public long getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
     @Override
-    public long getTimeout() {
+    public int getTimeout() {
         return this.timeout;
     }
 
     @Override
-    public void setTimeout(long timeout) {
+    public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
 
@@ -168,28 +156,8 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
     }
 
     @Override
-    public boolean wasInterrupted() {
-        return reasonOfInterruption != ReasonOfInterruption.NoInterruption;
-    }
-
-    @Override
     public boolean isRunning() {
         return solverState == SolverState.Running;
-    }
-
-    @Override
-    public void start(IsabelleSolverTimeout timeout, IsabelleTranslationSettings settings) {
-        thread = new Thread(this, "IsabelleSolverInstance: " + getProblem().getName());
-        this.solverTimeout = timeout;
-        isabelleSettings = settings;
-
-        //TODO probably want asynchronous behavior
-        thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            thread.interrupt();
-        }
     }
 
     @Override
@@ -207,68 +175,53 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
         return this.result;
     }
 
+
     @Override
-    public void run() {
+    public IsabelleResult call() throws InterruptedException {
         //Ensure there is an active IsabelleInstance
         setSolverState(SolverState.Preparing);
         try {
             isabelleResource = resourceController.getIsabelleResource(this);
         } catch (InterruptedException e) {
-            notifyProcessError(e);
-            return;
+            return handleInterrupt();
         }
 
 
         notifyProcessStarted();
-        startTime = System.currentTimeMillis();
+        startTime = Instant.now();
         Isabelle isabelle = isabelleResource.instance();
 
-        ToplevelState toplevel = ToplevelState.apply(isabelle);
-        LOGGER.info("Parsing theory for: " + problem.getName());
+
+        LOGGER.info("Parsing theory for: {}", problem.getName());
         setSolverState(SolverState.Parsing);
-        notifyParsingStarted();
+        ToplevelState toplevel = ToplevelState.apply(isabelle);
         try {
             toplevel = parseTheory(toplevel, isabelleResource);
         } catch (InterruptedException e) {
-            setSolverState(SolverState.Stopped);
-            notifyParsingError(e);
-            returnResource();
-            return;
+            return handleInterrupt();
         } catch (IsabelleMLException e) {
-            setSolverState(SolverState.Stopped);
-            returnResource();
-            notifyParsingError(e);
-            return;
+            return handleIsabelleError(e);
         }
-        notifyParsingFinished();
-        LOGGER.debug("Finished Parsing");
+        LOGGER.info("Finished Parsing");
+
 
         setSolverState(SolverState.Running);
-        notifySledgehammerStarted();
-
         try {
             this.result = sledgehammer(isabelleResource, toplevel);
-            computationTime = System.currentTimeMillis() - startTime;
-            notifySledgehammerFinished();
+            computationTime = java.time.Duration.between(startTime, Instant.now());
         } catch (TimeoutException e) {
-            setReasonOfInterruption(ReasonOfInterruption.Timeout);
-            computationTime = System.currentTimeMillis() - startTime;
             this.result = IsabelleResult.getTimeoutResult(computationTime);
-            notifySledgehammerFinished();
+            computationTime = java.time.Duration.between(startTime, Instant.now());
         } catch (InterruptedException e) {
-            this.result = IsabelleResult.getErrorResult(e);
-            notifySledgehammerError(e);
+            return handleInterrupt();
         } catch (IsabelleMLException e) {
-            this.result = IsabelleResult.getErrorResult(e);
-            setReasonOfInterruption(ReasonOfInterruption.Exception);
-            notifySledgehammerError(e);
-        } finally {
-            returnResource();
-            //getProblem().setResult(this.result);
-            setSolverState(SolverState.Stopped);
-            notifyProcessFinished();
-            LOGGER.info("Sledgehammer result: {}", this.result.getDescription());
+            return handleIsabelleError(e);
         }
+        LOGGER.info("Sledgehammer result: {}", this.result.getDescription());
+        returnResource();
+        setSolverState(SolverState.Stopped);
+        notifyProcessFinished();
+        return this.result;
     }
 
     private ToplevelState parseTheory(ToplevelState toplevel, IsabelleResourceController.IsabelleResource resource) throws InterruptedException, IsabelleMLException {
@@ -276,7 +229,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
         Isabelle isabelle = resource.instance();
         Theory thy0 = resource.theory();
 
-        if (wasInterrupted()) {
+        if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
         MLFunction2<Theory, String, List<Tuple2<Transition, String>>> parse_text = MLValue.compileFunction("""
@@ -291,27 +244,21 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
                             in addtext (Symbol.explode text) transitions end""", isabelle,
                     Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter(), new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())));
 
-        if (wasInterrupted()) {
+        if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
         MLFunction3<Object, Transition, ToplevelState, ToplevelState> command_exception = MLValue.compileFunction("fn (int, tr, st) => Toplevel.command_exception int tr st", isabelle,
                 de.unruh.isabelle.mlvalue.Implicits.booleanConverter(), Implicits.transitionConverter(), Implicits.toplevelStateConverter(), Implicits.toplevelStateConverter());
 
         java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
-        Future<List<Tuple2<Transition, String>>> transitionList = parse_text.apply(thy0, getProblem().getSequentTranslation(), isabelle,
+        List<Tuple2<Transition, String>> transitionList = parse_text.apply(thy0, getProblem().getSequentTranslation(), isabelle,
                         Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
-                .retrieve(new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())), isabelle);
-        try {
-            Await.result(transitionList, Duration.create(1, TimeUnit.HOURS))
-                    .foreach(transitionsAndTexts::add);
-        } catch (TimeoutException e) {
-            //Should not be reached
-            throw new RuntimeException(e);
-        }
+                .retrieveNow(new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())), isabelle);
+        transitionList.foreach(transitionsAndTexts::add);
 
         for (Tuple2<Transition, String> transitionAndText : transitionsAndTexts) {
             //println(s"""Transition: "${text.strip}"""")
-            if (reasonOfInterruption != ReasonOfInterruption.NoInterruption) {
+            if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
             result = command_exception.apply(Boolean.TRUE, transitionAndText._1(), result, isabelle,
@@ -342,7 +289,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
                                            val ctxt = Proof.context_of p_state;
                                            val params =\s""" + Sledgehammer_Commands + """
                                 .default_params thy
-                                                [("timeout",\"""" + timeout + """
+                                                [("timeout",\"""" + (double) timeout + """
                                 "),("verbose","true"),("provers", "cvc4 verit z3 e spass vampire zipperposition")];
                                 val results =\s"""
                                 + sledgehammer + """
@@ -376,52 +323,33 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
         if (successful) {
             result = IsabelleResult.getSuccessResult(resultFutureCollect._2()._2().head(), computationTime);
         } else {
-            result = IsabelleResult.getTimeoutResult(computationTime);
+            result = IsabelleResult.getUnknownResult();
         }
         this.result = result;
         return this.result;
     }
 
+    private IsabelleResult handleInterrupt() {
+        this.result = IsabelleResult.getInterruptedResult();
+        returnResource();
+        Thread.currentThread().interrupt();
+        setSolverState(SolverState.Stopped);
+        notifyProcessError(new InterruptedException());
+        return this.result;
+    }
+
+    private IsabelleResult handleIsabelleError(Exception e) {
+        this.result = IsabelleResult.getErrorResult(e);
+        this.exception = e;
+        returnResource();
+        setSolverState(SolverState.Stopped);
+        notifyProcessError(e);
+        return this.result;
+    }
+
     @Override
-    public long getComputationTime() {
+    public java.time.Duration getComputationTime() {
         return computationTime;
-    }
-
-
-    private void notifyParsingStarted() {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.parsingStarted(this, getProblem());
-        }
-    }
-
-    private void notifyParsingFinished() {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.parsingFinished(this, getProblem());
-        }
-    }
-
-    private void notifyParsingError(Exception e) {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.parsingFailed(this, getProblem(), e);
-        }
-    }
-
-    private void notifyBuildingStarted() {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.buildingStarted(this, getProblem());
-        }
-    }
-
-    private void notifyBuildingFinished() {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.buildingFinished(this, getProblem());
-        }
-    }
-
-    private void notifyBuildingError(Exception e) {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.buildingFailed(this, getProblem(), e);
-        }
     }
 
     private void notifyProcessStarted() {
@@ -438,35 +366,7 @@ public class IsabelleSolverInstance implements IsabelleSolver, Runnable {
 
     private void notifyProcessError(Exception e) {
         for (IsabelleSolverListener listener : listeners) {
-            listener.processInterrupted(this, getProblem(), e);
+            listener.processError(this, getProblem(), e);
         }
-    }
-
-    private void notifyProcessTimeout() {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.processTimeout(this, getProblem());
-        }
-    }
-
-    private void notifySledgehammerStarted() {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.sledgehammerStarted(this, getProblem());
-        }
-    }
-
-    private void notifySledgehammerFinished() {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.sledgehammerFinished(this, getProblem());
-        }
-    }
-
-    private void notifySledgehammerError(Exception e) {
-        for (IsabelleSolverListener listener : listeners) {
-            listener.sledgehammerFailed(this, getProblem(), e);
-        }
-    }
-
-    public void removeListener(IsabelleSolverListener listener) {
-        listeners.remove(listener);
     }
 }

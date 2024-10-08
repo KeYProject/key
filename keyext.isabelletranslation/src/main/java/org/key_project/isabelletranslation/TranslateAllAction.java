@@ -59,9 +59,9 @@ public class TranslateAllAction extends MainWindowAction {
                 throw new RuntimeException(e);
             }
 
-            launcher.addListener(new IsabelleLauncherProgressDialogMediator(settings, mediator.getSelectedProof()));
+            launcher.addListener(new IsabelleLauncherProgressDialogMediator(mediator.getSelectedProof()));
             try {
-                launcher.try0ThenSledgehammerAllPooled(translations, 30, 1);
+                launcher.try0ThenSledgehammerAllPooled(translations, settings.getTimeout(), 1);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
