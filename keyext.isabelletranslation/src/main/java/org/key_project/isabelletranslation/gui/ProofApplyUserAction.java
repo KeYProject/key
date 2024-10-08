@@ -7,8 +7,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
-import org.key_project.isabelletranslation.IsabelleProblem;
-import org.key_project.isabelletranslation.IsabelleSolver;
+import org.key_project.isabelletranslation.automation.IsabelleProblem;
+import org.key_project.isabelletranslation.automation.IsabelleSolver;
 
 import java.util.Collection;
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package org.key_project.isabelletranslation;
+package org.key_project.isabelletranslation.automation;
 
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.control.IsabelleMLException;
@@ -11,6 +11,7 @@ import de.unruh.isabelle.pure.Implicits;
 import de.unruh.isabelle.pure.Position;
 import de.unruh.isabelle.pure.Theory;
 import de.unruh.isabelle.pure.TheoryHeader;
+import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import scala.collection.immutable.List;

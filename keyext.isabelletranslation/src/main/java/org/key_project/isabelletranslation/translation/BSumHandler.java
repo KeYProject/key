@@ -1,10 +1,10 @@
-package org.key_project.isabelletranslation;
+package org.key_project.isabelletranslation.translation;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
 import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
@@ -13,13 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class QuantifierHandler implements IsabelleHandler {
+public class BSumHandler implements IsabelleHandler {
     private final Map<Operator, String> supportedOperators = new HashMap<>();
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) throws IOException {
-        supportedOperators.put(Quantifier.ALL, "\\<forall>");
-        supportedOperators.put(Quantifier.EX, "\\<exists>");
+        supportedOperators.clear();
+        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+
+        supportedOperators.put(integerLDT.getBsum(), "\\<Sum>");
     }
 
     @Override
@@ -38,9 +40,9 @@ public class QuantifierHandler implements IsabelleHandler {
                 trans.addGenericSort(sort);
             }
         }
-        result.append(". (");
-        result.append(trans.translate(term.sub(0))).append("))");
+        result.append("=");
+        result.append(trans.translate(term.sub(0))).append("..<").append(trans.translate(term.sub(1))).append(". ");
+        result.append(trans.translate(term.sub(2))).append(")");
         return result;
     }
-
 }

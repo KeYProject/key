@@ -3,6 +3,11 @@ package org.key_project.isabelletranslation;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import org.key_project.isabelletranslation.automation.IsabelleLauncher;
+import org.key_project.isabelletranslation.automation.IsabelleProblem;
+import org.key_project.isabelletranslation.automation.IsabelleSolverListener;
+import org.key_project.isabelletranslation.translation.IllegalFormulaException;
+import org.key_project.isabelletranslation.translation.IsabelleTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +61,7 @@ public class TranslationAction extends MainWindowAction {
                     throw new RuntimeException(e);
                 }
 
-                launcher.addListener(new IsabelleLauncherProgressDialogMediator(mediator.getSelectedProof()));
+                launcher.addListener(new IsabelleSolverListener.IsabelleLauncherProgressDialogMediator(mediator.getSelectedProof()));
                 try {
                     launcher.try0ThenSledgehammerAllPooled(list, settings.getTimeout(), 1);
                 } catch (IOException e) {
@@ -65,18 +70,5 @@ public class TranslationAction extends MainWindowAction {
 
             }, "IsabelleLauncherThread");
             thread.start();
-    }
-
-    protected static void writeTranslationFiles(IsabelleProblem translation) {
-        File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/Translation.thy");
-        File translationPreambleFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/TranslationPreamble.thy");
-        try {
-            Files.createDirectories(translationFile.toPath().getParent());
-            Files.write(translationPreambleFile.toPath(), translation.getPreamble().getBytes());
-            Files.write(translationFile.toPath(), translation.getSequentTranslation().getBytes());
-            LOGGER.info("Saved to: {} and {}", translationFile.toPath(), translationPreambleFile.toPath());
-        } catch (IOException e) {
-            LOGGER.error("Failed to save translation", e);
-        }
     }
 }

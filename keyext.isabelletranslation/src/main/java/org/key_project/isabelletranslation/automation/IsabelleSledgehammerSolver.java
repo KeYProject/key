@@ -1,4 +1,4 @@
-package org.key_project.isabelletranslation;
+package org.key_project.isabelletranslation.automation;
 
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.control.IsabelleMLException;
@@ -7,6 +7,7 @@ import de.unruh.isabelle.pure.Implicits;
 import de.unruh.isabelle.pure.Theory;
 import de.unruh.isabelle.pure.ToplevelState;
 import de.unruh.isabelle.pure.Transition;
+import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;

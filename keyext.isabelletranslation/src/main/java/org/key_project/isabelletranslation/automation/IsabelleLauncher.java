@@ -1,10 +1,14 @@
-package org.key_project.isabelletranslation;
+package org.key_project.isabelletranslation.automation;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.isabelletranslation.IsabelleTranslationSettings;
+import org.key_project.isabelletranslation.TranslationAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -36,6 +40,9 @@ public class IsabelleLauncher implements IsabelleSolverListener {
             return;
         }
 
+        //Ensure the preamble theory is present
+        problems.get(0).writeTranslationFiles(settings);
+
         IsabelleResourceController resourceController = new IsabelleResourceController(instanceCount);
 
         executorService = Executors.newFixedThreadPool(instanceCount);
@@ -58,10 +65,6 @@ public class IsabelleLauncher implements IsabelleSolverListener {
 
         resourceController.init();
         listener.launcherPreparationFinished(this, solverSet);
-
-
-        //Ensure the preamble theory is present
-        TranslationAction.writeTranslationFiles(problems.get(0));
 
         LOGGER.info("Setup complete, starting {} problems...", problems.size());
 
