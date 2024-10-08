@@ -755,9 +755,16 @@ public class Converter {
 
     private FunctionParamPattern convertFunctionParamPattern(
             org.key_project.rusty.parsing.RustyParser.FunctionParamPatternContext ctx) {
-        FunctionParamPattern param = new FunctionParamPattern(convertPattern(ctx.pattern()),
-            convertRustType(ctx.type_()));
-        declareVariable(((IdentPattern) param.pattern()).name().toString(), param);
+        RustType type = convertRustType(ctx.type_());
+        declaredType = new KeYRustyType(type.getSort(services));
+        inDeclarationMode = true;
+        Pattern pat = convertPattern(ctx.pattern());
+        inDeclarationMode = false;
+        FunctionParamPattern param = new FunctionParamPattern(pat, type);
+        variables.put(declaredVariable.name().toString(), param);
+        programVariables.put(param, declaredVariable);
+        declaredVariable = null;
+        declaredType = null;
         return param;
     }
 
