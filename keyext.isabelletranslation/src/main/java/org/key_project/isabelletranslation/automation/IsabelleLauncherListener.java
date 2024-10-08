@@ -1,4 +1,4 @@
-package org.key_project.isabelletranslation;
+package org.key_project.isabelletranslation.automation;
 
 import java.util.Collection;
 

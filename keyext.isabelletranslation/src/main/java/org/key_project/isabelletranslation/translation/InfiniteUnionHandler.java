@@ -1,4 +1,4 @@
-package org.key_project.isabelletranslation;
+package org.key_project.isabelletranslation.translation;
 
 import de.uka.ilkd.key.java.Services;
 import org.key_project.logic.Term;
@@ -10,13 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class SeqDefHandler implements IsabelleHandler {
-
+public class InfiniteUnionHandler implements IsabelleHandler {
     private final Map<Operator, String> supportedOperators = new HashMap<>();
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) throws IOException {
-        supportedOperators.put(services.getTypeConverter().getSeqLDT().getSeqDef(), "SeqDef");
+        supportedOperators.put(services.getTypeConverter().getLocSetLDT().getInfiniteUnion(), "infiniteUnion");
     }
 
     @Override
@@ -27,11 +26,8 @@ public class SeqDefHandler implements IsabelleHandler {
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
-        StringBuilder arg1 = trans.translate(term.sub(0));
-        StringBuilder arg2 = trans.translate(term.sub(1));
-        String arg3 = "(\\<lambda>" + LogicalVariableHandler.makeVarRef(trans, term.boundVars().get(0).name().toString(), term.boundVars().get(0).sort()) + ". " +
-                " to_any (" + trans.translate(term.sub(2)) + "))";
+        String arg1 = "{" + trans.translate(term.sub(0)) + "| " + LogicalVariableHandler.makeVarRef(trans, term.boundVars().get(0).name().toString(), term.boundVars().get(0).sort()) + ". True }";
 
-        return new StringBuilder("(seqDef ").append(arg1).append(arg2).append(arg3).append(")");
+        return new StringBuilder("(").append(supportedOperators.get(op)).append(arg1).append(")");
     }
 }

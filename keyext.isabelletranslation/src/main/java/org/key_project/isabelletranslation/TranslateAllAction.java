@@ -6,6 +6,12 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
+import org.key_project.isabelletranslation.automation.IsabelleLauncher;
+import org.key_project.isabelletranslation.automation.IsabelleProblem;
+import org.key_project.isabelletranslation.automation.IsabelleResult;
+import org.key_project.isabelletranslation.automation.IsabelleSolverListener;
+import org.key_project.isabelletranslation.translation.IllegalFormulaException;
+import org.key_project.isabelletranslation.translation.IsabelleTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +40,7 @@ public class TranslateAllAction extends MainWindowAction {
 
     private void generateTranslation() {
         KeYMediator mediator = getMediator();
+        IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
 
         List<IsabelleProblem> translations = new ArrayList<>();
@@ -46,12 +53,9 @@ public class TranslateAllAction extends MainWindowAction {
             return;
         }
 
-        writeTranslationFiles(translations.get(0));
+        translations.get(0).writeTranslationFiles(settings);
 
-        IsabelleResult result = null;
         Thread thread = new Thread(() -> {
-
-            IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
             IsabelleLauncher launcher;
             try {
                 launcher = new IsabelleLauncher(IsabelleTranslationSettings.getInstance());
@@ -59,7 +63,7 @@ public class TranslateAllAction extends MainWindowAction {
                 throw new RuntimeException(e);
             }
 
-            launcher.addListener(new IsabelleLauncherProgressDialogMediator(mediator.getSelectedProof()));
+            launcher.addListener(new IsabelleSolverListener.IsabelleLauncherProgressDialogMediator(mediator.getSelectedProof()));
             try {
                 launcher.try0ThenSledgehammerAllPooled(translations, settings.getTimeout(), 1);
             } catch (IOException e) {
@@ -68,28 +72,5 @@ public class TranslateAllAction extends MainWindowAction {
 
         }, "IsabelleControlThread");
         thread.start();
-        //result = translation.getResult();
-        //SledgehammerResult result = translation.sledgehammer(30);
-
-        //TODO needs its own action to enable undo, etc. and naming reworks
-        if (result != null && result.isSuccessful()) {
-            IBuiltInRuleApp app = SMTRuleApp.RULE.createApp("Isabelle " + result.getSuccessfulTactic());
-            app.tryToInstantiate(mediator.getSelectedGoal());
-            mediator.getSelectedGoal().apply(app);
-        }
-    }
-
-    protected static void writeTranslationFiles(IsabelleProblem translation) {
-        File translationFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/Translation.thy");
-        File translationPreambleFile = new File(IsabelleTranslationSettings.getInstance().getTranslationPath() + "/TranslationPreamble.thy");
-        try {
-            Files.createDirectories(translationFile.toPath().getParent());
-            Files.write(translationPreambleFile.toPath(), translation.getPreamble().getBytes());
-            Files.write(translationFile.toPath(), translation.getSequentTranslation().getBytes());
-            LOGGER.info("Saved to: " + translationFile.toPath() + " and " + translationPreambleFile.toPath());
-        } catch (IOException e) {
-            LOGGER.error("Failed to save translation", e);
-            return;
-        }
     }
 }

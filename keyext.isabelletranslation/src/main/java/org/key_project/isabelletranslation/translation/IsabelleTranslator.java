@@ -1,4 +1,4 @@
-package org.key_project.isabelletranslation;
+package org.key_project.isabelletranslation.translation;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -6,6 +6,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ArraySort;
+import org.key_project.isabelletranslation.automation.IsabelleProblem;
+import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 
