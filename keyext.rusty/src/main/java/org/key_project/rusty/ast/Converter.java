@@ -43,6 +43,7 @@ public class Converter {
     private boolean inDeclarationMode = false;
     private ProgramVariable declaredVariable = null;
     private KeYRustyType declaredType = null;
+    private boolean inContextFunction = false;
 
     public Converter(Services services) {
         this.services = services;
@@ -50,15 +51,6 @@ public class Converter {
 
     public Services getServices() {
         return services;
-    }
-
-    private void declareVariable(Pattern pat, LetStatement decl) {
-        if (pat instanceof IdentPattern ip) {
-            Name name = ip.name();
-            variables.put(name.toString(), decl);
-            programVariables.put(decl, new ProgramVariable(name,
-                new KeYRustyType(decl.type().getSort(services))));
-        }
     }
 
     private void declareVariable(String name, FunctionParamPattern decl) {
@@ -101,8 +93,11 @@ public class Converter {
     public Function convertFunction(
             org.key_project.rusty.parsing.RustyParser.Function_Context ctx) {
         Name name = convertIdentifier(ctx.identifier()).name();
+        if (name.toString().equals(Context.TMP_FN_NAME))
+            inContextFunction = true;
         ImmutableArray<FunctionParam> params =
             convertFunctionParams(ctx.functionParams());
+        inContextFunction = false;
         RustType returnType = convertRustType(ctx.functionRetTy().type_());
         BlockExpression body =
             convertBlockExpr(ctx.blockExpr());
@@ -652,6 +647,9 @@ public class Converter {
                     assert declaredVariable == null;
                     declaredVariable = new ProgramVariable(ident.name(), declaredType);
                     pv = declaredVariable;
+                } else if (inContextFunction) {
+                    pv = services.getNamespaces().programVariables().lookup(ident.name());
+                    declaredVariable = pv;
                 } else {
                     pv = getProgramVariable(ident);
                 }
@@ -757,7 +755,7 @@ public class Converter {
             org.key_project.rusty.parsing.RustyParser.FunctionParamPatternContext ctx) {
         RustType type = convertRustType(ctx.type_());
         declaredType = new KeYRustyType(type.getSort(services));
-        inDeclarationMode = true;
+        inDeclarationMode = !inContextFunction;
         Pattern pat = convertPattern(ctx.pattern());
         inDeclarationMode = false;
         FunctionParamPattern param = new FunctionParamPattern(pat, type);

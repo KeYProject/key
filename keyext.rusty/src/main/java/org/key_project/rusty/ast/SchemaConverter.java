@@ -55,6 +55,7 @@ public class SchemaConverter {
     private boolean inDeclarationMode = false;
     private ProgramVariable declaredVariable = null;
     private KeYRustyType declaredType = null;
+    private boolean inContextFunction = false;
 
     public SchemaConverter(Namespace<@NonNull SchemaVariable> svNS, Services services) {
         this.svNS = svNS;
@@ -127,8 +128,11 @@ public class SchemaConverter {
     public Function convertFunction(
             org.key_project.rusty.parsing.RustySchemaParser.Function_Context ctx) {
         Name name = convertIdentifier(ctx.identifier()).name();
+        if (name.toString().equals(Context.TMP_FN_NAME))
+            inContextFunction = true;
         ImmutableArray<FunctionParam> params =
             convertFunctionParams(ctx.functionParams());
+        inContextFunction = false;
         RustType returnType = convertRustType(ctx.functionRetTy().type_());
         BlockExpression body =
             convertBlockExpr(
@@ -763,6 +767,9 @@ public class SchemaConverter {
                         assert declaredVariable == null;
                         declaredVariable = new ProgramVariable(ident.name(), declaredType);
                         pv = declaredVariable;
+                    } else if (inContextFunction) {
+                        pv = services.getNamespaces().programVariables().lookup(ident.name());
+                        declaredVariable = pv;
                     } else {
                         pv = getProgramVariable(ident);
                     }
@@ -877,9 +884,16 @@ public class SchemaConverter {
 
     private FunctionParamPattern convertFunctionParamPattern(
             org.key_project.rusty.parsing.RustySchemaParser.FunctionParamPatternContext ctx) {
-        FunctionParamPattern param = new FunctionParamPattern(convertPattern(ctx.pattern()),
-            convertRustType(ctx.type_()));
-        declareVariable(((IdentPattern) param.pattern()).name().toString(), param);
+        RustType type = convertRustType(ctx.type_());
+        declaredType = new KeYRustyType(type.getSort(services));
+        inDeclarationMode = !inContextFunction;
+        Pattern pat = convertPattern(ctx.pattern());
+        inDeclarationMode = false;
+        FunctionParamPattern param = new FunctionParamPattern(pat, type);
+        variables.put(declaredVariable.name().toString(), param);
+        programVariables.put(param, declaredVariable);
+        declaredVariable = null;
+        declaredType = null;
         return param;
     }
 

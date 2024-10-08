@@ -13,7 +13,7 @@ import org.jspecify.annotations.NonNull;
  * non-declared variables are used
  */
 public class Context {
-    private static final String TMP_FN_NAME = "__RUSTY_KEY_CTX_FN_NAME__";
+    public static final String TMP_FN_NAME = "__RUSTY_KEY_CTX_FN_NAME__";
     private final Namespace<@NonNull ProgramVariable> varNS;
 
     public Context(Namespace<@NonNull ProgramVariable> varNS) {
