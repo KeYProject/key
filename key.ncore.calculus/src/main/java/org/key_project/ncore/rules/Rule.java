@@ -27,7 +27,8 @@ public interface Rule<G extends @NonNull ProofGoal<G>, App extends RuleApp<G>> e
     /**
      * the name of the rule
      */
-    @NonNull Name name();
+    @NonNull
+    Name name();
 
     /**
      * returns the display name of the rule

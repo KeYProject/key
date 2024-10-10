@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.jspecify.annotations.NonNull;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.proof.Goal;
-import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
 
 public interface RuleApp extends org.key_project.ncore.rules.RuleApp<@NonNull Goal> {
     /**
@@ -27,12 +28,11 @@ public interface RuleApp extends org.key_project.ncore.rules.RuleApp<@NonNull Go
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param goal the Goal where to apply the rule
+     * @param services
      * @return list of new created goals
      */
     @Override
-    @Nullable
-    ImmutableList<Goal> execute(@NonNull Goal goal);
+    void execute(Namespace<? super @NonNull Function> fns);
 
     /**
      * returns true if all variables are instantiated

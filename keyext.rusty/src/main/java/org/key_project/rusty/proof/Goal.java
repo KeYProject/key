@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.ncore.proof.ProofGoal;
+import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.Sequent;
@@ -15,6 +15,9 @@ import org.key_project.rusty.rule.TacletApp;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+
 
 
 public final class Goal implements ProofGoal<@NonNull Goal> {
@@ -107,9 +110,14 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
          * caught.
          */
         final ImmutableList<Goal> goalList;
-        goalList = ruleApp.execute(this);
-        // can be null when the taclet failed to apply (RuleAbortException)
-        if (goalList == null) {
+        ruleApp.execute(localNamespaces.functions());
+        addAppliedRuleApp(ruleApp);
+
+        try {
+            goalList = ruleApp.rule().apply(this, ruleApp);
+        } catch (RuleAbortException rae) {
+            removeLastAppliedRuleApp();
+            getNode().setAppliedRuleApp(null);
             return null;
         }
 
@@ -165,6 +173,14 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         }
 
         return goalList;
+    }
+
+    /**
+     * PRECONDITION: appliedRuleApps.size () > 0
+     */
+    public void removeLastAppliedRuleApp() {
+        appliedRuleApps = appliedRuleApps.tail();
+        // node ().setAppliedRuleApp ( null );
     }
 
     /**

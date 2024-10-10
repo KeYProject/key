@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op.sv;
 
-import org.key_project.logic.Named;
 
 /**
  * This interface represents the root of a schema variable hierarchy to be express termstructures
@@ -13,14 +12,14 @@ import org.key_project.logic.Named;
  */
 public interface SchemaVariable extends org.key_project.logic.op.sv.SchemaVariable {
     @Override
-    default boolean isFormula() {return false;}
+    default boolean isFormula() { return false; }
 
     @Override
-    default boolean isVariable() {return false;}
+    default boolean isVariable() { return false; }
 
     @Override
-    default boolean isTerm() {return false;}
+    default boolean isTerm() { return false; }
 
     @Override
-    default boolean isSkolemTerm() {return false;}
+    default boolean isSkolemTerm() { return false; }
 }

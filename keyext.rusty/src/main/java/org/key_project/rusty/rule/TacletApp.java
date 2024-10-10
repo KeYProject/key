@@ -222,24 +222,20 @@ public abstract class TacletApp implements RuleApp {
      * @return list of new created goals
      */
     @Override
-    public @Nullable ImmutableList<Goal> execute(Goal goal) {
-        final var services = goal.getOverlayServices();
+    public void execute(Namespace<? super @NonNull Function> localFunctionNamespace) {
         if (!complete()) {
             throw new IllegalStateException(
                 "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
         }
 
-        if (!isExecutable(services)) {
+        if (!isExecutable()) {
             throw new RuntimeException(
                 "taclet application with unsatisfied 'checkPrefix': " + this);
         }
-        registerSkolemConstants(goal.getLocalNamespaces());
-        goal.addAppliedRuleApp(this);
-
-        return taclet().apply(goal, this);
+        registerSkolemConstants(localFunctionNamespace);
     }
 
-    public boolean isExecutable(Services services) {
+    public boolean isExecutable() {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet rwt) {
             ImmutableList<Term> oldUpdCtx =
@@ -388,14 +384,13 @@ public abstract class TacletApp implements RuleApp {
         return calculateNonInstantiatedSV();
     }
 
-    public void registerSkolemConstants(NamespaceSet nss) {
+    public void registerSkolemConstants(Namespace<? super @NonNull Function> functions) {
         final SVInstantiations insts = instantiations();
         final Iterator<SchemaVariable> svIt = insts.svIterator();
         while (svIt.hasNext()) {
             final SchemaVariable sv = svIt.next();
             if (sv instanceof SkolemTermSV) {
                 final Term inst = (Term) insts.getInstantiation(sv);
-                final Namespace<@NonNull Function> functions = nss.functions();
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule

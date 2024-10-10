@@ -43,7 +43,8 @@ public class Semisequent extends org.key_project.ncore.sequent.Semisequent {
     }
 
     @Override
-    protected SemisequentChangeInfo createSemisequentChangeInfo(ImmutableList<SequentFormula> seqList) {
+    protected SemisequentChangeInfo createSemisequentChangeInfo(
+            ImmutableList<SequentFormula> seqList) {
         return new org.key_project.rusty.logic.SemisequentChangeInfo(seqList);
     }
 

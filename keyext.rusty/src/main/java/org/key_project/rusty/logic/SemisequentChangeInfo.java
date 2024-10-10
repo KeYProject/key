@@ -5,13 +5,13 @@ package org.key_project.rusty.logic;
 
 import org.key_project.ncore.sequent.Semisequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 public class SemisequentChangeInfo extends org.key_project.ncore.sequent.SemisequentChangeInfo {
     public SemisequentChangeInfo() {
     }
 
-    public SemisequentChangeInfo(ImmutableList<org.key_project.ncore.sequent.SequentFormula> formulas) {
+    public SemisequentChangeInfo(
+            ImmutableList<org.key_project.ncore.sequent.SequentFormula> formulas) {
         super(formulas);
     }
 
@@ -31,5 +31,6 @@ public class SemisequentChangeInfo extends org.key_project.ncore.sequent.Semiseq
         } else {
             semisequent = new org.key_project.rusty.logic.Semisequent(modifiedSemisequent());
         }
-        return semisequent;    }
+        return semisequent;
+    }
 }

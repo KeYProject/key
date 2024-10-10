@@ -3,13 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import java.util.Iterator;
 
-import org.checkerframework.checker.units.qual.N;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
@@ -21,9 +18,9 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
-import static org.key_project.util.Strings.formatAsList;
 
-public abstract class Taclet extends org.key_project.ncore.rules.Taclet<@NonNull Goal, @NonNull TacletApp> implements Rule {
+public abstract class Taclet extends
+        org.key_project.ncore.rules.Taclet<@NonNull Goal, @NonNull TacletApp> implements Rule {
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
@@ -36,10 +33,11 @@ public abstract class Taclet extends org.key_project.ncore.rules.Taclet<@NonNull
      */
     protected Taclet(Name name, org.key_project.ncore.rules.TacletApplPart applPart,
             ImmutableList<org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate<@NonNull Goal, TacletApp>> goalTemplates,
-            org.key_project.ncore.rules.TacletAttributes attrs, ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+            org.key_project.ncore.rules.TacletAttributes attrs,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
             boolean surviveSmbExec,
             ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
-       super(name, applPart, goalTemplates, attrs, prefixMap, surviveSmbExec, tacletAnnotations);
+        super(name, applPart, goalTemplates, attrs, prefixMap, surviveSmbExec, tacletAnnotations);
     }
 
     public final TacletMatcher getMatcher() {

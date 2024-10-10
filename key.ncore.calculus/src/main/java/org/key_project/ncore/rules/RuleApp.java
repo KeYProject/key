@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.rules;
 
-import org.jspecify.annotations.NonNull;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.ncore.proof.ProofGoal;
-import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
 
 public interface RuleApp<G extends @NonNull ProofGoal<G>> {
     /**
@@ -22,8 +23,7 @@ public interface RuleApp<G extends @NonNull ProofGoal<G>> {
      * @param goal the Goal where to apply the rule
      * @return list of new created goals
      */
-    @Nullable
-    ImmutableList<G> execute(G goal);
+    void execute(Namespace<? super @NonNull Function> fns);
 
     /**
      * returns true if all variables are instantiated

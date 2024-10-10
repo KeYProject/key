@@ -61,7 +61,7 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent {
      */
     private Sequent() {
         super(Semisequent.EMPTY_SEMISEQUENT,
-        Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT);
     }
 
     /** creates new Sequent with antecedence and succedence */
@@ -88,7 +88,8 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent {
      * @return the resulting sequent
      */
     @Override
-    protected Sequent composeSequent(boolean antec, org.key_project.ncore.sequent.Semisequent semiSeq) {
+    protected Sequent composeSequent(boolean antec,
+            org.key_project.ncore.sequent.Semisequent semiSeq) {
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent().isEmpty()) {
                 return EMPTY_SEQUENT;

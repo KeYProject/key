@@ -10,7 +10,8 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-public interface Rule extends org.key_project.ncore.rules.Rule<@NonNull Goal, @NonNull RuleApp>, Named {
+public interface Rule
+        extends org.key_project.ncore.rules.Rule<@NonNull Goal, @NonNull RuleApp>, Named {
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
