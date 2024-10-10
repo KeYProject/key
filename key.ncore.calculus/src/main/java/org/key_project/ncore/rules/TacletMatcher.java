@@ -40,7 +40,8 @@ public interface TacletMatcher {
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
     MatchConditions checkVariableConditions(SchemaVariable var,
-                                            SyntaxElement instantiationCandidate, MatchConditions matchCond, LogicServices services);
+            SyntaxElement instantiationCandidate, MatchConditions matchCond,
+            LogicServices services);
 
     /**
      * checks the provided matches against the variable conditions of this taclet It returns the
