@@ -247,7 +247,8 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         Duration maxDuration = Duration.ofSeconds(solver.getTimeout());
         Instant startTime = solver.getStartTime();
 
-        return RESOLUTION * (Duration.between(startTime, Instant.now()).toMillis() / maxDuration.toMillis());
+        return (long) Math.floor(RESOLUTION
+                        * (Duration.between(startTime, Instant.now()).toMillis() / (double) maxDuration.toMillis()));
     }
 
     private float calculateRemainingTime(IsabelleSolver solver) {
