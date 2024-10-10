@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-public interface RuleApp<App extends @NonNull RuleApp<App>> extends org.key_project.ncore.rules.RuleApp<@NonNull Goal, App> {
+public interface RuleApp extends org.key_project.ncore.rules.RuleApp<@NonNull Goal> {
     /**
      * returns the rule of this rule application
      */

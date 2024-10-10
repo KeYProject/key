@@ -9,11 +9,11 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-public interface RuleApp<G extends @NonNull ProofGoal<G>, App extends @NonNull RuleApp<G, App>> {
+public interface RuleApp<G extends @NonNull ProofGoal<G>> {
     /**
      * returns the rule of this rule application
      */
-    Rule<G, App> rule();
+    Rule<G, ? extends RuleApp<G>> rule();
 
     /**
      * applies the specified rule at the specified position if all schema variables have been

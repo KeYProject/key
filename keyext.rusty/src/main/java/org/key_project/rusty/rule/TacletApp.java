@@ -11,6 +11,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.rules.Rule;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.*;
@@ -87,7 +88,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the Rule the application information is collected for
      */
     @Override
-    public Taclet rule() {
+    public Rule<@NonNull Goal, org.key_project.ncore.rules.RuleApp<@NonNull Goal>> rule() {
         return taclet;
     }
 
