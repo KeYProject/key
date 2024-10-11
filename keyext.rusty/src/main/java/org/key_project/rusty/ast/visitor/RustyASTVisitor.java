@@ -326,4 +326,9 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     public void performActionOnWildCardPattern(WildCardPattern x) {
         doDefaultAction(x);
     }
+
+    @Override
+    public void performActionOnRangepattern(RangePattern x) {
+        doDefaultAction(x);
+    }
 }

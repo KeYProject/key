@@ -129,4 +129,6 @@ public interface Visitor {
     void performActionOnAltPattern(AltPattern x);
 
     void performActionOnWildCardPattern(WildCardPattern x);
+
+    void performActionOnRangepattern(RangePattern x);
 }

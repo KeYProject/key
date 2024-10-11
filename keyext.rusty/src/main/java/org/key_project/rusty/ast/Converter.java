@@ -661,7 +661,49 @@ public class Converter {
                 return WildCardPattern.WILDCARD;
             }
         }
+        else if (ctx.rangePattern() != null) {
+            return convertRangePattern(ctx.rangePattern());
+        }
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
+    }
+
+    private Pattern convertRangePattern(RustyParser.RangePatternContext ctx) {
+        if (ctx.rangeExclusivePattern() != null)
+            return convertRangeExclusivePattern(ctx.rangeExclusivePattern());
+        if (ctx.rangeInclusivePattern() != null)
+            return convertRangeInclusivePattern(ctx.rangeInclusivePattern());
+        if (ctx.rangeFromPattern() != null)
+            return convertRangeFromPattern(ctx.rangeFromPattern());
+        if (ctx.rangeToInclusivePattern() != null)
+            return convertRangeToInclusivePattern(ctx.rangeToInclusivePattern());
+        if (ctx.obsoleteRangePattern() != null)
+            return convertObsoleteRangePattern(ctx.obsoleteRangePattern());
+        throw new IllegalArgumentException("Unknown range pattern " + ctx.getText());
+    }
+
+    private Pattern convertRangeExclusivePattern(RustyParser.RangeExclusivePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)), RangePattern.Bounds.Exclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
+    }
+
+    private Pattern convertRangeInclusivePattern(RustyParser.RangeInclusivePatternContext ctx) {
+        throw new IllegalArgumentException("TODO @ TR");
+    }
+
+    private Pattern convertRangeFromPattern(RustyParser.RangeFromPatternContext ctx) {
+        throw new IllegalArgumentException("TODO @ TR");
+    }
+
+    private Pattern convertRangeToInclusivePattern(RustyParser.RangeToInclusivePatternContext ctx) {
+        throw new IllegalArgumentException("TODO @ TR");
+    }
+
+    private Pattern convertObsoleteRangePattern(RustyParser.ObsoleteRangePatternContext ctx) {
+        throw new IllegalArgumentException("TODO @ TR");
+    }
+
+    private Expr convertRangePatternBound(RustyParser.RangePatternBoundContext ctx) {
+        // TODO do this next
+        throw new IllegalArgumentException("TODO @ TR");
     }
 
     private RustType convertRustType(org.key_project.rusty.parsing.RustyParser.Type_Context ctx) {

@@ -592,4 +592,9 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnWildCardPattern(WildCardPattern x) {
 
     }
+
+    @Override
+    public void performActionOnRangepattern(RangePattern x) {
+
+    }
 }
