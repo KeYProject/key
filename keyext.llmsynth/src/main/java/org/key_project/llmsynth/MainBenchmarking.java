@@ -88,14 +88,14 @@ public class MainBenchmarking {
             tmpdir = Files.createTempDirectory("keyLlmSynth").toFile();
             tmpfile = File.createTempFile("MyFile", ".java", tmpdir).getAbsolutePath();
         } catch (IOException e) {
-            System.out.println("Setup failed");
+            System.err.println("Setup failed");
             e.printStackTrace();
             System.exit(1);
         }
         final String token = tokenDraft;
-        var benchmarkConfig = new ControlParameters().setMaxRestarts(1).setMaxSeachDepth(8).setKeyTimeoutSeconds(100);
+        var benchmarkConfig = new ControlParameters().setMaxRestarts(1).setMaxSeachDepth(1).setKeyTimeoutSeconds(100);
 
-        System.out.printf("Saving temporary files in %s", tmpfile);
+        System.err.printf("Saving temporary files in %s", tmpfile);
         LegacyInterfaceFactory lsp = new LegacyInterfaceFactory(Path.of(tmpfile));
         // Task: Create a contract for the given method; we do not care about the method's surroundings
         StrategyProvider<TaskSpecifyFunction, Nothing> legacySpecifyFunctionProvider = lsp.getTaskSpecifyFunctionProvider();
@@ -106,7 +106,9 @@ public class MainBenchmarking {
 
         OracleGpt3_5_Turbo.print_Messages = true;
 
-        System.out.println("[BENCHMARK_RUNNER] BENCHMARK CATEGORY: CONTRACT");
+        System.out.println("{");
+        System.out.println("  \"contracts\": ");
+
         iterateDirectory(benchmark_dir_contract, benchmark_list,ATTEMPTS,  (ClassInfo ci, String methodname) -> {
             MethodInfo mi = new MethodInfo(methodname);
             BenchmarkParameters bp = new BenchmarkParameters();
@@ -117,10 +119,13 @@ public class MainBenchmarking {
             Benchmark benchmark = new Benchmark(bp);
             var bmr = BenchmarkRunner.create(token, legacySpecifyFunctionProvider, legacySpecifySubcontractProvider, legacySpecifyLoopinvariantProvider);
 
-            bmr.run(benchmark);
+            String benchmark_results = bmr.run(benchmark);
+            System.out.println(benchmark_results);
         });
 
-        System.out.println("[BENCHMARK_RUNNER] BENCHMARK CATEGORY: SUBCONTRACT");
+        System.out.println("  ,");
+        System.out.println("  \"subcontracts\": ");
+
         iterateDirectory(benchmark_dir_subcontracts, benchmark_list,ATTEMPTS,  (ClassInfo ci, String metadata) -> {
             var metadataSplit = metadata.split("\n");
             MethodInfo mi = new MethodInfo(metadataSplit[1]);
@@ -133,10 +138,13 @@ public class MainBenchmarking {
             Benchmark benchmark = new Benchmark(bp);
             var bmr = BenchmarkRunner.create(token, legacySpecifyFunctionProvider, legacySpecifySubcontractProvider, legacySpecifyLoopinvariantProvider);
 
-            bmr.run(benchmark);
+            String benchmark_results = bmr.run(benchmark);
+            System.out.println(benchmark_results);
         });
 
-        System.out.println("[BENCHMARK_RUNNER] BENCHMARK CATEGORY: INVARIANT");
+        System.out.println("  ,");
+        System.out.println("  \"invariants\": ");
+
         iterateDirectory(benchmark_dir_invariants, benchmark_list,ATTEMPTS,  (ClassInfo ci, String methodname) -> {
             MethodInfo mi = new MethodInfo(methodname);
             BenchmarkParameters bp = new BenchmarkParameters();
@@ -147,8 +155,11 @@ public class MainBenchmarking {
             Benchmark benchmark = new Benchmark(bp);
             var bmr = BenchmarkRunner.create(token, legacySpecifyFunctionProvider, legacySpecifySubcontractProvider, legacySpecifyLoopinvariantProvider);
 
-            bmr.run(benchmark);
+            String benchmark_results = bmr.run(benchmark);
+            System.out.println(benchmark_results);
         });
+
+        System.out.println("}");
 
     }
 
@@ -170,10 +181,9 @@ public class MainBenchmarking {
                     }
                 }
                 if (!runBenchmark) {
-                    System.out.println("[BENCHMARK_RUNNER] Skipping " + javaFile.getAbsolutePath() + " because it is not in the benchmark list");
+                    System.err.println("[BENCHMARK_RUNNER] Skipping " + javaFile.getAbsolutePath() + " because it is not in the benchmark list");
                     continue;
                 }
-                System.out.println("[BENCHMARK_RUNNER] FILE: " + javaFile.getAbsolutePath());
                 File metadataFile = new File(directories, "meta.txt");
                 String metadata = null;
                 try {
@@ -191,7 +201,7 @@ public class MainBenchmarking {
                     continue;
                 }
                 for (int i = 0; i < attempts; i++) {
-                    System.out.println("[BENCHMARK_RUNNER] ATTEMPT: " + i);
+                    System.err.println("[BENCHMARK_RUNNER] ATTEMPT: " + i);
                     boolean success = true;
                     int restarts = 0;
                     do {
@@ -204,7 +214,7 @@ public class MainBenchmarking {
                             e.printStackTrace();
                             success = false;
                             restarts++;
-                            System.out.println("[BENCHMARK_RUNNER] RESTARTING: " + restarts);
+                            System.err.println("[BENCHMARK_RUNNER] RESTARTING: " + restarts);
                             try {
                                 Thread.sleep(5000);
                             } catch (InterruptedException ignored) {}

@@ -1,5 +1,7 @@
 package org.key_project.llmsynth.benchmarks;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.key_project.llmsynth.ISearchNode;
 import org.key_project.llmsynth.prompts.Prompt;
 import org.key_project.llmsynth.SearchNode;
@@ -51,10 +53,12 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
 
     /**
      * If the given benchmark is not completed, the BenchmarkRunner will try to solve it and store appropriate data denominating it.
+     *
      * @param benchmark The benchmark to be completed
+     * @return
      */
-    public void run(Benchmark benchmark) {
-        if (benchmark.isFinished()) return;
+    public String run(Benchmark benchmark) {
+        if (benchmark.isFinished()) return null;
         // this method is essentially only here to select the correct strategies and types
         // todo: this can be made fully independent of Type by yet another indirection, which may be added later
         // todo: it should be typesafe after making it independent
@@ -73,7 +77,14 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                 TFunc data = funcStrategyProvider.createUserData();
                 Function<Prompt, VerificationResult> defaultVerificator = funcStrategyProvider.createDefaultVerificator(param.oracle, task);
 
-                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                var roots = run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                ObjectMapper om = new ObjectMapper();
+                try {
+                    String serialized = om.writeValueAsString(roots);
+                    return serialized;
+                } catch (JsonProcessingException e) {
+                    System.err.println(e);
+                }
                 break;
             }
             case SPECIFY_SUBCONTRACT: {
@@ -82,7 +93,14 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                 TSub data = subStrategyProvider.createUserData();
                 Function<Prompt, VerificationResult> defaultVerificator = subStrategyProvider.createDefaultVerificator(param.oracle, task);
 
-                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                var roots = run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                ObjectMapper om = new ObjectMapper();
+                try {
+                    String serialized = om.writeValueAsString(roots);
+                    return serialized;
+                } catch (JsonProcessingException e) {
+                    System.err.println(e);
+                }
                 break;
             }
             case SPECIFY_LOOP_INVARIANT: {
@@ -91,13 +109,21 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                 TLoop data = loopStrategyProvider.createUserData();
                 Function<Prompt, VerificationResult> defaultVerificator = loopStrategyProvider.createDefaultVerificator(param.oracle, task);
 
-                run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                var roots = run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
+                ObjectMapper om = new ObjectMapper();
+                try {
+                    String serialized = om.writeValueAsString(roots);
+                    return serialized;
+                } catch (JsonProcessingException e) {
+                    System.err.println(e);
+                }
                 break;
             }
         }
+        return null;
     }
 
-    private static <TUserData> void run(
+    private static <TUserData> List<SearchNode<TUserData>> run(
             Benchmark benchmark,
             ControlParameters ctl,
             LLMTask task, // todo: this should be the concrete instance type (otherwise the visitor-hack is required)
@@ -142,7 +168,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
 
             // todo: do not expand the tree, if it's already too wide
             for(SearchNode<TUserData> searchNode : new_unexplored_nodes) {
-                System.out.println("STEP " + global_steps++);
+                // System.err.println("STEP " + global_steps++);
                 assert searchNode.parent == node_to_explore;
 
                 // todo: another for loop could be here, if the same prompt should be asked multiple times to exploit indeterminism
@@ -160,7 +186,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                     if (acceptResult.test(result)) {
                         // todo: stuff we do when it's correct (mainly just setting the BenchmarkResult)
                         // todo: aka: add the result as the finishing node that proves success
-                        System.out.println("[BENCHMARK_RUNNER] SUCCESSFUL RESULT");
+                        System.err.println("[BENCHMARK_RUNNER] SUCCESSFUL RESULT");
                         break;
                     }
                 } else  if (searchNode.getDepth() < ctl.maxSearchDepth) {
@@ -168,7 +194,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                 }
             }
         }
-        // todo: write the results into a file or onto a stream (like std::out)
+        return roots;
     }
 
     /**

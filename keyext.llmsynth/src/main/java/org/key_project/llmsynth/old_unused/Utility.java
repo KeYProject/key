@@ -61,7 +61,7 @@ public final class Utility {
         List<File> includes) throws ProblemLoaderException {
         // Ensure that Taclets are parsed
         if (!ProofSettings.isChoiceSettingInitialised()) {
-            System.out.println("Trying to load "+location.getAbsolutePath());
+            System.err.println("Trying to load "+location.getAbsolutePath());
             KeYEnvironment<?>
                     env = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
 
@@ -202,7 +202,7 @@ public final class Utility {
                     // Show proof result
 
                 } catch (ProofInputException e) {
-                    System.out.println("Exception at '" + contract.getDisplayName() + "' of " + contract.getTarget() + ":");
+                    System.err.println("Exception at '" + contract.getDisplayName() + "' of " + contract.getTarget() + ":");
                     e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -226,7 +226,7 @@ public final class Utility {
         try {
             var lines = Files.readAllLines(Path.of(file));
             var toPrint = lines.stream().skip(startL-1).limit(endL - startL + 1).collect(Collectors.joining("\n"));
-            System.out.println(toPrint);
+            System.err.println(toPrint);
         } catch (Exception e) {
 
         }

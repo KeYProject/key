@@ -58,7 +58,7 @@ public class LegacyVerificator implements Function<Prompt, VerificationResult> {
                     () -> {
                         System.out.flush();
                         System.err.flush();
-                        System.out.println("[VERIFICATOR] Running KeY Verification...");
+                        System.err.println("[VERIFICATOR] Running KeY Verification...");
                         System.out.flush();
                         Gpt3Prompt.Triple<Boolean, Gpt3Prompt.FailureReason, Exception> key_result;
                         try {
@@ -71,7 +71,7 @@ public class LegacyVerificator implements Function<Prompt, VerificationResult> {
                         } finally {
                             System.out.flush();
                             System.err.flush();
-                            System.out.println("[VERIFICATOR] KeY Verification finished.");
+                            System.err.println("[VERIFICATOR] KeY Verification finished.");
                             System.out.flush();
                         }
                         return key_result;
@@ -82,7 +82,7 @@ public class LegacyVerificator implements Function<Prompt, VerificationResult> {
             } catch (TimeoutException | InterruptedException | RuntimeException | ExecutionException e) {
                 fut.cancel(true);
                 try {
-                    System.out.println("[VERIFICATOR] KeY Verification timed out.");
+                    System.err.println("[VERIFICATOR] KeY Verification timed out.");
                     fut.get();
                 } catch (Exception ignored) {}
                 try {
@@ -90,7 +90,7 @@ public class LegacyVerificator implements Function<Prompt, VerificationResult> {
                 } catch (InterruptedException ignored) {}
                 System.out.flush();
                 System.err.flush();
-                System.out.println(e);
+                System.err.println(e);
                 e.printStackTrace();
                 System.out.flush();
                 System.err.flush();

@@ -72,12 +72,12 @@ public class Gpt3Prompt {
     public static boolean verbose = true;
     public static void status(String msg) {
         if (verbose)
-            System.out.println(msg);
+            System.err.println(msg);
     }
 
     public static void statusil(String msgPart) {
         if (verbose)
-            System.out.print(msgPart);
+            System.err.print(msgPart);
     }
 
     private static ChatCompletionRequest createCompletionRequest(List<ChatMessage> messages) {
@@ -371,13 +371,13 @@ public class Gpt3Prompt {
             env = envAuto.val;
             ImmutableList<ProgramVariable> projectionVariables = ImmutableList.fromList(new LinkedList<>());
             List<Contract> contracts = Utility.getContracts(env);
-            status("Looking for contracts:");
+            //status("Looking for contracts:");
             for (Contract c : contracts) {
                 if (!(c instanceof FunctionalOperationContractImpl)) continue;
                 FunctionalOperationContractImpl foc = (FunctionalOperationContractImpl) c; // todo: highly fragile
                 ProgramMethod pm = (ProgramMethod) foc.pm;
                 String pmName = pm.getName();
-                System.out.println("* " + pmName);
+                //System.err.println("* " + pmName);
                 // TODO: Distinction failed top level vs. failed subcontract verification...
                 if (pmName.contains(methodName)) { // Top Level Method: Always needs to be verified...
                     foundRelevantContract = true;
@@ -569,7 +569,7 @@ public class Gpt3Prompt {
                         try {
                             return tryKeyValidation(classLines, methodName, subfun, possible_jml_text.x, specInvariant, tmpFile, possible_jml_text.y);
                         } catch (Exception e) {
-                            System.out.println("KeY validation failed: " + e.toString());
+                            System.err.println("KeY validation failed: " + e.toString());
                             e.printStackTrace();
                             return new Triple<>(false, FailureReason.UNKNOWN_FATAL, null);
                         }
@@ -578,7 +578,7 @@ public class Gpt3Prompt {
                         var kr = fut.get(timeout, tou);
                         key_result = new Triple<>(kr.x, kr.y, kr.z);
                     } catch (TimeoutException | InterruptedException | RuntimeException | ExecutionException e) {
-                        System.out.println(e.toString());
+                        System.err.println(e.toString());
                         e.printStackTrace();
                         key_result = new Triple<>(false, FailureReason.INVALID_JAVA, null);
                     } finally {

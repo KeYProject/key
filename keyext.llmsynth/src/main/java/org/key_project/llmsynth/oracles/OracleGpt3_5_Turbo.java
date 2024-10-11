@@ -43,7 +43,8 @@ public class OracleGpt3_5_Turbo {
         ISearchNode current = node;
         while (current.useForHistory()) {
             current = current.getParent();
-            if (current == null || current.getPrompt() == null) return;
+            if (current == null) break;
+            if (current.getPrompt() == null) continue;
             messages.add(current.getPrompt().getOutputMessage());
             messages.add(current.getPrompt().getInputMessage());
         }
@@ -73,12 +74,12 @@ public class OracleGpt3_5_Turbo {
 
         prompt.output = answer.getContent();
 
-        if (print_Messages) {
-            System.out.println("=============================================================");
-            System.out.println(prompt.input);
-            System.out.println("-------------------------------------------------------------");
-            System.out.println(prompt.output);
-        }
+        /*if (print_Messages) {
+            System.err.println("=============================================================");
+            System.err.println(prompt.input);
+            System.err.println("-------------------------------------------------------------");
+            System.err.println(prompt.output);
+        }*/
     }
 
 
