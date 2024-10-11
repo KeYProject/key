@@ -3,43 +3,26 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.translation;
 
-import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Term;
-import org.key_project.logic.op.Operator;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-
 import java.io.IOException;
 import java.util.Properties;
 
+import de.uka.ilkd.key.java.Services;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+
 /**
- * General interface for routines that translate particular KeY data structures to SMT.
- * <p>
- * SMT handlers are loaded via a {@link java.util.ServiceLoader}.
- * <p>
- * To implement a new handler, implement this interface and add the classname to a file that
- * ServiceLoader reads for SMTHandler.
- *
- * <h2>Procedure</h2>
- * <p>
- * SMT handlers are created using the default constructor without parameters They are always used
- * within the same proof, but possibly for several proof obligations.
- * <p>
- * After creation, the {@link #init(IsabelleMasterHandler, Services, Properties, String[])} method is called
- * that injects the {@link Services} object belonging to the proof.
- * <p>
- * During translation, an SMT handler can be asked via {@link #canHandle(Term)} if it can translate
- * a term into smt.
- * <p>
- * If it returns true, the method {@link #handle(IsabelleMasterHandler, Term)} will be called which returns
- * the SMT result in form of an
+ * This class is a slightly adjusted version of {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}. It
+ * largely has the same functionality.
  *
  * @author Mattias Ulbrich
  * @author Jonas Schiffl
+ * @author Nils Buchholz
  */
 public interface IsabelleHandler {
 
     /**
-     * An enumeration of the possible answers of an handler to the {@link #canHandle(Term)} method.
+     * An enumeration of the possible answers of a handler to the {@link #canHandle(Term)} method.
      */
     enum Capability {
         /**
@@ -63,16 +46,16 @@ public interface IsabelleHandler {
      * <p>
      * This method may also allocate additional resources that it needs for translation.
      *
-     * @param masterHandler   the MasterHandler coordinating the other handlers (including the one at
-     *                        hand)
-     * @param services        the non-null services object which is relevant for this handler
+     * @param masterHandler the MasterHandler coordinating the other handlers (including the one at
+     *        hand)
+     * @param services the non-null services object which is relevant for this handler
      * @param handlerSnippets the snippets loaded for this handler, null if no snippet property file
-     *                        is available for this handler
-     * @param handlerOptions  arbitrary options for the handler to take into account
+     *        is available for this handler
+     * @param handlerOptions arbitrary options for the handler to take into account
      * @throws IOException if resources cannot be read.
      */
     void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
-              String[] handlerOptions) throws IOException;
+            String[] handlerOptions) throws IOException;
 
     /**
      * Query if this handler can translate a term.
@@ -83,9 +66,9 @@ public interface IsabelleHandler {
      *
      * @param term a non-null term to translate
      * @return {@link Capability#YES_THIS_OPERATOR} if this handler can successfully translate any
-     * term with the same toplevel operator, {@link Capability#YES_THIS_INSTANCE} if this
-     * handler can successfully translate this particular term, {@link Capability#UNABLE} if
-     * this handler cannot deal with the term.
+     *         term with the same toplevel operator, {@link Capability#YES_THIS_INSTANCE} if this
+     *         handler can successfully translate this particular term, {@link Capability#UNABLE} if
+     *         this handler cannot deal with the term.
      */
     default Capability canHandle(Term term) {
         return canHandle(term.op()) ? Capability.YES_THIS_OPERATOR : Capability.UNABLE;
@@ -98,12 +81,12 @@ public interface IsabelleHandler {
      *
      * @param op a non-null operator to translate
      * @return true if this handler can successfully translate all terms with op as toplevel
-     * operator
+     *         operator
      */
     boolean canHandle(Operator op);
 
     /**
-     * Translate the given term into an SMT SExpression.
+     * Translate the given term into a StringBuilder.
      * <p>
      * This method will only be called if {@link #canHandle(Term)} returned true for the same term
      * argument.
@@ -112,9 +95,8 @@ public interface IsabelleHandler {
      * to the {@link IsabelleMasterHandler} that it receives.
      *
      * @param trans the non-null master handler to which it belongs
-     * @param term  the non-null term to translate
-     * @return an SExpr representing the term
-     * @throws SMTTranslationException if the translation fails unexpectedly.
+     * @param term the non-null term to translate
+     * @return a StringBuilder containing the translation
      */
-    StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException;
+    StringBuilder handle(IsabelleMasterHandler trans, Term term);
 }

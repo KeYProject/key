@@ -1,23 +1,36 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.translation;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import org.key_project.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import org.key_project.logic.op.Operator;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+
+/**
+ * This class handles the translation of boolean operations and Boolean formulae
+ *
+ * @author Nils Buchholz
+ */
 public class BooleanOpHandler implements IsabelleHandler {
+    /**
+     * Map of the operators supported by this handler and their respective translation.
+     */
     private final Map<Operator, StringBuilder> supportedOperators = new HashMap<>();
 
 
     @Override
-    public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) {
+    public void init(IsabelleMasterHandler masterHandler, Services services,
+            Properties handlerSnippets, String[] handlerOptions) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
         Operator logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, new StringBuilder("False"));

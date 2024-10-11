@@ -3,23 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.translation;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import org.key_project.logic.Term;
-import org.key_project.logic.op.Operator;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+
 /**
- * This SMT translation handler takes care of integer expressions.
- * <p>
- * This includes the unary and binary integer operations and relational operations.
+ * This class handles translation of the integer operators.
  *
- * @author Jonas Schiffl
+ * @author Nils Buchholz
  */
 public class IntegerOpHandler implements IsabelleHandler {
     private final Map<Operator, String> supportedOperators = new HashMap<>();
@@ -27,8 +25,9 @@ public class IntegerOpHandler implements IsabelleHandler {
     private IntegerLDT integerLDT;
 
     @Override
-    public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+    public void init(IsabelleMasterHandler masterHandler, Services services,
+            Properties handlerSnippets,
+            String[] handlerOptions) {
         supportedOperators.clear();
         integerLDT = services.getTypeConverter().getIntegerLDT();
 
@@ -57,11 +56,12 @@ public class IntegerOpHandler implements IsabelleHandler {
     }
 
     @Override
-    public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
+    public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         List<StringBuilder> children = trans.translate(term.subs());
         Operator op = term.op();
 
-        //negation has a special pattern in Isabelle and thus can't be translated like the other functions
+        // negation has a special pattern in Isabelle and thus can't be translated like the other
+        // functions
         if (op == integerLDT.getNeg()) {
             return new StringBuilder("(-").append(children.get(0)).append(")");
         }

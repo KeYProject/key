@@ -3,18 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.translation;
 
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
-import java.util.Properties;
-
 /**
  * This handler is responsible to render number constants Z(3(2(1(#)))) as "123".
- * <p>
- * TODO Should that also do character constants (C) with the same machinery?
  */
 public class NumberConstantsHandler implements IsabelleHandler {
 
@@ -22,8 +21,9 @@ public class NumberConstantsHandler implements IsabelleHandler {
     private Services services;
 
     @Override
-    public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+    public void init(IsabelleMasterHandler masterHandler, Services services,
+            Properties handlerSnippets,
+            String[] handlerOptions) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();
     }
@@ -35,10 +35,12 @@ public class NumberConstantsHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        //TODO This needs an updated AbstractTermTransformer to comply with the new ncore package of KeY
+        // TODO This needs an updated AbstractTermTransformer to comply with the new ncore package
+        // of KeY
         assert (term instanceof de.uka.ilkd.key.logic.Term);
 
-        String string = AbstractTermTransformer.convertToDecimalString((de.uka.ilkd.key.logic.Term) term, services);
+        String string = AbstractTermTransformer
+                .convertToDecimalString((de.uka.ilkd.key.logic.Term) term, services);
         return new StringBuilder("(").append(string).append("::int)");
     }
 
