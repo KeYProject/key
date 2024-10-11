@@ -1,19 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.translation;
-
-import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Term;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import org.key_project.logic.op.Operator;
-import org.key_project.logic.sort.Sort;
 
 import java.util.Properties;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.sort.Sort;
+
+/**
+ * Handles the translation of LogicVariables.
+ */
 public class LogicalVariableHandler implements IsabelleHandler {
 
-    static final String VAR_PREFIX = "var_";
+    static final String VAR_POSTFIX = UninterpretedSymbolsHandler.PREFIX;
 
     @Override
-    public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) {
+    public void init(IsabelleMasterHandler masterHandler, Services services,
+            Properties handlerSnippets, String[] handlerOptions) {
 
     }
 
@@ -31,9 +39,18 @@ public class LogicalVariableHandler implements IsabelleHandler {
         return makeVarRef(trans, term.toString(), sort);
     }
 
+    /**
+     * Used to reference a given variable in the translation.
+     *
+     * @param trans The master handler used for translation
+     * @param name intended name of the variable
+     * @param sort sort of the variable
+     * @return reference of the given variable in the translation
+     */
     public static StringBuilder makeVarRef(IsabelleMasterHandler trans, String name, Sort sort) {
         StringBuilder result = new StringBuilder("(");
-        result.append(VAR_PREFIX).append(name).append("::").append(trans.translateSortName(sort)).append(")");
+        result.append(name).append(VAR_POSTFIX).append("::").append(trans.translateSortName(sort))
+                .append(")");
         return result;
     }
 }

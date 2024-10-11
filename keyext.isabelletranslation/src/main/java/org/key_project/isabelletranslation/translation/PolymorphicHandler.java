@@ -3,28 +3,25 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.translation;
 
-import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import org.key_project.logic.op.Operator;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+
 /**
- * This handler treats polymorphic symbols, in particular if-then-else and equals.
- *
- * @author Jonas Schiffl
+ * This handles translation of equals and if-then-else
  */
 public class PolymorphicHandler implements IsabelleHandler {
 
     @Override
-    public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
-        // nothing to be done
-        // there are also no snippets.
+    public void init(IsabelleMasterHandler masterHandler, Services services,
+            Properties handlerSnippets,
+            String[] handlerOptions) {
     }
 
     @Override
@@ -33,7 +30,7 @@ public class PolymorphicHandler implements IsabelleHandler {
     }
 
     @Override
-    public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
+    public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         Operator op = term.op();
         StringBuilder result;
         if (op == Equality.EQUALS) {

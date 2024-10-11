@@ -1,24 +1,36 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.translation;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.JFunction;
-import org.key_project.logic.Term;
-import org.key_project.logic.op.Function;
-import org.key_project.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+
+/**
+ * This class handles translation of the instance and exactInstance function.
+ *
+ * @author Nils Buchholz
+ */
 public class InstanceOperatorHandler implements IsabelleHandler {
+    /**
+     * Map of the operators supported by this handler and their respective translation.
+     */
     private final Map<Operator, String> supportedOperators = new HashMap<>();
 
     @Override
-    public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets, String[] handlerOptions) throws IOException {
+    public void init(IsabelleMasterHandler masterHandler, Services services,
+            Properties handlerSnippets, String[] handlerOptions) throws IOException {
         Namespace<JFunction> functionNamespace = services.getNamespaces().functions();
         Map<String, String> definedSortDependingFunctions = new HashMap<>();
 
@@ -43,7 +55,7 @@ public class InstanceOperatorHandler implements IsabelleHandler {
     }
 
     @Override
-    public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
+    public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         SortDependingFunction op = (SortDependingFunction) term.op();
         String functionName = supportedOperators.get(op);
         String dependingSortTypeName = trans.translateSortName(op.getSortDependingOn()) + "_type";

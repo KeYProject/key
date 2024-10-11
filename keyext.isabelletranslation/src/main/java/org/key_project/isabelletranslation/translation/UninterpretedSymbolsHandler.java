@@ -3,50 +3,32 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.translation;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
-import org.key_project.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import org.key_project.logic.Term;
-import org.key_project.logic.op.Function;
-import org.key_project.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.logic.op.SortedOperator;
-import org.key_project.logic.sort.Sort;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.sort.Sort;
+
 /**
  * This handler is a fallback handler that introduces a new uninterpreted function symbol with
- * prefix "u_".
+ * prefix in subscript
  * <p>
  * According declarations are added.
  */
 public class UninterpretedSymbolsHandler implements IsabelleHandler {
 
-    public final static String PREFIX = "var_";
+    public final static String PREFIX = "\\<^sub>v\\<^sub>a\\<^sub>r";
 
     @Override
-    public void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
-        masterHandler.addPreamblesLocales(handlerSnippets);
-        masterHandler.addPredefinedSort(JavaDLTheory.ANY, "any");
-
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
-
-        Namespace<Sort> sorts = services.getNamespaces().sorts();
-        masterHandler.addPredefinedSort(sorts.lookup(new Name("java.lang.Object")), "java_lang_Object");
-        masterHandler.addPredefinedSort(sorts.lookup(new Name("Null")), "Null");
-        masterHandler.addPredefinedSort(heapLDT.targetSort(), "Heap");
-        masterHandler.addPredefinedSort(locSetLDT.targetSort(), "LocSet");
-        masterHandler.addPredefinedSort(seqLDT.targetSort(), "Seq");
+    public void init(IsabelleMasterHandler masterHandler, Services services,
+            Properties handlerSnippets,
+            String[] handlerOptions) {
     }
 
     @Override
@@ -67,19 +49,30 @@ public class UninterpretedSymbolsHandler implements IsabelleHandler {
     }
 
     @Override
-    public StringBuilder handle(IsabelleMasterHandler trans, Term term) throws SMTTranslationException {
+    public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         SortedOperator op = (SortedOperator) term.op();
         if (trans.isNewSymbol(term)) {
-            String name = PREFIX + op.name().toString();
-            trans.addKnownSymbol(term, new StringBuilder(name.replace("::", "_").replace(".", "_")
-                    .replace("$", "_").replace("#", "_")));
+            String name = PREFIX + op.name();
+            trans.addSymbolAndDeclaration(term,
+                new StringBuilder(name.replace("::", "_").replace(".", "_")
+                        .replace("$", "_").replace("#", "_")));
         }
 
         String name = trans.getKnownSymbol(term).toString();
         return getFunctionRef(trans, term, op, name);
     }
 
-    static StringBuilder getFunctionRef(IsabelleMasterHandler trans, Term term, SortedOperator op, String name) {
+    /**
+     * Creates a reference to a function for use in translations.
+     *
+     * @param trans master handler used for translation
+     * @param term the term the function occurs in as the top operator
+     * @param op the function
+     * @param name name of the function in translations
+     * @return a reference to a function for use in translations.
+     */
+    static StringBuilder getFunctionRef(IsabelleMasterHandler trans, Term term, SortedOperator op,
+            String name) {
         List<StringBuilder> children = trans.translate(term.subs());
         StringBuilder result = new StringBuilder("(");
         result.append(name);

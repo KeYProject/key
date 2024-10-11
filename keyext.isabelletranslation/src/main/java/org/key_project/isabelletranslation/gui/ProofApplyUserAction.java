@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.gui;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
@@ -7,11 +13,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
+
 import org.key_project.isabelletranslation.automation.IsabelleProblem;
 import org.key_project.isabelletranslation.automation.IsabelleSolver;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 public class ProofApplyUserAction extends UserAction {
     private final Collection<IsabelleSolver> solvers;
@@ -21,11 +25,11 @@ public class ProofApplyUserAction extends UserAction {
     private final int numberOfGoalsClosed;
 
     public ProofApplyUserAction(KeYMediator mediator, Proof proof,
-                                Collection<IsabelleSolver> solvers) {
+            Collection<IsabelleSolver> solvers) {
         super(mediator, proof);
         this.solvers = solvers;
-        this.numberOfGoalsClosed = (int) solvers.stream().filter(solver ->
-                solver.getFinalResult().isSuccessful()).count();
+        this.numberOfGoalsClosed =
+            (int) solvers.stream().filter(solver -> solver.getFinalResult().isSuccessful()).count();
     }
 
     @Override
@@ -45,9 +49,11 @@ public class ProofApplyUserAction extends UserAction {
 
             goalsClosed.add(goal);
 
-            //TODO SMTRuleApp does not serve any purpose as a SMT exclusive rule.
-            //  The documentation does not suggest it should only be used for SMT, yet the name would suggest this.
-            //  Changing this requires changing parts of the KeY core. This needs a different class, which does not prepend "SMT" to all titles
+            // TODO SMTRuleApp does not serve any purpose as a SMT exclusive rule.
+            // The documentation does not suggest it should only be used for SMT, yet the name would
+            // suggest this.
+            // Changing this requires changing parts of the KeY core. This needs a different class,
+            // which does not prepend "SMT" to all titles
             IBuiltInRuleApp app = SMTRuleApp.RULE.createApp("")
                     .setTitle("Isabelle: " + solver.getFinalResult().getSuccessfulTactic());
             app.tryToInstantiate(goal);

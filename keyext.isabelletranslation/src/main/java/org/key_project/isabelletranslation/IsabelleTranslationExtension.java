@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -7,20 +14,19 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.pp.PosInSequent;
+
+import org.key_project.isabelletranslation.gui.controller.TranslateAllAction;
+import org.key_project.isabelletranslation.gui.controller.TranslationAction;
+
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Extension class for Isabelle translation
+ */
 @KeYGuiExtension.Info(name = "Isabelle Translation", optional = true,
-        experimental = false)
-public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExtension.Settings, KeYGuiExtension.ContextMenu, KeYGuiExtension.Startup {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslationExtension.class);
-
+    experimental = false)
+public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExtension.Settings,
+        KeYGuiExtension.ContextMenu, KeYGuiExtension.Startup {
     @Override
     public SettingsProvider getSettings() {
         return new IsabelleSettingsProvider();
@@ -45,7 +51,8 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
     };
 
     @Override
-    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator, @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
