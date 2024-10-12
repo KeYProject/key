@@ -661,7 +661,7 @@ public class Converter {
                 return WildCardPattern.WILDCARD;
             }
         }
-        else if (ctx.rangePattern() != null) {
+        if (ctx.rangePattern() != null) {
             return convertRangePattern(ctx.rangePattern());
         }
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
@@ -682,7 +682,8 @@ public class Converter {
     }
 
     private Pattern convertRangeExclusivePattern(RustyParser.RangeExclusivePatternContext ctx) {
-        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)), RangePattern.Bounds.Exclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Exclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
     }
 
     private Pattern convertRangeInclusivePattern(RustyParser.RangeInclusivePatternContext ctx) {
@@ -702,8 +703,19 @@ public class Converter {
     }
 
     private Expr convertRangePatternBound(RustyParser.RangePatternBoundContext ctx) {
-        // TODO do this next
-        throw new IllegalArgumentException("TODO @ TR");
+        if (ctx.INTEGER_LITERAL() != null) {
+            var text = ctx.INTEGER_LITERAL().getText();
+            var signed = text.contains("i");
+            var split = text.split("[ui]");
+            var size = split[split.length - 1];
+            var suffix = IntegerLiteralExpression.IntegerSuffix.get(signed, size);
+            var lit = split[0];
+            var value = new BigInteger(
+                lit);
+            return new IntegerLiteralExpression(value, suffix);
+        }
+        // TODO implement more bounds (char, byte, float, pathexpression)
+        throw new IllegalArgumentException("Unknown rangePatternBound: " + ctx.getText());
     }
 
     private RustType convertRustType(org.key_project.rusty.parsing.RustyParser.Type_Context ctx) {

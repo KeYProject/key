@@ -10,7 +10,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record IfLetExpression(Pattern pattern, Expr expr, BlockExpression then, @Nullable Expr elseExpr) implements Expr {
+public record IfLetExpression(Pattern pattern, Expr expr, ThenBranch then, @Nullable Expr elseExpr) implements Expr {
     @Override
     public void visit(Visitor v) {
         v.performActionOnIfLetExpression(this);
