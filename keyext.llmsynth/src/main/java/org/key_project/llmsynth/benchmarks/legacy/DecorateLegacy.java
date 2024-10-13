@@ -2,6 +2,7 @@ package org.key_project.llmsynth.benchmarks.legacy;
 
 import org.key_project.llmsynth.SearchNode;
 import org.key_project.llmsynth.prompts.*;
+import org.key_project.llmsynth.prompts.reasons.DirectPrompt;
 import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 
 import java.util.function.Supplier;
@@ -49,6 +50,11 @@ public class DecorateLegacy<T> implements ISearchStrategy<T>, LegacyVisitor<T> {
         return applyFallback();
     }
 
+    @Override
+    public Iterable<SearchNode<T>> reason(DirectPrompt reason, T o, Supplier<SearchNodeBuilder<T>> newBuilder) {
+        return applyFallback();
+    }
+
     //endregion
 
     @Override
@@ -57,7 +63,9 @@ public class DecorateLegacy<T> implements ISearchStrategy<T>, LegacyVisitor<T> {
             this.node = node;
             this.builder = newBuilder;
             if (node.reason instanceof LegacyReasons r) {
-                return  r.dispatch(this, node.userData, newBuilder);
+                return r.dispatch(this, node.userData, newBuilder);
+            } else if (node.reason instanceof DirectPrompt r) {
+                return this.reason((DirectPrompt) node.reason, node.userData, newBuilder);
             } else {
                 return fallback.apply(node, newBuilder);
             }

@@ -7,28 +7,31 @@ public class Prompt implements Cloneable {
     public String output;
     public PromptType type;
 
+    public boolean isAnswered;
+
     public Prompt() {
-        this(null, null, null);
+        this(null, null, null, false);
     }
 
     public Prompt(PromptType type, String input) {
-        this(type, input, null);
+        this(type, input, null, false);
     }
 
-    public Prompt(PromptType type, String input, String output) {
+    public Prompt(PromptType type, String input, String output, boolean isAnswered) {
         this.type = type;
         this.input = input;
         this.output = output;
+        this.isAnswered = isAnswered;
     }
 
     @JsonIgnore
     public boolean isAnswered() {
-        return output != null;
+        return this.isAnswered;
     }
 
     @JsonIgnore
     public Prompt clone() {
-        return new Prompt(type, input, output);
+        return new Prompt(type, input, output, isAnswered);
     }
 
     @JsonIgnore

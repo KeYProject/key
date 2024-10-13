@@ -9,15 +9,15 @@ import java.util.function.Supplier;
  * The reason of failure coulnd't be described further
  */
 public class UnknownReason extends LegacyReasons {
-    private Exception exception;
+    private String message;
 
-    public UnknownReason(Exception failureException) {
+    public UnknownReason(String message) {
         super("unknown reason");
-        this.exception = failureException;
+        this.message = message;
     }
 
-    public Exception getException() {
-        return exception;
+    public String getException() {
+        return message;
     }
 
     @Override

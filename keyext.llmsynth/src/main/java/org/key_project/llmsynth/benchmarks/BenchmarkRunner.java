@@ -9,7 +9,7 @@ import org.key_project.llmsynth.benchmarks.legacy.StrategyProvider;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
-import org.key_project.llmsynth.oracles.OracleGpt3_5_Turbo;
+import org.key_project.llmsynth.oracles.OracleGptDefault;
 import org.key_project.llmsynth.prompts.*;
 import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 
@@ -228,9 +228,26 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
             StrategyProvider<TaskSpecifySubcontract, TSub> subStrategyProvider,
             StrategyProvider<TaskSpecifyLoopInvariant, TLoop> loopStrategyProvider
     ) {
-        var oracle = new OracleGpt3_5_Turbo(token);
         return new BenchmarkRunner<>(funcStrategyProvider, subStrategyProvider, loopStrategyProvider,
-                choice -> oracle::answerPromptOnNode,
+                choice -> selectOracle(token, choice),
                 (llmChoice, controlParameters) -> (r -> true));
+    }
+
+    public static Consumer<ISearchNode> selectOracle(String token, LLMChoice choice) {
+        switch (choice) {
+            case GPT_3:
+                return (new OracleGptDefault(token,"gpt-3.5-turbo-0125"))::answerPromptOnNode;
+            case GPT_4:
+                return (new OracleGptDefault(token,"gpt-4-turbo-2024-04-09"))::answerPromptOnNode;
+            case GPT_4O:
+                return (new OracleGptDefault(token,"gpt-4o-2024-08-06"))::answerPromptOnNode;
+            case GPT_4O_MINI:
+                return (new OracleGptDefault(token,"gpt-4o-mini-2024-07-18"))::answerPromptOnNode;
+            default:
+                System.err.println("Unknown oracle choice: " + choice);
+                System.exit(1);
+                break;
+        }
+        return null;
     }
 }

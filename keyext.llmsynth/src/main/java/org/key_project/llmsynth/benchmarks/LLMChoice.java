@@ -12,8 +12,8 @@ public enum LLMChoice {
      * The program created an answer to a prompt
      */
     PROGRAM,
-    /**
-     * OpenAI's GPT 3.5-Turbo
-     */
-    GPT_3_5_TURBO
+    GPT_3,
+    GPT_4,
+    GPT_4O,
+    GPT_4O_MINI
 }

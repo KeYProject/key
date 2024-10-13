@@ -4,21 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.function.BiConsumer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.key_project.llmsynth.benchmarks.*;
-import org.key_project.llmsynth.prompts.Prompt;
 import org.key_project.llmsynth.benchmarks.legacy.*;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyFunction;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifyLoopInvariant;
 import org.key_project.llmsynth.benchmarks.tasks.TaskSpecifySubcontract;
-import org.key_project.llmsynth.oracles.OracleGpt3_5_Turbo;
+import org.key_project.llmsynth.oracles.OracleGptDefault;
 
-import org.key_project.llmsynth.prompts.*;
-import org.key_project.llmsynth.prompts.reasons.FirstPrompt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -30,53 +23,21 @@ public class MainBenchmarking {
     //private static final int ATTEMPTS = 3;
     private static final int ATTEMPTS = 1;
 
-    //         return new SearchNode(List.of(p -> p.println(s)), a -> VerificationResult.reject(a, new DirectPrompt()), typ, false);
-    private static void serialize_example() {
-        // TODO: give reasons and do proper rejections
-        Prompt a1 = new Prompt(PromptType.USER, "some root-string", "some inconspicuous answer");
-        SearchNode<Nothing> r1 = new SearchNode<>(a1, PromptStatus.REJECTED, new WrongJML("test", null));
-
-        Prompt a2_l = new Prompt(PromptType.USER, "left leaf", "very left");
-        SearchNode<Nothing> r2_l = new SearchNode<>(a2_l, PromptStatus.REJECTED, new NoJMLInRegion());
-
-        Prompt a2_r = new Prompt(PromptType.USER,"right leaf", "very right");
-        SearchNode<Nothing> r2_r = new SearchNode<>(a2_r, PromptStatus.ACCEPTED, null);
-
-        Prompt a3 = new Prompt(PromptType.USER, "left final leaf", "some addition");
-        SearchNode<Nothing> r3 = new SearchNode<>(a3, PromptStatus.REJECTED, new UnknownReason(null));
-
-        SearchNode<Nothing> root = new SearchNode<>(new FirstPrompt(0));
-        // todo: make sure that the parent is set?
-        root.reactions.add(r1);
-        r1.reactions.add(r2_l);
-        r1.reactions.add(r2_r);
-        r2_l.reactions.add(r3);
-
-        ObjectMapper om = new ObjectMapper();
-        try {
-            String serialized = om.writeValueAsString(root);
-            System.out.println(serialized);
-        } catch (JsonProcessingException e) {
-            System.err.println(e);
-        }
-        System.exit(0);
-    }
-
     public static void main(String[] args) {
-        File benchmark_dir = args.length > 0 ? new File(args[0]) : new File("");
-        File benchmark_dir_contract = new File(benchmark_dir, "contracts");
-        File benchmark_dir_subcontracts = new File(benchmark_dir, "subcontracts");
-        File benchmark_dir_invariants = new File(benchmark_dir, "invariants");
+        if (args.length < 5) {
+            System.err.println("Requires parameters: <strategy> <benchmark_directory> <restarts> <depth> <llm>");
+        }
+        String strategy = args[0];
+        File benchmark_dir = new File(args[1]);
+        int restarts = Integer.parseInt(args[2]);
+        int depth = Integer.parseInt(args[3]);
+        String llm = args[4];
 
-        //serialize_example();
+        LLMChoice llmChoice = LLMChoice.valueOf(llm);
 
-        File benchmark_filter = new File(args[1]);
-        // Read lines of benchmark_filter into a list
-        List<String> benchmark_list = null;
-        try {
-            benchmark_list = Files.readAllLines(benchmark_filter.toPath()).stream().map(String::trim).toList();
-        } catch (IOException e) {
-            System.err.println("Failed to read benchmark filter file " + benchmark_filter.getAbsolutePath());
+        // Check if the benchmark directory exists
+        if (!benchmark_dir.exists()) {
+            System.err.println("Benchmark directory does not exist: " + benchmark_dir.getAbsolutePath());
             System.exit(1);
         }
 
@@ -92,8 +53,9 @@ public class MainBenchmarking {
             e.printStackTrace();
             System.exit(1);
         }
+
         final String token = tokenDraft;
-        var benchmarkConfig = new ControlParameters().setMaxRestarts(1).setMaxSeachDepth(1).setKeyTimeoutSeconds(100);
+        var benchmarkConfig = new ControlParameters().setMaxRestarts(restarts).setMaxSeachDepth(depth).setKeyTimeoutSeconds(100);
 
         System.err.printf("Saving temporary files in %s", tmpfile);
         LegacyInterfaceFactory lsp = new LegacyInterfaceFactory(Path.of(tmpfile));
@@ -104,125 +66,71 @@ public class MainBenchmarking {
         // Task: Create a invariant for the method's loop; the invariant must allow the verification of the method's contract
         StrategyProvider<TaskSpecifyLoopInvariant, Nothing> legacySpecifyLoopinvariantProvider = lsp.getTaskSpecifyLoopInvariantProvider();
 
-        OracleGpt3_5_Turbo.print_Messages = true;
+        OracleGptDefault.print_Messages = false;
 
-        System.out.println("{");
-        System.out.println("  \"contracts\": ");
-
-        iterateDirectory(benchmark_dir_contract, benchmark_list,ATTEMPTS,  (ClassInfo ci, String methodname) -> {
-            MethodInfo mi = new MethodInfo(methodname);
-            BenchmarkParameters bp = new BenchmarkParameters();
-            bp.controlParameters = benchmarkConfig;
-            bp.oracle = LLMChoice.GPT_3_5_TURBO;
-            bp.name = null;
-            bp.task = new TaskSpecifyFunction(ci,mi);
-            Benchmark benchmark = new Benchmark(bp);
-            var bmr = BenchmarkRunner.create(token, legacySpecifyFunctionProvider, legacySpecifySubcontractProvider, legacySpecifyLoopinvariantProvider);
-
-            String benchmark_results = bmr.run(benchmark);
-            System.out.println(benchmark_results);
-        });
-
-        System.out.println("  ,");
-        System.out.println("  \"subcontracts\": ");
-
-        iterateDirectory(benchmark_dir_subcontracts, benchmark_list,ATTEMPTS,  (ClassInfo ci, String metadata) -> {
-            var metadataSplit = metadata.split("\n");
-            MethodInfo mi = new MethodInfo(metadataSplit[1]);
-            MethodInfo mi2 = new MethodInfo(metadataSplit[0]);
-            BenchmarkParameters bp = new BenchmarkParameters();
-            bp.controlParameters = benchmarkConfig;
-            bp.oracle = LLMChoice.GPT_3_5_TURBO;
-            bp.name = null;
-            bp.task = new TaskSpecifySubcontract(ci,mi,mi2);
-            Benchmark benchmark = new Benchmark(bp);
-            var bmr = BenchmarkRunner.create(token, legacySpecifyFunctionProvider, legacySpecifySubcontractProvider, legacySpecifyLoopinvariantProvider);
-
-            String benchmark_results = bmr.run(benchmark);
-            System.out.println(benchmark_results);
-        });
-
-        System.out.println("  ,");
-        System.out.println("  \"invariants\": ");
-
-        iterateDirectory(benchmark_dir_invariants, benchmark_list,ATTEMPTS,  (ClassInfo ci, String methodname) -> {
-            MethodInfo mi = new MethodInfo(methodname);
-            BenchmarkParameters bp = new BenchmarkParameters();
-            bp.controlParameters = benchmarkConfig;
-            bp.oracle = LLMChoice.GPT_3_5_TURBO;
-            bp.name = null;
-            bp.task = new TaskSpecifyLoopInvariant(ci,mi);
-            Benchmark benchmark = new Benchmark(bp);
-            var bmr = BenchmarkRunner.create(token, legacySpecifyFunctionProvider, legacySpecifySubcontractProvider, legacySpecifyLoopinvariantProvider);
-
-            String benchmark_results = bmr.run(benchmark);
-            System.out.println(benchmark_results);
-        });
-
-        System.out.println("}");
-
-    }
-
-    public static void iterateDirectory(File benchmark_dir, List<String> benchmark_list, int attempts, BiConsumer<ClassInfo, String> consumer) {
-        for (File directories : benchmark_dir.listFiles()) {
-            if (directories.isDirectory()) {
-                // Find Java File in directory
-                File[] files = directories.listFiles((dir, name) -> name.endsWith(".java"));
-                if (files.length == 0) {
-                    LOGGER.warn("No Java file found in directory {}", directories.getAbsolutePath());
-                    continue;
-                }
-                File javaFile = files[0];
-                boolean runBenchmark = false;
-                for (String benchmark : benchmark_list) {
-                    if (javaFile.getAbsolutePath().endsWith(benchmark)) {
-                        runBenchmark = true;
-                        break;
-                    }
-                }
-                if (!runBenchmark) {
-                    System.err.println("[BENCHMARK_RUNNER] Skipping " + javaFile.getAbsolutePath() + " because it is not in the benchmark list");
-                    continue;
-                }
-                File metadataFile = new File(directories, "meta.txt");
-                String metadata = null;
-                try {
-                    metadata = Files.readString(metadataFile.toPath()).trim();
-                } catch (IOException e) {
-                    LOGGER.error("Failed to read metadata file {}", metadataFile.getAbsolutePath());
-                    continue;
-                }
-                // Create ClassInfo object
-                ClassInfo ci;
-                try {
-                    ci = new ClassInfo(javaFile.getName(),javaFile.toPath());
-                } catch (IOException e) {
-                    LOGGER.error("Failed to read Java file {}", javaFile.getAbsolutePath());
-                    continue;
-                }
-                for (int i = 0; i < attempts; i++) {
-                    System.err.println("[BENCHMARK_RUNNER] ATTEMPT: " + i);
-                    boolean success = true;
-                    int restarts = 0;
-                    do {
-                        try {
-                            consumer.accept(ci, metadata);
-                            System.out.flush();
-                            System.err.flush();
-                        } catch (Exception e) {
-                            System.err.println(e);
-                            e.printStackTrace();
-                            success = false;
-                            restarts++;
-                            System.err.println("[BENCHMARK_RUNNER] RESTARTING: " + restarts);
-                            try {
-                                Thread.sleep(5000);
-                            } catch (InterruptedException ignored) {}
-                        }
-                    } while (!success && restarts < 3);
-                }
-            }
+        // Find Java File in directory
+        File[] files = benchmark_dir.listFiles((dir, name) -> name.endsWith(".java"));
+        if (files.length == 0) {
+            System.err.println("No Java file found in directory "+benchmark_dir.getAbsolutePath());
+            System.exit(1);
         }
+        File javaFile = files[0];
+
+        // Find Metadata File in directory
+        File metadataFile = new File(benchmark_dir, "meta.txt");
+        String metadata = null;
+        try {
+            metadata = Files.readString(metadataFile.toPath()).trim();
+        } catch (IOException e) {
+            System.err.println("Failed to read metadata file "+metadataFile.getAbsolutePath());
+            System.exit(1);
+        }
+
+        var bmr = BenchmarkRunner.create(token, legacySpecifyFunctionProvider, legacySpecifySubcontractProvider, legacySpecifyLoopinvariantProvider);
+        BenchmarkParameters bp = new BenchmarkParameters();
+        ClassInfo ci = null;
+        try {
+            ci = new ClassInfo(javaFile.getName(),javaFile.toPath());
+        } catch (IOException e) {
+            System.err.println("Failed to read Java file "+javaFile.getAbsolutePath());
+            System.exit(1);
+        }
+        MethodInfo mi;
+
+        switch (strategy) {
+            case "contract":
+                mi = new MethodInfo(metadata);
+                bp.controlParameters = benchmarkConfig;
+                bp.oracle = llmChoice;
+                bp.name = null;
+                bp.task = new TaskSpecifyFunction(ci,mi);
+                break;
+            case "subcontract":
+                var metadataSplit = metadata.split("\n");
+                mi = new MethodInfo(metadataSplit[1]);
+                MethodInfo mi2 = new MethodInfo(metadataSplit[0]);
+                bp.controlParameters = benchmarkConfig;
+                bp.oracle = llmChoice;
+                bp.name = null;
+                bp.task = new TaskSpecifySubcontract(ci,mi,mi2);
+                break;
+            case "invariants":
+                mi = new MethodInfo(metadata);
+                bp.controlParameters = benchmarkConfig;
+                bp.oracle = llmChoice;
+                bp.name = null;
+                bp.task = new TaskSpecifyLoopInvariant(ci,mi);
+
+                break;
+            default:
+                System.err.println("Unknown strategy: "+strategy);
+                System.exit(1);
+                break;
+        }
+        Benchmark benchmark = new Benchmark(bp);
+        String benchmark_results = bmr.run(benchmark);
+        System.out.println(benchmark_results);
+        System.exit(0);
     }
 
 }

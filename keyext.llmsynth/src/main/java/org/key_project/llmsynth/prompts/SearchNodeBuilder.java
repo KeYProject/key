@@ -151,6 +151,11 @@ public class SearchNodeBuilder<T>
         return this;
     }
 
+    public SearchNodeBuilder<T> isAnswered() {
+        this.referenceNode.prompt.isAnswered = true;
+        return this;
+    }
+
     private static VerificationResult autoReject(Prompt a) {
         return VerificationResult.reject(a, new DirectPrompt());
     }

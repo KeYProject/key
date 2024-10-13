@@ -9,14 +9,14 @@ import java.util.function.Supplier;
  * The given code was not valid Java
  */
 public class InvalidJava extends LegacyReasons {
-    private Exception exception;
-    public InvalidJava(Exception failureException) {
+    private String message;
+    public InvalidJava(String message) {
         super("invalid java");
-        this.exception = failureException;
+        this.message = message;
     }
 
-    public Exception getException() {
-        return exception;
+    public String getException() {
+        return message;
     }
 
     @Override

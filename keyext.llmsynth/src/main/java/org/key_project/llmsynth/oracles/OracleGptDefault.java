@@ -10,16 +10,17 @@ import org.key_project.llmsynth.prompts.PromptType;
 
 import java.util.*;
 
-public class OracleGpt3_5_Turbo {
+public class OracleGptDefault {
     public static boolean print_Messages = false;
     OpenAiService service;
 
     private final String token;
 
-    private final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), "");
+    private final String model;
 
-    public OracleGpt3_5_Turbo(String token) {
+    public OracleGptDefault(String token, String model) {
         service = new OpenAiService(token);
+        this.model = model;
         this.token = token;
     }
 
@@ -45,8 +46,12 @@ public class OracleGpt3_5_Turbo {
             current = current.getParent();
             if (current == null) break;
             if (current.getPrompt() == null) continue;
-            messages.add(current.getPrompt().getOutputMessage());
-            messages.add(current.getPrompt().getInputMessage());
+            if (current.getPrompt().getOutputMessage().getContent() != null) {
+                messages.add(current.getPrompt().getOutputMessage());
+            }
+            if (current.getPrompt().getInputMessage().getContent() != null) {
+                messages.add(current.getPrompt().getInputMessage());
+            }
         }
         Collections.reverse(messages);
         messages.add(prompt.getInputMessage());
@@ -73,13 +78,14 @@ public class OracleGpt3_5_Turbo {
         } while (answer == null && requestCount++ < 3);
 
         prompt.output = answer.getContent();
+        prompt.isAnswered = true;
 
-        /*if (print_Messages) {
+        if (print_Messages) {
             System.err.println("=============================================================");
             System.err.println(prompt.input);
             System.err.println("-------------------------------------------------------------");
             System.err.println(prompt.output);
-        }*/
+        }
     }
 
 
@@ -97,7 +103,7 @@ public class OracleGpt3_5_Turbo {
         List<ChatMessage> chats = messages.stream().map(this::convert).toList();
         return ChatCompletionRequest
                 .builder()
-                .model("gpt-3.5-turbo-0125")
+                .model(model)
                 //.model("gpt-4o")
                 .messages(chats)
                 .n(1)

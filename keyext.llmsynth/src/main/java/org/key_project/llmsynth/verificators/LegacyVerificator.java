@@ -147,13 +147,13 @@ public class LegacyVerificator implements Function<Prompt, VerificationResult> {
                     reason = new NoJMLInRegion();
                     break;
                 case INVALID_JAVA:
-                    reason = new InvalidJava(failureException);
+                    reason = new InvalidJava(failureException.getMessage());
                     break;
                 case WRONG_JML:
-                    reason = new WrongJML(possible_jml_text.x, failureException);
+                    reason = new WrongJML(possible_jml_text.x, failureException.getMessage());
                     break;
                 case UNKNOWN:
-                    reason = new UnknownReason(failureException);
+                    reason = new UnknownReason(failureException.getMessage());
                     break;
                 case UNKNOWN_FATAL:
                     throw new RuntimeException("There is no useful response for a fatal error problem");

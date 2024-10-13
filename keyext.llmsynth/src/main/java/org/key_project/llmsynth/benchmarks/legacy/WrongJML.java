@@ -9,17 +9,17 @@ import java.util.function.Supplier;
  * The JML code was incorrect or failed to verify
  */
 public class WrongJML extends LegacyReasons {
-    private Exception exception;
+    private String message;
     private String jml;
 
-    public WrongJML(String jml, Exception failureException) {
+    public WrongJML(String jml, String message) {
         super("wrong jml");
         this.jml = jml;
-        this.exception = failureException;
+        this.message = message;
     }
 
-    public Exception getException() {
-        return exception;
+    public String getException() {
+        return message;
     }
 
     public String getJml() {
