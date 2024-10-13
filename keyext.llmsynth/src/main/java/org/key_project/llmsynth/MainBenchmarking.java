@@ -59,12 +59,6 @@ public class MainBenchmarking {
 
         System.err.printf("Saving temporary files in %s", tmpfile);
         LegacyInterfaceFactory lsp = new LegacyInterfaceFactory(Path.of(tmpfile));
-        // Task: Create a contract for the given method; we do not care about the method's surroundings
-        StrategyProvider<TaskSpecifyFunction, Nothing> legacySpecifyFunctionProvider = lsp.getTaskSpecifyFunctionProvider();
-        // Task: Create a contract for the given method; the contract must allow the verification of the top-level method
-        StrategyProvider<TaskSpecifySubcontract, Nothing> legacySpecifySubcontractProvider = lsp.getTaskSpecifySubcontractProvider();
-        // Task: Create a invariant for the method's loop; the invariant must allow the verification of the method's contract
-        StrategyProvider<TaskSpecifyLoopInvariant, Nothing> legacySpecifyLoopinvariantProvider = lsp.getTaskSpecifyLoopInvariantProvider();
 
         OracleGptDefault.print_Messages = false;
 
@@ -86,7 +80,30 @@ public class MainBenchmarking {
             System.exit(1);
         }
 
-        var bmr = BenchmarkRunner.create(token, legacySpecifyFunctionProvider, legacySpecifySubcontractProvider, legacySpecifyLoopinvariantProvider);
+        BenchmarkRunner bmr = null;
+        String[] strategyParts = strategy.split("-");
+        if (strategyParts.length != 2) {
+            // Default strategy
+            strategy = strategyParts[0];
+            bmr = BenchmarkRunner.create(token, lsp.getTaskSpecifyFunctionProvider(), lsp.getTaskSpecifySubcontractProvider(), lsp.getTaskSpecifyLoopInvariantProvider());
+        } else {
+            strategy = strategyParts[0];
+            switch (strategyParts[1]) {
+                case "default":
+                    bmr = BenchmarkRunner.create(token, lsp.getTaskSpecifyFunctionProvider(), lsp.getTaskSpecifySubcontractProvider(), lsp.getTaskSpecifyLoopInvariantProvider());
+                    break;
+                case "code":
+                    bmr = BenchmarkRunner.create(token, lsp.getTaskSpecifyFunctionProviderCodeOnly(), lsp.getTaskSpecifySubcontractProviderCodeOnly(), lsp.getTaskSpecifyLoopInvariantProviderCodeOnly());
+                    break;
+                case "natural":
+                    bmr = BenchmarkRunner.create(token, lsp.getTaskSpecifyFunctionProviderNatural(), lsp.getTaskSpecifySubcontractProviderNatural(), lsp.getTaskSpecifyLoopInvariantProviderNatural());
+                    break;
+                default:
+                    System.err.println("Unknown strategy part: "+strategyParts[1]);
+                    System.exit(1);
+                    break;
+            }
+        }
         BenchmarkParameters bp = new BenchmarkParameters();
         ClassInfo ci = null;
         try {

@@ -177,6 +177,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
 
                 // todo: FIXME results lose parent info when they are accepted?
                 VerificationResult result = searchNode.verificator.apply(searchNode.prompt);
+                result.getReason().setNode(searchNode);
                 assert result.getPrompt() == searchNode.prompt;
                 searchNode.setResult(result);
                 node_to_explore.reactions.add(searchNode);
