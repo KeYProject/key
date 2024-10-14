@@ -12,6 +12,8 @@ extern crate rustc_span;
 mod callbacks;
 mod hir;
 
+pub use hir::conversion::convert;
+
 use rustc_driver::{RunCompiler, DEFAULT_LOCALE_RESOURCES};
 use rustc_interface::interface::try_print_query_stack;
 use rustc_session::{config::ErrorOutputType, EarlyDiagCtxt};

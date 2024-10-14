@@ -48,7 +48,7 @@ pub enum ExprKind {
 pub struct ConstBlock {
     pub hir_id: HirId,
     pub def_id: LocalDefId,
-    pub body: BodyId,
+    pub body: Body,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -135,7 +135,7 @@ pub struct Closure {
     pub capture_clause: CaptureBy,
     pub bound_generic_params: Vec<GenericParam>,
     pub fn_decl: FnDecl,
-    pub body: BodyId,
+    pub body: Body,
     pub fn_decl_span: Span,
     pub fn_arg_span: Option<Span>,
     //pub kind: ClosureKind,

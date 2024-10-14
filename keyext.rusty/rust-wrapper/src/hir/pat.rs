@@ -46,4 +46,4 @@ pub struct PatField {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DotDotPos(u32);
+pub struct DotDotPos(pub u32);

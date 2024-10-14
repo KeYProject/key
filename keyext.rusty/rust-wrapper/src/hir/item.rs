@@ -160,9 +160,9 @@ pub enum HirTyKind {
     BareFn(BareFnHirTy),
     Never,
     Tup(Vec<HirTy>),
-    AnonAdt(ItemId),
+    AnonAdt(Item),
     Path(QPath),
-    OpaqueDef(ItemId, Vec<GenericArg>, bool),
+    // OpaqueDef(Item, Vec<GenericArg>, bool),
     TraitObject(
         Vec<(PolyTraitRef, TraitBoundModifier)>,
         Lifetime,

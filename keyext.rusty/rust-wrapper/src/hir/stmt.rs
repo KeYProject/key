@@ -10,7 +10,7 @@ pub struct Stmt {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StmtKind {
     Let(LetStmt),
-    Item(ItemId),
+    Item(Item),
     Expr(Expr),
     Semi(Expr),
 }
