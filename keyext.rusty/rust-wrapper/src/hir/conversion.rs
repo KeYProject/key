@@ -8,7 +8,7 @@ use rustc_span::{
 
 use super::*;
 
-pub fn convert<'tcx>(tcx: &'tcx TyCtxt<'tcx>) -> Crate {
+pub fn convert(tcx: TyCtxt<'_>) -> Crate {
     let hir = tcx.hir();
     let m = hir.root_module();
     Crate {

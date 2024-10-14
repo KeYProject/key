@@ -4,7 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-smallvec = "1.13.2"
+rustc_ast = { path = "rust/compiler/rustc_ast" }
+rustc_driver_impl = { path = "rust/compiler/rustc_driver_impl" }
+rustc_errors = { path = "rust/compiler/rustc_errors" }
+rustc_hir = { path = "rust/compiler/rustc_hir" }
+rustc_interface = { path = "rust/compiler/rustc_interface" }
+rustc_middle = { path = "rust/compiler/rustc_middle" }
+rustc_session = { path = "rust/compiler/rustc_session" }
+rustc_span = { path = "rust/compiler/rustc_span" }
 
 [package.metadata.rust-analyzer]
 rustc_private = true
+
+[lib]
+crate-type = ["staticlib"]
