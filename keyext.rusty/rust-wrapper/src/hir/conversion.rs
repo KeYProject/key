@@ -190,7 +190,7 @@ impl<'hir> FromHir<'hir, &'hir hir::ItemKind<'hir>> for ItemKind {
                 matches!(safe, hir::Safety::Safe),
                 (*generics).hir_into(hir),
                 (*bounds).hir_into(hir),
-                refs.into_iter().map(Into::into).collect(),
+                refs.iter().map(Into::into).collect(),
             ),
             hir::ItemKind::TraitAlias(generics, bounds) => {
                 Self::TraitAlias((*generics).hir_into(hir), (*bounds).hir_into(hir))
@@ -340,9 +340,9 @@ impl<'hir> FromHir<'hir, &'hir hir::Generics<'hir>> for Generics {
 impl<'hir> FromHir<'hir, &'hir hir::WherePredicate<'hir>> for WherePredicate {
     fn from_hir(value: &'hir hir::WherePredicate<'hir>, hir: Map<'hir>) -> Self {
         match value {
-            hir::WherePredicate::BoundPredicate(b) => Self::BoundPredicate(b.hir_into(hir)),
-            hir::WherePredicate::RegionPredicate(r) => Self::RegionPredicate(r.hir_into(hir)),
-            hir::WherePredicate::EqPredicate(e) => Self::EqPredicate(e.hir_into(hir)),
+            hir::WherePredicate::BoundPredicate(b) => Self::Bound(b.hir_into(hir)),
+            hir::WherePredicate::RegionPredicate(r) => Self::Region(r.hir_into(hir)),
+            hir::WherePredicate::EqPredicate(e) => Self::Eq(e.hir_into(hir)),
         }
     }
 }
@@ -957,7 +957,7 @@ impl<'hir> FromHir<'hir, &'hir hir::TyKind<'hir>> for HirTyKind {
                 todo!()
             }
             hir::TyKind::TraitObject(ts, l, syn) => Self::TraitObject(
-                ts.into_iter()
+                ts.iter()
                     .map(|(r, m)| (r.hir_into(hir), m.into()))
                     .collect(),
                 (*l).into(),
@@ -1271,21 +1271,14 @@ impl<'hir> FromHir<'hir, &'hir hir::PatKind<'hir>> for PatKind {
             hir::PatKind::Tuple(ps, ddp) => Self::Tuple((*ps).hir_into(hir), ddp.into()),
             hir::PatKind::Box(p) => Self::Box((*p).hir_into(hir)),
             hir::PatKind::Deref(p) => Self::Deref((*p).hir_into(hir)),
-            hir::PatKind::Ref(p, m) => Self::Ref(
-                (*p).hir_into(hir),
-                match m {
-                    hir::Mutability::Mut => true,
-                    _ => false,
-                },
-            ),
+            hir::PatKind::Ref(p, m) => {
+                Self::Ref((*p).hir_into(hir), matches!(m, hir::Mutability::Mut))
+            }
             hir::PatKind::Lit(e) => Self::Lit((*e).hir_into(hir)),
             hir::PatKind::Range(l, r, i) => Self::Range(
                 l.map(|e| e.hir_into(hir)),
                 r.map(|e| e.hir_into(hir)),
-                match i {
-                    hir::RangeEnd::Included => true,
-                    _ => false,
-                },
+                matches!(i, hir::RangeEnd::Included),
             ),
             hir::PatKind::Slice(ps, p, pss) => Self::Slice(
                 (*ps).hir_into(hir),
@@ -1299,13 +1292,7 @@ impl<'hir> FromHir<'hir, &'hir hir::PatKind<'hir>> for PatKind {
 
 impl From<&hir::BindingMode> for BindingMode {
     fn from(value: &hir::BindingMode) -> Self {
-        BindingMode(
-            value.0.into(),
-            match value.1 {
-                hir::Mutability::Mut => true,
-                _ => false,
-            },
-        )
+        BindingMode(value.0.into(), matches!(value.1, hir::Mutability::Mut))
     }
 }
 
@@ -1400,14 +1387,8 @@ impl<'hir> FromHir<'hir, &'hir hir::ExprKind<'hir>> for ExprKind {
             }
             hir::ExprKind::Path(p) => Self::Path(p.hir_into(hir)),
             hir::ExprKind::AddrOf(raw, m, e) => Self::AddrOf(
-                match raw {
-                    hir::BorrowKind::Raw => true,
-                    _ => false,
-                },
-                match m {
-                    hir::Mutability::Mut => true,
-                    _ => false,
-                },
+                matches!(raw, hir::BorrowKind::Raw),
+                matches!(m, hir::Mutability::Mut),
                 (*e).hir_into(hir),
             ),
             hir::ExprKind::Break(d, e) => Self::Break(d.into(), e.map(|e| e.hir_into(hir))),
@@ -1417,7 +1398,7 @@ impl<'hir> FromHir<'hir, &'hir hir::ExprKind<'hir>> for ExprKind {
             hir::ExprKind::InlineAsm(..) => todo!(),
             hir::ExprKind::OffsetOf(ty, is) => Self::OffsetOf(
                 (*ty).hir_into(hir),
-                is.into_iter().copied().map(Into::into).collect(),
+                is.iter().copied().map(Into::into).collect(),
             ),
             hir::ExprKind::Struct(path, fs, e) => Self::Struct(
                 (*path).hir_into(hir),

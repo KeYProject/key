@@ -68,9 +68,9 @@ pub struct Generics {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WherePredicate {
-    BoundPredicate(WhereBoundPredicate),
-    RegionPredicate(WhereRegionPredicate),
-    EqPredicate(WhereEqPredicate),
+    Bound(WhereBoundPredicate),
+    Region(WhereRegionPredicate),
+    Eq(WhereEqPredicate),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
