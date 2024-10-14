@@ -8,6 +8,7 @@ public class Prompt implements Cloneable {
     public PromptType type;
 
     public boolean isAnswered;
+    public long tokenUsage;
 
     public Prompt() {
         this(null, null, null, false);

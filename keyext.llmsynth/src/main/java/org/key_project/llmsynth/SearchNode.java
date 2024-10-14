@@ -39,10 +39,10 @@ public class SearchNode<T> implements ISearchNode, Cloneable {
     }
 
     public SearchNode(Prompt prompt, PromptStatus status, PromptReason reason_of_rejection) {
-        this(prompt, status, reason_of_rejection, null, new ArrayList<>(), true, null, null);
+        this(prompt, status, reason_of_rejection, null, new ArrayList<>(), true, null, null, 0);
     }
 
-    public SearchNode(Prompt prompt, PromptStatus status, PromptReason reason, SearchNode<T> parent, List<SearchNode<T>> reactions, boolean keepHistory, Function<Prompt, VerificationResult> verificator, T userData) {
+    public SearchNode(Prompt prompt, PromptStatus status, PromptReason reason, SearchNode<T> parent, List<SearchNode<T>> reactions, boolean keepHistory, Function<Prompt, VerificationResult> verificator, T userData, int depth) {
         this.prompt = prompt;
         this.status = status;
         this.reason = reason;
@@ -51,6 +51,7 @@ public class SearchNode<T> implements ISearchNode, Cloneable {
         this.keepHistory = keepHistory;
         this.verificator = verificator;
         this.userData = userData;
+        this.depth = depth;
     }
 
     private void addReaction(SearchNode<T> reaction) {
@@ -60,7 +61,7 @@ public class SearchNode<T> implements ISearchNode, Cloneable {
 
     @Override
     public SearchNode<T> clone() {
-        return new SearchNode<>(this.prompt.clone(), this.status, this.reason, this.parent, this.reactions, this.keepHistory, this.verificator, this.userData);
+        return new SearchNode<>(this.prompt.clone(), this.status, this.reason, this.parent, this.reactions, this.keepHistory, this.verificator, this.userData, this.depth);
     }
 
     @Override
@@ -96,5 +97,9 @@ public class SearchNode<T> implements ISearchNode, Cloneable {
         assert result.getPrompt() == this.prompt;
         this.status = result.getStatus();
         this.reason = result.getReason();
+    }
+
+    public void setZeroDepth() {
+        this.depth = parent == null ? 0 : parent.depth;
     }
 }

@@ -42,6 +42,7 @@ public class SearchNodeBuilder<T>
 
     public SearchNodeBuilder<T> skipVerification() {
         setVerificator(SearchNodeBuilder::autoReject);
+        this.referenceNode.setZeroDepth();
         return this;
     }
 

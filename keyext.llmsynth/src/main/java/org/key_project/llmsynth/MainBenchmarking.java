@@ -26,6 +26,7 @@ public class MainBenchmarking {
     public static void main(String[] args) {
         if (args.length < 5) {
             System.err.println("Requires parameters: <strategy> <benchmark_directory> <restarts> <depth> <llm>");
+            System.exit(1);
         }
         String strategy = args[0];
         File benchmark_dir = new File(args[1]);
@@ -57,7 +58,7 @@ public class MainBenchmarking {
         final String token = tokenDraft;
         var benchmarkConfig = new ControlParameters().setMaxRestarts(restarts).setMaxSeachDepth(depth).setKeyTimeoutSeconds(100);
 
-        System.err.printf("Saving temporary files in %s", tmpfile);
+        System.err.printf("Saving temporary files in %s\n", tmpfile);
         LegacyInterfaceFactory lsp = new LegacyInterfaceFactory(Path.of(tmpfile));
 
         OracleGptDefault.print_Messages = false;
@@ -115,14 +116,14 @@ public class MainBenchmarking {
         MethodInfo mi;
 
         switch (strategy) {
-            case "contract":
+            case "contracts":
                 mi = new MethodInfo(metadata);
                 bp.controlParameters = benchmarkConfig;
                 bp.oracle = llmChoice;
                 bp.name = null;
                 bp.task = new TaskSpecifyFunction(ci,mi);
                 break;
-            case "subcontract":
+            case "subcontracts":
                 var metadataSplit = metadata.split("\n");
                 mi = new MethodInfo(metadataSplit[1]);
                 MethodInfo mi2 = new MethodInfo(metadataSplit[0]);

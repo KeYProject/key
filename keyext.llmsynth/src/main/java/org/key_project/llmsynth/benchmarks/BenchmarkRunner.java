@@ -80,7 +80,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                 var roots = run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
                 ObjectMapper om = new ObjectMapper();
                 try {
-                    String serialized = om.writeValueAsString(roots);
+                    String serialized = om.writerWithDefaultPrettyPrinter().writeValueAsString(roots);
                     return serialized;
                 } catch (JsonProcessingException e) {
                     System.err.println(e);
@@ -96,7 +96,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                 var roots = run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
                 ObjectMapper om = new ObjectMapper();
                 try {
-                    String serialized = om.writeValueAsString(roots);
+                    String serialized = om.writerWithDefaultPrettyPrinter().writeValueAsString(roots);
                     return serialized;
                 } catch (JsonProcessingException e) {
                     System.err.println(e);
@@ -112,7 +112,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                 var roots = run(benchmark, ctl, param.task, llm_oracle, strategy, acceptResult, defaultVerificator, data);
                 ObjectMapper om = new ObjectMapper();
                 try {
-                    String serialized = om.writeValueAsString(roots);
+                    String serialized = om.writerWithDefaultPrettyPrinter().writeValueAsString(roots);
                     return serialized;
                 } catch (JsonProcessingException e) {
                     System.err.println(e);
@@ -153,7 +153,8 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
         // This implementation explores each child, but then descends the first child, repeating this behaviour.
         // So it's not exacly  a DFS.
         int global_steps = 0;
-        while (!pq.isEmpty()) {
+        boolean done = false;
+        while (!pq.isEmpty() && !done) {
             SearchNode<TUserData> node_to_explore = pq.poll();
 
             Supplier<SearchNodeBuilder<TUserData>> builderFactory = () -> {
@@ -177,7 +178,9 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
 
                 // todo: FIXME results lose parent info when they are accepted?
                 VerificationResult result = searchNode.verificator.apply(searchNode.prompt);
-                result.getReason().setNode(searchNode);
+                if (result.getReason() != null) {
+                    result.getReason().setNode(searchNode);
+                }
                 assert result.getPrompt() == searchNode.prompt;
                 searchNode.setResult(result);
                 node_to_explore.reactions.add(searchNode);
@@ -188,6 +191,7 @@ public class BenchmarkRunner<TFunc, TSub, TLoop> {
                         // todo: stuff we do when it's correct (mainly just setting the BenchmarkResult)
                         // todo: aka: add the result as the finishing node that proves success
                         System.err.println("[BENCHMARK_RUNNER] SUCCESSFUL RESULT");
+                        done = true;
                         break;
                     }
                 } else  if (searchNode.getDepth() < ctl.maxSearchDepth) {

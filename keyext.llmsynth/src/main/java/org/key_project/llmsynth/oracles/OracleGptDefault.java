@@ -8,6 +8,7 @@ import org.key_project.llmsynth.prompts.Prompt;
 import org.key_project.llmsynth.prompts.PromptMessage;
 import org.key_project.llmsynth.prompts.PromptType;
 
+import java.time.Duration;
 import java.util.*;
 
 public class OracleGptDefault {
@@ -19,7 +20,7 @@ public class OracleGptDefault {
     private final String model;
 
     public OracleGptDefault(String token, String model) {
-        service = new OpenAiService(token);
+        service = new OpenAiService(token, Duration.ofSeconds(300));
         this.model = model;
         this.token = token;
     }
@@ -60,24 +61,28 @@ public class OracleGptDefault {
         int requestCount = 0;
 
         ChatMessage answer = null;
+        long tokenUsage = 0;
         do {
             try {
                 ChatCompletionRequest ccr = createCompletionRequest(messages);
 
-                Flowable<ChatCompletionChunk> flowable = service.streamChatCompletion(ccr);
+                ChatCompletionResult completionResult = service.createChatCompletion(ccr);
 
-                answer = service
-                        .mapStreamToAccumulator(flowable)
-                        .lastElement()
-                        .blockingGet()
-                        .getAccumulatedMessage();
+                tokenUsage = completionResult.getUsage().getTotalTokens();
+
+                if (completionResult.getChoices().isEmpty()) {
+                    System.err.println("No choices returned from GPT");
+                    continue;
+                }
+                answer = completionResult.getChoices().get(0).getMessage();
             } catch (RuntimeException e) {
                 System.err.println("Error prompting GPT, resetting connection: " + e.getMessage());
                 this.resetConnection();
             }
-        } while (answer == null && requestCount++ < 3);
+        } while (answer == null && requestCount++ < 10);
 
         prompt.output = answer.getContent();
+        prompt.tokenUsage = tokenUsage;
         prompt.isAnswered = true;
 
         if (print_Messages) {
