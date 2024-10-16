@@ -48,7 +48,7 @@ public enum Operator implements SyntaxElement {
 
     @Override
     public int getChildCount() {
-        return 2;
+        return 3;
     }
 
     @Override

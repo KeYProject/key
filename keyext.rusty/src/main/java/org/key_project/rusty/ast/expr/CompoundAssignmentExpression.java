@@ -27,7 +27,7 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
 
     @Override
     public int getChildCount() {
-        return 2;
+        return 3;
     }
 
     @Override

@@ -27,7 +27,7 @@ public record ComparisonExpression(Expr left, Operator op, Expr right) implement
 
     @Override
     public int getChildCount() {
-        return 2;
+        return 3;
     }
 
     @Override

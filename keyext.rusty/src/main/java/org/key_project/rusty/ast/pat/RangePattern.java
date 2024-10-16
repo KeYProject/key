@@ -21,8 +21,8 @@ public record RangePattern(@Nullable Expr left,Bounds bounds,@Nullable Expr righ
 
     private final String bounds;
 
-    Bounds(String rangeType) {
-        this.bounds = rangeType;
+    Bounds(String bounds) {
+        this.bounds = bounds;
     }
 
     @Override
