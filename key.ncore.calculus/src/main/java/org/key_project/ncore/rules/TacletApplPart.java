@@ -6,8 +6,8 @@ package org.key_project.ncore.rules;
 import org.key_project.ncore.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
-public record TacletApplPart(Sequent assumesSequent, ImmutableList<NewVarcond> varsNew,
-                             ImmutableList<NotFreeIn> varsNotFreeIn,
-                             ImmutableList<NewDependingOn> varsNewDependingOn,
-                             ImmutableList<VariableCondition> variableConditions) {
+public record TacletApplPart(Sequent assumesSequent, ImmutableList<? extends NewVarcond> varsNew,
+                             ImmutableList<? extends NotFreeIn> varsNotFreeIn,
+                             ImmutableList<? extends NewDependingOn> varsNewDependingOn,
+                             ImmutableList<? extends VariableCondition> variableConditions) {
 }

@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * this class represents an application of a built in rule application
+ * this class represents an application of a built-in rule application
  */
 public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
