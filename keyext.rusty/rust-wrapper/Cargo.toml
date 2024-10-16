@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+jni = "0.21.1"
 rustc_ast = { path = "rust/compiler/rustc_ast" }
 rustc_driver_impl = { path = "rust/compiler/rustc_driver_impl" }
 rustc_errors = { path = "rust/compiler/rustc_errors" }
