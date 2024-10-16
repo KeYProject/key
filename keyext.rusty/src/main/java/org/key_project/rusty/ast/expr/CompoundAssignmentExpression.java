@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -35,7 +36,7 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
         return left + " " + op + " " + right;
     }
 
-    public enum Operator implements SyntaxElement {
+    public enum Operator implements RustyProgramElement {
         Plus, Minus, Multiply, Divide, Modulo, And, Or, Xor, Shl, Shr;
 
         @Override
@@ -62,5 +63,10 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
         @Override
         public int getChildCount() {
             return 0;
+        }
+
+        @Override
+        public void visit(Visitor v) {
+            // Operator should stay invisible to the visitors and therefore no visit is needed
         }
     }}

@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.pat;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.visitor.Visitor;
 
@@ -16,7 +17,7 @@ import org.jspecify.annotations.Nullable;
  * Grammar</a>
  */
 public record RangePattern(@Nullable Expr left,Bounds bounds,@Nullable Expr right)implements Pattern{public enum Bounds
-        implements SyntaxElement {
+        implements RustyProgramElement {
     Inclusive("..="), Exclusive(".."), Obsolete("...");
 
     private final String bounds;
@@ -40,7 +41,12 @@ public record RangePattern(@Nullable Expr left,Bounds bounds,@Nullable Expr righ
         return 0;
     }
 
+    @Override
+    public void visit(Visitor v) {
+        // Bounds should stay invisible to the visitors and therefore no visit is needed
     }
+
+}
 
     @Override
     public void visit(Visitor v) {

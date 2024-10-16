@@ -4,13 +4,14 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
 public record ArithLogicalExpression(Expr left,org.key_project.rusty.ast.expr.ArithLogicalExpression.Operator op,Expr right)implements Expr{
 
-public enum Operator implements SyntaxElement {
+public enum Operator implements RustyProgramElement {
     Plus, Minus, Multiply, Divide, Modulo, BitwiseAnd, BitwiseOr, BitwiseXor, Shl, Shr;
 
     @Override
@@ -37,6 +38,11 @@ public enum Operator implements SyntaxElement {
     @Override
     public int getChildCount() {
         return 0;
+    }
+
+    @Override
+    public void visit(Visitor v) {
+        // Operator should stay invisible to the visitors and therefore no visit is needed
     }
 
 }

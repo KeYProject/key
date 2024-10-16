@@ -34,7 +34,7 @@ public record IfLetExpression(Pattern pattern, Expr expr, ThenBranch then, @Null
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("if let ").append(pattern).append(" = ").append(expr).append(then);
+            sb.append("if let ").append(pattern).append(" = ").append(expr).append(" ").append(then);
             if (elseExpr != null) sb.append(" else ").append(elseExpr);
             return sb.toString();
         }
