@@ -126,7 +126,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions, boolean antec,
+    public SequentChangeInfo addFormula(ImmutableList<? extends SequentFormula> insertions, boolean antec,
             boolean first) {
 
         final Semisequent seq = antec ? antecedent : succedent;
@@ -175,7 +175,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions,
+    public SequentChangeInfo addFormula(ImmutableList<? extends SequentFormula> insertions,
             PosInOccurrence p) {
         final Semisequent seq = getSemisequent(p);
 
@@ -219,7 +219,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo changeFormula(ImmutableList<SequentFormula> replacements,
+    public SequentChangeInfo changeFormula(ImmutableList<? extends SequentFormula> replacements,
             PosInOccurrence p) {
 
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, replacements);

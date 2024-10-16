@@ -112,7 +112,6 @@ public class Node implements Iterable<Node> {
 
     private @Nullable Lookup userData = null;
 
-
     /**
      * If the rule base has been extended e.g. by loading a new taclet as lemma or by applying a
      * taclet with an addrule section on this node, then these taclets are stored in this list

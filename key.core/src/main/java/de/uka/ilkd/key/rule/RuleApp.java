@@ -4,18 +4,19 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * rule application with specific information how and where the rule has to be applied
  */
 public interface RuleApp
-        extends org.key_project.ncore.rules.RuleApp<Goal>, EqualsModProofIrrelevancy {
+        extends org.key_project.ncore.rules.RuleApp, EqualsModProofIrrelevancy {
 
     /**
      * returns the rule of this rule application
@@ -32,9 +33,9 @@ public interface RuleApp
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
+     * TODO: better name
+     *
      * @param goal the Goal where to apply the rule
-     * @return list of new created goals
      */
-    @Nullable
-    ImmutableList<Goal> execute(Goal goal);
+    void execute(Namespace<? super @NonNull Function> fns);
 }

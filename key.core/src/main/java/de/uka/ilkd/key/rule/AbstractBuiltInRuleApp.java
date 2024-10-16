@@ -11,11 +11,13 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
 
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     public static final AtomicLong PERF_EXECUTE = new AtomicLong();
@@ -71,23 +73,8 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * @return list of new created goals
      */
     @Override
-    public @Nullable ImmutableList<Goal> execute(Goal goal) {
-        var time = System.nanoTime();
-        var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
-        var services = goal.getOverlayServices();
-        try {
-            goal.addAppliedRuleApp(this);
-            try {
-                return Objects.requireNonNull(builtInRule.apply(goal, this));
-            } catch (RuleAbortException rae) {
-                goal.removeLastAppliedRuleApp();
-                goal.node().setAppliedRuleApp(null);
-                return null;
-            }
-        } finally {
-            PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
-            PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
-        }
+    public void execute(Namespace<? extends @NonNull Function> fns) {
+
     }
 
     public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
