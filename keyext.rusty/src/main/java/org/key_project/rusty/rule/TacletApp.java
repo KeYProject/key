@@ -11,16 +11,20 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.ncore.rules.Rule;
+import org.key_project.ncore.rules.AssumesFormulaInstantiation;
+import org.key_project.ncore.sequent.PIOPathIterator;
+import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.Semisequent;
+import org.key_project.ncore.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.op.BoundVariable;
 import org.key_project.rusty.logic.op.LogicVariable;
 import org.key_project.rusty.logic.op.RFunction;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
-import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.VariableNameProposer;
 import org.key_project.rusty.rule.inst.*;
 import org.key_project.util.collection.*;
@@ -45,7 +49,7 @@ public abstract class TacletApp implements RuleApp {
     /**
      * chosen instantiations for the assumes-sequent formulas
      */
-    protected final ImmutableList<IfFormulaInstantiation> ifInstantiations;
+    protected final ImmutableList<AssumesFormulaInstantiation> assumesInstantiations;
 
     /**
      * set of schema variables that appear in the Taclet and need to be instantiated but are not
@@ -66,10 +70,10 @@ public abstract class TacletApp implements RuleApp {
     }
 
     TacletApp(Taclet taclet, SVInstantiations instantiations,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations) {
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         this.taclet = taclet;
         this.instantiations = instantiations;
-        this.ifInstantiations = ifInstantiations;
+        this.assumesInstantiations = ifInstantiations;
         this.matchConditions = new MatchConditions(instantiations);
     }
 
@@ -88,7 +92,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the Rule the application information is collected for
      */
     @Override
-    public Rule<@NonNull Goal, org.key_project.ncore.rules.RuleApp<@NonNull Goal>> rule() {
+    public Rule rule() {
         return taclet;
     }
 
@@ -105,8 +109,8 @@ public abstract class TacletApp implements RuleApp {
         return matchConditions;
     }
 
-    public ImmutableList<IfFormulaInstantiation> ifFormulaInstantiations() {
-        return ifInstantiations;
+    public ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations() {
+        return assumesInstantiations;
     }
 
     /**
@@ -218,7 +222,6 @@ public abstract class TacletApp implements RuleApp {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param goal the Goal at which the Taclet is applied
      * @return list of new created goals
      */
     @Override
@@ -405,7 +408,7 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff the if-instantiation list is not null or no if sequent is needed
      */
     public boolean ifInstsComplete() {
-        return ifInstantiations != null || taclet().assumesSequent().isEmpty();
+        return assumesInstantiations != null || taclet().assumesSequent().isEmpty();
     }
 
     public PosTacletApp setPosInOccurrence(PosInOccurrence pos, Services services) {
@@ -413,7 +416,7 @@ public abstract class TacletApp implements RuleApp {
             throw new IllegalStateException("Cannot add position to an taclet" + " without find");
         }
         return PosTacletApp.createPosTacletApp((FindTaclet) taclet(), instantiations(),
-            ifFormulaInstantiations(), pos, services);
+            assumesFormulaInstantiations(), pos, services);
     }
 
     /**
@@ -598,8 +601,8 @@ public abstract class TacletApp implements RuleApp {
         return findIfFormulaInstantiationsHelp(
             createSemisequentList(taclet().assumesSequent().succedent()),
             createSemisequentList(taclet().assumesSequent().antecedent()),
-            IfFormulaInstSeq.createList(seq, false, services),
-            IfFormulaInstSeq.createList(seq, true, services),
+            AssumesFormulaInstSeq.createList(seq, false, services),
+            AssumesFormulaInstSeq.createList(seq, true, services),
             ImmutableSLList.nil(), matchConditions(), services);
     }
 
@@ -621,9 +624,9 @@ public abstract class TacletApp implements RuleApp {
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
             ImmutableList<SequentFormula> ruleSuccTail, ImmutableList<SequentFormula> ruleAntecTail,
-            ImmutableArray<IfFormulaInstantiation> instSucc,
-            ImmutableArray<IfFormulaInstantiation> instAntec,
-            ImmutableList<IfFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
+            ImmutableArray<AssumesFormulaInstantiation> instSucc,
+            ImmutableArray<AssumesFormulaInstantiation> instAntec,
+            ImmutableList<AssumesFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
             Services services) {
 
         while (ruleSuccTail.isEmpty()) {
@@ -643,13 +646,13 @@ public abstract class TacletApp implements RuleApp {
         }
 
         // Match the current formula
-        IfMatchResult mr = taclet().getMatcher().matchIf(instSucc, ruleSuccTail.head().formula(),
+        IfMatchResult mr = taclet().getMatcher().matchAssumes(instSucc, ruleSuccTail.head().formula(),
             matchCond, services);
 
         // For each matching formula call the method again to match
         // the remaining terms
         ImmutableList<TacletApp> res = ImmutableSLList.nil();
-        Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
+        Iterator<AssumesFormulaInstantiation> itCand = mr.getFormulas().iterator();
         Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
         ruleSuccTail = ruleSuccTail.tail();
         while (itCand.hasNext()) {
@@ -704,7 +707,7 @@ public abstract class TacletApp implements RuleApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     protected abstract TacletApp setAllInstantiations(MatchConditions mc,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services);
+                                                      ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services);
 
     /**
      * adds a new instantiation to this TacletApp
@@ -719,7 +722,7 @@ public abstract class TacletApp implements RuleApp {
     @Override
     public String toString() {
         return "Application of Taclet " + taclet() + " with " + instantiations() + " and "
-            + ifFormulaInstantiations();
+            + assumesFormulaInstantiations();
     }
 
     /**
@@ -728,7 +731,7 @@ public abstract class TacletApp implements RuleApp {
      * fail
      * if the assumes-formulas have already been instantiated.
      */
-    public TacletApp setIfFormulaInstantiations(ImmutableList<IfFormulaInstantiation> p_list,
+    public TacletApp setIfFormulaInstantiations(ImmutableList<AssumesFormulaInstantiation> p_list,
             Services p_services) {
         if (p_list == null) {
             // (LG 2022-02-07) Apparently findIfFormulaInstantiations() might return null
@@ -736,11 +739,11 @@ public abstract class TacletApp implements RuleApp {
             // So we replace null with nil() here as a bugfix.
             p_list = ImmutableSLList.nil();
         }
-        assert ifInstsCorrectSize(p_list) && ifInstantiations == null
+        assert ifInstsCorrectSize(p_list) && assumesInstantiations == null
                 : "If instantiations list has wrong size "
                     + "or the if formulas have already been instantiated";
 
-        MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
+        MatchConditions mc = taclet().getMatcher().matchAssumes(p_list, matchConditions, p_services);
 
         return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
     }
@@ -751,7 +754,7 @@ public abstract class TacletApp implements RuleApp {
      * @param list list of instantiations (non-null)
      * @return true iff the list of if instantiations has the correct size
      */
-    public boolean ifInstsCorrectSize(ImmutableList<IfFormulaInstantiation> list) {
+    public boolean ifInstsCorrectSize(ImmutableList<AssumesFormulaInstantiation> list) {
         Semisequent antec = taclet().assumesSequent().antecedent();
         Semisequent succ = taclet().assumesSequent().succedent();
         return list.size() == (antec.size() + succ.size());

@@ -9,7 +9,7 @@ import org.key_project.rusty.logic.SequentFormula;
 /**
  * Instantiation of an if-formula that has to be proven by an explicit if-goal
  */
-public class IfFormulaInstDirect implements IfFormulaInstantiation {
+public class IfFormulaInstDirect implements AssumesFormulaInstantiation {
 
     /**
      * Simply the formula
@@ -23,7 +23,7 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     /**
      * @return the cf this is pointing to
      */
-    public SequentFormula getConstrainedFormula() {
+    public SequentFormula getSequentFormula() {
         return cf;
     }
 

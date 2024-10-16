@@ -32,7 +32,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
         MatchConditions mc = tacletApp.matchConditions();
 
         ImmutableList<SequentChangeInfo> newSequentsForGoals =
-            checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
+            checkIfGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 

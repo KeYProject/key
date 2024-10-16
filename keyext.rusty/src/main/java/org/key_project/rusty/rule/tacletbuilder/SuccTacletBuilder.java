@@ -7,7 +7,6 @@ package org.key_project.rusty.rule.tacletbuilder;
 import org.key_project.logic.Term;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.rule.SuccTaclet;
-import org.key_project.rusty.rule.TacletApplPart;
 
 public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
     private boolean ignoreTopLevelUpdates = true;

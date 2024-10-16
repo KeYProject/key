@@ -5,8 +5,13 @@ package org.key_project.rusty.rule.executor.rustydl;
 
 import java.util.Iterator;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.FormulaChangeInfo;
+import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.SequentChangeInfo;
+import org.key_project.ncore.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -28,16 +33,15 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         final MatchConditions mc = tacletApp.matchConditions();
 
         final ImmutableList<SequentChangeInfo> newSequentsForGoals =
-            checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
+            checkIfGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         final ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
-        final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
         final Iterator<Goal> goalIt = newGoals.iterator();
         final Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
 
-        while (it.hasNext()) {
-            final TacletGoalTemplate gt = it.next();
+        for  (var nextGT : taclet.goalTemplates()) {
+            final var gt = (TacletGoalTemplate) nextGT;
             final Goal currentGoal = goalIt.next();
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
@@ -99,8 +103,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param services the {@link Services} encapsulating all Rust model information
      */
     protected abstract void applyAdd(Sequent add, SequentChangeInfo currentSequent,
-            PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
-            MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
+                                     PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+                                     MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
 
     /**
      * applies the {@code replacewith}-expression of taclet goal descriptions

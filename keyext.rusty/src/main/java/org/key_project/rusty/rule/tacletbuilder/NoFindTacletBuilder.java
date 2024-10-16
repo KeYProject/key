@@ -6,7 +6,6 @@ package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.rusty.rule.BoundUniquenessChecker;
 import org.key_project.rusty.rule.NoFindTaclet;
-import org.key_project.rusty.rule.TacletApplPart;
 
 public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
 

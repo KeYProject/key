@@ -6,9 +6,10 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.ncore.rules.TacletApplPart;
 import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.proof.Goal;
+import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -20,7 +21,7 @@ import org.jspecify.annotations.NonNull;
 
 
 public abstract class Taclet extends
-        org.key_project.ncore.rules.Taclet<@NonNull Goal, @NonNull TacletApp> implements Rule {
+        org.key_project.ncore.rules.Taclet<@NonNull TacletApp> implements Rule {
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
@@ -32,9 +33,9 @@ public abstract class Taclet extends
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, org.key_project.ncore.rules.TacletApplPart applPart,
-            ImmutableList<org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate<@NonNull Goal, TacletApp>> goalTemplates,
+            ImmutableList<? extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate<TacletApp>> goalTemplates,
             org.key_project.ncore.rules.TacletAttributes attrs,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
             boolean surviveSmbExec,
             ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, attrs, prefixMap, surviveSmbExec, tacletAnnotations);
@@ -55,9 +56,9 @@ public abstract class Taclet extends
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<? extends TacletGoalTemplate> goalTemplates,
+            org.key_project.ncore.rules.TacletAttributes attrs, ImmutableMap<SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+            ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, prefixMap, false,
             tacletAnnotations);
     }
@@ -88,12 +89,12 @@ public abstract class Taclet extends
             ImmutableSet<QuantifiableVariable> result =
                 DefaultImmutableSet.nil();
 
-            for (final TacletGoalTemplate tgt : goalTemplates()) {
+            for (final var tgt : goalTemplates()) {
                 result = result.union(tgt.getBoundVariables());
             }
 
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
-            bvv.visit(assumesSequent());
+            bvv.visit((Sequent) assumesSequent());
             result = result.union(bvv.getBoundVariables()).union(getBoundVariablesHelper());
 
             boundVariables = result;
@@ -110,6 +111,26 @@ public abstract class Taclet extends
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
     /**
+     * returns the set of schemavariables of the taclet's if-part
+     *
+     * @return Set of schemavariables of the if part
+     */
+    protected ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> getAssumesVariables() {
+        // should be synchronized
+        if (assumesVariables == null) {
+            TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
+            svc.visit((Sequent) assumesSequent());
+
+            assumesVariables = DefaultImmutableSet.nil();
+            for (final SchemaVariable sv : svc.vars()) {
+                assumesVariables = assumesVariables.add(sv);
+            }
+        }
+
+        return assumesVariables;
+    }
+
+    /**
      * returns the computed prefix for the given schemavariable. The prefix of a schemavariable is
      * used to determine if an instantiation is correct, in more detail: it mainly contains all
      * variables that can appear free in an instantiation of the schemvariable sv (rewrite taclets
@@ -119,11 +140,11 @@ public abstract class Taclet extends
      * @return prefix of schema variable sv
      */
     public TacletPrefix getPrefix(SchemaVariable sv) {
-        return prefixMap.get(sv);
+        return (TacletPrefix) prefixMap.get(sv);
     }
 
     public TacletExecutor<? extends Taclet> getExecutor() {
-        return executor;
+        return (TacletExecutor<? extends Taclet>) executor;
     }
 
     @Override

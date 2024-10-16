@@ -21,15 +21,15 @@ import org.jspecify.annotations.NonNull;
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
-public abstract class TacletGoalTemplate<G extends @NonNull ProofGoal<G>, App extends @NonNull RuleApp<G, App>> {
+public abstract class TacletGoalTemplate<App extends @NonNull RuleApp> {
     /** stores sequent that is one of the new goals */
     private final Sequent addedSeq;
 
     /** stores list of Taclet which are introduced */
-    private ImmutableList<Taclet<G, App>> addedRules = ImmutableSLList.nil();
+    private ImmutableList<? extends Taclet<App>> addedRules = ImmutableSLList.nil();
 
     /** program variables added by this taclet to the namespace */
-    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
+    private ImmutableSet<? extends SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
 
     private String name = null;
 
@@ -42,8 +42,8 @@ public abstract class TacletGoalTemplate<G extends @NonNull ProofGoal<G>, App ex
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet<G, App>> addedRules,
-            ImmutableSet<SchemaVariable> addedProgVars) {
+    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<? extends Taclet<App>> addedRules,
+            ImmutableSet<? extends SchemaVariable> addedProgVars) {
         // TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 
         this.addedRules = addedRules;
@@ -60,7 +60,7 @@ public abstract class TacletGoalTemplate<G extends @NonNull ProofGoal<G>, App ex
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet<G, App>> addedRules) {
+    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet< App>> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
@@ -78,11 +78,11 @@ public abstract class TacletGoalTemplate<G extends @NonNull ProofGoal<G>, App ex
      *
      * @return IList<Taclet> contains new introduced rules
      */
-    public ImmutableList<Taclet<G, App>> rules() {
+    public ImmutableList<? extends Taclet<App>> rules() {
         return addedRules;
     }
 
-    public ImmutableSet<SchemaVariable> addedProgVars() {
+    public ImmutableSet<? extends SchemaVariable> addedProgVars() {
         return addedProgVars;
     }
 
@@ -90,7 +90,6 @@ public abstract class TacletGoalTemplate<G extends @NonNull ProofGoal<G>, App ex
         return null;
     }
 
-    // TODO: Maybe also pull up?
     /**
      * retrieves and returns all variables that are bound in the goal template
      *

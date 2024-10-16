@@ -7,7 +7,6 @@ package org.key_project.rusty.rule.tacletbuilder;
 import org.key_project.logic.Term;
 import org.key_project.rusty.rule.RewriteTaclet;
 import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
-import org.key_project.rusty.rule.TacletApplPart;
 
 public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T> {
 

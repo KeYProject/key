@@ -5,13 +5,12 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
-import org.key_project.rusty.logic.PosInOccurrence;
-import org.key_project.rusty.proof.Goal;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
-public interface RuleApp extends org.key_project.ncore.rules.RuleApp<@NonNull Goal> {
+public interface RuleApp extends org.key_project.ncore.rules.RuleApp {
     /**
      * returns the rule of this rule application
      */
@@ -28,7 +27,6 @@ public interface RuleApp extends org.key_project.ncore.rules.RuleApp<@NonNull Go
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param services
      * @return list of new created goals
      */
     @Override

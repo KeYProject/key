@@ -7,7 +7,6 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -40,7 +39,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     public static NoPosTacletApp createNoPosTacletApp(Taclet taclet,
-            SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
+            SVInstantiations instantiations, ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
             Services services) {
         SVInstantiations inst = resolveCollisionVarSV(taclet, instantiations, services);
         if (checkNoFreeVars(taclet)) {
@@ -87,7 +86,7 @@ public class NoPosTacletApp extends TacletApp {
      * @param instantiations the SVInstantiations
      */
     private NoPosTacletApp(Taclet taclet, SVInstantiations instantiations,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations) {
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         super(taclet, instantiations, ifInstantiations);
     }
 
@@ -195,7 +194,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     public TacletApp setMatchConditions(MatchConditions mc, Services services) {
-        return createNoPosTacletApp(taclet(), mc.getInstantiations(), ifFormulaInstantiations(),
+        return createNoPosTacletApp(taclet(), mc.getInstantiations(), assumesFormulaInstantiations(),
             services);
     }
 
@@ -205,7 +204,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setAllInstantiations(MatchConditions mc,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
+                                             ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services) {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(), ifInstantiations, services);
     }
 
@@ -232,7 +231,7 @@ public class NoPosTacletApp extends TacletApp {
          * } else
          */ {
             return createNoPosTacletApp(taclet(), instantiations().add(sv, term, services),
-                ifFormulaInstantiations(), services);
+                assumesFormulaInstantiations(), services);
         }
     }
 
@@ -249,6 +248,6 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SVInstantiations svi, Services services) {
         return new NoPosTacletApp(taclet(), svi.union(instantiations(), services),
-            ifFormulaInstantiations());
+            assumesFormulaInstantiations());
     }
 }

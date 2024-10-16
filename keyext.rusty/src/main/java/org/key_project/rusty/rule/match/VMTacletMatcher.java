@@ -199,12 +199,12 @@ public class VMTacletMatcher implements TacletMatcher {
     }
 
     @Override
-    public final IfMatchResult matchIf(Iterable<IfFormulaInstantiation> toMatch,
+    public final IfMatchResult matchIf(Iterable<AssumesFormulaInstantiation> toMatch,
             Term template, MatchConditions matchCond, Services services) {
         TacletMatchProgram prg = assumesMatchPrograms.get(template);
 
 
-        ImmutableList<IfFormulaInstantiation> resFormulas =
+        ImmutableList<AssumesFormulaInstantiation> resFormulas =
             ImmutableSLList.nil();
         ImmutableList<MatchConditions> resMC = ImmutableSLList.nil();
 
@@ -218,7 +218,7 @@ public class VMTacletMatcher implements TacletMatcher {
         }
 
         for (var cf : toMatch) {
-            Term formula = cf.getConstrainedFormula().formula();
+            Term formula = cf.getSequentFormula().formula();
 
             if (updateContextPresent) {
                 formula = matchUpdateContext(context, formula);
@@ -269,7 +269,7 @@ public class VMTacletMatcher implements TacletMatcher {
      * @inheritDoc
      */
     @Override
-    public final MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
+    public final MatchConditions matchIf(Iterable<AssumesFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services) {
 
         final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
@@ -277,12 +277,12 @@ public class VMTacletMatcher implements TacletMatcher {
 
         ImmutableList<MatchConditions> newMC;
 
-        for (final IfFormulaInstantiation candidateInst : p_toMatch) {
+        for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ
-            boolean candidateInAntec = (candidateInst instanceof IfFormulaInstSeq)
+            boolean candidateInAntec = (candidateInst instanceof AssumesFormulaInstSeq)
                     // Only IfFormulaInstSeq has inAntec() property ...
-                    && (((IfFormulaInstSeq) candidateInst).inAntec())
-                    || !(candidateInst instanceof IfFormulaInstSeq)
+                    && (((AssumesFormulaInstSeq) candidateInst).inAntec())
+                    || !(candidateInst instanceof AssumesFormulaInstSeq)
                             // ... and it seems we don't need the check for other implementations.
                             // Default: just take the next ante formula, else succ formula
                             && anteIterator.hasNext();
@@ -292,7 +292,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
             assert itIfSequent.hasNext()
                     : "toMatch and assumes sequent must have same number of elements";
-            newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
+            newMC = matchIf(ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
             if (newMC.isEmpty()) {

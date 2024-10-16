@@ -5,6 +5,7 @@ package org.key_project.rusty.proof;
 
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.Sequent;
@@ -213,7 +214,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
             assert sci.sequent().equals(sci.getOriginalSequent());
             return;
         }
-        getNode().setSequent(sci.sequent());
+        getNode().setSequent((Sequent) sci.sequent());
         // getNode().getNodeInfo().setSequentChangeInfo(sci);
     }
 

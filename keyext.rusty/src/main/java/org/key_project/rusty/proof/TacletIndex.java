@@ -11,7 +11,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
-import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.ProgramPrefix;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;

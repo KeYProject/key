@@ -286,11 +286,11 @@ public class IntermediateProofReplayer {
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
-        ImmutableList<IfFormulaInstantiation> ifFormulaList =
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList =
             ImmutableSLList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
-                ifFormulaList.append(new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
+                ifFormulaList.append(new AssumesFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             // MU 2019: #1487. We have to use the right namespaces to not
@@ -314,7 +314,7 @@ public class IntermediateProofReplayer {
             }
 
             TacletApp newApp = instApps.head();
-            ifFormulaList = newApp.ifFormulaInstantiations();
+            ifFormulaList = newApp.assumesFormulaInstantiations();
         }
 
         // TODO: In certain cases, the below method call returns null and

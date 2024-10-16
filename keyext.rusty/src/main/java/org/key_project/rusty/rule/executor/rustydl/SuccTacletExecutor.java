@@ -4,7 +4,6 @@
 package org.key_project.rusty.rule.executor.rustydl;
 
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.MatchConditions;

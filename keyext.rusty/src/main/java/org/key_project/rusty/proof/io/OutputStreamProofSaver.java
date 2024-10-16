@@ -13,7 +13,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.PosInTerm;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
@@ -23,8 +22,7 @@ import org.key_project.rusty.pp.PrettyPrinter;
 import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.init.Profile;
-import org.key_project.rusty.rule.IfFormulaInstSeq;
-import org.key_project.rusty.rule.IfFormulaInstantiation;
+import org.key_project.rusty.rule.AssumesFormulaInstSeq;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.rusty.rule.inst.TermInstantiation;
@@ -211,7 +209,7 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
         // TODO: output.append(getInteresting(appliedRuleApp.instantiations()));
-        final ImmutableList<IfFormulaInstantiation> l = appliedRuleApp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> l = appliedRuleApp.assumesFormulaInstantiations();
         if (l != null) {
             output.append(ifFormulaInsts(node, l));
         }
@@ -221,11 +219,11 @@ public class OutputStreamProofSaver {
         output.append(")\n");
     }
 
-    public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
+    public String ifFormulaInsts(Node node, ImmutableList<AssumesFormulaInstantiation> l) {
         StringBuilder s = new StringBuilder();
-        for (final IfFormulaInstantiation aL : l) {
-            if (aL instanceof IfFormulaInstSeq ifis) {
-                final SequentFormula f = aL.getConstrainedFormula();
+        for (final AssumesFormulaInstantiation aL : l) {
+            if (aL instanceof AssumesFormulaInstSeq ifis) {
+                final SequentFormula f = aL.getSequentFormula();
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
                                 .formulaNumberInSequent(ifis.inAntec(), f))

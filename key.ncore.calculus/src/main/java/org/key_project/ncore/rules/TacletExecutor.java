@@ -18,8 +18,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
-public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp<Goal>, T extends Taclet<Goal, App>> {
-    private static final String AUTO_NAME = "_taclet";
+public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp, T extends Taclet< App>> {
+    protected static final String AUTO_NAME = "_taclet";
 
     protected final T taclet;
 
@@ -55,7 +55,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *         obligation for the to be proven formulas of the assumes goal
      */
     protected ImmutableList<SequentChangeInfo> checkIfGoals(Goal p_goal,
-            ImmutableList<AssumesFormulaInstantiation> p_list, MatchConditions p_matchCond,
+            ImmutableList<?extends AssumesFormulaInstantiation> p_list, MatchConditions p_matchCond,
             int p_numberOfNewGoals) {
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
@@ -167,7 +167,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      */
-    protected abstract void applyAddrule(ImmutableList<Taclet<Goal, App>> rules, Goal goal,
+    protected abstract void applyAddrule(ImmutableList<Taclet< App>> rules, Goal goal,
             LogicServices services,
             MatchConditions matchCond);
 

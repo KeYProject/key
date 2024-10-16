@@ -19,8 +19,8 @@ import org.jspecify.annotations.NonNull;
 
 import static org.key_project.util.Strings.formatAsList;
 
-public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNull RuleApp<G, App>>
-        implements Rule<G, App> {
+public abstract class Taclet<App extends @NonNull RuleApp>
+        implements Rule {
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
     /** unique name of the taclet */
@@ -38,25 +38,25 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
      * Variables that have to be created each time the taclet is applied. Those variables occur in
      * the varcond part of a taclet description.
      */
-    private final ImmutableList<NewVarcond> varsNew;
+    private final ImmutableList<?extends NewVarcond> varsNew;
     /**
      * variables with a "x not free in y" variable condition. This means the instantiation of
      * VariableSV x must not occur free in the instantiation of TermSV y.
      */
-    private final ImmutableList<NotFreeIn> varsNotFreeIn;
+    private final ImmutableList<?extends NotFreeIn> varsNotFreeIn;
     /**
      * variable conditions used to express that a termsv depends on the free variables of a given
      * formula(SV) Used by skolemization rules.
      */
-    private final ImmutableList<NewDependingOn> varsNewDependingOn;
+    private final ImmutableList<?extends NewDependingOn> varsNewDependingOn;
 
     /** Additional generic conditions for schema variable instantiations. */
-    private final ImmutableList<VariableCondition> variableConditions;
+    private final ImmutableList<?extends VariableCondition> variableConditions;
 
     /**
      * the list of taclet goal descriptions
      */
-    private final ImmutableList<TacletGoalTemplate<G, App>> goalTemplates;
+    private final ImmutableList<?extends TacletGoalTemplate<App>> goalTemplates;
 
     /**
      * map from a schemavariable to its prefix. The prefix is used to test correct instantiations of
@@ -64,10 +64,10 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
      * all variables that may appear free in the instantiation of the schemavariable (a bit more
      * complicated for rewrite taclets, see paper of M:Giese)
      */
-    protected final ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap;
+    protected final ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, TacletPrefix> prefixMap;
 
     /** cache; contains set of all bound variables */
-    private ImmutableSet<QuantifiableVariable> boundVariables = null;
+    protected ImmutableSet<QuantifiableVariable> boundVariables = null;
 
     /** tracks state of pre-computation */
     private boolean contextInfoComputed = false;
@@ -76,7 +76,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
     protected String tacletAsString;
 
     /** Set of schemavariables of the {@code assumes} part */
-    private ImmutableSet<SchemaVariable> assumesVariables = null;
+    protected ImmutableSet<SchemaVariable> assumesVariables = null;
 
     private final Trigger trigger;
 
@@ -86,12 +86,12 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
     /**
      * The taclet matcher
      */
-    private TacletMatcher matcher;
+    protected TacletMatcher matcher;
 
     /**
      * The taclet executor
      */
-    protected TacletExecutor<G, App, ? extends Taclet<G, App>> executor;
+    protected TacletExecutor/*<?, App, ? extends Taclet<?, App>>*/ executor;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -104,7 +104,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate<G, App>> goalTemplates,
+            ImmutableList<? extends TacletGoalTemplate<App>> goalTemplates,
             TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -146,7 +146,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate<G, App>> goalTemplates,
+            ImmutableList<TacletGoalTemplate<App>> goalTemplates,
             TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, prefixMap, false,
@@ -209,7 +209,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
     /**
      * @return the generic variable conditions of this taclet
      */
-    public ImmutableList<VariableCondition> getVariableConditions() {
+    public ImmutableList<?extends VariableCondition> getVariableConditions() {
         return variableConditions;
     }
 
@@ -239,25 +239,25 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
     /**
      * returns an iterator over the variables that are new in the Taclet.
      */
-    public ImmutableList<NewVarcond> varsNew() {
+    public ImmutableList<?extends NewVarcond> varsNew() {
         return varsNew;
     }
 
     /**
      * returns an iterator over the variable pairs that indicate that are new in the Taclet.
      */
-    public ImmutableList<NotFreeIn> varsNotFreeIn() {
+    public ImmutableList<?extends NotFreeIn> varsNotFreeIn() {
         return varsNotFreeIn;
     }
 
-    public ImmutableList<NewDependingOn> varsNewDependingOn() {
+    public ImmutableList<?extends NewDependingOn> varsNewDependingOn() {
         return varsNewDependingOn;
     }
 
     /**
      * returns an iterator over the goal descriptions.
      */
-    public ImmutableList<TacletGoalTemplate<G, App>> goalTemplates() {
+    public ImmutableList<? extends TacletGoalTemplate<App>> goalTemplates() {
         return goalTemplates;
     }
 
@@ -292,7 +292,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
      *
      * @return Set of schemavariables of the {@code if} part
      */
-    protected abstract ImmutableSet<SchemaVariable> getAssumesVariables();
+    protected abstract ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> getAssumesVariables();
 
     /**
      * returns true iff a context flag is set in one of the entries in the prefix map. Is cached
@@ -321,7 +321,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
      */
     public abstract ImmutableSet<SchemaVariable> getAssumesAndFindVariables();
 
-    StringBuffer toStringAssumes(StringBuffer sb) {
+    protected StringBuffer toStringAssumes(StringBuffer sb) {
         if (!assumesSequent.isEmpty()) {
             sb.append("\\assumes (").append(assumesSequent).append(") ");
             sb.append("\n");
@@ -329,7 +329,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
         return sb;
     }
 
-    StringBuffer toStringVarCond(StringBuffer sb) {
+    protected StringBuffer toStringVarCond(StringBuffer sb) {
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
             sb.append("\\varcond(");
 
@@ -359,7 +359,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
         return sb;
     }
 
-    StringBuffer toStringGoalTemplates(StringBuffer sb) {
+    protected StringBuffer toStringGoalTemplates(StringBuffer sb) {
         if (goalTemplates.isEmpty()) {
             sb.append("\\closegoal");
         } else {
@@ -368,7 +368,7 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
         return sb;
     }
 
-    StringBuffer toStringTriggers(StringBuffer sb) {
+    protected StringBuffer toStringTriggers(StringBuffer sb) {
         if (trigger != null) {
             sb.append("\n\\trigger{");
             sb.append(trigger.triggerVar());
@@ -402,23 +402,9 @@ public abstract class Taclet<G extends @NonNull ProofGoal<G>, App extends @NonNu
         return tacletAsString;
     }
 
-    /**
-     * applies the given rule application to the specified goal
-     *
-     * @param goal the goal that the rule application should refer to.
-     * @param tacletApp the rule application that is executed.
-     * @return List of the goals created by the rule which have to be proved. If this is a
-     *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
-     *         goal that should be closed (with the constraint this taclet is applied under).
-     */
-    @Override
-    public @NonNull ImmutableList<G> apply(G goal, App tacletApp) {
-        return getExecutor().apply(goal, tacletApp);
-    }
-
-    public TacletExecutor<G, App, ? extends Taclet<G, App>> getExecutor() {
+    public<G extends ProofGoal<G>, App extends RuleApp, T extends Taclet<App>> TacletExecutor<G, App, T> getExecutor() {
         return executor;
     }
 
-    public abstract Taclet<G, App> setName(String s);
+    public abstract Taclet<App> setName(String s);
 }

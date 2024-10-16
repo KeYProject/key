@@ -5,12 +5,11 @@ package org.key_project.rusty.proof.io;
 
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.SequentFormula;
-import org.key_project.rusty.rule.IfFormulaInstantiation;
 
 /**
  * Instantiation of an if-formula that has to be proven by an explicit if-goal
  */
-public class IfFormulaInstDirect implements IfFormulaInstantiation {
+public class IfFormulaInstDirect implements AssumesFormulaInstantiation {
     /**
      * Simply the formula
      */
@@ -24,7 +23,7 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
      * @return the cf this is pointing to
      */
     @Override
-    public SequentFormula getConstrainedFormula() {
+    public SequentFormula getSequentFormula() {
         return sf;
     }
 

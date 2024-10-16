@@ -5,11 +5,12 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
+import org.key_project.ncore.rules.AssumesFormulaInstantiation;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
-public interface TacletMatcher {
+public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher {
     /**
      * matches the given term against the taclet's find term if the taclet has no find term or the
      * match is unsuccessful <code>null</code>
@@ -72,8 +73,8 @@ public interface TacletMatcher {
      *         could successfully be matched against p_template, and the corresponding
      *         MatchConditions.
      */
-    IfMatchResult matchIf(Iterable<IfFormulaInstantiation> toMatch, Term template,
-            MatchConditions matchCond, Services services);
+    IfMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch, Term template,
+                               MatchConditions matchCond, Services services);
 
     /**
      * Match the whole if sequent using the given list of instantiations of all assumes-sequent
@@ -85,8 +86,8 @@ public interface TacletMatcher {
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
-    MatchConditions matchIf(Iterable<IfFormulaInstantiation> toMatch,
-            MatchConditions matchCond, Services services);
+    MatchConditions matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
+                                 MatchConditions matchCond, Services services);
 
     MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchConditions,
             Services services);

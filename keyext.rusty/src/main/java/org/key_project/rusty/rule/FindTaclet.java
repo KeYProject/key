@@ -6,6 +6,7 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.ncore.rules.TacletApplPart;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -25,7 +26,7 @@ public abstract class FindTaclet extends Taclet {
     protected final Term find;
 
     /** Set of schemavariables of the {@code if} and the (optional) {@code find} part */
-    private ImmutableSet<SchemaVariable> ifFindVariables = null;
+    private ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> ifFindVariables = null;
 
     /**
      * this method is used to determine if top level updates are allowed to be ignored. This is the
@@ -51,10 +52,10 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableList<? extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate<TacletApp>> goalTemplates,
+            org.key_project.ncore.rules.TacletAttributes attrs, Term find, ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
             boolean surviveSymbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, attrs, prefixMap, surviveSymbExec,
             tacletAnnotations);
         this.find = find;
@@ -76,9 +77,9 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<? extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate<TacletApp>> goalTemplates,
+            org.key_project.ncore.rules.TacletAttributes attrs, Term find, ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+            ImmutableSet<org.key_project.ncore.rules.TacletAnnotation>tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, find, prefixMap, false,
             tacletAnnotations);
     }
@@ -117,12 +118,12 @@ public abstract class FindTaclet extends Taclet {
     /**
      * @return Set of schemavariables of the {@code if} and the (optional) {@code find} part
      */
-    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
+    public ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> getAssumesAndFindVariables() {
         if (ifFindVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             find().execPostOrder(svc);
 
-            ifFindVariables = getIfVariables();
+            ifFindVariables = getAssumesVariables();
 
             for (final SchemaVariable sv : svc.vars()) {
                 ifFindVariables = ifFindVariables.add(sv);

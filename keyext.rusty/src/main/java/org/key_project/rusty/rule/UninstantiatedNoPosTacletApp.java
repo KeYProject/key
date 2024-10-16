@@ -4,7 +4,6 @@
 package org.key_project.rusty.rule;
 
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.PosInOccurrence;
 
 public class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
     UninstantiatedNoPosTacletApp(Taclet taclet) {
