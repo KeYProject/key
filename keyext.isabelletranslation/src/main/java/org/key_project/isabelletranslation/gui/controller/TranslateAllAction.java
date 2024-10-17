@@ -5,10 +5,7 @@ package org.key_project.isabelletranslation.gui.controller;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
@@ -51,22 +48,31 @@ public class TranslateAllAction extends MainWindowAction {
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
 
         List<IsabelleProblem> translations = new ArrayList<>();
-        try {
-            for (Goal goal : Objects.requireNonNull(mediator.getSelectedProof()).openGoals()) {
+        Map<Goal, IllegalFormulaException> translationExceptions = new HashMap<>();
+        for (Goal goal : Objects.requireNonNull(mediator.getSelectedProof()).openGoals()) {
+            try {
                 translations.add(translator.translateProblem(goal));
+            } catch (IllegalFormulaException e) {
+                translationExceptions.put(goal, e);
             }
-        } catch (IllegalFormulaException e) {
-            LOGGER.error("Failed to generate translation", e);
+        }
+        if (!translations.isEmpty()) {
+            Set<PositionedIssueString> issueStrings = new HashSet<>();
+            for (Goal goal : translationExceptions.keySet()) {
+                String issueStringBuilder = "Translation failed for this goal:" +
+                        System.lineSeparator() + "Goal: " +
+                        goal.node().serialNr() + "  " +
+                        translationExceptions.get(goal).getMessage();
+                issueStrings.add(new PositionedIssueString(issueStringBuilder));
+            }
+            IssueDialog issueDialog =
+                    new IssueDialog(mainWindow, "Translations failed!", issueStrings, false);
+            issueDialog.setVisible(true);
             return;
         }
 
         Thread thread = new Thread(() -> {
-            IsabelleLauncher launcher;
-            try {
-                launcher = new IsabelleLauncher(IsabelleTranslationSettings.getInstance());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            IsabelleLauncher launcher = new IsabelleLauncher(settings);
 
             IsabelleLauncherProgressDialogMediator progressDialogMediator =
                 new IsabelleLauncherProgressDialogMediator(
