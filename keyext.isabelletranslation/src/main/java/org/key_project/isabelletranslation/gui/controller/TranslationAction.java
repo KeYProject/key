@@ -7,9 +7,12 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.PositionedIssueString;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 
 import org.key_project.isabelletranslation.IsabelleTranslationSettings;
@@ -50,7 +53,11 @@ public class TranslationAction extends MainWindowAction {
         try {
             translation = translator.translateProblem(mediator.getSelectedGoal());
         } catch (IllegalFormulaException e) {
-            LOGGER.error("Failed to generate translation", e);
+            PositionedIssueString issueString = new PositionedIssueString(
+                    "Failed to translate Goal " + mediator.getSelectedGoal().node().serialNr() + ": " + e.getMessage());
+            IssueDialog issueDialog =
+                    new IssueDialog(mainWindow, "Translations failed!", Set.of(issueString), false);
+            issueDialog.setVisible(true);
             return;
         }
 
@@ -59,12 +66,7 @@ public class TranslationAction extends MainWindowAction {
         list.add(translation);
 
         Thread thread = new Thread(() -> {
-            IsabelleLauncher launcher;
-            try {
-                launcher = new IsabelleLauncher(settings);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            IsabelleLauncher launcher = new IsabelleLauncher(settings);
 
             IsabelleLauncherProgressDialogMediator progressDialogMediator =
                 new IsabelleLauncherProgressDialogMediator(

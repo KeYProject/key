@@ -61,7 +61,7 @@ public class IsabelleLauncher implements IsabelleSolverListener {
     private final LinkedBlockingDeque<IsabelleSolver> solverQueue = new LinkedBlockingDeque<>();
 
 
-    public IsabelleLauncher(@NonNull IsabelleTranslationSettings settings) throws IOException {
+    public IsabelleLauncher(@NonNull IsabelleTranslationSettings settings) {
         this.settings = settings;
     }
 
