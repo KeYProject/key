@@ -22,7 +22,7 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
 
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3.4.2
+      uses: gradle/actions/setup-gradle@v4.1.0
     - name: Assemble with Gradle
       run: ./gradlew assemble
 

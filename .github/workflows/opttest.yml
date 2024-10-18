@@ -25,7 +25,7 @@ jobs:
           cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.4.2
+        uses: gradle/actions/setup-gradle@v4.1.0
       - name: Test with Gradle
         run: ./gradlew --continue ${{ matrix.tests }}
 

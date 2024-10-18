@@ -24,7 +24,7 @@ plugins {
     id "com.diffplug.spotless" version "6.25.0"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.41"
+    id "org.checkerframework" version "0.6.44"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -74,27 +74,27 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.13")
-        implementation("org.slf4j:slf4j-api:2.0.13")
-        testImplementation("ch.qos.logback:logback-classic:1.5.6")
+        implementation("org.slf4j:slf4j-api:2.0.16")
+        implementation("org.slf4j:slf4j-api:2.0.16")
+        testImplementation("ch.qos.logback:logback-classic:1.5.8")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
-        compileOnly("org.jspecify:jspecify:0.3.0")
-        testCompileOnly("org.jspecify:jspecify:0.3.0")
-        def eisop_version = "3.42.0-eisop3"
+        compileOnly("org.jspecify:jspecify:1.0.0")
+        testCompileOnly("org.jspecify:jspecify:1.0.0")
+        def eisop_version = "3.42.0-eisop4"
         compileOnly "io.github.eisop:checker-qual:$eisop_version"
         compileOnly "io.github.eisop:checker-util:$eisop_version"
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.6")
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.3'
+        testImplementation("ch.qos.logback:logback-classic:1.5.8")
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.1'
         testImplementation project(':key.util')
 
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.1'
     }
 
     tasks.withType(JavaCompile) {
@@ -334,6 +334,8 @@ subprojects {
             targetExclude 'build/**'
 
             // allows us to use spotless:off / spotless:on to keep pre-formatted sections
+            // MU: Only ... because of the eclipse(...) below, it is "@formatter:off" and "@formatter:on"
+            // that must be used instead.
             toggleOffOn()
 
             removeUnusedImports()

@@ -38,7 +38,7 @@ jobs:
           cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.4.2
+        uses: gradle/actions/setup-gradle@v4.1.0
       - name: Test with Gradle
         run: ./gradlew --continue -DjacocoEnabled=true -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
 
@@ -87,7 +87,7 @@ jobs:
         shell: bash
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.4.2
+        uses: gradle/actions/setup-gradle@v4.1.0
       - name: "Running tests: ${{ matrix.test }}"
         run: ./gradlew --continue ${{ matrix.test }}
 

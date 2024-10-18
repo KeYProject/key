@@ -108,7 +108,8 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         defineDefault(SaveBundleAction.class, KeyEvent.VK_B, SHORTCUT_KEY_MASK);
         defineDefault(SaveFileAction.class, KeyEvent.VK_S, SHORTCUT_KEY_MASK);
         defineDefault(SettingsManager.ShowSettingsAction.class, KeyEvent.VK_N, SHORTCUT_KEY_MASK);
-        defineDefault(TacletOptionsAction.class, KeyEvent.VK_T, SHORTCUT_KEY_MASK);
+        // remove as the old menu should not be accessible anymore
+        // defineDefault(TacletOptionsAction.class, KeyEvent.VK_T, SHORTCUT_KEY_MASK);
         defineDefault(OpenFileAction.class, KeyEvent.VK_O, SHORTCUT_KEY_MASK);
         defineDefault(SearchInSequentAction.class, KeyEvent.VK_F, SHORTCUT_KEY_MASK);
 

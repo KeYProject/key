@@ -15,9 +15,11 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -43,6 +45,12 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     private ChoiceSettings settings;
     private boolean warnNoProof = true;
 
+    // to make the "No Proof Loaded" header invisible when a proof is loaded
+    private JLabel noProofLoadedHeader;
+
+    private Proof loadedProof = null;
+
+
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
         pCenter.setLayout(new MigLayout(new LC().fillX(), new AC().fill().grow().gap("3mm")));
@@ -60,8 +68,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * and it is also used by the eclipse projects.
      * </p>
      *
-     * @param category
-     *        The category for which the explanation is requested.
+     * @param category The category for which the explanation is requested.
      * @return The explanation for the given category.
      */
     public static String getExplanation(String category) {
@@ -71,7 +78,9 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                 InputStream is =
                     TacletOptionsSettings.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
-                    if (is == null) { throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found"); }
+                    if (is == null) {
+                        throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
+                    }
                     explanationMap.loadFromXML(is);
                 } catch (InvalidPropertiesFormatException e) {
                     LOGGER.error("Cannot load help message in rule view (malformed XML).", e);
@@ -81,7 +90,9 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             }
         }
         String result = explanationMap.getProperty(category);
-        if (result == null) { result = "No explanation for " + category + " available."; }
+        if (result == null) {
+            result = "No explanation for " + category + " available.";
+        }
 
         return result;
     }
@@ -89,8 +100,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Checks if the given choice makes a proof unsound.
      *
-     * @param choice
-     *        The choice to check.
+     * @param choice The choice to check.
      * @return {@code true} proof will be unsound, {@code false} proof will be sound as long as all
      *         other choices are sound.
      */
@@ -103,8 +113,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Checks if the given choice makes a proof incomplete.
      *
-     * @param choice
-     *        The choice to check.
+     * @param choice The choice to check.
      * @return {@code true} proof will be incomplete, {@code false} proof will be complete as long
      *         as all other choices are complete.
      */
@@ -118,8 +127,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Checks if additional information for the choice are available.
      *
-     * @param choice
-     *        The choice to check.
+     * @param choice The choice to check.
      * @return The additional information or {@code null} if no information are available.
      */
     public static String getInformation(String choice) {
@@ -139,10 +147,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Searches the choice in the given {@link ChoiceEntry}s.
      *
-     * @param choices
-     *        The {@link ChoiceEntry}s to search in.
-     * @param choice
-     *        The choice to search.
+     * @param choices The {@link ChoiceEntry}s to search in.
+     * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(List<ChoiceEntry> choices, final String choice) {
@@ -152,12 +158,13 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Creates {@link ChoiceEntry}s for all given choices.
      *
-     * @param choices
-     *        The choices.
+     * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
     public static List<ChoiceEntry> createChoiceEntries(Collection<String> choices) {
-        if (choices == null) { return Collections.emptyList(); }
+        if (choices == null) {
+            return Collections.emptyList();
+        }
         return choices.stream().map(TacletOptionsSettings::createChoiceEntry)
                 .collect(Collectors.toList());
     }
@@ -165,8 +172,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     /**
      * Creates a {@link ChoiceEntry} for the given choice.
      *
-     * @param choice
-     *        The choice.
+     * @param choice The choice.
      * @return The created {@link ChoiceEntry}.
      */
     public static ChoiceEntry createChoiceEntry(String choice) {
@@ -175,12 +181,10 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     protected void layoutHead() {
-        if (warnNoProof) {
-            JLabel lblHead2 = new JLabel("No Proof loaded. Taclet options may not be parsed.");
-            lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
-            lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
-            pNorth.add(lblHead2);
-        }
+        this.noProofLoadedHeader = new JLabel("No Proof loaded. Taclet options may not be parsed.");
+        noProofLoadedHeader.setIcon(IconFactory.WARNING_INCOMPLETE.get());
+        noProofLoadedHeader.setFont(noProofLoadedHeader.getFont().deriveFont(14f));
+        pNorth.add(noProofLoadedHeader);
 
         JLabel lblHead2 = new JLabel("Taclet options will take effect only on new proofs.");
         lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
@@ -190,7 +194,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     protected void layoutChoiceSelector() {
         pCenter.removeAll();
-        category2Choice.keySet().stream().sorted().forEach(this::addCategory);
+        category2Choice.keySet().stream().sorted(String::compareToIgnoreCase)
+                .forEach(this::addCategory);
     }
 
     protected void addCategory(String cat) {
@@ -198,44 +203,55 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         ChoiceEntry selectedChoice = findChoice(choices, category2Choice.get(cat));
         String explanation = getExplanation(cat);
 
-        addTitleRow(cat);
-        ButtonGroup btnGroup = new ButtonGroup();
-        for (ChoiceEntry c : choices) {
-            JRadioButton btn = addRadioButton(c, btnGroup);
-            if (c.equals(selectedChoice)) { btn.setSelected(true); }
-            btn.addActionListener(new ChoiceSettingsSetter(cat, c.choice));
+        JLabel title = createTitleRow(cat, selectedChoice);
+        JPanel selectPanel = new JPanel(new MigLayout(new LC().fillX(), new AC().fill().grow()));
+
+        if (!warnNoProof) {
+            ButtonGroup btnGroup = new ButtonGroup();
+            for (ChoiceEntry c : choices) {
+                JRadioButton btn = mkRadioButton(c, btnGroup);
+                if (c.equals(selectedChoice)) {
+                    btn.setSelected(true);
+                }
+                btn.addActionListener(new ChoiceSettingsSetter(title, cat, c));
+                selectPanel.add(btn, new CC().newline());
+            }
         }
-        addExplanation(explanation);
+        selectPanel.add(mkExplanation(explanation), new CC().pad(0, 20, 0, 0).newline());
+
+        JPanel catEntry = createCollapsableTitlePane(title, selectPanel);
+        pCenter.add(catEntry, new CC().newline());
     }
 
-    protected void addExplanation(String explanation) {
-        JTextArea explanationArea = new JTextArea();
+    protected JComponent mkExplanation(String explanation) {
+        JTextArea explanationArea = new JTextArea() {
+            @Override
+            public void setBackground(Color bg) {
+                super.setBackground(bg);
+            }
+        };
         explanationArea.setEditable(false);
         explanationArea.setLineWrap(true);
         explanationArea.setWrapStyleWord(true);
-        explanationArea.setText(explanation);
+        explanationArea.setText(explanation.trim());
         explanationArea.setCaretPosition(0);
-        explanationArea.setBackground(getBackground());
-        JPanel p = createCollapsibleTitlePane("Info", explanationArea);
-        pCenter.add(p, new CC().span().newline());
+        explanationArea.setBackground(toNonUIColor(getBackground()));
+        return explanationArea;
     }
 
-    private @NonNull JPanel createCollapsibleTitlePane(String titleText, JComponent child) {
+    @NonNull
+    private JPanel createCollapsableTitlePane(JComponent title, JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
-        JPanel north = new JPanel(new BorderLayout());
-
-        p.setBorder(BorderFactory.createLineBorder(Color.black));
-        JButton title = new JButton(titleText);
-        title.setContentAreaFilled(false);
-        title.setBorderPainted(false);
-        north.add(title, BorderLayout.WEST);
+        JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel more = new JLabel(IconFactory.TREE_NODE_RETRACTED.get());
+        north.add(more);
+        north.add(title);
         p.add(north, BorderLayout.NORTH);
         p.add(child);
-        child.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // child.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         child.setVisible(false);
 
-        title.setIcon(IconFactory.TREE_NODE_RETRACTED.get());
-        title.addMouseListener(new MouseAdapter() {
+        var mouse = new MouseAdapter() {
             private boolean opened = false;
 
             @Override
@@ -243,20 +259,23 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                 opened = !opened;
                 child.setVisible(opened);
                 if (opened) {
-                    title.setIcon(IconFactory.TREE_NODE_EXPANDED.get());
+                    more.setIcon(IconFactory.TREE_NODE_EXPANDED.get());
                 } else {
-                    title.setIcon(IconFactory.TREE_NODE_RETRACTED.get());
+                    more.setIcon(IconFactory.TREE_NODE_RETRACTED.get());
                 }
             }
-        });
+        };
+
+        title.addMouseListener(mouse);
+        more.addMouseListener(mouse);
+
         return p;
     }
 
-    private JRadioButton addRadioButton(ChoiceEntry c, ButtonGroup btnGroup) {
+    private JRadioButton mkRadioButton(ChoiceEntry c, ButtonGroup btnGroup) {
         Box b = new Box(BoxLayout.X_AXIS);
         JRadioButton button = new JRadioButton(c.choice);
         btnGroup.add(button);
-        // add(new JLabel(c.choice));
         b.add(button);
 
         if (c.incomplete) {
@@ -270,17 +289,60 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             b.add(lbl);
         }
         if (c.information != null) {
-            JLabel lbl = SettingsPanel.createHelpLabel(c.information);
+            JLabel lbl = SettingsPanel.createHelpTextLabel(c.information);
             b.add(lbl);
         }
-        pCenter.add(b, new CC().newline());
         return button;
     }
 
-    private void addTitleRow(String cat) {
-        JLabel lbl = new JLabel(cat);
+    private JLabel createTitleRow(String cat, ChoiceEntry entry) {
+        JLabel lbl = new JLabel(createCatTitleText(cat, entry));
         lbl.setFont(lbl.getFont().deriveFont(14f));
-        pCenter.add(lbl, new CC().span().newline());
+
+        // we want to display a warning if the current choice differs from the loaded proof
+        checkForDifferingOptions(lbl, cat, entry);
+
+        return lbl;
+    }
+
+    private String createCatTitleText(String cat, ChoiceEntry entry) {
+        // if no proof is loaded, we do not want to display current settings
+        if (warnNoProof) {
+            return cat;
+        }
+
+        // strip the leading "cat:" from "cat:value"
+        return cat + (entry == null ? ""
+                : " (set to '" +
+                    entry.choice.substring(cat.length() + 1) + "')");
+    }
+
+    /**
+     * Checks if the current choice {@code entry} differs from the loaded proof and sets the icon to
+     * show a warning if necessary.
+     *
+     * @param lbl The label to set the icon on
+     * @param cat The category of the choice
+     * @param entry The current choice
+     */
+    private void checkForDifferingOptions(JLabel lbl, String cat, ChoiceEntry entry) {
+        if (loadedProof != null) {
+            String choiceOfLoadedProof =
+                loadedProof.getSettings().getChoiceSettings().getDefaultChoices().get(cat);
+            boolean choiceDiffers = entry != null && !entry.choice.equals(choiceOfLoadedProof);
+            if (choiceDiffers) {
+                lbl.setIcon(IconFactory.WARNING_INCOMPLETE.get());
+                lbl.setHorizontalTextPosition(JLabel.LEFT);
+                lbl.setIconTextGap(10);
+                lbl.setToolTipText(
+                    "<html>The current choice of this option differs from the loaded proof.<br>"
+                        + "The loaded proof uses: " + choiceOfLoadedProof + "</html>");
+
+            } else {
+                lbl.setIcon(null);
+                lbl.setToolTipText(null);
+            }
+        }
     }
 
     @Override
@@ -290,7 +352,10 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     @Override
     public JPanel getPanel(MainWindow window) {
-        warnNoProof = window.getMediator().getSelectedProof() == null;
+        loadedProof = window.getMediator().getSelectedProof();
+        warnNoProof = loadedProof == null;
+        // this makes the header invisible
+        this.noProofLoadedHeader.setVisible(warnNoProof);
         setChoiceSettings(SettingsManager.getChoiceSettings(window));
         return this;
     }
@@ -346,14 +411,10 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         /**
          * Constructor.
          *
-         * @param choice
-         *        The choice.
-         * @param unsound
-         *        Is unsound?
-         * @param incomplete
-         *        Is incomplete?
-         * @param information
-         *        An optionally information.
+         * @param choice The choice.
+         * @param unsound Is unsound?
+         * @param incomplete Is incomplete?
+         * @param information An optionally information.
          */
         public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
             assert choice != null;
@@ -408,7 +469,9 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             hashcode = hashcode * 17 + choice.hashCode();
             hashcode = hashcode * 17 + (incomplete ? 5 : 3);
             hashcode = hashcode * 17 + (unsound ? 5 : 3);
-            if (information != null) { hashcode = hashcode * 17 + information.hashCode(); }
+            if (information != null) {
+                hashcode = hashcode * 17 + information.hashCode();
+            }
             return hashcode;
         }
 
@@ -461,17 +524,39 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     private class ChoiceSettingsSetter implements ActionListener {
+        private final JLabel title;
         private final String category;
-        private final String options;
+        private final ChoiceEntry choice;
 
-        public ChoiceSettingsSetter(String cat, String choice) {
-            category = cat;
-            options = choice;
+        public ChoiceSettingsSetter(JLabel title, String cat, ChoiceEntry choice) {
+            this.title = title;
+            this.category = cat;
+            this.choice = choice;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            category2Choice.put(category, options);
+            category2Choice.put(category, choice.choice);
+            title.setText(createCatTitleText(category, choice));
+            checkForDifferingOptions(title, category, choice);
+            title.repaint();
+        }
+    }
+
+    /**
+     * Converts a color to a non-UI color.
+     *
+     * There is a call to "SwingUtilities.updateComponentTreeUI(comp);" somewhere which resets all
+     * resources to original colors. To override, we have to convert the color to a non-UI color.
+     *
+     * @param color The color to convert.
+     * @return The non-UI color.
+     */
+    private static Color toNonUIColor(Color color) {
+        if (color instanceof ColorUIResource) {
+            return new Color(color.getRGB(), true);
+        } else {
+            return color;
         }
     }
 }

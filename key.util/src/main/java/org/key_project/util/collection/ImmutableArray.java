@@ -11,13 +11,11 @@ import java.util.stream.StreamSupport;
 import org.key_project.util.Strings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-@SuppressWarnings("nullness")
-public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
+public class ImmutableArray<S extends @Nullable Object>
+        implements java.lang.Iterable<S>, java.io.Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -9041545065066866250L;
 
     private final S[] content;
@@ -50,13 +48,14 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      */
     @SuppressWarnings("unchecked")
     public ImmutableArray(S... arr) {
-        content = (S[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
-        System.arraycopy(arr, 0, content, 0, arr.length);
+        this(arr, 0, arr.length);
     }
 
     @SuppressWarnings("unchecked")
     public ImmutableArray(S[] arr, int lower, int upper) {
-        content = (S[]) Array.newInstance(arr.getClass().getComponentType(), upper - lower);
+        Class<? extends Object[]> arrayClass = arr.getClass();
+        assert arrayClass.isArray() : "@AssumeAssertion(nullness): arrayClass is an array";
+        content = (S[]) Array.newInstance(arrayClass.getComponentType(), upper - lower);
         System.arraycopy(arr, lower, content, 0, upper - lower);
     }
 
@@ -113,7 +112,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }
 
     public boolean contains(S op) {
-        for (S el : content) { if (el.equals(op)) { return true; } }
+        for (S el : content) { if (Objects.equals(el, op)) { return true; } }
         return false;
     }
 
@@ -127,7 +126,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     public <T> T[] toArray(T[] array) {
         T[] result;
         if (array.length < size()) {
-            result = (T[]) Array.newInstance(array.getClass().getComponentType(), content.length);
+            Class<? extends Object[]> arrayClass = array.getClass();
+            assert arrayClass.isArray() : "@AssumeAssertion(nullness): arrayClass is an array";
+            result = (T[]) Array.newInstance(arrayClass.getComponentType(), content.length);
         } else {
             result = array;
         }
@@ -141,20 +142,19 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) { return true; }
 
-        final S[] cmp;
+        final @Nullable Object @Nullable [] cmp;
         if (o instanceof ImmutableArray) {
-            cmp = ((ImmutableArray<S>) o).content;
+            cmp = ((ImmutableArray<?>) o).content;
         } else {
             return false;
         }
 
         if (cmp.length != content.length) { return false; }
 
-        for (int i = 0; i < content.length; i++) { if (!content[i].equals(cmp[i])) { return false; } }
+        for (int i = 0; i < content.length; i++) { if (!Objects.equals(content[i], cmp[i])) { return false; } }
         return true;
     }
 
