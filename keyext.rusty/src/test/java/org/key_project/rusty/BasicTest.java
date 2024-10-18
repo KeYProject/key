@@ -317,4 +317,92 @@ public class BasicTest {
         p.getRoot().sequent().succedent().getFirst().formula();
         // continue manual proof like for example in TestApplyTaclet
     }
+
+    @Test
+    public void testIfLet() {
+        TacletForTests.clear();
+        TacletForTests.parse(new RustProfile());
+        Semisequent antec = parseTermForSemisequent("");
+        Semisequent succ =
+            parseTermForSemisequent(
+                "\\<{ let n: u32 = 1u32; if let 1u32..10u32 = n { n } 1u32 }\\>true");
+        Sequent s = Sequent.createSequent(antec, succ);
+        var proof = new Proof(new Name("IfLet"), s, TacletForTests.initConfig());
+        applyRule("letIdentPatAssign",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("\nAfter letIdentPatAssign:\n" + proof.openGoals().head().sequent());
+        applyRule("letIdentPat",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("\nAfter letIdentPat:\n" + proof.openGoals().head().sequent());
+        applyRule("assignment",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("\nAfter assignment:\n" + proof.openGoals().head().sequent());
+
+        try {
+            ProofSaver.saveToFile(new File("iflet.proof"), proof);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        applyRule("ifLetExclusive",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("\nAfter assignment:\n" + proof.openGoals().head().sequent());
+
+
+
+        applyRule("",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("\nAfter :\n" + proof.openGoals().head().sequent());
+    }
+
+    @Test
+    public void test() {
+        TacletForTests.clear();
+        TacletForTests.parse(new RustProfile());
+        Semisequent antec = parseTermForSemisequent("");
+        Semisequent succ =
+            parseTermForSemisequent(
+                "\\<{ i += 2u32; 1u32 }\\>true");
+        Sequent s = Sequent.createSequent(antec, succ);
+        var proof = new Proof(new Name("Test children"), s, TacletForTests.initConfig());
+        applyRule("testHiddenChildren",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("\nAfter testHiddenChildren:\n" + proof.openGoals().head().sequent());
+    }
+
+    @Test
+    public void testIfUnfold() {
+        TacletForTests.clear();
+        TacletForTests.parse(new RustProfile());
+        Semisequent antec = parseTermForSemisequent("");
+        Semisequent succ =
+            parseTermForSemisequent(
+                "\\<{ if 1u32 < 3u32 { 1u32 } 1u32 }\\>true");
+        Sequent s = Sequent.createSequent(antec, succ);
+        var proof = new Proof(new Name("Test children"), s, TacletForTests.initConfig());
+        applyRule("ifUnfold",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false),
+            proof);
+        assertEquals(1, proof.openGoals().size());
+        System.out.println("\nAfter testHiddenChildren:\n" + proof.openGoals().head().sequent());
+    }
 }

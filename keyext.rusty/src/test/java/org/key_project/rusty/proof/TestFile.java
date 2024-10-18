@@ -157,7 +157,8 @@ public class TestFile {
                     }
                 }
 
-                assertFalse(replayResult.hasErrors(), "Loading problem file failed");
+                assertFalse(replayResult.hasErrors(), "Loading problem file '" + keyFile.getName()
+                    + "' failed: " + replayResult.getErrorList());
 
                 // For a reload test we are done at this point. Loading was successful.
                 if (testProperty == TestProperty.LOADABLE) {

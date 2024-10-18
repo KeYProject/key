@@ -528,7 +528,18 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnIfLetExpression(IfLetExpression x) {
-
+        layouter.keyWord("if").print(" ");
+        layouter.keyWord("let").print(" ");
+        x.pattern().visit(this);
+        layouter.print(" = ");
+        x.expr().visit(this);
+        layouter.print(" ");
+        x.then().visit(this);
+        if (x.elseExpr() != null) {
+            layouter.print(" ");
+            layouter.keyWord("else").print(" ");
+            x.elseExpr().visit(this);
+        }
     }
 
     @Override
@@ -595,6 +606,22 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnRangepattern(RangePattern x) {
-
+        if (x.left() != null) {
+            x.left().visit(this);
+        }
+        switch (x.bounds()) {
+        case Inclusive:
+            layouter.print("..=");
+            break;
+        case Exclusive:
+            layouter.print("..");
+            break;
+        case Obsolete:
+            layouter.print("...");
+            break;
+        }
+        if (x.right() != null) {
+            x.right().visit(this);
+        }
     }
 }

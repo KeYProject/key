@@ -39,6 +39,7 @@ public class ProofCollections {
         var simple = c.group("simple");
         simple.loadable("simple.proof");
         simple.loadable("if.proof");
+        simple.loadable("iflet.proof");
 
         return c;
     }
