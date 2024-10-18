@@ -71,9 +71,12 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of the
      * default values.
      *
-     * @param preamble the preamble to be prepended to smt problems created with this translator
-     * @param handlerOptions arbitrary String options for the SMTHandlers used by this translator
-     * @param handlerNames fully classified class names of the SMTHandlers to be used by this
+     * @param preamble
+     *        the preamble to be prepended to smt problems created with this translator
+     * @param handlerOptions
+     *        arbitrary String options for the SMTHandlers used by this translator
+     * @param handlerNames
+     *        fully classified class names of the SMTHandlers to be used by this
      *        translator
      */
     public ModularSMTLib2Translator(String[] handlerNames, String[] handlerOptions,
@@ -128,16 +131,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         sb.append("; --- Declarations\n");
         extractSortDeclarations(services, master);
-        for (Writable decl : master.getDeclarations()) {
-            decl.appendTo(sb);
-            sb.append("\n");
-        }
+        for (Writable decl : master.getDeclarations()) { decl.appendTo(sb); sb.append("\n"); }
 
         sb.append("\n; --- Axioms\n");
-        for (Writable ax : master.getAxioms()) {
-            ax.appendTo(sb);
-            sb.append("\n");
-        }
+        for (Writable ax : master.getAxioms()) { ax.appendTo(sb); sb.append("\n"); }
 
         boolean getUnsatCore = Arrays.asList(handlerOptions).contains(GET_UNSAT_CORE);
         sb.append("\n; --- Sequent\n");
@@ -194,9 +191,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      */
     private List<SExpr> makeSMTAsserts(MasterHandler master, List<Term> sequentAsserts) {
         List<SExpr> sequentSMTAsserts = new LinkedList<>();
-        for (Term t : sequentAsserts) {
-            sequentSMTAsserts.add(master.translate(t, Type.BOOL));
-        }
+        for (Term t : sequentAsserts) { sequentSMTAsserts.add(master.translate(t, Type.BOOL)); }
         return sequentSMTAsserts;
     }
 
@@ -210,9 +205,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         try {
             String line;
             StringBuilder sb = new StringBuilder();
-            while ((line = r.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
+            while ((line = r.readLine()) != null) { sb.append(line).append("\n"); }
 
             return sb.toString();
         } catch (IOException e) {
@@ -226,19 +219,16 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
         TermBuilder tb = serv.getTermBuilder();
         List<Term> res = new LinkedList<>();
-        for (SequentFormula sf : seq.antecedent()) {
-            res.add(sf.formula());
-        }
-        for (SequentFormula sf : seq.succedent()) {
-            res.add(tb.not(sf.formula()));
-        }
+        for (SequentFormula sf : seq.antecedent()) { res.add(sf.formula()); }
+        for (SequentFormula sf : seq.succedent()) { res.add(tb.not(sf.formula())); }
         return res;
     }
 
     /**
      * remove obvious identities from SMT code.
      *
-     * @param result, a non-null SExpr
+     * @param result,
+     *        a non-null SExpr
      * @return an equivalent smt code with some simplifications
      */
     private SExpr postProcess(SExpr result) {

@@ -5,13 +5,13 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
 
 /**
  * Expression resolvers are used by specification parsers (e.g. for JML or OCL) to translate complex
@@ -43,9 +43,7 @@ public abstract class SLExpressionResolver {
      * areInSamePackage().
      */
     private String trimPackageRef(String ref) {
-        if (ref == null || javaInfo.isPackage(ref)) {
-            return ref;
-        }
+        if (ref == null || javaInfo.isPackage(ref)) { return ref; }
 
         int i = ref.lastIndexOf('.');
         if (i < 0) {
@@ -89,9 +87,7 @@ public abstract class SLExpressionResolver {
                 mod = new Public();
             } else if (md.isProtected()) {
                 mod = new Protected();
-            } else if (md.isPrivate()) {
-                mod = new Private();
-            }
+            } else if (md.isPrivate()) { mod = new Private(); }
         }
 
         // check according to visibility rules
@@ -119,9 +115,7 @@ public abstract class SLExpressionResolver {
         // visible in enclosing classes of specInClass?
         while (!result) {
             final PackageReference p = inType.createPackagePrefix();
-            if (p == null || javaInfo.isPackage(p.toString())) {
-                break;
-            }
+            if (p == null || javaInfo.isPackage(p.toString())) { break; }
             inType = javaInfo.getTypeByClassName(p.toString());
             assert inType != null;
             result = isVisibleHelper(md, containingType, inType);
@@ -134,9 +128,12 @@ public abstract class SLExpressionResolver {
     /**
      * Resolves property calls on explicit receivers.
      *
-     * @param receiver receiver (may *not* be null)
-     * @param name name of the property
-     * @param parameters the actual parameters, or null if not applicable
+     * @param receiver
+     *        receiver (may *not* be null)
+     * @param name
+     *        name of the property
+     * @param parameters
+     *        the actual parameters, or null if not applicable
      * @return a suitable term or collection if successful, null otherwise
      * @throws SLTranslationException
      */
@@ -146,9 +143,7 @@ public abstract class SLExpressionResolver {
 
     public final SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
             throws SLTranslationException {
-        if (!canHandleReceiver(receiver)) {
-            return null;
-        }
+        if (!canHandleReceiver(receiver)) { return null; }
         return doResolving(receiver, name, parameters);
     }
 

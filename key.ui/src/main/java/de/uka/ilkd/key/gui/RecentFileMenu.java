@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -66,21 +67,22 @@ public class RecentFileMenu {
     /**
      * Create a new RecentFiles list.
      *
-     * @param mediator Key mediator
+     * @param mediator
+     *        Key mediator
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
         this.lissy = e -> {
             String absPath = getAbsolutePath((JMenuItem) e.getSource());
-            File file = new File(absPath);
+            var file = Paths.get(absPath);
 
             // special case proof bundles -> allow to select the proof to load
-            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+            if (ProofSelectionDialog.isProofBundle(file)) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
                 if (proofPath == null) {
                     // canceled by user!
                 } else {
-                    mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
+                    mediator.getUI().loadProofFromBundle(file, proofPath);
                 }
             } else {
                 mediator.getUI().loadProblem(file);
@@ -106,9 +108,7 @@ public class RecentFileMenu {
      */
     private void addNewToModelAndView(final String path) {
         // do not add quick save location to recent files
-        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(path)) {
-            return;
-        }
+        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(path)) { return; }
 
         if (new File(path).exists()) {
             final RecentFileEntry entry = new RecentFileEntry(path);
@@ -168,7 +168,8 @@ public class RecentFileMenu {
      * maximum number of names will be allowed in the list, and additional names will be removed at
      * the end. (set the maximum number with the {@link #setMaxNumberOfEntries(int i)} method).
      *
-     * @param path the path of the file.
+     * @param path
+     *        the path of the file.
      */
     public void addRecentFile(final String path) {
         addRecentFileNoSave(path);
@@ -180,9 +181,7 @@ public class RecentFileMenu {
      */
     public void setMaxNumberOfEntries(int max) {
         if (maxNumberOfEntries > max && menu.getItemCount() > max) {
-            for (int i = menu.getItemCount() - 1; i > max; i--) {
-                menu.remove(i);
-            }
+            for (int i = menu.getItemCount() - 1; i > max; i--) { menu.remove(i); }
 
         }
         this.maxNumberOfEntries = max;

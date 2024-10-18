@@ -89,12 +89,11 @@ public class TermLabelMenu extends JMenu {
      * <p>
      * <b>Attention:</b> This can happen in an Eclipse context outside of the checkbox items!
      *
-     * @param e The event object.
+     * @param e
+     *        The event object.
      */
     protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-        if (displayLabelsCheckBox != null) {
-            displayLabelsCheckBox.setSelected(visibleTermLabels.isShowLabels());
-        }
+        if (displayLabelsCheckBox != null) { displayLabelsCheckBox.setSelected(visibleTermLabels.isShowLabels()); }
         for (TermLabelCheckBox box : checkBoxMap.values()) {
             box.setEnabled(visibleTermLabels.isShowLabels());
             box.setSelected(!visibleTermLabels.isHidden(box.labelName));
@@ -128,9 +127,7 @@ public class TermLabelMenu extends JMenu {
         /*
          * Add the checkboxes to the menu.
          */
-        for (TermLabelCheckBox c : checkBoxList) {
-            add(c);
-        }
+        for (TermLabelCheckBox c : checkBoxList) { add(c); }
     }
 
     public TermLabelVisibilityManager getVisibleTermLabels() {
@@ -159,9 +156,7 @@ public class TermLabelMenu extends JMenu {
         public void handleClickEvent() {
             boolean selected = isSelected();
             visibleTermLabels.setShowLabels(selected);
-            for (JCheckBoxMenuItem checkBox : checkBoxMap.values()) {
-                checkBox.setEnabled(selected);
-            }
+            for (JCheckBoxMenuItem checkBox : checkBoxMap.values()) { checkBox.setEnabled(selected); }
             mainWindow.makePrettyView();
         }
 
@@ -235,7 +230,7 @@ public class TermLabelMenu extends JMenu {
                 setToolTipText(enabledToolTipText);
             } else {
                 setToolTipText("You turned off visibility for all term labels. "
-                    + "This checkbox is disabled.");
+                        + "This checkbox is disabled.");
             }
         }
 

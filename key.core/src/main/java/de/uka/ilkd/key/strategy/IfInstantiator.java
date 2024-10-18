@@ -48,9 +48,7 @@ public class IfInstantiator {
     }
 
     private void addResult(NoPosTacletApp app) {
-        if (app == null) {
-            return;
-        }
+        if (app == null) { return; }
         results = results.prepend(app);
         /*
          * final RuleAppContainer cont = TacletAppContainer.createContainer ( app,
@@ -89,22 +87,19 @@ public class IfInstantiator {
     }
 
     /**
-     * @param p_all if true then return all formulas of the particular semisequent, otherwise only
+     * @param p_all
+     *        if true then return all formulas of the particular semisequent, otherwise only
      *        the formulas returned by <code>selectNewFormulas</code>
      * @return a list of potential if-formula instantiations (analogously to
      *         <code>IfFormulaInstSeq.createList</code>)
      */
     private ImmutableArray<IfFormulaInstantiation> getSequentFormulas(boolean p_antec,
             boolean p_all) {
-        if (p_all) {
-            return getAllSequentFormulas(p_antec);
-        }
+        if (p_all) { return getAllSequentFormulas(p_antec); }
 
         final ImmutableArray<IfFormulaInstantiation> cache =
             getNewSequentFormulasFromCache(p_antec);
-        if (cache != null) {
-            return cache;
-        }
+        if (cache != null) { return cache; }
 
         final ImmutableArray<IfFormulaInstantiation> newFormulas = selectNewFormulas(p_antec);
 
@@ -144,9 +139,7 @@ public class IfInstantiator {
 
         final ImmutableArray<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
 
-        if (cache != null) {
-            return cache.contains(p_ifInstantiation);
-        }
+        if (cache != null) { return cache.contains(p_ifInstantiation); }
 
         return isNewFormulaDirect(p_ifInstantiation);
     }
@@ -190,11 +183,15 @@ public class IfInstantiator {
     /**
      * Recursive function for matching the remaining tail of an if sequent
      *
-     * @param p_ifSeqTail tail of the current semisequent as list
-     * @param p_ifSeqTail2nd the following semisequent (i.e. antecedent) or null
-     * @param p_matchCond match conditions until now, i.e. after matching the first formulas of the
+     * @param p_ifSeqTail
+     *        tail of the current semisequent as list
+     * @param p_ifSeqTail2nd
+     *        the following semisequent (i.e. antecedent) or null
+     * @param p_matchCond
+     *        match conditions until now, i.e. after matching the first formulas of the
      *        assumes-sequent
-     * @param p_alreadyMatchedNewFor at least one new formula has already been matched, i.e. a
+     * @param p_alreadyMatchedNewFor
+     *        at least one new formula has already been matched, i.e. a
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(ImmutableList<SequentFormula> p_ifSeqTail,

@@ -72,30 +72,20 @@ public class Polynomial {
     }
 
     public Polynomial multiply(BigInteger c) {
-        if (c.signum() == 0) {
-            return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
-        }
+        if (c.signum() == 0) { return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO); }
         ImmutableList<Monomial> newParts = ImmutableSLList.nil();
-        for (Monomial part : parts) {
-            newParts = newParts.prepend(part.multiply(c));
-        }
+        for (Monomial part : parts) { newParts = newParts.prepend(part.multiply(c)); }
 
         return new Polynomial(newParts, constantPart.multiply(c));
     }
 
     public Polynomial multiply(Monomial m) {
-        if (m.getCoefficient().signum() == 0) {
-            return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
-        }
+        if (m.getCoefficient().signum() == 0) { return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO); }
 
         ImmutableList<Monomial> newParts = ImmutableSLList.nil();
-        for (Monomial part : parts) {
-            newParts = newParts.prepend(part.multiply(m));
-        }
+        for (Monomial part : parts) { newParts = newParts.prepend(part.multiply(m)); }
 
-        if (m.getParts().isEmpty()) {
-            return new Polynomial(newParts, constantPart.multiply(m.getCoefficient()));
-        }
+        if (m.getParts().isEmpty()) { return new Polynomial(newParts, constantPart.multiply(m.getCoefficient())); }
 
         newParts = addPart(newParts, m.multiply(constantPart));
         return new Polynomial(newParts, BigInteger.ZERO);
@@ -108,16 +98,12 @@ public class Polynomial {
     public Polynomial sub(Polynomial p) {
         final BigInteger newConst = getConstantTerm().subtract(p.getConstantTerm());
         ImmutableList<Monomial> newParts = parts;
-        for (Monomial monomial : p.getParts()) {
-            newParts = addPart(newParts, monomial.multiply(MINUS_ONE));
-        }
+        for (Monomial monomial : p.getParts()) { newParts = addPart(newParts, monomial.multiply(MINUS_ONE)); }
         return new Polynomial(newParts, newConst);
     }
 
     public Polynomial add(Monomial m) {
-        if (m.getParts().isEmpty()) {
-            return new Polynomial(parts, constantPart.add(m.getCoefficient()));
-        }
+        if (m.getParts().isEmpty()) { return new Polynomial(parts, constantPart.add(m.getCoefficient())); }
 
         return new Polynomial(addPart(parts, m), constantPart);
     }
@@ -125,9 +111,7 @@ public class Polynomial {
     public Polynomial add(Polynomial p) {
         final BigInteger newConst = getConstantTerm().add(p.getConstantTerm());
         ImmutableList<Monomial> newParts = parts;
-        for (Monomial monomial : p.getParts()) {
-            newParts = addPart(newParts, monomial);
-        }
+        for (Monomial monomial : p.getParts()) { newParts = addPart(newParts, monomial); }
         return new Polynomial(newParts, newConst);
     }
 
@@ -138,9 +122,7 @@ public class Polynomial {
      */
     public BigInteger coeffGcd() {
         BigInteger res = BigInteger.ZERO;
-        for (Monomial part : parts) {
-            res = res.gcd(part.getCoefficient());
-        }
+        for (Monomial part : parts) { res = res.gcd(part.getCoefficient()); }
         return res;
     }
 
@@ -150,9 +132,7 @@ public class Polynomial {
      *         equal)
      */
     public boolean valueLess(Polynomial p) {
-        if (!sameParts(p)) {
-            return false;
-        }
+        if (!sameParts(p)) { return false; }
         return constantPart.compareTo(p.constantPart) < 0;
     }
 
@@ -161,30 +141,22 @@ public class Polynomial {
      *         of <code>p</code> (i.e., same monomials and same constant part)
      */
     public boolean valueEq(Polynomial p) {
-        if (!sameParts(p)) {
-            return false;
-        }
+        if (!sameParts(p)) { return false; }
         return constantPart.equals(p.constantPart);
     }
 
     public boolean valueUneq(Polynomial p) {
-        if (!sameParts(p)) {
-            return false;
-        }
+        if (!sameParts(p)) { return false; }
         return !constantPart.equals(p.constantPart);
     }
 
     public boolean valueEq(BigInteger c) {
-        if (!parts.isEmpty()) {
-            return false;
-        }
+        if (!parts.isEmpty()) { return false; }
         return constantPart.equals(c);
     }
 
     public boolean valueUneq(BigInteger c) {
-        if (!parts.isEmpty()) {
-            return false;
-        }
+        if (!parts.isEmpty()) { return false; }
         return !constantPart.equals(c);
     }
 
@@ -194,37 +166,30 @@ public class Polynomial {
      *         equal)
      */
     public boolean valueLeq(Polynomial p) {
-        if (!sameParts(p)) {
-            return false;
-        }
+        if (!sameParts(p)) { return false; }
         return constantPart.compareTo(p.constantPart) <= 0;
     }
 
     public boolean valueLess(BigInteger c) {
-        if (!parts.isEmpty()) {
-            return false;
-        }
+        if (!parts.isEmpty()) { return false; }
         return constantPart.compareTo(c) < 0;
     }
 
     public boolean valueGeq(BigInteger c) {
-        if (!parts.isEmpty()) {
-            return false;
-        }
+        if (!parts.isEmpty()) { return false; }
         return constantPart.compareTo(c) >= 0;
     }
 
     public boolean sameParts(Polynomial p) {
-        if (parts.size() != p.parts.size()) {
-            return false;
-        }
+        if (parts.size() != p.parts.size()) { return false; }
         return difference(parts, p.parts).isEmpty();
     }
 
     /**
      * Creates a term from this polynomial expression.
      *
-     * @param services the services object
+     * @param services
+     *        the services object
      * @return the resulting term
      */
     public Term toTerm(Services services) {
@@ -234,9 +199,7 @@ public class Polynomial {
         final Iterator<Monomial> it = parts.iterator();
         if (it.hasNext()) {
             res = it.next().toTerm(services);
-            while (it.hasNext()) {
-                res = services.getTermFactory().createTerm(add, res, it.next().toTerm(services));
-            }
+            while (it.hasNext()) { res = services.getTermFactory().createTerm(add, res, it.next().toTerm(services)); }
         }
 
         final Term cTerm = services.getTermBuilder().zTerm(constantPart.toString());
@@ -255,9 +218,7 @@ public class Polynomial {
         final StringBuilder res = new StringBuilder();
         res.append(constantPart);
 
-        for (Monomial part : parts) {
-            res.append(" + ").append(part);
-        }
+        for (Monomial part : parts) { res.append(" + ").append(part); }
 
         return res.toString();
     }
@@ -300,41 +261,29 @@ public class Polynomial {
             ImmutableList<Monomial> b) {
         ImmutableList<Monomial> res = a;
         final Iterator<Monomial> it = b.iterator();
-        while (it.hasNext() && !res.isEmpty()) {
-            res = res.removeFirst(it.next());
-        }
+        while (it.hasNext() && !res.isEmpty()) { res = res.removeFirst(it.next()); }
         return res;
     }
 
     private static ImmutableList<Monomial> addPart(ImmutableList<Monomial> oldParts, Monomial m) {
-        if (m.getCoefficient().signum() == 0) {
-            return oldParts;
-        }
+        if (m.getCoefficient().signum() == 0) { return oldParts; }
         final ImmutableList<Monomial> newParts = addPartHelp(oldParts, m);
-        if (newParts != null) {
-            return newParts;
-        }
+        if (newParts != null) { return newParts; }
         return oldParts.prepend(m);
     }
 
     private static ImmutableList<Monomial> addPartHelp(ImmutableList<Monomial> oldParts,
             Monomial m) {
-        if (oldParts.isEmpty()) {
-            return null;
-        }
+        if (oldParts.isEmpty()) { return null; }
         final Monomial head = oldParts.head();
         final ImmutableList<Monomial> tail = oldParts.tail();
         if (head.variablesEqual(m)) {
             final Monomial newHead = head.addToCoefficient(m.getCoefficient());
-            if (newHead.getCoefficient().signum() == 0) {
-                return tail;
-            }
+            if (newHead.getCoefficient().signum() == 0) { return tail; }
             return tail.prepend(newHead);
         }
         final ImmutableList<Monomial> res = addPartHelp(tail, m);
-        if (res == null) {
-            return null;
-        }
+        if (res == null) { return null; }
         return res.prepend(head);
     }
 

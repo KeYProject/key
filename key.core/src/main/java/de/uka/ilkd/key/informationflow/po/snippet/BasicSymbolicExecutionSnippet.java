@@ -5,22 +5,22 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.Branch;
+import de.uka.ilkd.key.java.ast.statement.Catch;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -44,16 +44,12 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        assert poVars.exceptionParameter.op() instanceof LocationVariable
-                : "Something is wrong with the catch variable";
+        assert poVars.exceptionParameter
+                .op() instanceof LocationVariable : "Something is wrong with the catch variable";
 
         ImmutableList<Term> posts = ImmutableSLList.nil();
-        if (poVars.post.self != null) {
-            posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
-        }
-        if (poVars.post.result != null) {
-            posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
-        }
+        if (poVars.post.self != null) { posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self)); }
+        if (poVars.post.result != null) { posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result)); }
         posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
         final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
@@ -158,9 +154,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             throws IllegalArgumentException {
         ProgramVariable[] formalParVars = new ProgramVariable[formalPars.size()];
         int i = 0;
-        for (Term formalPar : formalPars) {
-            formalParVars[i++] = formalPar.op(ProgramVariable.class);
-        }
+        for (Term formalPar : formalPars) { formalParVars[i++] = formalPar.op(ProgramVariable.class); }
         return formalParVars;
     }
 }

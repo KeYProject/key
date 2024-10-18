@@ -34,9 +34,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
  * In case that you want to access the result of each solver:<br>
  *
  * <pre>
- * for (SMTSolver solver : problem.getSolvers()) {
- *     solver.getFinalResult();
- * }
+ * for (SMTSolver solver : problem.getSolvers()) { solver.getFinalResult(); }
  * </pre>
  *
  * <br>
@@ -83,7 +81,8 @@ public class SolverLauncher implements SolverListener {
     /**
      * Create for every solver execution a new object. Don't reuse the solver launcher object.
      *
-     * @param settings settings for the execution of the SMT Solvers.
+     * @param settings
+     *        settings for the execution of the SMT Solvers.
      */
     public SolverLauncher(SMTSettings settings) {
         this.settings = settings;
@@ -108,9 +107,12 @@ public class SolverLauncher implements SolverListener {
      * Note: Calling this methods does not create an extra thread, i.e. the calling thread is
      * blocked until the method returns. (Synchronous method call).
      *
-     * @param problem The problem that should be translated and passed to the solvers
-     * @param services The services object of the current proof.
-     * @param solverTypes A list of solver types that should be used for the problem.
+     * @param problem
+     *        The problem that should be translated and passed to the solvers
+     * @param services
+     *        The services object of the current proof.
+     * @param solverTypes
+     *        A list of solver types that should be used for the problem.
      */
     public void launch(SMTProblem problem, Services services, SolverType... solverTypes) {
         checkLaunchCall();
@@ -122,9 +124,12 @@ public class SolverLauncher implements SolverListener {
      * does not create an extra thread, i.e. the calling thread is blocked until the method returns.
      * (Synchronous method call).
      *
-     * @param problems The problems that should be translated and passed to the solvers
-     * @param services The services object of the current proof.
-     * @param solverTypes A list of solver types that should be used for the problem.
+     * @param problems
+     *        The problems that should be translated and passed to the solvers
+     * @param services
+     *        The services object of the current proof.
+     * @param solverTypes
+     *        A list of solver types that should be used for the problem.
      */
     public void launch(Collection<SolverType> solverTypes, Collection<SMTProblem> problems,
             Services services) {
@@ -219,9 +224,7 @@ public class SolverLauncher implements SolverListener {
         for (SolverType type : factories) {
             if (type.isInstalled(false)) {
                 installedSolvers.add(type);
-                if (settings.checkForSupport()) {
-                    type.checkForSupport();
-                }
+                if (settings.checkForSupport()) { type.checkForSupport(); }
             }
         }
         prepareSolvers(installedSolvers, problems, services);
@@ -229,18 +232,14 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void checkLaunchCall() {
-        if (launcherHasBeenUsed) {
-            throw new IllegalStateException("Every launcher object can be used only once.");
-        }
+        if (launcherHasBeenUsed) { throw new IllegalStateException("Every launcher object can be used only once."); }
         launcherHasBeenUsed = true;
     }
 
     private void launchIntern(Collection<SMTProblem> problems, Collection<SolverType> factories) {
 
         LinkedList<SMTSolver> solvers = new LinkedList<>();
-        for (SMTProblem problem : problems) {
-            solvers.addAll(problem.getSolvers());
-        }
+        for (SMTProblem problem : problems) { solvers.addAll(problem.getSolvers()); }
         launchSolvers(solvers, problems, factories);
     }
 
@@ -297,9 +296,7 @@ public class SolverLauncher implements SolverListener {
 
     private void notifyListenersOfStart(Collection<SMTProblem> problems,
             Collection<SolverType> solverTypes) {
-        for (SolverLauncherListener listener : listeners) {
-            listener.launcherStarted(problems, solverTypes, this);
-        }
+        for (SolverLauncherListener listener : listeners) { listener.launcherStarted(problems, solverTypes, this); }
     }
 
     /**
@@ -349,11 +346,7 @@ public class SolverLauncher implements SolverListener {
      * set.
      */
     private void cleanUp(Collection<SMTSolver> solvers) {
-        if (isInterrupted()) {
-            for (SMTSolver solver : solvers) {
-                solver.interrupt(ReasonOfInterruption.User);
-            }
-        }
+        if (isInterrupted()) { for (SMTSolver solver : solvers) { solver.interrupt(ReasonOfInterruption.User); } }
     }
 
     private void notifyListenersOfStop() {
@@ -361,18 +354,12 @@ public class SolverLauncher implements SolverListener {
         Collection<SMTSolver> finishedSolvers = session.getFinishedSolvers();
 
         for (SMTSolver solver : problemSolvers) {
-            if (!finishedSolvers.contains(solver)) {
-                finishedSolvers.add(solver);
-            }
+            if (!finishedSolvers.contains(solver)) { finishedSolvers.add(solver); }
         }
 
-        for (SolverLauncherListener listener : listeners) {
-            listener.launcherStopped(this, finishedSolvers);
-        }
+        for (SolverLauncherListener listener : listeners) { listener.launcherStopped(this, finishedSolvers); }
 
-        if (!problemSolvers.isEmpty() && listeners.isEmpty()) {
-            throw new SolverException(problemSolvers);
-        }
+        if (!problemSolvers.isEmpty() && listeners.isEmpty()) { throw new SolverException(problemSolvers); }
     }
 
     /**
@@ -398,8 +385,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     @Override
-    public void processStarted(SMTSolver solver, SMTProblem problem) {
-    }
+    public void processStarted(SMTSolver solver, SMTProblem problem) {}
 
     @Override
     public void processStopped(SMTSolver solver, SMTProblem problem) {
@@ -419,8 +405,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     @Override
-    public void processUser(SMTSolver solver, SMTProblem problem) {
-    }
+    public void processUser(SMTSolver solver, SMTProblem problem) {}
 
 }
 
@@ -460,9 +445,7 @@ class Session {
         try {
             lock.lock();
             int i = currentlyRunning.indexOf(solver);
-            if (i >= 0) {
-                currentlyRunning.remove(i);
-            }
+            if (i >= 0) { currentlyRunning.remove(i); }
         } finally {
             lock.unlock();
         }
@@ -497,9 +480,7 @@ class Session {
     public void interruptAll(ReasonOfInterruption reason) {
         try {
             lock.lock();
-            for (SMTSolver solver : currentlyRunning) {
-                solver.interrupt(reason);
-            }
+            for (SMTSolver solver : currentlyRunning) { solver.interrupt(reason); }
         } finally {
             lock.unlock();
         }

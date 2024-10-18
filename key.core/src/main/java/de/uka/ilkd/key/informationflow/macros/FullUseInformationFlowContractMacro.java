@@ -34,7 +34,7 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
     @Override
     public String getDescription() {
         return "Applies all applicable information flow contract rules and "
-            + "prepares the information flow pre branches.";
+                + "prepares the information flow pre branches.";
     }
 
     @Override
@@ -57,13 +57,9 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (proof == null) {
-            return false;
-        }
+        if (proof == null) { return false; }
         final Services services = proof.getServices();
-        if (services == null) {
-            return false;
-        }
+        if (services == null) { return false; }
         final ProofOblInput poForProof =
             services.getSpecificationRepository().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)

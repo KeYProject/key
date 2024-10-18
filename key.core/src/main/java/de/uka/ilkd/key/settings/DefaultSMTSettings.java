@@ -78,14 +78,10 @@ public class DefaultSMTSettings implements SMTSettings {
     public Collection<Taclet> getTaclets() {
         if (taclets == null) {
             taclets = new LinkedList<>();
-            if (proof == null) {
-                return taclets;
-            }
+            if (proof == null) { return taclets; }
 
             for (Taclet taclet : proof.getInitConfig().activatedTaclets()) {
-                if (pdSettings.getSupportedTaclets().contains(taclet.name().toString(), true)) {
-                    taclets.add(taclet);
-                }
+                if (pdSettings.getSupportedTaclets().contains(taclet.name().toString(), true)) { taclets.add(taclet); }
             }
         }
         return taclets;
@@ -98,9 +94,7 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public long getTimeout(SolverType type) {
-        if (piSettings.getSolverTimeout(type) >= 1) {
-            return piSettings.getSolverTimeout(type);
-        }
+        if (piSettings.getSolverTimeout(type) >= 1) { return piSettings.getSolverTimeout(type); }
         return getTimeout();
     }
 

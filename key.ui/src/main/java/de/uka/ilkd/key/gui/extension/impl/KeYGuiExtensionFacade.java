@@ -76,9 +76,7 @@ public final class KeYGuiExtensionFacade {
         JMenu menu = new JMenu("Extensions");
         getMainMenuActions(mainWindow).forEach(it -> sortActionIntoMenu(it, menuBar, menu));
 
-        if (menu.getMenuComponents().length > 0) {
-            menuBar.add(menu);
-        }
+        if (menu.getMenuComponents().length > 0) { menuBar.add(menu); }
 
     }
 
@@ -141,9 +139,7 @@ public final class KeYGuiExtensionFacade {
             String cur = mpath.next();
             for (int i = 0; i < menuBar.getMenuCount(); i++) {
                 JMenu menu = menuBar.getMenu(i);
-                if (Objects.equals(menu.getText(), cur)) {
-                    return findMenu(menu, mpath);
-                }
+                if (Objects.equals(menu.getText(), cur)) { return findMenu(menu, mpath); }
             }
             JMenu menu = new JMenu(cur);
             menu.setName(cur);
@@ -205,7 +201,8 @@ public final class KeYGuiExtensionFacade {
     /**
      * Creates all toolbars for the known extension.
      *
-     * @param mainWindow non-null
+     * @param mainWindow
+     *        non-null
      * @return
      */
     public static List<JToolBar> createToolbars(MainWindow mainWindow) {
@@ -230,9 +227,12 @@ public final class KeYGuiExtensionFacade {
      * If the underlying object is a proof, this will also include the usual actions.
      * </p>
      *
-     * @param kind what kind of object the context menu is built on
-     * @param underlyingObject the object the context menu is built on
-     * @param mediator the KeY mediator
+     * @param kind
+     *        what kind of object the context menu is built on
+     * @param underlyingObject
+     *        the object the context menu is built on
+     * @param mediator
+     *        the KeY mediator
      * @return populated context menu
      */
     public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
@@ -257,9 +257,7 @@ public final class KeYGuiExtensionFacade {
 
     public static List<Action> getContextMenuItems(ContextMenuKind kind, Object underlyingObject,
             KeYMediator mediator) {
-        if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) {
-            throw new IllegalArgumentException();
-        }
+        if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) { throw new IllegalArgumentException(); }
 
         return getContextMenuExtensions().stream()
                 .flatMap(it -> it.getContextActions(mediator, kind, underlyingObject).stream())
@@ -281,8 +279,10 @@ public final class KeYGuiExtensionFacade {
     }
 
     /**
-     * @param clazz the interface class
-     * @param <T> the interface of the service
+     * @param clazz
+     *        the interface class
+     * @param <T>
+     *        the interface of the service
      * @return a list of all found and enabled service implementations
      */
     @SuppressWarnings("unchecked")
@@ -301,22 +301,19 @@ public final class KeYGuiExtensionFacade {
      * A plugin can either disabled by adding its fqn to the {@see #forbiddenPlugins} list or
      * setting <code>-P[fqn]=false</code> add the command line.
      *
-     * @param a an instance of a plugin, non-null
+     * @param a
+     *        an instance of a plugin, non-null
      * @return
      */
     private static <T> boolean isNotForbidden(Class<T> a) {
-        if (forbiddenPlugins.contains(a.getName())) {
-            return false;
-        }
+        if (forbiddenPlugins.contains(a.getName())) { return false; }
         String sys = System.getProperty(a.getName());
         return sys == null || !sys.equalsIgnoreCase("false");
     }
     // endregion
 
     public static List<Extension<?>> getExtensions() {
-        if (extensions.isEmpty()) {
-            loadExtensions();
-        }
+        if (extensions.isEmpty()) { loadExtensions(); }
         return extensions;
     }
 
@@ -386,8 +383,10 @@ public final class KeYGuiExtensionFacade {
 
     /**
      *
-     * @param window the main window.
-     * @param pos the position the user selected.
+     * @param window
+     *        the main window.
+     * @param pos
+     *        the position the user selected.
      * @return every term info string from every loaded extension.
      */
     public static List<String> getTooltipStrings(MainWindow window, PosInSequent pos) {
@@ -409,7 +408,8 @@ public final class KeYGuiExtensionFacade {
      * If this extension is already loaded, it will be removed from the list of extensions. This
      * does not include a removal from the GUI in all cases.
      *
-     * @param clazz a fqdn of a class
+     * @param clazz
+     *        a fqdn of a class
      */
     public void forbidClass(String clazz) {
         forbiddenPlugins.add(clazz);
@@ -438,9 +438,7 @@ public final class KeYGuiExtensionFacade {
         }
 
         private int getPriority(Action action) {
-            if (action.getValue(KeyAction.PRIORITY) != null) {
-                return (int) action.getValue(KeyAction.PRIORITY);
-            }
+            if (action.getValue(KeyAction.PRIORITY) != null) { return (int) action.getValue(KeyAction.PRIORITY); }
             return 0;
         }
     }

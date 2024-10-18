@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -48,8 +48,10 @@ public final class PartialInvAxiom extends ClassAxiom {
     /**
      * Creates a new class axiom.
      *
-     * @param inv (partial) invariant from which the axiom is derived
-     * @param isStatic whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or
+     * @param inv
+     *        (partial) invariant from which the axiom is derived
+     * @param isStatic
+     *        whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or
      *        instance invariants (i.e., &lt;inv&gt;)
      * @param services
      */
@@ -78,14 +80,10 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass()) {
-            return false;
-        }
+        if (o == null || this.getClass() != o.getClass()) { return false; }
         final PartialInvAxiom other = (PartialInvAxiom) o;
 
-        if (!target.equals(other.target)) {
-            return false;
-        }
+        if (!target.equals(other.target)) { return false; }
         return inv.equals(other.inv);
     }
 
@@ -127,7 +125,7 @@ public final class PartialInvAxiom extends ClassAxiom {
             // i==0 normal and i==1 EQ version
             TacletGenerator TG = TacletGenerator.getInstance();
             final Name name = MiscTools.toValidTacletName("Partial inv axiom for "
-                + (target.isStatic() ? "static " : "") + inv.getName() + (i == 0 ? "" : " EQ"));
+                    + (target.isStatic() ? "static " : "") + inv.getName() + (i == 0 ? "" : " EQ"));
 
             // create schema variables
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -148,9 +146,7 @@ public final class PartialInvAxiom extends ClassAxiom {
             result = result.union(taclets);
 
             // EQ taclet (with i==1) only for non-static invariants
-            if (target.isStatic()) {
-                break;
-            }
+            if (target.isStatic()) { break; }
         }
 
         // return

@@ -3,19 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -24,13 +20,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
@@ -119,32 +109,22 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         // focus must be top level succedent
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-            return false;
-        }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) { return false; }
 
         // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) {
-            return false;
-        }
+        if (Transformer.inTransformer(pio)) { return false; }
 
         // instantiation must succeed
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate(pio.subTerm(), goal.proof().getServices());
-        if (inst == null) {
-            return false;
-        }
+        if (inst == null) { return false; }
 
         if (inst.isFirst()) {
             // additional checks for method calls.
             // currently only applicable to strictly pure methods
-            if (!inst.getFirst().pm.isModel() || inst.getFirst().pm.getStateCount() > 1) {
-                return false;
-            }
+            if (!inst.getFirst().pm.isModel() || inst.getFirst().pm.getStateCount() > 1) { return false; }
 
-            if (!(inst.getFirst().actualResult instanceof ProgramVariable)) {
-                return false;
-            }
+            if (!(inst.getFirst().actualResult instanceof ProgramVariable)) { return false; }
         }
 
         return true;
@@ -293,13 +273,9 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             args[idx++] = services.getTermBuilder().getBaseHeap();
         }
 
-        if (!op.isStatic()) {
-            args[idx++] = receiver;
-        }
+        if (!op.isStatic()) { args[idx++] = receiver; }
 
-        for (int i = 0; i < methodArgs.size(); i++) {
-            args[idx++] = methodArgs.get(i);
-        }
+        for (int i = 0; i < methodArgs.size(); i++) { args[idx++] = methodArgs.get(i); }
 
         return services.getTermFactory().createTerm(op, args);
     }
@@ -343,34 +319,24 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (!(mainFml.op() instanceof Modality)) {
-            return null;
-        }
+        if (!(mainFml.op() instanceof Modality)) { return null; }
         result.modality = mainFml;
 
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
-        if (!(activeStatement instanceof CopyAssignment ca)) {
-            return null;
-        }
+        if (!(activeStatement instanceof CopyAssignment ca)) { return null; }
 
         final Expression lhs = ca.getExpressionAt(0);
         final Expression rhs = ca.getExpressionAt(1);
 
-        if (!(lhs instanceof LocationVariable)) {
-            return null;
-        }
+        if (!(lhs instanceof LocationVariable)) { return null; }
         result.assignmentTarget = (LocationVariable) lhs;
 
-        if (!(rhs instanceof FieldReference)) {
-            return null;
-        }
+        if (!(rhs instanceof FieldReference)) { return null; }
         result.fieldReference = (FieldReference) rhs;
         result.modelField = result.fieldReference.getProgramVariable();
 
-        if (!result.modelField.isModel()) {
-            return null;
-        }
+        if (!result.modelField.isModel()) { return null; }
 
         // find receiver term
         final ExecutionContext ec =
@@ -403,9 +369,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     private static Union<Instantiation, ModelFieldInstantiation> instantiate(Term focusTerm,
             Services services) {
         // result cached?
-        if (focusTerm == lastFocusTerm) {
-            return lastInstantiation;
-        }
+        if (focusTerm == lastFocusTerm) { return lastInstantiation; }
 
         // compute
         Instantiation inst = UseOperationContractRule.computeInstantiation(focusTerm, services);

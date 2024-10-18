@@ -20,8 +20,10 @@ public final class ShortUniqueFileNames {
     /**
      * This is a helper function for prepareForInsertionOf and needs all invariants from there.
      *
-     * @param entry An entry whose name ends with shorter's name
-     * @param shorter An entry
+     * @param entry
+     *        An entry whose name ends with shorter's name
+     * @param shorter
+     *        An entry
      */
     private static void resolveDuplicate(Name entry, Name shorter) {
         // First, resolve cases like entry = a/(b/c) and shorter = b/b/(c)
@@ -30,14 +32,10 @@ public final class ShortUniqueFileNames {
             // By extending shorter's name
             boolean shorterCanBeMadeLonger = shorter.makeNameLonger();
             // return if we resolved the duplicate
-            if (!entry.getName().endsWith(shorter.getName())) {
-                return;
-            }
+            if (!entry.getName().endsWith(shorter.getName())) { return; }
 
             // break if shorter can't be made longer
-            if (!shorterCanBeMadeLonger) {
-                break;
-            }
+            if (!shorterCanBeMadeLonger) { break; }
         }
 
         // When we are here, we have a common stem of the same length
@@ -58,9 +56,11 @@ public final class ShortUniqueFileNames {
      * Renames all files (including entry) to give entry a unique name.
      * entry must have the default name given by the constructor (the file name of its full path).
      *
-     * @param files already existing files, they must have unique names and must not contain
+     * @param files
+     *        already existing files, they must have unique names and must not contain
      *        entry
-     * @param entry the entry that should be prepared for
+     * @param entry
+     *        the entry that should be prepared for
      */
     private static void prepareForInsertionOf(
             Name[] files,
@@ -90,7 +90,8 @@ public final class ShortUniqueFileNames {
     /**
      * Constructs short unique names for the given unique file paths
      *
-     * @param files unique list of files
+     * @param files
+     *        unique list of files
      * @return named files
      */
     public static Name[] makeUniqueNames(String[] files) {
@@ -118,7 +119,8 @@ public final class ShortUniqueFileNames {
         /**
          * Constructor
          *
-         * @param path the full path
+         * @param path
+         *        the full path
          */
         public Name(String path) {
             this.path = path;
@@ -150,9 +152,7 @@ public final class ShortUniqueFileNames {
          * @return true if the name was made longer
          */
         public boolean makeNameLonger() {
-            if (this.nameStart == -1) {
-                return false;
-            }
+            if (this.nameStart == -1) { return false; }
             this.nameStart = getNextNameStart();
             this.name = path.substring(nameStart + 1);
             return true;

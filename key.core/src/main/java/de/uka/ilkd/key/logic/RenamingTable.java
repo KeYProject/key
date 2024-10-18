@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 
 
 public abstract class RenamingTable {
@@ -18,9 +18,7 @@ public abstract class RenamingTable {
 
     public static RenamingTable getRenamingTable(
             HashMap<? extends SourceElement, ? extends SourceElement> hmap) {
-        if (hmap.size() == 0) {
-            return null;
-        }
+        if (hmap.size() == 0) { return null; }
         if (hmap.size() == 1) {
             Entry<? extends SourceElement, ? extends SourceElement> entry =
                 hmap.entrySet().iterator().next();

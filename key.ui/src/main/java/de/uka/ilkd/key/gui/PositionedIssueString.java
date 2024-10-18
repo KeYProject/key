@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 
@@ -43,7 +42,7 @@ public class PositionedIssueString extends PositionedString
     }
 
     public PositionedIssueString(@NonNull String text) {
-        this(text, new Location(null, Position.UNDEFINED), "", Kind.ERROR);
+        this(text, Location.UNDEFINED, "", Kind.ERROR);
     }
 
     public PositionedIssueString(@NonNull PositionedString o, @NonNull String additionalInfo) {
@@ -60,15 +59,9 @@ public class PositionedIssueString extends PositionedString
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        if (!super.equals(o)) { return false; }
         PositionedIssueString that = (PositionedIssueString) o;
         return additionalInfo.equals(that.additionalInfo) && kind.equals(that.kind);
     }
@@ -81,9 +74,7 @@ public class PositionedIssueString extends PositionedString
     @Override
     public int compareTo(PositionedIssueString o) {
         int compareLocation = location.compareTo(o.location);
-        if (compareLocation != 0) {
-            return compareLocation;
-        }
+        if (compareLocation != 0) { return compareLocation; }
         return kind.compareTo(o.kind);
     }
 }

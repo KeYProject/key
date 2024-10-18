@@ -24,7 +24,8 @@ public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializ
     /**
      * Add an element to this heap object
      *
-     * @param element The element to be added
+     * @param element
+     *        The element to be added
      * @return a heap that contains all elements of this heap, and additionally <code>element</code>
      */
     ImmutableHeap<T> insert(T element);
@@ -32,7 +33,8 @@ public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializ
     /**
      * Add multiple elements to this heap object
      *
-     * @param elements The elements to be added
+     * @param elements
+     *        The elements to be added
      * @return a heap that contains all elements of this heap, and additionally all objects from
      *         <code>elements</code>
      */
@@ -41,7 +43,8 @@ public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializ
     /**
      * Add multiple elements to this heap object
      *
-     * @param h a heap containing the elements to be added
+     * @param h
+     *        a heap containing the elements to be added
      * @return a heap that contains all elements of this heap, and additionally all objects from
      *         <code>h</code>
      */

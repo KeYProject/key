@@ -3,23 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
-import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
-import org.jspecify.annotations.Nullable;
 
 public class SLTranslationException extends ProofInputException implements HasLocation {
     protected final Location location;
 
     public SLTranslationException(String message, Throwable cause, Location location) {
         super(message, cause);
-        if (location == null) {
-            throw new IllegalArgumentException();
-        }
+        if (location == null) { throw new IllegalArgumentException(); }
         this.location = location;
     }
 
@@ -36,7 +32,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
     }
 
     @Override
-    public @Nullable Location getLocation() throws MalformedURLException {
+    public Location getLocation() {
         return location;
     }
 }

@@ -42,9 +42,9 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     @Override
     public String getDescription() {
         return "Applies specificed macro as long as specified condition is met"
-            + "with no more rule applications than specified. If the"
-            + "macro is not applicable anymore and the maximum steps"
-            + "are not reached yet, then apply other macro once.";
+                + "with no more rule applications than specified. If the"
+                + "macro is not applicable anymore and the maximum steps"
+                + "are not reached yet, then apply other macro once.";
     }
 
     @Override

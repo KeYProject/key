@@ -33,14 +33,10 @@ public class LoopContractExternalCompletion implements InteractiveRuleApplicatio
             final boolean force) {
         LoopContractExternalBuiltInRuleApp result =
             (LoopContractExternalBuiltInRuleApp) application;
-        if (!result.complete() && result.cannotComplete(goal)) {
-            return result;
-        }
+        if (!result.complete() && result.cannotComplete(goal)) { return result; }
         if (force) {
             result.tryToInstantiate(goal);
-            if (result.complete()) {
-                return result;
-            }
+            if (result.complete()) { return result; }
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation = LoopContractExternalRule.INSTANCE

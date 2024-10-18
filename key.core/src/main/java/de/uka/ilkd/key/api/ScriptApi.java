@@ -41,10 +41,13 @@ public class ScriptApi {
      * containing matching results from where the information about instantiated schema variables
      * can be extracted. If no match was possible the list is exmpt.
      *
-     * @param pattern a string representation of the pattern sequent against which the current
+     * @param pattern
+     *        a string representation of the pattern sequent against which the current
      *        sequent should be matched
-     * @param currentSeq current concrete sequent
-     * @param assignments variables appearing in the pattern as schemavariables with their
+     * @param currentSeq
+     *        current concrete sequent
+     * @param assignments
+     *        variables appearing in the pattern as schemavariables with their
      *        corresponding type in KeY
      * @return List of VariableAssignments (possibly empty if no match was found)
      */
@@ -56,8 +59,10 @@ public class ScriptApi {
     /**
      * Execute ScriptCommand onto goal node
      *
-     * @param call to be applied with parameters set
-     * @param onNode the starting node
+     * @param call
+     *        to be applied with parameters set
+     * @param onNode
+     *        the starting node
      * @return List of new proof goals (possibly empty) Should throw an Exception if command not
      *         applicable?
      */
@@ -96,7 +101,8 @@ public class ScriptApi {
      * @param term
      * @param assignments
      * @return
-     * @throws Exception either for Syntax or Type error
+     * @throws Exception
+     *         either for Syntax or Type error
      */
     public Term toTerm(String term, VariableAssignments assignments) throws Exception {
         // TODO

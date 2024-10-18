@@ -29,27 +29,15 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
     @Override
     public final Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
             JComponent component) {
-        if (Objects.equals(SEQUENT_VIEW, componentId)) {
-            return getShortcuts(mediator, (SequentView) component);
-        }
-        if (Objects.equals(GOAL_LIST, componentId)) {
-            return getShortcuts(mediator, (GoalList) component);
-        }
-        if (Objects.equals(PROOF_TREE_VIEW, componentId)) {
-            return getShortcuts(mediator, (ProofTreeView) component);
-        }
-        if (Objects.equals(MAIN_WINDOW, componentId)) {
-            return getShortcutsMainWindow(mediator, (JPanel) component);
-        }
-        if (Objects.equals(INFO_VIEW, componentId)) {
-            return getShortcuts(mediator, (InfoView) component);
-        }
+        if (Objects.equals(SEQUENT_VIEW, componentId)) { return getShortcuts(mediator, (SequentView) component); }
+        if (Objects.equals(GOAL_LIST, componentId)) { return getShortcuts(mediator, (GoalList) component); }
+        if (Objects.equals(PROOF_TREE_VIEW, componentId)) { return getShortcuts(mediator, (ProofTreeView) component); }
+        if (Objects.equals(MAIN_WINDOW, componentId)) { return getShortcutsMainWindow(mediator, (JPanel) component); }
+        if (Objects.equals(INFO_VIEW, componentId)) { return getShortcuts(mediator, (InfoView) component); }
         if (Objects.equals(STRATEGY_SELECTION_VIEW, componentId)) {
             return getShortcuts(mediator, (StrategySelectionView) component);
         }
-        if (Objects.equals(SOURCE_VIEW, componentId)) {
-            return getShortcuts(mediator, (SourceView) component);
-        }
+        if (Objects.equals(SOURCE_VIEW, componentId)) { return getShortcuts(mediator, (SourceView) component); }
 
         return fallbackShortcuts(mediator, componentId, component);
     }

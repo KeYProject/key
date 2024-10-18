@@ -30,8 +30,10 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
     /**
      * Constructor.
      *
-     * @param environment The parent {@link KeYEnvironment}.
-     * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
+     * @param environment
+     *        The parent {@link KeYEnvironment}.
+     * @param builder
+     *        The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
      */
     public SymbolicExecutionEnvironment(KeYEnvironment<U> environment,
             SymbolicExecutionTreeBuilder builder) {
@@ -41,9 +43,12 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
     /**
      * Constructor.
      *
-     * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
-     * @param initConfig The loaded project.
-     * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
+     * @param ui
+     *        The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
+     * @param initConfig
+     *        The loaded project.
+     * @param builder
+     *        The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
      */
     public SymbolicExecutionEnvironment(U ui, InitConfig initConfig,
             SymbolicExecutionTreeBuilder builder) {
@@ -73,8 +78,10 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
      * Configures the given {@link Proof} to use the symbolic execution strategy by reusing the
      * default {@link StrategyProperties}.
      *
-     * @param proof The {@link Proof} to configure.
-     * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
+     * @param proof
+     *        The {@link Proof} to configure.
+     * @param maximalNumberOfNodesPerBranch
+     *        The maximal number of nodes per branch.
      */
     public static void configureProofForSymbolicExecution(Proof proof,
             int maximalNumberOfNodesPerBranch) {
@@ -100,15 +107,22 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
     /**
      * Configures the given {@link Proof} to use the symbolic execution strategy.
      *
-     * @param proof The {@link Proof} to configure.
-     * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
-     * @param methodTreatmentContract {@code true} use operation contracts, {@code false} expand
+     * @param proof
+     *        The {@link Proof} to configure.
+     * @param maximalNumberOfNodesPerBranch
+     *        The maximal number of nodes per branch.
+     * @param methodTreatmentContract
+     *        {@code true} use operation contracts, {@code false} expand
      *        methods.
-     * @param loopTreatmentInvariant {@code true} use invariants, {@code false} expand loops.
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param loopTreatmentInvariant
+     *        {@code true} use invariants, {@code false} expand loops.
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
+     * @param aliasChecks
+     *        Do alias checks?
      */
     public static void configureProofForSymbolicExecution(Proof proof,
             int maximalNumberOfNodesPerBranch, boolean methodTreatmentContract,
@@ -135,12 +149,8 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
     @Override
     public void dispose() {
         Proof proof = getProof();
-        if (builder != null) {
-            builder.dispose();
-        }
-        if (proof != null && !proof.isDisposed() && proof != getLoadedProof()) {
-            proof.dispose();
-        }
+        if (builder != null) { builder.dispose(); }
+        if (proof != null && !proof.isDisposed() && proof != getLoadedProof()) { proof.dispose(); }
         super.dispose();
     }
 }

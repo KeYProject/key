@@ -37,9 +37,7 @@ public final class UpdateApplication extends AbstractOperator implements Operato
     public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
             throws TermCreationException {
         super.validTopLevelException(term);
-        if (term.sub(0).sort() != JavaDLTheory.UPDATE) {
-            throw new TermCreationException(this, term);
-        }
+        if (term.sub(0).sort() != JavaDLTheory.UPDATE) { throw new TermCreationException(this, term); }
     }
 
 
@@ -53,7 +51,8 @@ public final class UpdateApplication extends AbstractOperator implements Operato
 
     /**
      * @return the subterm representing the update being applies
-     * @param t term with this operator as top level operator
+     * @param t
+     *        term with this operator as top level operator
      */
     public static Term getUpdate(Term t) {
         assert t.op() == UPDATE_APPLICATION;
@@ -72,7 +71,8 @@ public final class UpdateApplication extends AbstractOperator implements Operato
 
     /**
      * @return the subterm representing the formula/term the update is applied to
-     * @param t term with this operator as top level operator
+     * @param t
+     *        term with this operator as top level operator
      */
     public static Term getTarget(Term t) {
         assert t.op() == UPDATE_APPLICATION;

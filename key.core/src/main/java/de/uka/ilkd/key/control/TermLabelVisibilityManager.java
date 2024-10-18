@@ -67,7 +67,8 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * Set the switch whether term labels should be shown to passed value.
      *
-     * @param showLabels A boolean value whether term labels should be shown
+     * @param showLabels
+     *        A boolean value whether term labels should be shown
      */
     public void setShowLabels(boolean showLabels) {
         if (this.showLabels != showLabels) {
@@ -79,7 +80,8 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * Gives the information whether the term label with the passed name is currently hidden.
      *
-     * @param labelName The name of a term label
+     * @param labelName
+     *        The name of a term label
      * @return A boolean value whether the investigated term label is hidden.
      */
     public boolean isHidden(Name labelName) {
@@ -89,18 +91,16 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * Sets the state of the term label with the passed name to hidden or not.
      *
-     * @param labelName The name of a term label
-     * @param hidden The boolean value whether the term label should be hidden or not
+     * @param labelName
+     *        The name of a term label
+     * @param hidden
+     *        The boolean value whether the term label should be hidden or not
      */
     public void setHidden(Name labelName, boolean hidden) {
         if (hidden) {
-            if (hiddenLabels.add(labelName)) {
-                fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this));
-            }
+            if (hiddenLabels.add(labelName)) { fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this)); }
         } else {
-            if (hiddenLabels.remove(labelName)) {
-                fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this));
-            }
+            if (hiddenLabels.remove(labelName)) { fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this)); }
         }
     }
 
@@ -127,23 +127,21 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * Registers the given {@link TermLabelVisibilityManagerListener}.
      *
-     * @param l The {@link TermLabelVisibilityManagerListener} to add.
+     * @param l
+     *        The {@link TermLabelVisibilityManagerListener} to add.
      */
     public void addTermLabelVisibilityManagerListener(TermLabelVisibilityManagerListener l) {
-        if (l != null) {
-            listeners.add(l);
-        }
+        if (l != null) { listeners.add(l); }
     }
 
     /**
      * Unregisters the given {@link TermLabelVisibilityManagerListener}.
      *
-     * @param l The {@link TermLabelVisibilityManagerListener} to remove.
+     * @param l
+     *        The {@link TermLabelVisibilityManagerListener} to remove.
      */
     public void removeTermLabelVisibilityManagerListener(TermLabelVisibilityManagerListener l) {
-        if (l != null) {
-            listeners.remove(l);
-        }
+        if (l != null) { listeners.remove(l); }
     }
 
     /**
@@ -160,19 +158,19 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * {@link TermLabelVisibilityManagerListener#visibleLabelsChanged( TermLabelVisibilityManagerEvent)}
      * to all listeners.
      *
-     * @param e The event object.
+     * @param e
+     *        The event object.
      */
     protected void fireVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
         TermLabelVisibilityManagerListener[] listener = getTermLabelVisibilityManagerListeners();
-        for (TermLabelVisibilityManagerListener l : listener) {
-            l.visibleLabelsChanged(e);
-        }
+        for (TermLabelVisibilityManagerListener l : listener) { l.visibleLabelsChanged(e); }
     }
 
     /**
      * Returns a sorted list of all term label names supported by the given {@link Proof}.
      *
-     * @param proof The given {@link Proof}.
+     * @param proof
+     *        The given {@link Proof}.
      * @return The sorted list of supported term label names.
      */
     public static List<Name> getSortedTermLabelNames(Proof proof) {
@@ -182,7 +180,8 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * Returns a sorted list of all term label names supported by the given {@link Profile}.
      *
-     * @param profile The given {@link Profile}.
+     * @param profile
+     *        The given {@link Profile}.
      * @return The sorted list of supported term label names.
      */
     public static List<Name> getSortedTermLabelNames(Profile profile) {
@@ -193,7 +192,8 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * Returns a sorted list of all term TermLabelManager names supported by the given
      * {@link TermLabelManager}.
      *
-     * @param manager The given {@link Profile}.
+     * @param manager
+     *        The given {@link Profile}.
      * @return The sorted list of supported term label names.
      */
     public static List<Name> getSortedTermLabelNames(TermLabelManager manager) {

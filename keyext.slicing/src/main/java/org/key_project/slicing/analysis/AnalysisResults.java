@@ -91,17 +91,28 @@ public final class AnalysisResults {
     /**
      * Specify the results of analyzing a proof.
      *
-     * @param proof the analyzed proof
-     * @param dependencyGraph the dependency graph of the proof
-     * @param totalSteps the number of steps in the proof
-     * @param ruleStatistics statistics on analyzed rules
-     * @param usefulSteps set of useful steps to include in the slice
-     * @param usefulNodes set of useful graph nodes
-     * @param uselessBranches set of useless branches
-     * @param branchStacks branch stacks (see {@link SlicingProofReplayer} for details)
-     * @param didDependencyAnalysis whether the dependency analysis algorithm ran
-     * @param didDeduplicateRuleApps whether the rule de-duplication algorithm ran
-     * @param executionTime timings
+     * @param proof
+     *        the analyzed proof
+     * @param dependencyGraph
+     *        the dependency graph of the proof
+     * @param totalSteps
+     *        the number of steps in the proof
+     * @param ruleStatistics
+     *        statistics on analyzed rules
+     * @param usefulSteps
+     *        set of useful steps to include in the slice
+     * @param usefulNodes
+     *        set of useful graph nodes
+     * @param uselessBranches
+     *        set of useless branches
+     * @param branchStacks
+     *        branch stacks (see {@link SlicingProofReplayer} for details)
+     * @param didDependencyAnalysis
+     *        whether the dependency analysis algorithm ran
+     * @param didDeduplicateRuleApps
+     *        whether the rule de-duplication algorithm ran
+     * @param executionTime
+     *        timings
      */
     public AnalysisResults(
             Proof proof,
@@ -136,7 +147,8 @@ public final class AnalysisResults {
     }
 
     /**
-     * @param branchLocation branch location
+     * @param branchLocation
+     *        branch location
      * @return whether that branch is marked as useless
      */
     public boolean branchIsUseful(BranchLocation branchLocation) {
@@ -154,7 +166,8 @@ public final class AnalysisResults {
      * Reduce the sequent of the provided node to formulas deemed useful.
      * (Formulas are useful if they are used to close the branch.)
      *
-     * @param node proof node
+     * @param node
+     *        proof node
      * @return sequent with only useful formulas
      */
     public Sequent reduceSequent(Node node) {
@@ -168,9 +181,7 @@ public final class AnalysisResults {
         for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));
-            if (usefulNodes.contains(graphNode)) {
-                semiList.add(sf);
-            }
+            if (usefulNodes.contains(graphNode)) { semiList.add(sf); }
         }
         return Semisequent.create(semiList);
     }
@@ -178,8 +189,8 @@ public final class AnalysisResults {
     @Override
     public String toString() {
         return "AnalysisResults{" +
-            "totalSteps=" + totalSteps +
-            ", usefulSteps=" + usefulStepsNr +
-            ", ...}";
+                "totalSteps=" + totalSteps +
+                ", usefulSteps=" + usefulStepsNr +
+                ", ...}";
     }
 }

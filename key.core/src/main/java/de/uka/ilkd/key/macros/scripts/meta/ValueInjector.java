@@ -37,15 +37,23 @@ public class ValueInjector {
      * Injects the given {@code arguments} in the {@code obj}. For more details see
      * {@link #inject(ProofScriptCommand, Object, Map)}
      *
-     * @param command a proof script command
-     * @param obj a parameter class with annotation
-     * @param arguments a non-null map of string pairs
-     * @param <T> an arbitrary type
+     * @param command
+     *        a proof script command
+     * @param obj
+     *        a parameter class with annotation
+     * @param arguments
+     *        a non-null map of string pairs
+     * @param <T>
+     *        an arbitrary type
      * @return the same object as {@code obj}
-     * @throws ArgumentRequiredException a required argument was not given in {@code arguments}
-     * @throws InjectionReflectionException an access on some reflection methods occurred
-     * @throws NoSpecifiedConverterException unknown type for the current converter map
-     * @throws ConversionException an converter could not translate the given value in arguments
+     * @throws ArgumentRequiredException
+     *         a required argument was not given in {@code arguments}
+     * @throws InjectionReflectionException
+     *         an access on some reflection methods occurred
+     * @throws NoSpecifiedConverterException
+     *         unknown type for the current converter map
+     * @throws ConversionException
+     *         an converter could not translate the given value in arguments
      */
     public static <T> T injection(ProofScriptCommand<T> command, T obj,
             Map<String, String> arguments) throws ArgumentRequiredException,
@@ -60,9 +68,7 @@ public class ValueInjector {
      * @see #createDefault()
      */
     public static ValueInjector getInstance() {
-        if (instance == null) {
-            instance = createDefault();
-        }
+        if (instance == null) { instance = createDefault(); }
         return instance;
     }
 
@@ -93,15 +99,23 @@ public class ValueInjector {
     /**
      * Injects the converted version of the given {@code arguments} in the given {@code obj}.
      *
-     * @param command a proof script command
-     * @param obj a non-null instance of a parameter class (with annotation)
-     * @param arguments a non-null string map
-     * @param <T> type safety
+     * @param command
+     *        a proof script command
+     * @param obj
+     *        a non-null instance of a parameter class (with annotation)
+     * @param arguments
+     *        a non-null string map
+     * @param <T>
+     *        type safety
      * @return the same object as {@code obj}
-     * @throws ArgumentRequiredException a required argument was not given in {@code arguments}
-     * @throws InjectionReflectionException an access on some reflection methods occurred
-     * @throws NoSpecifiedConverterException unknown type for the current converter map
-     * @throws ConversionException an converter could not translate the given value in arguments
+     * @throws ArgumentRequiredException
+     *         a required argument was not given in {@code arguments}
+     * @throws InjectionReflectionException
+     *         an access on some reflection methods occurred
+     * @throws NoSpecifiedConverterException
+     *         unknown type for the current converter map
+     * @throws ConversionException
+     *         an converter could not translate the given value in arguments
      * @see Option
      * @see Flag
      */
@@ -201,9 +215,12 @@ public class ValueInjector {
     /**
      * Registers the given converter for the specified class.
      *
-     * @param clazz a class
-     * @param conv a converter for the given class
-     * @param <T> an arbitrary type
+     * @param clazz
+     *        a class
+     * @param conv
+     *        a converter for the given class
+     * @param <T>
+     *        an arbitrary type
      */
     public <T> void addConverter(Class<T> clazz, StringConverter<T> conv) {
         converters.put(clazz, conv);
@@ -212,8 +229,10 @@ public class ValueInjector {
     /**
      * Finds a converter for the given class.
      *
-     * @param clazz a non-null class
-     * @param <T> an arbitrary type
+     * @param clazz
+     *        a non-null class
+     * @param <T>
+     *        an arbitrary type
      * @return null or a suitable converter (registered) converter for the requested class.
      */
     @SuppressWarnings("unchecked")

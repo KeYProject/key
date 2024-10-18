@@ -5,6 +5,7 @@ package de.uka.ilkd.key.ui;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -75,11 +76,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Current key problem file that is attempted to be proven.
      */
-    private File keyProblemFile = null;
+    private Path keyProblemFile = null;
 
     /**
      * We want to record whether there was a proof that could not be proven. {@link Main} calls
-     * System.exit() after all files have been loaded with {@link #loadProblem(java.io.File)}.
+     * System.exit() after all files have been loaded with {@link #loadProblem(java.nio.file.Path)}.
      * Program return value depends on whether there has been a proof attempt that was not
      * successful.
      */
@@ -115,7 +116,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          * assigned to keyProblemFile in method loadProblem(File).
          */
         assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
-            + " save a proof but no corresponding key problem file is " + "available.";
+                + " save a proof but no corresponding key problem file is " + "available.";
         allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
         /*
          * We "delete" the value of keyProblemFile at this point by assigning null to it. That way
@@ -145,9 +146,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
-            if (!isAtLeastOneMacroRunning()) {
-                printResults(openGoals, info, result2);
-            }
+            if (!isAtLeastOneMacroRunning()) { printResults(openGoals, info, result2); }
         } else if (info.getSource() instanceof ProblemLoader) {
             LOGGER.debug("{}", result2);
             System.exit(-1);
@@ -190,7 +189,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public void loadProblem(File file) {
+    public void loadProblem(Path file) {
         /*
          * Current file is stored in a private field. It will be used in method printResults() to
          * determine file names, in which proofs will be written.
@@ -202,20 +201,24 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * loads the problem or proof from the given file
      *
-     * @param file the File with the problem description or the proof
-     * @param classPath the class path entries to use.
-     * @param bootClassPath the boot class path to use.
-     * @param includes the included files to use
+     * @param file
+     *        the File with the problem description or the proof
+     * @param classPath
+     *        the class path entries to use.
+     * @param bootClassPath
+     *        the boot class path to use.
+     * @param includes
+     *        the included files to use
      */
-    public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
+    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes) {
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
-    public void loadProofFromBundle(File proofBundle, File proofFilename) {
+    public void loadProofFromBundle(Path proofBundle, Path proofFilename) {
         ProblemLoader problemLoader =
             getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
@@ -272,9 +275,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     public final void taskProgress(int position) {
         super.taskProgress(position);
         if (progressMax > 0) {
-            if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) {
-                System.out.print(PROGRESS_MARK);
-            }
+            if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) { System.out.print(PROGRESS_MARK); }
         }
     }
 
@@ -356,30 +357,26 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Save proof.
      *
-     * @param result the result
-     * @param proof the proof
-     * @param keyProblemFile the key problem file
+     * @param result
+     *        the result
+     * @param proof
+     *        the proof
+     * @param keyProblemFile
+     *        the key problem file
      * @return true, if successful
      */
-    public static boolean saveProof(Object result, Proof proof, File keyProblemFile) {
-        if (result instanceof Throwable) {
-            throw new RuntimeException("Error in batchmode.", (Throwable) result);
-        }
+    public static boolean saveProof(Object result, Proof proof, Path keyProblemFile) {
+        if (result instanceof Throwable) { throw new RuntimeException("Error in batchmode.", (Throwable) result); }
 
         // Save the proof before exit.
-        String baseName = keyProblemFile.getAbsolutePath();
+        String baseName = keyProblemFile.toAbsolutePath().toString();
         int idx = baseName.indexOf(".key");
-        if (idx == -1) {
-            idx = baseName.indexOf(".proof");
-        }
+        if (idx == -1) { idx = baseName.indexOf(".proof"); }
         baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
 
         File f;
         int counter = 0;
-        do {
-            f = new File(baseName + ".auto." + counter + ".proof");
-            counter++;
-        } while (f.exists());
+        do { f = new File(baseName + ".auto." + counter + ".proof"); counter++; } while (f.exists());
 
         try {
             // a copy with running number to compare different runs

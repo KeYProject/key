@@ -99,9 +99,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
     private ColorProperty createColorProperty(String key, String description, Color defaultValue) {
         Optional<ColorProperty> item =
             getProperties().filter(it -> it.getKey().equals(key)).findFirst();
-        if (item.isPresent()) {
-            return item.get();
-        }
+        if (item.isPresent()) { return item.get(); }
 
         ColorProperty pe = new ColorProperty(key, description, defaultValue);
         propertyEntries.add(pe);
@@ -123,16 +121,12 @@ public class ColorSettings extends AbstractPropertiesSettings {
         public ColorProperty(String key, String description, Color defaultValue) {
             this.key = key;
             this.description = description;
-            if (!properties.containsKey(key)) {
-                set(defaultValue);
-            }
+            if (!properties.containsKey(key)) { set(defaultValue); }
         }
 
         @Override
         public String value() {
-            if (currentValue != null) {
-                return toHex(currentValue);
-            }
+            if (currentValue != null) { return toHex(currentValue); }
 
             String v = properties.get(key).toString();
 
@@ -175,9 +169,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public Color get() {
-            if (currentValue != null) {
-                return currentValue;
-            }
+            if (currentValue != null) { return currentValue; }
 
             String v = (String) properties.get(key);
 

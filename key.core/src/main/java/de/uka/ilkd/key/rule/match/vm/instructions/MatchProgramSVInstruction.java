@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -54,9 +54,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
                     return null;
                 }
             }
-            if (inMap.equals(peForCompare)) {
-                return matchCond;
-            }
+            if (inMap.equals(peForCompare)) { return matchCond; }
         }
         return null;
     }
@@ -113,9 +111,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
         MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) {
-            termPosition.gotoNextSibling();
-        }
+        if (result != null) { termPosition.gotoNextSibling(); }
         return result;
     }
 }

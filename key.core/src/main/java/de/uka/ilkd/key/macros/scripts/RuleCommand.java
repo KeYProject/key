@@ -102,9 +102,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             TacletApp app = maybeApp.orElseThrow(
                 () -> new ScriptException("Taclet '" + p.rulename + "' not known."));
 
-            if (app.taclet() instanceof FindTaclet) {
-                app = findTacletApp(p, state);
-            }
+            if (app.taclet() instanceof FindTaclet) { app = findTacletApp(p, state); }
 
             return app;
         }
@@ -138,9 +136,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
 
-        if (assumesCandidates.size() != 1) {
-            throw new ScriptException("Not a unique \\assumes instantiation");
-        }
+        if (assumesCandidates.size() != 1) { throw new ScriptException("Not a unique \\assumes instantiation"); }
 
         result = assumesCandidates.head();
 
@@ -174,9 +170,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         for (SchemaVariable sv : result.uninstantiatedVars()) {
             if (result.isInstantiationRequired(sv)) {
                 Term inst = p.instantiations.get(sv.name().toString());
-                if (inst == null) {
-                    throw new ScriptException("missing instantiation for " + sv);
-                }
+                if (inst == null) { throw new ScriptException("missing instantiation for " + sv); }
 
                 result = result.addInstantiation(sv, inst, true, services);
             }
@@ -186,9 +180,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         result = result.tryToInstantiate(
             services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
-        if (result == null) {
-            throw new ScriptException("Cannot instantiate this rule");
-        }
+        if (result == null) { throw new ScriptException("Cannot instantiate this rule"); }
 
         if (recheckMatchConditions) {
             final MatchConditions appMC =
@@ -214,20 +206,16 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             findBuiltInRuleApps(p, state).stream().filter(r -> r.rule().name().equals(rule.name()))
                     .toList();
 
-        if (matchingApps.isEmpty()) {
-            throw new ScriptException("No matching applications.");
-        }
+        if (matchingApps.isEmpty()) { throw new ScriptException("No matching applications."); }
 
         if (p.occ < 0) {
-            if (matchingApps.size() > 1) {
-                throw new ScriptException("More than one applicable occurrence");
-            }
+            if (matchingApps.size() > 1) { throw new ScriptException("More than one applicable occurrence"); }
 
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
                 throw new ScriptException("Occurence " + p.occ
-                    + " has been specified, but there are only " + matchingApps.size() + " hits.");
+                        + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
 
             return matchingApps.get(p.occ);
@@ -239,19 +227,15 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         List<TacletApp> matchingApps = filterList(p, allApps);
 
-        if (matchingApps.isEmpty()) {
-            throw new ScriptException("No matching applications.");
-        }
+        if (matchingApps.isEmpty()) { throw new ScriptException("No matching applications."); }
 
         if (p.occ < 0) {
-            if (matchingApps.size() > 1) {
-                throw new ScriptException("More than one applicable occurrence");
-            }
+            if (matchingApps.size() > 1) { throw new ScriptException("More than one applicable occurrence"); }
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
                 throw new ScriptException("Occurence " + p.occ
-                    + " has been specified, but there are only " + matchingApps.size() + " hits.");
+                        + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
             return matchingApps.get(p.occ);
         }
@@ -267,18 +251,14 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
-                continue;
-            }
+            if (!isFormulaSearchedFor(p, sf, services)) { continue; }
 
             allApps = allApps.append(
                 index.getBuiltInRule(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
-                continue;
-            }
+            if (!isFormulaSearchedFor(p, sf, services)) { continue; }
 
             allApps = allApps.append(
                 index.getBuiltInRule(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
@@ -298,18 +278,14 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
-                continue;
-            }
+            if (!isFormulaSearchedFor(p, sf, services)) { continue; }
 
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
-                continue;
-            }
+            if (!isFormulaSearchedFor(p, sf, services)) { continue; }
 
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
@@ -323,8 +299,10 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      * {@link Parameters#formula} parameter or its String representation matches the
      * {@link Parameters#matches} regex. If both parameters are not supplied, always returns true.
      *
-     * @param p The {@link Parameters} object.
-     * @param sf The {@link SequentFormula} to check.
+     * @param p
+     *        The {@link Parameters} object.
+     * @param sf
+     *        The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
     private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
@@ -343,7 +321,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     /**
      * Removes spaces and line breaks from the string representation of a term.
      *
-     * @param str The string to "clean up".
+     * @param str
+     *        The string to "clean up".
      * @return The original without spaces and line breaks.
      */
     private static String formatTermString(String str) {
@@ -374,9 +353,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                             || userInst.equalsModProperty(ptaInst, IRRELEVANT_TERM_LABELS_PROPERTY);
                 }
 
-                if (add) {
-                    matchingApps.add(pta);
-                }
+                if (add) { matchingApps.add(pta); }
             }
         }
         return matchingApps;

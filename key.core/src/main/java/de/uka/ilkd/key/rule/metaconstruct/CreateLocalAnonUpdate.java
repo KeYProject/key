@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -34,9 +34,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         final Term target = term.sub(0);
 
         // the target term should have a Java block
-        if (target.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
-            return null;
-        }
+        if (target.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) { return null; }
 
         assert target.op() instanceof Modality;
 

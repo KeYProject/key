@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.statement.JmlAssert;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -74,18 +74,12 @@ public final class JmlAssertRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
-        if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
-            return false;
-        }
+        if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) { return false; }
         // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) {
-            return false;
-        }
+        if (Transformer.inTransformer(occurrence)) { return false; }
 
         Term target = occurrence.subTerm();
-        if (target.op() instanceof UpdateApplication) {
-            target = UpdateApplication.getTarget(target);
-        }
+        if (target.op() instanceof UpdateApplication) { target = UpdateApplication.getTarget(target); }
         final SourceElement activeStatement = JavaTools.getActiveStatement(target.javaBlock());
         return activeStatement instanceof JmlAssert
                 && ((JmlAssert) activeStatement).getKind() == kind;
@@ -114,9 +108,7 @@ public final class JmlAssertRule implements BuiltInRule {
         final Term update = UpdateApplication.getUpdate(formula);
 
         Term target = formula;
-        if (formula.op() instanceof UpdateApplication) {
-            target = UpdateApplication.getTarget(formula);
-        }
+        if (formula.op() instanceof UpdateApplication) { target = UpdateApplication.getTarget(formula); }
 
         final JmlAssert jmlAssert =
             Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))

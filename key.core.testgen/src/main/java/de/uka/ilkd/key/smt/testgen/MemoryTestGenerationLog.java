@@ -47,8 +47,7 @@ public class MemoryTestGenerationLog implements TestGenerationLog {
      * {@inheritDoc}
      */
     @Override
-    public void testGenerationCompleted() {
-    }
+    public void testGenerationCompleted() {}
 
     /**
      * {@inheritDoc}

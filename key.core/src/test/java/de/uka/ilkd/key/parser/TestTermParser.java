@@ -5,7 +5,7 @@ package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -32,11 +32,10 @@ public class TestTermParser extends AbstractTestTermParser {
     private LogicVariable x, y, z, xs, ys;
     private Term t_x, t_y, t_z, t_xs, t_ys;
     private Term t_headxs, t_tailys, t_nil;
-    private final Recoder2KeY r2k;
+    private final JavaService r2k;
 
     public TestTermParser() {
-        r2k = new Recoder2KeY(services, nss);
-        r2k.parseSpecialClasses();
+        r2k = services.getJavaService();
         r2k.readCompilationUnit(COMPILATION_UNIT);
     }
 
@@ -254,10 +253,10 @@ public class TestTermParser extends AbstractTestTermParser {
             "\\exists elem y; \\forall list xs; \\forall list ys; ( ys =" + " cons(y,xs))");
         Term t3 =
             parseTerm("\\exists int_sort bi; (\\<{ int p_x = 1;" + " {int s = 2;} }\\>" + " true ->"
-                + "\\<{ int p_x = 1;boolean p_y=2<1;" + " while(p_y){ int s=3 ;} }\\>" + " true)");
+                    + "\\<{ int p_x = 1;boolean p_y=2<1;" + " while(p_y){ int s=3 ;} }\\>" + " true)");
         Term t4 =
             parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;" + " {int s = 2;} }\\>" + " true ->"
-                + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
+                    + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
         assertTrue(t3.equalsModProperty(t4, RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming");
         assertEquals(t3.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -365,22 +364,36 @@ public class TestTermParser extends AbstractTestTermParser {
     public void testAmbigiousFuncVarPred() {
         // tests bug id 216
         String s = """
-                \\functions {} \\predicates{mypred(int, int);}
+                \\functions {}
+                \\predicates{mypred(int, int);}
                 \\problem {\\forall int x; mypred(x, 0)}
-                 \\proof {
-                (branch "dummy ID"(opengoal "  ==> true  -> true ") ) }""";
+                \\proof {
+                    (branch "dummy ID"(opengoal "  ==> true  -> true ") )
+                }
+                """;
         try {
             parseProblem(s);
         } catch (Exception re) {
             fail("Fixed bug 216 occured again. The original bug "
-                + "was due to ambigious rules using semantic " + "predicates in a 'wrong' way");
+                    + "was due to ambigious rules using semantic " + "predicates in a 'wrong' way");
         }
     }
 
-    static final String COMPILATION_UNIT = "public class T extends " + "java.lang.Object{ "
-        + "private T a;" + "private static T b;" + "T c;" + "static T d;" + "public T e;"
-        + "public static T f;" + "protected T g;" + "protected T h;" + "public T query(){} "
-        + "public static T staticQ(T p){} " + "public static T staticQ() {}}";
+    static final String COMPILATION_UNIT = """
+            public class T extends java.lang.Object {
+                private T a;
+                private static T b;
+                T c;
+                static T d;
+                public T e;
+
+                public static T f;
+                protected T g; protected T h;
+                public T query()             {  }
+                public static T staticQ(T p) {  }
+                public static T staticQ()    {  }
+            }
+            """;
 
 
     public Term testParseQueriesAndAttributes(String expr) throws Exception {
@@ -433,7 +446,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Disabled
     public void testJavaQueryAndAttribute_all() throws Exception {
         String all = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
-            + "& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
+                + "& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
         testParseQueriesAndAttributes(all);
     }
 

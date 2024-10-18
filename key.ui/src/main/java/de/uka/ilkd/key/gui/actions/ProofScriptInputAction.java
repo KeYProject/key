@@ -32,7 +32,8 @@ public class ProofScriptInputAction extends AbstractAction {
     /**
      * Instantiates a new proof script input action.
      *
-     * @param mediator the mediator
+     * @param mediator
+     *        the mediator
      */
     public ProofScriptInputAction(KeYMediator mediator) {
         super("Input proof script...");

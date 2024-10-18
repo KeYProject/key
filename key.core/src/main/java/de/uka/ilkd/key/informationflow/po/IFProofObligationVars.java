@@ -72,9 +72,7 @@ public class IFProofObligationVars {
             } else {
                 ifTerm = null;
             }
-            if (symbTerm != null) {
-                map.put(symbTerm, ifTerm);
-            }
+            if (symbTerm != null) { map.put(symbTerm, ifTerm); }
         }
     }
 

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.reference.ThisReference;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -38,9 +38,7 @@ public final class IsThisReference extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
-        if (var != this.var) {
-            return true;
-        }
+        if (var != this.var) { return true; }
         // boolean isThisRef = instMap.getInstantiation(var) instanceof ThisReference;
         boolean isThisRef = instCandidate instanceof ThisReference;
         return negated != isThisRef;

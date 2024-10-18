@@ -114,9 +114,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public Token findProof() {
             KeYParser.ProofContext a = ctx.proof();
-            if (a != null) {
-                return a.PROOF().getSymbol();
-            }
+            if (a != null) { return a.PROOF().getSymbol(); }
             return null;
         }
 

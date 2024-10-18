@@ -51,7 +51,7 @@ public class TestTermTacletAppIndex {
     @BeforeEach
     public void setUp() {
         File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-            + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+                + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
         assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
@@ -108,9 +108,7 @@ public class TestTermTacletAppIndex {
 
     @Test
     public void testIndex0WithCache() {
-        for (int i = 0; i != 3; ++i) {
-            doTestIndex0(realCache);
-        }
+        for (int i = 0; i != 3; ++i) { doTestIndex0(realCache); }
     }
 
     private void doTestIndex0(TermTacletAppIndexCacheSet cache) {
@@ -204,9 +202,7 @@ public class TestTermTacletAppIndex {
     private void checkTacletList(ImmutableList<NoPosTacletApp> p_toCheck,
             ImmutableList<Taclet> p_template) {
         assertEquals(p_toCheck.size(), p_template.size());
-        for (NoPosTacletApp aP_toCheck : p_toCheck) {
-            assertTrue(p_template.contains(aP_toCheck.taclet()));
-        }
+        for (NoPosTacletApp aP_toCheck : p_toCheck) { assertTrue(p_template.contains(aP_toCheck.taclet())); }
     }
 
 }

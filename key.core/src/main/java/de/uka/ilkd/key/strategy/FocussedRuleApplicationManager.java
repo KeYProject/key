@@ -96,9 +96,7 @@ public class FocussedRuleApplicationManager
 
     @Override
     public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
-        if (isRuleApplicationForFocussedFormula(rule, pos)) {
-            delegate.ruleAdded(rule, pos);
-        }
+        if (isRuleApplicationForFocussedFormula(rule, pos)) { delegate.ruleAdded(rule, pos); }
     }
 
     protected boolean isRuleApplicationForFocussedFormula(RuleApp rule, PosInOccurrence pos) {
@@ -130,9 +128,7 @@ public class FocussedRuleApplicationManager
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = ImmutableSLList.nil();
         for (RuleApp r : rules) {
-            if (isRuleApplicationForFocussedFormula(r, pos)) {
-                applicableRules = applicableRules.prepend(r);
-            }
+            if (isRuleApplicationForFocussedFormula(r, pos)) { applicableRules = applicableRules.prepend(r); }
         }
 
         delegate.rulesAdded(applicableRules, pos);
@@ -146,9 +142,7 @@ public class FocussedRuleApplicationManager
     private PosInOccurrence getPIOForFocussedSubterm() {
         final PosInOccurrence formula = goal.getFormulaTagManager().getPosForTag(focussedFormula);
 
-        if (formula == null) {
-            return null;
-        }
+        if (formula == null) { return null; }
 
         return focussedSubterm.replaceConstrainedFormula(formula.sequentFormula());
     }
@@ -160,12 +154,8 @@ public class FocussedRuleApplicationManager
         while (true) {
             final int overChild = overIt.next();
             final int underChild = underIt.next();
-            if (overChild == -1) {
-                return true;
-            }
-            if (overChild != underChild) {
-                return false;
-            }
+            if (overChild == -1) { return true; }
+            if (overChild != underChild) { return false; }
         }
     }
 

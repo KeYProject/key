@@ -63,13 +63,19 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Constructor.
      *
-     * @param node The {@link Node} which provides the state.
-     * @param modalityPio The {@link PosInOccurrence} in the {@link Node}.
-     * @param executionNode The current {@link IExecutionNode}.
-     * @param condition An optional additional condition.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param node
+     *        The {@link Node} which provides the state.
+     * @param modalityPio
+     *        The {@link PosInOccurrence} in the {@link Node}.
+     * @param executionNode
+     *        The current {@link IExecutionNode}.
+     * @param condition
+     *        An optional additional condition.
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     public ExecutionVariableExtractor(Node node, PosInOccurrence modalityPio,
             IExecutionNode<?> executionNode, Term condition, boolean simplifyConditions)
@@ -122,7 +128,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * Extracts the current state and represents it as {@link IExecutionVariable}s.
      *
      * @return The {@link IExecutionVariable}s representing the current state.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public IExecutionVariable[] analyse() throws ProofInputException {
         Collection<StateExecutionVariable> variables = allStateVariables.values();
@@ -132,9 +139,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Analyzes the tree structure of the given {@link ExecutionVariableValuePair}s.
      *
-     * @param pairs The {@link ExecutionVariableValuePair}s to analyze.
-     * @param topVariables The state locations,
-     * @param childrenInfo the child locations.
+     * @param pairs
+     *        The {@link ExecutionVariableValuePair}s to analyze.
+     * @param topVariables
+     *        The state locations,
+     * @param childrenInfo
+     *        the child locations.
      */
     protected void analyzeTreeStructure(Set<ExecutionVariableValuePair> pairs,
             Map<LocationDef, List<ExecutionVariableValuePair>> topVariables,
@@ -163,13 +173,18 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Creates an {@link IExecutionVariable} for the given {@link ExecutionVariableValuePair}s.
      *
-     * @param pairs The {@link ExecutionVariableValuePair}s to represent.
-     * @param childrenInfo The {@link Map} providing child content information.
-     * @param parentValue The optional parent {@link IExecutionValue}.
-     * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the
+     * @param pairs
+     *        The {@link ExecutionVariableValuePair}s to represent.
+     * @param childrenInfo
+     *        The {@link Map} providing child content information.
+     * @param parentValue
+     *        The optional parent {@link IExecutionValue}.
+     * @param alreadyVisitedObjects
+     *        The value {@link Term}s of already visited objects on the
      *        current path in the variable-value-hierarchy.
      * @return The created {@link IExecutionVariable}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected IExecutionVariable createVariablesValueStructure(
             List<ExecutionVariableValuePair> pairs,
@@ -183,9 +198,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             modalityPio, firstPair.getProgramVariable(), firstPair.getArrayIndex(),
             firstPair.getArrayStartIndex(), firstPair.getArrayEndIndex(), additionalCondition,
             parentValue);
-        if (parentValue != null) {
-            parentValue.addChildVariable(variable);
-        }
+        if (parentValue != null) { parentValue.addChildVariable(variable); }
         // Fill variable with values
         List<IExecutionValue> values = new LinkedList<>();
         createValues(variable, pairs, firstPair, childrenInfo, values, alreadyVisitedObjects);
@@ -196,14 +209,21 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Creates the {@link IExecutionValue}s of the given {@link IExecutionVariable}.
      *
-     * @param variable The {@link IExecutionVariable}.
-     * @param pairs The {@link ExecutionVariableValuePair}s which provides the content.
-     * @param firstPair The first entry in the {@link ExecutionVariableValuePair}s.
-     * @param contentMap The content {@link Map}.
-     * @param valueListToFill The result {@link List} to fill.
-     * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the
+     * @param variable
+     *        The {@link IExecutionVariable}.
+     * @param pairs
+     *        The {@link ExecutionVariableValuePair}s which provides the content.
+     * @param firstPair
+     *        The first entry in the {@link ExecutionVariableValuePair}s.
+     * @param contentMap
+     *        The content {@link Map}.
+     * @param valueListToFill
+     *        The result {@link List} to fill.
+     * @param alreadyVisitedObjects
+     *        The value {@link Term}s of already visited objects on the
      *        current path in the variable-value-hierarchy.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected void createValues(final IExecutionVariable variable,
             final List<ExecutionVariableValuePair> pairs,
@@ -293,9 +313,11 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Updates the already visited objects list if required.
      *
-     * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the
+     * @param alreadyVisitedObjects
+     *        The value {@link Term}s of already visited objects on the
      *        current path in the variable-value-hierarchy.
-     * @param value The current value.
+     * @param value
+     *        The current value.
      * @return The new already visited objects list or the original one if the current value is not
      *         an object.
      */
@@ -317,66 +339,72 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Utility class representing a parent definition.
      *
-     * @param parent   The parent.
-     * @param goalNode The {@link Node} on which this result is based on.
+     * @param parent
+     *        The parent.
+     * @param goalNode
+     *        The {@link Node} on which this result is based on.
      * @author Martin Hentschel
      */
-        private record ParentDef(Term parent, Node goalNode) {
+    private record ParentDef(Term parent, Node goalNode) {
         /**
          * Constructor.
          *
-         * @param parent   The parent.
-         * @param goalNode The {@link Node} on which this result is based on.
+         * @param parent
+         *        The parent.
+         * @param goalNode
+         *        The {@link Node} on which this result is based on.
          */
-        private ParentDef {
-        }
+        private ParentDef {}
 
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof ParentDef other) {
-                    return Objects.equals(parent, other.parent)
-                            && Objects.equals(goalNode, other.goalNode);
-                } else {
-                    return false;
-                }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof ParentDef other) {
+                return Objects.equals(parent, other.parent)
+                        && Objects.equals(goalNode, other.goalNode);
+            } else {
+                return false;
             }
+        }
 
     }
 
     /**
      * Utility class representing a location.
      *
-     * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is used instead.
-     * @param arrayIndex      The array index or {@code null} if a {@link ProgramVariable} is used instead.
+     * @param programVariable
+     *        The {@link ProgramVariable} or {@code null} if an array index is used instead.
+     * @param arrayIndex
+     *        The array index or {@code null} if a {@link ProgramVariable} is used instead.
      * @author Martin Hentschel
      */
-        private record LocationDef(ProgramVariable programVariable, Term arrayIndex) {
+    private record LocationDef(ProgramVariable programVariable, Term arrayIndex) {
         /**
          * Constructor.
          *
-         * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is
-         *                        used instead.
-         * @param arrayIndex      The array index or <code>null</code>, if a {@link ProgramVariable} is
-         *                        used instead.
+         * @param programVariable
+         *        The {@link ProgramVariable} or {@code null} if an array index is
+         *        used instead.
+         * @param arrayIndex
+         *        The array index or <code>null</code>, if a {@link ProgramVariable} is
+         *        used instead.
          */
-        private LocationDef {
-        }
+        private LocationDef {}
 
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof LocationDef other) {
-                    return programVariable == other.programVariable
-                            && Objects.equals(arrayIndex, other.arrayIndex);
-                } else {
-                    return false;
-                }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof LocationDef other) {
+                return programVariable == other.programVariable
+                        && Objects.equals(arrayIndex, other.arrayIndex);
+            } else {
+                return false;
             }
+        }
 
     }
 
@@ -394,13 +422,19 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         /**
          * Constructor.
          *
-         * @param parentNode The {@link IExecutionNode} providing relevant information.
-         * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+         * @param parentNode
+         *        The {@link IExecutionNode} providing relevant information.
+         * @param proofNode
+         *        The {@link Node} of KeY's proof tree which is represented by this
          *        {@link IExecutionNode}.
-         * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
-         * @param programVariable The represented {@link IProgramVariable} which value is shown.
-         * @param arrayIndex The index in the parent array.
-         * @param additionalCondition An optional additional condition to consider.
+         * @param modalityPIO
+         *        The {@link PosInOccurrence} of the modality of interest.
+         * @param programVariable
+         *        The represented {@link IProgramVariable} which value is shown.
+         * @param arrayIndex
+         *        The index in the parent array.
+         * @param additionalCondition
+         *        An optional additional condition to consider.
          */
         public StateExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
                 PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
@@ -414,9 +448,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public synchronized IExecutionValue[] getValues() throws ProofInputException {
-            if (values != null) {
-                return values;
-            }
+            if (values != null) { return values; }
             // Compute values
             Set<ExecutionVariableValuePair> pairs =
                 computeVariableValuePairs(getAdditionalCondition(), layoutTerm,
@@ -479,14 +511,21 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         /**
          * Constructor.
          *
-         * @param parentNode The {@link IExecutionNode} providing relevant information.
-         * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+         * @param parentNode
+         *        The {@link IExecutionNode} providing relevant information.
+         * @param proofNode
+         *        The {@link Node} of KeY's proof tree which is represented by this
          *        {@link IExecutionNode}.
-         * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
-         * @param programVariable The represented {@link IProgramVariable} which value is shown.
-         * @param arrayIndex The index in the parent array.
-         * @param additionalCondition An optional additional condition to consider.
-         * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
+         * @param modalityPIO
+         *        The {@link PosInOccurrence} of the modality of interest.
+         * @param programVariable
+         *        The represented {@link IProgramVariable} which value is shown.
+         * @param arrayIndex
+         *        The index in the parent array.
+         * @param additionalCondition
+         *        An optional additional condition to consider.
+         * @param parentValue
+         *        The parent {@link IExecutionValue} or {@code null} if not available.
          */
         public ExtractedExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
                 PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
@@ -501,7 +540,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         /**
          * Sets the {@link IExecutionValue}s.
          *
-         * @param values The {@link IExecutionValue}s to set.
+         * @param values
+         *        The {@link IExecutionValue}s to set.
          */
         private void setValues(List<IExecutionValue> values) {
             this.values = values;
@@ -569,12 +609,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 if (getArrayStartIndex() != null) {
                     name += getArrayIndexString() + " >= " + getArrayStartIndexString();
                 }
-                if (getArrayStartIndex() != null && getArrayEndIndex() != null) {
-                    name += " and ";
-                }
-                if (getArrayEndIndex() != null) {
-                    name += getArrayIndexString() + " <= " + getArrayEndIndexString();
-                }
+                if (getArrayStartIndex() != null && getArrayEndIndex() != null) { name += " and "; }
+                if (getArrayEndIndex() != null) { name += getArrayIndexString() + " <= " + getArrayEndIndexString(); }
                 name += "]";
                 return name;
             } else {
@@ -602,12 +638,17 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         /**
          * Constructor.
          *
-         * @param parentNode The {@link IExecutionNode} providing relevant information.
-         * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+         * @param parentNode
+         *        The {@link IExecutionNode} providing relevant information.
+         * @param proofNode
+         *        The {@link Node} of KeY's proof tree which is represented by this
          *        {@link IExecutionNode}.
-         * @param variable The parent {@link IExecutionVariable} which contains this value.
-         * @param condition The condition.
-         * @param value The value.
+         * @param variable
+         *        The parent {@link IExecutionVariable} which contains this value.
+         * @param condition
+         *        The condition.
+         * @param value
+         *        The value.
          */
         public ExtractedExecutionValue(IExecutionNode<?> parentNode, Node proofNode,
                 IExecutionVariable variable, Term condition, Term value) {
@@ -651,12 +692,11 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         /**
          * Adds a child {@link ExtractedExecutionVariable}.
          *
-         * @param variable The {@link ExtractedExecutionVariable} to add.
+         * @param variable
+         *        The {@link ExtractedExecutionVariable} to add.
          */
         protected void addChildVariable(ExtractedExecutionVariable variable) {
-            if (variable != null) {
-                childVariables.add(variable);
-            }
+            if (variable != null) { childVariables.add(variable); }
         }
 
         /**

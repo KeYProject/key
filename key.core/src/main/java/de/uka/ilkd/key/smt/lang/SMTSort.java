@@ -132,7 +132,8 @@ public class SMTSort {
     }
 
     /**
-     * @param l the bound to set
+     * @param l
+     *        the bound to set
      */
     public void setBound(long l) {
         this.bound = l;
@@ -147,7 +148,8 @@ public class SMTSort {
     }
 
     /**
-     * @param intSize the bitSize to set
+     * @param intSize
+     *        the bitSize to set
      */
     public void setBitSize(long intSize) {
         this.bitSize = intSize;
@@ -162,7 +164,8 @@ public class SMTSort {
     }
 
     /**
-     * @param boundConst the boundConst to set
+     * @param boundConst
+     *        the boundConst to set
      */
     public void setBoundConst(SMTFunction boundConst) {
         this.boundConst = boundConst;
@@ -176,7 +179,8 @@ public class SMTSort {
     }
 
     /**
-     * @param allocatedAtoms the allocatedAtoms to set
+     * @param allocatedAtoms
+     *        the allocatedAtoms to set
      */
     public void setAllocatedAtoms(SMTFunction allocatedAtoms) {
         this.allocatedAtoms = allocatedAtoms;
@@ -207,17 +211,11 @@ public class SMTSort {
     /** Returns true iff ((that is from type sort) and (this.id == that.id)) */
     @Override
     public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
+        if (this == that) { return true; }
 
-        if (!(that instanceof SMTSort sort)) {
-            return false;
-        }
+        if (!(that instanceof SMTSort sort)) { return false; }
 
-        if (this.isBV() && sort.isBV()) {
-            return this.bitSize == sort.bitSize;
-        }
+        if (this.isBV() && sort.isBV()) { return this.bitSize == sort.bitSize; }
 
         return this.id.equals(sort.id);
     }
@@ -231,9 +229,7 @@ public class SMTSort {
      * Sort's string value
      */
     public String toString() {
-        if (this.bitSize > 0) {
-            return "(define-sort " + id + " () (_ BitVec " + this.bitSize + "))";
-        }
+        if (this.bitSize > 0) { return "(define-sort " + id + " () (_ BitVec " + this.bitSize + "))"; }
         return "(declare-sort " + id + " 0)";
     }
 

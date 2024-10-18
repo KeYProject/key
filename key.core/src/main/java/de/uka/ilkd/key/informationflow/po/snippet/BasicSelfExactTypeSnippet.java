@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -25,7 +25,7 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod pm)) {
             throw new UnsupportedOperationException("Tried to produce "
-                + "SELF_EXACT_TYPE for an observer " + "which is no IProgramMethod.");
+                    + "SELF_EXACT_TYPE for an observer " + "which is no IProgramMethod.");
         }
         KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
         Term result = d.tb.tt();

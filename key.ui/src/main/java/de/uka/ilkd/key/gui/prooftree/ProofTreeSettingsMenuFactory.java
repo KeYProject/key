@@ -34,9 +34,7 @@ public class ProofTreeSettingsMenuFactory {
             menu.add(createCollapseAll(view));
             menu.addSeparator();
 
-            for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) {
-                menu.add(createFilter(view, filter));
-            }
+            for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) { menu.add(createFilter(view, filter)); }
             menu.addSeparator();
 
             menu.add(createExpandOSSToggle(view));
@@ -97,9 +95,7 @@ public class ProofTreeSettingsMenuFactory {
         button.addActionListener(e -> {
             Proof proof = view.getMediator().getSelectedProof();
             if (proof != null) {
-                for (final Goal g : proof.openGoals()) {
-                    view.makeNodeExpanded(g.node());
-                }
+                for (final Goal g : proof.openGoals()) { view.makeNodeExpanded(g.node()); }
                 view.collapseClosedNodes();
                 // do not show selected node if it is not on the path to an
                 // open goal, but do expand root

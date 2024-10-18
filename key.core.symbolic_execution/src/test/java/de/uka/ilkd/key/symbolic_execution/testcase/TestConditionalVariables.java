@@ -26,7 +26,8 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
     /**
      * Compares the conditional values on the {@code Number} example.
      *
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     @Test
     public void testVariablesUnderMethodReturnCondition() throws Exception {
@@ -67,14 +68,21 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
     /**
      * Ensures that the result of {@link IExecutionNode#getVariables(Term)} is correct.
      *
-     * @param expected The expected {@link IExecutionVariable}s.
-     * @param node The current {@link IExecutionNode} to call
+     * @param expected
+     *        The expected {@link IExecutionVariable}s.
+     * @param node
+     *        The current {@link IExecutionNode} to call
      *        {@link IExecutionNode#getVariables(Term)} on.
-     * @param condition The condition to use.
-     * @param compareParent Compare parents?
-     * @param compareChildren Compare children?
-     * @param compareConstraints Compare constraints?
-     * @throws ProofInputException Occurred Exception.
+     * @param condition
+     *        The condition to use.
+     * @param compareParent
+     *        Compare parents?
+     * @param compareChildren
+     *        Compare children?
+     * @param compareConstraints
+     *        Compare constraints?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected static void assertConditionalVariables(IExecutionVariable[] expected,
             IExecutionNode<?> node, Term condition, boolean compareParent, boolean compareChildren,

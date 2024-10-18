@@ -28,13 +28,17 @@ public class TacletAppIntermediate extends AppIntermediate {
     /**
      * Constructs a new intermediate taclet application.
      *
-     * @param tacletName Name of the taclet.
-     * @param posInfo Position information (Integer representing position of the target formula,
+     * @param tacletName
+     *        Name of the taclet.
+     * @param posInfo
+     *        Position information (Integer representing position of the target formula,
      *        PosInTerm for relevant term inside the formula).
-     * @param insts Schema variable instantiations.
+     * @param insts
+     *        Schema variable instantiations.
      * @param ifSeqFormulaList
      * @param ifDirectFormulaList
-     * @param newNames New names registered during taclet application.
+     * @param newNames
+     *        New names registered during taclet application.
      */
     public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
             LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,

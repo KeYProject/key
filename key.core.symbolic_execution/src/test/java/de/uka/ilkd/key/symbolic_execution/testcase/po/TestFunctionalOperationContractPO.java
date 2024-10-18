@@ -66,9 +66,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
         } finally {
             // Restore taclet options
             restoreTacletOptions(originalTacletOptions);
-            if (env != null) {
-                env.dispose();
-            }
+            if (env != null) { env.dispose(); }
         }
     }
 }

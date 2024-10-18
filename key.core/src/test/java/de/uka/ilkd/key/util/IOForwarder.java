@@ -38,7 +38,8 @@ public class IOForwarder extends Thread {
      * <p>
      * This method launches two new threads.
      *
-     * @param process process whose output is to be forwarded.
+     * @param process
+     *        process whose output is to be forwarded.
      */
     public static void forward(Process process) {
         IOForwarder f2 = new IOForwarder("stdout", process.getInputStream(), System.out);
@@ -52,9 +53,7 @@ public class IOForwarder extends Thread {
         try {
             byte[] buffer = new byte[4096];
             int read;
-            while ((read = from.read(buffer)) > 0) {
-                to.write(buffer, 0, read);
-            }
+            while ((read = from.read(buffer)) > 0) { to.write(buffer, 0, read); }
         } catch (IOException e) {
             LOGGER.warn("Forward failed", e);
         }

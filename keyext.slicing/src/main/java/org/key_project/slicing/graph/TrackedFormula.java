@@ -43,10 +43,14 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
     /**
      * Construct a new tracked formula.
      *
-     * @param formula sequent formula
-     * @param branchLocation location where formula was derived
-     * @param inAntec polarity of the sequent formula
-     * @param services services
+     * @param formula
+     *        sequent formula
+     * @param branchLocation
+     *        location where formula was derived
+     * @param inAntec
+     *        polarity of the sequent formula
+     * @param services
+     *        services
      */
     public TrackedFormula(
             SequentFormula formula,
@@ -66,29 +70,21 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
 
     @Override
     public String toString(boolean abbreviated, boolean omitBranch) {
-        if (abbreviated) {
-            return Integer.toHexString(hashCode());
-        }
+        if (abbreviated) { return Integer.toHexString(hashCode()); }
         String term = LogicPrinter.quickPrintTerm(
             formula.formula(),
             services,
             true, // pretty print
             true // using unicode symbols
         ).trim();
-        if (!omitBranch) {
-            term = term + branchLocation.toString();
-        }
+        if (!omitBranch) { term = term + branchLocation.toString(); }
         return !inAntec ? (SEQ_ARROW + " " + term) : (term + " " + SEQ_ARROW);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         TrackedFormula that = (TrackedFormula) o;
         return inAntec == that.inAntec
                 && formula == that.formula
@@ -102,12 +98,8 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
 
     @Override
     public boolean equalsModProofIrrelevancy(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         TrackedFormula that = (TrackedFormula) o;
         return inAntec == that.inAntec
                 && formula.equalsModProofIrrelevancy(that.formula)

@@ -45,9 +45,7 @@ public class SMTTermBinOp extends SMTTerm {
         this.right = right;
         this.left.upp = this;
         this.right.upp = this;
-        if (bvSymbols == null || intSymbols == null) {
-            initMaps();
-        }
+        if (bvSymbols == null || intSymbols == null) { initMaps(); }
 
         throw new RuntimeException("BinaryOps are no longer supported.");
     }
@@ -58,7 +56,7 @@ public class SMTTermBinOp extends SMTTerm {
         case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
         case IMPLIES -> OpProperty.RIGHTASSOC;
         case EQUALS ->
-            /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
+                /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
         case DISTINCT -> OpProperty.PAIRWISE;
         default -> OpProperty.NONE;
         };
@@ -158,20 +156,20 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public SMTSort sort() {
         return switch (operator) {
-            case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM -> {
-                if (!left.sort().equals(right.sort())) {
+        case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM -> {
+            if (!left.sort().equals(right.sort())) {
 
-                    String error = "Unexpected: binary operation with two diff. arg sorts";
-                    error += "\n";
-                    error += this.toSting() + "\n";
-                    error += "Left sort: " + left.sort() + "\n";
-                    error += "Right sort: " + right.sort() + "\n";
-                    throw new RuntimeException(error);
+                String error = "Unexpected: binary operation with two diff. arg sorts";
+                error += "\n";
+                error += this.toSting() + "\n";
+                error += "Left sort: " + left.sort() + "\n";
+                error += "Right sort: " + right.sort() + "\n";
+                throw new RuntimeException(error);
 
-                }
-                yield left.sort();
             }
-            default -> SMTSort.BOOL;
+            yield left.sort();
+        }
+        default -> SMTSort.BOOL;
         };
     }
 
@@ -179,9 +177,7 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public boolean occurs(SMTTermVariable a) {
         for (int i = 0; i < getQuantVars().size(); i++) {
-            if (!a.getId().equals(getQuantVars().get(i).getId())) {
-                return true;
-            }
+            if (!a.getId().equals(getQuantVars().get(i).getId())) { return true; }
         }
         return ((SMTTermBinOp) getQuantVars()).occurs(a);
     }
@@ -202,9 +198,7 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
 
-        if (this.equals(a)) {
-            return b;
-        }
+        if (this.equals(a)) { return b; }
 
         return left.substitute(a, b).binOp(operator, right.substitute(a, b)); // TODO
     }
@@ -253,13 +247,9 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public boolean equals(Object term) {
 
-        if (this == term) {
-            return true;
-        }
+        if (this == term) { return true; }
 
-        if (!(term instanceof SMTTermBinOp bt)) {
-            return false;
-        }
+        if (!(term instanceof SMTTermBinOp bt)) { return false; }
 
         return this.operator.equals(bt.operator) && this.left.equals(bt.left)
                 && this.right.equals(bt.right);
@@ -267,9 +257,7 @@ public class SMTTermBinOp extends SMTTerm {
 
     public boolean equals(SMTTermBinOp bt) {
 
-        if (this == bt) {
-            return true;
-        }
+        if (this == bt) { return true; }
 
         return this.operator.equals(bt.operator) && this.left.equals(bt.left)
                 && this.right.equals(bt.right);
@@ -378,22 +366,16 @@ public class SMTTermBinOp extends SMTTerm {
 
             if (this.operator.equals(Op.AND)) {
                 List<String> chainStrings = checkChainable(nestPos, args);
-                if (chainStrings.size() == 1 && args.isEmpty()) {
-                    return tab + chainStrings.get(0);
-                }
-                for (String s : chainStrings) {
-                    chainString.append(" ").append(tab).append(s).append("\n");
-                }
+                if (chainStrings.size() == 1 && args.isEmpty()) { return tab + chainStrings.get(0); }
+                for (String s : chainStrings) { chainString.append(" ").append(tab).append(s).append("\n"); }
             }
 
             StringBuilder argsString = new StringBuilder();
-            for (SMTTerm arg : args) {
-                argsString.append(arg.toString(nestPos + 1)).append("\n");
-            }
+            for (SMTTerm arg : args) { argsString.append(arg.toString(nestPos + 1)).append("\n"); }
             return tab + "(" + symbol + "\n" + argsString + chainString + tab + ")";
         } else {
             return tab + "(" + symbol + " \n" + left.toString(nestPos + 1) + "\n"
-                + right.toString(nestPos + 1) + "\n" + tab + ")";
+                    + right.toString(nestPos + 1) + "\n" + tab + ")";
         }
         // }
 
@@ -409,9 +391,7 @@ public class SMTTermBinOp extends SMTTerm {
             }
         }
 
-        for (SMTTerm arg : chainables) {
-            args.remove(arg);
-        }
+        for (SMTTerm arg : chainables) { args.remove(arg); }
 
         return result;
     }
@@ -451,9 +431,7 @@ public class SMTTermBinOp extends SMTTerm {
             List<SMTTerm> chain = chains.get(i);
             Op op = ops.get(i);
             StringBuilder chainString = new StringBuilder("(" + getSymbol(op, chain.get(0)));
-            for (SMTTerm t : chain) {
-                chainString.append(" ").append(t.toString(nestPos));
-            }
+            for (SMTTerm t : chain) { chainString.append(" ").append(t.toString(nestPos)); }
             chainString.append(")");
             chainStrings.add(chainString.toString());
         }
@@ -468,9 +446,7 @@ public class SMTTermBinOp extends SMTTerm {
         } else {
             symbol = bvSymbols.get(operator);
         }
-        if (symbol == null) {
-            throw new RuntimeException("Unknown operator: " + operator);
-        }
+        if (symbol == null) { throw new RuntimeException("Unknown operator: " + operator); }
         return symbol;
     }
 

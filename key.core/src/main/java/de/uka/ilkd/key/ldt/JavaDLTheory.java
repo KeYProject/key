@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -101,16 +100,16 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the cast function for the given sort
      *
-     * @param sort the Sort for which to retrieve the cast function
-     * @param services the TermServices for lookup
+     * @param sort
+     *        the Sort for which to retrieve the cast function
+     * @param services
+     *        the TermServices for lookup
      * @return the found cast function
      */
     public final SortDependingFunction getCastSymbol(Sort sort, TermServices services) {
         SortDependingFunction castFunction =
             SortDependingFunction.getFirstInstance(CAST_NAME, services);
-        if (castFunction == null) {
-            throw new IllegalStateException("No 'cast' function found for any type.");
-        }
+        if (castFunction == null) { throw new IllegalStateException("No 'cast' function found for any type."); }
         SortDependingFunction result = castFunction.getInstanceFor(sort, services);
         assert result.getSortDependingOn() == sort && result.sort() == sort;
         return result;
@@ -119,8 +118,10 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the instanceof function for the given sort
      *
-     * @param sort the Sort for which to retrieve the instanceof function
-     * @param services the TermServices for lookup
+     * @param sort
+     *        the Sort for which to retrieve the instanceof function
+     * @param services
+     *        the TermServices for lookup
      * @return the found instanceof function
      */
     public final SortDependingFunction getInstanceofSymbol(Sort sort, TermServices services) {
@@ -135,8 +136,10 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the exactInstance function for the given sort
      *
-     * @param sort the Sort for which to retrieve the exactInstance function
-     * @param services the TermServices for lookup
+     * @param sort
+     *        the Sort for which to retrieve the exactInstance function
+     * @param services
+     *        the TermServices for lookup
      * @return the found exactInstance function
      */
     public final SortDependingFunction getExactInstanceofSymbol(Sort sort, TermServices services) {
@@ -149,20 +152,23 @@ public class JavaDLTheory extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term[] subs,
+            Services services, ExecutionContext ec) {
         assert false;
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right, Services services,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term left,
+            Term right, Services services,
             ExecutionContext ec) {
         assert false;
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term sub,
+            TermServices services,
             ExecutionContext ec) {
         assert false;
         return false;
@@ -175,7 +181,8 @@ public class JavaDLTheory extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public JFunction getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op,
+            Services services, ExecutionContext ec) {
         assert false;
         return null;
     }

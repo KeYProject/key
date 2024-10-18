@@ -93,9 +93,7 @@ public class SyntaxElementCursor {
                 return true;
         }
         // Nothing found; re-build stack
-        for (var ancestor : ancestors) {
-            path.push(ancestor);
-        }
+        for (var ancestor : ancestors) { path.push(ancestor); }
         return false;
     }
 }

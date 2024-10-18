@@ -26,11 +26,15 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
     /**
      * Joins to abstract elements in the lattice.
      *
-     * @param a First domain element for the join.
-     * @param b Second domain element for the join.
-     * @param combiner The combination function (e.g., "AND") for the respective predicates of the
+     * @param a
+     *        First domain element for the join.
+     * @param b
+     *        Second domain element for the join.
+     * @param combiner
+     *        The combination function (e.g., "AND") for the respective predicates of the
      *        inputs..
-     * @param abstrElemConstructor A function constructing abstract domain elements from predicates.
+     * @param abstrElemConstructor
+     *        A function constructing abstract domain elements from predicates.
      * @return The joined abstract domain element.
      */
     protected AbstractPredicateAbstractionDomainElement join(AbstractDomainElement a,
@@ -51,17 +55,11 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
         AbstractPredicateAbstractionDomainElement pade2 =
             (AbstractPredicateAbstractionDomainElement) b;
 
-        if (pade1.isTopElem() || pade2.isTopElem()) {
-            return getTopElem();
-        }
+        if (pade1.isTopElem() || pade2.isTopElem()) { return getTopElem(); }
 
-        if (pade1 == getBottomElem()) {
-            return pade2;
-        }
+        if (pade1 == getBottomElem()) { return pade2; }
 
-        if (pade2 == getBottomElem()) {
-            return pade1;
-        }
+        if (pade2 == getBottomElem()) { return pade1; }
 
         ImmutableSet<AbstractionPredicate> preds1 = pade1.getPredicates();
         ImmutableSet<AbstractionPredicate> preds2 = pade2.getPredicates();
@@ -107,7 +105,8 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
          * Constructs a new {@link AbstractPredicateLatticeIterator}; initializes the bit sets for
          * the iteration.
          *
-         * @param numApplPreds The number of applicable predicates for the lattice.
+         * @param numApplPreds
+         *        The number of applicable predicates for the lattice.
          */
         public AbstractPredicateLatticeIterator(int numApplPreds) {
             // We work with bit sets of length n (where n is the number of
@@ -116,9 +115,7 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
             // conjunction.
 
             // Initialize the list.
-            for (int i = 0; i < numApplPreds + 1; i++) {
-                bitSetsByNumZeroes.add(new ArrayList<>());
-            }
+            for (int i = 0; i < numApplPreds + 1; i++) { bitSetsByNumZeroes.add(new ArrayList<>()); }
 
             // bitSet initially represents the number 0.
             ImmutableFixedLengthBitSet bitSet = new ImmutableFixedLengthBitSet(numApplPreds);
@@ -127,9 +124,7 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
                 int numZeroes = bitSet.getNumOfZeroBits();
                 bitSetsByNumZeroes.get(numZeroes).add(bitSet);
 
-                if (i < MergeRuleUtils.intPow(2, numApplPreds) - 1) {
-                    bitSet = bitSet.inc();
-                }
+                if (i < MergeRuleUtils.intPow(2, numApplPreds) - 1) { bitSet = bitSet.inc(); }
             }
         }
 

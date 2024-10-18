@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.VariableReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -20,7 +20,8 @@ public class IsStatic extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe the instance of expression contained by the meta construct
+     * @param pe
+     *        the instance of expression contained by the meta construct
      */
     public IsStatic(ProgramElement pe) {
         super("#isstatic", pe);

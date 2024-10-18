@@ -72,16 +72,15 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * This launches the first macro and registers a new {@link AutoModeListener} with the
      * {@code mediator}. This listener unregisters itself after the last macro.
      *
-     * @throws InterruptedException if one of the wrapped macros is interrupted.
+     * @throws InterruptedException
+     *         if one of the wrapped macros is interrupted.
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         final List<Node> initNodes = new ArrayList<>(goals.size());
-        for (Goal goal : goals) {
-            initNodes.add(goal.node());
-        }
+        for (Goal goal : goals) { initNodes.add(goal.node()); }
         final ImmutableList<Goal> gs = initNodes.isEmpty() ? proof.openEnabledGoals()
                 : proof.getSubtreeEnabledGoals(initNodes.get(0));
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof);

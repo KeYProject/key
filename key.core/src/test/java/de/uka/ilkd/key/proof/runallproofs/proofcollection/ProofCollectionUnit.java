@@ -24,7 +24,8 @@ public abstract class ProofCollectionUnit implements Serializable {
      *
      * Creates a {@link RunAllProofsTestUnit} from this {@link ProofCollectionUnit}.
      *
-     * @param parentSettings Settings used during execution of returned
+     * @param parentSettings
+     *        Settings used during execution of returned
      *        {@link RunAllProofsTestUnit}.
      */
     public abstract RunAllProofsTestUnit createRunAllProofsTestUnit(String testName)

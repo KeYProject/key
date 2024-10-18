@@ -64,10 +64,7 @@ public class LocationSet {
 
         result.append(" = {");
 
-        for (Location ls : locations) {
-            result.append(ls);
-            result.append(", ");
-        }
+        for (Location ls : locations) { result.append(ls); result.append(", "); }
 
         result = new StringBuilder(result.toString().trim());
         if (result.toString().contains(",")) {
@@ -83,9 +80,7 @@ public class LocationSet {
      * Location sets with equal names are equal.
      */
     public boolean equals(Object o) {
-        if (o instanceof LocationSet ls) {
-            return ls.name.equals(name);
-        }
+        if (o instanceof LocationSet ls) { return ls.name.equals(name); }
         return false;
     }
 

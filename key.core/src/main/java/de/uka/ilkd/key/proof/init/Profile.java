@@ -77,7 +77,8 @@ public interface Profile {
     /**
      * returns the StrategyFactory for strategy <code>strategyName</code>
      *
-     * @param strategyName the Name of the strategy
+     * @param strategyName
+     *        the Name of the strategy
      * @return the StrategyFactory to build the demanded strategy
      */
     StrategyFactory getStrategyFactory(Name strategyName);
@@ -95,8 +96,10 @@ public interface Profile {
     /**
      * sets the user selected goal chooser builder to be used as prototype
      *
-     * @param name the String with the name of the goal chooser to be used
-     * @throws IllegalArgumentException if a goal chooser of the given name is not supported
+     * @param name
+     *        the String with the name of the goal chooser to be used
+     * @throws IllegalArgumentException
+     *         if a goal chooser of the given name is not supported
      */
     void setSelectedGoalChooserBuilder(String name);
 

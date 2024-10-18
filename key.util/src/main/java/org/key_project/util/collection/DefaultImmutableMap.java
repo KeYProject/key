@@ -62,8 +62,10 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
      * entry has
      * to be removed {@code null} is not allowed for key or value.
      *
-     * @param key a S to be used as key
-     * @param value a T to be stored as value
+     * @param key
+     *        a S to be used as key
+     * @param value
+     *        a T to be stored as value
      * @return a ImmutableMap including the {@code <key, value>}-pair and all other pairs of the
      *         current map
      *         with keys different from the given key
@@ -84,9 +86,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
             final ImmutableMapEntry<S, T> e = queue.entry;
 
             final S entryKey = e.key();
-            if (entryKey == key || entryKey.equals(key)) {
-                return e.value();
-            }
+            if (entryKey == key || entryKey.equals(key)) { return e.value(); }
 
             queue = queue.parent;
         }
@@ -116,9 +116,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         while (!queue.isEmpty()) {
             final ImmutableMapEntry<S, T> e = queue.entry;
             final S entryKey = e.key();
-            if (entryKey == key || entryKey.equals(key)) {
-                return true;
-            }
+            if (entryKey == key || entryKey.equals(key)) { return true; }
 
             queue = queue.parent;
         }
@@ -131,9 +129,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         while (!queue.isEmpty()) {
             final ImmutableMapEntry<S, T> e = queue.entry;
             final T entryVal = e.value();
-            if (entryVal == value || entryVal.equals(value)) {
-                return true;
-            }
+            if (entryVal == value || entryVal.equals(value)) { return true; }
             queue = queue.parent;
 
         }
@@ -143,9 +139,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     private DefaultImmutableMap<S, T> createMap(ImmutableMapEntry<S, T>[] stack, int counter,
             DefaultImmutableMap<S, T> p_parent) {
         DefaultImmutableMap<S, T> result = p_parent;
-        for (int i = 0; i < counter; i++) {
-            result = new DefaultImmutableMap<>(stack[i], result);
-        }
+        for (int i = 0; i < counter; i++) { result = new DefaultImmutableMap<>(stack[i], result); }
         return result;
     }
 
@@ -164,9 +158,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
             final S entryKey = e.key();
 
-            if (entryKey == key || entryKey.equals(key)) {
-                return createMap(stack, counter, queue.parent);
-            }
+            if (entryKey == key || entryKey.equals(key)) { return createMap(stack, counter, queue.parent); }
 
 
             stack[counter] = e;
@@ -232,35 +224,23 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
      * @return true iff the other object is an immutable map with the same entries
      */
     @SuppressWarnings("unchecked")
-    public boolean equals(@Nullable Object o) {
-        if (!(o instanceof ImmutableMap)) {
-            return false;
-        }
-
-        if (o == this) {
-            return true;
-        }
+    public boolean equals(@NullableObject o) {
+        if (!(o instanceof ImmutableMap)) { return false; }
+        if (o == this) { return true; }
 
         // TODO: This unchecked cast is a bit blunt but seems safe in the current implementations
-        ImmutableMap<S, T> o1 = (ImmutableMap<S, T>) o;
-        if (o1.size() != size()) {
-            return false;
-        }
+        ImmutableMap<S, T> o1 =  (ImmutableMap<S, T>) o;
+            if (o1.size() != size()) { return false; }
 
-        for (ImmutableMapEntry<S, T> e : this) {
-            if (!e.value().equals(o1.get(e.key()))) {
-                return false;
-            }
-        }
+
+        for (ImmutableMapEntry<S, T> e : this) { if (!e.value().equals(o1.get(e.key()))) { return false; } }
 
         return true;
     }
 
     public int hashCode() {
         int hashCode = 1;
-        for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) {
-            hashCode += 7 * stImmutableMapEntry.hashCode();
-        }
+        for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) { hashCode += 7 * stImmutableMapEntry.hashCode(); }
         return hashCode;
     }
 

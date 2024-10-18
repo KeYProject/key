@@ -57,9 +57,7 @@ public class ActionHistoryExtension implements UserActionListener,
 
     private List<UserAction> getActions() {
         List<UserAction> actions = userActions.get(currentProof);
-        if (actions == null) {
-            return List.of();
-        }
+        if (actions == null) { return List.of(); }
         // filter out actions that can't be undone
         for (int i = 0; i < actions.size(); i++) {
             if (!actions.get(i).canUndo()) {
@@ -82,15 +80,13 @@ public class ActionHistoryExtension implements UserActionListener,
     /**
      * Undo the provided user action after undoing every action performed after that one.
      *
-     * @param userAction the action
+     * @param userAction
+     *        the action
      */
     private void undoUptoAction(UserAction userAction) {
         List<UserAction> allActions = userActions.get(userAction.getProof());
         int idx = allActions.indexOf(userAction);
-        for (int i = allActions.size() - 1; i >= idx; i--) {
-            allActions.get(i).undo();
-            allActions.remove(i);
-        }
+        for (int i = allActions.size() - 1; i >= idx; i--) { allActions.get(i).undo(); allActions.remove(i); }
     }
 
     public ActionHistoryExtension(MainWindow window, KeYMediator mediator) {
@@ -118,9 +114,7 @@ public class ActionHistoryExtension implements UserActionListener,
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
         Proof p = e.getSource();
-        if (p == currentProof) {
-            currentProof = null;
-        }
+        if (p == currentProof) { currentProof = null; }
         userActions.remove(p);
         registeredProofs.remove(p);
     }
@@ -139,9 +133,7 @@ public class ActionHistoryExtension implements UserActionListener,
     public void selectedProofChanged(KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
         currentProof = p;
-        if (p == null || registeredProofs.contains(p)) {
-            return;
-        }
+        if (p == null || registeredProofs.contains(p)) { return; }
         registeredProofs.add(p);
         p.addProofDisposedListener(this);
     }

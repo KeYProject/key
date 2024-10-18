@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.*;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,9 +73,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
         errors.add(se);
 
-        if (throwDirect) {
-            throwException();
-        }
+        if (throwDirect) { throwException(); }
     }
 
     /**
@@ -92,9 +90,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * @see #hasErrors()
      */
     public void throwException() {
-        if (hasErrors()) {
-            throw new ParserException("", errors);
-        }
+        if (hasErrors()) { throw new ParserException("", errors); }
     }
 
 
@@ -121,9 +117,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * @see #hasErrors()
      */
     public void throwException(Supplier<String[]> lines) {
-        if (hasErrors()) {
-            throwException(lines.get());
-        }
+        if (hasErrors()) { throwException(lines.get()); }
     }
 
     /**
@@ -153,13 +147,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
         public String getBeatifulErrorMessage(String[] lines) {
             return ("syntax-error in " + positionAsUrl() + "\n" + msg + "\n" + showInInput(lines)
-                + "\n");
+                    + "\n");
         }
 
         public String showInInput(String[] lines) {
             String line = lines[this.line];
             return line + "\n" + StringUtil.repeat(" ", (charPositionInLine - 1))
-                + StringUtil.repeat("^", (offendingSymbol.getText().length()));
+                    + StringUtil.repeat("^", (offendingSymbol.getText().length()));
         }
 
         public String positionAsUrl() {
@@ -169,10 +163,19 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
     public static class ParserException extends RuntimeException implements HasLocation {
         private final List<SyntaxError> errors;
+        private final Location location;
 
         public ParserException(String msg, List<SyntaxError> errors) {
             super(msg);
             this.errors = errors;
+            if (errors.isEmpty()) {
+                location = Location.UNDEFINED;
+            } else {
+                SyntaxError e = errors.get(0);
+                // e.charPositionInLine is 0 based!
+                location =
+                    new Location(e.source, Position.fromOneZeroBased(e.line, e.charPositionInLine));
+            }
         }
 
         public String print(String[] lines, CharSequence delimter) {
@@ -192,14 +195,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         @Override
-        public Location getLocation() throws MalformedURLException {
-            if (!errors.isEmpty()) {
-                SyntaxError e = errors.get(0);
-                // e.charPositionInLine is 0 based!
-                return new Location(e.source,
-                    Position.fromOneZeroBased(e.line, e.charPositionInLine));
-            }
-            return null;
+        public @NonNull Location getLocation() {
+            return location;
         }
     }
 }

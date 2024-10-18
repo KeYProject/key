@@ -28,7 +28,8 @@ public class ShowOriginAction extends MainWindowAction {
     /**
      * Creates a new {@link ShowOriginAction}.
      *
-     * @param pos the position of the term whose origin shall be shown.
+     * @param pos
+     *        the position of the term whose origin shall be shown.
      */
     public ShowOriginAction(PosInSequent pos) {
         super(MainWindow.getInstance());
@@ -49,11 +50,7 @@ public class ShowOriginAction extends MainWindowAction {
         PosInOccurrence pio = pos.getPosInOccurrence();
 
         // OriginTermLabelVisualizer.TermView can only print sequents or formulas, not terms.
-        if (pio != null) {
-            while (!pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) {
-                pio = pio.up();
-            }
-        }
+        if (pio != null) { while (!pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) { pio = pio.up(); } }
 
         OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(pio,
             getMediator().getSelectedNode(), getMediator().getServices());

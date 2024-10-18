@@ -7,11 +7,11 @@ import java.util.EnumMap;
 import java.util.List;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -237,9 +237,7 @@ class BasicSnippetData {
 
     private ImmutableList<Term> toTermList(ImmutableSet<LocationVariable> vars) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (ProgramVariable v : vars) {
-            result = result.append(tb.var(v));
-        }
+        for (ProgramVariable v : vars) { result = result.append(tb.var(v)); }
         return result;
     }
 

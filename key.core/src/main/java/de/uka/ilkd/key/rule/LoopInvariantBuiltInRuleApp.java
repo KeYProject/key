@@ -8,16 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.IGuard;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -75,13 +76,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * where <code>v</code> is a ghost variable of type sequence, values is instantiated with
      * <code>v</code>, otherwise <code>rawInv</code> is returned.
      *
-     * @param services TODO
+     * @param services
+     *        TODO
      */
     private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
             TermServices services) {
-        if (rawInv == null) {
-            return null;
-        }
+        if (rawInv == null) { return null; }
         Map<LocationVariable, Term> invs = rawInv.getInternalInvariants();
         Map<LocationVariable, Term> freeInvs = rawInv.getInternalFreeInvariants();
         Term var = rawInv.getInternalVariant();
@@ -91,7 +91,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
 
         // try to retrieve a loop index variable
-        de.uka.ilkd.key.java.statement.IGuard guard = loop.getGuard();
+        IGuard guard = loop.getGuard();
         // the guard is expected to be of the form "i < x" and we want to retrieve "i".
         assert guard.getChildCount() == 1 : "child count: " + guard.getChildCount();
         ProgramElement guardStatement = guard.getChildAt(0);
@@ -139,9 +139,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     }
                 } else {
                     Term[] newSubs = new Term[subs.size()];
-                    for (int i = 0; i < subs.size(); i++) {
-                        newSubs[i] = replace(subs.get(i));
-                    }
+                    for (int i = 0; i < subs.size(); i++) { newSubs[i] = replace(subs.get(i)); }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
                         visited.boundVars(), visited.getLabels());
                 }
@@ -170,9 +168,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     }
                 } else {
                     Term[] newSubs = new Term[subs.size()];
-                    for (int i = 0; i < subs.size(); i++) {
-                        newSubs[i] = replace(subs.get(i));
-                    }
+                    for (int i = 0; i < subs.size(); i++) { newSubs[i] = replace(subs.get(i)); }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
                         visited.boundVars(), visited.getLabels());
                 }
@@ -273,9 +269,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public Term programTerm() {
-        if (posInOccurrence() != null) {
-            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
-        }
+        if (posInOccurrence() != null) { return TermBuilder.goBelowUpdates(posInOccurrence().subTerm()); }
         return null;
     }
 
@@ -298,9 +292,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
-        if (this.loop == inv.getLoop()) {
-            this.spec = inv;
-        }
+        if (this.loop == inv.getLoop()) { this.spec = inv; }
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext,
             services);
     }
@@ -319,9 +311,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp tryToInstantiate(Goal goal) {
-        if (spec != null) {
-            return this;
-        }
+        if (spec != null) { return this; }
         final Services services = goal.proof().getServices();
         LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
         var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
