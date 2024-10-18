@@ -38,7 +38,8 @@ public class TestCaseRunner extends JFrame {
                 "basicMDArray42",
                 "correlation_init_array",
                 "correlation_print_array",
-                "gem_ver_scope_1"
+                "gem_ver_scope_1",
+                "three_nested_loops"
         });
         relaxedCheckBox = new JCheckBox("Relaxed");
         JButton runButton = new JButton("Run Test");

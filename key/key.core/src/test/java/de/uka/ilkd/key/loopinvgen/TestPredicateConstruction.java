@@ -1472,6 +1472,73 @@ public class TestPredicateConstruction {
     }
 //======================================================================================================================================
 
+
+    public LoopInvariantGenerationResult three_nested_loops(boolean relaxed) {//Change length of arrays in AbstractLoopInvariantGenerator to 1
+
+        final Term succFormula;
+
+        try {
+            succFormula = parse("{i:=0 || j:=0 || k:=0 || x:=0}\\<{" +
+                    "while (i<=N-1) {" +
+                    "while (j<=M-1) {" +
+                    "while (k<=N-1 && k<=M-1) {" +
+                    "x = a[i][j] + a[i][k] + a[k][j];" +
+                    "k++;}" +
+                    "k=0; j++;}" +
+                    "j=0; i++;}" +
+                    "}\\>true");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            if (e.getCause() != null) {
+                System.out.println(e.getCause().getMessage());
+            }
+            e.printStackTrace();
+            return null;
+        }
+        Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+        String[] arrLeft;
+        if (!relaxed) {
+            arrLeft = new String[]{"wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
+                    "noW(matrixRange(heap,a,0,N-1,0,M-1))", "noR(matrixRange(heap,a,0,N-1,0,M-1))", "a.length > N", "a[0].length > M", "N >10", "M >10"};
+        } else {
+            arrLeft = new String[]{"wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "relaxedNoW(arrayRange(a,0,a.length-1))",
+                    "relaxedNoW(matrixRange(heap,a,0,N-1,0,M-1))", "relaxedNoR(matrixRange(heap,a,0,N-1,0,M-1))",
+                    "a.length > N", "a[0].length > M", "N >10", "M >10"};
+        }
+
+        String[] arrRight = {"a=null"};
+        try {
+            for (String fml : arrLeft) {
+                seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            if (e.getCause() != null) {
+                System.out.println(e.getCause().getMessage());
+            }
+            e.printStackTrace();
+            return null;
+        }
+
+        try {
+            for (String fml : arrRight) {
+                seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            if (e.getCause() != null) {
+                System.out.println(e.getCause().getMessage());
+            }
+            e.printStackTrace();
+            return null;
+        }
+
+        return generateResultNested(seq, succFormula, relaxed);
+    }
+
+//======================================================================================================================================
+
     public LoopInvariantGenerationResult correlation_print_array(boolean relaxed) {//Change length of arrays in AbstractLoopInvariantGenerator to 1
 
         Term succFormula;
