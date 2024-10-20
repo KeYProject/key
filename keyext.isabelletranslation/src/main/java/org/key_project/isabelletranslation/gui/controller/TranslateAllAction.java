@@ -38,37 +38,43 @@ public class TranslateAllAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         LOGGER.info("Translating...");
 
-        generateTranslation();
+        solveOpenGoals();
     }
 
 
-    private void generateTranslation() {
+    private void solveOpenGoals() {
         KeYMediator mediator = getMediator();
         IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
         IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
 
         List<IsabelleProblem> translations = new ArrayList<>();
         Map<Goal, IllegalFormulaException> translationExceptions = new HashMap<>();
+        List<Goal> untranslatableGoals = new ArrayList<>();
         for (Goal goal : Objects.requireNonNull(mediator.getSelectedProof()).openGoals()) {
             try {
                 translations.add(translator.translateProblem(goal));
             } catch (IllegalFormulaException e) {
                 translationExceptions.put(goal, e);
+                //Add problem without translation
+                untranslatableGoals.add(goal);
             }
         }
-        if (!translations.isEmpty()) {
+        if (!translationExceptions.isEmpty()) {
             Set<PositionedIssueString> issueStrings = new HashSet<>();
             for (Goal goal : translationExceptions.keySet()) {
-                String issueStringBuilder = "Translation failed for this goal:" +
-                        System.lineSeparator() + "Goal: " +
-                        goal.node().serialNr() + "  " +
+                String issueStringBuilder = "Translation failed for" +
+                        "Goal " + goal.node().serialNr() + ":  " +
                         translationExceptions.get(goal).getMessage();
                 issueStrings.add(new PositionedIssueString(issueStringBuilder));
             }
             IssueDialog issueDialog =
-                    new IssueDialog(mainWindow, "Translations failed!", issueStrings, false);
+                    new IssueDialog(mainWindow, "Translations failed!", issueStrings, translations.isEmpty());
             issueDialog.setVisible(true);
-            return;
+
+            if (translations.isEmpty()) {
+                return;
+            }
+            untranslatableGoals.forEach(goal -> translations.add(new IsabelleProblem(goal, translationExceptions.get(goal))));
         }
 
         Thread thread = new Thread(() -> {
@@ -89,7 +95,7 @@ public class TranslateAllAction extends MainWindowAction {
                     new IssueDialog(mainWindow, "Launch failed!", Set.of(issueString), true);
                 issueDialog.setVisible(true);
             }
-        }, "IsabelleControlThread");
+        }, "IsabelleLauncherThread");
         thread.start();
     }
 }
