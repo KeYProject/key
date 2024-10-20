@@ -72,17 +72,21 @@ public class IsabelleLauncher implements IsabelleSolverListener {
      * @param problems The problems for which proof search will be started
      * @param timeoutSeconds The timeout setting to use for the Isabelle instances
      * @param instanceCount The number of concurrent Isabelle instances
-     * @throws IOException If {@link IsabelleResourceController} fails to initiate || translation
-     *         files could not be written
+     * @throws IOException translation files could not be written
+     * @throws IsabelleNotFoundException If {@link IsabelleResourceController} fails to initiate
      */
     public void launch(List<IsabelleProblem> problems, int timeoutSeconds,
-            int instanceCount) throws IOException {
-        if (problems.isEmpty()) {
-            return;
+            int instanceCount) throws IOException, IsabelleNotFoundException {
+        // Ensure the preamble theory file is present, so theory objects can be created.
+        // If no problems have translations, don't write anything
+        // All solvers should recognize this and throw an appropriate exception
+        List<IsabelleProblem> problemsWithTranslation =
+            problems.stream().filter(IsabelleProblem::hasTranslation).toList();
+
+        if (!problemsWithTranslation.isEmpty()) {
+            problemsWithTranslation.get(0).writeTranslationFiles(settings);
         }
 
-        // Ensure the preamble theory file is present, so theory objects can be created.
-        problems.get(0).writeTranslationFiles(settings);
 
         IsabelleResourceController resourceController =
             new IsabelleResourceController(instanceCount, settings);
