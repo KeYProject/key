@@ -135,4 +135,8 @@ public class IsabelleProblem {
     public boolean hasTranslation() {
         return translation != null || preamble != null;
     }
+
+    public IllegalFormulaException getTranslationException() {
+        return exception;
+    }
 }

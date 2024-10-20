@@ -118,7 +118,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     public void abort() {
         // If solver already completed, the interrupt should be ignored
         if (setFinalResult(IsabelleResult.getInterruptedResult())) {
-            handleInterrupt();
+            handleInterrupt(new InterruptedException());
         }
     }
 
@@ -175,12 +175,17 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
 
     @Override
     public IsabelleResult call() throws InterruptedException {
+        //Return error result, if problem does not have a translation
+        if (!problem.hasTranslation()) {
+            return handleIsabelleError(problem.getTranslationException());
+        }
+
         // Ensure there is an active IsabelleInstance
         setSolverState(SolverState.Preparing);
         try {
             isabelleResource = resourceController.getIsabelleResource();
         } catch (InterruptedException e) {
-            return handleInterrupt();
+            return handleInterrupt(e);
         }
 
         notifyProcessStarted();
@@ -192,7 +197,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
         try {
             toplevel = parseTheory(isabelleResource);
         } catch (InterruptedException e) {
-            return handleInterrupt();
+            return handleInterrupt(e);
         } catch (IsabelleMLException e) {
             return handleIsabelleError(e);
         }
@@ -210,7 +215,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
                 return this.result;
             }
         } catch (InterruptedException e) {
-            return handleInterrupt();
+            return handleInterrupt(e);
         } catch (IsabelleMLException e) {
             return handleIsabelleError(e);
         }
@@ -383,13 +388,13 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
      *
      * @return Interrupt result
      */
-    private IsabelleResult handleInterrupt() {
+    private IsabelleResult handleInterrupt(InterruptedException e) {
         setFinalResult(IsabelleResult.getInterruptedResult());
         returnResource();
         setComputationTime();
         Thread.currentThread().interrupt();
         setSolverState(SolverState.Stopped);
-        notifyProcessError(new InterruptedException());
+        notifyProcessError(e);
         return this.result;
     }
 
@@ -414,7 +419,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     }
 
     private void setComputationTime() {
-        if (getStartTime() == null) {
+        if (getStartTime() != null) {
             computationTime = java.time.Duration.between(getStartTime(), Instant.now());
         }
     }

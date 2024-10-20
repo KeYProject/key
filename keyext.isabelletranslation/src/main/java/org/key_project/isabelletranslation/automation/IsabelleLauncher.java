@@ -106,7 +106,13 @@ public class IsabelleLauncher implements IsabelleSolverListener {
 
         notifyLauncherStarted();
 
-        resourceController.init();
+        try {
+            resourceController.init();
+        } catch (InterruptedException e) {
+            stopAll();
+            notifyLauncherStopped();
+            return;
+        }
         notifyPreparationFinished();
 
         LOGGER.info("Setup complete, starting {} problems...", problems.size());
@@ -114,7 +120,7 @@ public class IsabelleLauncher implements IsabelleSolverListener {
         try {
             executorService.invokeAll(solverQueue);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            stopAll();
         } catch (RejectedExecutionException e) {
             // Launcher has been shutdown before running instances
             // Nothing to do here, intended behavior
@@ -145,7 +151,7 @@ public class IsabelleLauncher implements IsabelleSolverListener {
      * Notifies all listeners that the launcher has started.
      */
     private void notifyLauncherStarted() {
-        listeners.forEach(listener -> listener.launcherStarted(this, solverQueue));
+        listeners.forEach(listener -> listener.launcherStarted(this, new ArrayList<>(solverQueue)));
     }
 
     /**
