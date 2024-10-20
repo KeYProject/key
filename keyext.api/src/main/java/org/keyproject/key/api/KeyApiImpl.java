@@ -389,8 +389,6 @@ public final class KeyApiImpl implements KeyApi {
                     var proofId = new ProofId(envId, proof.name().toString());
                     return data.register(proofId, proof);
                 } catch (ProblemLoaderException e) {
-                    if (proof != null)
-                        proof.dispose();
                     if (env != null)
                         env.dispose();
                     throw new RuntimeException(e);
@@ -442,8 +440,6 @@ public final class KeyApiImpl implements KeyApi {
                 var proofId = new ProofId(envId, proof.name().toString());
                 return data.register(proofId, proof);
             } catch (ProblemLoaderException | IOException e) {
-                if (proof != null)
-                    proof.dispose();
                 if (env != null)
                     env.dispose();
                 throw new RuntimeException(e);
@@ -459,8 +455,8 @@ public final class KeyApiImpl implements KeyApi {
     @Override
     public CompletableFuture<Either<EnvironmentId, ProofId>> load(LoadParams params) {
         return CompletableFutures.computeAsync((c) -> {
-            Proof proof = null;
-            KeYEnvironment<?> env = null;
+            Proof proof;
+            KeYEnvironment<?> env;
             try {
                 var loader = control.load(JavaProfile.getDefaultProfile(),
                     params.keyFile(),
@@ -482,10 +478,6 @@ public final class KeyApiImpl implements KeyApi {
                     return Either.forLeft(envId);
                 }
             } catch (ProblemLoaderException e) {
-                if (proof != null)
-                    proof.dispose();
-                if (env != null)
-                    env.dispose();
                 throw new RuntimeException(e);
             }
         });
@@ -579,6 +571,4 @@ public final class KeyApiImpl implements KeyApi {
             super.showIssueDialog(issues);
         }
     }
-
-
 }
