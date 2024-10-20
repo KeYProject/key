@@ -6,6 +6,8 @@ package de.uka.ilkd.key.ui;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
@@ -44,6 +46,8 @@ public class MediatorProofControl extends AbstractProofControl {
 
     private final AbstractMediatorUserInterfaceControl ui;
     private AutoModeWorker worker;
+
+    private Condition inAutoMode;
 
     public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
         super(ui, ui);
@@ -101,17 +105,14 @@ public class MediatorProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void waitWhileAutoMode() {
+    public void waitWhileAutoMode() throws InterruptedException {
         if (SwingUtilities.isEventDispatchThread()) {
             LOGGER.error("", new IllegalStateException(
                 "tried to block the UI thread whilst waiting for auto mode to finish"));
             return; // do not block the UI thread
         }
-        while (ui.getMediator().isInAutoMode()) { // Wait until auto mode has stopped.
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
+        if (inAutoMode != null) {
+            inAutoMode.await();
         }
     }
 
@@ -138,6 +139,7 @@ public class MediatorProofControl extends AbstractProofControl {
     public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
         KeYMediator mediator = ui.getMediator();
         final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
+        inAutoMode = worker.getFinish();
         interactionListeners.forEach(worker::addInteractionListener);
         mediator.initiateAutoMode(node.proof(), true, false);
         mediator.addInterruptedListener(worker);
@@ -174,6 +176,9 @@ public class MediatorProofControl extends AbstractProofControl {
             if (ui.getMediator().getAutoSaver() != null) {
                 applyStrategy.addProverTaskObserver(ui.getMediator().getAutoSaver());
             }
+
+            var lock = new ReentrantLock();
+            inAutoMode = lock.newCondition();
         }
 
         @Override
@@ -185,6 +190,9 @@ public class MediatorProofControl extends AbstractProofControl {
             } catch (final CancellationException exception) {
                 // when the user canceled it's not an error
             } finally {
+                // release threads waiting on automode finish
+                inAutoMode.signalAll();
+
                 // make it possible to free memory and falsify the isAutoMode() property
                 worker = null;
                 // Clear strategy
@@ -212,7 +220,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         @Override
-        protected ApplyStrategyInfo doInBackground() throws Exception {
+        protected ApplyStrategyInfo doInBackground() {
             boolean stopMode =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties()
                         .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)

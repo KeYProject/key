@@ -25,7 +25,18 @@ plugins {
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.44"
+
+    id("org.sonarqube") version "5.0.0.4638"
 }
+
+sonar {
+  properties {
+    property "sonar.projectKey", "KeYProject_key"
+    property "sonar.organization", "keyproject"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
 
 // Configure this project for use inside IntelliJ:
 idea {
@@ -62,8 +73,8 @@ subprojects {
     version = rootProject.version
 
     java {
-        sourceCompatibility = 17
-        targetCompatibility = 17
+        sourceCompatibility = 22
+        targetCompatibility = 22
     }
 
     repositories {
@@ -100,8 +111,8 @@ subprojects {
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-        // Setting the release to Java 17
-        options.release = 17
+        // Setting the release to Java 22
+        options.release = 22
     }
 
     tasks.withType(Javadoc) {
