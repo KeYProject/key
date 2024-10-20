@@ -1,46 +1,90 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
+package org.key_project.key.api.doc;/*
+                                     * This file is part of KeY - https://key-project.org
+                                     * KeY is licensed under the GNU General Public License Version
+                                     * 2
+                                     * SPDX-License-Identifier: GPL-2.0-only
+                                     */
+
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import de.uka.ilkd.key.proof.Proof;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
-import com.google.gson.*;
+import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.javadoc.description.JavadocDescription;
+import com.github.javaparser.utils.SourceRoot;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
-import sun.misc.Unsafe;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
 
 /**
  * @author Alexander Weigl
  * @version 1 (14.10.23)
  */
-public class ExtractMetaData {
-    private static PrintWriter out;
+@NullMarked
+@CommandLine.Command(name = "gendoc",
+    mixinStandardHelpOptions = true,
+    version = "gendoc 1.0",
+    description = "Generates the documentation for key.api")
+public class ExtractMetaData implements Callable<Integer> {
+    private final List<Metamodel.Endpoint> endpoints = new LinkedList<>();
+    private final List<Metamodel.Type> types = new LinkedList<>();
+    private final Metamodel.KeyApi keyApi = new Metamodel.KeyApi(endpoints, types);
+    private SourceRoot sourceRoot = new SourceRoot(Paths.get("."));
 
-    private static final List<Metamodel.Endpoint> endpoints = new LinkedList<>();
-    private static final List<Metamodel.Type> types = new LinkedList<>();
-    private static final Metamodel.KeyApi keyApi = new Metamodel.KeyApi(endpoints, types);
+
+    @Option(names = { "-s", "--source" }, description = "Source folder for getting JavaDoc")
+    private @Nullable Path source = Paths.get("keyext.api", "src", "main", "java");
+
+    @Option(names = { "-o", "--output" }, description = "Output folder")
+    private Path output = Paths.get("out");
 
     public static void main(String[] args) {
+        int exitCode = new CommandLine(new ExtractMetaData()).execute(args);
+        System.exit(exitCode);
+    }
+
+    @Override
+    public Integer call() throws IOException {
+        if (source != null) {
+            ParserConfiguration config = new ParserConfiguration();
+            config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_21);
+            config.setAttributeComments(true);
+            config.setLexicalPreservationEnabled(false);
+            config.setStoreTokens(false);
+            config.setIgnoreAnnotationsWhenAttributingComments(true);
+            config.setDoNotAssignCommentsPrecedingEmptyLines(true);
+            sourceRoot = new SourceRoot(source, config);
+        }
+
         for (Method method : KeyApi.class.getMethods()) {
             addServerEndpoint(method);
         }
@@ -49,17 +93,20 @@ public class ExtractMetaData {
             addClientEndpoint(method);
         }
 
+        Files.createDirectories(output);
+
         runGenerator("api.meta.json", (a) -> () -> getGson().toJson(a));
         runGenerator("api.meta.md", DocGen::new);
-        runGenerator("keydata.py", PythionGenerator.PyDataGen::new);
-        runGenerator("server.py", PythionGenerator.PyApiGen::new);
+        runGenerator("keydata.py", PythonGenerator.PyDataGen::new);
+        runGenerator("server.py", PythonGenerator.PyApiGen::new);
+
+        return 0;
     }
 
-    private static void runGenerator(String target,
-            Function<Metamodel.KeyApi, Supplier<String>> api) {
+    private void runGenerator(String target, Function<Metamodel.KeyApi, Supplier<String>> api) {
         try {
             var n = api.apply(keyApi);
-            Files.writeString(Paths.get(target), n.get());
+            Files.writeString(output.resolve(target), n.get());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -68,19 +115,16 @@ public class ExtractMetaData {
     private static Gson getGson() {
         return new GsonBuilder()
                 .setPrettyPrinting()
-                .registerTypeAdapter(Type.class, new JsonSerializer<Metamodel.Type>() {
-                    @Override
-                    public JsonElement serialize(Metamodel.Type src, Type typeOfSrc,
-                            JsonSerializationContext context) {
+                .registerTypeAdapter(Type.class,
+                    (JsonSerializer<Metamodel.Type>) (src, typeOfSrc, context) -> {
                         JsonObject json = (JsonObject) context.serialize(src);
                         json.addProperty("kind", src.kind());
                         return json;
-                    }
-                })
+                    })
                 .create();
     }
 
-    private static void addServerEndpoint(Method method) {
+    private void addServerEndpoint(Method method) {
         var jsonSegment = method.getDeclaringClass().getAnnotation(JsonSegment.class);
         if (jsonSegment == null)
             return;
@@ -118,28 +162,32 @@ public class ExtractMetaData {
         throw new IllegalStateException();
     }
 
-    private static String findDocumentation(Method method) {
-        // TODO get compilation, get type, find method, getJavaDocComment()
-        return "";
+    private String findDocumentation(Method method) {
+        return findCompilationUnit(method.getDeclaringClass())
+                .map(it -> it.getMethodsByName(method.getName()))
+                .map(List::getFirst)
+                .flatMap(NodeWithJavadoc::getJavadoc)
+                .map(Javadoc::getDescription)
+                .map(JavadocDescription::toText)
+                .orElse("");
     }
 
-    private static List<Metamodel.Argument> translate(Parameter[] parameters) {
-        return Arrays.stream(parameters).map(ExtractMetaData::translate).toList();
+    private List<Metamodel.Argument> translate(Parameter[] parameters) {
+        return Arrays.stream(parameters).map(this::translate).toList();
     }
 
-    private static Metamodel.Argument translate(Parameter parameter) {
+    private Metamodel.Argument translate(Parameter parameter) {
         var type = getOrFindType(parameter.getType()).name();
         return new Metamodel.Argument(parameter.getName(), type);
     }
 
-    private static Metamodel.Type getOrFindType(Class<?> type) {
+    private Metamodel.Type getOrFindType(Class<?> type) {
         System.out.println(type);
         if (type == CompletableFuture.class) {
             return getOrFindType(type.getTypeParameters()[0].getClass());
         }
 
-        if (type == Unsafe.class || type == Class.class || type == Constructor.class
-                || type == Proof.class) {
+        if (type == Class.class || type == Constructor.class || type == Proof.class) {
             throw new IllegalStateException("Forbidden class reached!");
         }
 
@@ -178,7 +226,7 @@ public class ExtractMetaData {
         return a;
     }
 
-    private static Metamodel.Type createType(Class<?> type) {
+    private Metamodel.Type createType(Class<?> type) {
         final var documentation = findDocumentation(type);
         if (type.isEnum())
             return new Metamodel.EnumType(type.getSimpleName(),
@@ -194,34 +242,24 @@ public class ExtractMetaData {
         return obj;
     }
 
-    private static String findDocumentation(Class<?> type) {
-        var parser = initJavaParser();
-        var fileName = findFileForType(type);
-
-        if (Files.exists(fileName)) {
-            try {
-                return parser.parse(fileName).getResult().flatMap(CompilationUnit::getPrimaryType)
-                        .flatMap(NodeWithJavadoc::getJavadocComment)
-                        .map(Comment::getContent).orElse("");
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        } else
-            return "";
+    private String findDocumentation(Class<?> type) {
+        return findCompilationUnit(type)
+                .flatMap(NodeWithJavadoc::getJavadocComment)
+                .map(Comment::getContent)
+                .orElse("");
     }
 
-    private static Path findFileForType(Class<?> type) {
-        final var folderString = type.getPackageName().replaceAll("\\.", "/");
-        var folder = Paths.get("keyext.api", "src", "main", "java", folderString);
-        final Class<?> declaringClass = type.getDeclaringClass();
-        var fileName = (declaringClass != null ? declaringClass : type).getSimpleName() + ".java";
-        var file = folder.resolve(fileName);
-        return file;
+    private Optional<TypeDeclaration<?>> findCompilationUnit(Class<?> type) {
+        try {
+            return sourceRoot.parse(type.getPackageName(), type.getSimpleName() + ".java")
+                    .getPrimaryType();
+        } catch (ParseProblemException e) {
+            return Optional.empty();
+        }
     }
 
 
-    private static void addClientEndpoint(Method method) {
+    private void addClientEndpoint(Method method) {
         var jsonSegment = method.getDeclaringClass().getAnnotation(JsonSegment.class);
         var segment = jsonSegment.value();
 
@@ -248,7 +286,7 @@ public class ExtractMetaData {
         }
     }
 
-    private static String callMethodName(String method, String segment, String userValue,
+    private static String callMethodName(String method, String segment, @Nullable String userValue,
             boolean useSegment) {
         if (!useSegment) {
             if (userValue == null || userValue.isBlank()) {
@@ -265,8 +303,8 @@ public class ExtractMetaData {
         }
     }
 
-    private static Metamodel.Type getOrFindType(Type genericReturnType) {
-        if (genericReturnType instanceof Class c)
+    private Metamodel.@Nullable Type getOrFindType(Type genericReturnType) {
+        if (genericReturnType instanceof Class<?> c)
             return getOrFindType(c);
         if (genericReturnType instanceof ParameterizedType pt) {
             if (Objects.equals(pt.getRawType().getTypeName(),
@@ -286,16 +324,4 @@ public class ExtractMetaData {
         }
         return null;
     }
-
-    static JavaParser initJavaParser() {
-        ParserConfiguration config = new ParserConfiguration();
-        config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17_PREVIEW);
-        config.setAttributeComments(true);
-        config.setLexicalPreservationEnabled(false);
-        config.setStoreTokens(false);
-        config.setIgnoreAnnotationsWhenAttributingComments(true);
-        config.setDoNotAssignCommentsPrecedingEmptyLines(true);
-        return new JavaParser(config);
-    }
-
 }
