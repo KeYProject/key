@@ -1,4 +1,4 @@
-/* This file is part of KeY - https://key-project.org
+package org.key_project.key.api.doc;/* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 import java.io.PrintWriter;
@@ -12,12 +12,12 @@ import java.util.stream.Stream;
  * @author Alexander Weigl
  * @version 1 (29.10.23)
  */
-public abstract class PythionGenerator implements Supplier<String> {
+public abstract class PythonGenerator implements Supplier<String> {
     protected final Metamodel.KeyApi metamodel;
     protected PrintWriter out;
     protected final StringWriter target = new StringWriter();
 
-    public PythionGenerator(Metamodel.KeyApi metamodel) {
+    public PythonGenerator(Metamodel.KeyApi metamodel) {
         this.metamodel = metamodel;
     }
 
@@ -34,8 +34,7 @@ public abstract class PythionGenerator implements Supplier<String> {
 
     protected String asPython(String typeName) {
         return switch (typeName) {
-            case "INT" -> "int";
-            case "LONG" -> "int";
+            case "INT", "LONG" -> "int";
             case "STRING" -> "str";
             case "BOOL" -> "bool";
             case "DOUBLE" -> "float";
@@ -57,9 +56,8 @@ public abstract class PythionGenerator implements Supplier<String> {
 
         if (t instanceof Metamodel.BuiltinType bt) {
             return switch (bt) {
-            case INT -> "int";
-            case LONG -> "int";
-            case STRING -> "str";
+            case INT, LONG -> "int";
+                case STRING -> "str";
             case BOOL -> "bool";
             case DOUBLE -> "float";
             };
@@ -73,7 +71,7 @@ public abstract class PythionGenerator implements Supplier<String> {
     }
 
 
-    public static class PyApiGen extends PythionGenerator {
+    public static class PyApiGen extends PythonGenerator {
         public PyApiGen(Metamodel.KeyApi metamodel) {
             super(metamodel);
         }
@@ -123,7 +121,7 @@ public abstract class PythionGenerator implements Supplier<String> {
                 out.format("    def %s(self, %s):%n", endpoint.name().replace("/", "_"), args);
             }
             out.format("        \"\"\"%s\"\"\"%n%n", endpoint.documentation());
-            out.format("        pass".formatted(endpoint.name(), ""));
+            out.format("        pass");
             out.println();
             out.println();
         }
@@ -134,7 +132,7 @@ public abstract class PythionGenerator implements Supplier<String> {
                         def __init__(self, endpoint : LspEndpoint):
                             super().__init__(endpoint)
 
-                     """);
+                    """);
             sorted.forEach(this::serverEndpoint);
         }
 
@@ -169,7 +167,7 @@ public abstract class PythionGenerator implements Supplier<String> {
     }
 
 
-    public static class PyDataGen extends PythionGenerator {
+    public static class PyDataGen extends PythonGenerator {
         public PyDataGen(Metamodel.KeyApi metamodel) {
             super(metamodel);
         }

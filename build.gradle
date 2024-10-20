@@ -73,8 +73,8 @@ subprojects {
     version = rootProject.version
 
     java {
-        sourceCompatibility = 17
-        targetCompatibility = 17
+        sourceCompatibility = 22
+        targetCompatibility = 22
     }
 
     repositories {
@@ -111,8 +111,8 @@ subprojects {
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-        // Setting the release to Java 17
-        options.release = 17
+        // Setting the release to Java 22
+        options.release = 22
     }
 
     tasks.withType(Javadoc) {
