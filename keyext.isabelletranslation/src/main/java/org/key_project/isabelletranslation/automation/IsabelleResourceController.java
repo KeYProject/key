@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.automation;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.*;
@@ -74,7 +73,7 @@ public class IsabelleResourceController {
      * Creates a resource controller. Initializes the settings.
      *
      * @param numberOfInstances the maximum number of Isabelle instances to create at any time
-     * @param settings          {@link IsabelleTranslationSettings} to be used
+     * @param settings {@link IsabelleTranslationSettings} to be used
      */
     public IsabelleResourceController(int numberOfInstances, IsabelleTranslationSettings settings) {
         this.settings = settings;
@@ -88,9 +87,9 @@ public class IsabelleResourceController {
     /**
      * Creates the Isabelle instances.
      *
-     * @throws IOException If instance creation failed.
+     * @throws IsabelleNotFoundException If instance creation failed.
      */
-    public void init() throws IOException, InterruptedException {
+    public void init() throws IsabelleNotFoundException, InterruptedException {
         for (int i = 0; i < numberOfInstances; i++) {
             if (!isShutdown()) {
                 IsabelleResource newResource = createIsabelleResource();
@@ -157,11 +156,15 @@ public class IsabelleResourceController {
         if (resource.isDestroyed()) {
             try {
                 resource = createIsabelleResource();
-            } catch (IOException | InterruptedException e) {
+            } catch (IsabelleNotFoundException e) {
                 // Should not occur. If it was possible to create instances during creation, it
                 // should be possible now.
                 shutdownGracefully();
                 LOGGER.error(e.getMessage());
+            } catch (InterruptedException e) {
+                shutdownGracefully();
+                LOGGER.error(e.getMessage());
+                Thread.currentThread().interrupt();
             }
         } else {
             resource.interrupt();
@@ -182,9 +185,10 @@ public class IsabelleResourceController {
      * Creates a new {@link IsabelleResource} via the thread pool used for this purpose.
      *
      * @return fresh IsabelleResource
-     * @throws IOException if instance creation failed
+     * @throws IsabelleNotFoundException if instance creation failed
      */
-    private IsabelleResource createIsabelleResource() throws IOException, InterruptedException {
+    private IsabelleResource createIsabelleResource()
+            throws IsabelleNotFoundException, InterruptedException {
         Callable<IsabelleResource> creationTask = () -> {
             Isabelle isabelleInstance = startIsabelleInstance();
             Theory theory = beginTheory(isabelleInstance, settings);
@@ -192,17 +196,14 @@ public class IsabelleResourceController {
         };
         try {
             return instanceCreatorService.submit(creationTask).get();
-        } catch (InterruptedException e) {
-            shutdownGracefully();
-            throw new RuntimeException(e);
         } catch (ExecutionException e) {
             LOGGER.error("Error during Isabelle setup");
 
-            if (e.getCause() instanceof IOException) {
-                throw (IOException) e.getCause();
+            if (e.getCause() instanceof IsabelleNotFoundException) {
+                throw (IsabelleNotFoundException) e.getCause();
             }
             if (e.getCause() instanceof InterruptedException) {
-                 throw (InterruptedException) e.getCause();
+                throw (InterruptedException) e.getCause();
             }
             throw new RuntimeException(e);
         } catch (RejectedExecutionException e) {
@@ -215,21 +216,23 @@ public class IsabelleResourceController {
      * the settings.
      *
      * @return freshly started Isabelle instance
-     * @throws IOException if Isabelle could not be found at the location stored in the settings
+     * @throws IsabelleNotFoundException if Isabelle could not be found at the location stored in
+     *         the settings
      */
-    private Isabelle startIsabelleInstance() throws IOException {
+    private Isabelle startIsabelleInstance() throws IsabelleNotFoundException {
         ArrayList<Path> sessionRoots = new ArrayList<>();
         sessionRoots.add(settings.getTranslationPath());
         Isabelle isabelle;
         try {
             Isabelle.Setup setup = JIsabelle.setupSetLogic("KeYTranslations",
-                    JIsabelle.setupSetSessionRoots(sessionRoots,
-                            JIsabelle.setupSetWorkingDirectory(settings.getTranslationPath(),
-                                    JIsabelle.setup(settings.getIsabellePath()))));
+                JIsabelle.setupSetSessionRoots(sessionRoots,
+                    JIsabelle.setupSetWorkingDirectory(settings.getTranslationPath(),
+                        JIsabelle.setup(settings.getIsabellePath()))));
             isabelle = new Isabelle(setup);
         } catch (Exception e) {
             LOGGER.error("Can't find Isabelle at {}", settings.getIsabellePath());
-            throw new IOException("Can't find Isabelle at " + settings.getIsabellePath());
+            throw new IsabelleNotFoundException(
+                "Can't find Isabelle at " + settings.getIsabellePath());
         }
         return isabelle;
     }
@@ -245,29 +248,29 @@ public class IsabelleResourceController {
      */
     private static Theory beginTheory(Isabelle isabelle, IsabelleTranslationSettings settings) {
         MLFunction3<Path, TheoryHeader, List<Theory>, Theory> begin_theory =
-                MLValue.compileFunction(
-                        "fn (path, header, parents) => Resources.begin_theory path header parents",
-                        isabelle,
-                        Implicits.pathConverter(), Implicits.theoryHeaderConverter(),
-                        new ListConverter<>(Implicits.theoryConverter()), Implicits.theoryConverter());
+            MLValue.compileFunction(
+                "fn (path, header, parents) => Resources.begin_theory path header parents",
+                isabelle,
+                Implicits.pathConverter(), Implicits.theoryHeaderConverter(),
+                new ListConverter<>(Implicits.theoryConverter()), Implicits.theoryConverter());
         MLFunction2<String, Position, TheoryHeader> header_read =
-                MLValue.compileFunction("fn (text,pos) => Thy_Header.read pos text", isabelle,
-                        de.unruh.isabelle.mlvalue.Implicits.stringConverter(),
-                        Implicits.positionConverter(), Implicits.theoryHeaderConverter());
+            MLValue.compileFunction("fn (text,pos) => Thy_Header.read pos text", isabelle,
+                de.unruh.isabelle.mlvalue.Implicits.stringConverter(),
+                Implicits.positionConverter(), Implicits.theoryHeaderConverter());
 
 
         TheoryHeader header = header_read
                 .apply(settings.getHeader(), Position.none(isabelle), isabelle,
-                        de.unruh.isabelle.mlvalue.Implicits.stringConverter(),
-                        Implicits.positionConverter())
+                    de.unruh.isabelle.mlvalue.Implicits.stringConverter(),
+                    Implicits.positionConverter())
                 .retrieveNow(Implicits.theoryHeaderConverter(), isabelle);
         Path topDir = settings.getTranslationPath();
 
 
         return begin_theory.apply(topDir, header,
-                        header.imports(isabelle).map((String name) -> Theory.apply(name, isabelle)), isabelle,
-                        Implicits.pathConverter(), Implicits.theoryHeaderConverter(),
-                        new ListConverter<>(Implicits.theoryConverter()))
+            header.imports(isabelle).map((String name) -> Theory.apply(name, isabelle)), isabelle,
+            Implicits.pathConverter(), Implicits.theoryHeaderConverter(),
+            new ListConverter<>(Implicits.theoryConverter()))
                 .retrieveNow(Implicits.theoryConverter(), isabelle);
     }
 
@@ -279,27 +282,26 @@ public class IsabelleResourceController {
      */
     private record IsabelleResourceImpl(Isabelle instance, Theory theory) implements IsabelleResource {
 
-        @Override
-        public boolean isDestroyed() {
-            return instance.isDestroyed();
-        }
+    @Override
+    public boolean isDestroyed() {
+        return instance.isDestroyed();
+    }
 
-        @Override
-        public void destroy() {
-            instance.destroy();
-        }
+    @Override
+    public void destroy() {
+        instance.destroy();
+    }
 
-        private void interruptIntern() throws IsabelleMLException {
-            instance.executeMLCodeNow("error \"Interrupt\"");
-        }
+    private void interruptIntern() throws IsabelleMLException {
+        instance.executeMLCodeNow("error \"Interrupt\"");
+    }
 
-        @Override
-        public void interrupt() {
-            try {
-                interruptIntern();
-            } catch (IsabelleMLException e) {
-                // Always throws this due to the way Isabelle is interrupted.
-            }
+    @Override
+    public void interrupt() {
+        try {
+            interruptIntern();
+        } catch (IsabelleMLException e) {
+            // Always throws this due to the way Isabelle is interrupted.
         }
     }
-}
+}}

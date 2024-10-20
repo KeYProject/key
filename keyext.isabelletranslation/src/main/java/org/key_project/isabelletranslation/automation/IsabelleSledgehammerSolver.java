@@ -175,7 +175,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
 
     @Override
     public IsabelleResult call() throws InterruptedException {
-        //Return error result, if problem does not have a translation
+        // Return error result, if problem does not have a translation
         if (!problem.hasTranslation()) {
             return handleIsabelleError(problem.getTranslationException());
         }

@@ -5,21 +5,22 @@ package org.key_project.isabelletranslation.gui.controller;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.PositionedIssueString;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.isabelletranslation.automation.IsabelleLauncher;
+import org.key_project.isabelletranslation.automation.IsabelleNotFoundException;
 import org.key_project.isabelletranslation.automation.IsabelleProblem;
 import org.key_project.isabelletranslation.translation.IllegalFormulaException;
 import org.key_project.isabelletranslation.translation.IsabelleTranslator;
+import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,30 +41,25 @@ public class TranslationAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         LOGGER.info("Translating...");
 
-        generateTranslation();
+        KeYMediator mediator = getMediator();
+        solveGoals(ImmutableList.of(getMediator().getSelectedGoal()), mediator, mainWindow);
     }
 
-
-    private void generateTranslation() {
-        KeYMediator mediator = getMediator();
-        IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
+    static void solveGoals(ImmutableList<Goal> goals, KeYMediator mediator, MainWindow mainWindow) {
         IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
+        IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
 
-        IsabelleProblem translation;
-        try {
-            translation = translator.translateProblem(mediator.getSelectedGoal());
-        } catch (IllegalFormulaException e) {
-            PositionedIssueString issueString = new PositionedIssueString(
-                    "Failed to translate Goal " + mediator.getSelectedGoal().node().serialNr() + ": " + e.getMessage());
-            IssueDialog issueDialog =
-                    new IssueDialog(mainWindow, "Translations failed!", Set.of(issueString), false);
-            issueDialog.setVisible(true);
-            return;
+        List<IsabelleProblem> translations = new ArrayList<>();
+        Map<Goal, IllegalFormulaException> translationExceptions = new HashMap<>();
+        for (Goal goal : Objects.requireNonNull(goals)) {
+            try {
+                translations.add(translator.translateProblem(goal));
+            } catch (IllegalFormulaException e) {
+                translationExceptions.put(goal, e);
+                // Add problem without translation
+                translations.add(new IsabelleProblem(goal, translationExceptions.get(goal)));
+            }
         }
-
-        List<IsabelleProblem> list = new ArrayList<>();
-
-        list.add(translation);
 
         Thread thread = new Thread(() -> {
             IsabelleLauncher launcher = new IsabelleLauncher(settings);
@@ -74,9 +70,20 @@ public class TranslationAction extends MainWindowAction {
 
             launcher.addListener(progressDialogMediator);
             try {
-                launcher.launch(list, settings.getTimeout(), 1);
-            } catch (IOException e) {
+                launcher.launch(translations, settings.getTimeout(), 1);
+            } catch (IsabelleNotFoundException e) {
                 progressDialogMediator.discardEvent();
+                PositionedIssueString issueString = new PositionedIssueString(e.getMessage());
+                IssueDialog issueDialog =
+                    new IssueDialog(mainWindow, "Launch failed!", Set.of(issueString), true);
+                issueDialog.setVisible(true);
+            } catch (IOException e) {
+                // Couldn't write files
+                progressDialogMediator.discardEvent();
+                PositionedIssueString issueString = new PositionedIssueString(e.getMessage());
+                IssueDialog issueDialog =
+                    new IssueDialog(mainWindow, "Launch failed!", Set.of(issueString), true);
+                issueDialog.setVisible(true);
             }
         }, "IsabelleLauncherThread");
         thread.start();
