@@ -17,7 +17,7 @@ import org.key_project.logic.sort.Sort;
  */
 public class LogicalVariableHandler implements IsabelleHandler {
 
-    static final String VAR_POSTFIX = UninterpretedSymbolsHandler.PREFIX;
+    static final String VAR_POSTFIX = UninterpretedSymbolsHandler.POSTFIX;
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
