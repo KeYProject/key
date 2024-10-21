@@ -95,7 +95,8 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
     @Override
     public int compareTo(@NonNull Location o) {
         return Comparator
-                .<Location, URI>comparing(l -> l.fileUri)
-                .thenComparing(Location::getPosition).compare(this, o);
+                .<Location, URI>comparing(l -> l.fileUri, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(Location::getPosition, Comparator.nullsLast(Comparator.naturalOrder()))
+                .compare(this, o);
     }
 }
