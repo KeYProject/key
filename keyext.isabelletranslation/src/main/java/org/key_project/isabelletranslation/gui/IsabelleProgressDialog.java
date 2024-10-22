@@ -299,7 +299,7 @@ class ProgressTable extends JTable {
             content.add(Box.createHorizontalStrut(2));
             content.add(getProgressBar());
             content.add(Box.createHorizontalStrut(2));
-            // content.add(getInfoButton());
+            content.add(getInfoButton());
             content.add(Box.createHorizontalStrut(2));
             this.add(content);
             this.add(Box.createVerticalStrut(2));
@@ -324,9 +324,6 @@ class ProgressTable extends JTable {
 
 
     private class ProgressCellEditor extends AbstractCellEditor implements TableCellEditor {
-
-        private static final long serialVersionUID = 1L;
-
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
@@ -368,20 +365,18 @@ class ProgressTable extends JTable {
 
     }
 
-    private final TableCellRenderer renderer =
-        (table, value, isSelected, hasFocus, row, column) -> {
-            ProcessData data = (ProcessData) value;
-            prepareProgressPanel(progressPanelRenderer, data);
-            return progressPanelRenderer;
-        };
 
-
-    private final TableCellEditor editor = new ProgressCellEditor();
     private final Point currentEditorCell = new Point();
 
 
     public ProgressTable(int resolution, ProgressTableListener listener) {
+        TableCellRenderer renderer = (table, value, isSelected, hasFocus, row, column) -> {
+            ProcessData data = (ProcessData) value;
+            prepareProgressPanel(progressPanelRenderer, data);
+            return progressPanelRenderer;
+        };
         this.setDefaultRenderer(IsabelleProgressModel.ProcessColumn.class, renderer);
+        TableCellEditor editor = new ProgressCellEditor();
         this.setDefaultEditor(IsabelleProgressModel.ProcessColumn.class, editor);
         init(getProgressPanelEditor(), this.getFont(), resolution, listener);
         init(progressPanelRenderer, this.getFont(), resolution, listener);
@@ -428,7 +423,7 @@ class ProgressTable extends JTable {
 
         TableColumnModel colModel = table.getColumnModel();
         TableColumn col = colModel.getColumn(vColIndex);
-        int width = 0;
+        int width;
 
 
         TableCellRenderer renderer = col.getHeaderRenderer();
