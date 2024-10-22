@@ -7,9 +7,8 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
+import java.util.*;
 import java.util.Timer;
-import java.util.TimerTask;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -21,6 +20,7 @@ import org.key_project.isabelletranslation.automation.IsabelleLauncher;
 import org.key_project.isabelletranslation.automation.IsabelleLauncherListener;
 import org.key_project.isabelletranslation.automation.IsabelleResult;
 import org.key_project.isabelletranslation.automation.IsabelleSolver;
+import org.key_project.isabelletranslation.gui.InformationWindow;
 import org.key_project.isabelletranslation.gui.IsabelleProgressDialog;
 import org.key_project.isabelletranslation.gui.IsabelleProgressModel;
 import org.key_project.isabelletranslation.gui.ProofApplyUserAction;
@@ -427,6 +427,11 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     private void waiting(IsabelleSolver solver) {
     }
 
+    private IsabelleSolver getSolver(int column, int row) {
+        // This needs to be changed, if different kinds of Isabelle solvers are supported
+        return solvers.stream().filter(s -> (s.getSolverIndex() == row)).findFirst().orElse(null);
+    }
+
     /**
      * Updates the progress bar of a solver that is currently preparing.
      *
@@ -449,6 +454,11 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
 
         @Override
         public void infoButtonClicked(int column, int row) {
+            IsabelleSolver solver = getSolver(column, row);
+            if (solver == null) {
+                throw new RuntimeException("Something went wrong in Dialog");
+            }
+            showInformation(solver);
         }
 
         @Override
@@ -465,5 +475,21 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         public void discardButtonClicked() {
             discardEvent();
         }
+    }
+
+    private void showInformation(IsabelleSolver solver) {
+        Collection<InformationWindow.Information> information = new HashSet<>();
+        information.add(new InformationWindow.Information("Translation theory",
+            solver.getRawSolverInput(), solver.name()));
+        if (solver.getFinalResult().isError()) {
+            information.add(new InformationWindow.Information("Exception",
+                solver.getFinalResult().getException().getMessage(), solver.name()));
+        } else {
+            information.add(new InformationWindow.Information("Raw Solver Output",
+                solver.getRawSolverOutput(), solver.name()));
+        }
+
+        new InformationWindow(progressDialog, information,
+            "Information for " + solver.name());
     }
 }
