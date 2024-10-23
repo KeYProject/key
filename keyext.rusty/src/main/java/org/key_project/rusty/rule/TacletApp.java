@@ -13,9 +13,11 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.BoundVariable;
 import org.key_project.rusty.logic.op.LogicVariable;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.RFunction;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
@@ -445,7 +447,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
     private TacletApp instantiationHelper(boolean force, Services services) {
-        // final VariableNamer varNamer = services.getVariableNamer();
+        final VariableNamer varNamer = services.getVariableNamer();
         final TermBuilder tb = services.getTermBuilder();
 
         TacletApp app = this;
@@ -461,15 +463,14 @@ public abstract class TacletApp implements RuleApp {
             }
 
             if (operatorSv.sort() == ProgramSVSort.VARIABLE) {
-                /*
-                 * String proposal =
-                 * varNamer.getSuggestiveNameProposalForProgramVariable(operatorSv, this,
-                 * services, proposals);
-                 * RustyProgramElement pe =
-                 * app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
-                 * app = app.addCheckedInstantiation(operatorSv, pe, services, true);
-                 * proposals = proposals.append(proposal);
-                 */
+                String proposal =
+                    varNamer.getSuggestiveNameProposalForProgramVariable(operatorSv, this,
+                        services, proposals);
+                RustyProgramElement pe =
+                    app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
+                app = app.addCheckedInstantiation(operatorSv, pe, services, true);
+                proposals = proposals.append(proposal);
+
             } else if (operatorSv instanceof SkolemTermSV) {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
@@ -836,7 +837,20 @@ public abstract class TacletApp implements RuleApp {
 
     public RustyProgramElement getProgramElement(String instantiation, ProgramSV sv,
             Services services) {
+        // TODO implement the real version
+        // Currently a simplified version is used
         Sort svSort = sv.sort();
+        if (svSort == ProgramSVSort.VARIABLE) {
+            NewVarcond nv = taclet.varDeclaredNew(sv);
+            if (nv != null) {
+                KeYRustyType krt = nv.getType();
+                assert krt != null
+                        : "This version of getProgramElement currently only works with NewVarconds with KeYRustyTypes";
+                // return new Identifier(new Name(instantiation));\
+                return new ProgramVariable(new Name(instantiation), krt);
+            }
+        }
+
         // if (svSort == ProgramSVSort.VARIABLE) {
         // NewVarcond nvc = taclet.varDeclaredNew(sv);
         // if (nvc != null) {

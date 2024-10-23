@@ -34,6 +34,7 @@ public class InnerVariableNamer extends VariableNamer {
     @Override
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
-        return "";
+        return super.getProposal(app, var, services, undoAnchor, previousProposals);
+        // return "";
     }
 }
