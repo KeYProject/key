@@ -16,7 +16,7 @@ cache:
   key: ${CI_COMMIT_REF_SLUG}
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2 -Dorg.gradle.configureondemand=true"
+  GRADLE_OPTS:  "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2 -Dorg.gradle.configureondemand=true"
   GIT_DEPTH: 0
 
 before_script:
@@ -24,9 +24,6 @@ before_script:
   #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - export SONAR_SCANNER_OPTS="-Xmx8G"
-  - sudo add-apt-repository ppa:cwchien/gradle
-  - sudo apt-get update
-  - sudo apt upgrade gradle
 
 stages:
   - primary
@@ -48,7 +45,7 @@ compile:classes:
       - .gradle
 
 compile:testClasses:
-  dependencies: [ "compile:classes" ]
+  dependencies:  ["compile:classes"]
   stage: secondary
   image: wadoon/key-test-docker:jdk17
   script:
@@ -62,7 +59,7 @@ compile:testClasses:
       - .gradle
 
 sonarqube:
-  dependencies: [ "compile:testClasses" ]
+  dependencies:  ["compile:testClasses"]
   stage: ternary
   image: wadoon/key-test-docker:jdk17
   allow_failure: true
