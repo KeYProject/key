@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.automation;
 
 import de.uka.ilkd.key.java.Services;
@@ -7,21 +10,26 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 public class IsabelleRuleApp extends AbstractExternalSolverRuleApp {
     public static final IsabelleRule RULE = new IsabelleRule();
 
-    protected IsabelleRuleApp(IsabelleRule rule, PosInOccurrence pio, String successfulSolverName, String successfulTactic) {
-        this(rule, pio, null, successfulSolverName, "Isabelle " + successfulSolverName + ": " + successfulTactic);
+    protected IsabelleRuleApp(IsabelleRule rule, PosInOccurrence pio, String successfulSolverName,
+            String successfulTactic) {
+        this(rule, pio, null, successfulSolverName,
+            "Isabelle " + successfulSolverName + ": " + successfulTactic);
     }
 
-    protected IsabelleRuleApp(IsabelleRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts, String successfulSolverName) {
+    protected IsabelleRuleApp(IsabelleRule rule, PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> ifInsts, String successfulSolverName) {
         this(rule, pio, ifInsts, successfulSolverName, "Isabelle: " + successfulSolverName);
     }
 
-    private IsabelleRuleApp(IsabelleRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts, String successfulSolverName, String title) {
+    private IsabelleRuleApp(IsabelleRule rule, PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> ifInsts, String successfulSolverName, String title) {
         super(rule, pio, ifInsts, successfulSolverName, title);
     }
 
@@ -45,7 +53,8 @@ public class IsabelleRuleApp extends AbstractExternalSolverRuleApp {
             return new IsabelleRule();
         }
 
-        public AbstractExternalSolverRuleApp createApp(String successfulSolverName, String successfulTactic) {
+        public AbstractExternalSolverRuleApp createApp(String successfulSolverName,
+                String successfulTactic) {
             return new IsabelleRuleApp(this, null, successfulSolverName, successfulTactic);
         }
 
@@ -55,7 +64,8 @@ public class IsabelleRuleApp extends AbstractExternalSolverRuleApp {
         }
 
         @Override
-        public AbstractExternalSolverRuleApp createApp(String successfulSolverName, ImmutableList<PosInOccurrence> unsatCore) {
+        public AbstractExternalSolverRuleApp createApp(String successfulSolverName,
+                ImmutableList<PosInOccurrence> unsatCore) {
             return new IsabelleRuleApp(this, null, unsatCore, successfulSolverName);
         }
 
