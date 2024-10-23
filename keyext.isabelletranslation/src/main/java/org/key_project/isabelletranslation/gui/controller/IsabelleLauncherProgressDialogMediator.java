@@ -102,6 +102,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
             Collection<IsabelleSolver> finishedInstances) {
         timer.cancel();
 
+        setProgressText(finishedInstances.size());
         progressModel.setEditable(true);
         refreshDialog();
         progressDialog.setModus(IsabelleProgressDialog.Modus.SOLVERS_DONE);
@@ -280,9 +281,6 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         JProgressBar bar = progressDialog.getProgressBar();
         if (value < 0) {
             bar.setString("Preparing... (this might take a few seconds)");
-            bar.setStringPainted(true);
-        } else if (value == bar.getMaximum()) {
-            bar.setString("Finished.");
             bar.setStringPainted(true);
         } else {
             bar.setString("Processed " + value + " of " + bar.getMaximum() + " problems.");
@@ -479,17 +477,19 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
 
     private void showInformation(IsabelleSolver solver) {
         Collection<InformationWindow.Information> information = new HashSet<>();
+        String informationTitle = solver.name() + ": " + solver.getProblem().getName();
+
         information.add(new InformationWindow.Information("Translation theory",
-            solver.getRawSolverInput(), solver.name()));
+            solver.getRawSolverInput(), informationTitle));
         if (solver.getFinalResult().isError()) {
             information.add(new InformationWindow.Information("Exception",
-                solver.getFinalResult().getException().getMessage(), solver.name()));
+                solver.getFinalResult().getException().getMessage(), informationTitle));
         } else {
             information.add(new InformationWindow.Information("Raw Solver Output",
-                solver.getRawSolverOutput(), solver.name()));
+                solver.getRawSolverOutput(), informationTitle));
         }
 
         new InformationWindow(progressDialog, information,
-            "Information for " + solver.name());
+            "Information for " + informationTitle);
     }
 }
