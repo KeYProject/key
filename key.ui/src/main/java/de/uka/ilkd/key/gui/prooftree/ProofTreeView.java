@@ -177,6 +177,35 @@ public class ProofTreeView extends JPanel implements TabPanel {
             private static final long serialVersionUID = 6555955929759162324L;
 
             @Override
+            public String getToolTipText(MouseEvent mouseEvent) {
+                /*
+                 * For performance reasons, we want to make sure that the tooltips are only rendered
+                 * when they are really needed. Therefore, they are now lazily generated and can
+                 * also be disabled completely.
+                 */
+                if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .isShowProofTreeTooltips()) {
+                    return null;
+                }
+                TreePath path = delegateView.getPathForLocation(mouseEvent.getX(),
+                    mouseEvent.getY());
+                if (path == null) {
+                    return null;
+                }
+                var last = path.getLastPathComponent();
+
+                if (last instanceof GUIAbstractTreeNode node) {
+
+                    Style style = renderer.initStyleForNode(node);
+                    if (style.tooltip != null) {
+                        return renderTooltip(style.tooltip);
+                    }
+                }
+
+                return super.getToolTipText(mouseEvent);
+            }
+
+            @Override
             public void setFont(Font font) {
                 iconHeight = font.getSize();
                 super.setFont(font);
@@ -1243,16 +1272,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
-            Style style = new Style();
-            style.foreground = getForeground();
-            style.background = getBackground();
-            // Normalize whitespace
-            style.text = value.toString().replaceAll("\\s+", " ");
-            style.border = null;
-            style.tooltip = new Style.Tooltip();
-            style.icon = null;
-
-            stylers.forEach(it -> it.style(style, node));
+            Style style = initStyleForNode(node);
 
             setForeground(style.foreground);
             setBackground(style.background);
@@ -1265,12 +1285,33 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             setFont(getFont().deriveFont(Font.PLAIN));
-            String tooltip = renderTooltip(style.tooltip);
-            setToolTipText(tooltip);
+            // For performance reasons, we render the tooltips now lazily ...
+            // String tooltip = renderTooltip(style.tooltip);
+            // setToolTipText(tooltip);
             setText(style.text);
             setIcon(style.icon);
 
             return this;
+        }
+
+        /**
+         * Creates a new Style object and fills it for the given node.
+         *
+         * @param node the tree node
+         * @return the created Style with all the info about the node
+         */
+        public Style initStyleForNode(GUIAbstractTreeNode node) {
+            Style style = new Style();
+            style.foreground = getForeground();
+            style.background = getBackground();
+            // Normalize whitespace
+            style.text = node.toString().replaceAll("\\s+", " ");
+            style.border = null;
+            style.tooltip = new Style.Tooltip();
+            style.icon = null;
+
+            stylers.forEach(it -> it.style(style, node));
+            return style;
         }
     }
 

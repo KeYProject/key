@@ -112,6 +112,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /** this setting enables/disables tool tips in the source view */
     private static final String SOURCE_VIEW_TOOLTIP = "SourceViewTooltips";
 
+    /** this setting enables/disables tool tips in the proof tree */
+    private static final String PROOF_TREE_TOOLTIP = "ProofTreeTooltips";
+
     private static final String HIGHLIGHT_ORIGIN = "HighlightOrigin";
     /**
      *
@@ -202,6 +205,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
         createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
     private final PropertyEntry<Boolean> showSourceViewTooltips =
         createBooleanProperty(SOURCE_VIEW_TOOLTIP, true);
+    private final PropertyEntry<Boolean> showProofTreeTooltips =
+        createBooleanProperty(PROOF_TREE_TOOLTIP, true);
     private final PropertyEntry<Boolean> highlightOrigin =
         createBooleanProperty(HIGHLIGHT_ORIGIN, true);
     private final PropertyEntry<Set<String>> clutterRules =
@@ -537,6 +542,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     public void setShowSourceViewTooltips(boolean showSourceViewTooltips) {
         this.showSourceViewTooltips.set(showSourceViewTooltips);
+    }
+
+    public boolean isShowProofTreeTooltips() {
+        return showProofTreeTooltips.get();
+    }
+
+    public void setShowProofTreeTooltips(boolean showProofTreeTooltips) {
+        this.showProofTreeTooltips.set(showProofTreeTooltips);
     }
 
     public double getUIFontSizeFactor() {

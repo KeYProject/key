@@ -210,7 +210,7 @@ public final class Immutables {
     public static <T extends @Nullable Object, R extends @Nullable Object> ImmutableList<R> map(
             ImmutableList<T> ts, Function<? super T, R> function) {
         // This must be a loop. A tail recursive implementation is not optimised
-        // by the compiler and quickly leads to a stack overlow.
+        // by the compiler and quickly leads to a stack overflow.
         ImmutableList<R> acc = ImmutableSLList.nil();
         while (!ts.isEmpty()) {
             T hd = ts.head();
