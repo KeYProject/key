@@ -207,7 +207,7 @@ public class IsabelleLauncher implements IsabelleSolverListener {
         if (!solverQueue.remove(solver)) {
             LOGGER.error(
                 "Something went wrong during Isabelle instance management! Solver \"{}\" was not in queue, but started anyway.",
-                solver.name());
+                solver.name() + ": " + solver.getProblem().getName());
             stopAll();
             throw new RuntimeException("Something went wrong during Isabelle instance management!");
         }

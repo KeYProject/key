@@ -81,6 +81,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSledgehammerSolver.class);
     private final Collection<IsabelleSolverListener> listeners;
+    private String rawOutput;
 
     public IsabelleSledgehammerSolver(IsabelleProblem problem,
             Collection<IsabelleSolverListener> listeners, int solverIndex,
@@ -101,7 +102,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
 
     @Override
     public String name() {
-        return "Isabelle Solver: " + problem.getName();
+        return "sledgehammer";
     }
 
     @Override
@@ -159,7 +160,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
 
     @Override
     public String getRawSolverOutput() {
-        return result.getSuccessfulTactic();
+        return rawOutput;
     }
 
     @Override
@@ -373,10 +374,13 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
         Tuple2<Object, Tuple2<String, List<String>>> resultFutureCollect =
             Await.result(resultFuture, Duration.create(getTimeout(), TimeUnit.SECONDS));
 
+        rawOutput = resultFutureCollect._2().toString();
+
         boolean successful = (boolean) resultFutureCollect._1();
         setComputationTime();
         if (successful) {
-            return IsabelleResult.getSuccessResult(resultFutureCollect._2()._2().head(),
+            String successfulTactic = resultFutureCollect._2()._2().head().split("Try this: ")[1];
+            return IsabelleResult.getSuccessResult(successfulTactic,
                 getComputationTime());
         } else {
             return IsabelleResult.getUnknownResult();
