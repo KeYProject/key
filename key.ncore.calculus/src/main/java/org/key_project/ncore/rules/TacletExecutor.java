@@ -18,7 +18,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
-public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp, T extends Taclet< App>> {
+public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp, T extends Taclet>
+        implements RuleExecutor {
     protected static final String AUTO_NAME = "_taclet";
 
     protected final T taclet;
@@ -26,17 +27,6 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
     public TacletExecutor(T taclet) {
         this.taclet = taclet;
     }
-
-    /**
-     * applies the given rule application to the specified goal
-     *
-     * @param goal the goal that the rule application should refer to.
-     * @param ruleApp the rule application that is executed.
-     * @return List of the goals created by the rule which have to be proved. If this is a
-     *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
-     *         goal that should be closed (with the constraint this taclet is applied under).
-     */
-    public abstract ImmutableList<Goal> apply(Goal goal, App ruleApp);
 
     /**
      * Search for formulas within p_list that have to be proved by an explicit assumes-goal, i.e.
@@ -54,8 +44,9 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *         two entries: one for the original sequent and one with the sequent encoding the proof
      *         obligation for the to be proven formulas of the assumes goal
      */
-    protected ImmutableList<SequentChangeInfo> checkIfGoals(Goal p_goal,
-            ImmutableList<?extends AssumesFormulaInstantiation> p_list, MatchConditions p_matchCond,
+    protected ImmutableList<SequentChangeInfo> checkAssumesGoals(Goal p_goal,
+            ImmutableList<? extends AssumesFormulaInstantiation> p_list,
+            MatchConditions p_matchCond,
             int p_numberOfNewGoals) {
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
@@ -79,7 +70,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
 
                     // negate formulas of the assumes-succedent
                     if (i <= 0) {
-                        assumesPart = not(assumesPart);
+                        assumesPart = not(assumesPart, p_goal);
                     }
 
                     if (res == null) {
@@ -91,11 +82,11 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                         }
                         assumesObl = assumesPart;
                     } else {
-                        assumesObl = and(assumesObl, assumesPart);
+                        assumesObl = and(assumesObl, assumesPart, p_goal);
                     }
 
                     // UGLY: We create a flat structure of the new
-                    // goals, thus the if formulas have to be added to
+                    // goals, thus the `assumes` formulas have to be added to
                     // every new goal
                     itNewGoalSequents = res.iterator();
                     SequentChangeInfo seq = itNewGoalSequents.next();
@@ -118,7 +109,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                         null, p_goal.sequent(), p_goal.sequent()));
             }
         } else {
-            // find the sequent the if obligation has to be added to
+            // find the sequent the `assumes` obligation has to be added to
             itNewGoalSequents = res.iterator();
             SequentChangeInfo seq = itNewGoalSequents.next();
             while (itNewGoalSequents.hasNext()) {
@@ -131,9 +122,9 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
         return res;
     }
 
-    protected abstract Term not(Term t);
+    protected abstract Term not(Term t, Goal goal);
 
-    protected abstract Term and(Term t1, Term t2);
+    protected abstract Term and(Term t1, Term t2, Goal p_goal);
 
     /**
      * adds SequentFormula to antecedent or succedent depending on position information or the
@@ -167,11 +158,11 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      */
-    protected abstract void applyAddrule(ImmutableList<Taclet< App>> rules, Goal goal,
+    protected abstract void applyAddrule(ImmutableList<? extends Taclet> rules, Goal goal,
             LogicServices services,
             MatchConditions matchCond);
 
-    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
+    protected void applyAddProgVars(ImmutableSet<? extends SchemaVariable> pvs,
             SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
             LogicServices services, MatchConditions matchCond) {
         // TODO @ DD
@@ -293,12 +284,12 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             applicationPosInOccurrence, matchCond,
             goal, tacletApp, services);
 
-        instantiatedFormula = applyContextUpdate(svInst, instantiatedFormula);
+        instantiatedFormula = applyContextUpdate(svInst, instantiatedFormula, goal);
 
         return new SequentFormula(instantiatedFormula);
     }
 
-    protected abstract Term applyContextUpdate(SVInstantiations svInst, Term formula);
+    protected abstract Term applyContextUpdate(SVInstantiations svInst, Term formula, Goal goal);
 
     /**
      * a new term is created by replacing variables of term whose replacement is found in the given

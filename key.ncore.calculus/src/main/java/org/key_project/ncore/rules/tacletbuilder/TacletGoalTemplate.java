@@ -5,8 +5,6 @@ package org.key_project.ncore.rules.tacletbuilder;
 
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.ncore.proof.ProofGoal;
-import org.key_project.ncore.rules.RuleApp;
 import org.key_project.ncore.rules.Taclet;
 import org.key_project.ncore.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -14,19 +12,17 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
-public abstract class TacletGoalTemplate<App extends @NonNull RuleApp> {
+public abstract class TacletGoalTemplate {
     /** stores sequent that is one of the new goals */
     private final Sequent addedSeq;
 
     /** stores list of Taclet which are introduced */
-    private ImmutableList<? extends Taclet<App>> addedRules = ImmutableSLList.nil();
+    private ImmutableList<? extends Taclet> addedRules = ImmutableSLList.nil();
 
     /** program variables added by this taclet to the namespace */
     private ImmutableSet<? extends SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
@@ -42,7 +38,7 @@ public abstract class TacletGoalTemplate<App extends @NonNull RuleApp> {
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<? extends Taclet<App>> addedRules,
+    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<? extends Taclet> addedRules,
             ImmutableSet<? extends SchemaVariable> addedProgVars) {
         // TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 
@@ -60,7 +56,7 @@ public abstract class TacletGoalTemplate<App extends @NonNull RuleApp> {
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet< App>> addedRules) {
+    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
@@ -78,7 +74,7 @@ public abstract class TacletGoalTemplate<App extends @NonNull RuleApp> {
      *
      * @return IList<Taclet> contains new introduced rules
      */
-    public ImmutableList<? extends Taclet<App>> rules() {
+    public ImmutableList<? extends Taclet> rules() {
         return addedRules;
     }
 

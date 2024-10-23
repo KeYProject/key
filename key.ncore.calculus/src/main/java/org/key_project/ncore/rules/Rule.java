@@ -5,8 +5,6 @@ package org.key_project.ncore.rules;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
-import org.key_project.ncore.proof.ProofGoal;
-import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -23,4 +21,6 @@ public interface Rule extends Named {
     default String displayName() {
         return name().toString();
     }
+
+    RuleExecutor getExecutor();
 }
