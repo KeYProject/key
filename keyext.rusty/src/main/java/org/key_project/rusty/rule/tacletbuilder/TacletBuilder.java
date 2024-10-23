@@ -8,13 +8,16 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.ncore.rules.*;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.VariableSV;
 import org.key_project.rusty.rule.*;
+import org.key_project.rusty.rule.NewVarcond;
+import org.key_project.rusty.rule.Taclet;
+import org.key_project.rusty.rule.VariableCondition;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -57,7 +60,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     private static boolean containsFreeVarSV(Sequent sequent) {
-        for (final SequentFormula cf : sequent) {
+        for (final var cf : sequent) {
             if (containsFreeVarSV(cf.formula())) {
                 return true;
             }

@@ -5,6 +5,9 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.ncore.rules.TacletAnnotation;
+import org.key_project.ncore.rules.TacletApplPart;
+import org.key_project.ncore.rules.TacletAttributes;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.executor.rustydl.SuccTacletExecutor;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -37,7 +40,7 @@ public class SuccTaclet extends FindTaclet {
     public SuccTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, attrs, find, prefixMap,
             tacletAnnotations);
@@ -75,7 +78,8 @@ public class SuccTaclet extends FindTaclet {
                 varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
-        return new SuccTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
+        return new SuccTaclet(new Name(s), applPart,
+            (ImmutableList<TacletGoalTemplate>) goalTemplates(), attrs, find,
             ignoreTopLevelUpdates, prefixMap, tacletAnnotations);
     }
 

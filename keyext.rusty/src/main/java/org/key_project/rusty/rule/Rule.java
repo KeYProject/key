@@ -4,11 +4,6 @@
 package org.key_project.rusty.rule;
 
 import org.key_project.logic.Named;
-import org.key_project.ncore.rules.RuleAbortException;
-import org.key_project.rusty.proof.Goal;
-import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
 
 public interface Rule
         extends org.key_project.ncore.rules.Rule, Named {

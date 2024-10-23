@@ -11,6 +11,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.rules.TacletAnnotation;
+import org.key_project.ncore.rules.Trigger;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;

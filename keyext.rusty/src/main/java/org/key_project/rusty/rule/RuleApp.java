@@ -5,9 +5,9 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 public interface RuleApp extends org.key_project.ncore.rules.RuleApp {

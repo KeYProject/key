@@ -72,7 +72,7 @@ public interface TacletMatcher {
      *         could successfully be matched against p_template, and the corresponding
      *         MatchConditions.
      */
-    AssumesMatchResult matchIf(Iterable<AssumesFormulaInstantiation> toMatch, Term template,
+    AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch, Term template,
             MatchConditions matchCond, LogicServices services);
 
     /**
@@ -85,7 +85,7 @@ public interface TacletMatcher {
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
-    MatchConditions matchIf(Iterable<AssumesFormulaInstantiation> toMatch,
+    MatchConditions matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
             MatchConditions matchCond, LogicServices services);
 
     MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchConditions,

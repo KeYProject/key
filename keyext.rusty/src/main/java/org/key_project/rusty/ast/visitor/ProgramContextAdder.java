@@ -5,11 +5,11 @@ package org.key_project.rusty.ast.visitor;
 
 import java.rmi.UnexpectedException;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.expr.ContextBlockExpression;
 import org.key_project.rusty.ast.stmt.Statement;
-import org.key_project.rusty.logic.IntIterator;
 import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.rule.inst.ContextBlockExpressionInstantiation;
 import org.key_project.util.collection.ImmutableList;

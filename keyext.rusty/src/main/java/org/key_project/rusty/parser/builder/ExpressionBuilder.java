@@ -575,13 +575,13 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (head != null && ss != null) {
             // A sequent with only head in the antecedent.
             Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
-            ant = ant.insertFirst(new SequentFormula(head)).semisequent();
+            ant = (Semisequent) ant.insertFirst(new SequentFormula(head)).semisequent();
             return Sequent.createSequent(ant, ss);
         }
         if (head != null && s != null) {
             // A sequent. Prepend head to the antecedent.
             Semisequent newAnt = s.antecedent();
-            newAnt = newAnt.insertFirst(new SequentFormula(head)).semisequent();
+            newAnt = (Semisequent) newAnt.insertFirst(new SequentFormula(head)).semisequent();
             return Sequent.createSequent(newAnt, s.succedent());
         }
         if (ss != null) {
@@ -599,7 +599,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         Term head = accept(ctx.term());
         if (head != null) {
-            ss = ss.insertFirst(new SequentFormula(head)).semisequent();
+            ss = (Semisequent) ss.insertFirst(new SequentFormula(head)).semisequent();
         }
         return ss;
     }

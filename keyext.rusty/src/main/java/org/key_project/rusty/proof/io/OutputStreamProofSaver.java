@@ -10,10 +10,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
+import org.key_project.ncore.rules.AssumesFormulaInstantiation;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.logic.PosInTerm;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.pp.LogicPrinter;
@@ -209,7 +211,8 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
         // TODO: output.append(getInteresting(appliedRuleApp.instantiations()));
-        final ImmutableList<AssumesFormulaInstantiation> l = appliedRuleApp.assumesFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> l =
+            appliedRuleApp.assumesFormulaInstantiations();
         if (l != null) {
             output.append(ifFormulaInsts(node, l));
         }
@@ -223,7 +226,7 @@ public class OutputStreamProofSaver {
         StringBuilder s = new StringBuilder();
         for (final AssumesFormulaInstantiation aL : l) {
             if (aL instanceof AssumesFormulaInstSeq ifis) {
-                final SequentFormula f = aL.getSequentFormula();
+                final SequentFormula f = (SequentFormula) aL.getSequentFormula();
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
                                 .formulaNumberInSequent(ifis.inAntec(), f))

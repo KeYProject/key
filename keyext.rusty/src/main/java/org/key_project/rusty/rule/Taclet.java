@@ -17,11 +17,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-
 
 public abstract class Taclet extends
-        org.key_project.ncore.rules.Taclet<@NonNull TacletApp> implements Rule {
+        org.key_project.ncore.rules.Taclet implements Rule {
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
@@ -33,7 +31,7 @@ public abstract class Taclet extends
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, org.key_project.ncore.rules.TacletApplPart applPart,
-            ImmutableList<? extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate<TacletApp>> goalTemplates,
+            ImmutableList<? extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
             org.key_project.ncore.rules.TacletAttributes attrs,
             ImmutableMap<SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
             boolean surviveSmbExec,
@@ -57,7 +55,8 @@ public abstract class Taclet extends
      */
     protected Taclet(Name name, TacletApplPart applPart,
             ImmutableList<? extends TacletGoalTemplate> goalTemplates,
-            org.key_project.ncore.rules.TacletAttributes attrs, ImmutableMap<SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+            org.key_project.ncore.rules.TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
             ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, prefixMap, false,
             tacletAnnotations);
@@ -143,7 +142,7 @@ public abstract class Taclet extends
         return (TacletPrefix) prefixMap.get(sv);
     }
 
-    public TacletExecutor<? extends Taclet> getExecutor() {
+    public TacletExecutor<?> getExecutor() {
         return (TacletExecutor<? extends Taclet>) executor;
     }
 

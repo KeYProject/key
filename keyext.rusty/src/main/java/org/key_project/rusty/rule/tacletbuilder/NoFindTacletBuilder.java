@@ -4,6 +4,7 @@
 package org.key_project.rusty.rule.tacletbuilder;
 
 
+import org.key_project.ncore.rules.TacletApplPart;
 import org.key_project.rusty.rule.BoundUniquenessChecker;
 import org.key_project.rusty.rule.NoFindTaclet;
 

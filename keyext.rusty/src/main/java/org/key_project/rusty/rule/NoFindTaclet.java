@@ -5,7 +5,7 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.ncore.rules.TacletApplPart;
 import org.key_project.rusty.rule.executor.rustydl.NoFindTacletExecutor;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -33,8 +33,9 @@ public class NoFindTaclet extends Taclet {
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
-            TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            org.key_project.ncore.rules.TacletAttributes attrs,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+            ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, attrs, prefixMap,
             tacletAnnotations);
         createTacletServices();
@@ -49,8 +50,8 @@ public class NoFindTaclet extends Taclet {
      * @return Set of schemavariables of {@code if} and the (optional) find part
      */
     @Override
-    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
-        return getIfVariables();
+    public ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> getAssumesAndFindVariables() {
+        return getAssumesVariables();
     }
 
     /**
@@ -69,9 +70,10 @@ public class NoFindTaclet extends Taclet {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes(displayName(), null);
+        final var attrs = new org.key_project.ncore.rules.TacletAttributes(displayName(), null);
 
-        return new NoFindTaclet(new Name(s), applPart, goalTemplates(), attrs,
+        return new NoFindTaclet(new Name(s), applPart,
+            (ImmutableList<TacletGoalTemplate>) goalTemplates(), attrs,
             prefixMap, tacletAnnotations);
     }
 }

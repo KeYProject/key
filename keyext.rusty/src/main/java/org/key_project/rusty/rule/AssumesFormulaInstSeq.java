@@ -53,7 +53,7 @@ public class AssumesFormulaInstSeq implements AssumesFormulaInstantiation {
      * Create a list with all formulas of a given semisequent
      */
     private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(Sequent p_s,
-                                                                              boolean antec) {
+            boolean antec) {
         Semisequent semi;
         if (antec) {
             semi = p_s.antecedent();
@@ -73,7 +73,7 @@ public class AssumesFormulaInstSeq implements AssumesFormulaInstantiation {
     }
 
     public static ImmutableArray<AssumesFormulaInstantiation> createList(Sequent p_s, boolean antec,
-                                                                         Services services) {
+            Services services) {
         return createListHelp(p_s, antec);
     }
 

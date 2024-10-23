@@ -6,9 +6,13 @@ package org.key_project.rusty.rule;
 import java.util.Iterator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.Semisequent;
+import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.Quantifier;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
@@ -55,7 +59,7 @@ public class TestApplyTaclet {
             return Semisequent.EMPTY_SEMISEQUENT;
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+        return (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
     }
 
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
@@ -119,7 +123,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = goal.apply();
         assertEquals(1, goals.size(), "Too many or zero goals for imp_right_add.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
@@ -536,7 +540,8 @@ public class TestApplyTaclet {
         Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
         SequentFormula ifformula = new SequentFormula(ifterm);
         ImmutableList<AssumesFormulaInstantiation> ifInsts = ImmutableSLList
-                .<AssumesFormulaInstantiation>nil().prepend(new IfFormulaInstDirect(ifformula));
+                .<AssumesFormulaInstantiation>nil()
+                .prepend(new AssumesFormulaInstDirect(ifformula));
         appIt = rApplist.iterator();
         while (appIt.hasNext()) {
             TacletApp a =

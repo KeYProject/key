@@ -7,8 +7,12 @@ import java.io.File;
 import java.io.IOException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
-import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.Semisequent;
+import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
@@ -37,7 +41,7 @@ public class BasicTest {
             return Semisequent.EMPTY_SEMISEQUENT;
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+        return (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
     }
 
     private static Goal createGoal(Node n, TacletIndex tacletIndex) {

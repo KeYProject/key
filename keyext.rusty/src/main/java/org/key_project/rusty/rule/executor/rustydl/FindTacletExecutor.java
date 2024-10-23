@@ -33,14 +33,14 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         final MatchConditions mc = tacletApp.matchConditions();
 
         final ImmutableList<SequentChangeInfo> newSequentsForGoals =
-            checkIfGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
+            checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         final ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
         final Iterator<Goal> goalIt = newGoals.iterator();
         final Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
 
-        for  (var nextGT : taclet.goalTemplates()) {
+        for (var nextGT : taclet.goalTemplates()) {
             final var gt = (TacletGoalTemplate) nextGT;
             final Goal currentGoal = goalIt.next();
             final SequentChangeInfo currentSequent = newSequentsIt.next();
@@ -103,8 +103,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param services the {@link Services} encapsulating all Rust model information
      */
     protected abstract void applyAdd(Sequent add, SequentChangeInfo currentSequent,
-                                     PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
-                                     MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
+            PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
 
     /**
      * applies the {@code replacewith}-expression of taclet goal descriptions

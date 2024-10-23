@@ -5,6 +5,7 @@ package org.key_project.rusty.rule.executor.rustydl;
 
 import java.util.Iterator;
 
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.proof.Goal;
@@ -32,17 +33,17 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
         MatchConditions mc = tacletApp.matchConditions();
 
         ImmutableList<SequentChangeInfo> newSequentsForGoals =
-            checkIfGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
+            checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
-        Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
+        var it = taclet.goalTemplates().iterator();
         Iterator<Goal> goalIt = newGoals.iterator();
         Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
 
         final var services = goal.getOverlayServices();
         while (it.hasNext()) {
-            TacletGoalTemplate gt = it.next();
+            TacletGoalTemplate gt = (TacletGoalTemplate) it.next();
             Goal currentGoal = goalIt.next();
             // add first because we want to use pos information that
             // is lost applying replacewith

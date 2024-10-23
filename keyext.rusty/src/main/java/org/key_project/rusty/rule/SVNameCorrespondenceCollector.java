@@ -7,7 +7,6 @@ import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.rusty.logic.Semisequent;
 import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.SubstOp;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
@@ -66,8 +65,8 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (SequentFormula cf : semiseq) {
-            cf.formula().execPostOrder(this);
+        for (var sf : semiseq) {
+            sf.formula().execPostOrder(this);
         }
     }
 
@@ -90,7 +89,7 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
         SchemaVariable findSV = null;
-        visit(taclet.assumesSequent());
+        visit((Sequent) taclet.assumesSequent());
         if (taclet instanceof FindTaclet) {
             final Term findTerm = ((FindTaclet) taclet).find();
             findTerm.execPostOrder(this);
@@ -98,8 +97,8 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
                 findSV = sv;
             }
         }
-        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
-            TacletGoalTemplate gt = tacletGoalTemplate;
+        for (var tacletGoalTemplate : taclet.goalTemplates()) {
+            TacletGoalTemplate gt = (TacletGoalTemplate) tacletGoalTemplate;
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate rwtgt) {
                 final Term replaceWithTerm = rwtgt.replaceWith();

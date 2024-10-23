@@ -5,30 +5,28 @@ package org.key_project.rusty.rule;
 
 import org.key_project.rusty.rule.inst.SVInstantiations;
 
-public class MatchConditions {
+public class MatchConditions extends org.key_project.ncore.rules.MatchConditions {
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
         new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS);
 
-    private final SVInstantiations instantiations;
-
     public MatchConditions() {
-        this.instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        super(SVInstantiations.EMPTY_SVINSTANTIATIONS);
     }
 
     public MatchConditions(SVInstantiations p_instantiations) {
-        assert p_instantiations != null;
-        instantiations = p_instantiations;
+        super(p_instantiations);
     }
 
     public SVInstantiations getInstantiations() {
-        return instantiations;
+        return (SVInstantiations) instantiations;
     }
 
-    public MatchConditions setInstantiations(SVInstantiations p_instantiations) {
+    public MatchConditions setInstantiations(
+            org.key_project.ncore.rules.inst.SVInstantiations p_instantiations) {
         if (instantiations == p_instantiations) {
             return this;
         } else {
-            return new MatchConditions(p_instantiations);
+            return new MatchConditions((SVInstantiations) p_instantiations);
         }
     }
 }

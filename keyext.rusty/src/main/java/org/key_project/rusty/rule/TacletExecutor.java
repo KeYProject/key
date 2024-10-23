@@ -3,26 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import java.util.Iterator;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.ncore.sequent.PosInOccurrence;
-import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
-import org.key_project.rusty.logic.op.Junctor;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.rule.inst.GenericSortCondition;
 import org.key_project.rusty.rule.inst.SVInstantiations;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
-public abstract class TacletExecutor<T extends Taclet> extends org.key_project.ncore.rules.TacletExecutor<@NonNull Goal,@NonNull RuleApp, T> {
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+public abstract class TacletExecutor<T extends Taclet> extends
+        org.key_project.ncore.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T> {
     public TacletExecutor(T taclet) {
         super(taclet);
     }
@@ -38,19 +34,32 @@ public abstract class TacletExecutor<T extends Taclet> extends org.key_project.n
      */
     public abstract ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
 
+    @Override
+    public <Goal extends @NonNull ProofGoal<Goal>> ImmutableList<Goal> apply(
+            ProofGoal<@NonNull Goal> goal, org.key_project.ncore.rules.RuleApp ruleApp) {
+        // TODO @ DD
+        return (ImmutableList<Goal>) apply((org.key_project.rusty.proof.Goal) goal,
+            (RuleApp) ruleApp);
+    }
+
     /**
      * adds the given rules (i.e. the rules to add according to the Taclet goal template to the node
      * of the given goal)
      *
      * @param rules the rules to be added
      * @param goal the goal describing the node where the rules should be added
-     * @param services the Services encapsulating all Rust information
-     * @param matchCond the MatchConditions containing in particular the instantiations of the
+     * @param p_services the Services encapsulating all Rust information
+     * @param p_matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      */
-    protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, Services services,
-            MatchConditions matchCond) {
-        for (Taclet tacletToAdd : rules) {
+    @Override
+    protected void applyAddrule(ImmutableList<? extends org.key_project.ncore.rules.Taclet> rules,
+            @NonNull Goal goal, LogicServices p_services,
+            org.key_project.ncore.rules.MatchConditions p_matchCond) {
+        var services = (Services) p_services;
+        var matchCond = (MatchConditions) p_matchCond;
+        for (var rule : rules) {
+            var tacletToAdd = (Taclet) rule;
             final Node n = goal.getNode();
             tacletToAdd = tacletToAdd
                     .setName(tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId());
@@ -110,5 +119,35 @@ public abstract class TacletExecutor<T extends Taclet> extends org.key_project.n
                 mc.getInstantiations(), goal, taclet, ruleApp, services);
         term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
+    }
+
+    @Override
+    protected Term not(Term t, @NonNull Goal goal) {
+        return goal.getOverlayServices().getTermBuilder().not(t);
+    }
+
+    @Override
+    protected Term and(Term t1, Term t2, @NonNull Goal goal) {
+        return goal.getOverlayServices().getTermBuilder().and(t1, t2);
+    }
+
+    @Override
+    protected Term applyContextUpdate(org.key_project.ncore.rules.inst.SVInstantiations p_svInst,
+            Term formula, @NonNull Goal goal) {
+        var svInst = (SVInstantiations) p_svInst;
+        if (svInst.getUpdateContext().isEmpty()) {
+            return formula;
+        } else {
+            return goal.getOverlayServices().getTermBuilder()
+                    .applyUpdatePairsSequential(svInst.getUpdateContext(), formula);
+        }
+    }
+
+    @Override
+    protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
+            org.key_project.ncore.rules.MatchConditions mc, @NonNull Goal goal,
+            @NonNull RuleApp ruleApp, LogicServices services) {
+        return syntacticalReplace(term, applicationPosInOccurrence, (MatchConditions) mc, goal,
+            ruleApp, (Services) services);
     }
 }

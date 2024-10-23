@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.ncore.rules.AssumesFormulaInstantiation;
+import org.key_project.ncore.rules.AssumesMatchResult;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+
 
 public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher {
     /**
@@ -30,6 +33,12 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
     MatchConditions matchFind(Term term, MatchConditions matchCond,
             Services services);
 
+    @Override
+    default MatchConditions matchFind(Term term,
+            org.key_project.ncore.rules.MatchConditions matchCond, LogicServices services) {
+        return matchFind(term, (MatchConditions) matchCond, (Services) services);
+    }
+
     /**
      * checks if the conditions for a correct instantiation are satisfied
      *
@@ -44,6 +53,14 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
     MatchConditions checkVariableConditions(SchemaVariable var,
             SyntaxElement instantiationCandidate, MatchConditions matchCond, Services services);
 
+    @Override
+    default MatchConditions checkVariableConditions(org.key_project.logic.op.sv.SchemaVariable var,
+            SyntaxElement instantiationCandidate,
+            org.key_project.ncore.rules.MatchConditions matchCond, LogicServices services) {
+        return checkVariableConditions((SchemaVariable) var, instantiationCandidate,
+            (MatchConditions) matchCond, (Services) services);
+    }
+
     /**
      * checks the provided matches against the variable conditions of this taclet It returns the
      * resulting match conditions or <code>null</code> if the found matches do not satisfy the
@@ -56,6 +73,12 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
      *         the taclet's variable conditions
      */
     MatchConditions checkConditions(MatchConditions matchConditions, Services services);
+
+    @Override
+    default MatchConditions checkConditions(
+            org.key_project.ncore.rules.MatchConditions matchConditions, LogicServices services) {
+        return checkConditions((MatchConditions) matchConditions, (Services) services);
+    }
 
     /**
      * Match the given template (which is probably a formula of the assumes-sequent) against a list
@@ -73,8 +96,14 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
      *         could successfully be matched against p_template, and the corresponding
      *         MatchConditions.
      */
-    IfMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch, Term template,
-                               MatchConditions matchCond, Services services);
+    AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch, Term template,
+            MatchConditions matchCond, Services services);
+
+    default AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
+            Term template,
+            org.key_project.ncore.rules.MatchConditions matchCond, LogicServices services) {
+        return matchAssumes(toMatch, template, (MatchConditions) matchCond, (Services) services);
+    }
 
     /**
      * Match the whole if sequent using the given list of instantiations of all assumes-sequent
@@ -87,10 +116,22 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
     MatchConditions matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
-                                 MatchConditions matchCond, Services services);
+            MatchConditions matchCond, Services services);
+
+    default MatchConditions matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
+            org.key_project.ncore.rules.MatchConditions matchCond, LogicServices services) {
+        return matchAssumes(toMatch, (MatchConditions) matchCond, (Services) services);
+    }
 
     MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchConditions,
             Services services);
+
+    default MatchConditions matchSV(org.key_project.logic.op.sv.SchemaVariable sv, Term term,
+            org.key_project.ncore.rules.MatchConditions matchConditions,
+            LogicServices services) {
+        return matchSV((SchemaVariable) sv, term, (MatchConditions) matchConditions,
+            (Services) services);
+    }
 
     MatchConditions matchSV(SchemaVariable sv, RustyProgramElement pe,
             MatchConditions matchConditions, Services services);

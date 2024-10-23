@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.executor.rustydl;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.RewriteTaclet;
@@ -41,8 +43,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      */
     @Override
     protected void applyAdd(Sequent add,
-                            SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
-                            MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+            SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
         if (posOfFind.isInAntec()) {
             addToAntec(add.antecedent(),
                 currentSequent,
@@ -86,7 +88,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         Term formula = replace(term, rwTemplate,
             posOfFind, it, matchCond, term.sort(), goal, services, ruleApp);
         if (term == formula) {
-            return posOfFind.sequentFormula();
+            return (SequentFormula) posOfFind.sequentFormula();
         } else {
             return new SequentFormula(formula);
         }

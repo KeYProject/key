@@ -37,8 +37,8 @@ public class BoundVarsVisitor implements Visitor<@NonNull Term> {
      * visits a sequent
      */
     public void visit(Sequent visited) {
-        for (SequentFormula cf : visited) {
-            visit(cf.formula());
+        for (var sf : visited) {
+            visit(sf.formula());
         }
     }
 

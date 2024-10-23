@@ -181,7 +181,7 @@ public class LogicPrinter {
     public void printSemisequent(Semisequent semiseq) {
         for (int i = 0; i < semiseq.size(); i++) {
             layouter.markStartSub();
-            printConstrainedFormula(semiseq.get(i));
+            printConstrainedFormula((SequentFormula) semiseq.get(i));
             layouter.markEndSub();
             if (i != semiseq.size() - 1) {
                 layouter.print(",").brk();

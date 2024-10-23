@@ -48,8 +48,9 @@ public class PosTacletApp extends TacletApp {
     }
 
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
-                                                  SVInstantiations instantiations, ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
-                                                  PosInOccurrence pos, Services services) {
+            SVInstantiations instantiations,
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
+            PosInOccurrence pos, Services services) {
         instantiations = resolveCollisionWithContext(taclet,
             resolveCollisionVarSV(taclet, instantiations, services), pos, services);
         if (checkVarCondNotFreeIn(taclet, instantiations, pos)) {
@@ -73,7 +74,7 @@ public class PosTacletApp extends TacletApp {
      * @param pos the PosInOccurrence storing the position where to apply the Taclet
      */
     private PosTacletApp(FindTaclet taclet, SVInstantiations instantiations,
-                         ImmutableList<AssumesFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
         super(taclet, instantiations, ifInstantiations);
         this.pos = pos;
     }
@@ -185,7 +186,7 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setAllInstantiations(MatchConditions mc,
-                                             ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services) {
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(), ifInstantiations,
             posInOccurrence(), services);
     }

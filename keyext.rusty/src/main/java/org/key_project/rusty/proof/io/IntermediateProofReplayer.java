@@ -3,16 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof.io;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.ncore.rules.AssumesFormulaInstantiation;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.NamespaceSet;
+import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.LogicVariable;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -290,7 +298,8 @@ public class IntermediateProofReplayer {
             ImmutableSLList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
-                ifFormulaList.append(new AssumesFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
+                ifFormulaList
+                        .append(new AssumesFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             // MU 2019: #1487. We have to use the right namespaces to not
@@ -298,7 +307,8 @@ public class IntermediateProofReplayer {
             NamespaceSet nss = currGoal.getLocalNamespaces();
             Term term = parseTerm(ifFormulaStr, proof, nss.variables(), nss.programVariables(),
                 nss.functions());
-            ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(new SequentFormula(term)));
+            ifFormulaList =
+                ifFormulaList.append(new AssumesFormulaInstDirect(new SequentFormula(term)));
         }
 
         if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {

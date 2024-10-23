@@ -3,24 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.Taclet;
-import org.key_project.rusty.rule.TacletApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
-public class TacletGoalTemplate extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate<@NonNull TacletApp> {
+public class TacletGoalTemplate
+        extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate {
     /**
      * creates new Goaldescription
      *
@@ -63,7 +63,7 @@ public class TacletGoalTemplate extends org.key_project.ncore.rules.tacletbuilde
      * @return IList<Taclet> contains new introduced rules
      */
     public ImmutableList<Taclet> rules() {
-        return(ImmutableList<@NonNull  Taclet>) super.rules();
+        return (ImmutableList<@NonNull Taclet>) super.rules();
     }
 
     public ImmutableSet<SchemaVariable> addedProgVars() {

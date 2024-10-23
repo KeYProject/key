@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.io.intermediate.AppNodeIntermediate;
 import org.key_project.rusty.proof.io.intermediate.BranchNodeIntermediate;
@@ -17,8 +17,6 @@ import org.key_project.rusty.proof.io.intermediate.TacletAppIntermediate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
-
-import static org.key_project.rusty.proof.io.IProofFileParser.ProofElementID.*;
 
 public class IntermediatePresentationProofFileParser implements IProofFileParser {
     /* + The proof object for storing meta information */

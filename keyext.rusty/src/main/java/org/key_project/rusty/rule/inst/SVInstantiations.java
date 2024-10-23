@@ -20,7 +20,7 @@ import org.key_project.util.collection.*;
 
 import static org.key_project.rusty.rule.match.instructions.MatchProgramSVInstruction.convertToLogicElement;
 
-public class SVInstantiations {
+public class SVInstantiations implements org.key_project.ncore.rules.inst.SVInstantiations {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
     /**

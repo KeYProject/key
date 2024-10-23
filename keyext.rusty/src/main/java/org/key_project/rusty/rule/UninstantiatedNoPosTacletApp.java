@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
 
 public class UninstantiatedNoPosTacletApp extends NoPosTacletApp {

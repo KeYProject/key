@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.pp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 public class PosInSequent {
     private Range bounds;
     private final boolean sequent;

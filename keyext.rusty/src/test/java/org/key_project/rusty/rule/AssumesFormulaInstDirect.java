@@ -1,30 +1,31 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.rusty.proof.io;
+package org.key_project.rusty.rule;
 
-import org.key_project.rusty.Services;
+import org.key_project.logic.LogicServices;
+import org.key_project.ncore.rules.AssumesFormulaInstantiation;
 import org.key_project.rusty.logic.SequentFormula;
 
 /**
  * Instantiation of an if-formula that has to be proven by an explicit if-goal
  */
-public class IfFormulaInstDirect implements AssumesFormulaInstantiation {
+public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
+
     /**
      * Simply the formula
      */
-    private final SequentFormula sf;
+    private final SequentFormula cf;
 
-    public IfFormulaInstDirect(SequentFormula sf) {
-        this.sf = sf;
+    public AssumesFormulaInstDirect(SequentFormula p_cf) {
+        cf = p_cf;
     }
 
     /**
      * @return the cf this is pointing to
      */
-    @Override
     public SequentFormula getSequentFormula() {
-        return sf;
+        return cf;
     }
 
     public String toString() {
@@ -32,20 +33,19 @@ public class IfFormulaInstDirect implements AssumesFormulaInstantiation {
     }
 
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstDirect o)) {
+        if (!(p_obj instanceof AssumesFormulaInstDirect)) {
             return false;
         }
-        return sf.equals(o.sf);
+        return cf.equals(((AssumesFormulaInstDirect) p_obj).cf);
     }
 
     public int hashCode() {
         int result = 17;
-        result = 37 * result + sf.hashCode();
+        result = 37 * result + cf.hashCode();
         return result;
     }
 
-    @Override
-    public String toString(Services services) {
-        return ProofSaver.printAnything(sf.formula(), services);
+    public String toString(LogicServices services) {
+        return cf.formula().toString();
     }
 }

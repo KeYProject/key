@@ -7,12 +7,13 @@ package org.key_project.rusty.rule.tacletbuilder;
 import java.util.Iterator;
 
 import org.key_project.logic.Term;
+import org.key_project.ncore.rules.NotFreeIn;
 import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.rule.*;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableMap;
 
 
 public class TacletPrefixBuilder {
@@ -23,7 +24,7 @@ public class TacletPrefixBuilder {
         0;
     private final TacletBuilder<? extends Taclet> tacletBuilder;
 
-    protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
+    protected ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap =
         DefaultImmutableMap.nilMap();
 
     public TacletPrefixBuilder(TacletBuilder<? extends Taclet> tacletBuilder) {
@@ -63,7 +64,7 @@ public class TacletPrefixBuilder {
         if (t.op() instanceof SchemaVariable sv && t.arity() == 0) {
             if (sv instanceof TermSV || sv instanceof FormulaSV || sv instanceof UpdateSV) {
                 int numberOfBoundVars = removeNotFreeIn(sv);
-                TacletPrefix prefix = prefixMap.get(sv);
+                TacletPrefix prefix = (TacletPrefix) prefixMap.get(sv);
                 if (prefix == null || prefix.prefixLength() == numberOfBoundVars) {
                     setPrefixOfOccurrence(sv, numberOfBoundVars);
                 } else {
@@ -102,8 +103,8 @@ public class TacletPrefixBuilder {
     }
 
     private void visit(Sequent s) {
-        for (final SequentFormula cf : s) {
-            visit(cf.formula());
+        for (final var sf : s) {
+            visit(sf.formula());
         }
     }
 
@@ -135,23 +136,24 @@ public class TacletPrefixBuilder {
 
 
     private void checkPrefixInAddRules(Taclet addRule) {
-        final ImmutableMap<SchemaVariable, TacletPrefix> addRuleSV2PrefixMap = addRule.prefixMap();
-        for (final ImmutableMapEntry<SchemaVariable, TacletPrefix> entry : prefixMap) {
-            final TacletPrefix addRulePrefix = addRuleSV2PrefixMap.get(entry.key());
+        final var addRuleSV2PrefixMap = addRule.prefixMap();
+        for (final var entry : prefixMap) {
+            final TacletPrefix addRulePrefix = (TacletPrefix) addRuleSV2PrefixMap.get(entry.key());
 
+            var prefix = (TacletPrefix) entry.value();
             if (addRulePrefix != null
-                    && addRulePrefix.prefixLength() != entry.value().prefixLength()) {
+                    && addRulePrefix.prefixLength() != prefix.prefixLength()) {
                 throw new TacletPrefixBuilder.InvalidPrefixException(
-                    tacletBuilder.getName().toString(), entry.key(),
-                    entry.value(), addRulePrefix.prefixLength());
+                    tacletBuilder.getName().toString(), (SchemaVariable) entry.key(),
+                    prefix, addRulePrefix.prefixLength());
             }
         }
 
         // we have to descend into the addrules of the addrules
 
-        for (TacletGoalTemplate tacletGoalTemplate : addRule.goalTemplates()) {
-            for (Taclet taclet : tacletGoalTemplate.rules()) {
-                checkPrefixInAddRules(taclet);
+        for (var tacletGoalTemplate : addRule.goalTemplates()) {
+            for (var taclet : tacletGoalTemplate.rules()) {
+                checkPrefixInAddRules((Taclet) taclet);
             }
         }
     }
@@ -197,14 +199,15 @@ public class TacletPrefixBuilder {
         if (!(tacletBuilder instanceof RewriteTacletBuilder) || !atMostOneRepl()) {
             return;
         }
-        for (final ImmutableMapEntry<SchemaVariable, TacletPrefix> entry : prefixMap) {
-            if (occurrsOnlyInFindOrRepl(entry.key())) {
+        for (final var entry : prefixMap) {
+            var sv = (SchemaVariable) entry.key();
+            if (occurrsOnlyInFindOrRepl(sv)) {
                 prefixMap = prefixMap.put(entry.key(), entry.value().setContext(true));
             }
         }
     }
 
-    public ImmutableMap<SchemaVariable, TacletPrefix> getPrefixMap() {
+    public ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> getPrefixMap() {
         considerContext();
         return prefixMap;
     }

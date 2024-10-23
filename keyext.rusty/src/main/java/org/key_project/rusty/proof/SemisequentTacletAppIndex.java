@@ -5,8 +5,9 @@ package org.key_project.rusty.proof;
 
 import java.util.Iterator;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.PosInTerm;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.rule.NoPosTacletApp;
@@ -45,10 +46,10 @@ public class SemisequentTacletAppIndex {
      * Add indices for the given formulas to the map <code>termIndices</code>. Existing entries are
      * replaced with the new indices. Note: destructive, use only when constructing new index
      */
-    private void addTermIndices(ImmutableList<SequentFormula> cfmas, Services services,
+    private void addTermIndices(ImmutableList<? super SequentFormula> cfmas, Services services,
             TacletIndex tacletIndex) {
         while (!cfmas.isEmpty()) {
-            final SequentFormula cfma = cfmas.head();
+            final SequentFormula cfma = (SequentFormula) cfmas.head();
             cfmas = cfmas.tail();
             addTermIndex(cfma, services, tacletIndex);
         }
@@ -80,7 +81,7 @@ public class SemisequentTacletAppIndex {
      * Get term index for the formula to which position <code>pos</code> points
      */
     private TermTacletAppIndex getTermIndex(PosInOccurrence pos) {
-        return termIndices.get(pos.sequentFormula());
+        return termIndices.get((SequentFormula) pos.sequentFormula());
     }
 
     /**

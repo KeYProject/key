@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 public record FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
 
     public SequentFormula getOriginalFormula() {
-        return positionOfModification().sequentFormula();
+        return (SequentFormula) positionOfModification().sequentFormula();
     }
 
     /**

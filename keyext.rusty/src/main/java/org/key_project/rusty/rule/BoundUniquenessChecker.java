@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -52,8 +51,8 @@ public class BoundUniquenessChecker {
      * @param seq the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
-        for (final SequentFormula cf : seq) {
-            terms = terms.prepend(cf.formula());
+        for (final var sf : seq) {
+            terms = terms.prepend(sf.formula());
         }
     }
 

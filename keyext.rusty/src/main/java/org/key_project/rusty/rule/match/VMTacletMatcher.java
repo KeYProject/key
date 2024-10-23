@@ -10,15 +10,20 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.ncore.rules.AssumesFormulaInstantiation;
+import org.key_project.ncore.rules.AssumesMatchResult;
+import org.key_project.ncore.rules.NotFreeIn;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.UpdateApplication;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.match.instructions.MatchSchemaVariableInstruction;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -56,10 +61,10 @@ public class VMTacletMatcher implements TacletMatcher {
     private final Term findExp;
 
     public VMTacletMatcher(Taclet taclet) {
-        varconditions = taclet.getVariableConditions();
-        assumesSequent = taclet.assumesSequent();
+        varconditions = (ImmutableList<VariableCondition>) taclet.getVariableConditions();
+        assumesSequent = (Sequent) taclet.assumesSequent();
         boundVars = taclet.getBoundVariables();
-        varsNotFreeIn = taclet.varsNotFreeIn();
+        varsNotFreeIn = (ImmutableList<NotFreeIn>) taclet.varsNotFreeIn();
 
         if (taclet instanceof FindTaclet ft) {
             findExp = ft.find();
@@ -73,7 +78,7 @@ public class VMTacletMatcher implements TacletMatcher {
             findMatchProgram = TacletMatchProgram.EMPTY_PROGRAM;
         }
 
-        for (SequentFormula sf : assumesSequent) {
+        for (var sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(), TacletMatchProgram.createProgram(sf.formula()));
         }
     }
@@ -199,14 +204,14 @@ public class VMTacletMatcher implements TacletMatcher {
     }
 
     @Override
-    public final IfMatchResult matchIf(Iterable<AssumesFormulaInstantiation> toMatch,
-            Term template, MatchConditions matchCond, Services services) {
+    public final AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
+            Term template, MatchConditions matchCond, Services lservices) {
+        var services = (Services) lservices;
         TacletMatchProgram prg = assumesMatchPrograms.get(template);
-
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas =
             ImmutableSLList.nil();
-        ImmutableList<MatchConditions> resMC = ImmutableSLList.nil();
+        ImmutableList<org.key_project.ncore.rules.MatchConditions> resMC = ImmutableSLList.nil();
 
         final boolean updateContextPresent =
             !matchCond.getInstantiations().getUpdateContext().isEmpty();
@@ -233,7 +238,7 @@ public class VMTacletMatcher implements TacletMatcher {
                 }
             }
         }
-        return new IfMatchResult(resFormulas, resMC);
+        return new AssumesMatchResult(resFormulas, resMC);
     }
 
     /**
@@ -269,13 +274,13 @@ public class VMTacletMatcher implements TacletMatcher {
      * @inheritDoc
      */
     @Override
-    public final MatchConditions matchIf(Iterable<AssumesFormulaInstantiation> p_toMatch,
+    public final MatchConditions matchAssumes(Iterable<AssumesFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services) {
 
-        final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
-        final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
+        final var anteIterator = assumesSequent.antecedent().iterator();
+        final var succIterator = assumesSequent.succedent().iterator();
 
-        ImmutableList<MatchConditions> newMC;
+        ImmutableList<org.key_project.ncore.rules.MatchConditions> newMC;
 
         for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ
@@ -287,19 +292,20 @@ public class VMTacletMatcher implements TacletMatcher {
                             // Default: just take the next ante formula, else succ formula
                             && anteIterator.hasNext();
 
-            Iterator<SequentFormula> itIfSequent = candidateInAntec ? anteIterator : succIterator;
+            var itIfSequent = candidateInAntec ? anteIterator : succIterator;
             // Fix end
 
             assert itIfSequent.hasNext()
                     : "toMatch and assumes sequent must have same number of elements";
-            newMC = matchIf(ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(candidateInst),
-                itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
+            newMC = matchAssumes(
+                ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(candidateInst),
+                itIfSequent.next().formula(), p_matchCond, p_services).matchConditions();
 
             if (newMC.isEmpty()) {
                 return null;
             }
 
-            p_matchCond = newMC.head();
+            p_matchCond = (MatchConditions) newMC.head();
         }
         assert !anteIterator.hasNext() && !succIterator.hasNext()
                 : "toMatch and assumes sequent must have same number of elements";
