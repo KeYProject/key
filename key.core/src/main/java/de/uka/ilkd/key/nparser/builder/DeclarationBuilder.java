@@ -183,7 +183,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                 // weigl: agreement on KaKeY meeting: this should be ignored until we finally have
                 // local namespaces for generic sorts
                 // addWarning(ctx, "Sort declaration is ignored, due to collision.");
-                LOGGER.info("Sort declaration of {} in {} is ignored due to collision (already "
+                LOGGER.debug("Sort declaration of {} in {} is ignored due to collision (already "
                     + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
                     existingSort.getOrigin());
             }

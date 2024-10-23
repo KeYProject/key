@@ -86,9 +86,13 @@ public class TestMapAsListFromIntegerToString {
         // another key before
         Integer hundred = 100;
         map = map.put(hundred, entryStr[1]);
-        assertSame(map.get(hundred), entryStr[1],
+        String valHundred = map.get(hundred);
+        assertNotNull(valHundred);
+        assertSame(valHundred, entryStr[1],
             entryStr[1] + " is not mapped to the newer key 100");
-        assertSame(map.get(entryInt[1]), entryStr[1],
+        String val1 = map.get(entryInt[1]);
+        assertNotNull(val1);
+        assertSame(val1, entryStr[1],
             entryStr[1] + " is not mapped to the older key " + entryInt[1]);
     }
 
