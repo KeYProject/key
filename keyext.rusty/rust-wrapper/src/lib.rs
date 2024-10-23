@@ -3,7 +3,8 @@
 
 use jni::{
     objects::{JClass, JObject},
-    JNIEnv,
+    sys::{jint, jobject, JNI_VERSION_1_8},
+    JNIEnv, JavaVM,
 };
 
 mod callbacks;
@@ -28,6 +29,11 @@ pub extern "system" fn Java_org_key_1project_rusty_nast_Wrapper_start<'a>(
         .alloc_object(crate_class)
         .expect("Could not allocate crate");
     return ret;
+}
+
+#[no_mangle]
+pub extern "system" fn JNI_OnLoad_rustwrapper(_vm: JavaVM, _reserved: jobject) -> jint {
+    JNI_VERSION_1_8
 }
 
 pub fn start() -> Crate {

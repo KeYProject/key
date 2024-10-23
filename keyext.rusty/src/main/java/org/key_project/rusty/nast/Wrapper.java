@@ -8,7 +8,7 @@ public class Wrapper {
     private static native Crate start();
 
     static {
-        System.loadLibrary("rust_wrapper");
+        System.loadLibrary("rustwrapper");
     }
 
     public static Crate parse() {
