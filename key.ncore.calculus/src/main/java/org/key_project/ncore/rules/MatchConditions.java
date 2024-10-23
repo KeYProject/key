@@ -7,7 +7,7 @@ package org.key_project.ncore.rules;
 import org.key_project.ncore.rules.inst.SVInstantiations;
 
 public abstract class MatchConditions {
-    private final SVInstantiations instantiations;
+    protected final SVInstantiations instantiations;
 
     protected MatchConditions(SVInstantiations p_instantiations) {
         assert p_instantiations != null;

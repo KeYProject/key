@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.key_project.util.collection.ImmutableSet;
 

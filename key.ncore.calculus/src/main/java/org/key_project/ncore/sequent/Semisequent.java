@@ -174,7 +174,8 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
      *         which formulas have been added or removed
      */
     private SemisequentChangeInfo insertAndRemoveRedundancy(int idx,
-            ImmutableList<? extends SequentFormula> sequentFormulasToBeInserted, SemisequentChangeInfo sci) {
+            ImmutableList<? extends SequentFormula> sequentFormulasToBeInserted,
+            SemisequentChangeInfo sci) {
 
         int pos = idx;
         ImmutableList<SequentFormula> oldFormulas = sci.getFormulaList();
@@ -255,7 +256,8 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
      * @return a semi sequent change information object with the new semisequent and information
      *         which formulas have been added or removed
      */
-    public SemisequentChangeInfo insert(int idx, ImmutableList<? extends SequentFormula> insertionList) {
+    public SemisequentChangeInfo insert(int idx,
+            ImmutableList<? extends SequentFormula> insertionList) {
         return removeRedundance(idx, insertionList);
     }
 

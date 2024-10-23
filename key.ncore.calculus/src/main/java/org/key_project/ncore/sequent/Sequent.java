@@ -126,7 +126,8 @@ public abstract class Sequent implements Iterable<SequentFormula> {
      * @return a SequentChangeInfo which contains the new sequent and information which formulas
      *         have been added or removed
      */
-    public SequentChangeInfo addFormula(ImmutableList<? extends SequentFormula> insertions, boolean antec,
+    public SequentChangeInfo addFormula(ImmutableList<? extends SequentFormula> insertions,
+            boolean antec,
             boolean first) {
 
         final Semisequent seq = antec ? antecedent : succedent;

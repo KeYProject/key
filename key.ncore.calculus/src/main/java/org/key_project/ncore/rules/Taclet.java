@@ -8,7 +8,6 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.ncore.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -19,7 +18,7 @@ import org.jspecify.annotations.NonNull;
 
 import static org.key_project.util.Strings.formatAsList;
 
-public abstract class Taclet<App extends @NonNull RuleApp>
+public abstract class Taclet
         implements Rule {
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
@@ -38,25 +37,25 @@ public abstract class Taclet<App extends @NonNull RuleApp>
      * Variables that have to be created each time the taclet is applied. Those variables occur in
      * the varcond part of a taclet description.
      */
-    private final ImmutableList<?extends NewVarcond> varsNew;
+    private final ImmutableList<? extends NewVarcond> varsNew;
     /**
      * variables with a "x not free in y" variable condition. This means the instantiation of
      * VariableSV x must not occur free in the instantiation of TermSV y.
      */
-    private final ImmutableList<?extends NotFreeIn> varsNotFreeIn;
+    private final ImmutableList<? extends NotFreeIn> varsNotFreeIn;
     /**
      * variable conditions used to express that a termsv depends on the free variables of a given
      * formula(SV) Used by skolemization rules.
      */
-    private final ImmutableList<?extends NewDependingOn> varsNewDependingOn;
+    private final ImmutableList<? extends NewDependingOn> varsNewDependingOn;
 
     /** Additional generic conditions for schema variable instantiations. */
-    private final ImmutableList<?extends VariableCondition> variableConditions;
+    private final ImmutableList<? extends VariableCondition> variableConditions;
 
     /**
      * the list of taclet goal descriptions
      */
-    private final ImmutableList<?extends TacletGoalTemplate<App>> goalTemplates;
+    private final ImmutableList<? extends TacletGoalTemplate> goalTemplates;
 
     /**
      * map from a schemavariable to its prefix. The prefix is used to test correct instantiations of
@@ -91,7 +90,7 @@ public abstract class Taclet<App extends @NonNull RuleApp>
     /**
      * The taclet executor
      */
-    protected TacletExecutor/*<?, App, ? extends Taclet<?, App>>*/ executor;
+    protected TacletExecutor/* <?, App, ? extends Taclet<?, App>> */ executor;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -104,7 +103,7 @@ public abstract class Taclet<App extends @NonNull RuleApp>
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<? extends TacletGoalTemplate<App>> goalTemplates,
+            ImmutableList<? extends TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -146,7 +145,7 @@ public abstract class Taclet<App extends @NonNull RuleApp>
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate<App>> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, prefixMap, false,
@@ -209,7 +208,7 @@ public abstract class Taclet<App extends @NonNull RuleApp>
     /**
      * @return the generic variable conditions of this taclet
      */
-    public ImmutableList<?extends VariableCondition> getVariableConditions() {
+    public ImmutableList<? extends VariableCondition> getVariableConditions() {
         return variableConditions;
     }
 
@@ -239,25 +238,25 @@ public abstract class Taclet<App extends @NonNull RuleApp>
     /**
      * returns an iterator over the variables that are new in the Taclet.
      */
-    public ImmutableList<?extends NewVarcond> varsNew() {
+    public ImmutableList<? extends NewVarcond> varsNew() {
         return varsNew;
     }
 
     /**
      * returns an iterator over the variable pairs that indicate that are new in the Taclet.
      */
-    public ImmutableList<?extends NotFreeIn> varsNotFreeIn() {
+    public ImmutableList<? extends NotFreeIn> varsNotFreeIn() {
         return varsNotFreeIn;
     }
 
-    public ImmutableList<?extends NewDependingOn> varsNewDependingOn() {
+    public ImmutableList<? extends NewDependingOn> varsNewDependingOn() {
         return varsNewDependingOn;
     }
 
     /**
      * returns an iterator over the goal descriptions.
      */
-    public ImmutableList<? extends TacletGoalTemplate<App>> goalTemplates() {
+    public ImmutableList<? extends TacletGoalTemplate> goalTemplates() {
         return goalTemplates;
     }
 
@@ -402,9 +401,9 @@ public abstract class Taclet<App extends @NonNull RuleApp>
         return tacletAsString;
     }
 
-    public<G extends ProofGoal<G>, App extends RuleApp, T extends Taclet<App>> TacletExecutor<G, App, T> getExecutor() {
+    public TacletExecutor<?, ?, ?> getExecutor() {
         return executor;
     }
 
-    public abstract Taclet<App> setName(String s);
+    public abstract Taclet setName(String s);
 }
