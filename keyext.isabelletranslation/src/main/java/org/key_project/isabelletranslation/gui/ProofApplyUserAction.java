@@ -49,7 +49,8 @@ public class ProofApplyUserAction extends UserAction {
 
             goalsClosed.add(goal);
 
-            IBuiltInRuleApp app = IsabelleRuleApp.RULE.createApp(solver.name(), solver.getFinalResult().getSuccessfulTactic());
+            IBuiltInRuleApp app = IsabelleRuleApp.RULE.createApp(solver.name(),
+                solver.getFinalResult().getSuccessfulTactic());
             app.tryToInstantiate(goal);
             goal.apply(app);
         }
