@@ -97,7 +97,7 @@ public abstract class ProgramSVSort extends SortImpl {
         private final String sortName;
 
         public SortedVariableSort(String sort) {
-            super(new Name("Variable_"+sort));
+            super(new Name("Variable_" + sort));
             sortName = sort;
         }
 

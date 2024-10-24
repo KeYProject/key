@@ -1,0 +1,29 @@
+\profile "Rust Profile";
+
+\programVariables {
+    u32 a;
+    u32 b;
+    MRef_u32 x;
+    u32 c;
+}
+
+\problem {
+    \<{
+        a = 1u32;
+        b = 2u32;
+        x = &mut a;
+        *x = 0u32;
+        x = &mut b;
+        *x = 4u32;
+        c = a + b;
+        c
+    }\> (u32ToInt(c) = 4)
+}
+
+\proof {
+    (branch "dummy ID"
+        (rule "assignment" (formula "1"))
+        (rule "assignment" (formula "1") (term "1"))
+        (rule "borrowMut" (formula "1") (term "1,1"))
+    )
+}

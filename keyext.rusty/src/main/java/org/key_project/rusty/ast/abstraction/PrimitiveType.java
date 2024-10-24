@@ -53,7 +53,8 @@ public final class PrimitiveType implements Type {
     @Override
     public Sort getSort(Services services) {
         var sort = services.getNamespaces().sorts().lookup(name);
-        if (sort == null) throw new RuntimeException("Unknown type " + this);
+        if (sort == null)
+            throw new RuntimeException("Unknown type " + this);
         return sort;
     }
 }

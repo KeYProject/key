@@ -218,7 +218,8 @@ public class Converter {
             var segments =
                 pieCtx.pathExprSegment().stream().map(this::convertPathExprSegment).toList();
             var pie = new PathInExpression(new ImmutableArray<>(segments));
-            return Objects.requireNonNull(getProgramVariable(pie), "PV for " + pie.toString() + " is null");
+            return Objects.requireNonNull(getProgramVariable(pie),
+                "PV for " + pie.toString() + " is null");
         }
     }
 
@@ -730,7 +731,8 @@ public class Converter {
         return new PrimitiveRustType(pt);
     }
 
-    private RustType convertReferenceType(org.key_project.rusty.parsing.RustyParser.ReferenceTypeContext ctx) {
+    private RustType convertReferenceType(
+            org.key_project.rusty.parsing.RustyParser.ReferenceTypeContext ctx) {
         var isMut = ctx.KW_MUT() != null;
         var inner = convertTypeNoBounds(ctx.typeNoBounds());
         var type = ReferenceType.get(inner.type(), isMut);

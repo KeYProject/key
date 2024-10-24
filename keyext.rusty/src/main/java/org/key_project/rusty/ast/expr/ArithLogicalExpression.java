@@ -44,6 +44,7 @@ public enum Operator implements RustyProgramElement {
     public void visit(Visitor v) {
         v.performActionOnArithLogicalOperator(this);
     }
+
 }
 
     @Override

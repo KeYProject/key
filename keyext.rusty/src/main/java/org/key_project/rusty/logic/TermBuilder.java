@@ -519,4 +519,8 @@ public class TermBuilder {
         return tf.createTerm(op, new ImmutableArray<>(substTerm, origTerm),
             new ImmutableArray<>(substVar));
     }
+
+    public Term mutRef(MutRef mRef) {
+        return tf.createTerm(mRef);
+    }
 }

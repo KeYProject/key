@@ -15,7 +15,7 @@ import org.jspecify.annotations.NonNull;
 
 public class LDTs implements Iterable<LDT> {
     private final BoolLDT boolLDT;
-    private final IntLDT intLDT;
+    private final IntLDT intLDT;;
     private final Map<Name, LDT> map;
 
     public LDTs(Services services) {
