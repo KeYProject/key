@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.visitor.Visitor;
@@ -25,5 +26,10 @@ public record PathInExpression(ImmutableArray<PathExprSegment> segments) impleme
     @Override
     public int getChildCount() {
         return segments.size();
+    }
+
+    @Override
+    public String toString() {
+        return segments.stream().map(PathExprSegment::toString).collect(Collectors.joining("::"));
     }
 }

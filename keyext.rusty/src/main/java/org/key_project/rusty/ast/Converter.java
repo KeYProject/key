@@ -10,6 +10,7 @@ import org.key_project.logic.Name;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
+import org.key_project.rusty.ast.abstraction.ReferenceType;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.FunctionParam;
@@ -21,6 +22,7 @@ import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.ReferenceRustType;
 import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.parsing.RustyParser;
@@ -108,6 +110,7 @@ public class Converter {
     }
 
     private Expr convertExpr(org.key_project.rusty.parsing.RustyParser.ExprContext ctx) {
+        assert ctx != null;
         if (ctx instanceof org.key_project.rusty.parsing.RustyParser.LiteralExpressionContext lit)
             return convertLiteralExpr(lit.literalExpr());
         if (ctx instanceof org.key_project.rusty.parsing.RustyParser.PathExpressionContext path)
@@ -215,7 +218,7 @@ public class Converter {
             var segments =
                 pieCtx.pathExprSegment().stream().map(this::convertPathExprSegment).toList();
             var pie = new PathInExpression(new ImmutableArray<>(segments));
-            return Objects.requireNonNull(getProgramVariable(pie));
+            return Objects.requireNonNull(getProgramVariable(pie), "PV for " + pie.toString() + " is null");
         }
     }
 
@@ -682,6 +685,8 @@ public class Converter {
             throw new IllegalArgumentException("TODO @ DD");
         if (ctx.neverType() != null)
             throw new IllegalArgumentException("TODO @ DD");
+        if (ctx.referenceType() != null)
+            return convertReferenceType(ctx.referenceType());
         throw new IllegalArgumentException("Unknown type " + ctx.getText());
     }
 
@@ -723,6 +728,13 @@ public class Converter {
         default -> throw new IllegalArgumentException("Unknown type '" + text + "'");
         };
         return new PrimitiveRustType(pt);
+    }
+
+    private RustType convertReferenceType(org.key_project.rusty.parsing.RustyParser.ReferenceTypeContext ctx) {
+        var isMut = ctx.KW_MUT() != null;
+        var inner = convertTypeNoBounds(ctx.typeNoBounds());
+        var type = ReferenceType.get(inner.type(), isMut);
+        return new ReferenceRustType(isMut, inner, type);
     }
 
     private ImmutableArray<FunctionParam> convertFunctionParams(

@@ -154,6 +154,7 @@ public class TestFile {
                     for (int i = 0; i < errors.size(); i++) {
                         Throwable error = errors.get(i);
                         // LOGGER.warn("Error " + (i + 1) + ":", error);
+                        System.out.println(error.getMessage());
                     }
                 }
 

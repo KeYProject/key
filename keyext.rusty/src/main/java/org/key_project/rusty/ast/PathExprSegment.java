@@ -15,4 +15,9 @@ public record PathExprSegment(PathIdentSegment segment) implements SyntaxElement
     public int getChildCount() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return segment.toString();
+    }
 }

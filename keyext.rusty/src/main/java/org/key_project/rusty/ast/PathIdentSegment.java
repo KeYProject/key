@@ -15,4 +15,9 @@ public record PathIdentSegment(Identifier ident) implements SyntaxElement {
     public int getChildCount() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return ident.toString();
+    }
 }

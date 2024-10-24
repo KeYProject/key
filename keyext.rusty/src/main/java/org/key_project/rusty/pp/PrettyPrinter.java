@@ -14,6 +14,7 @@ import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.ReferenceRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -591,5 +592,15 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnWildCardPattern(WildCardPattern x) {
 
+    }
+
+    @Override
+    public void performActionOnReferenceRustType(ReferenceRustType x) {
+        layouter.print("&");
+        if (x.isMut()) {
+            layouter.keyWord("mut");
+            layouter.print(" ");
+        }
+        x.inner().visit(this);
     }
 }

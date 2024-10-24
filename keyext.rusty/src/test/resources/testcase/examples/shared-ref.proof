@@ -1,0 +1,31 @@
+\profile "Rust Profile";
+
+\programVariables {
+    int i;
+    bool b;
+}
+
+\problem {
+    \<{
+        let x: &u32 = &i;
+        let j: u32 = i;
+        let y: &u32 = &j;
+        b = x == y;
+        b
+    }\> (b = TRUE)
+}
+
+\proof {
+    (branch "dummy ID"
+        (rule "letIdentPatAssign" (formula "1"))
+        (rule "letIdentPat" (formula "1"))
+        (rule "borrowShared" (formula "1"))
+        (rule "letIdentPatAssign" (formula "1") (term "1"))
+        (rule "letIdentPat" (formula "1") (term "1"))
+        (rule "assignment" (formula "1") (term "1"))
+        (rule "letIdentPatAssign" (formula "1") (term "1,1"))
+        (rule "letIdentPat" (formula "1") (term "1,1"))
+        (rule "borrowShared" (formula "1") (term "1,1"))
+        (rule "equalityComparisonSimple" (formula "1") (term "1,1,1"))
+    )
+}
