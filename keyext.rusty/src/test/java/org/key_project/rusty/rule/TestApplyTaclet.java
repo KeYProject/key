@@ -560,13 +560,13 @@ public class TestApplyTaclet {
 
         // Goal one
         final var correctSeqGoal1 =
-                proof[11].root().sequent().addFormula(ifformula, true, true).sequent();
+            proof[11].root().sequent().addFormula(ifformula, true, true).sequent();
         assertEquals(goals.head().sequent(), correctSeqGoal1, "Wrong result");
 
 
         // Goal two
         final var correctSeqGoal2 =
-                proof[10].root().sequent().addFormula(ifformula, false, true).sequent();
+            proof[10].root().sequent().addFormula(ifformula, false, true).sequent();
         assertEquals(goals.tail().head().sequent(), correctSeqGoal2, "Wrong result");
     }
 
