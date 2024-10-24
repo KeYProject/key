@@ -1,13 +1,13 @@
 use super::*;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Expr {
     pub hir_id: HirId,
     pub kind: Box<ExprKind>,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ExprKind {
     ConstBlock(ConstBlock),
     Array(Vec<Expr>),
@@ -44,14 +44,14 @@ pub enum ExprKind {
     Err,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ConstBlock {
     pub hir_id: HirId,
     pub def_id: LocalDefId,
     pub body: Body,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum UnOp {
     Deref,
     Not,
@@ -60,7 +60,7 @@ pub enum UnOp {
 
 pub type Lit = Spanned<LitKind>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LitKind {
     Str(Symbol, StrStyle),
     ByteStr(Vec<u8>, StrStyle),
@@ -73,26 +73,26 @@ pub enum LitKind {
     Err,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum StrStyle {
     Cooked,
     Raw(u8),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LitIntType {
     Signed(IntHirTy),
     Unsigned(UintHirTy),
     Unsuffixed,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LitFloatType {
     Suffixed(FloatHirTy),
     Unsuffixed,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct LetExpr {
     pub span: Span,
     pub pat: Pat,
@@ -101,14 +101,14 @@ pub struct LetExpr {
     pub recovered: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LoopSource {
     Loop,
     While,
     ForLoop,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Arm {
     pub hir_id: HirId,
     pub span: Span,
@@ -117,7 +117,7 @@ pub struct Arm {
     pub body: Expr,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum MatchSource {
     Normal,
     Postfix,
@@ -127,7 +127,7 @@ pub enum MatchSource {
     FormatArgs,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Closure {
     pub def_id: LocalDefId,
     pub binder: ClosureBinder,
@@ -141,19 +141,19 @@ pub struct Closure {
     //pub kind: ClosureKind,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ClosureBinder {
     Default,
     For { span: Span },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum CaptureBy {
     Value { move_kw: Span },
     Ref,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Block {
     pub stmts: Vec<Stmt>,
     pub expr: Option<Expr>,
@@ -163,13 +163,13 @@ pub struct Block {
     pub targeted_by_break: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum BlockCheckMode {
     DefaultBlock,
     UnsafeBlock(UnsafeSource),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum UnsafeSource {
     CompilerGenerated,
     UserProvided,
@@ -177,7 +177,7 @@ pub enum UnsafeSource {
 
 pub type BinOp = Spanned<BinOpKind>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum BinOpKind {
     Add,
     Sub,
@@ -199,25 +199,25 @@ pub enum BinOpKind {
     Gt,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Destination {
     pub label: Option<Label>,
     pub target_id: Result<HirId, LoopIdError>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Label {
     pub ident: Ident,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LoopIdError {
     OutsideLoopScope,
     UnlabeledCfInWhileCondition,
     UnresolvedLabel,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ExprField {
     pub hir_id: HirId,
     pub ident: Ident,
@@ -226,7 +226,7 @@ pub struct ExprField {
     pub is_shorthand: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum YieldSource {
     Await { expr: Option<HirId> },
     Yield,

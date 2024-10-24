@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Item {
     pub ident: Ident,
     pub owner_id: OwnerId,
@@ -9,7 +9,7 @@ pub struct Item {
     pub vis_span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ItemKind {
     ExternCrate(Option<Symbol>),
     Use(UsePath, UseKind),
@@ -33,13 +33,13 @@ pub enum ItemKind {
     Impl(Impl),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Body {
     pub params: Vec<Param>,
     pub value: Expr,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Param {
     pub hir_id: HirId,
     pub pat: Pat,
@@ -47,14 +47,14 @@ pub struct Param {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct FnSig {
     pub header: FnHeader,
     pub decl: FnDecl,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct FnHeader {
     pub safety: bool,
     pub constness: bool,
@@ -62,24 +62,24 @@ pub struct FnHeader {
     //pub abi: Abi,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Mod {
     pub spans: ModSpans,
     pub items: Vec<Item>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ModSpans {
     pub inner_span: Span,
     pub inject_use_span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct EnumDef {
     pub variants: Vec<Variant>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Variant {
     pub ident: Ident,
     pub hir_id: HirId,
@@ -89,7 +89,7 @@ pub struct Variant {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum VariantData {
     Struct {
         fields: Vec<FieldDef>,
@@ -99,7 +99,7 @@ pub enum VariantData {
     Unit(HirId, LocalDefId),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct FieldDef {
     pub span: Span,
     pub vis_span: Span,
@@ -109,7 +109,7 @@ pub struct FieldDef {
     pub ty: HirTy,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct TraitItemRef {
     pub id: TraitItemId,
     pub ident: Ident,
@@ -117,12 +117,12 @@ pub struct TraitItemRef {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct TraitItemId {
     pub owner_id: OwnerId,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Impl {
     pub constness: bool,
     pub safety: bool,
@@ -135,13 +135,13 @@ pub struct Impl {
     pub items: Vec<ImplItemRef>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ImplPolarity {
     Positive,
     Negative(Span),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ImplItemRef {
     pub id: ImplItemId,
     pub ident: Ident,
@@ -150,7 +150,7 @@ pub struct ImplItemRef {
     pub trait_item_def_id: Option<DefId>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum HirTyKind {
     InferDelegation(DefId, InferDelegationKind),
     Slice(HirTy),
@@ -163,50 +163,46 @@ pub enum HirTyKind {
     AnonAdt(Item),
     Path(QPath),
     // OpaqueDef(Item, Vec<GenericArg>, bool),
-    TraitObject(
-        Vec<(PolyTraitRef, TraitBoundModifier)>,
-        Lifetime,
-        TraitObjectSyntax,
-    ),
+    TraitObject(Vec<PolyTraitRef>, Lifetime, TraitObjectSyntax),
     Typeof(AnonConst),
     Infer,
     Err,
     Pat(HirTy, Pat),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum AssocItemKind {
     Const,
     Fn { has_self: bool },
     Type,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum TraitObjectSyntax {
     Dyn,
     DynStar,
     None,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum InferDelegationKind {
     Input(usize),
     Output,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ArrayLen {
     Infer(InferArg),
     Body(ConstArg),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct MutHirTy {
     pub ty: HirTy,
     pub mutbl: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct BareFnHirTy {
     pub safety: bool,
     //pub abi: Abi,
@@ -215,7 +211,7 @@ pub struct BareFnHirTy {
     pub param_names: Vec<Ident>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct FnDecl {
     pub inputs: Vec<HirTy>,
     pub output: FnRetTy,
@@ -224,13 +220,13 @@ pub struct FnDecl {
     pub lifetime_elision_allowed: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum FnRetTy {
     DefaultReturn(Span),
     Return(HirTy),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ImplicitSelfKind {
     Imm,
     Mut,
@@ -241,7 +237,7 @@ pub enum ImplicitSelfKind {
 
 pub type UsePath = Path<Vec<Res>>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum UseKind {
     Single,
     Glob,

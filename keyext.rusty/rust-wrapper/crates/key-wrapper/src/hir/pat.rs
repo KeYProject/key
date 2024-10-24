@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Pat {
     pub hir_id: HirId,
     pub kind: Box<PatKind>,
@@ -8,7 +8,7 @@ pub struct Pat {
     pub default_binding_modes: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum PatKind {
     Wild,
     Binding(BindingMode, HirId, Ident, Option<Pat>),
@@ -27,16 +27,16 @@ pub enum PatKind {
     Err,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct BindingMode(pub ByRef, pub bool);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ByRef {
     Yes(bool),
     No,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct PatField {
     pub hir_id: HirId,
     pub ident: Ident,
@@ -45,5 +45,5 @@ pub struct PatField {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct DotDotPos(pub u32);

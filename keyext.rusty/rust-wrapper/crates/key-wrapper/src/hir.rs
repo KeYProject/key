@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use expr::*;
 use item::*;
 use pat::*;
@@ -9,29 +11,29 @@ pub mod item;
 pub mod pat;
 pub mod stmt;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Crate {
     pub top_mod: Mod,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Symbol(pub u32);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct BytePos(pub u32);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct SyntaxContext(u32);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct LocalDefId {
     pub local_def_index: DefIndex,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct DefIndex(pub u32);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Span {
     pub lo: BytePos,
     pub hi: BytePos,
@@ -39,25 +41,25 @@ pub struct Span {
     pub parent: Option<LocalDefId>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Ident {
     pub name: Symbol,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct OwnerId {
     pub def_id: LocalDefId,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct HirTy {
     pub hir_id: HirId,
     pub kind: Box<HirTyKind>,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Generics {
     pub params: Vec<GenericParam>,
     pub predicates: Vec<WherePredicate>,
@@ -66,14 +68,14 @@ pub struct Generics {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum WherePredicate {
     Bound(WhereBoundPredicate),
     Region(WhereRegionPredicate),
     Eq(WhereEqPredicate),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct WhereBoundPredicate {
     pub hir_id: HirId,
     pub span: Span,
@@ -83,14 +85,14 @@ pub struct WhereBoundPredicate {
     pub bounds: GenericBounds,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum PredicateOrigin {
     WhereClause,
     GenericParam,
     ImplTrait,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct WhereRegionPredicate {
     pub span: Span,
     pub in_where_clause: bool,
@@ -100,37 +102,37 @@ pub struct WhereRegionPredicate {
 
 pub type GenericBounds = Vec<GenericBound>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct WhereEqPredicate {
     pub span: Span,
     pub lhs_ty: HirTy,
     pub rhs_ty: HirTy,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum Defaultness {
     Default { has_value: bool },
     Final,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ImplItemId {
     pub owner_id: OwnerId,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ItemId {
     pub owner_id: OwnerId,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Path<R = Res> {
     pub span: Span,
     pub res: R,
     pub segments: Vec<PathSegment>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum Res<Id = HirId> {
     Def(DefKind, DefId),
     PrimTy(PrimHirTy),
@@ -149,25 +151,25 @@ pub enum Res<Id = HirId> {
     Err,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct HirId {
     pub owner: OwnerId,
     pub local_id: ItemLocalId,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ItemLocalId(pub u32);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct DefId {
     pub index: DefIndex,
     pub krate: CrateNum,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct CrateNum(pub u32);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum DefKind {
     Mod,
     Struct,
@@ -209,7 +211,7 @@ pub enum DefKind {
     SyntheticCoroutineBody,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum NonMacroAttrKind {
     Builtin(Symbol),
     Tool,
@@ -217,7 +219,7 @@ pub enum NonMacroAttrKind {
     DeriveHelperCompat,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum PrimHirTy {
     Int(IntHirTy),
     Uint(UintHirTy),
@@ -227,7 +229,7 @@ pub enum PrimHirTy {
     Char,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum IntHirTy {
     Isize,
     I8,
@@ -237,7 +239,7 @@ pub enum IntHirTy {
     I128,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum UintHirTy {
     Usize,
     U8,
@@ -247,7 +249,7 @@ pub enum UintHirTy {
     U128,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum FloatHirTy {
     F16,
     F32,
@@ -255,20 +257,20 @@ pub enum FloatHirTy {
     F128,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum CtorOf {
     Struct,
     Variant,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum MacroKind {
     Bang,
     Attr,
     Derive,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct PathSegment {
     pub ident: Ident,
     pub hir_id: HirId,
@@ -277,7 +279,7 @@ pub struct PathSegment {
     pub infer_args: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct GenericArgs {
     pub args: Vec<GenericArg>,
     pub constraints: Vec<AssocItemConstraint>,
@@ -285,7 +287,7 @@ pub struct GenericArgs {
     pub span_ext: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum GenericArg {
     Lifetime(Lifetime),
     Type(HirTy),
@@ -293,20 +295,20 @@ pub enum GenericArg {
     Infer(InferArg),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct InferArg {
     pub hir_id: HirId,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum GenericArgsParentheses {
     No,
     ReturnTypeNotation,
     ParenSugar,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct AssocItemConstraint {
     pub hir_id: HirId,
     pub ident: Ident,
@@ -315,36 +317,27 @@ pub struct AssocItemConstraint {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum AssocItemConstraintKind {
     Equality { term: Term },
     Bound { bounds: Vec<GenericBound> },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum GenericBound {
-    Trait(PolyTraitRef, TraitBoundModifier),
+    Trait(PolyTraitRef),
     Outlives(Lifetime),
     Use(Vec<PreciseCapturingArg>, Span),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TraitBoundModifier {
-    None,
-    Negative,
-    Maybe,
-    Const,
-    MaybeConst,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct PolyTraitRef {
     pub bound_generic_params: Vec<GenericParam>,
     pub trait_ref: TraitRef,
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct GenericParam {
     pub hir_id: HirId,
     pub def_id: LocalDefId,
@@ -356,20 +349,20 @@ pub struct GenericParam {
     pub source: GenericParamSource,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum GenericParamSource {
     Generics,
     Binder,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ParamName {
     Plain(Ident),
     Fresh,
     Error,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum GenericParamKind {
     Lifetime {
         kind: LifetimeParamKind,
@@ -386,14 +379,14 @@ pub enum GenericParamKind {
     },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LifetimeParamKind {
     Explicit,
     Elided(MissingLifetimeKind),
     Error,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum MissingLifetimeKind {
     Underscore,
     Ampersand,
@@ -401,33 +394,33 @@ pub enum MissingLifetimeKind {
     Brackets,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct TraitRef {
     pub path: Path,
     pub hir_ref_id: HirId,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum PreciseCapturingArg {
     Lifetime(Lifetime),
     Param(PreciseCapturingNonLifetimeArg),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Lifetime {
     pub hir_id: HirId,
     pub ident: Ident,
     pub res: LifetimeName,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct PreciseCapturingNonLifetimeArg {
     pub hir_id: HirId,
     pub ident: Ident,
     pub res: Res,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LifetimeName {
     Param(LocalDefId),
     ImplicitObjectLifetimeDefault,
@@ -436,26 +429,26 @@ pub enum LifetimeName {
     Static,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum Term {
     Ty(HirTy),
     Const(ConstArg),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ConstArg {
     pub hir_id: HirId,
     pub kind: ConstArgKind,
     pub is_desugared_from_effects: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ConstArgKind {
     Path(QPath),
     Anon(AnonConst),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct AnonConst {
     pub hir_id: HirId,
     pub def_id: LocalDefId,
@@ -463,19 +456,19 @@ pub struct AnonConst {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum QPath {
     Resolved(Option<HirTy>, Path),
     TypeRelative(HirTy, PathSegment),
     LangItem(LangItem, Span),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct BodyId {
     pub hir_id: HirId,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LangItem {
     Sized,
     Unsize,
@@ -671,7 +664,7 @@ pub enum LangItem {
     EffectsTyCompat,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Spanned<T> {
     pub node: T,
     pub span: Span,

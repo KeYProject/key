@@ -1,0 +1,13 @@
+[package]
+name = "key-wrapper"
+authors = ["Daniel Drodt <daniel.drodt@tu-darmstadt.de>"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0.213", features = ["serde_derive"] }
+clap = { version = "4.5.20", features = ["derive", "env"] }
+serde_json = "1.0.132"
+
+[package.metadata.rust-analyzer]
+rustc_private = true

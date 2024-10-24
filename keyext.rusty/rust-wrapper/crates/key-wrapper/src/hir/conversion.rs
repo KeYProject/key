@@ -568,7 +568,7 @@ impl<'hir> FromHir<'hir, &'hir hir::Term<'hir>> for Term {
 impl<'hir> FromHir<'hir, &'hir hir::GenericBound<'hir>> for GenericBound {
     fn from_hir(value: &'hir hir::GenericBound<'hir>, hir: Map<'hir>) -> Self {
         match value {
-            hir::GenericBound::Trait(r, m) => GenericBound::Trait(r.hir_into(hir), m.into()),
+            hir::GenericBound::Trait(r) => GenericBound::Trait(r.hir_into(hir)),
             hir::GenericBound::Outlives(l) => GenericBound::Outlives((*l).into()),
             hir::GenericBound::Use(args, sp) => Self::Use((*args).hir_into(hir), (*sp).into()),
         }
@@ -592,18 +592,6 @@ impl<'hir> FromHir<'hir, &'hir hir::PreciseCapturingNonLifetimeArg>
             hir_id: value.hir_id.into(),
             ident: value.ident.into(),
             res: (&value.res).hir_into(hir),
-        }
-    }
-}
-
-impl From<&hir::TraitBoundModifier> for TraitBoundModifier {
-    fn from(value: &hir::TraitBoundModifier) -> Self {
-        match value {
-            hir::TraitBoundModifier::None => Self::None,
-            hir::TraitBoundModifier::Negative => Self::Negative,
-            hir::TraitBoundModifier::Maybe => Self::Maybe,
-            hir::TraitBoundModifier::Const => Self::Const,
-            hir::TraitBoundModifier::MaybeConst => Self::MaybeConst,
         }
     }
 }
@@ -957,9 +945,7 @@ impl<'hir> FromHir<'hir, &'hir hir::TyKind<'hir>> for HirTyKind {
                 todo!()
             }
             hir::TyKind::TraitObject(ts, l, syn) => Self::TraitObject(
-                ts.iter()
-                    .map(|(r, m)| (r.hir_into(hir), m.into()))
-                    .collect(),
+                ts.iter().map(|r| r.hir_into(hir)).collect(),
                 (*l).into(),
                 syn.into(),
             ),
