@@ -23,7 +23,6 @@ public final class AssignmentExpression implements Expr {
     }
 
     public AssignmentExpression(ExtList changeList) {
-        Pattern pat = changeList.removeFirstOccurrence(Pattern.class);
         Expr[] exprs = changeList.collect(Expr.class);
         assert exprs.length == 2 : Arrays.toString(exprs);
         lhs = exprs[0];

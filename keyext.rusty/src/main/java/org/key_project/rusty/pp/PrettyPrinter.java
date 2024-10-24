@@ -88,16 +88,6 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    protected void printBinaryOperator(String symbol, RustyProgramElement lhs,
-            RustyProgramElement rhs) {
-        layouter.beginC();
-        lhs.visit(this);
-        layouter.print(" ");
-        layouter.print(symbol);
-        layouter.brk();
-        rhs.visit(this);
-    }
-
     /**
      * Marks the start of the first executable statement ...
      *
@@ -162,7 +152,12 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnArithLogicalExpression(ArithLogicalExpression x) {
-        printBinaryOperator(x.op().toString(), x.left(), x.right());
+        layouter.beginC();
+        x.left().visit(this);
+        layouter.print(" ");
+        layouter.print(x.op().toString());
+        layouter.brk();
+        x.right().visit(this);
     }
 
     @Override
@@ -348,7 +343,9 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnComparisonExpression(ComparisonExpression x) {
-        printBinaryOperator(x.op().toString(), x.left(), x.right());
+        x.left().visit(this);
+        x.op().visit(this);
+        x.right().visit(this);
     }
 
     @Override
@@ -364,12 +361,16 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnLazyBooleanExpression(LazyBooleanExpression x) {
-        printBinaryOperator(x.op().toString(), x.left(), x.right());
+        x.left().visit(this);
+        x.op().visit(this);
+        x.right().visit(this);
     }
 
     @Override
     public void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x) {
-        printBinaryOperator(x.op().toString(), x.left(), x.right());
+        x.left().visit(this);
+        x.op().visit(this);
+        x.right().visit(this);
     }
 
     @Override
@@ -602,5 +603,33 @@ public class PrettyPrinter implements Visitor {
             layouter.print(" ");
         }
         x.inner().visit(this);
+    }
+
+    @Override
+    public void performActionOnComparisonOperator(ComparisonExpression.Operator x) {
+        layouter.print(" ");
+        layouter.print(x.toString());
+        layouter.print(" ");
+    }
+
+    @Override
+    public void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x) {
+        layouter.print(" ");
+        layouter.print(x.toString());
+        layouter.print(" ");
+    }
+
+    @Override
+    public void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x) {
+        layouter.print(" ");
+        layouter.print(x.toString());
+        layouter.print(" ");
+    }
+
+    @Override
+    public void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x) {
+        layouter.print(" ");
+        layouter.print(x.toString());
+        layouter.print(" ");
     }
 }

@@ -132,4 +132,12 @@ public interface Visitor {
     void performActionOnWildCardPattern(WildCardPattern x);
 
     void performActionOnReferenceRustType(ReferenceRustType x);
+
+    void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x);
+
+    void performActionOnComparisonOperator(ComparisonExpression.Operator x);
+
+    void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x);
+
+    void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x);
 }

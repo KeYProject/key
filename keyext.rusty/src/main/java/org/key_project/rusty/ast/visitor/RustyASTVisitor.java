@@ -332,4 +332,24 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     public void performActionOnReferenceRustType(ReferenceRustType x) {
         doDefaultAction(x);
     }
+
+    @Override
+    public void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnComparisonOperator(ComparisonExpression.Operator x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x) {
+        doDefaultAction(x);
+    }
 }

@@ -22,6 +22,7 @@ public abstract class ProgramSVSort extends SortImpl {
     // ----------- Types of Expression Program SVs ----------------------------
     public static final ProgramSVSort LEFT_HAND_SIDE = new LeftHandSideSort();
     public static final ProgramSVSort VARIABLE = new ProgramVariableSort();
+    public static final ProgramSVSort U32Variable = new SortedVariableSort("u32");
     public static final ProgramSVSort SIMPLE_EXPRESSION = new SimpleExpressionSort();
     public static final ProgramSVSort NON_SIMPLE_EXPRESSION = new NonSimpleExpressionSort();
     public static final ProgramSVSort EXPRESSION = new ExpressionSort();
@@ -85,6 +86,24 @@ public abstract class ProgramSVSort extends SortImpl {
     private static class ProgramVariableSort extends LeftHandSideSort {
         public ProgramVariableSort() {
             super(new Name("Variable"));
+        }
+    }
+
+    /**
+     * This sort represents a type of program schema variables that match only on
+     * program variables
+     */
+    private static class SortedVariableSort extends LeftHandSideSort {
+        private final String sortName;
+
+        public SortedVariableSort(String sort) {
+            super(new Name("Variable_"+sort));
+            sortName = sort;
+        }
+
+        @Override
+        public boolean canStandFor(Term t) {
+            return t instanceof ProgramVariable pv && pv.sort().name().toString().equals(sortName);
         }
     }
 

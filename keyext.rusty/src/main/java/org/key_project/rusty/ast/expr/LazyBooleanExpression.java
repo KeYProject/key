@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -18,15 +19,16 @@ public record LazyBooleanExpression(Expr left, Operator op, Expr right) implemen
     public  @NonNull SyntaxElement getChild(int n) {
         return switch (n) {
             case 0 -> left;
-            case 1 -> right;
+            case 1 -> op;
+            case 2 -> right;
             default -> throw new IndexOutOfBoundsException(
-                    "ComparisonExpression has only 2 children");
+                    "ComparisonExpression has only 3 children");
         };
     }
 
     @Override
     public int getChildCount() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -34,7 +36,7 @@ public record LazyBooleanExpression(Expr left, Operator op, Expr right) implemen
         return left + " " + op + " " + right;
     }
 
-    public enum Operator {
+    public enum Operator implements RustyProgramElement {
         And, Or;
 
         @Override
@@ -43,5 +45,21 @@ public record LazyBooleanExpression(Expr left, Operator op, Expr right) implemen
                 case And -> "&&";
                 case Or -> "||";
             };
+        }
+
+
+        @Override
+        public void visit(Visitor v) {
+            v.performActionOnLazyBooleanOperator(this);
+        }
+
+        @Override
+        public SyntaxElement getChild(int n) {
+            throw new IndexOutOfBoundsException("Operator has no children");
+        }
+
+        @Override
+        public int getChildCount() {
+            return 0;
         }
     }}

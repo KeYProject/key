@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -27,7 +28,7 @@ public record ComparisonExpression(Expr left, Operator op, Expr right) implement
 
     @Override
     public int getChildCount() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -35,7 +36,7 @@ public record ComparisonExpression(Expr left, Operator op, Expr right) implement
         return left + " " + op + " " + right;
     }
 
-    public enum Operator implements SyntaxElement {
+    public enum Operator implements RustyProgramElement {
         Equal, NotEqual, Greater, Less, GreaterOrEqual, LessOrEqual;
 
         @Override
@@ -58,5 +59,10 @@ public record ComparisonExpression(Expr left, Operator op, Expr right) implement
         @Override
         public int getChildCount() {
             return 0;
+        }
+
+        @Override
+        public void visit(Visitor v) {
+v.performActionOnComparisonOperator(this);
         }
     }}
