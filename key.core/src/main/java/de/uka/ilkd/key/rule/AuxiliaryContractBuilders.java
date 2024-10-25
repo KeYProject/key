@@ -42,6 +42,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -1138,7 +1139,7 @@ public final class AuxiliaryContractBuilders {
         /**
          * The position at which the rule is applied.
          */
-        private final org.key_project.ncore.sequent.PosInOccurrence occurrence;
+        private final PosInOccurrence occurrence;
 
         /**
          * Services.
@@ -1164,7 +1165,7 @@ public final class AuxiliaryContractBuilders {
         public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
                 final TermLabelState termLabelState, final Instantiation instantiation,
                 final List<Label> labels, final AuxiliaryContract.Variables variables,
-                final org.key_project.ncore.sequent.PosInOccurrence occurrence,
+                final PosInOccurrence occurrence,
                 final Services services,
                 final AbstractAuxiliaryContractRule rule) {
             this.application = application;

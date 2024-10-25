@@ -133,7 +133,7 @@ public class DefaultProofControl extends AbstractProofControl {
      */
     @Override
     public void runMacro(Node node, ProofMacro macro,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         if (!isInAutoMode()) {
             autoModeThread = new MacroThread(node, macro, posInOcc);
             autoModeThread.start();
@@ -145,7 +145,7 @@ public class DefaultProofControl extends AbstractProofControl {
 
         private final ProofMacro macro;
 
-        private final org.key_project.ncore.sequent.PosInOccurrence posInOcc;
+        private final PosInOccurrence posInOcc;
 
         public MacroThread(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
             this.node = node;

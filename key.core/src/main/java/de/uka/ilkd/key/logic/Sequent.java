@@ -26,8 +26,9 @@ import org.jspecify.annotations.NonNull;
  * {@link Sequent#createSuccSequent} or by inserting formulas directly into
  * {@link Sequent#EMPTY_SEQUENT}.
  */
-public class Sequent extends org.key_project.ncore.sequent.Sequent<SequentFormula> {
-    public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
+public class Sequent extends org.key_project.ncore.sequent.Sequent {
+
+    public static final Sequent EMPTY_SEQUENT = new NILSequent();
 
     /**
      * creates a new Sequent with empty succedent
@@ -77,7 +78,7 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent<SequentFormul
      *
      */
     private Sequent() {
-        super(Semisequent.EMPTY_SEMISEQUENT);
+        super(Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
     }
 
     /** creates new Sequent with antecedence and succedence */
@@ -86,18 +87,18 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent<SequentFormul
     }
 
     @Override
-    public final Semisequent antecedent() {
-        return (Semisequent) super.antecedent();
-    }
-
-    @Override
     public Semisequent succedent() {
         return (Semisequent) super.succedent();
     }
 
     @Override
-    public SequentChangeInfo<SequentFormula> addFormula(SequentFormula cf, PosInOccurrence p) {
-        return super.addFormula(cf, p);
+    public Semisequent antecedent() {
+        return (Semisequent) super.antecedent();
+    }
+
+    @Override
+    public SequentChangeInfo<SequentFormula> removeFormula(PosInOccurrence p) {
+        return super.removeFormula(p);
     }
 
     /**
@@ -108,9 +109,10 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent<SequentFormul
      * @param p_semiSeq the {@link Semisequent} to use
      * @return the resulting sequent
      */
-    protected Sequent composeSequent(boolean antec,
-            org.key_project.ncore.sequent.Semisequent<SequentFormula> p_semiSeq) {
-        final var semiSeq = (Semisequent) p_semiSeq;
+    private Sequent composeSequent(boolean antec,
+            org.key_project.ncore.sequent.Semisequent semiSeq) {
+        final var antecedent = antecedent();
+        final var succedent = succedent();
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent().isEmpty()) {
                 return EMPTY_SEQUENT;
@@ -122,11 +124,173 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent<SequentFormul
         if ((antec && semiSeq == antecedent()) || (!antec && semiSeq == succedent())) {
             return this;
         }
+        final Semisequent semiSequent = (Semisequent) semiSeq;
+        return new Sequent(antec ? semiSequent : antecedent, antec ? succedent : semiSequent);
+    }
 
-        return new Sequent(antec ? semiSeq : antecedent(), antec ? succedent() : semiSeq);
+    /**
+     * determines if the sequent is empty.
+     *
+     * @return true iff the sequent consists of two instances of Semisequent.EMPTY_SEMISEQUENT
+     */
+    public boolean isEmpty() {
+        return antecedent().isEmpty() && succedent().isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Sequent o1)) {
+            return false;
+        }
+        return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
+    }
+
+    /**
+     * Computes the position of the given sequent formula on the proof sequent, starting with one
+     * for the very first sequent formula.
+     *
+     * @param inAntec a boolean stating whether we search in the antecedent or the succedent
+     * @param cfma the given sequent formula
+     * @return an integer strictly greater than zero for the position of the given sequent formula
+     *         on the proof sequent.
+     */
+    public int formulaNumberInSequent(boolean inAntec, SequentFormula cfma) {
+        int n = inAntec ? 0 : antecedent.size();
+        final Iterator<SequentFormula> formIter =
+            inAntec ? antecedent.iterator() : succedent.iterator();
+        while (formIter.hasNext()) {
+            n++;
+            if (formIter.next().equals(cfma)) {
+                return n;
+            }
+        }
+        throw new RuntimeException(
+            "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
+    }
+
+    /**
+     * Computes the position of the given {@link PosInOccurrence} on the proof sequent.
+     *
+     * @param pio the position
+     * @return an integer strictly greater than zero for the position of the given sequent formula
+     *         on the proof sequent.
+     */
+    public int formulaNumberInSequent(PosInOccurrence pio) {
+        var inAntec = pio.isInAntec();
+        var formula = pio.sequentFormula();
+        return formulaNumberInSequent(inAntec, formula);
+    }
+
+    /**
+     * Get a sequent formula by its position in the sequent.
+     * The first formula has number 1.
+     *
+     * @param formulaNumber formula number
+     * @return the sequent formula at that position
+     */
+    public SequentFormula getFormulabyNr(int formulaNumber) {
+        checkFormulaIndex(formulaNumber);
+        if (formulaNumber <= antecedent.size()) {
+            return antecedent.get(formulaNumber - 1);
+        }
+        return succedent.get((formulaNumber - 1) - antecedent.size());
+    }
+
+    /**
+     * returns the semisequent in which the SequentFormula described by PosInOccurrence p lies
+     */
+    private Semisequent getSemisequent(PosInOccurrence p) {
+        return p.isInAntec() ? antecedent() : succedent();
+    }
+
+    @Override
+    public int hashCode() {
+        return antecedent.hashCode() * 17 + succedent.hashCode();
+    }
+
+    /**
+     * returns iterator about all ConstrainedFormulae of the sequent
+     *
+     * @return iterator about all ConstrainedFormulae of the sequent
+     */
+    @Override
+    public Iterator<SequentFormula> iterator() {
+        return new SequentIterator(antecedent(), succedent());
+    }
+
+    /**
+     * @param formulaNumber formula number (1-based)
+     * @return whether that formula is in the antecedent
+     */
+    public boolean numberInAntec(int formulaNumber) {
+        checkFormulaIndex(formulaNumber);
+        return formulaNumber <= antecedent.size();
+    }
+
+    /**
+     * removes the formula at position p (NOTICE:Sequent determines index using identity (==) not
+     * equality.)
+     *
+     * @param p a PosInOccurrence that describes position in the sequent
+     * @return a SequentChangeInfo which contains the new sequent and information which formulas
+     *         have been added or removed
+     */
+    public SequentChangeInfo removeFormula(PosInOccurrence p) {
+        final Semisequent seq = getSemisequent(p);
+
+        final SemisequentChangeInfo semiCI = seq.remove(seq.indexOf(p.sequentFormula()));
+
+        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
+            semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+    }
+
+    /**
+     * Computes the size of the proof sequent recursively (decends to antecedent and succedent).
+     *
+     * @return the size of the proof sequent as an integer number
+     */
+    public int size() {
+        return antecedent().size() + succedent().size();
+    }
+
+    /** returns semisequent of the succedent to work with */
+    public Semisequent succedent() {
+        return succedent;
+    }
+
+    /**
+     * String representation of the sequent
+     *
+     * @return String representation of the sequent
+     */
+    @Override
+    public String toString() {
+        return antecedent().toString() + "==>" + succedent().toString();
+    }
+
+    /**
+     * returns true iff the given variable is bound in a formula of a SequentFormula in this
+     * sequent.
+     *
+     * @param v the bound variable to search for
+     */
+    public boolean varIsBound(QuantifiableVariable v) {
+        for (SequentFormula sequentFormula : this) {
+            final BoundVarsVisitor bvv = new BoundVarsVisitor();
+            sequentFormula.formula().execPostOrder(bvv);
+            if (bvv.getBoundVariables().contains(v)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static final class NILSequent extends Sequent {
+        private static final NILSequent INSTANCE = new NILSequent();
+
         private NILSequent() {
         }
 

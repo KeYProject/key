@@ -54,7 +54,9 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -343,7 +345,7 @@ public class IntermediateProofReplayer {
 
                             partnerNodeInfo.add(new PartnerNode(
                                 currNode,
-                                org.key_project.ncore.sequent.PosInOccurrence.findInSequent(
+                                PosInOccurrence.findInSequent(
                                     currGoal.sequent(),
                                     appInterm.getPosInfo().first, appInterm.getPosInfo().second),
                                 currNodeInterm));
@@ -450,7 +452,7 @@ public class IntermediateProofReplayer {
         final Sequent seq = currGoal.sequent();
 
         TacletApp ourApp;
-        org.key_project.ncore.sequent.PosInOccurrence pos = null;
+        PosInOccurrence pos = null;
 
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
@@ -468,7 +470,7 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = org.key_project.ncore.sequent.PosInOccurrence
+                pos = PosInOccurrence
                         .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
 
                 /*
@@ -556,7 +558,7 @@ public class IntermediateProofReplayer {
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
 
         Contract currContract = null;
-        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> builtinIfInsts = null;
+        ImmutableList<PosInOccurrence> builtinIfInsts = null;
 
         // Load contracts, if applicable
         if (currInterm.getContract() != null) {
@@ -579,8 +581,8 @@ public class IntermediateProofReplayer {
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
 
                 try {
-                    final org.key_project.ncore.sequent.PosInOccurrence ifInst =
-                        org.key_project.ncore.sequent.PosInOccurrence.findInSequent(
+                    final PosInOccurrence ifInst =
+                        PosInOccurrence.findInSequent(
                             currGoal.sequent(),
                             currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
@@ -637,7 +639,7 @@ public class IntermediateProofReplayer {
                 throw new SkipSMTRuleException();
             } else {
                 String name = smtProblem.getSuccessfulSolver().name();
-                ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> unsatCore =
+                ImmutableList<PosInOccurrence> unsatCore =
                     SMTFocusResults.getUnsatCore(smtProblem);
                 if (unsatCore != null) {
                     return SMTRuleApp.RULE.createApp(name, unsatCore);
@@ -652,7 +654,7 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = org.key_project.ncore.sequent.PosInOccurrence
+                pos = PosInOccurrence
                         .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
             } catch (RuntimeException e) {
                 throw new BuiltInConstructionException("Wrong position information.", e);
@@ -729,7 +731,7 @@ public class IntermediateProofReplayer {
      */
     private MergeRuleBuiltInRuleApp instantiateJoinApp(final MergeAppIntermediate joinAppInterm,
             final Node currNode,
-            final HashSet<PartnerNode> partnerNodesInfo,
+            final Set<PartnerNode> partnerNodesInfo,
             final Services services) throws SkipSMTRuleException, BuiltInConstructionException {
         final MergeRuleBuiltInRuleApp joinApp =
             (MergeRuleBuiltInRuleApp) constructBuiltinApp(joinAppInterm, currGoal);

@@ -45,7 +45,7 @@ public class SimpleFilteredStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
@@ -71,7 +71,7 @@ public class SimpleFilteredStrategy implements Strategy {
      *
      * @return true iff the rule should be applied, false otherwise
      */
-    public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         // do not apply a rule twice
         return !(app instanceof TacletApp) || NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,

@@ -56,8 +56,8 @@ import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
-import org.key_project.ncore.logic.PosInTerm;
 
 /**
  * Collection of strategy features that can be accessed statically. This class is essentially a

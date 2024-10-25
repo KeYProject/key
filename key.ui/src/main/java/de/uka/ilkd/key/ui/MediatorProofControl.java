@@ -55,7 +55,7 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         boolean result = super.selectedTaclet(taclet, goal, pos);
         if (!result) {
             ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));

@@ -148,9 +148,9 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * returns the program contained in a PosInOccurrence
      */
-    protected ProgramElement getProgramFromPIO(org.key_project.ncore.sequent.PosInOccurrence pio) {
+    protected ProgramElement getProgramFromPIO(PosInOccurrence pio) {
         Term progTerm;
-        if (pio != null && (progTerm = findProgramInTerm(pio.subTerm())) != null) {
+        if (pio != null && (progTerm = findProgramInTerm((Term) pio.subTerm())) != null) {
             return progTerm.javaBlock().program();
         } else {
             return new EmptyStatement();
@@ -305,7 +305,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the renamed version of the var parameter
      */
     public abstract LocationVariable rename(LocationVariable var, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence posOfFind);
+            PosInOccurrence posOfFind);
 
 
 
@@ -349,7 +349,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the name proposal, or null if no proposal is available
      */
     protected ProgramElementName getNameProposalForSchemaVariable(String basename,
-            SchemaVariable sv, org.key_project.ncore.sequent.PosInOccurrence posOfFind,
+            SchemaVariable sv, PosInOccurrence posOfFind,
             PosInProgram posOfDeclaration,
             ImmutableList<String> previousProposals, Services services) {
         ProgramElementName result = null;

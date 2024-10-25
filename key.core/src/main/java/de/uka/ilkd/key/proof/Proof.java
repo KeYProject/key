@@ -243,7 +243,8 @@ public class Proof implements ProofObject<Goal>, Named {
     public Proof(String name, Term problem, String header, InitConfig initConfig) {
         this(name,
             Sequent.createSuccSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),
+                (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem))
+                        .semisequent()),
             initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;
     }

@@ -330,12 +330,12 @@ public abstract class AbstractBetaFeature implements Feature {
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final Term findTerm = pos.sequentFormula().formula();
+        final Term findTerm = (Term) pos.sequentFormula().formula();
 
         return doComputation(pos, findTerm, goal.proof().getServices().getCaches());
     }
 
-    protected abstract RuleAppCost doComputation(org.key_project.ncore.sequent.PosInOccurrence pos,
+    protected abstract RuleAppCost doComputation(PosInOccurrence pos,
             Term findTerm,
             ServiceCaches caches);
 }

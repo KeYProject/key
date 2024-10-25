@@ -26,6 +26,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -195,7 +196,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      *        conditions.
      */
     public SymbolicLayoutExtractor(Node node,
-            org.key_project.ncore.sequent.PosInOccurrence modalityPio, boolean useUnicode,
+            PosInOccurrence modalityPio, boolean useUnicode,
             boolean usePrettyPrinting, boolean simplifyConditions) {
         super(node, modalityPio);
         this.settings = new ModelSettings(useUnicode, usePrettyPrinting, simplifyConditions);

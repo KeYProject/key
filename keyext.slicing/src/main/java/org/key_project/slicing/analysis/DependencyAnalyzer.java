@@ -35,7 +35,7 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.RuleStatistics;
@@ -363,7 +363,7 @@ public final class DependencyAnalyzer {
             // mark all available formulas as useful
             Sequent seq = goal.sequent();
             for (int i = 1; i <= seq.size(); i++) {
-                org.key_project.ncore.sequent.PosInOccurrence pio =
+                PosInOccurrence pio =
                     PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
                 GraphNode node = graph.getGraphNode(proof, goal.node().getBranchLocation(), pio);
                 usefulFormulas.add(node);

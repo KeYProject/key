@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 import org.key_project.logic.Name;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -123,7 +124,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
         }
@@ -134,7 +135,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         }
 
         final AbstractLoopContractRule.Instantiation instantiation =
-            new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal).instantiate();
+            new AbstractLoopContractRule.Instantiator((Term) pio.subTerm(), goal).instantiate();
 
         if (instantiation == null) {
             return false;

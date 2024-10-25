@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -25,10 +26,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     protected final BuiltInRule builtInRule;
 
     protected final PosInOccurrence pio;
-    protected ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts;
+    protected ImmutableList<PosInOccurrence> ifInsts;
 
     protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+            ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
         this.pio = pio;
         this.ifInsts = (ifInsts == null ? ImmutableSLList.nil() : ifInsts);
@@ -43,7 +44,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * what is going on there This restores the behaviour as it was before my previous commit for
      * the moment
      */
-    public void setMutable(ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+    public void setMutable(ImmutableList<PosInOccurrence> ifInsts) {
         this.ifInsts = ifInsts;
     }
 
@@ -68,11 +69,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param goal the Goal where to apply the rule
      * @return list of new created goals
      */
     @Override
-    public void execute(Namespace<? extends @NonNull Function> fns) {
+    public <F extends Function> void execute(Namespace<@NonNull F> fns) {
 
     }
 
@@ -80,10 +80,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public abstract IBuiltInRuleApp setIfInsts(
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts);
+            ImmutableList<PosInOccurrence> ifInsts);
 
     @Override
-    public ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts() {
+    public ImmutableList<PosInOccurrence> ifInsts() {
         return ifInsts;
     }
 
@@ -140,8 +140,8 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
                 && Objects.equals(getHeapContext(), that.getHeapContext()))) {
             return false;
         }
-        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts1 = ifInsts();
-        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts2 = that.ifInsts();
+        ImmutableList<PosInOccurrence> ifInsts1 = ifInsts();
+        ImmutableList<PosInOccurrence> ifInsts2 = that.ifInsts();
         if (ifInsts1.size() != ifInsts2.size()) {
             return false;
         }
@@ -157,8 +157,9 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public int hashCodeModProofIrrelevancy() {
+        var sf = (de.uka.ilkd.key.logic.SequentFormula) posInOccurrence().sequentFormula();
         return Objects.hash(rule(), getHeapContext(),
-            posInOccurrence().sequentFormula().hashCodeModProofIrrelevancy(),
+            sf.hashCodeModProofIrrelevancy(),
             posInOccurrence().posInTerm());
     }
 

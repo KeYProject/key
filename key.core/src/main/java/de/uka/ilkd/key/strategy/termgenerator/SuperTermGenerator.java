@@ -37,7 +37,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         return new SuperTermGenerator(cond) {
             @Override
             protected Iterator<Term> createIterator(
-                    org.key_project.ncore.sequent.PosInOccurrence focus, MutableState mState) {
+                    PosInOccurrence focus, MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
         };
@@ -47,20 +47,20 @@ public abstract class SuperTermGenerator implements TermGenerator {
         return new SuperTermWithIndexGenerator(cond) {
             @Override
             protected Iterator<Term> createIterator(
-                    org.key_project.ncore.sequent.PosInOccurrence focus, MutableState mState) {
+                    PosInOccurrence focus, MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
         };
     }
 
-    public Iterator<Term> generate(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         return createIterator(pos, mState);
     }
 
     protected abstract Iterator<Term> createIterator(
-            org.key_project.ncore.sequent.PosInOccurrence focus, MutableState mState);
+            PosInOccurrence focus, MutableState mState);
 
     protected Term generateOneTerm(Term superterm, int child) {
         return superterm;
@@ -80,7 +80,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
 
         @Override
         public Iterator<Term> generate(RuleApp app,
-                org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal,
+                PosInOccurrence pos, Goal goal,
                 MutableState mState) {
             if (services == null) {
                 services = goal.proof().getServices();
@@ -160,7 +160,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     }
 
     class UpwardsIterator implements Iterator<Term> {
-        private org.key_project.ncore.sequent.PosInOccurrence currentPos;
+        private PosInOccurrence currentPos;
         private final MutableState mState;
         private final Services services;
 
@@ -179,7 +179,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         public Term next() {
             final int child = currentPos.getIndex();
             currentPos = currentPos.up();
-            final Term res = generateOneTerm(currentPos.subTerm(), child);
+            final Term res = generateOneTerm((Term) currentPos.subTerm(), child);
             if (!generateFurther(res, mState, services)) {
                 currentPos = null;
             }

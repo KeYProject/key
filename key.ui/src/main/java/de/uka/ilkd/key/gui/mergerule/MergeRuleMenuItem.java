@@ -16,6 +16,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * The menu item for the state merging rule.
  *

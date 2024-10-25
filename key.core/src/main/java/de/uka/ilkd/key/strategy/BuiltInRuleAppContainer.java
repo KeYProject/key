@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -25,7 +26,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * was created
      */
     private final FormulaTag positionTag;
-    private final org.key_project.ncore.sequent.PosInOccurrence applicationPosition;
+    private final PosInOccurrence applicationPosition;
 
     private final IBuiltInRuleApp bir;
 
@@ -36,7 +37,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // -------------------------------------------------------------------------
 
     private BuiltInRuleAppContainer(IBuiltInRuleApp bir,
-            org.key_project.ncore.sequent.PosInOccurrence pio, RuleAppCost cost,
+            PosInOccurrence pio, RuleAppCost cost,
             Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
@@ -59,7 +60,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         if (applicationPosition == null) {
             return bir.rule().isApplicable(goal, null);
         } else {
-            final org.key_project.ncore.sequent.PosInOccurrence topPos =
+            final PosInOccurrence topPos =
                 goal.getFormulaTagManager().getPosForTag(positionTag);
             if (topPos == null) {
                 // the formula does not exist anymore, bail out
@@ -75,12 +76,12 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * Copied from FindTaclet.
      */
     private PosInOccurrence getPosInOccurrence(Goal p_goal) {
-        final org.key_project.ncore.sequent.PosInOccurrence topPos =
+        final PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
         assert topPos != null;
 
-        return applicationPosition.replaceConstrainedFormula(topPos.sequentFormula());
+        return applicationPosition.replaceSequentFormula(topPos.sequentFormula());
     }
 
 
@@ -96,7 +97,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static RuleAppContainer createAppContainer(IBuiltInRuleApp bir,
-            org.key_project.ncore.sequent.PosInOccurrence pio,
+            PosInOccurrence pio,
             Goal goal) {
         final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
         return new BuiltInRuleAppContainer(bir, pio, cost, goal);
@@ -109,7 +110,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static ImmutableList<RuleAppContainer> createInitialAppContainers(
-            ImmutableList<IBuiltInRuleApp> birs, org.key_project.ncore.sequent.PosInOccurrence pio,
+            ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio,
             Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
@@ -128,7 +129,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
             return ImmutableSLList.nil();
         }
 
-        final org.key_project.ncore.sequent.PosInOccurrence pio = getPosInOccurrence(goal);
+        final PosInOccurrence pio = getPosInOccurrence(goal);
 
         RuleAppContainer container = createAppContainer(bir, pio, goal);
         if (container.getCost() instanceof TopRuleAppCost) {

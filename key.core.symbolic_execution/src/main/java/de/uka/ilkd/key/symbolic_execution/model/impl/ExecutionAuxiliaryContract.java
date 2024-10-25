@@ -74,7 +74,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
     protected String lazyComputeName() throws ProofInputException {
         // Find self term
         Term self = null;
-        Term applicationTerm = getModalityPIO().subTerm();
+        var applicationTerm = getModalityPIO().subTerm();
         Term modalityTerm = TermBuilder.goBelowUpdates(applicationTerm);
         ExecutionContext ec =
             JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), getServices());

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule.executor.javadl;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 
 public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         extends FindTacletExecutor<TacletKind> {
@@ -37,7 +37,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      * does the work for applyReplacewith (wraps recursion)
      */
     private Term replace(Term term, Term with, TermLabelState termLabelState,
-            TacletLabelHint labelHint, org.key_project.ncore.sequent.PosInOccurrence posOfFind,
+            TacletLabelHint labelHint, PosInOccurrence posOfFind,
             org.key_project.logic.IntIterator it,
             MatchConditions mc, Sort maxSort, Goal goal, Services services, RuleApp ruleApp) {
         if (it.hasNext()) {
@@ -65,10 +65,10 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
 
 
     private SequentFormula applyReplacewithHelper(Goal goal, TermLabelState termLabelState,
-            RewriteTacletGoalTemplate gt, org.key_project.ncore.sequent.PosInOccurrence posOfFind,
+            RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind,
             Services services,
             MatchConditions matchCond, RuleApp ruleApp) {
-        final Term term = posOfFind.sequentFormula().formula();
+        final Term term = (Term) posOfFind.sequentFormula().formula();
         final IntIterator it = posOfFind.posInTerm().iterator();
         final Term rwTemplate = gt.replaceWith();
 
@@ -77,7 +77,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula,
             posOfFind, taclet, goal, null, rwTemplate);
         if (term == formula) {
-            return posOfFind.sequentFormula();
+            return (SequentFormula) posOfFind.sequentFormula();
         } else {
             return new SequentFormula(formula);
         }
@@ -102,8 +102,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent,
-            org.key_project.ncore.sequent.PosInOccurrence posOfFind, MatchConditions matchCond,
+            SequentChangeInfo<SequentFormula> currentSequent,
+            PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services) {
         if (gt instanceof RewriteTacletGoalTemplate) {
             final SequentFormula cf = applyReplacewithHelper(goal, termLabelState,
@@ -113,7 +113,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             // Then there was no replacewith...
             // This is strange in a RewriteTaclet, but who knows...
             // However, term label refactorings have to be performed.
-            final Term oldFormula = posOfFind.sequentFormula().formula();
+            final Term oldFormula = (Term) posOfFind.sequentFormula().formula();
             final Term newFormula = TermLabelManager.refactorSequentFormula(termLabelState,
                 services, oldFormula, posOfFind, taclet, goal, null, null);
             if (oldFormula != newFormula) {
@@ -140,8 +140,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent,
-            org.key_project.ncore.sequent.PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            SequentChangeInfo<SequentFormula> currentSequent,
+            PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
         if (posOfFind.isInAntec()) {
             addToAntec(add.antecedent(), termLabelState,

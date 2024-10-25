@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
@@ -35,9 +34,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         cApp = cApp.tryToInstantiateContract(services);
 
-        final List<org.key_project.ncore.sequent.PosInOccurrence> steps = UseDependencyContractRule
+        final List<PosInOccurrence> steps = UseDependencyContractRule
                 .getSteps(cApp.getHeapContext(), cApp.posInOccurrence(), goal.sequent(), services);
-        org.key_project.ncore.sequent.PosInOccurrence step =
+        PosInOccurrence step =
             letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
         if (step == null) {
             return null;
@@ -54,9 +53,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
      * @param services
      * @return
      */
-    private static org.key_project.ncore.sequent.PosInOccurrence letUserChooseStep(
+    private static PosInOccurrence letUserChooseStep(
             List<LocationVariable> heapContext,
-            List<org.key_project.ncore.sequent.PosInOccurrence> steps, boolean forced,
+            List<PosInOccurrence> steps, boolean forced,
             Services services) {
         assert heapContext != null;
 
@@ -90,8 +89,8 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return findCorrespondingStep(steps, resultHeaps);
     }
 
-    public static org.key_project.ncore.sequent.PosInOccurrence findCorrespondingStep(
-            List<org.key_project.ncore.sequent.PosInOccurrence> steps,
+    public static PosInOccurrence findCorrespondingStep(
+            List<PosInOccurrence> steps,
             Term[] resultHeaps) {
         // find corresponding step
         for (PosInOccurrence step : steps) {
@@ -111,22 +110,22 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     }
 
     public static void extractHeaps(List<LocationVariable> heapContext,
-            List<org.key_project.ncore.sequent.PosInOccurrence> steps,
+            List<PosInOccurrence> steps,
             final TermStringWrapper[] heaps, final LogicPrinter lp) {
         int i = 0;
-        for (org.key_project.ncore.sequent.PosInOccurrence step : steps) {
-            Operator op = step.subTerm().op();
+        for (PosInOccurrence step : steps) {
+            var op = step.subTerm().op();
             // necessary distinction (see bug #1232)
             // subterm may either be an observer or a heap term already
-            int size = (op instanceof IObserverFunction)
-                    ? ((IObserverFunction) op).getStateCount() * heapContext.size()
+            int size = (op instanceof IObserverFunction iof)
+                    ? iof.getStateCount() * heapContext.size()
                     : 1;
             final Term[] heapTerms = new Term[size];
             StringBuilder prettyPrint = new StringBuilder("<html><tt>").append(size > 1 ? "[" : "");
             for (int j = 0; j < size; j++) {
                 // TODO: there may still be work to do
                 // what if we have a heap term, where the base heap lies deeper?
-                final Term heap = step.subTerm().sub(j);
+                final Term heap = (Term) step.subTerm().sub(j);
                 heapTerms[j] = heap;
                 lp.reset();
                 lp.printTerm(heap);

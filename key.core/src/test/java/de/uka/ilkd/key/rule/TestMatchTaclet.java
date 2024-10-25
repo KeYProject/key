@@ -21,7 +21,9 @@ import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -253,7 +255,7 @@ public class TestMatchTaclet {
                     .semisequent());
         TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
         index.add(close_rule.taclet());
-        org.key_project.ncore.sequent.PosInOccurrence pio =
+        PosInOccurrence pio =
             new PosInOccurrence(new SequentFormula(closeable_two), PosInTerm.getTopLevel(), false);
 
         TacletApp tacletApp =

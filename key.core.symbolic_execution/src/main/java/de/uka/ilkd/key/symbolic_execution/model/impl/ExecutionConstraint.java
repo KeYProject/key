@@ -10,6 +10,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * The default implementation of {@link IExecutionConstraint}.
  *
@@ -24,7 +26,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     /**
      * The {@link PosInOccurrence} of the modality of interest.
      */
-    private final org.key_project.ncore.sequent.PosInOccurrence modalityPIO;
+    private final PosInOccurrence modalityPIO;
 
     /**
      * Constructor.
@@ -35,7 +37,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      * @param term The {@link Term} representing the constraint.
      */
     public ExecutionConstraint(ITreeSettings settings, Node proofNode,
-            org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
+            PosInOccurrence modalityPIO,
             Term term) {
         super(settings, proofNode);
         assert term != null;
@@ -72,7 +74,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      * {@inheritDoc}
      */
     @Override
-    public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
+    public PosInOccurrence getModalityPIO() {
         return modalityPIO;
     }
 }

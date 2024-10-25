@@ -88,8 +88,8 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
                     getProof().getServices().getTermBuilder().not(getCondition());
                 // initialize values
                 PosInOccurrence pio = ruleApp.posInOccurrence();
-                Term term = pio.subTerm();
-                term = TermBuilder.goBelowUpdates(term);
+                var t = pio.subTerm();
+                Term term = TermBuilder.goBelowUpdates(t);
                 IExecutionContext ec =
                     JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
                 // put values into map which have to be replaced

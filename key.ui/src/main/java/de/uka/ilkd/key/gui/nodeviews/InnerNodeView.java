@@ -24,7 +24,8 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -127,7 +128,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             if (!(inst2 instanceof IfFormulaInstSeq inst)) {
                 continue;
             }
-            final org.key_project.ncore.sequent.PosInOccurrence pos =
+            final PosInOccurrence pos =
                 new PosInOccurrence(inst.getConstrainedFormula(),
                     PosInTerm.getTopLevel(), inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
@@ -135,7 +136,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     private void highlightIfInsts(IBuiltInRuleApp bapp) throws BadLocationException {
-        final ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifs = bapp.ifInsts();
+        final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
         if (bapp instanceof SMTRuleApp && ifs.isEmpty()) {
             /*
              * Special case for SMTRuleApp: If no unsat core is used, we highlight all formulas.
@@ -143,14 +144,14 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
              * clutter saved proofs very much.
              */
             for (int i = 0; i < node.sequent().size(); i++) {
-                org.key_project.ncore.sequent.PosInOccurrence pio =
-                    org.key_project.ncore.sequent.PosInOccurrence.findInSequent(node.sequent(),
+                PosInOccurrence pio =
+                    PosInOccurrence.findInSequent(node.sequent(),
                         i + 1,
                         PosInTerm.getTopLevel());
                 highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
             }
         } else {
-            for (org.key_project.ncore.sequent.PosInOccurrence pio : ifs) {
+            for (PosInOccurrence pio : ifs) {
                 highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
             }
         }
@@ -163,7 +164,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      *         highlighted.
      * @throws BadLocationException
      */
-    private Range highlightPos(org.key_project.ncore.sequent.PosInOccurrence pos,
+    private Range highlightPos(PosInOccurrence pos,
             HighlightPainter light)
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, getFilter());

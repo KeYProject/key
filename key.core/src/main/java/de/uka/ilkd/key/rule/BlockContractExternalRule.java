@@ -27,6 +27,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -183,7 +184,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
     @Override
     public boolean isApplicable(final Goal goal,
-            final org.key_project.ncore.sequent.PosInOccurrence occurrence) {
+            final PosInOccurrence occurrence) {
         return !InfFlowCheckInfo.isInfFlow(goal) && super.isApplicable(goal, occurrence);
     }
 
@@ -200,7 +201,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         }
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal);
+            instantiate((Term) application.posInOccurrence().subTerm(), goal);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());

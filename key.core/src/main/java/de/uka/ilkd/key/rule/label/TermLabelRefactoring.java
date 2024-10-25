@@ -23,10 +23,12 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, Goal, Object, Term)}
+ * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
@@ -107,7 +109,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @return The required {@link RefactoringScope}.
      */
     RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm);
 
@@ -130,7 +132,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     void refactorLabels(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, LabelCollection labels);
 

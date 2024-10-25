@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.key_project.ncore.sequent.PIOPathIterator;
 import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
@@ -30,7 +30,7 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
         boolean positive = pos.isInAntec();
 
         while (it.next() != -1) {
-            final Term subTerm = it.getSubTerm();
+            final Term subTerm = (Term) it.getSubTerm();
             final Operator op = subTerm.op();
 
             if (it.getChild() == 0) {

@@ -59,7 +59,8 @@ import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * Strategy tailored to be used as long as a java program can be found in the sequent.
@@ -1441,7 +1442,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 return tOne;
             }
 
-            public Term toTerm(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+            public Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tOne;
             }
@@ -1455,7 +1456,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 return tTwo;
             }
 
-            public Term toTerm(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+            public Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tTwo;
             }
@@ -2053,7 +2054,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         all (it is discarded by the strategy).
      */
     @Override
-    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         var time = System.nanoTime();
@@ -2075,7 +2076,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     @Override
     public final boolean isApprovedApp(RuleApp app,
-            org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal) {
+            PosInOccurrence pio, Goal goal) {
         var time = System.nanoTime();
         try {
             return !(approvalF.computeCost(app, pio, goal,
@@ -2087,7 +2088,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     @Override
     protected RuleAppCost instantiateApp(RuleApp app,
-            org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal,
+            PosInOccurrence pio, Goal goal,
             MutableState mState) {
         var time = System.nanoTime();
         try {

@@ -163,7 +163,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         }
 
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal);
+            instantiate((Term) occurrence.subTerm(), goal);
 
         if (instantiation == null) {
             return false;

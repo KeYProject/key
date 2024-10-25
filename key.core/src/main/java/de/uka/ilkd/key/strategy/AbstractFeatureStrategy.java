@@ -108,7 +108,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
 
 
-    public void instantiateApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    public void instantiateApp(RuleApp app, PosInOccurrence pio,
             Goal goal,
             RuleAppCostCollector collector) {
         final MutableState mState = new MutableState();

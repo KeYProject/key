@@ -22,6 +22,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * The default implementation of {@link IExecutionBaseMethodReturn}.
  *
@@ -177,18 +179,20 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         // Get relevant information in current node
         Node proofNode = methodCall.getProofNode();
         assert proofNode.childrenCount() == 1;
-        org.key_project.ncore.sequent.PosInOccurrence originalPIO = methodCall.getModalityPIO();
+        PosInOccurrence originalPIO = methodCall.getModalityPIO();
         int index = originalPIO.isInAntec()
-                ? proofNode.sequent().antecedent().indexOf(originalPIO.sequentFormula())
-                : proofNode.sequent().succedent().indexOf(originalPIO.sequentFormula());
+                ? proofNode.sequent().antecedent()
+                        .indexOf((SequentFormula) originalPIO.sequentFormula())
+                : proofNode.sequent().succedent()
+                        .indexOf((SequentFormula) originalPIO.sequentFormula());
         // Search relevant position in child node
         Node childNode = proofNode.child(0);
         SequentFormula nodeSF =
             originalPIO.isInAntec() ? childNode.sequent().antecedent().get(index)
                     : childNode.sequent().succedent().get(index);
-        org.key_project.ncore.sequent.PosInOccurrence modalityPIO =
+        PosInOccurrence modalityPIO =
             new PosInOccurrence(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
-        Term modalityTerm = modalityPIO.subTerm();
+        var modalityTerm = modalityPIO.subTerm();
         while (modalityTerm.op() instanceof UpdateApplication) {
             modalityPIO = modalityPIO.down(1);
             modalityTerm = modalityPIO.subTerm();

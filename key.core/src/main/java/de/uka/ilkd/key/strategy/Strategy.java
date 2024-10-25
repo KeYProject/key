@@ -28,7 +28,7 @@ public interface Strategy extends Named, Feature {
      *         indicates that the rule shall not be applied at all (it is discarded by
      *         the strategy).
      */
-    default RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
             Goal goal) {
         return computeCost(app, pos, goal, new MutableState());
     }
@@ -46,7 +46,7 @@ public interface Strategy extends Named, Feature {
      *
      * @return true iff the rule should be applied, false otherwise
      */
-    boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal);
 
     /**

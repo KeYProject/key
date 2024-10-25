@@ -11,6 +11,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * Defines the basic methods and properties each element in the symbolic execution tree model has.
  *
@@ -66,7 +68,7 @@ public interface IExecutionElement {
      *
      * @return The {@link PosInOccurrence} of the modality of interest including updates.
      */
-    org.key_project.ncore.sequent.PosInOccurrence getModalityPIO();
+    PosInOccurrence getModalityPIO();
 
     /**
      * Returns the {@link NodeInfo} of {@link #getProofNode()}.

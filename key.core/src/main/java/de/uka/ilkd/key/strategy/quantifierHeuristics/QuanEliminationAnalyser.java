@@ -21,16 +21,16 @@ public class QuanEliminationAnalyser {
      *         if the subformula is not an eliminable definition
      */
     public int eliminableDefinition(Term definition,
-            org.key_project.ncore.sequent.PosInOccurrence envPIO) {
-        final org.key_project.ncore.sequent.PosInOccurrence matrixPIO = walkUpMatrix(envPIO);
-        final Term matrix = matrixPIO.subTerm();
+            PosInOccurrence envPIO) {
+        final PosInOccurrence matrixPIO = walkUpMatrix(envPIO);
+        final Term matrix = (Term) matrixPIO.subTerm();
 
         if (matrixPIO.isTopLevel()) {
             return Integer.MAX_VALUE;
         }
 
-        org.key_project.ncore.sequent.PosInOccurrence quantPIO = matrixPIO.up();
-        Term quantTerm = quantPIO.subTerm();
+        PosInOccurrence quantPIO = matrixPIO.up();
+        Term quantTerm = (Term) quantPIO.subTerm();
         final boolean ex;
         if (quantTerm.op() == Quantifier.EX) {
             ex = true;
@@ -40,7 +40,7 @@ public class QuanEliminationAnalyser {
             return Integer.MAX_VALUE;
         }
 
-        if (!isDefinitionCandidate(definition, envPIO.subTerm(), ex)) {
+        if (!isDefinitionCandidate(definition, (Term) envPIO.subTerm(), ex)) {
             return Integer.MAX_VALUE;
         }
 
@@ -57,7 +57,7 @@ public class QuanEliminationAnalyser {
                 return Integer.MAX_VALUE;
             }
             quantPIO = quantPIO.up();
-            quantTerm = quantPIO.subTerm();
+            quantTerm = (Term) quantPIO.subTerm();
 
             if (quantTerm.op() != (ex ? Quantifier.EX : Quantifier.ALL)) {
                 return Integer.MAX_VALUE;
@@ -94,11 +94,11 @@ public class QuanEliminationAnalyser {
         return false;
     }
 
-    private org.key_project.ncore.sequent.PosInOccurrence walkUpMatrix(
-            org.key_project.ncore.sequent.PosInOccurrence pio) {
+    private PosInOccurrence walkUpMatrix(
+            PosInOccurrence pio) {
         while (!pio.isTopLevel()) {
             final PosInOccurrence parent = pio.up();
-            final Operator parentOp = parent.subTerm().op();
+            final var parentOp = parent.subTerm().op();
             if (parentOp != Junctor.AND && parentOp != Junctor.OR) {
                 return pio;
             }

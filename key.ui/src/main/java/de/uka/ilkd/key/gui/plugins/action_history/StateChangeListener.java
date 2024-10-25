@@ -54,7 +54,7 @@ public class StateChangeListener implements InteractionListener {
 
     @Override
     public void runMacro(Node node, ProofMacro macro,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc,
+            PosInOccurrence posInOcc,
             ProofMacroFinishedInfo info) {
 
     }

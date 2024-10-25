@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
@@ -22,7 +21,10 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PIOPathIterator;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.*;
@@ -111,7 +113,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return set of the bound variables
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-            SVInstantiations instantiations, org.key_project.ncore.sequent.PosInOccurrence pos) {
+            SVInstantiations instantiations, PosInOccurrence pos) {
 
         ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
@@ -320,44 +322,27 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param goal the Goal at which the Taclet is applied
      * @return list of new created goals
      */
     @Override
-    public @Nullable ImmutableList<Goal> execute(Goal goal) {
-        var time = System.nanoTime();
-        var services = goal.getOverlayServices();
-        var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
-        try {
-            var timePre = System.nanoTime();
-            try {
-                if (!complete()) {
-                    throw new IllegalStateException(
-                        "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
-                }
-
-                if (!isExecutable(services)) {
-                    throw new RuntimeException(
-                        "taclet application with unsatisfied 'checkPrefix': " + this);
-                }
-                registerSkolemConstants(goal.getLocalNamespaces());
-                goal.addAppliedRuleApp(this);
-            } finally {
-                PERF_PRE.getAndAdd(System.nanoTime() - timePre);
-            }
-
-            return taclet().apply(goal, this);
-        } finally {
-            PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
-            PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
+    public <F extends Function> void execute(Namespace<@NonNull F> fns) {
+        if (!complete()) {
+            throw new IllegalStateException(
+                "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
         }
+
+        if (!isExecutable()) {
+            throw new RuntimeException(
+                "taclet application with unsatisfied 'checkPrefix': " + this);
+        }
+        registerSkolemConstants(fns);
     }
 
     /*
      * checks if application conditions are satisfied and returns <code>true</code> if this is the
      * case
      */
-    public boolean isExecutable(TermServices services) {
+    public boolean isExecutable() {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet) {
             ImmutableList<UpdateLabelPair> oldUpdCtx =
@@ -705,19 +690,18 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     }
 
 
-    public void registerSkolemConstants(NamespaceSet nss) {
+    private <F extends Function> void registerSkolemConstants(Namespace<@NonNull F> fns) {
         final SVInstantiations insts = instantiations();
         final Iterator<SchemaVariable> svIt = insts.svIterator();
         while (svIt.hasNext()) {
             final SchemaVariable sv = svIt.next();
             if (sv instanceof SkolemTermSV) {
                 final Term inst = (Term) insts.getInstantiation(sv);
-                final Namespace<JFunction> functions = nss.functions();
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
-                if (functions.lookup(inst.op().name()) == null) {
-                    functions.addSafely((JFunction) inst.op());
+                if (fns.lookup(inst.op().name()) == null) {
+                    fns.addSafely((F) inst.op());
                 }
             }
         }
@@ -952,7 +936,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      *
      * <p>
      * <b>CAUTION:</b> If you call this method, consider to call
-     * {@link NoPosTacletApp#matchFind(org.key_project.ncore.sequent.PosInOccurrence, Services)}
+     * {@link NoPosTacletApp#matchFind(PosInOccurrence, Services)}
      * first (if applicable) as
      * otherwise the TacletApp may become invalid. (This happened sometimes during interactive
      * proofs).
@@ -960,7 +944,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @param pos the PosInOccurrence of the newl created PosTacletApp
      * @return the new TacletApp
      */
-    public PosTacletApp setPosInOccurrence(org.key_project.ncore.sequent.PosInOccurrence pos,
+    public PosTacletApp setPosInOccurrence(PosInOccurrence pos,
             Services services) {
         if (taclet() instanceof NoFindTaclet) {
             throw new IllegalStateException("Cannot add position to an taclet" + " without find");
@@ -1194,7 +1178,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return true iff all variable conditions x not free in y are hold
      */
     public static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
 
         Iterator<SchemaVariable> it = instantiations.svIterator();
         while (it.hasNext()) {
@@ -1218,7 +1202,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return a set of logic variables that are bound above the specified subterm
      */
     protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         PIOPathIterator it = pos.iterator();
@@ -1226,7 +1210,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         ImmutableArray<QuantifiableVariable> vars;
 
         while ((i = it.next()) != -1) {
-            vars = it.getSubTerm().varsBoundHere(i);
+            vars = (ImmutableArray<QuantifiableVariable>) it.getSubTerm().varsBoundHere(i);
             for (i = 0; i < vars.size(); i++) {
                 result = result.add(vars.get(i));
             }

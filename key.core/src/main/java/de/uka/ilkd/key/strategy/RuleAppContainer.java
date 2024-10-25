@@ -65,7 +65,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      *         <code>TopRuleAppCost</code>.
      */
     public static RuleAppContainer createAppContainer(RuleApp p_app,
-            org.key_project.ncore.sequent.PosInOccurrence p_pio,
+            PosInOccurrence p_pio,
             Goal p_goal) {
 
         if (p_app instanceof NoPosTacletApp) {

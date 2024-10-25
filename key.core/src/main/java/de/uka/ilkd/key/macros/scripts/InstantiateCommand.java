@@ -22,6 +22,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -136,7 +138,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,
+                Term term = (Term) pta.posInOccurrence().subTerm();
+                if (term.equalsModProperty(p.formula,
                     RENAMING_TERM_PROPERTY)) {
                     return pta;
                 }

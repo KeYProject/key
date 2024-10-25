@@ -51,12 +51,13 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         if (goals == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
         }
-        if (posInOcc == null || posInOcc.subTerm() == null) {
+        Term term = (Term) posInOcc.subTerm();
+        if (posInOcc == null || term == null) {
             return false;
         }
         final Services services = proof.getServices();
@@ -78,7 +79,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
-        return posInOcc.subTerm().equalsModProperty(selfComposedExec, RENAMING_TERM_PROPERTY);
+        return term.equalsModProperty(selfComposedExec, RENAMING_TERM_PROPERTY);
     }
 
     @Override

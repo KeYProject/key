@@ -92,7 +92,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private JTree tree;
 
     /** The currently highlighted position. */
-    private org.key_project.ncore.sequent.PosInOccurrence highlight;
+    private PosInOccurrence highlight;
 
     /** The button for the {@link #nodeLinkAction} */
 
@@ -433,7 +433,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private void buildModel(TreeNode parentNode,
-            org.key_project.ncore.sequent.PosInOccurrence parentPos,
+            PosInOccurrence parentPos,
             DefaultTreeModel treeModel) {
         if (parentPos == null) {
             int index = 0;
@@ -497,7 +497,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private ImmutableList<Integer> getPosTablePath(
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         if (pos == null) {
             return ImmutableSLList.<Integer>nil().prepend(0);
         }
@@ -545,7 +545,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return result;
     }
 
-    private String getTooltipText(org.key_project.ncore.sequent.PosInOccurrence pio) {
+    private String getTooltipText(PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
@@ -570,7 +570,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
             TreeNode node = (TreeNode) value;
 
-            org.key_project.ncore.sequent.PosInOccurrence pio = node.pos;
+            PosInOccurrence pio = node.pos;
             Term term = node.term;
             assert pio.subTerm().equals(term);
 
@@ -648,9 +648,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
-        private final org.key_project.ncore.sequent.PosInOccurrence pos;
+        private final PosInOccurrence pos;
 
-        TermViewLogicPrinter(org.key_project.ncore.sequent.PosInOccurrence pos, NotationInfo ni,
+        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni,
                 Services services) {
             super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
             this.pos = pos;
@@ -687,7 +687,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         private InitialPositionTable posTable = new InitialPositionTable();
         private final Node node;
 
-        TermView(org.key_project.ncore.sequent.PosInOccurrence pos, Node node,
+        TermView(PosInOccurrence pos, Node node,
                 MainWindow mainWindow) {
             super(mainWindow);
             this.node = node;

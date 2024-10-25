@@ -72,7 +72,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(proof.getActiveStrategy());
     }
 

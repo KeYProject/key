@@ -50,8 +50,8 @@ public class InfFlowContractAppFeature implements Feature {
      * to be decided by the subclasses
      */
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            org.key_project.ncore.sequent.PosInOccurrence newPio,
-            org.key_project.ncore.sequent.PosInOccurrence oldPio) {
+            PosInOccurrence newPio,
+            PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
     }
 
@@ -71,7 +71,7 @@ public class InfFlowContractAppFeature implements Feature {
      * <code>null</code>
      */
     protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp,
-            org.key_project.ncore.sequent.PosInOccurrence newPio) {
+            PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -84,7 +84,7 @@ public class InfFlowContractAppFeature implements Feature {
             if (!(cmp instanceof PosTacletApp)) {
                 return false;
             }
-            final org.key_project.ncore.sequent.PosInOccurrence oldPio = cmp.posInOccurrence();
+            final PosInOccurrence oldPio = cmp.posInOccurrence();
             if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
             }
@@ -153,12 +153,12 @@ public class InfFlowContractAppFeature implements Feature {
      * the sequent
      */
     protected boolean duplicateFindTaclet(TacletApp app,
-            org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal) {
+            PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert app.ifFormulaInstantiations().size() >= 1
                 : "Featureis only applicable to rules with at least one assumes.";
 
-        final SequentFormula focusFor = pos.sequentFormula();
+        final SequentFormula focusFor = (SequentFormula) pos.sequentFormula();
         final boolean antec = pos.isInAntec();
         final SequentFormula assumesFor =
             app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
@@ -223,7 +223,7 @@ public class InfFlowContractAppFeature implements Feature {
 
         // only relate the n-th called method in execution A with the n-th
         // called method in execution B automatically
-        final SequentFormula focusFor = pos.sequentFormula();
+        final SequentFormula focusFor = (SequentFormula) pos.sequentFormula();
         final SequentFormula assumesFor =
             app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 

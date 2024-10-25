@@ -403,7 +403,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
 
-                                Term term = pis.getPosInOccurrence().subTerm();
+                                Term term = (Term) pis.getPosInOccurrence().subTerm();
 
                                 // Reactivate this when the parser is fully capable again.
                                 // droppedString = LogicPrinter.quickPrintTerm(term,
@@ -593,7 +593,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
-                                Term term = pis.getPosInOccurrence().subTerm();
+                                Term term = (Term) pis.getPosInOccurrence().subTerm();
                                 // Reactivate this when the parser is fully capable again.
                                 // String droppedString = LogicPrinter.quickPrintTerm(term,
                                 // mediator.getServices(),

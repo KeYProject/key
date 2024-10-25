@@ -151,7 +151,7 @@ public class AutoMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new AutoMacroFilterStrategy(proof.getActiveStrategy(), breakpoint,
                 allowSplits, whitelist, symbexOnly, onlyHumanReadable);
     }
@@ -229,8 +229,8 @@ public class AutoMacro extends StrategyProofMacro {
             }
 
             if (isJavaPIO(pio)) {
-                final SourceElement activeStmt = //
-                        JavaTools.getActiveStatement(pio.subTerm().javaBlock());
+                var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();final SourceElement activeStmt = //
+                        JavaTools.getActiveStatement(term.javaBlock());
                 final String currStmtString = activeStmt.toString();
 
                 if (currStmtString != null && //
@@ -244,9 +244,8 @@ public class AutoMacro extends StrategyProofMacro {
             return super.isApprovedApp(app, pio, goal);
         }
 
-        private boolean isJavaPIO(org.key_project.ncore.sequent.PosInOccurrence pio) {
-            return pio != null
-                    && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+        private boolean isJavaPIO(PosInOccurrence pio) {
+            if(pio==null) return false;var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
         }
 
         @Override

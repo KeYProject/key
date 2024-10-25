@@ -194,9 +194,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         addClipboardItem(control);
 
         if (getPos() != null) {
-            org.key_project.ncore.sequent.PosInOccurrence occ = getPos().getPosInOccurrence();
+            PosInOccurrence occ = getPos().getPosInOccurrence();
             if (occ != null && occ.posInTerm() != null) {
-                Term t = occ.subTerm();
+                Term t = (Term) occ.subTerm();
                 createAbbrevSection(t, control);
 
                 if (t.op() instanceof ProgramVariable var) {
@@ -542,13 +542,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 switch (((JMenuItem) e.getSource()).getText()) {
                 case DISABLE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
+                        mediator.getNotationInfo().getAbbrevMap().setEnabled((Term) occ.subTerm(),
+                            false);
                         getSequentView().printSequent();
                     }
                 }
                 case ENABLE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), true);
+                        mediator.getNotationInfo().getAbbrevMap().setEnabled((Term) occ.subTerm(),
+                            true);
                         getSequentView().printSequent();
                     }
                 }
@@ -569,7 +571,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                         "Only letters, numbers and '_' are allowed for Abbreviations",
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
-                                    mediator.getNotationInfo().getAbbrevMap().put(occ.subTerm(),
+                                    mediator.getNotationInfo().getAbbrevMap().put(
+                                        (Term) occ.subTerm(),
                                         abbreviation, true);
                                     getSequentView().printSequent();
                                 }
@@ -585,7 +588,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                         String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
                             "Enter abbreviation for term: \n" + occ.subTerm().toString(),
                             "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
-                            mediator.getNotationInfo().getAbbrevMap().getAbbrev(occ.subTerm())
+                            mediator.getNotationInfo().getAbbrevMap()
+                                    .getAbbrev((Term) occ.subTerm())
                                     .substring(1));
                         try {
                             if (abbreviation != null) {
@@ -596,7 +600,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     mediator.getNotationInfo().getAbbrevMap()
-                                            .changeAbbrev(occ.subTerm(), abbreviation);
+                                            .changeAbbrev((Term) occ.subTerm(), abbreviation);
                                     getSequentView().printSequent();
                                 }
                             }

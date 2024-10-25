@@ -32,7 +32,7 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
     public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final SequentFormula cfma = pos.sequentFormula();
+        final SequentFormula cfma = (SequentFormula) pos.sequentFormula();
         final boolean antec = pos.isInAntec();
 
         Node node = goal.node();

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -15,6 +13,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ncore.sequent.FormulaChangeInfo;
+import org.key_project.ncore.sequent.PIOPathIterator;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -32,7 +32,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * was created
      */
     private final FormulaTag positionTag;
-    private final org.key_project.ncore.sequent.PosInOccurrence applicationPosition;
+    private final PosInOccurrence applicationPosition;
 
     /**
      * Creates a FindTacletAppContainer for applying a find taclet.
@@ -43,7 +43,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @param goal the goal to apply the taclet on
      * @param age the age
      */
-    FindTacletAppContainer(NoPosTacletApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    FindTacletAppContainer(NoPosTacletApp app, PosInOccurrence pio,
             RuleAppCost cost, Goal goal,
             long age) {
         super(app, cost, age);
@@ -63,7 +63,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      */
     @Override
     protected boolean isStillApplicable(Goal p_goal) {
-        org.key_project.ncore.sequent.PosInOccurrence topPos =
+        PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         return topPos != null && !subformulaOrPreceedingUpdateHasChanged(p_goal);
     }
@@ -74,11 +74,11 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         altered since the creation of this object or if a preceding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged(Goal goal) {
-        ImmutableList<FormulaChangeInfo> infoList =
+        ImmutableList<FormulaChangeInfo<SequentFormula>> infoList =
             goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty()) {
-            final FormulaChangeInfo info = infoList.head();
+            final FormulaChangeInfo<SequentFormula> info = infoList.head();
             infoList = infoList.tail();
 
             final SequentFormula newFormula = info.newFormula();
@@ -108,7 +108,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         formulas) and no indirect relationship exists which is established by a modification
      *         that occurred inside an update
      */
-    private boolean independentSubformulas(org.key_project.ncore.sequent.PosInOccurrence changePos,
+    private boolean independentSubformulas(PosInOccurrence changePos,
             SequentFormula newFormula) {
         final PIOPathIterator changePIO = changePos.iterator();
         final PIOPathIterator appPIO = applicationPosition.iterator();
@@ -122,7 +122,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
             }
 
             if (changeIndex == -1) {
-                final Term beforeChangeTerm = changePIO.getSubTerm();
+                final Term beforeChangeTerm = (Term) changePIO.getSubTerm();
                 final Operator beforeChangeOp = beforeChangeTerm.op();
 
                 // special case: a taclet application is not affected by changes
@@ -131,9 +131,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // during symbolic program execution; also consider
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
                 if (beforeChangeOp instanceof Modality beforeChangeMod) {
-                    final org.key_project.ncore.sequent.PosInOccurrence afterChangePos =
-                        changePos.replaceConstrainedFormula(newFormula);
-                    final Term afterChangeTerm = afterChangePos.subTerm();
+                    final PosInOccurrence afterChangePos =
+                        changePos.replaceSequentFormula(newFormula);
+                    final Term afterChangeTerm = (Term) afterChangePos.subTerm();
                     if (afterChangeTerm.op() instanceof Modality afterChangeMod) {
                         return beforeChangeMod.kind() == afterChangeMod.kind()
                                 && beforeChangeTerm.sub(0)
@@ -151,7 +151,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // in case a change within an update occurred, also (some)
                 // taclets within the update target expression have to be
                 // invalidated
-                final Operator modOp = changePIO.getSubTerm().op();
+                final var modOp = changePIO.getSubTerm().op();
 
                 return !(modOp instanceof UpdateApplication
                         && appIndex == UpdateApplication.targetPos() && updateContextIsRecorded());
@@ -173,10 +173,10 @@ public class FindTacletAppContainer extends TacletAppContainer {
      */
     @Override
     protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
-        final org.key_project.ncore.sequent.PosInOccurrence topPos =
+        final PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         assert topPos != null;
-        return applicationPosition.replaceConstrainedFormula(topPos.sequentFormula());
+        return applicationPosition.replaceSequentFormula(topPos.sequentFormula());
     }
 
 }

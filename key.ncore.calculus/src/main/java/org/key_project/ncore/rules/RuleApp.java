@@ -19,9 +19,9 @@ public interface RuleApp {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @return list of new created goals
+     * @TODO: better name
      */
-    void execute(Namespace<? super @NonNull Function> fns);
+    <F extends Function> void execute(Namespace<@NonNull F> fns);
 
     /**
      * returns true if all variables are instantiated

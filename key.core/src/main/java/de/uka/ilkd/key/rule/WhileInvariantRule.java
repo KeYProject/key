@@ -54,6 +54,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -182,8 +183,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
             Services services) throws RuleAbortException {
-        final Term focusTerm = app.posInOccurrence().subTerm();
-
+        final Term focusTerm = (Term) app.posInOccurrence().subTerm();
 
         // leading update?
         final Pair<Term, Term> update = applyUpdates(focusTerm, services);
@@ -647,13 +647,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     @Override
-    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         return checkApplicability(goal, pio);
     }
 
 
     // focus must be top level succedent
-    static boolean checkApplicability(Goal g, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    static boolean checkApplicability(Goal g, PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
         }
@@ -661,7 +661,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (Transformer.inTransformer(pio)) {
             return false;
         }
-        Pair<Term, Term> up = applyUpdates(pio.subTerm(), g.proof().getServices());
+        Pair<Term, Term> up = applyUpdates((Term) pio.subTerm(), g.proof().getServices());
         final Term progPost = up.second;
         if (!checkFocus(progPost)) {
             return false;
@@ -683,7 +683,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private void setupWdGoal(final Goal goal, final LoopSpecification inv, final Term update,
             final Term selfTerm, final LocationVariable heap, final Term anonHeap,
             final Term localAnonUpdate, final ImmutableSet<LocationVariable> localIns,
-            org.key_project.ncore.sequent.PosInOccurrence pio, Services services) {
+            PosInOccurrence pio, Services services) {
         if (goal == null) {
             return;
         }

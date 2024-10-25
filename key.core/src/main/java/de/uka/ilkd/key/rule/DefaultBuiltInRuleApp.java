@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -19,7 +20,7 @@ public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
 
     public DefaultBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio,
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+            ImmutableList<PosInOccurrence> ifInsts) {
         super(builtInRule, pio, ifInsts);
     }
 
@@ -35,7 +36,7 @@ public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public DefaultBuiltInRuleApp setIfInsts(
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
         // return new DefaultBuiltInRuleApp(builtInRule, pio, ifInsts);

@@ -87,11 +87,11 @@ public class InitialPositionTable extends PositionTable {
      * @param filter the current filter
      * @return the path for the given pio
      */
-    public ImmutableList<Integer> pathForPosition(org.key_project.ncore.sequent.PosInOccurrence pio,
+    public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
             SequentPrintFilter filter) {
         ImmutableList<Integer> p = ImmutableSLList.nil();
         p = prependPathInFormula(p, pio);
-        int index = indexOfCfma(pio.sequentFormula(), filter);
+        int index = indexOfCfma((SequentFormula) pio.sequentFormula(), filter);
         if (index == -1) {
             return null;
         }
