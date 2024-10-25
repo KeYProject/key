@@ -23,6 +23,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * An implementation of {@link IExecutionVariable} used to query all array indices at the same time.
@@ -63,7 +64,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionAllArrayIndicesVariable(IExecutionNode<?> parentNode, Node proofNode,
-            org.key_project.ncore.sequent.PosInOccurrence modalityPIO, ExecutionValue parentValue,
+            PosInOccurrence modalityPIO, ExecutionValue parentValue,
             IProgramVariable arrayProgramVariable, Term additionalCondition) {
         super(parentNode, proofNode, modalityPIO, parentValue, arrayProgramVariable,
             additionalCondition);

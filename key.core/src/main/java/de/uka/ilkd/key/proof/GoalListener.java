@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 
+import de.uka.ilkd.key.logic.SequentFormula;
+
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
 /** interface to be implemented by a goal listener */
@@ -13,7 +15,7 @@ public interface GoalListener {
     /**
      * informs the listener about a change that occured to the sequent of goal
      */
-    void sequentChanged(Goal source, SequentChangeInfo sci);
+    void sequentChanged(Goal source, SequentChangeInfo<SequentFormula> sci);
 
     /**
      * Informs the listener that the given goal <code>source</code> has been replaced by the goals

@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -318,8 +319,9 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     public int hashCodeModProofIrrelevancy() {
+        SequentFormula sf = (SequentFormula) pos.sequentFormula();
         return Objects.hash(super.hashCodeModProofIrrelevancy(),
-            pos.sequentFormula().hashCodeModProofIrrelevancy(),
+            sf.hashCodeModProofIrrelevancy(),
             pos.posInTerm());
     }
 

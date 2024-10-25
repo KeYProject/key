@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.util.properties.Properties;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -39,9 +41,9 @@ public class InfFlowContractAppTacletExecutor
 
     @Override
     protected void addToAntec(Semisequent semi, TermLabelState termLabelState,
-            TacletLabelHint labelHint, SequentChangeInfo currentSequent,
-            org.key_project.ncore.sequent.PosInOccurrence pos,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            TacletLabelHint labelHint, SequentChangeInfo<SequentFormula> currentSequent,
+            PosInOccurrence pos,
+            PosInOccurrence applicationPosInOccurrence,
             MatchConditions matchCond, Goal goal,
             RuleApp tacletApp) {
         final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,

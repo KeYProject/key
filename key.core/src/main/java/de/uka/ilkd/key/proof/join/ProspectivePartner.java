@@ -72,7 +72,8 @@ public class ProspectivePartner {
         if (commonParent.getAppliedRuleApp() != null
                 && commonParent.getAppliedRuleApp().posInOccurrence() != null) {
             setFormulaForHiding(
-                commonParent.getAppliedRuleApp().posInOccurrence().sequentFormula());
+                (SequentFormula) commonParent.getAppliedRuleApp().posInOccurrence()
+                        .sequentFormula());
         }
     }
 

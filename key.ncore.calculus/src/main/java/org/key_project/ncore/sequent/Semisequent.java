@@ -408,8 +408,20 @@ public abstract class Semisequent<SF extends SequentFormula> implements Iterable
      *         place idx
      */
     public SemisequentChangeInfo<SF> replace(int idx, SF sequentFormula) {
-        return insertFirst(sequentFormula);
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), null);
     }
+
+    /**
+     * replaces the formula at position {@code idx} by the given list of formulas
+     *
+     * @param idx the position
+     * @param replacements the new formulas
+     * @return change information including the resulting semisequent after the replacement
+     */
+    public SemisequentChangeInfo<SF> replace(int idx, ImmutableList<SF> replacements) {
+        return insertAndRemoveRedundancy(idx, replacements, remove(idx));
+    }
+
 
     /**
      * checks if the {@link SequentFormula} occurs in this Semisequent (identity check)
@@ -419,5 +431,15 @@ public abstract class Semisequent<SF extends SequentFormula> implements Iterable
      */
     public boolean contains(SF sequentFormula) {
         return indexOf(sequentFormula) != -1;
+    }
+
+    /**
+     * checks if a {@link SequentFormula} is in this Semisequent (equality check)
+     *
+     * @param sequentFormula the {@link SequentFormula} to look for
+     * @return true iff. sequentFormula has been found in this Semisequent
+     */
+    public boolean containsEqual(SF sequentFormula) {
+        return seqList.contains(sequentFormula);
     }
 }

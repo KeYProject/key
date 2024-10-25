@@ -53,14 +53,14 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
-            org.key_project.ncore.sequent.PosInOccurrence p_pio,
+            PosInOccurrence p_pio,
             Goal p_goal, boolean p_initial) {
         return createContainer(p_app, p_pio, p_goal,
             p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), p_initial);
     }
 
     private static TacletAppContainer createContainer(NoPosTacletApp p_app,
-            org.key_project.ncore.sequent.PosInOccurrence p_pio,
+            PosInOccurrence p_pio,
             Goal p_goal, RuleAppCost p_cost, boolean p_initial) {
         // This relies on the fact that the method <code>Goal.getTime()</code>
         // never returns a value less than zero
@@ -186,7 +186,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     protected static ImmutableList<RuleAppContainer> createInitialAppContainers(
             ImmutableList<NoPosTacletApp> p_app,
-            org.key_project.ncore.sequent.PosInOccurrence p_pio, Goal p_goal) {
+            PosInOccurrence p_pio, Goal p_goal) {
 
         List<RuleAppCost> costs = new LinkedList<>();
 
@@ -214,7 +214,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      *         of <code>TopRuleAppCost</code>.
      */
     static RuleAppContainer createAppContainers(NoPosTacletApp p_app,
-            org.key_project.ncore.sequent.PosInOccurrence p_pio,
+            PosInOccurrence p_pio,
             Goal p_goal) {
         if (!(p_pio == null ? p_app.taclet() instanceof NoFindTaclet
                 : p_app.taclet() instanceof FindTaclet))
@@ -266,7 +266,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     protected abstract boolean isStillApplicable(Goal p_goal);
 
-    protected org.key_project.ncore.sequent.PosInOccurrence getPosInOccurrence(Goal p_goal) {
+    protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
         return null;
     }
 
@@ -295,7 +295,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         if (!app.complete()) {
             return app.tryToInstantiate(services.getOverlay(p_goal.getLocalNamespaces()));
-        } else if (!app.isExecutable(services)) {
+        } else if (!app.isExecutable()) {
             return null;
         } else {
             return app;

@@ -53,7 +53,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
         Feature labelFeature = (app, pos, goal, mState) -> {
             boolean hasLabel = false;
             if (pos != null && app instanceof TacletApp) {
-                Term findTerm = pos.subTerm();
+                Term findTerm = (Term) pos.subTerm();
                 if (!findTerm.containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
                     // Term with result label is not used in find term and thus is not allowed
                     // to be used in an assumes clause

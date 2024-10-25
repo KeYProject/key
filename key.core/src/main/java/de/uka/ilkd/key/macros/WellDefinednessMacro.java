@@ -54,13 +54,13 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new WellDefinednessStrategy();
     }
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         if (proof == null || proof.isDisposed() || !WellDefinednessCheck.isOn()) {
             return false;
         }
@@ -104,7 +104,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp,
-                org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (name.startsWith(WD_PREFIX)) {
@@ -115,7 +115,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             return true;
         }

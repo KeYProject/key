@@ -39,7 +39,7 @@ public class FocusProjection implements ProjectionToTerm {
             pos = pos.up();
         }
 
-        return pos.subTerm();
+        return (Term) pos.subTerm();
     }
 
 }

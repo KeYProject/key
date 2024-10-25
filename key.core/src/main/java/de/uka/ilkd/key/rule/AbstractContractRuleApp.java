@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -26,7 +27,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts,
+            ImmutableList<PosInOccurrence> ifInsts,
             Contract contract) {
         super(rule, pio, ifInsts);
         this.instantiation = contract;

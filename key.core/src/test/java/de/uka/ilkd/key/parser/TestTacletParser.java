@@ -101,7 +101,7 @@ public class TestTacletParser {
     }
 
     public Semisequent sseq(String s) {
-        return Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf(s)).semisequent();
+        return (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf(s)).semisequent();
     }
 
     public Sequent sequent(String a, String s) {

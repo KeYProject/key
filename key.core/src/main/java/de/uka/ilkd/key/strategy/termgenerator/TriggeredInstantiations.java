@@ -100,7 +100,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
             if (taclet.hasTrigger()) {
 
-                final Term comprehension = pos.subTerm();
+                final Term comprehension = (Term) pos.subTerm();
 
                 if (tapp.uninstantiatedVars().size() <= 1) {
                     SVInstantiations svInst = tapp.instantiations();

@@ -25,6 +25,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -75,7 +77,7 @@ public class TestVariableNamer {
     }
 
 
-    private org.key_project.ncore.sequent.PosInOccurrence constructPIO(SequentFormula formula) {
+    private PosInOccurrence constructPIO(SequentFormula formula) {
         return new PosInOccurrence(formula, PosInTerm.getTopLevel(), true);
     }
 
@@ -151,7 +153,7 @@ public class TestVariableNamer {
         LocationVariable v = constructProgramVariable(name);
         SequentFormula formula = constructFormula(v);
         Goal goal = constructGoal(formula);
-        org.key_project.ncore.sequent.PosInOccurrence pio = constructPIO(formula);
+        PosInOccurrence pio = constructPIO(formula);
         v = vn.rename(v, goal, pio);
         assertEquals("x", v.getProgramElementName().getProgramName());
     }
@@ -162,7 +164,7 @@ public class TestVariableNamer {
         VariableNamer vn = services.getVariableNamer();
         ProgramVariable v, w;
 
-        org.key_project.ncore.sequent.PosInOccurrence pio = constructPIO(formulaWithX);
+        PosInOccurrence pio = constructPIO(formulaWithX);
         Goal goal = constructGoal(formulaWithX);
 
         v = vn.rename(y, goal, pio);
@@ -204,7 +206,7 @@ public class TestVariableNamer {
         VariableNamer vn = services.getVariableNamer();
         ProgramElementName proposal;
 
-        org.key_project.ncore.sequent.PosInOccurrence pio = constructPIO(formulaWithVar_1);
+        PosInOccurrence pio = constructPIO(formulaWithVar_1);
         Goal goal = constructGoal(formulaWithVar_1);
 
         proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null, services);
@@ -224,7 +226,7 @@ public class TestVariableNamer {
         VariableNamer vn = services.getVariableNamer();
         ProgramVariable v;
 
-        org.key_project.ncore.sequent.PosInOccurrence pio = constructPIO(formulaWithX_1);
+        PosInOccurrence pio = constructPIO(formulaWithX_1);
         Goal goal = constructGoal(formulaWithX_1);
         proof.getNamespaces().programVariables().addSafely(xx);
         addGlobal(goal, xx);

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -51,12 +52,12 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+            ImmutableList<PosInOccurrence> ifInsts) {
         super(rule, pio, ifInsts);
     }
 
     public MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts, Node mergeNode,
+            ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
             ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
             SymbolicExecutionStateWithProgCnt thisSEState,
             ImmutableList<SymbolicExecutionState> mergePartnerStates, Term distForm,
@@ -78,7 +79,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public IBuiltInRuleApp setIfInsts(
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

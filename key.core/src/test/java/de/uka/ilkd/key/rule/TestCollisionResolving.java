@@ -13,7 +13,9 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -119,7 +121,7 @@ public class TestCollisionResolving {
         FindTaclet coll_varSV =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_coll_context").taclet();
 
-        org.key_project.ncore.sequent.PosInOccurrence pos =
+        PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
 
         TacletApp result =
@@ -144,7 +146,7 @@ public class TestCollisionResolving {
 
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_ns1").taclet();
-        org.key_project.ncore.sequent.PosInOccurrence pos =
+        PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
         TacletApp app = PosTacletApp.createPosTacletApp(taclet,
             taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null),
@@ -220,7 +222,7 @@ public class TestCollisionResolving {
                 .insert(1, new SequentFormula(TacletForTests.parseTerm("\\exists s x; p(x)")))
                 .semisequent();
         Sequent seq = Sequent.createSuccSequent(semiseq);
-        org.key_project.ncore.sequent.PosInOccurrence pos =
+        PosInOccurrence pos =
             new PosInOccurrence(semiseq.get(0), PosInTerm.getTopLevel(), false);
 
         NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp(taclet);
@@ -327,7 +329,7 @@ public class TestCollisionResolving {
         FindTaclet taclet = (FindTaclet) TacletForTests
                 .getTaclet("TestCollisionResolving_name_conflict_with_context2").taclet();
         Term term = TacletForTests.parseTerm("\\forall s x; p(x)");
-        org.key_project.ncore.sequent.PosInOccurrence pos =
+        PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
         MatchConditions mc =
             taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null);

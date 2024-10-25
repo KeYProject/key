@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**

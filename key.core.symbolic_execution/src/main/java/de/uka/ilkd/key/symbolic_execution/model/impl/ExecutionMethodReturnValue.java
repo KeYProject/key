@@ -10,6 +10,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * The default implementation of {@link IExecutionMethodReturnValue}.
  *
@@ -25,7 +27,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
     /**
      * The {@link PosInOccurrence} of the modality of interest.
      */
-    private final org.key_project.ncore.sequent.PosInOccurrence modalityPIO;
+    private final PosInOccurrence modalityPIO;
 
     /**
      * The return value as human readable {@link String}.
@@ -52,7 +54,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * @param condition The optional condition or {@code null} if no condition is available.
      */
     public ExecutionMethodReturnValue(ITreeSettings settings, Node proofNode,
-            org.key_project.ncore.sequent.PosInOccurrence modalityPIO, Term returnValue,
+            PosInOccurrence modalityPIO, Term returnValue,
             Term condition) {
         super(settings, proofNode);
         assert returnValue != null;
@@ -156,7 +158,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
+    public PosInOccurrence getModalityPIO() {
         return modalityPIO;
     }
 }

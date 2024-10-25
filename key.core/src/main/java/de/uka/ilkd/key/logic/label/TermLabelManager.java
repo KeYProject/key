@@ -24,6 +24,9 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -44,15 +47,15 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * {@link #getSupportedTermLabelNames()}.</li>
  * <li>To instantiate a {@link TermLabel} via {@link #parseLabel(String, List, TermServices)}.</li>
  * <li>To compute the {@link TermLabel}s of a {@link Term} to be created via
- * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+ * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
  * during rule application.</li>
  * <li>To refactor existing {@link Term}s during rule application via:
  * <ul>
- * <li>{@link #refactorGoal(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, Goal, Object, Term)}:
+ * <li>{@link #refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, Term)}:
  * The full sequent</li>
- * <li>{@link #refactorSequentFormula(TermLabelState, Services, Term, org.key_project.ncore.sequent.PosInOccurrence, Rule, Goal, Object, Term)}
+ * <li>{@link #refactorSequentFormula(TermLabelState, Services, Term, PosInOccurrence, Rule, Goal, Object, Term)}
  * : The sequent formula which contains the application term on which the rule is applied</li>
- * <li>{@link #refactorTerm(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, Goal, Object, Term)}
+ * <li>{@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term)}
  * : The current term.</li>
  * </ul>
  * </li>
@@ -381,9 +384,9 @@ public class TermLabelManager {
 
     /**
      * Computes the {@link TermLabel}s for the new {@link Term} via
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
      * and refactors the labels below the new {@link Term} in addition via
-     * {@link #refactorTerm(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Goal, Object, Rule, Term)}.
+     * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
@@ -401,20 +404,20 @@ public class TermLabelManager {
      * @return The {@link Term} with updates labels.
      */
     public static Term label(Services services, TermLabelState state,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Rule rule,
+            PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal,
             Object hint, Term tacletTerm, Term newTerm) {
         Term applicationTerm =
-            applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+            applicationPosInOccurrence != null ? (Term) applicationPosInOccurrence.subTerm() : null;
         return label(services, state, applicationTerm, applicationPosInOccurrence, rule, ruleApp,
             goal, hint, tacletTerm, newTerm);
     }
 
     /**
      * Computes the {@link TermLabel}s for the new {@link Term} via
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
      * and refactors the labels below the new {@link Term} in addition via
-     * {@link #refactorTerm(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Goal, Object, Rule, Term)}.
+     * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
@@ -434,7 +437,7 @@ public class TermLabelManager {
      * @return The {@link Term} with updates labels.
      */
     public static Term label(Services services, TermLabelState state, Term applicationTerm,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Rule rule,
+            PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal,
             Object hint, Term tacletTerm, Term newTerm) {
         TermLabelManager manager = getTermLabelManager(services);
@@ -448,9 +451,9 @@ public class TermLabelManager {
 
     /**
      * Computes the {@link TermLabel}s for the new {@link Term} via
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
      * and refactors the labels below the new {@link Term} in addition via
-     * {@link #refactorTerm(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Goal, Object, Rule, Term)}.
+     * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
      * @param state The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -470,7 +473,7 @@ public class TermLabelManager {
      * @return The {@link Term} with updates labels.
      */
     public Term label(TermLabelState state, Services services, Term applicationTerm,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Rule rule,
+            PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal,
             Object hint, Term tacletTerm, Term newTerm) {
         ImmutableArray<TermLabel> newLabels = instantiateLabels(state, services, applicationTerm,
@@ -507,10 +510,10 @@ public class TermLabelManager {
      */
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Rule rule,
+            PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
         Term applicationTerm =
-            applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+            applicationPosInOccurrence != null ? (Term) applicationPosInOccurrence.subTerm() : null;
         return instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule,
             ruleApp, goal, hint, tacletTerm, newTerm);
     }
@@ -544,7 +547,7 @@ public class TermLabelManager {
      */
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services, Term applicationTerm,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Rule rule, RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
@@ -577,7 +580,7 @@ public class TermLabelManager {
      *        which should be created.
      */
     private void addLabelsBasedOnApplicationTerm(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term newTerm, Set<TermLabel> newLabels) {
         if (applicationTerm == null) {
@@ -641,7 +644,7 @@ public class TermLabelManager {
      * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
      */
     public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule,
             RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
         // Compute current rule specific updates
@@ -686,7 +689,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
@@ -705,7 +708,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper method of
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param state The {@link TermLabelState} of the current rule application.
@@ -726,7 +729,7 @@ public class TermLabelManager {
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performTermLabelPolicies(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term newTerm, Map<Name, TermLabelPolicy> policies,
             Set<TermLabel> newLabels) {
@@ -745,7 +748,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper method of
-     * {@link #performTermLabelPolicies(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, Goal, Object, Term, Term, Map, Set)}
+     * {@link #performTermLabelPolicies(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Term, Map, Set)}
      * </p>
      *
      * @param state The {@link TermLabelState} of the current rule application.
@@ -767,7 +770,7 @@ public class TermLabelManager {
      * @param label The current {@link TermLabel} to ask its {@link TermLabelPolicy}.
      */
     protected void performTermLabelPolicies(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term newTerm, Map<Name, TermLabelPolicy> policies,
             Set<TermLabel> newLabels, TermLabel label) {
@@ -788,7 +791,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -809,7 +812,7 @@ public class TermLabelManager {
      * @return The active {@link ChildTermLabelPolicy} which have to be performed.
      */
     protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term newTerm,
             Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
@@ -846,7 +849,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -866,7 +869,7 @@ public class TermLabelManager {
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performDirectChildPolicies(TermServices services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term newTerm,
             Map<Name, ChildTermLabelPolicy> policies, Set<TermLabel> newLabels) {
@@ -887,7 +890,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -907,7 +910,7 @@ public class TermLabelManager {
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performChildAndGrandchildPolicies(final TermServices services,
-            final org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            final PosInOccurrence applicationPosInOccurrence,
             final Term applicationTerm,
             final Rule rule, final Goal goal, final Object hint, final Term tacletTerm,
             final Term newTerm, final Map<Name, ChildTermLabelPolicy> policies,
@@ -935,7 +938,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param state The {@link TermLabelState} of the current rule application.
@@ -956,7 +959,7 @@ public class TermLabelManager {
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performUpdater(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Term modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
             ImmutableList<TermLabelUpdate> updater,
@@ -985,7 +988,7 @@ public class TermLabelManager {
      */
     public static Term refactorSequentFormula(TermLabelState state, Services services,
             Term sequentFormula,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Rule rule,
+            PosInOccurrence applicationPosInOccurrence, Rule rule,
             Goal goal,
             Object hint, Term tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
@@ -1014,11 +1017,11 @@ public class TermLabelManager {
      * @return The updated application {@link Term}.
      */
     public Term refactorSequentFormula(TermLabelState state, Services services, Term sequentFormula,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Goal goal,
+            PosInOccurrence applicationPosInOccurrence, Goal goal,
             Object hint, Rule rule,
             Term tacletTerm) {
         final PosInTerm pos = applicationPosInOccurrence.posInTerm();
-        final Term oldTerm = pos.getSubTerm(sequentFormula);
+        final Term oldTerm = (Term) pos.getSubTerm(sequentFormula);
         // Compute active refactorings
         RefactoringsContainer refactorings = computeRefactorings(state, services,
             applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
@@ -1063,7 +1066,7 @@ public class TermLabelManager {
      * @return The updated application {@link Term}.
      */
     public static Term refactorTerm(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
@@ -1093,7 +1096,7 @@ public class TermLabelManager {
      * @return The updated application {@link Term}.
      */
     public Term refactorTerm(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Goal goal,
             Object hint, Rule rule, Term tacletTerm) {
         // Compute active refactorings
@@ -1128,13 +1131,14 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      */
     public static void refactorGoal(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Rule rule,
+            PosInOccurrence applicationPosInOccurrence, Rule rule,
             Goal goal, Object hint,
             Term tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             Term applicationTerm =
-                applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+                applicationPosInOccurrence != null ? (Term) applicationPosInOccurrence.subTerm()
+                        : null;
             manager.refactorGoal(state, services, applicationPosInOccurrence, applicationTerm, rule,
                 goal, hint, tacletTerm);
         }
@@ -1164,7 +1168,7 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      */
     public void refactorGoal(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         // Compute active refactorings
@@ -1220,13 +1224,14 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      */
     public static void refactorSequent(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Rule rule,
+            PosInOccurrence applicationPosInOccurrence, Rule rule,
             Goal goal, Object hint,
             Term tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             Term applicationTerm =
-                applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+                applicationPosInOccurrence != null ? (Term) applicationPosInOccurrence.subTerm()
+                        : null;
             manager.refactorSequent(state, services, applicationPosInOccurrence, applicationTerm,
                 rule, goal, hint, tacletTerm);
         }
@@ -1256,7 +1261,7 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      */
     public void refactorSequent(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         // Compute active refactorings
@@ -1297,10 +1302,10 @@ public class TermLabelManager {
      *         specified {@link PosInOccurrence}.
      */
     protected Term replaceTerm(TermLabelState state,
-            org.key_project.ncore.sequent.PosInOccurrence pio, Term newTerm,
+            PosInOccurrence pio, Term newTerm,
             TermFactory tf, Set<TermLabelRefactoring> parentRefactorings,
             Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm) {
         do {
@@ -1310,7 +1315,7 @@ public class TermLabelManager {
                 int childIndex = pio.getIndex();
                 pio = pio.up();
                 Term newChild = newTerm;
-                newTerm = pio.subTerm();
+                newTerm = (Term) pio.subTerm();
                 ImmutableArray<TermLabel> newLabels;
                 if (!parentRefactorings.isEmpty()) {
                     newLabels = performRefactoring(state, services, applicationPosInOccurrence,
@@ -1352,7 +1357,7 @@ public class TermLabelManager {
      */
     private void determineAndCollectRuleSpecificRefactorings(TermLabelState state,
             Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm,
             RefactoringsContainer refactorings) {
@@ -1401,7 +1406,7 @@ public class TermLabelManager {
      */
     private void determineAndRuleIndependentRefactorings(TermLabelState state,
             Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm,
             RefactoringsContainer refactorings) {
@@ -1442,7 +1447,7 @@ public class TermLabelManager {
      * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
      */
     protected RefactoringsContainer computeRefactorings(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         final RefactoringsContainer refactorings = new RefactoringsContainer();
@@ -1455,7 +1460,7 @@ public class TermLabelManager {
 
     /**
      * Utility class used by
-     * {@link TermLabelManager#computeRefactorings(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, Goal, Object, Term)}
+     * {@link TermLabelManager#computeRefactorings(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term)}
      *
      * @param sequentRefactorings                      The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
      * @param belowUpdatesRefactorings                 The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
@@ -1513,7 +1518,7 @@ public class TermLabelManager {
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     private Term refactorChildTerms(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
         Term newApplicationTerm = applicationTerm;
@@ -1565,7 +1570,7 @@ public class TermLabelManager {
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     private Term refactorBelowUpdates(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
             Term newApplicationTerm) {
@@ -1607,7 +1612,7 @@ public class TermLabelManager {
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     private Term refactorChildrenRecursively(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
             Term newApplicationTerm) {
@@ -1654,7 +1659,7 @@ public class TermLabelManager {
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     protected Term refactorApplicationTerm(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
         if (applicationTerm != null && (!refactorings.directChildRefactorings().isEmpty()
@@ -1698,7 +1703,7 @@ public class TermLabelManager {
      * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      */
     protected void refactorSemisequent(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Semisequent semisequent, boolean inAntec,
             Set<TermLabelRefactoring> activeRefactorings) {
@@ -1736,7 +1741,7 @@ public class TermLabelManager {
      * @return The refactored {@link Term} in which the {@link TermLabel}s may have changed.
      */
     protected Term refactorLabelsRecursive(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term,
             Set<TermLabelRefactoring> activeRefactorings) {
@@ -1778,7 +1783,7 @@ public class TermLabelManager {
      * @return The new {@link TermLabel} which should be used for the given {@link Term}.
      */
     protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term,
             Set<TermLabelRefactoring> activeRefactorings) {
@@ -1988,10 +1993,10 @@ public class TermLabelManager {
      * @return The found {@link TermLabel} or {@code null} if not available.
      */
     public static TermLabel findInnerMostParentLabel(
-            org.key_project.ncore.sequent.PosInOccurrence pio, Name termLabelName) {
+            PosInOccurrence pio, Name termLabelName) {
         TermLabel label = null;
         while (label == null && pio != null) {
-            Term subTerm = pio.subTerm();
+            Term subTerm = (Term) pio.subTerm();
             label = subTerm.getLabel(termLabelName);
             pio = pio.isTopLevel() ? null : pio.up();
         }
@@ -2006,7 +2011,8 @@ public class TermLabelManager {
      *        {@link SequentFormula}s.
      * @param services The {@link Services} to use.
      */
-    public static void mergeLabels(SequentChangeInfo currentSequent, Services services) {
+    public static void mergeLabels(SequentChangeInfo<SequentFormula> currentSequent,
+            Services services) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             manager.mergeLabels(services, currentSequent);
@@ -2021,12 +2027,12 @@ public class TermLabelManager {
      * @param currentSequent The {@link SequentChangeInfo} which lists the rejected
      *        {@link SequentFormula}s.
      */
-    public void mergeLabels(Services services, SequentChangeInfo currentSequent) {
-        for (SequentFormula rejectedSF : currentSequent.getSemisequentChangeInfo(true)
+    public void mergeLabels(Services services, SequentChangeInfo<SequentFormula> currentSequent) {
+        for (var rejectedSF : currentSequent.getSemisequentChangeInfo(true)
                 .rejectedFormulas()) {
             mergeLabels(currentSequent, services, rejectedSF, true);
         }
-        for (final SequentFormula rejectedSF : currentSequent.getSemisequentChangeInfo(false)
+        for (final var rejectedSF : currentSequent.getSemisequentChangeInfo(false)
                 .rejectedFormulas()) {
             mergeLabels(currentSequent, services, rejectedSF, false);
         }
@@ -2043,12 +2049,12 @@ public class TermLabelManager {
      * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent,
      *        {@code false} it is in succedent.
      */
-    protected void mergeLabels(SequentChangeInfo currentSequent, Services services,
+    protected void mergeLabels(SequentChangeInfo<SequentFormula> currentSequent, Services services,
             SequentFormula rejectedSF, boolean inAntecedent) {
         final Term rejectedTerm = rejectedSF.formula();
         if (rejectedTerm.hasLabels()) {
             // Search existing SequentFormula
-            Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
+            var s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
             SequentFormula existingSF = CollectionUtil.search(s,
                 element -> element.formula().equalsModProperty(rejectedTerm,
                     RENAMING_TERM_PROPERTY));
@@ -2075,7 +2081,7 @@ public class TermLabelManager {
                     Term newTerm = services.getTermFactory().createTerm(existingTerm.op(),
                         existingTerm.subs(), existingTerm.boundVars(),
                         new ImmutableArray<>(mergedLabels));
-                    SequentChangeInfo sci =
+                    SequentChangeInfo<SequentFormula> sci =
                         currentSequent.sequent().changeFormula(new SequentFormula(newTerm),
                             new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));
                     currentSequent.combine(sci);

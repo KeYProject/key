@@ -58,7 +58,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     /**
      * This position may be null if no subterm selected
      */
-    private final org.key_project.ncore.sequent.PosInOccurrence posInOcc;
+    private final PosInOccurrence posInOcc;
     /**
      * The resulting information of the task or null if the task was cancelled an exception was
      * thrown
@@ -139,7 +139,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     }
 
     protected void emitProofMacroFinished(Node node, ProofMacro macro,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc,
+            PosInOccurrence posInOcc,
             ProofMacroFinishedInfo info) {
         interactionListeners.forEach((l) -> l.runMacro(node, macro, posInOcc, info));
     }

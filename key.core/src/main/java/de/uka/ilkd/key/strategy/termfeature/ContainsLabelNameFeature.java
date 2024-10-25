@@ -20,6 +20,9 @@ public class ContainsLabelNameFeature extends BinaryFeature {
 
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return pos != null && pos.subTerm().getLabel(labelName) != null;
+        if (pos == null)
+            return false;
+        var term = (de.uka.ilkd.key.logic.Term) pos.subTerm();
+        return term.getLabel(labelName) != null;
     }
 }

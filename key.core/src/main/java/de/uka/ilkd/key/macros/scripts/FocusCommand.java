@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -111,11 +113,10 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param antec whether the formula is in the antecedent
      */
     private void makeTacletApp(Goal g, SequentFormula toHide, Taclet tac, boolean antec) {
-
         // hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();
 
-        org.key_project.ncore.sequent.PosInOccurrence pio = new PosInOccurrence(toHide, pit, antec);
+        PosInOccurrence pio = new PosInOccurrence(toHide, pit, antec);
 
         Set<SchemaVariable> svs = tac.collectSchemaVars();
         assert svs.size() == 1;

@@ -111,7 +111,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             TermLabel targetLabel = target.getLabel(FormulaTermLabel.NAME);
             if (targetLabel instanceof FormulaTermLabel) {
                 if (applicationPosInOccurrence != null) {
-                    Term appliationTerm = applicationPosInOccurrence.subTerm();
+                    Term appliationTerm = (Term) applicationPosInOccurrence.subTerm();
                     TermLabel applicationLabel = appliationTerm.getLabel(FormulaTermLabel.NAME);
                     if (applicationLabel instanceof FormulaTermLabel) {
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also

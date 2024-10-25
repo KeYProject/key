@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -161,7 +162,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a sequent
      */
-    public SequentChangeInfo replace(Sequent s) {
+    public SequentChangeInfo<SequentFormula> replace(Sequent s) {
         SemisequentChangeInfo anteCI = replace(s.antecedent());
         SemisequentChangeInfo succCI = replace(s.succedent());
 
@@ -170,7 +171,7 @@ public final class ProgVarReplacer {
 
         Sequent newSequent = Sequent.createSequent(newAntecedent, newSuccedent);
 
-        SequentChangeInfo result =
+        SequentChangeInfo<SequentFormula> result =
             SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
         return result;
     }

@@ -57,7 +57,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if (macros.isEmpty()) {
             return false;

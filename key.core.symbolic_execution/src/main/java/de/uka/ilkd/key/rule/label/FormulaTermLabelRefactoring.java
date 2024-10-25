@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
@@ -40,7 +41,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * Key used in {@link TermLabelState} by the {@link StayOnOperatorTermLabelPolicy} to indicate
      * that a refactoring below an update ({@link RefactoringScope#APPLICATION_BELOW_UPDATES}) is
      * required, which will be performed by
-     * {@link #refactorBelowUpdates(org.key_project.ncore.sequent.PosInOccurrence, Term, LabelCollection)}.
+     * {@link #refactorBelowUpdates(PosInOccurrence, Term, LabelCollection)}.
      * <p>
      * This is for instance required for the following rules:
      * <ul>
@@ -110,7 +111,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
@@ -145,7 +146,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, LabelCollection labels) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
@@ -218,10 +219,10 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     private void refactorBelowUpdates(
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Term term,
+            PosInOccurrence applicationPosInOccurrence, Term term,
             LabelCollection labels) {
         Term applicationTerm =
-            applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+            applicationPosInOccurrence != null ? (Term) applicationPosInOccurrence.subTerm() : null;
         FormulaTermLabel applicationLabel = applicationTerm != null
                 ? (FormulaTermLabel) applicationTerm.getLabel(FormulaTermLabel.NAME)
                 : null;

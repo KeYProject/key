@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableList;
  * strategy.
  *
  * In order to implement a {@link StrategyProofMacro}, override
- * {@link #createStrategy(Proof, org.key_project.ncore.sequent.PosInOccurrence)}.
+ * {@link #createStrategy(Proof, PosInOccurrence)}.
  *
  * This class is aware of Position in occurrences and can also be applied to inner nodes. Both
  * {@link AutomatedRuleApplicationManager} and {@link Strategy} are changed for the course of the
@@ -38,7 +38,7 @@ import org.key_project.util.collection.ImmutableList;
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
     protected abstract Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc);
+            PosInOccurrence posInOcc);
 
     /**
      * {@inheritDoc}
@@ -50,7 +50,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 

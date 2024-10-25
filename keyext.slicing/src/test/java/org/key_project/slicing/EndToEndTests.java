@@ -16,7 +16,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
@@ -43,7 +43,7 @@ class EndToEndTests {
     /**
      * Load and slice a proof after analyzing it using the dependency analysis algorithm.
      * Also checks that
-     * {@link DependencyTracker#getNodeThatProduced(Node, org.key_project.ncore.sequent.PosInOccurrence)}
+     * {@link DependencyTracker#getNodeThatProduced(Node, PosInOccurrence)}
      * works
      * as expected.
      *
@@ -59,7 +59,7 @@ class EndToEndTests {
         int[] producingNodes =
             new int[] { 15, 15, 13, 12, 11, 23, 25, 24, 22, 21, 19, 17, 2, 16, 0 };
         for (int i = 0; i < producingNodes.length; i++) {
-            org.key_project.ncore.sequent.PosInOccurrence pio = PosInOccurrence.findInSequent(
+            PosInOccurrence pio = PosInOccurrence.findInSequent(
                 node26.sequent(), i + 1, PosInTerm.getTopLevel());
             assertEquals(producingNodes[i],
                 tracker.getNodeThatProduced(node26, pio).serialNr());

@@ -27,7 +27,7 @@ public interface InteractionListener {
     void runPrune(Node node);
 
     void runMacro(Node node, ProofMacro macro,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc,
+            PosInOccurrence posInOcc,
             ProofMacroFinishedInfo info);
 
     void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos,

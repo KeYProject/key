@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -75,7 +76,7 @@ public final class JmlAssertRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence occurrence) {
+            PosInOccurrence occurrence) {
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -84,7 +85,7 @@ public final class JmlAssertRule implements BuiltInRule {
             return false;
         }
 
-        Term target = occurrence.subTerm();
+        Term target = (Term) occurrence.subTerm();
         if (target.op() instanceof UpdateApplication) {
             target = UpdateApplication.getTarget(target);
         }
@@ -111,9 +112,9 @@ public final class JmlAssertRule implements BuiltInRule {
         }
         final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
-        final org.key_project.ncore.sequent.PosInOccurrence occurrence = ruleApp.posInOccurrence();
+        final PosInOccurrence occurrence = ruleApp.posInOccurrence();
 
-        final Term formula = occurrence.subTerm();
+        final Term formula = (Term) occurrence.subTerm();
         final Term update = UpdateApplication.getUpdate(formula);
 
         Term target = formula;
@@ -159,13 +160,13 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     private void setUpValidityRule(Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence occurrence, Term update,
+            PosInOccurrence occurrence, Term update,
             Term condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, org.key_project.ncore.sequent.PosInOccurrence occurrence,
+    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence,
             Term update, Term target,
             Term condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");

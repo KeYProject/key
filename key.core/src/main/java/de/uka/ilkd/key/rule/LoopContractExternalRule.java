@@ -28,6 +28,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -183,7 +184,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     @Override
     public boolean isApplicable(final Goal goal,
-            final org.key_project.ncore.sequent.PosInOccurrence occurrence) {
+            final PosInOccurrence occurrence) {
         if (InfFlowCheckInfo.isInfFlow(goal)) {
             return false;
         } else if (occursNotAtTopLevelInSuccedent(occurrence)) {
@@ -192,7 +193,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             return false;
         } else {
             final Instantiation instantiation =
-                instantiate(occurrence.subTerm(), goal);
+                instantiate((Term) occurrence.subTerm(), goal);
 
             if (instantiation == null) {
                 return false;
@@ -218,7 +219,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             (LoopContractExternalBuiltInRuleApp) ruleApp;
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal);
+            instantiate((Term) application.posInOccurrence().subTerm(), goal);
         final LoopContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
 

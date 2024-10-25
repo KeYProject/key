@@ -34,6 +34,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -255,7 +256,7 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         return true;
     }
 

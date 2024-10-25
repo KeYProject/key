@@ -22,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -72,7 +73,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The {@link PosInOccurrence} of the modality or its updates.
      */
-    private org.key_project.ncore.sequent.PosInOccurrence modalityPIO;
+    private PosInOccurrence modalityPIO;
 
     /**
      * The up to know discovered completed {@link IExecutionBlockStartNode}s.
@@ -368,7 +369,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
+    public PosInOccurrence getModalityPIO() {
         if (modalityPIO == null) {
             modalityPIO = lazyComputeModalityPIO();
         }
@@ -381,12 +382,12 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      *
      * @return The {@link PosInOccurrence}s of the modality or its updates.
      */
-    protected org.key_project.ncore.sequent.PosInOccurrence lazyComputeModalityPIO() {
-        org.key_project.ncore.sequent.PosInOccurrence originalPio =
+    protected PosInOccurrence lazyComputeModalityPIO() {
+        PosInOccurrence originalPio =
             getProofNode().getAppliedRuleApp().posInOccurrence();
         // Try to go back to the parent which provides the updates
-        org.key_project.ncore.sequent.PosInOccurrence pio = originalPio;
-        Term term = pio.subTerm();
+        PosInOccurrence pio = originalPio;
+        var term = pio.subTerm();
         if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
             pio = pio.up();
             term = pio.subTerm();

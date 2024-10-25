@@ -20,7 +20,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool.IfInstantiationCache;
 import de.uka.ilkd.key.util.Debug;
 
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -159,7 +160,7 @@ public class IfInstantiator {
         final boolean antec = p_ifInstantiation.inAntec();
 
         final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula();
-        final org.key_project.ncore.sequent.PosInOccurrence pio =
+        final PosInOccurrence pio =
             new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
         final FormulaTagManager tagManager = goal.getFormulaTagManager();

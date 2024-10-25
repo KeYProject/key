@@ -21,7 +21,8 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
 
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;

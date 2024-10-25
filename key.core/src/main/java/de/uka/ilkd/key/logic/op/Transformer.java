@@ -4,13 +4,12 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PIOPathIterator;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -76,19 +75,17 @@ public class Transformer extends JFunction {
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
-    public static boolean inTransformer(org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public static boolean inTransformer(PosInOccurrence pio) {
         boolean trans = false;
         if (pio == null) {
             return false;
         }
         if (pio.posInTerm() != null) {
             PIOPathIterator it = pio.iterator();
-            Operator op;
 
             while (it.next() != -1 && !trans) {
-                final Term t = it.getSubTerm();
-                op = t.op();
-                trans = op instanceof Transformer;
+                final var t = it.getSubTerm();
+                trans = t.op() instanceof Transformer;
             }
         }
         return trans;
@@ -107,10 +104,9 @@ public class Transformer extends JFunction {
             Operator op;
 
             while (it.next() != -1) {
-                final Term t = it.getSubTerm();
-                op = t.op();
-                if (op instanceof Transformer) {
-                    return (Transformer) op;
+                final var t = it.getSubTerm();
+                if (t.op() instanceof Transformer trans) {
+                    return trans;
                 }
             }
         }

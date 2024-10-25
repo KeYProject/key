@@ -13,6 +13,10 @@ public class PosInOccurrence {
             seq.numberInAntec(formulaNumber));
     }
 
+    // saves 8 bytes (due to alignment issues) per instance if we use a
+    // short here instead of an int
+    private final short hashCode;
+
     /**
      * the constrained formula the pos in occurrence describes
      */
@@ -36,6 +40,7 @@ public class PosInOccurrence {
         this.inAntec = inAntec;
         this.sequentFormula = sequentFormula;
         this.posInTerm = posInTerm;
+        this.hashCode = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
     }
 
     /**
@@ -51,6 +56,16 @@ public class PosInOccurrence {
      */
     public int depth() {
         return posInTerm().depth();
+    }
+
+    /**
+     * creates a new PosInOccurrence that has exactly the same state as this object except the
+     * PosInTerm is new and walked up the specified subterm, as specified in method up of
+     * {@link PosInTerm}.
+     */
+    public PosInOccurrence up() {
+        assert !isTopLevel() : "not possible to go up from top level position";
+        return new PosInOccurrence(sequentFormula, posInTerm.up(), inAntec);
     }
 
     /**
@@ -93,6 +108,16 @@ public class PosInOccurrence {
     }
 
     /**
+     * Ascend to the top node of the formula this object points to
+     */
+    public PosInOccurrence topLevel() {
+        if (isTopLevel()) {
+            return this;
+        }
+        return new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), inAntec);
+    }
+
+    /**
      * returns the subterm this object points to
      */
     public Term subTerm() {
@@ -100,6 +125,73 @@ public class PosInOccurrence {
             subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
         }
         return subTermCache;
+    }
+
+    /**
+     * compares this PosInOccurrence with another PosInOccurrence and returns true if both describe
+     * the same occurrence
+     */
+    public boolean eqEquals(Object obj) {
+        if (!(obj instanceof PosInOccurrence cmp)) {
+            return false;
+        }
+
+        if (!sequentFormula.equals(cmp.sequentFormula)) {
+            return false;
+        }
+
+        return equalsHelp(cmp);
+    }
+
+    /**
+     * Contrary to <code>eqEquals</code>, this method returns true only for pio objects that point
+     * to the same (identical) formula
+     *
+     * @param obj the Object to which this one is compared
+     * @return true if both objects are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof PosInOccurrence cmp)) {
+            return false;
+        }
+
+        // NB: the class <code>NonDuplicateAppFeature</code> depends on the usage
+        // of <code>!=</code> in this condition
+        if (sequentFormula() != cmp.sequentFormula()) {
+            return false;
+        }
+
+        return equalsHelp(cmp);
+    }
+
+    private boolean equalsHelp(final PosInOccurrence cmp) {
+        if (inAntec == cmp.inAntec) {
+            return posInTerm.equals(cmp.posInTerm);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
+
+    /**
+     * Replace the formula this object points to with the new formula given
+     *
+     * @param p_newFormula the new formula
+     * @return a <code>PosInOccurrence</code> object that points to the same position within the
+     *         formula <code>p_newFormula</code> as this object does within the formula
+     *         <code>constrainedFormula()</code>. It is not tested whether this position exists
+     *         within <code>p_newFormula</code>
+     */
+    public PosInOccurrence replaceSequentFormula(SequentFormula p_newFormula) {
+        assert p_newFormula != null;
+        if (p_newFormula == sequentFormula) {
+            return this;
+        }
+        return new PosInOccurrence(p_newFormula, posInTerm, inAntec);
     }
 
     public PIOPathIterator iterator() {

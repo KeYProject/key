@@ -20,6 +20,8 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -359,8 +361,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
+                Term term = (Term) pta.posInOccurrence().subTerm();
                 boolean add =
-                    p.on == null || pta.posInOccurrence().subTerm()
+                    p.on == null || term
                             .equalsModProperty(p.on, RENAMING_TERM_PROPERTY);
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();

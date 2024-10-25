@@ -6,7 +6,6 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -25,6 +24,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PIOPathIterator;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -128,14 +129,14 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         boolean applicable = false;
         if (pio != null) {
             // abort if inside of transformer
             if (Transformer.inTransformer(pio)) {
                 return false;
             }
-            Term term = pio.subTerm();
+            Term term = (Term) pio.subTerm();
             if (term != null) {
                 if (term.op() == Equality.EQUALS) {
                     applicable = isApplicableQuery(goal, term.sub(0), pio)
@@ -148,7 +149,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
 
     /**
      * Checks if the query term is supported. The functionality is identical to
-     * {@link QueryExpand#isApplicable(Goal, org.key_project.ncore.sequent.PosInOccurrence)}.
+     * {@link QueryExpand#isApplicable(Goal, PosInOccurrence)}.
      *
      * @param goal The {@link Goal}.
      * @param pmTerm The {@link Term} to with the query to check.
@@ -156,7 +157,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * @return {@code true} is applicable, {@code false} is not applicable
      */
     private boolean isApplicableQuery(Goal goal, Term pmTerm,
-            org.key_project.ncore.sequent.PosInOccurrence pio) {
+            PosInOccurrence pio) {
         if (pmTerm.op() instanceof IProgramMethod pm && pmTerm.freeVars().isEmpty()) {
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic()
@@ -164,7 +165,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                             && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
-                    Term focus = it.getSubTerm();
+                    var focus = it.getSubTerm();
                     if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
                         return false;
                     }
@@ -191,10 +192,10 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             throws RuleAbortException {
         try {
             // Extract required Terms from goal
-            org.key_project.ncore.sequent.PosInOccurrence pio = ruleApp.posInOccurrence();
+            PosInOccurrence pio = ruleApp.posInOccurrence();
             Sequent goalSequent = goal.sequent();
-            SequentFormula equalitySF = pio.sequentFormula();
-            Term equalityTerm = pio.subTerm();
+            var equalitySF = pio.sequentFormula();
+            Term equalityTerm = (Term) pio.subTerm();
             Term queryTerm;
             Term varTerm;
             boolean varFirst;
@@ -210,7 +211,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             Term queryConditionTerm = null;
             if (equalitySF.formula().op() == Junctor.IMP
                     && equalitySF.formula().sub(1) == equalityTerm) {
-                queryConditionTerm = equalitySF.formula().sub(0);
+                queryConditionTerm = (Term) equalitySF.formula().sub(0);
             }
             // Compute sequent for side proof to compute query in.
             // New OneStepSimplifier is required because it has an internal state and the default
@@ -219,11 +220,12 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true);
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
-                    .computeGeneralSequentToProve(goalSequent, equalitySF);
+                    .computeGeneralSequentToProve(goalSequent, (SequentFormula) equalitySF);
             JFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =
-                sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
+                (Sequent) sequentToProve.addFormula(new SequentFormula(newTerm), false, false)
+                        .sequent();
             // Compute results and their conditions
             List<ResultsAndCondition> conditionsAndResultsMap =
                 computeResultsAndConditions(goal, sideProofEnv, sequentToProve,

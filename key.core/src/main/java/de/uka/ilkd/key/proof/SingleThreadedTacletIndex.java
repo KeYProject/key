@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The default taclet index implementation. It executes method
- * {@link #matchTaclets(ImmutableList, RuleFilter, org.key_project.ncore.sequent.PosInOccurrence, Services)}
+ * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, Services)}
  * in a single thread
  * (the thread invoking the method).
  *

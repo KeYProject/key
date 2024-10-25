@@ -61,6 +61,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -503,14 +504,14 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         // focus must be top level succedent
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
         }
 
         // instantiation must succeed
-        final Instantiation inst = instantiate(pio.subTerm(), goal.proof().getServices());
+        final Instantiation inst = instantiate((Term) pio.subTerm(), goal.proof().getServices());
         if (inst == null) {
             return false;
         }
@@ -556,7 +557,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         final TermLabelState termLabelState = new TermLabelState();
         var services = goal.getOverlayServices();
         // get instantiation
-        final Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), services);
+        final Instantiation inst =
+            instantiate((Term) ruleApp.posInOccurrence().subTerm(), services);
         final JavaBlock jb = inst.progPost.javaBlock();
         final TermBuilder tb = services.getTermBuilder();
 

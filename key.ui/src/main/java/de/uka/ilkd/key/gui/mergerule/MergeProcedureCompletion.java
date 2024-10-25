@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -41,7 +42,7 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
         return new MergeProcedureCompletion<>() {
             @Override
             public T complete(
-                    T proc, Pair<Goal, org.key_project.ncore.sequent.PosInOccurrence> mergeGoalPio,
+                    T proc, Pair<Goal, PosInOccurrence> mergeGoalPio,
                     Collection<MergePartner> partners) {
                 return completion.apply(proc);
             }
@@ -58,7 +59,7 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
      * @return The completed {@link MergeProcedure}.
      */
     public abstract C complete(final C proc,
-            final Pair<Goal, org.key_project.ncore.sequent.PosInOccurrence> mergeGoalPio,
+            final Pair<Goal, PosInOccurrence> mergeGoalPio,
             final Collection<MergePartner> partners);
 
     /**

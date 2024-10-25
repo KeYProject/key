@@ -15,10 +15,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * <p>
  * A {@link ChildTermLabelPolicy} is used by
- * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+ * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
  * to decide for each {@link TermLabel} on a child or grandchild of the application {@link Term} if
  * it should be re-added to the new {@link Term} or not.
  * </p>
@@ -35,7 +37,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     /**
      * Decides if the currently active {@link Rule} application is supported or not. If it is not
      * supported no iteration over children will be executed. Only if it returns {@code true}
-     * {@link #addLabel( TermServices, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, Goal, Object, Term, Term, Term, TermLabel)}
+     * {@link #addLabel( TermServices, PosInOccurrence, Term, Rule, Goal, Object, Term, Term, Term, TermLabel)}
      * will
      * be called if a child {@link Term} contains a managed label.
      *
@@ -56,7 +58,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      *         drop {@link TermLabel} and do not need it to the new {@link Term}.
      */
     boolean isRuleApplicationSupported(TermServices services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term newTerm);
 
@@ -91,7 +93,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      *         {@link TermLabel} to new {@link Term}.
      */
     boolean addLabel(TermServices services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm,
             Term newTerm, Term childTerm, TermLabel label);
 }

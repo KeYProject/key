@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 
 /**
  * <p>
@@ -54,7 +56,7 @@ public interface TermLabelPolicy {
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
     TermLabel keepLabel(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm,
             Term newTerm, TermLabel label);

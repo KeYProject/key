@@ -21,6 +21,7 @@ import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -125,7 +126,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         if (pos != null && focusedGoal != null) {
             LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node {}",
                 focusedGoal.node().serialNr());
@@ -137,7 +138,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         if (pos != null) {
             return filterTaclet(focusedGoal,
                 focusedGoal.ruleAppIndex().getRewriteTaclet(TacletFilter.TRUE, pos), pos);
@@ -152,7 +153,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal,
             ImmutableList<NoPosTacletApp> tacletInstances,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<>();
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp app : tacletInstances) {
@@ -185,7 +186,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         ImmutableSet<TacletApp> applics = getAppsForName(goal, taclet.name().toString(), pos);
         if (applics.size() == 0) {
             return false;
@@ -293,7 +294,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @return a list of all found rule applications of the given rule at position pos
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         return getAppsForName(goal, name, pos, TacletFilter.TRUE);
     }
 
@@ -309,7 +310,7 @@ public abstract class AbstractProofControl implements ProofControl {
      *         passing the filter
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
-            org.key_project.ncore.sequent.PosInOccurrence pos,
+            PosInOccurrence pos,
             TacletFilter filter) {
         Services services = goal.proof().getServices();
         ImmutableSet<TacletApp> result = DefaultImmutableSet.nil();
@@ -608,7 +609,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     @Override
     public synchronized void startFocussedAutoMode(
-            org.key_project.ncore.sequent.PosInOccurrence focus, Goal goal) {
+            PosInOccurrence focus, Goal goal) {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 

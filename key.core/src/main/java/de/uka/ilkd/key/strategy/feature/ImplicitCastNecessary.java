@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -24,7 +25,7 @@ public class ImplicitCastNecessary extends BinaryFeature {
 
         int subPos = pos.getIndex();
 
-        final Sort maxSort = TermHelper.getMaxSort(pos.up().subTerm(), subPos);
+        final Sort maxSort = TermHelper.getMaxSort((Term) pos.up().subTerm(), subPos);
         return projection.toTerm(app, pos, goal, mState).sort().extendsTrans(maxSort);
     }
 

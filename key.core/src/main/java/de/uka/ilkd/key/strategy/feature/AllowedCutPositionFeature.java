@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ncore.sequent.PIOPathIterator;
 import org.key_project.ncore.sequent.PosInOccurrence;
 
 
@@ -30,13 +29,13 @@ public class AllowedCutPositionFeature extends BinaryFeature {
         return onlyBelowRightJunctors(pos);
     }
 
-    private boolean onlyBelowRightJunctors(org.key_project.ncore.sequent.PosInOccurrence pos) {
+    private boolean onlyBelowRightJunctors(PosInOccurrence pos) {
         boolean negated = pos.isInAntec();
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {
             final int child = it.getChild();
-            final Operator op = it.getSubTerm().op();
+            final var op = it.getSubTerm().op();
 
             if (op == Junctor.NOT) {
                 negated = !negated;

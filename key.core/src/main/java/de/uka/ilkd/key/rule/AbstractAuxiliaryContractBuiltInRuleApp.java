@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -48,7 +49,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
      * @param ifInstantiations if instantiations.
      */
     public AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInstantiations) {
+            ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 

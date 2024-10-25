@@ -74,7 +74,7 @@ public class ProofMacroMenu extends JMenu {
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
      */
     public ProofMacroMenu(KeYMediator mediator,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         super("Strategy Macros");
 
         // Macros are grouped according to their category.

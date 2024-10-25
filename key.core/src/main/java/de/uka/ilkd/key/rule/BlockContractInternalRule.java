@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -222,7 +223,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             (BlockContractInternalBuiltInRuleApp) ruleApp;
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal);
+            instantiate((Term) application.posInOccurrence().subTerm(), goal);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());
@@ -279,7 +280,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     public boolean isApplicable(Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence occurrence) {
+            PosInOccurrence occurrence) {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -288,7 +289,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             return false;
         }
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal);
+            instantiate((Term) occurrence.subTerm(), goal);
         if (instantiation == null) {
             return false;
         }

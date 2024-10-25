@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -52,7 +53,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public IBuiltInRuleApp setIfInsts(
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

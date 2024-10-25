@@ -12,16 +12,9 @@ import org.jspecify.annotations.NonNull;
 /**
  * Subclasses must add {@code create} methods
  */
-public abstract class Sequent<SF extends SequentFormula> implements Iterable<SF> {
-    private final Semisequent<SF> antecedent;
+public abstract class Sequent implements Iterable<SequentFormula> {
 
     private final Semisequent<SF> succedent;
-
-    /** used by NILSequent implementations */
-    protected Sequent(Semisequent emptySemisequent) {
-        this.antecedent = emptySemisequent;
-        this.succedent = emptySemisequent;
-    }
 
     /** creates new Sequent with antecedence and succedence */
     protected Sequent(Semisequent<SF> antecedent, Semisequent<SF> succedent) {
@@ -30,6 +23,7 @@ public abstract class Sequent<SF extends SequentFormula> implements Iterable<SF>
         this.succedent = succedent;
     }
 
+    /** used by NILSequent implementations */
     protected Sequent(Semisequent<SF> emptySeq) {
         assert emptySeq.isEmpty();
         this.antecedent = emptySeq;
@@ -181,6 +175,28 @@ public abstract class Sequent<SF extends SequentFormula> implements Iterable<SF>
     }
 
     /**
+     * Replace a formula at the specified index.
+     *
+     * @param formulaNr where to replace the formula
+     * @param replacement the new sequent formula
+     * @return a SequentChangeInfo which contains the new sequent and information which formulas
+     *         have been added or removed
+     */
+    public SequentChangeInfo<SF> replaceFormula(int formulaNr, SF replacement) {
+        checkFormulaIndex(formulaNr);
+        formulaNr--;
+        boolean inAntec = formulaNr < antecedent.size();
+
+        Semisequent<SF> seq = inAntec ? antecedent : succedent;
+        int idx = inAntec ? formulaNr : formulaNr - antecedent.size();
+
+        final SemisequentChangeInfo<SF> semiCI = seq.replace(idx, replacement);
+
+        return SequentChangeInfo.createSequentChangeInfo(inAntec, semiCI,
+            composeSequent(inAntec, semiCI.semisequent()), this);
+    }
+
+    /**
      * adds the formulas of list insertions to the sequent starting at position p. (NOTICE:Sequent
      * determines index using identy (==) not equality.)
      *
@@ -198,6 +214,24 @@ public abstract class Sequent<SF extends SequentFormula> implements Iterable<SF>
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
             composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+    }
+
+    /**
+     * removes the formula at position p (NOTICE:Sequent determines index using identity (==) not
+     * equality.)
+     *
+     * @param p a PosInOccurrence that describes position in the sequent
+     * @return a SequentChangeInfo which contains the new sequent and information which formulas
+     *         have been added or removed
+     */
+    public SequentChangeInfo<SF> removeFormula(PosInOccurrence p) {
+        final Semisequent<SF> seq = getSemisequent(p);
+
+        @SuppressWarnings("unchecked")
+        final SemisequentChangeInfo<SF> semiCI = seq.remove(seq.indexOf((SF) p.sequentFormula()));
+
+        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
+            semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /**
@@ -267,7 +301,7 @@ public abstract class Sequent<SF extends SequentFormula> implements Iterable<SF>
      * @return an integer strictly greater than zero for the position of the given sequent formula
      *         on the proof sequent.
      */
-    public int formulaNumberInSequent(boolean inAntec, SF cfma) {
+    public int formulaNumberInSequent(boolean inAntec, SequentFormula cfma) {
         int n = inAntec ? 0 : antecedent.size();
         final Iterator<SF> formIter =
             inAntec ? antecedent.iterator() : succedent.iterator();
@@ -281,8 +315,20 @@ public abstract class Sequent<SF extends SequentFormula> implements Iterable<SF>
             "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
     }
 
-    static class SequentIterator<SF extends SequentFormula> implements Iterator<SF> {
+    /**
+     * Computes the position of the given {@link PosInOccurrence} on the proof sequent.
+     *
+     * @param pio the position
+     * @return an integer strictly greater than zero for the position of the given sequent formula
+     *         on the proof sequent.
+     */
+    public int formulaNumberInSequent(PosInOccurrence pio) {
+        var inAntec = pio.isInAntec();
+        var formula = pio.sequentFormula();
+        return formulaNumberInSequent(inAntec, formula);
+    }
 
+    static class SequentIterator<SF extends SequentFormula> implements Iterator<SF> {
         /**
          * The iterator over the ancedent of the proof sequent.
          */

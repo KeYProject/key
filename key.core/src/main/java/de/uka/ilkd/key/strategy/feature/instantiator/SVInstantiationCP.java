@@ -48,7 +48,7 @@ public class SVInstantiationCP implements Feature {
         this.value = value;
     }
 
-    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
@@ -79,7 +79,7 @@ public class SVInstantiationCP implements Feature {
 
     private class CP implements ChoicePoint {
 
-        private final org.key_project.ncore.sequent.PosInOccurrence pos;
+        private final PosInOccurrence pos;
         private final RuleApp app;
         private final Goal goal;
         private final MutableState mState;

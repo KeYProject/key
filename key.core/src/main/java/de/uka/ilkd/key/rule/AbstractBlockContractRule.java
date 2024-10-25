@@ -363,7 +363,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return false;
         }
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal);
+            instantiate((Term) occurrence.subTerm(), goal);
         if (instantiation == null) {
             return false;
         }

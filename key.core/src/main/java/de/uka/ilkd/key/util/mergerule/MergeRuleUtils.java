@@ -36,8 +36,10 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
 
@@ -554,12 +556,12 @@ public class MergeRuleUtils {
      * @param u Update to check.
      * @return true iff u is in normal form.
      */
-    public static boolean isUpdateNormalForm(Term u) {
+    public static boolean isUpdateNormalForm(org.key_project.logic.Term u) {
         if (u.op() instanceof ElementaryUpdate) {
             return true;
         } else if (u.op() instanceof UpdateJunctor) {
             boolean result = true;
-            for (Term sub : u.subs()) {
+            for (var sub : u.subs()) {
                 result = result && isUpdateNormalForm(sub);
             }
             return result;
@@ -802,7 +804,7 @@ public class MergeRuleUtils {
         final Semisequent semiseq =
             antec ? goal.sequent().antecedent() : goal.sequent().succedent();
         for (final SequentFormula f : semiseq) {
-            final org.key_project.ncore.sequent.PosInOccurrence gPio =
+            final PosInOccurrence gPio =
                 new PosInOccurrence(f, PosInTerm.getTopLevel(), antec);
             goal.removeFormula(gPio);
         }
@@ -1026,10 +1028,10 @@ public class MergeRuleUtils {
      * @param pio Position of update-program counter formula in goal.
      * @param services The services object.
      * @return An SE state (U,C).
-     * @see #sequentToSETriple(Node, org.key_project.ncore.sequent.PosInOccurrence, Services)
+     * @see #sequentToSETriple(Node, PosInOccurrence, Services)
      */
     public static SymbolicExecutionState sequentToSEPair(Node node,
-            org.key_project.ncore.sequent.PosInOccurrence pio,
+            PosInOccurrence pio,
             Services services) {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio, services);
@@ -1058,12 +1060,12 @@ public class MergeRuleUtils {
      * @return An SE state (U,C,p).
      */
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
-            org.key_project.ncore.sequent.PosInOccurrence pio, Services services) {
+            PosInOccurrence pio, Services services) {
 
         ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent().asList());
 
-        Term selected = pio.subTerm();
+        var selected = pio.subTerm();
 
         for (SequentFormula sf : node.sequent().succedent()) {
             if (!sf.formula().equals(selected)) {
@@ -1076,8 +1078,8 @@ public class MergeRuleUtils {
         Term programCounter = null;
 
         if (selected.op() instanceof UpdateApplication) {
-            updateTerm = selected.sub(0);
-            programCounter = selected.sub(1);
+            updateTerm = (Term) selected.sub(0);
+            programCounter = (Term) selected.sub(1);
         }
 
         return new SymbolicExecutionStateWithProgCnt(updateTerm, // Update
@@ -1089,7 +1091,7 @@ public class MergeRuleUtils {
     /**
      * Convenience method for converting a whole list of goal-pio combinations to symbolic execution
      * states; relies on
-     * {@link #sequentToSETriple(Node, org.key_project.ncore.sequent.PosInOccurrence, Services)}.
+     * {@link #sequentToSETriple(Node, PosInOccurrence, Services)}.
      *
      * @param sequentInfos Goals and PosInOccurrences specifying merge partners and the positions of
      *        the program counter-post condition formulae in the goals.

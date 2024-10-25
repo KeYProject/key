@@ -28,7 +28,10 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.rules.RuleExecutor;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -112,16 +115,19 @@ public class TestTermLabelManager {
         Services services = initConfig.getServices();
         TermBuilder TB = services.getTermBuilder();
         // Create sequent
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
         Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
         one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
         two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
         Sequent sequent = Sequent.EMPTY_SEQUENT;
-        sequent = sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
-        sequent = sequent.addFormula(pos.sequentFormula(), true, false).sequent();
-        sequent = sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
+        sequent =
+            (Sequent) sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
+        sequent = (Sequent) sequent.addFormula((SequentFormula) pos.sequentFormula(), true, false)
+                .sequent();
+        sequent =
+            (Sequent) sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
         // Test supported rule
         Rule rule = new DummyRule("rule");
         Term taclet = TB.tt();
@@ -213,7 +219,7 @@ public class TestTermLabelManager {
         } catch (ProblemLoaderException e) {
             fail();
         }
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
         // Create labels
@@ -244,7 +250,7 @@ public class TestTermLabelManager {
         } catch (ProblemLoaderException e) {
             fail();
         }
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
         // Create labels
@@ -273,7 +279,7 @@ public class TestTermLabelManager {
         } catch (ProblemLoaderException e) {
             fail();
         }
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
         // Create labels
@@ -325,7 +331,7 @@ public class TestTermLabelManager {
         } catch (ProblemLoaderException e) {
             fail();
         }
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
         // Create labels
@@ -361,7 +367,7 @@ public class TestTermLabelManager {
     public void testInstantiateLabels_directChildPolicies_allRules() throws ProblemLoaderException {
         LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
         Services services = createTestServices(null, null, policy, null, null, null).getServices();
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
         // Create labels
@@ -403,7 +409,7 @@ public class TestTermLabelManager {
         } catch (ProblemLoaderException e) {
             fail();
         }
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
         // Create labels
@@ -449,7 +455,7 @@ public class TestTermLabelManager {
             new ParameterlessTermLabel(new Name("UPDATE")));
         Term updateApp = TB.apply(update, modality,
             new ImmutableArray<>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
-        org.key_project.ncore.sequent.PosInOccurrence pos =
+        PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
         Term taclet = TB.tt();
         Rule rule = new DummyRule("rule");
@@ -476,7 +482,7 @@ public class TestTermLabelManager {
         } catch (ProblemLoaderException e) {
             fail();
         }
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         Term taclet = services.getTermBuilder().tt();
         Rule rule = new DummyRule("rule");
         // Create labels
@@ -501,7 +507,7 @@ public class TestTermLabelManager {
         } catch (ProblemLoaderException e) {
             fail();
         }
-        org.key_project.ncore.sequent.PosInOccurrence pos = createTestPosInOccurrence(services);
+        PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().label(services.getTermBuilder().tt(),
             new ImmutableArray<>(new ParameterlessTermLabel(new Name("TACLET"))));
@@ -523,7 +529,7 @@ public class TestTermLabelManager {
         assertTrue(labels.isEmpty());
     }
 
-    protected org.key_project.ncore.sequent.PosInOccurrence createTestPosInOccurrence(
+    protected PosInOccurrence createTestPosInOccurrence(
             Services services) {
         Term testTerm = createTestTerm(services);
         Term inInt = services.getTermBuilder().inInt(testTerm);
@@ -718,7 +724,7 @@ public class TestTermLabelManager {
 
         @Override
         public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+                PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm) {
             return scope;
@@ -726,7 +732,7 @@ public class TestTermLabelManager {
 
         @Override
         public void refactorLabels(TermLabelState state, Services services,
-                org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+                PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm, Term term, LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
@@ -763,7 +769,7 @@ public class TestTermLabelManager {
 
         @Override
         public void updateLabels(TermLabelState state, Services services,
-                org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+                PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Term modalityTerm,
                 Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
                 Set<TermLabel> labels) {
@@ -789,7 +795,7 @@ public class TestTermLabelManager {
 
         @Override
         public boolean isRuleApplicationSupported(TermServices services,
-                org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+                PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm, Term newTerm) {
             return true;
@@ -797,7 +803,7 @@ public class TestTermLabelManager {
 
         @Override
         public boolean addLabel(TermServices services,
-                org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+                PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm,
                 Term newTerm, Term childTerm, TermLabel label) {
             log.add(label);
@@ -814,7 +820,7 @@ public class TestTermLabelManager {
 
         @Override
         public TermLabel keepLabel(TermLabelState state, Services services,
-                org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+                PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm,
                 Term newTerm, TermLabel label) {
@@ -875,13 +881,13 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
+        public @NonNull RuleExecutor getExecutor()
                 throws RuleAbortException {
             throw new RuleAbortException("no implementation");
         }
 
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return new Name(name);
         }
 

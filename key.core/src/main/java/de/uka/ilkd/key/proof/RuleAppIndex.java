@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -47,13 +49,13 @@ public final class RuleAppIndex {
     private boolean autoMode;
 
     private final NewRuleListener newRuleListener = new NewRuleListener() {
-        public void ruleAdded(RuleApp taclet, org.key_project.ncore.sequent.PosInOccurrence pos) {
+        public void ruleAdded(RuleApp taclet, PosInOccurrence pos) {
             informNewRuleListener(taclet, pos);
         }
 
         @Override
         public void rulesAdded(ImmutableList<? extends RuleApp> rules,
-                org.key_project.ncore.sequent.PosInOccurrence pos) {
+                PosInOccurrence pos) {
             informNewRuleListener(rules, pos);
         }
     };
@@ -142,7 +144,7 @@ public final class RuleAppIndex {
      *        like (static)types etc.
      */
     public ImmutableList<TacletApp> getTacletAppAt(TacletFilter filter,
-            org.key_project.ncore.sequent.PosInOccurrence pos,
+            PosInOccurrence pos,
             Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
@@ -165,7 +167,7 @@ public final class RuleAppIndex {
      * @return the possible rule applications
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter filter,
-            org.key_project.ncore.sequent.PosInOccurrence pos,
+            PosInOccurrence pos,
             Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
@@ -186,7 +188,7 @@ public final class RuleAppIndex {
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter filter,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result = result.prepend(interactiveTacletAppIndex.getFindTaclet(pos, filter));
@@ -222,7 +224,7 @@ public final class RuleAppIndex {
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(TacletFilter filter,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result =
@@ -297,7 +299,7 @@ public final class RuleAppIndex {
      *
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(SequentChangeInfo sci) {
+    public void sequentChanged(SequentChangeInfo<SequentFormula> sci) {
         if (!autoMode) {
             interactiveTacletAppIndex.sequentChanged(sci);
         }
@@ -358,7 +360,7 @@ public final class RuleAppIndex {
      * informs all observers, if a formula has been added, changed or removed
      */
     private void informNewRuleListener(RuleApp p_app,
-            org.key_project.ncore.sequent.PosInOccurrence p_pos) {
+            PosInOccurrence p_pos) {
         if (ruleListener != null) {
             ruleListener.ruleAdded(p_app, p_pos);
         }
@@ -368,7 +370,7 @@ public final class RuleAppIndex {
      * informs all observers, if a formula has been added, changed or removed
      */
     private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
-            org.key_project.ncore.sequent.PosInOccurrence p_pos) {
+            PosInOccurrence p_pos) {
         if (ruleListener != null) {
             ruleListener.rulesAdded(p_apps, p_pos);
         }

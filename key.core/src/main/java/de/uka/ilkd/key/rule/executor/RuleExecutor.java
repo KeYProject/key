@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * Executes a Rule with respect to a given instantiation of the schemavariables.
  */
-public interface RuleExecutor {
+public interface RuleExecutor extends org.key_project.ncore.rules.RuleExecutor {
 
     /**
      * applies the given rule application to the specified goal

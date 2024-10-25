@@ -59,7 +59,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     @Override
-    protected boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
         m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());

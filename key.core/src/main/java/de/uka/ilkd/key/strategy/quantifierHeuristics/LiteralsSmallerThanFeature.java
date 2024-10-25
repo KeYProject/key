@@ -41,7 +41,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return new LiteralsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
@@ -50,7 +50,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     protected boolean compareTerms(Term leftTerm, Term rightTerm,
-            org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal) {
+            PosInOccurrence pos, Goal goal) {
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final LiteralCollector m2 = new LiteralCollector();

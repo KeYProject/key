@@ -28,7 +28,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         assert pos != null : "Feature is only applicable to rules with find";
 
         ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();
-        final SequentFormula findFormula = pos.sequentFormula();
+        final var findFormula = pos.sequentFormula();
         final boolean findIsInAntec = pos.isInAntec();
 
         assert list != null;

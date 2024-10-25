@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -42,7 +43,7 @@ public interface ProofControl {
      * @return a list of Taclets with all applicable RewriteTaclets
      */
     ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal,
-            org.key_project.ncore.sequent.PosInOccurrence pos);
+            PosInOccurrence pos);
 
     /**
      * collects all applicable FindTaclets of the current goal (called by the SequentViewer)
@@ -50,7 +51,7 @@ public interface ProofControl {
      * @return a list of Taclets with all applicable FindTaclets
      */
     ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal,
-            org.key_project.ncore.sequent.PosInOccurrence pos);
+            PosInOccurrence pos);
 
     /**
      * collects all applicable NoFindTaclets of the current goal (called by the SequentViewer)
@@ -67,7 +68,7 @@ public interface ProofControl {
     ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
 
     boolean selectedTaclet(Taclet taclet, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence pos);
+            PosInOccurrence pos);
 
     /**
      * Apply a RuleApp and continue with update simplification or strategy application according to
@@ -170,7 +171,7 @@ public interface ProofControl {
      */
     void startAndWaitForAutoMode(Proof proof);
 
-    void startFocussedAutoMode(org.key_project.ncore.sequent.PosInOccurrence focus, Goal goal);
+    void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
 
     /**
      * Runs the given {@link ProofMacro} at the given {@link PosInOccurrence} on the given
@@ -182,5 +183,5 @@ public interface ProofControl {
      *        at.
      */
     void runMacro(Node node, ProofMacro macro,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc);
+            PosInOccurrence posInOcc);
 }

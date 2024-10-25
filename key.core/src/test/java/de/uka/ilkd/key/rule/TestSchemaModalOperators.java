@@ -18,6 +18,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -151,7 +153,7 @@ public class TestSchemaModalOperators {
             "Schemamodality " + osv + " has not been instantiated");
         assertSame(Modality.JavaModalityKind.DIA, mc.getInstantiations().getInstantiation(osv));
 
-        org.key_project.ncore.sequent.PosInOccurrence pos =
+        PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
         PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
         Term instReplace =
@@ -168,7 +170,7 @@ public class TestSchemaModalOperators {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal1);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
-        org.key_project.ncore.sequent.PosInOccurrence applyPos =
+        PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
@@ -176,7 +178,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(),
             "There should be 1 goal for testSchemaModal1 taclet, was " + goals.size());
         Sequent seq = goals.head().sequent();
@@ -203,7 +205,7 @@ public class TestSchemaModalOperators {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal2);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
-        org.key_project.ncore.sequent.PosInOccurrence applyPos =
+        PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
@@ -211,7 +213,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(),
             "There should be 1 goal for testSchemaModal2 taclet, was " + goals.size());
         Sequent seq = goals.head().sequent();
@@ -234,7 +236,7 @@ public class TestSchemaModalOperators {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal3);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
-        org.key_project.ncore.sequent.PosInOccurrence applyPos =
+        PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
@@ -242,7 +244,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(3, goals.size(),
             "There should be 3 goals for testSchemaModal3 taclet, was " + goals.size());
         Sequent seq0 = goals.head().sequent();

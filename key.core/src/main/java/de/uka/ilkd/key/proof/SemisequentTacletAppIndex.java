@@ -14,6 +14,10 @@ import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.FormulaChangeInfo;
+import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.*;
 
 /**
@@ -53,7 +57,7 @@ public class SemisequentTacletAppIndex {
      */
     private void addTermIndex(SequentFormula cfma, Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
-        final org.key_project.ncore.sequent.PosInOccurrence pos =
+        final PosInOccurrence pos =
             new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
         termIndices = termIndices.put(cfma, TermTacletAppIndex.create(pos, services, tacletIndex,
             listener, ruleFilter, indexCaches));
@@ -69,7 +73,7 @@ public class SemisequentTacletAppIndex {
         final TermTacletAppIndex oldIndex = termIndices.get(cfma);
         assert oldIndex != null : "Term index that is supposed to be updated " + "does not exist";
 
-        final org.key_project.ncore.sequent.PosInOccurrence pos =
+        final PosInOccurrence pos =
             new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
         termIndices = termIndices.put(cfma,
@@ -100,10 +104,11 @@ public class SemisequentTacletAppIndex {
      * @return the old indices in the same order as the list <code>infos</code> Note: destructive,
      *         use only when constructing new index
      */
-    private List<TermTacletAppIndex> removeFormulas(ImmutableList<FormulaChangeInfo> infos) {
+    private List<TermTacletAppIndex> removeFormulas(
+            ImmutableList<FormulaChangeInfo<SequentFormula>> infos) {
         var oldIndices = new ArrayList<TermTacletAppIndex>(infos.size());
 
-        for (FormulaChangeInfo info : infos) {
+        for (FormulaChangeInfo<SequentFormula> info : infos) {
             final SequentFormula oldFor = info.getOriginalFormula();
 
             oldIndices.add(termIndices.get(oldFor));
@@ -120,13 +125,14 @@ public class SemisequentTacletAppIndex {
      * when constructing new index
      */
     private void updateTermIndices(List<TermTacletAppIndex> oldIndices,
-            ImmutableList<FormulaChangeInfo> infos, Services services, TacletIndex tacletIndex,
+            ImmutableList<FormulaChangeInfo<SequentFormula>> infos, Services services,
+            TacletIndex tacletIndex,
             NewRuleListener listener) {
-        final Iterator<FormulaChangeInfo> infoIt = infos.iterator();
+        final Iterator<FormulaChangeInfo<SequentFormula>> infoIt = infos.iterator();
         final Iterator<TermTacletAppIndex> oldIndexIt = oldIndices.iterator();
 
         while (infoIt.hasNext()) {
-            final FormulaChangeInfo info = infoIt.next();
+            final FormulaChangeInfo<SequentFormula> info = infoIt.next();
             final SequentFormula newFor = info.newFormula();
             final TermTacletAppIndex oldIndex = oldIndexIt.next();
 
@@ -135,17 +141,17 @@ public class SemisequentTacletAppIndex {
             {
                 addTermIndex(newFor, services, tacletIndex, listener);
             } else {
-                final org.key_project.ncore.sequent.PosInOccurrence oldPos =
+                final PosInOccurrence oldPos =
                     info.positionOfModification();
-                final org.key_project.ncore.sequent.PosInOccurrence newPos =
-                    oldPos.replaceConstrainedFormula(newFor);
+                final PosInOccurrence newPos =
+                    oldPos.replaceSequentFormula(newFor);
                 termIndices = termIndices.put(newFor,
                     oldIndex.update(newPos, services, tacletIndex, listener, indexCaches));
             }
         }
     }
 
-    private void updateTermIndices(ImmutableList<FormulaChangeInfo> infos,
+    private void updateTermIndices(ImmutableList<FormulaChangeInfo<SequentFormula>> infos,
             Services services, TacletIndex tacletIndex, NewRuleListener listener) {
 
         // remove original indices
@@ -187,15 +193,15 @@ public class SemisequentTacletAppIndex {
     /**
      * Get term index for the formula to which position <code>pos</code> points
      */
-    private TermTacletAppIndex getTermIndex(org.key_project.ncore.sequent.PosInOccurrence pos) {
-        return termIndices.get(pos.sequentFormula());
+    private TermTacletAppIndex getTermIndex(PosInOccurrence pos) {
+        return termIndices.get((SequentFormula) pos.sequentFormula());
     }
 
     /**
      * @return all taclet apps for the given position
      */
     public ImmutableList<NoPosTacletApp> getTacletAppAt(
-            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter filter) {
+            PosInOccurrence pos, RuleFilter filter) {
         TermTacletAppIndex termIndex = getTermIndex(pos);
         return termIndex.getTacletAppAt(pos, filter);
     }
@@ -204,7 +210,7 @@ public class SemisequentTacletAppIndex {
      * @return all taclet apps for or below the given position
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(
-            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter filter,
+            PosInOccurrence pos, RuleFilter filter,
             Services services) {
         return getTermIndex(pos).getTacletAppAtAndBelow(pos, filter, services);
     }
@@ -214,7 +220,8 @@ public class SemisequentTacletAppIndex {
      *
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public SemisequentTacletAppIndex sequentChanged(SequentChangeInfo sci, Services services,
+    public SemisequentTacletAppIndex sequentChanged(SequentChangeInfo<SequentFormula> sci,
+            Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         if (sci.hasChanged(antec)) {
             final SemisequentTacletAppIndex result = copy();
@@ -263,7 +270,7 @@ public class SemisequentTacletAppIndex {
         for (final ImmutableMapEntry<SequentFormula, TermTacletAppIndex> entry : termIndices) {
             final SequentFormula cfma = entry.key();
             final TermTacletAppIndex index = entry.value();
-            final org.key_project.ncore.sequent.PosInOccurrence pio =
+            final PosInOccurrence pio =
                 new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
             index.reportTacletApps(pio, l);

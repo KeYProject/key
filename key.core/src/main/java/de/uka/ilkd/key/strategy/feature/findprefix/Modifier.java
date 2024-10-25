@@ -19,5 +19,5 @@ interface Modifier {
      * @param pos the position to be modified
      * @return the (new) position
      */
-    org.key_project.ncore.sequent.PosInOccurrence modifyPosistion(PosInOccurrence pos);
+    PosInOccurrence modifyPosistion(PosInOccurrence pos);
 }

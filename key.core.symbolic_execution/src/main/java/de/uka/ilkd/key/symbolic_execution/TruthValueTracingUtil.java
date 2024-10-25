@@ -43,6 +43,7 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ArrayUtil;
 
@@ -258,7 +259,7 @@ public final class TruthValueTracingUtil {
                     }
                 }
             } else if (parent.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp app) {
-                org.key_project.ncore.sequent.PosInOccurrence parentPio = null;
+                PosInOccurrence parentPio = null;
                 for (RuleApp protocolApp : app.getProtocol()) {
                     if (parentPio != null) {
                         updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(),
@@ -281,7 +282,7 @@ public final class TruthValueTracingUtil {
                 if (parentPio != null) {
                     assert 1 == parent.childrenCount()
                             : "Implementaton of the OneStepSimplifierRule has changed.";
-                    org.key_project.ncore.sequent.PosInOccurrence childPio =
+                    PosInOccurrence childPio =
                         SymbolicExecutionUtil.posInOccurrenceToOtherSequent(
                             parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
                     updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName,
@@ -327,9 +328,9 @@ public final class TruthValueTracingUtil {
             Name termLabelName) {
         List<LabelOccurrence> result = new LinkedList<>();
         // Search for labels in find part
-        org.key_project.ncore.sequent.PosInOccurrence pio = tacletApp.posInOccurrence();
+        PosInOccurrence pio = tacletApp.posInOccurrence();
         if (pio != null) {
-            Term term = pio.subTerm();
+            Term term = (Term) pio.subTerm();
             if (term != null) {
                 // Check for evaluated truth values
                 TermLabel label = term.getLabel(termLabelName);
@@ -443,8 +444,8 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResultBasedOnNewMinorIdsOSS(
-            final org.key_project.ncore.sequent.PosInOccurrence childPio,
-            final org.key_project.ncore.sequent.PosInOccurrence parentPio, final Name termLabelName,
+            final PosInOccurrence childPio,
+            final PosInOccurrence parentPio, final Name termLabelName,
             final TermBuilder tb,
             final Map<String, MultiEvaluationResult> results) {
         if (parentPio != null) {
@@ -452,15 +453,17 @@ public final class TruthValueTracingUtil {
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
-                    checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName,
+                    checkForNewMinorIdsOSS((SequentFormula) childPio.sequentFormula(), visited,
+                        termLabelName,
                         parentPio, tb, results);
                 }
             });
             // Check application term parents
-            org.key_project.ncore.sequent.PosInOccurrence currentPio = parentPio;
+            PosInOccurrence currentPio = parentPio;
             while (!currentPio.isTopLevel()) {
                 currentPio = currentPio.up();
-                checkForNewMinorIdsOSS(childPio.sequentFormula(), currentPio.subTerm(),
+                checkForNewMinorIdsOSS((SequentFormula) childPio.sequentFormula(),
+                    (Term) currentPio.subTerm(),
                     termLabelName, parentPio, tb, results);
             }
         }
@@ -478,7 +481,7 @@ public final class TruthValueTracingUtil {
      */
     private static void checkForNewMinorIdsOSS(
             SequentFormula onlyChangedChildSF, Term term,
-            Name termLabelName, org.key_project.ncore.sequent.PosInOccurrence parentPio,
+            Name termLabelName, PosInOccurrence parentPio,
             TermBuilder tb,
             Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
@@ -534,7 +537,7 @@ public final class TruthValueTracingUtil {
         final Node parentNode = childNode.parent();
         if (parentNode != null) {
             final RuleApp parentRuleApp = parentNode.getAppliedRuleApp();
-            final org.key_project.ncore.sequent.PosInOccurrence parentPio =
+            final PosInOccurrence parentPio =
                 parentRuleApp.posInOccurrence();
             if (parentPio != null) {
                 // Check application term and all of its children and grand children
@@ -546,10 +549,11 @@ public final class TruthValueTracingUtil {
                     }
                 });
                 // Check application term parents
-                org.key_project.ncore.sequent.PosInOccurrence currentPio = parentPio;
+                PosInOccurrence currentPio = parentPio;
                 while (!currentPio.isTopLevel()) {
                     currentPio = currentPio.up();
-                    checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio,
+                    checkForNewMinorIds(childNode, (Term) currentPio.subTerm(), termLabelName,
+                        parentPio,
                         tb, results);
                 }
                 // Check if instantiations
@@ -577,7 +581,7 @@ public final class TruthValueTracingUtil {
      */
     private static void checkForNewMinorIds(
             Node childNode, Term term, Name termLabelName,
-            org.key_project.ncore.sequent.PosInOccurrence parentPio, TermBuilder tb,
+            PosInOccurrence parentPio, TermBuilder tb,
             Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {

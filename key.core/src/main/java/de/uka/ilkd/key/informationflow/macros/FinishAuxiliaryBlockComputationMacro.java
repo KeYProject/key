@@ -32,7 +32,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);

@@ -55,7 +55,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, org.key_project.ncore.sequent.PosInOccurrence posInOcc,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
             ProverTaskListener listener)
             throws InterruptedException {
         for (Goal goal : goals) {
@@ -87,7 +87,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new SemanticsBlastingStrategy();
     }
 
@@ -207,7 +207,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp app,
-                org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
 
             if (app.rule() instanceof OneStepSimplifier) {
@@ -221,7 +221,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
             } else if (getEqualityRuleFilter().filter(app.rule())) {
                 return NumberRuleAppCost.create(10);
             } else if (app.rule().name().toString().equals("pullOut")) {
-                Term t = pio.subTerm();
+                var t = pio.subTerm();
                 if (t.op() instanceof JFunction) {
                     if (getAllowedPullOut().contains(t.op().name().toString())) {
                         return NumberRuleAppCost.create(1000);
@@ -234,7 +234,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
 
             if (app.rule() instanceof OneStepSimplifier) {

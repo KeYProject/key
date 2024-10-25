@@ -31,6 +31,9 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
@@ -986,9 +989,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     var ossParentNode = ((GUIProofTreeNode) ossNode.getParent());
                     var newSequent = ossParentNode.getNode().sequent();
                     var modifiedSequent = newSequent
-                            .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
+                            .replaceFormula(ossNode.getFormulaNr(),
+                                (SequentFormula) pio.sequentFormula())
+                            .sequent();
                     mediator.getSelectionModel().setSelectedSequentAndRuleApp(
-                        ossParentNode.getNode(), modifiedSequent, ossNode.getRuleApp());
+                        ossParentNode.getNode(), (Sequent) modifiedSequent, ossNode.getRuleApp());
                 } else {
                     mediator.nonGoalNodeChosen(node);
                 }
@@ -1175,7 +1180,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             if (pio != null) {
                 String on = LogicPrinter.quickPrintTerm(
-                    pio.subTerm(), node.proof().getServices());
+                    (Term) pio.subTerm(), node.proof().getServices());
                 style.tooltip.addAppliedOn(cutIfTooLong(on));
             }
 
@@ -1253,7 +1258,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             RuleApp app = node.getRuleApp();
             style.text = app.rule().name().toString();
             Services services = node.getNode().proof().getServices();
-            String on = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
+            String on =
+                LogicPrinter.quickPrintTerm((Term) app.posInOccurrence().subTerm(), services);
             style.tooltip.addRule(style.text);
             style.tooltip.addAppliedOn(cutIfTooLong(on));
         }

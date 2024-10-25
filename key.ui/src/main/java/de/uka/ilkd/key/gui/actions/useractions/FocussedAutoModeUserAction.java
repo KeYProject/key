@@ -17,7 +17,7 @@ public class FocussedAutoModeUserAction extends ProofModifyingUserAction {
     /**
      * Focussed pio to apply rules on.
      */
-    private final org.key_project.ncore.sequent.PosInOccurrence focus;
+    private final PosInOccurrence focus;
 
     /**
      * Construct a new focussed auto mode user action.

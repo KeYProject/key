@@ -41,7 +41,7 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         long begin = System.nanoTime();

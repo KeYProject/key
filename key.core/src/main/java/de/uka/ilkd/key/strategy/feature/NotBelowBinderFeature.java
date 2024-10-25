@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ncore.sequent.PIOPathIterator;
 import org.key_project.ncore.sequent.PosInOccurrence;
 
 
@@ -28,13 +28,13 @@ public class NotBelowBinderFeature extends BinaryFeature {
         return !belowBinder(pos);
     }
 
-    private boolean belowBinder(org.key_project.ncore.sequent.PosInOccurrence pos) {
+    private boolean belowBinder(PosInOccurrence pos) {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {
-            final Term t = it.getSubTerm();
+            final Term t = (Term) it.getSubTerm();
 
-            if (t.varsBoundHere(it.getChild()).size() > 0) {
+            if (!t.varsBoundHere(it.getChild()).isEmpty()) {
                 return true;
             }
         }

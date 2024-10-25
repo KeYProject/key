@@ -7,7 +7,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateA
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 

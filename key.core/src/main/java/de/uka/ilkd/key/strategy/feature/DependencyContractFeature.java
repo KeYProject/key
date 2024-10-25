@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -21,13 +22,14 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 public final class DependencyContractFeature extends BinaryFeature {
 
     private void removePreviouslyUsedSteps(Term focus, Goal goal,
-            List<org.key_project.ncore.sequent.PosInOccurrence> steps) {
+            List<PosInOccurrence> steps) {
         for (RuleApp app : goal.appliedRuleApps()) {
+            Term term = (Term) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule
-                    && app.posInOccurrence().subTerm().equalsModProperty(focus,
+                    && term.equalsModProperty(focus,
                         RENAMING_TERM_PROPERTY)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-                for (org.key_project.ncore.sequent.PosInOccurrence ifInst : bapp.ifInsts()) {
+                for (PosInOccurrence ifInst : bapp.ifInsts()) {
                     steps.remove(ifInst);
                 }
             }
@@ -35,17 +37,17 @@ public final class DependencyContractFeature extends BinaryFeature {
     }
 
     @Override
-    protected boolean filter(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    protected boolean filter(RuleApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-        final Term focus = pos.subTerm();
+        final Term focus = (Term) pos.subTerm();
 
         // determine possible steps
 
         List<LocationVariable> heapContext = bapp.getHeapContext() != null ? bapp.getHeapContext()
                 : HeapContext.getModifiableHeaps(goal.proof().getServices(), false);
 
-        final List<org.key_project.ncore.sequent.PosInOccurrence> steps =
+        final List<PosInOccurrence> steps =
             UseDependencyContractRule.getSteps(heapContext, pos,
                 goal.sequent(), goal.proof().getServices());
         if (steps.isEmpty()) {

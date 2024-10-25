@@ -35,7 +35,7 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     public FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
-            Goal goal, Optional<org.key_project.ncore.sequent.PosInOccurrence> focussedSubterm,
+            Goal goal, Optional<PosInOccurrence> focussedSubterm,
             Optional<String> breakpoint) {
         this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
                 .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
@@ -76,7 +76,7 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public void ruleAdded(RuleApp rule, org.key_project.ncore.sequent.PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
         if (mayAddRule(rule, pos)) {
             delegate.ruleAdded(rule, pos);
         }
@@ -95,15 +95,16 @@ public class FocussedBreakpointRuleApplicationManager
         delegate.rulesAdded(applicableRules, pos);
     }
 
-    private boolean mayAddRule(RuleApp rule, org.key_project.ncore.sequent.PosInOccurrence pos) {
+    private boolean mayAddRule(RuleApp rule, PosInOccurrence pos) {
         if (!breakpoint.isPresent()) {
             return true;
         }
 
         if ((!(rule instanceof Taclet) || NodeInfo.isSymbolicExecution((Taclet) rule.rule()))
                 && isJavaPIO(pos)) {
+            var term = (de.uka.ilkd.key.logic.Term) pos.subTerm();
             final SourceElement activeStmt = //
-                JavaTools.getActiveStatement(pos.subTerm().javaBlock());
+                JavaTools.getActiveStatement(term.javaBlock());
             final String currStmtString = activeStmt.toString();
 
             return currStmtString == null || //
@@ -115,8 +116,11 @@ public class FocussedBreakpointRuleApplicationManager
         return true;
     }
 
-    private static boolean isJavaPIO(org.key_project.ncore.sequent.PosInOccurrence pio) {
-        return pio != null && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+    private static boolean isJavaPIO(PosInOccurrence pio) {
+        if (pio == null)
+            return false;
+        var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();
+        return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
     }
 
     @Override

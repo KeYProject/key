@@ -36,7 +36,7 @@ public class SkipMacro extends AbstractProofMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return false;
     }
 

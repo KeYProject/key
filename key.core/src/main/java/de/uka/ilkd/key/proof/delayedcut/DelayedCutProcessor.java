@@ -18,6 +18,8 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -165,7 +167,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private ImmutableList<Goal> apply(final String tacletName, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence pio) {
+            PosInOccurrence pio) {
         TacletFilter filter = new TacletFilter() {
             @Override
             protected boolean filter(Taclet taclet) {
@@ -189,7 +191,7 @@ public class DelayedCutProcessor implements Runnable {
 
         SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
 
-        org.key_project.ncore.sequent.PosInOccurrence pio =
+        PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel(), cut.isDecisionPredicateInAntecendet());
 
         ImmutableList<Goal> result = apply(getHideTacletName(cut), goal, pio);
@@ -337,7 +339,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private void check(Goal goal, final RuleApp app,
-            org.key_project.ncore.sequent.PosInOccurrence newPos, Services services) {
+            PosInOccurrence newPos, Services services) {
         if (newPos == null) {
             return;
         }
@@ -393,7 +395,7 @@ public class DelayedCutProcessor implements Runnable {
         int formulaNumber =
             pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
                 oldRuleApp.posInOccurrence().sequentFormula());
-        return org.key_project.ncore.sequent.PosInOccurrence.findInSequent(pair.goal.sequent(),
+        return PosInOccurrence.findInSequent(pair.goal.sequent(),
             formulaNumber,
             oldRuleApp.posInOccurrence().posInTerm());
     }

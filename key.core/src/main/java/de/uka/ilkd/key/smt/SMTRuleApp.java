@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -68,7 +70,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
          */
         @Override
         public SMTRuleApp createApp(String successfulSolverName,
-                ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> unsatCore) {
+                ImmutableList<PosInOccurrence> unsatCore) {
             return new SMTRuleApp(this, null, unsatCore, successfulSolverName);
         }
 
@@ -79,7 +81,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
 
 
         @Override
-        public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+        public boolean isApplicable(Goal goal, PosInOccurrence pio) {
             return false;
         }
 
@@ -124,7 +126,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
 
     @Override
     public SMTRuleApp setIfInsts(
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -142,7 +144,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
     public SMTRuleApp tryToInstantiate(Goal goal) {
         SMTRuleApp app = RULE.createApp(pio, goal.proof().getServices());
         Sequent seq = goal.sequent();
-        List<org.key_project.ncore.sequent.PosInOccurrence> ifInsts = new ArrayList<>();
+        List<PosInOccurrence> ifInsts = new ArrayList<>();
         for (SequentFormula ante : seq.antecedent()) {
             ifInsts.add(new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
         }

@@ -19,7 +19,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
 
     public static Feature less(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+            protected boolean filter(RuleApp app, PosInOccurrence pos,
                     Goal goal,
                     MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)
@@ -30,7 +30,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
 
     public static Feature leq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+            protected boolean filter(RuleApp app, PosInOccurrence pos,
                     Goal goal,
                     MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)

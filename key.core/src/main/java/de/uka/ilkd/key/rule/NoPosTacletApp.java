@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -303,7 +304,7 @@ public class NoPosTacletApp extends TacletApp {
      *
      * @return TacletApp with the resulting instantiations or null
      */
-    public NoPosTacletApp matchFind(org.key_project.ncore.sequent.PosInOccurrence pos,
+    public NoPosTacletApp matchFind(PosInOccurrence pos,
             Services services) {
         NoPosTacletApp result = matchFind(pos, services, null);
         return result;
@@ -315,10 +316,10 @@ public class NoPosTacletApp extends TacletApp {
      * expensive pos.subTerm() while matching during a recursive descent in a term (where the
      * current subterm is known anyway).
      */
-    public NoPosTacletApp matchFind(org.key_project.ncore.sequent.PosInOccurrence pos,
+    public NoPosTacletApp matchFind(PosInOccurrence pos,
             Services services, Term t) {
         if ((t == null) && (pos != null)) {
-            t = pos.subTerm();
+            t = (Term) pos.subTerm();
         }
 
         MatchConditions mc = setupMatchConditions(pos, services);
@@ -359,7 +360,7 @@ public class NoPosTacletApp extends TacletApp {
 
 
     protected MatchConditions setupMatchConditions(
-            org.key_project.ncore.sequent.PosInOccurrence pos, TermServices services) {
+            PosInOccurrence pos, TermServices services) {
         SVInstantiations svInst = taclet() instanceof NoFindTaclet ? instantiations()
                 : instantiations().clearUpdateContext();
 

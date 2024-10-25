@@ -16,11 +16,13 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 
 /**
  * <p>
  * A {@link TermLabelUpdate} is used by
- * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
+ * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
  * to add or remove maintained {@link TermLabel}s which will be added to the new {@link Term}.
  * </p>
  * <p>
@@ -57,7 +59,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
      * @param labels The {@link Set} of {@link TermLabel}s to modify.
      */
     void updateLabels(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Term modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
             Set<TermLabel> labels);

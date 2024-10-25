@@ -8,7 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
 import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
@@ -30,6 +30,6 @@ public class SubtermProjection implements ProjectionToTerm {
     }
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
+        return (Term) pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
     }
 }

@@ -23,7 +23,7 @@ import org.key_project.ncore.sequent.PosInOccurrence;
 public class TestGenMacro extends StrategyProofMacro {
     @Override
     protected Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new TestGenStrategy(proof.getActiveStrategy());
     }
 
@@ -81,7 +81,7 @@ class TestGenStrategy extends FilterStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         if (TestGenStrategy.isUnwindRule(app.rule())) {

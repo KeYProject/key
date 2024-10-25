@@ -32,8 +32,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * to be decided by the subclasses
      */
     protected abstract boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            org.key_project.ncore.sequent.PosInOccurrence newPio,
-            org.key_project.ncore.sequent.PosInOccurrence oldPio);
+            PosInOccurrence newPio,
+            PosInOccurrence oldPio);
 
     /**
      * Check whether the old rule application <code>ruleCmp</code> is a duplicate of the new
@@ -41,7 +41,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * <code>null</code>
      */
     protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp,
-            org.key_project.ncore.sequent.PosInOccurrence newPio) {
+            PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -124,7 +124,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * the sequent
      */
     protected boolean noDuplicateFindTaclet(TacletApp app,
-            org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal) {
+            PosInOccurrence pos, Goal goal) {
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();

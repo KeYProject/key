@@ -26,6 +26,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -135,12 +136,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec() || Transformer.inTransformer(pio)) {
             return false;
         }
 
-        final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
+        final Term progPost = splitUpdates((Term) pio.subTerm(), goal.proof().getServices()).second;
         JavaBlock javaBlock = progPost.javaBlock();
 
         return !javaBlock.isEmpty() && JavaTools.getActiveStatement(javaBlock) instanceof While;
@@ -367,7 +368,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
             Services services) throws RuleAbortException {
-        final Term focusTerm = app.posInOccurrence().subTerm();
+        final Term focusTerm = (Term) app.posInOccurrence().subTerm();
 
         if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
                 .getSpecificationRepository().getLoopSpec(lastInstantiation.loop)) {

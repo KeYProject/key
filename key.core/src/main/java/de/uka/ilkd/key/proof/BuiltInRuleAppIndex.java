@@ -7,6 +7,10 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.FormulaChangeInfo;
+import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -135,7 +139,8 @@ public class BuiltInRuleAppIndex {
      *
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(Goal goal, SequentChangeInfo sci, NewRuleListener listener) {
+    public void sequentChanged(Goal goal, SequentChangeInfo<SequentFormula> sci,
+            NewRuleListener listener) {
         scanAddedFormulas(goal, true, sci, listener);
         scanAddedFormulas(goal, false, sci, listener);
 
@@ -143,7 +148,7 @@ public class BuiltInRuleAppIndex {
         scanModifiedFormulas(goal, false, sci, listener);
     }
 
-    private void scanAddedFormulas(Goal goal, boolean antec, SequentChangeInfo sci,
+    private void scanAddedFormulas(Goal goal, boolean antec, SequentChangeInfo<SequentFormula> sci,
             NewRuleListener listener) {
         ImmutableList<SequentFormula> cfmas = sci.addedFormulas(antec);
         while (!cfmas.isEmpty()) {
@@ -154,12 +159,13 @@ public class BuiltInRuleAppIndex {
     }
 
 
-    private void scanModifiedFormulas(Goal goal, boolean antec, SequentChangeInfo sci,
+    private void scanModifiedFormulas(Goal goal, boolean antec,
+            SequentChangeInfo<SequentFormula> sci,
             NewRuleListener listener) {
-        ImmutableList<FormulaChangeInfo> fcis = sci.modifiedFormulas(antec);
+        ImmutableList<FormulaChangeInfo<SequentFormula>> fcis = sci.modifiedFormulas(antec);
 
         while (!fcis.isEmpty()) {
-            final FormulaChangeInfo fci = fcis.head();
+            final FormulaChangeInfo<SequentFormula> fci = fcis.head();
             final SequentFormula cfma = fci.newFormula();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             fcis = fcis.tail();

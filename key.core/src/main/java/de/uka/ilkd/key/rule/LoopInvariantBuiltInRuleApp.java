@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -53,7 +54,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts,
+            ImmutableList<PosInOccurrence> ifInsts,
             LoopSpecification inv,
             List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
@@ -291,7 +292,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp setIfInsts(
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
 

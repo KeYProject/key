@@ -9,7 +9,6 @@ import java.util.Map;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -21,7 +20,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -36,16 +35,16 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
-    private org.key_project.ncore.sequent.PosInOccurrence getApplicablePosInOcc(Proof proof,
-            Goal goal, org.key_project.ncore.sequent.PosInOccurrence posInOcc,
+    private PosInOccurrence getApplicablePosInOcc(Proof proof,
+            Goal goal, PosInOccurrence posInOcc,
             ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
         } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
             return posInOcc;
         } else {
-            final Term subTerm = posInOcc.subTerm();
-            org.key_project.ncore.sequent.PosInOccurrence res = null;
+            final var subTerm = posInOcc.subTerm();
+            PosInOccurrence res = null;
             for (int i = 0; i < subTerm.arity() && res == null; i++) {
                 res = getApplicablePosInOcc(proof, goal, posInOcc.down(i), macro);
             }
@@ -76,10 +75,10 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         final Services services = proof.getServices();
 
-        final Map<Node, org.key_project.ncore.sequent.PosInOccurrence> applicableOnNodeAtPos =
+        final Map<Node, PosInOccurrence> applicableOnNodeAtPos =
             services.getCaches().getExhaustiveMacroCache();
 
         Sequent seq = null;
@@ -92,10 +91,10 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     // node has not been checked before, so do it
                     for (int i = 1; i <= seq.size()
                             && applicableOnNodeAtPos.get(goal.node()) == null; i++) {
-                        org.key_project.ncore.sequent.PosInOccurrence searchPos =
-                            org.key_project.ncore.sequent.PosInOccurrence.findInSequent(seq, i,
+                        PosInOccurrence searchPos =
+                            PosInOccurrence.findInSequent(seq, i,
                                 PosInTerm.getTopLevel());
-                        org.key_project.ncore.sequent.PosInOccurrence applicableAt =
+                        PosInOccurrence applicableAt =
                             getApplicablePosInOcc(proof, goal, searchPos, macro);
                         applicableOnNodeAtPos.put(goal.node(), applicableAt);
                     }
@@ -109,11 +108,11 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, org.key_project.ncore.sequent.PosInOccurrence posInOcc,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
             ProverTaskListener listener)
             throws Exception {
 
-        final Map<Node, org.key_project.ncore.sequent.PosInOccurrence> applicableOnNodeAtPos =
+        final Map<Node, PosInOccurrence> applicableOnNodeAtPos =
             proof.getServices().getCaches().getExhaustiveMacroCache();
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         final ProofMacro macro = getProofMacro();

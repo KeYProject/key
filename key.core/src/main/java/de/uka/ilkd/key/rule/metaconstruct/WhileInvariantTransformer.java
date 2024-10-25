@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -93,7 +94,7 @@ public final class WhileInvariantTransformer {
     /** calculates the resulting term. */
     public Term transform(TermLabelState termLabelState, Rule rule, RuleApp ruleApp, Goal goal,
             Sequent applicationSequent,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPos, Term initialPost,
+            PosInOccurrence applicationPos, Term initialPost,
             Term invariantFramingTermination, SVInstantiations svInst, Services services) {
 
         // global initialisation
@@ -237,7 +238,7 @@ public final class WhileInvariantTransformer {
      * @return The {@link TermLabel}s to add to the loop body modality {@link Term}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
-            Services services, org.key_project.ncore.sequent.PosInOccurrence applicationPos,
+            Services services, PosInOccurrence applicationPos,
             Rule rule, RuleApp ruleApp,
             Goal goal, Operator loopBodyModality, Term result, JavaBlock mainJavaBlock,
             Sequent applicationSequent, ImmutableArray<TermLabel> newTermOriginalLabels) {
@@ -325,7 +326,7 @@ public final class WhileInvariantTransformer {
     private Term returnCase(TermLabelState termLabelState, ProgramVariable returnFlag,
             KeYJavaType returnType, ProgramVariable returnExpression, Term post, Rule rule,
             RuleApp ruleApp, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPos, Services services) {
+            PosInOccurrence applicationPos, Services services) {
         JavaBlock returnJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
         Term executeReturn = services.getTermBuilder().prog(modality.kind(), returnJavaBlock, post,
@@ -352,7 +353,7 @@ public final class WhileInvariantTransformer {
 
     private Term breakCase(TermLabelState termLabelState, ProgramVariable breakFlag, Term post,
             ArrayList<If> breakIfCascade, Rule rule, RuleApp ruleApp, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPos, Services services) {
+            PosInOccurrence applicationPos, Services services) {
         JavaBlock executeJavaBlock = addContext(root,
             new StatementBlock(breakIfCascade.toArray(new Statement[0])));
         Term executeBreak = services.getTermBuilder().prog(modality.kind(), executeJavaBlock, post,
@@ -367,7 +368,7 @@ public final class WhileInvariantTransformer {
     }
 
     private Term normalCaseAndContinue(TermLabelState termLabelState, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPos, Rule rule,
+            PosInOccurrence applicationPos, Rule rule,
             RuleApp ruleApp, Goal goal,
             Sequent applicationSequent, Term contFlagTerm, Term returnFlagTerm, Term breakFlagTerm,
             Term excFlagTerm, Term inv) {
@@ -427,7 +428,7 @@ public final class WhileInvariantTransformer {
      * @return The {@link TermLabel}s to add to the new {@link Term}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,
-            Services services, org.key_project.ncore.sequent.PosInOccurrence applicationPos,
+            Services services, PosInOccurrence applicationPos,
             Rule rule, RuleApp ruleApp,
             Goal goal, Operator operator, ImmutableArray<Term> subs, Sequent applicationSequent) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
@@ -437,7 +438,7 @@ public final class WhileInvariantTransformer {
 
     private Term throwCase(TermLabelState termLabelState, ProgramVariable excFlag,
             ProgramVariable thrownException, Term post, Rule rule, RuleApp ruleApp, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPos, Services services) {
+            PosInOccurrence applicationPos, Services services) {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));

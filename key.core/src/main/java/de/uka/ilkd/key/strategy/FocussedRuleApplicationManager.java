@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -11,6 +10,7 @@ import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
+import org.key_project.ncore.sequent.PIOPathIterator;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -27,7 +27,7 @@ public class FocussedRuleApplicationManager
     public final QueueRuleApplicationManager rootManager;
 
     private final FormulaTag focussedFormula;
-    private final org.key_project.ncore.sequent.PosInOccurrence focussedSubterm;
+    private final PosInOccurrence focussedSubterm;
 
     private Goal goal;
 
@@ -41,7 +41,7 @@ public class FocussedRuleApplicationManager
 
     private FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, Goal goal,
             FormulaTag focussedFormula,
-            org.key_project.ncore.sequent.PosInOccurrence focussedSubterm,
+            PosInOccurrence focussedSubterm,
             boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
         this.rootManager =
@@ -54,7 +54,7 @@ public class FocussedRuleApplicationManager
     }
 
     public FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence focussedSubterm) {
+            PosInOccurrence focussedSubterm) {
         this(delegate, goal, goal.getFormulaTagManager().getTagForPos(focussedSubterm.topLevel()),
             focussedSubterm, true);
 
@@ -96,21 +96,21 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public void ruleAdded(RuleApp rule, org.key_project.ncore.sequent.PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
         if (isRuleApplicationForFocussedFormula(rule, pos)) {
             delegate.ruleAdded(rule, pos);
         }
     }
 
     protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         /*
          * filter the rule applications, only allow applications within the focussed subterm or to
          * other formulas that have been added after creation of the manager (we rely on the fact
          * that the caching rule indexes only report rules for modified added formulas anyway)
          */
 
-        final org.key_project.ncore.sequent.PosInOccurrence focFormula = getPIOForFocussedSubterm();
+        final PosInOccurrence focFormula = getPIOForFocussedSubterm();
 
         if (focFormula != null && pos != null) {
             if (isSameFormula(pos, focFormula)) {
@@ -140,25 +140,25 @@ public class FocussedRuleApplicationManager
         delegate.rulesAdded(applicableRules, pos);
     }
 
-    private boolean isSameFormula(org.key_project.ncore.sequent.PosInOccurrence pio1,
-            org.key_project.ncore.sequent.PosInOccurrence pio2) {
+    private boolean isSameFormula(PosInOccurrence pio1,
+            PosInOccurrence pio2) {
         return pio2.isInAntec() == pio1.isInAntec()
                 && pio2.sequentFormula().equals(pio1.sequentFormula());
     }
 
-    private org.key_project.ncore.sequent.PosInOccurrence getPIOForFocussedSubterm() {
-        final org.key_project.ncore.sequent.PosInOccurrence formula =
+    private PosInOccurrence getPIOForFocussedSubterm() {
+        final PosInOccurrence formula =
             goal.getFormulaTagManager().getPosForTag(focussedFormula);
 
         if (formula == null) {
             return null;
         }
 
-        return focussedSubterm.replaceConstrainedFormula(formula.sequentFormula());
+        return focussedSubterm.replaceSequentFormula(formula.sequentFormula());
     }
 
-    private boolean isBelow(org.key_project.ncore.sequent.PosInOccurrence over,
-            org.key_project.ncore.sequent.PosInOccurrence under) {
+    private boolean isBelow(PosInOccurrence over,
+            PosInOccurrence under) {
         final PIOPathIterator overIt = over.iterator();
         final PIOPathIterator underIt = under.iterator();
 

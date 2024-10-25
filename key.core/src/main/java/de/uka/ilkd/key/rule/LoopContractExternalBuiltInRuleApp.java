@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -40,7 +41,7 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
      */
     public LoopContractExternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence,
-            final ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInstantiations,
+            final ImmutableList<PosInOccurrence> ifInstantiations,
             final JavaStatement statement, final LoopContract contract,
             final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
@@ -60,7 +61,7 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
 
     @Override
     public LoopContractExternalBuiltInRuleApp setIfInsts(
-            final ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInstantiations) {
+            final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;
     }

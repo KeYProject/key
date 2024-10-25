@@ -33,6 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -353,10 +354,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         ApplyStrategyInfo info = null;
         try {
             // initialize values
-            org.key_project.ncore.sequent.PosInOccurrence pio = ruleApp.posInOccurrence();
-            Term term = pio.subTerm();
+            PosInOccurrence pio = ruleApp.posInOccurrence();
+            var t = pio.subTerm();
             getProof().getServices().getTermBuilder();
-            term = TermBuilder.goBelowUpdates(term);
+            Term term = TermBuilder.goBelowUpdates(t);
             IExecutionContext ec =
                 JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
             // put values into map which have to be replaced

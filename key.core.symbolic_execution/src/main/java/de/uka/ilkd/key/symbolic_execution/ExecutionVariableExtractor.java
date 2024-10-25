@@ -19,6 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -71,7 +72,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception
      */
     public ExecutionVariableExtractor(Node node,
-            org.key_project.ncore.sequent.PosInOccurrence modalityPio,
+            PosInOccurrence modalityPio,
             IExecutionNode<?> executionNode, Term condition, boolean simplifyConditions)
             throws ProofInputException {
         super(node, modalityPio);
@@ -403,7 +404,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param additionalCondition An optional additional condition to consider.
          */
         public StateExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-                org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
+                PosInOccurrence modalityPIO,
                 IProgramVariable programVariable, Term arrayIndex,
                 Term additionalCondition) {
             super(parentNode.getSettings(), proofNode, programVariable, null, arrayIndex,
@@ -490,7 +491,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
          */
         public ExtractedExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-                org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
+                PosInOccurrence modalityPIO,
                 IProgramVariable programVariable, Term arrayIndex,
                 Term arrayStartIndex, Term arrayEndIndex, Term additionalCondition,
                 ExtractedExecutionValue parentValue) {

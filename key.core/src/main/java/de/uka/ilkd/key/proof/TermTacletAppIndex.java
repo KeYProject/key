@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -16,6 +15,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.ncore.sequent.PIOPathIterator;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
 
@@ -60,7 +61,7 @@ public class TermTacletAppIndex {
      * @return list of all possible instantiations
      */
     private static ImmutableList<NoPosTacletApp> getRewriteTaclet(
-            org.key_project.ncore.sequent.PosInOccurrence pos,
+            PosInOccurrence pos,
             RuleFilter filter, Services services, TacletIndex tacletIndex) {
 
         return tacletIndex.getRewriteTaclet(pos, filter, services);
@@ -75,7 +76,7 @@ public class TermTacletAppIndex {
      * @return list of all possible instantiations
      */
     private static ImmutableList<NoPosTacletApp> getFindTaclet(
-            org.key_project.ncore.sequent.PosInOccurrence pos,
+            PosInOccurrence pos,
             RuleFilter filter, Services services, TacletIndex tacletIndex) {
         ImmutableList<NoPosTacletApp> tacletInsts = ImmutableSLList.nil();
         if (pos.isTopLevel()) {
@@ -101,7 +102,7 @@ public class TermTacletAppIndex {
      * @return list of all possible instantiations
      */
     private static ImmutableList<NoPosTacletApp> antecTaclet(
-            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter filter,
+            PosInOccurrence pos, RuleFilter filter,
             Services services, TacletIndex tacletIndex) {
         return tacletIndex.getAntecedentTaclet(pos, filter, services);
     }
@@ -116,7 +117,7 @@ public class TermTacletAppIndex {
      * @return list of all possible instantiations
      */
     private static ImmutableList<NoPosTacletApp> succTaclet(
-            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter filter,
+            PosInOccurrence pos, RuleFilter filter,
             Services services, TacletIndex tacletIndex) {
         return tacletIndex.getSuccedentTaclet(pos, filter, services);
     }
@@ -128,10 +129,10 @@ public class TermTacletAppIndex {
      * @return list of the index objects
      */
     private static ImmutableArray<TermTacletAppIndex> createSubIndices(
-            org.key_project.ncore.sequent.PosInOccurrence pos,
+            PosInOccurrence pos,
             Services services, TacletIndex tacletIndex, NewRuleListener listener, RuleFilter filter,
             ITermTacletAppIndexCache indexCache) {
-        final Term localTerm = pos.subTerm();
+        final Term localTerm = (Term) pos.subTerm();
         final TermTacletAppIndex[] result = new TermTacletAppIndex[localTerm.arity()];
 
         for (int i = 0; i < result.length; i++) {
@@ -150,7 +151,7 @@ public class TermTacletAppIndex {
      *        has to be a top-level term position
      * @return the index object
      */
-    public static TermTacletAppIndex create(org.key_project.ncore.sequent.PosInOccurrence pos,
+    public static TermTacletAppIndex create(PosInOccurrence pos,
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener, RuleFilter filter,
             TermTacletAppIndexCacheSet indexCaches) {
@@ -162,7 +163,7 @@ public class TermTacletAppIndex {
     }
 
     private static ITermTacletAppIndexCache determineIndexCache(
-            org.key_project.ncore.sequent.PosInOccurrence pos,
+            PosInOccurrence pos,
             TermTacletAppIndexCacheSet indexCaches) {
         if (pos.isInAntec()) {
             return indexCaches.getAntecCache();
@@ -172,11 +173,11 @@ public class TermTacletAppIndex {
     }
 
 
-    private static TermTacletAppIndex createHelp(org.key_project.ncore.sequent.PosInOccurrence pos,
+    private static TermTacletAppIndex createHelp(PosInOccurrence pos,
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener, RuleFilter filter,
             ITermTacletAppIndexCache indexCache) {
-        final Term localTerm = pos.subTerm();
+        final Term localTerm = (Term) pos.subTerm();
 
         final TermTacletAppIndex cached = indexCache.getIndexForTerm(localTerm);
         if (cached != null) {
@@ -210,7 +211,7 @@ public class TermTacletAppIndex {
      * @return the index object
      */
     public TermTacletAppIndex addTaclets(RuleFilter filter,
-            org.key_project.ncore.sequent.PosInOccurrence pos, Services services,
+            PosInOccurrence pos, Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         final RuleFilter effectiveFilter = new AndRuleFilter(filter, ruleFilter);
 
@@ -218,7 +219,7 @@ public class TermTacletAppIndex {
     }
 
     private TermTacletAppIndex addTacletsHelp(RuleFilter filter,
-            org.key_project.ncore.sequent.PosInOccurrence pos,
+            PosInOccurrence pos,
             Services services, TacletIndex tacletIndex, NewRuleListener listener) {
 
         final ImmutableArray<TermTacletAppIndex> newSubIndices =
@@ -235,7 +236,7 @@ public class TermTacletAppIndex {
 
 
     private ImmutableArray<TermTacletAppIndex> addTacletsSubIndices(RuleFilter filter,
-            org.key_project.ncore.sequent.PosInOccurrence pos, Services services,
+            PosInOccurrence pos, Services services,
             TacletIndex tacletIndex,
             NewRuleListener listener) {
         final TermTacletAppIndex[] result = new TermTacletAppIndex[subtermIndices.size()];
@@ -267,14 +268,14 @@ public class TermTacletAppIndex {
 
         // Below the position of modification everything has to be rebuilt
         final boolean completeRebuild = !pathToModification.hasNext();
-        final org.key_project.ncore.sequent.PosInOccurrence pos =
+        final PosInOccurrence pos =
             pathToModification.getPosInOccurrence();
 
         if (completeRebuild) {
             return updateCompleteRebuild(pos, services, tacletIndex, listener, indexCache);
         }
 
-        final Term newTerm = pathToModification.getSubTerm();
+        final Term newTerm = (Term) pathToModification.getSubTerm();
 
         final TermTacletAppIndex cached = indexCache.getIndexForTerm(newTerm);
         if (cached != null) {
@@ -294,10 +295,10 @@ public class TermTacletAppIndex {
 
 
     private TermTacletAppIndex updateCompleteRebuild(
-            org.key_project.ncore.sequent.PosInOccurrence pos, Services services,
+            PosInOccurrence pos, Services services,
             TacletIndex tacletIndex, NewRuleListener listener,
             ITermTacletAppIndexCache indexCache) {
-        final Term newTerm = pos.subTerm();
+        final Term newTerm = (Term) pos.subTerm();
         final Operator newOp = newTerm.op();
 
         if (newOp instanceof Modality mod
@@ -315,7 +316,7 @@ public class TermTacletAppIndex {
     }
 
 
-    private TermTacletAppIndex updateLocalApps(org.key_project.ncore.sequent.PosInOccurrence pos,
+    private TermTacletAppIndex updateLocalApps(PosInOccurrence pos,
             Term newSubterm,
             Services services, TacletIndex tacletIndex, NewRuleListener listener,
             ImmutableArray<TermTacletAppIndex> newSubIndices) {
@@ -333,7 +334,7 @@ public class TermTacletAppIndex {
             ITermTacletAppIndexCache indexCache) {
         ImmutableArray<TermTacletAppIndex> newSubIndices = subtermIndices;
 
-        final Term newTerm = pathToModification.getSubTerm();
+        final Term newTerm = (Term) pathToModification.getSubTerm();
         final int child = pathToModification.getChild();
 
         if (newTerm.op() instanceof UpdateApplication) {
@@ -357,7 +358,7 @@ public class TermTacletAppIndex {
      */
     private ImmutableArray<TermTacletAppIndex> updateIUpdateTarget(
             ImmutableArray<TermTacletAppIndex> oldSubindices, int updateTarget,
-            org.key_project.ncore.sequent.PosInOccurrence targetPos, Services services,
+            PosInOccurrence targetPos, Services services,
             TacletIndex tacletIndex,
             NewRuleListener listener, ITermTacletAppIndexCache indexCache) {
 
@@ -418,7 +419,7 @@ public class TermTacletAppIndex {
      * @param indexCaches caches
      * @return the updated index object
      */
-    TermTacletAppIndex update(org.key_project.ncore.sequent.PosInOccurrence pos, Services services,
+    TermTacletAppIndex update(PosInOccurrence pos, Services services,
             TacletIndex tacletIndex,
             NewRuleListener listener, TermTacletAppIndexCacheSet indexCaches) {
 
@@ -432,7 +433,7 @@ public class TermTacletAppIndex {
     /**
      * @return the sub-index for the given position
      */
-    private TermTacletAppIndex descend(org.key_project.ncore.sequent.PosInOccurrence pos) {
+    private TermTacletAppIndex descend(PosInOccurrence pos) {
         if (pos.isTopLevel()) {
             return this;
         }
@@ -455,7 +456,7 @@ public class TermTacletAppIndex {
      * @return all taclet apps for the given position
      */
     public ImmutableList<NoPosTacletApp> getTacletAppAt(
-            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter p_filter) {
+            PosInOccurrence pos, RuleFilter p_filter) {
         final TermTacletAppIndex index = descend(pos);
         return filter(p_filter, index.localTacletApps);
     }
@@ -465,13 +466,13 @@ public class TermTacletAppIndex {
      * @return all taclet apps for or below the given position
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(
-            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter filter,
+            PosInOccurrence pos, RuleFilter filter,
             Services services) {
         return descend(pos).collectTacletApps(pos, filter, services);
     }
 
     private ImmutableList<TacletApp> convert(ImmutableList<? extends RuleApp> rules,
-            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter filter,
+            PosInOccurrence pos, RuleFilter filter,
             ImmutableList<TacletApp> convertedApps,
             Services services) {
 
@@ -498,15 +499,15 @@ public class TermTacletAppIndex {
      * @return a list of all taclet apps
      */
     private ImmutableList<TacletApp> collectTacletApps(
-            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter p_filter,
+            PosInOccurrence pos, RuleFilter p_filter,
             Services services) {
 
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
-        final ImmutableList<Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
+        final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
             collectAllTacletAppsHereAndBelow(pos, ImmutableSLList.nil());
 
-        for (final Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
+        for (final Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             result = convert(pair.second, pair.first, p_filter, result, services);
         }
 
@@ -520,15 +521,15 @@ public class TermTacletAppIndex {
      * @param pos The position of this index
      * @param listener The listener to which the taclet apps found are supposed to be reported
      */
-    void reportTacletApps(org.key_project.ncore.sequent.PosInOccurrence pos,
+    void reportTacletApps(PosInOccurrence pos,
             NewRuleListener listener) {
 
-        final ImmutableList<Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>>> result =
+        final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> result =
             ImmutableSLList.nil();
-        final ImmutableList<Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
+        final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
             collectAllTacletAppsHereAndBelow(pos, result);
 
-        for (final Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
+        for (final Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             fireRulesAdded(listener, pair.second, pair.first);
         }
     }
@@ -543,9 +544,9 @@ public class TermTacletAppIndex {
      *        position below pos as key
      * @return the resulting list of taclet applications from this and all subterm taclet indices
      */
-    private ImmutableList<Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectAllTacletAppsHereAndBelow(
-            org.key_project.ncore.sequent.PosInOccurrence pos,
-            ImmutableList<Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectedApps) {
+    private ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectAllTacletAppsHereAndBelow(
+            PosInOccurrence pos,
+            ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectedApps) {
 
         // assert collectedApps.get(pos) == null;
         collectedApps = collectedApps.prepend(new Pair<>(pos, localTacletApps));
@@ -564,10 +565,10 @@ public class TermTacletAppIndex {
      * modification, and the taclets whose update context has changed.
      */
     private void reportTacletApps(PIOPathIterator pathToModification, NewRuleListener listener) {
-        final ImmutableList<Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
+        final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
             collectAllTacletAppsAffectedByModification(pathToModification, ImmutableSLList.nil());
 
-        for (final Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
+        for (final Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             fireRulesAdded(listener, pair.second, pair.first);
         }
     }
@@ -581,17 +582,17 @@ public class TermTacletAppIndex {
      *
      * @return all affected taclet apps grouped by the corresponding {@link PosInOccurrence}
      */
-    private ImmutableList<Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectAllTacletAppsAffectedByModification(
+    private ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectAllTacletAppsAffectedByModification(
             PIOPathIterator pathToModification,
-            ImmutableList<Pair<org.key_project.ncore.sequent.PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectedApps) {
+            ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectedApps) {
 
         TermTacletAppIndex index = this;
-        org.key_project.ncore.sequent.PosInOccurrence pos = pathToModification.getPosInOccurrence();
+        PosInOccurrence pos = pathToModification.getPosInOccurrence();
         while (pathToModification.hasNext()) {
             // assert collectedApps.get(pos) == null;
             collectedApps = collectedApps.prepend(new Pair<>(pos, index.localTacletApps));
 
-            final Term subTerm = pos.subTerm();
+            final var subTerm = pos.subTerm();
             final int nextSubtermIndex = pathToModification.getChild();
 
             if (subTerm.op() instanceof UpdateApplication) {
@@ -618,7 +619,7 @@ public class TermTacletAppIndex {
 
     private static void fireRulesAdded(NewRuleListener listener,
             ImmutableList<NoPosTacletApp> taclets,
-            org.key_project.ncore.sequent.PosInOccurrence pos) {
+            PosInOccurrence pos) {
         listener.rulesAdded(taclets, pos);
     }
 

@@ -11,14 +11,14 @@ import org.key_project.ncore.sequent.PosInOccurrence;
 public class NodeRedundantAddChange implements NodeChange {
 
     /** the PosInOccurrence of the formula that has been tried to add */
-    private final org.key_project.ncore.sequent.PosInOccurrence pio;
+    private final PosInOccurrence pio;
 
     /**
      * creates an instance
      *
      * @param pio the PosInOccurrence of the formula that has been tried to add
      */
-    public NodeRedundantAddChange(org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public NodeRedundantAddChange(PosInOccurrence pio) {
         this.pio = pio;
     }
 

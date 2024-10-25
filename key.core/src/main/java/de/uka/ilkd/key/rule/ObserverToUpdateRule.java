@@ -35,6 +35,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -116,7 +117,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         // focus must be top level succedent
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
@@ -129,7 +130,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // instantiation must succeed
         Union<Instantiation, ModelFieldInstantiation> inst =
-            instantiate(pio.subTerm(), goal.proof().getServices());
+            instantiate((Term) pio.subTerm(), goal.proof().getServices());
         if (inst == null) {
             return false;
         }
@@ -153,7 +154,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
         Union<Instantiation, ModelFieldInstantiation> inst =
-            instantiate(ruleApp.posInOccurrence().subTerm(), services);
+            instantiate((Term) ruleApp.posInOccurrence().subTerm(), services);
         assert inst != null : "If isApplicable has been checked, this must not be null";
         if (inst.isFirst()) {
             return applyForMethods(goal, inst.getFirst(), ruleApp);

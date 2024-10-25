@@ -21,7 +21,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     private EqNonDuplicateAppFeature() {}
 
-    public boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    public boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
@@ -33,7 +33,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     }
 
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            org.key_project.ncore.sequent.PosInOccurrence newPio,
+            PosInOccurrence newPio,
             PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
     }

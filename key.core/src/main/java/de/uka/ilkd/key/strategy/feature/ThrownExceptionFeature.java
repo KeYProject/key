@@ -62,7 +62,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
     }
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return app instanceof TacletApp && filter(pos.subTerm(), goal.proof().getServices(),
+        return app instanceof TacletApp && filter((Term) pos.subTerm(), goal.proof().getServices(),
             ((TacletApp) app).instantiations().getExecutionContext());
     }
 

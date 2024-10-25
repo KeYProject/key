@@ -9,7 +9,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 
-import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -116,11 +117,11 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         return antec;
     }
 
-    private volatile org.key_project.ncore.sequent.PosInOccurrence pioCache = null;
+    private volatile PosInOccurrence pioCache = null;
 
-    public org.key_project.ncore.sequent.PosInOccurrence toPosInOccurrence() {
+    public PosInOccurrence toPosInOccurrence() {
         if (pioCache == null) {
-            org.key_project.ncore.sequent.PosInOccurrence localPioCache =
+            PosInOccurrence localPioCache =
                 new PosInOccurrence(cf, PosInTerm.getTopLevel(), antec);
             pioCache = localPioCache;
         }

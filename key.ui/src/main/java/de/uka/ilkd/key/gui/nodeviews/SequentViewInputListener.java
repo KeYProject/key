@@ -173,7 +173,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         FileOrigin origin;
         Set<FileOrigin> subtermOrigins;
 
-        Term term = pos.getPosInOccurrence().subTerm();
+        Term term = (Term) pos.getPosInOccurrence().subTerm();
         OriginTermLabel label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
 
         if (label == null) {
@@ -223,7 +223,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
             if ((mousePos != null) && !("".equals(sequentView.getHighlightedText(mousePos)))) {
 
-                Term t;
+                org.key_project.logic.Term t;
                 final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
                 if (posInOcc != null) {
                     t = posInOcc.subTerm();

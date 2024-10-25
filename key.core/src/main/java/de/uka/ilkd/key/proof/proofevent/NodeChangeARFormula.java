@@ -11,9 +11,9 @@ import org.key_project.ncore.sequent.PosInOccurrence;
  */
 public abstract class NodeChangeARFormula implements NodeChange {
 
-    final org.key_project.ncore.sequent.PosInOccurrence pos;
+    final PosInOccurrence pos;
 
-    public NodeChangeARFormula(org.key_project.ncore.sequent.PosInOccurrence p_pos) {
+    public NodeChangeARFormula(PosInOccurrence p_pos) {
         pos = p_pos;
     }
 

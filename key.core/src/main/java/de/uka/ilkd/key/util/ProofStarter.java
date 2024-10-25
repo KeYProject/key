@@ -62,7 +62,7 @@ public class ProofStarter {
         }
 
         public UserProvidedInput(Term formula, ProofEnvironment env) {
-            this(Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
+            this(Sequent.createSuccSequent((Semisequent) Semisequent.EMPTY_SEMISEQUENT
                     .insertFirst(new SequentFormula(formula)).semisequent()),
                 env);
         }

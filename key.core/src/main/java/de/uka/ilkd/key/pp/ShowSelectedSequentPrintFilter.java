@@ -4,7 +4,9 @@
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -18,14 +20,14 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     /**
      * The position of the only sub-formula to show.
      */
-    private final org.key_project.ncore.sequent.PosInOccurrence pos;
+    private final PosInOccurrence pos;
 
     /**
      * Create a new {@link ShowSelectedSequentPrintFilter}.
      *
      * @param pos the position of the only sub-formula to show.
      */
-    public ShowSelectedSequentPrintFilter(org.key_project.ncore.sequent.PosInOccurrence pos) {
+    public ShowSelectedSequentPrintFilter(PosInOccurrence pos) {
         this.pos = pos;
     }
 
@@ -71,9 +73,9 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
          */
         private final SequentFormula original;
 
-        private Entry(org.key_project.ncore.sequent.PosInOccurrence pos) {
-            filtered = new SequentFormula(pos.subTerm());
-            original = pos.sequentFormula();
+        private Entry(PosInOccurrence pos) {
+            filtered = new SequentFormula((Term) pos.subTerm());
+            original = (SequentFormula) pos.sequentFormula();
         }
 
         @Override

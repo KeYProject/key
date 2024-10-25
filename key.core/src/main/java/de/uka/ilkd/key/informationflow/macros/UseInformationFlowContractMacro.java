@@ -87,7 +87,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     @Override
     protected UseInformationFlowContractMacro.PropExpansionStrategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new UseInformationFlowContractMacro.PropExpansionStrategy(getAdmittedRuleNames());
     }
 
@@ -102,7 +102,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * @return true if rule may be applied
      */
     protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
-            org.key_project.ncore.sequent.PosInOccurrence pio,
+            PosInOccurrence pio,
             Goal goal) {
         return true;
     }
@@ -184,7 +184,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp,
-                org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             // first try to apply
             // - impLeft on previous information flow contract application
@@ -213,7 +213,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             // abort if
             // - the parent.parent rule application is an information

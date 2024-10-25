@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -12,6 +11,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ncore.sequent.PIOPathIterator;
 import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
@@ -38,7 +38,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         ;
     }
 
-    private boolean isNotSelfApplication(org.key_project.ncore.sequent.PosInOccurrence pos,
+    private boolean isNotSelfApplication(PosInOccurrence pos,
             IfFormulaInstantiation ifInst) {
         if (!(ifInst instanceof IfFormulaInstSeq)
                 || ifInst.getConstrainedFormula() != pos.sequentFormula()
