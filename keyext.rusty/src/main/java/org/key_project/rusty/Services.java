@@ -20,8 +20,9 @@ public class Services implements LogicServices {
     /**
      * proof specific namespaces (functions, predicates, sorts, variables)
      */
-    private NamespaceSet namespaces = new NamespaceSet(); // TODO ask Daniel; was final before
+    private NamespaceSet namespaces = new NamespaceSet();
     private LDTs ldts;
+    private MutRefSortManager mRefManager;
 
     private final TermFactory tf;
     private final TermBuilder tb;
@@ -43,6 +44,7 @@ public class Services implements LogicServices {
         this.tf = new TermFactory();
         this.tb = new TermBuilder(tf, this);
         counters = new LinkedHashMap<>();
+        mRefManager = new MutRefSortManager(this);
     }
 
     public Services(Profile profile) {
@@ -59,6 +61,7 @@ public class Services implements LogicServices {
         this.proof = services.proof;
         this.profile = services.profile;
         this.counters = services.counters;
+        this.mRefManager = services.mRefManager;
     }
 
     public NamespaceSet getNamespaces() {
@@ -75,6 +78,10 @@ public class Services implements LogicServices {
 
     public TermFactory getTermFactory() {
         return tf;
+    }
+
+    public MutRefSortManager getMRefManager() {
+        return mRefManager;
     }
 
     public void initLDTs() {

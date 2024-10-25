@@ -19,20 +19,6 @@ public record MatchExpression(Expr expr,ImmutableArray<MatchArm>arms)implements 
 
 @Override public int getChildCount(){return 1+arms.size();}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("match (").append(expr).append(") {\n");
-        for (int i = 0; i < arms.size(); i++) {
-            if (i > 0) sb.append(", ");
-            sb.append(arms.get(i));
-        }
-        sb.append("}");
-        return sb.toString();
-    }
+@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("match (").append(expr).append(") {\n");for(int i=0;i<arms.size();i++){if(i>0)sb.append(", ");sb.append(arms.get(i));}sb.append("}");return sb.toString();}
 
-    @Override
-    public Type type(Services services) {
-        return arms.get(0).type(services);
-    }
-}
+@Override public Type type(Services services){return arms.get(0).type(services);}}

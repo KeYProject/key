@@ -22,10 +22,7 @@ import org.key_project.rusty.ast.SchemaRustyReader;
 import org.key_project.rusty.ldt.LDT;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.*;
-import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
-import org.key_project.rusty.logic.op.sv.OperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.logic.op.sv.VariableSV;
+import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.parser.KeYRustyLexer;
 import org.key_project.rusty.parser.KeYRustyParser;
 import org.key_project.rusty.util.parsing.BuildingException;
@@ -893,6 +890,20 @@ public class ExpressionBuilder extends DefaultBuilder {
             return base;
         }
         return null;// handleAttributes(base, ctx.attribute());
+    }
+
+    public Term visitMRef_term(KeYRustyParser.MRef_termContext ctx) {
+        String borrowed = accept(ctx.simple_ident());
+        var pv = services.getNamespaces().programVariables().lookup(borrowed);
+        Place place;
+        if (pv != null) {
+            place = PVPlace.getInstance(pv);
+        } else {
+            var sv = schemaVariables().lookup(borrowed);
+            assert sv != null;
+            place = SVPlace.getInstance((ProgramSV) sv);
+        }
+        return getTermFactory().createTerm(MutRef.getInstance(place, services));
     }
 
     @Override

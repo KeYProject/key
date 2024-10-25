@@ -26,7 +26,8 @@ package recoder.util;
  *
  * <pre>
  * {@code
- * lessOrEquals(x,y)==(less(x,y) || equals(x,y))}
+ * lessOrEquals(x, y) == (less(x, y) || equals(x, y))
+ * }
  * ,
  * </pre>
  *

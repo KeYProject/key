@@ -18,16 +18,6 @@ public record InfiniteLoopExpression(@Nullable Label label,BlockExpression body)
 
 @Override public int getChildCount(){return 1;}
 
-    @Override
-    public String toString() {
-    StringBuilder sb = new StringBuilder();
-    if (label != null) sb.append(label).append(": ");
-    sb.append("loop ").append(body);
-        return sb.toString();
-    }
+@Override public String toString(){StringBuilder sb=new StringBuilder();if(label!=null)sb.append(label).append(": ");sb.append("loop ").append(body);return sb.toString();}
 
-    @Override
-    public Type type(Services services) {
-        throw new UnsupportedOperationException();
-    }
-}
+@Override public Type type(Services services){throw new UnsupportedOperationException();}}

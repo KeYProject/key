@@ -4,7 +4,6 @@
 package org.key_project.rusty.logic.op;
 
 import java.lang.ref.WeakReference;
-import java.util.Objects;
 import java.util.WeakHashMap;
 
 import org.key_project.logic.Name;
@@ -23,7 +22,7 @@ public class MutRef extends AbstractSortedOperator {
 
     private MutRef(Place p, Services services) {
         super(new Name("refM<" + p + ">"), new Sort[] {},
-            Objects.requireNonNull(services.getNamespaces().sorts().lookup("MRef_" + p.sort())),
+            services.getMRefManager().getMRefSort(p.sort()),
             Modifier.NONE);
         this.place = p;
     }

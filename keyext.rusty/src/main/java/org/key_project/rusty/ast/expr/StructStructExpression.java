@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-public record StructStructExpression(PathInExpression path, ImmutableArray<StructExprField>fields, boolean withRest)implements Expr{@Override public void visit(Visitor v){v.performActionOnFieldStructExpression(this);}
+public record StructStructExpression(PathInExpression path,ImmutableArray<StructExprField>fields,boolean withRest)implements Expr{@Override public void visit(Visitor v){v.performActionOnFieldStructExpression(this);}
 
 @Override public @NonNull SyntaxElement getChild(int n){if(n==0){return path;}return Objects.requireNonNull(fields.get(n-1));}
 
@@ -22,8 +22,4 @@ public record StructStructExpression(PathInExpression path, ImmutableArray<Struc
 
 @Override public String toString(){StringBuilder sb=new StringBuilder();sb.append(path).append(" {\n");for(int i=0;i<fields.size();i++){if(i>0){sb.append(",\n");}sb.append('\t').append(fields.get(i));if(i==fields.size()-1&&withRest){sb.append("\t..");}}sb.append('}');return sb.toString();}
 
-    @Override
-    public Type type(Services services) {
-        throw new UnsupportedOperationException();
-    }
-}
+@Override public Type type(Services services){throw new UnsupportedOperationException();}}

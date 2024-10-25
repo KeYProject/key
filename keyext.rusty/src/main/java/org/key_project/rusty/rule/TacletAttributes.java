@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-public record TacletAttributes(String displayName,  Trigger trigger) {
-}
+public record TacletAttributes(String displayName,Trigger trigger){}

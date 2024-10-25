@@ -27,75 +27,37 @@ import org.jspecify.annotations.NonNull;
  * Both line and column numbers are assumed to be 1-based. That is the first character is on line 1,
  * column 1.
  *
- * @param fileUri  The location of the resource of the Location. May be null!
+ * @param fileUri The location of the resource of the Location. May be null!
  * @param position The position in the file
  * @author Hubert Schmid
  */
 
-public record Location(URI fileUri, Position position) implements Comparable<Location> {
-    public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
+public record Location(URI fileUri,Position position)implements Comparable<Location>{public static final Location UNDEFINED=new Location(null,Position.UNDEFINED);
 
-    /**
-     * Legacy constructor for creating a new Location from a String denoting the file path and line
-     * and column number, tries to convert the path given as String into a URL.
-     *
-     * @param filename path to the resource of the Location
-     * @param position position of the Location
-     * @throws RuntimeException if the given string is null or can not be parsed to URL
-     * @deprecated Use {@link #Location(URI, Position)} instead.
-     */
-    @Deprecated
-    public static Location fromFileName(String filename, Position position) {
-        try {
-            return new Location(filename == null ? null : MiscTools.parseURL(filename).toURI(),
-                    position);
-        } catch (MalformedURLException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
+/**
+ * Legacy constructor for creating a new Location from a String denoting the file path and line
+ * and column number, tries to convert the path given as String into a URL.
+ *
+ * @param filename path to the resource of the Location
+ * @param position position of the Location
+ * @throws RuntimeException if the given string is null or can not be parsed to URL
+ * @deprecated Use {@link #Location(URI, Position)} instead.
+ */
+@Deprecated public static Location fromFileName(String filename,Position position){try{return new Location(filename==null?null:MiscTools.parseURL(filename).toURI(),position);}catch(MalformedURLException|URISyntaxException e){throw new RuntimeException(e);}}
 
-    public static Location fromToken(Token token) {
-        return new Location(MiscTools.getURIFromTokenSource(token.getTokenSource()),
-                Position.fromToken(token));
-    }
+public static Location fromToken(Token token){return new Location(MiscTools.getURIFromTokenSource(token.getTokenSource()),Position.fromToken(token));}
 
-    public Optional<URI> getFileURI() {
-        return Optional.ofNullable(fileUri);
-    }
+public Optional<URI>getFileURI(){return Optional.ofNullable(fileUri);}
 
-    public Position getPosition() {
-        return position;
-    }
+public Position getPosition(){return position;}
 
-    /**
-     * Internal string representation. Do not rely on format!
-     */
-    @Override
-    public String toString() {
-        var url = fileUri == null ? IntStream.UNKNOWN_SOURCE_NAME : fileUri.toString();
-        return "[" + url + ":" + position + "]";
-    }
+/**
+ * Internal string representation. Do not rely on format!
+ */
+@Override public String toString(){var url=fileUri==null?IntStream.UNKNOWN_SOURCE_NAME:fileUri.toString();return"["+url+":"+position+"]";}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        Location location = (Location) o;
-        return Objects.equals(fileUri, location.fileUri)
-                && Objects.equals(position, location.position);
-    }
+@Override public boolean equals(Object o){if(this==o)return true;if(o==null||getClass()!=o.getClass())return false;Location location=(Location)o;return Objects.equals(fileUri,location.fileUri)&&Objects.equals(position,location.position);}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(fileUri, position);
-    }
+@Override public int hashCode(){return Objects.hash(fileUri,position);}
 
-    @Override
-    public int compareTo(@NonNull Location o) {
-        return Comparator
-                .<Location, URI>comparing(l -> l.fileUri)
-                .thenComparing(Location::getPosition).compare(this, o);
-    }
-}
+@Override public int compareTo(@NonNull Location o){return Comparator.<Location,URI>comparing(l->l.fileUri).thenComparing(Location::getPosition).compare(this,o);}}

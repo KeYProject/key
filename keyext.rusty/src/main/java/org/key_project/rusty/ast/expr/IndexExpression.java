@@ -10,31 +10,12 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record IndexExpression(Expr base, Expr index) implements Expr {
-    @Override
-    public void visit(Visitor v) {
-        v.performActionOnIndexExpression(this);
-    }
+public record IndexExpression(Expr base,Expr index)implements Expr{@Override public void visit(Visitor v){v.performActionOnIndexExpression(this);}
 
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0) return base;
-        if (n == 1) return index;
-        throw new IndexOutOfBoundsException("IndexExpression has only 2 children: " + n);
-    }
+@Override public @NonNull SyntaxElement getChild(int n){if(n==0)return base;if(n==1)return index;throw new IndexOutOfBoundsException("IndexExpression has only 2 children: "+n);}
 
-    @Override
-    public int getChildCount() {
-        return 2;
-    }
+@Override public int getChildCount(){return 2;}
 
-    @Override
-    public String toString() {
-        return base + "[" + index + "]";
-    }
+@Override public String toString(){return base+"["+index+"]";}
 
-    @Override
-    public Type type(Services services) {
-        throw new UnsupportedOperationException();
-    }
-}
+@Override public Type type(Services services){throw new UnsupportedOperationException();}}

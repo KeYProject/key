@@ -20,16 +20,6 @@ public record IteratorLoopExpression(@Nullable Label label,Pattern pattern,Expr 
 
 @Override public int getChildCount(){int c=0;if(label!=null){++c;}return c+3;}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        if (label != null) sb.append(label).append(": ");
-        sb.append("for ").append(pattern).append(" in ").append(body);
-        return sb.toString();
-    }
+@Override public String toString(){StringBuilder sb=new StringBuilder();if(label!=null)sb.append(label).append(": ");sb.append("for ").append(pattern).append(" in ").append(body);return sb.toString();}
 
-    @Override
-    public Type type(Services services) {
-        return TupleType.UNIT;
-    }
-}
+@Override public Type type(Services services){return TupleType.UNIT;}}

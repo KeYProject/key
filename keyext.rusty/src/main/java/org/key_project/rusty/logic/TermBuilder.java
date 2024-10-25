@@ -267,8 +267,7 @@ public class TermBuilder {
     }
 
     public Term mutating(Term lhs, Term rhs) {
-        MutatingUpdate mut = MutatingUpdate.getInstance(lhs);
-        return tf.createTerm(mut, rhs);
+        return tf.createTerm(MutatingUpdate.MUTATING_UPDATE, lhs, rhs);
     }
 
     public Term skip() {

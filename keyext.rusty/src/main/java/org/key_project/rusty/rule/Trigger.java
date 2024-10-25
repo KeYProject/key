@@ -7,18 +7,8 @@ import org.key_project.logic.Term;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.util.collection.ImmutableList;
 
-public record Trigger(OperatorSV triggerVar, Term trigger, ImmutableList<Term> avoidConditions) {
-    public Trigger {
-        assert triggerVar != null;
-        assert trigger != null;
-        assert avoidConditions != null;
-    }
+public record Trigger(OperatorSV triggerVar,Term trigger,ImmutableList<Term>avoidConditions){public Trigger{assert triggerVar!=null;assert trigger!=null;assert avoidConditions!=null;}
 
-    public Term getTerm() {
-        return trigger;
-    }
+public Term getTerm(){return trigger;}
 
-    public boolean hasAvoidConditions() {
-        return !avoidConditions.isEmpty();
-    }
-}
+public boolean hasAvoidConditions(){return!avoidConditions.isEmpty();}}

@@ -19,7 +19,4 @@ public record RangeExpression(@Nullable Expr left,@Nullable Expr right,boolean i
 
 @Override public String toString(){StringBuilder sb=new StringBuilder();if(left!=null)sb.append(left);sb.append("..");if(inclusive)sb.append('=');if(right!=null)sb.append(right);return sb.toString();}
 
-    @Override
-    public Type type(Services services) {
-        throw new UnsupportedOperationException();
-    }}
+@Override public Type type(Services services){throw new UnsupportedOperationException();}}

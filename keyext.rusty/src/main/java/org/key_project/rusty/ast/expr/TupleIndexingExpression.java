@@ -16,8 +16,4 @@ public record TupleIndexingExpression(Expr base,int index)implements Expr{@Overr
 
 @Override public int getChildCount(){return 1;}
 
-@Override public String toString(){return base+"."+index;}
-    @Override
-    public Type type(Services services) {
-        throw new UnsupportedOperationException();
-    }}
+@Override public String toString(){return base+"."+index;}@Override public Type type(Services services){throw new UnsupportedOperationException();}}

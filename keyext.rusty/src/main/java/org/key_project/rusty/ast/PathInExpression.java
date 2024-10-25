@@ -12,24 +12,10 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-public record PathInExpression(ImmutableArray<PathExprSegment> segments) implements RustyProgramElement {
-    @Override
-    public void visit(Visitor v) {
-        v.performActionOnPathInExpression(this);
-    }
+public record PathInExpression(ImmutableArray<PathExprSegment>segments)implements RustyProgramElement{@Override public void visit(Visitor v){v.performActionOnPathInExpression(this);}
 
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        return Objects.requireNonNull(segments.get(n));
-    }
+@Override public @NonNull SyntaxElement getChild(int n){return Objects.requireNonNull(segments.get(n));}
 
-    @Override
-    public int getChildCount() {
-        return segments.size();
-    }
+@Override public int getChildCount(){return segments.size();}
 
-    @Override
-    public String toString() {
-        return segments.stream().map(PathExprSegment::toString).collect(Collectors.joining("::"));
-    }
-}
+@Override public String toString(){return segments.stream().map(PathExprSegment::toString).collect(Collectors.joining("::"));}}

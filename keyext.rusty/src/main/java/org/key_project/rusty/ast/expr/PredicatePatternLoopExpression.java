@@ -18,9 +18,4 @@ public record PredicatePatternLoopExpression(@Nullable Label label,Pattern patte
 
 @Override public @NonNull SyntaxElement getChild(int n){if(n==0&&label!=null){return label;}if(label!=null){--n;}if(n==0)return pattern;if(n==1)return expr;if(n==2)return body;throw new IndexOutOfBoundsException();}
 
-@Override public int getChildCount(){int c=0;if(label!=null){++c;}return c+3;}
-    @Override
-    public Type type(Services services) {
-        return TupleType.UNIT;
-    }
-}
+@Override public int getChildCount(){int c=0;if(label!=null){++c;}return c+3;}@Override public Type type(Services services){return TupleType.UNIT;}}

@@ -11,32 +11,12 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record PathExpression(Identifier var) implements Expr {
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0) {
-            return var;
-        }
-        throw new IndexOutOfBoundsException("PathExpression has only one child");
-    }
+public record PathExpression(Identifier var)implements Expr{@Override public @NonNull SyntaxElement getChild(int n){if(n==0){return var;}throw new IndexOutOfBoundsException("PathExpression has only one child");}
 
-    @Override
-    public int getChildCount() {
-        return 1;
-    }
+@Override public int getChildCount(){return 1;}
 
-    @Override
-    public String toString() {
-        return var.toString();
-    }
+@Override public String toString(){return var.toString();}
 
-    @Override
-    public void visit(Visitor v) {
-        throw new RuntimeException("Shouldn't be called");
-    }
+@Override public void visit(Visitor v){throw new RuntimeException("Shouldn't be called");}
 
-    @Override
-    public Type type(Services services) {
-        throw new UnsupportedOperationException();
-    }
-}
+@Override public Type type(Services services){throw new UnsupportedOperationException();}}

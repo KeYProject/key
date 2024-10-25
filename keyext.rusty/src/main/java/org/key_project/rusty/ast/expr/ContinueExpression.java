@@ -19,9 +19,4 @@ public record ContinueExpression(@Nullable Label label,@Nullable Expr expr)imple
 
 @Override public int getChildCount(){int c=0;if(label!=null){++c;}if(expr!=null){++c;}return c;}
 
-@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("continue");if(label!=null){sb.append(" ").append(label);}if(expr!=null){sb.append(" ").append(expr);}sb.append(";");return sb.toString();}
-    @Override
-    public Type type(Services services) {
-        return TupleType.UNIT;
-    }
-}
+@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("continue");if(label!=null){sb.append(" ").append(label);}if(expr!=null){sb.append(" ").append(expr);}sb.append(";");return sb.toString();}@Override public Type type(Services services){return TupleType.UNIT;}}

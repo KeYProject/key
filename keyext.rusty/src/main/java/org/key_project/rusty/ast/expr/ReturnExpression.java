@@ -11,37 +11,12 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record ReturnExpression(@Nullable Expr expr) implements Expr {
-    @Override
-    public void visit(Visitor v) {
-        v.performActionOnReturnExpression(this);
-    }
+public record ReturnExpression(@Nullable Expr expr)implements Expr{@Override public void visit(Visitor v){v.performActionOnReturnExpression(this);}
 
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0 && expr != null) {return expr;}
-        throw new IndexOutOfBoundsException("ReturnExpression has only " + getChildCount() + " children");
-    }
+@Override public @NonNull SyntaxElement getChild(int n){if(n==0&&expr!=null){return expr;}throw new IndexOutOfBoundsException("ReturnExpression has only "+getChildCount()+" children");}
 
-    @Override
-    public int getChildCount() {
-        int c =0;
-        if (expr != null) {++c;}
-        return c;
-    }
+@Override public int getChildCount(){int c=0;if(expr!=null){++c;}return c;}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("return");
-        if (expr != null) {
-            sb.append(" ").append(expr);
-        }
-        return sb.toString();
-    }
+@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("return");if(expr!=null){sb.append(" ").append(expr);}return sb.toString();}
 
-    @Override
-    public Type type(Services services) {
-        throw new UnsupportedOperationException();
-    }
-}
+@Override public Type type(Services services){throw new UnsupportedOperationException();}}

@@ -20,3 +20,15 @@ varexpId
 
 elementary_update_term: a=mutating_update_term (ASSIGN b=mutating_update_term)?;
 mutating_update_term: a=equivalence_term (MUTATE b=equivalence_term)?;
+
+primitive_term:
+    termParen
+  | ifThenElseTerm
+  | ifExThenElseTerm
+  | abbreviation
+  | accessterm
+  | mRef_term
+  | literals
+  ;
+
+mRef_term : REF_M LESS simple_ident GREATER;

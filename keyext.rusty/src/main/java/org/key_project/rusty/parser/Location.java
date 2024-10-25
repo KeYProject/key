@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser;
 
-public record Location() {
-}
+public record Location(){}

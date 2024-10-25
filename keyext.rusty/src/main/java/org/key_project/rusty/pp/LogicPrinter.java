@@ -437,7 +437,9 @@ public class LogicPrinter {
      * the format is like
      *
      * <pre>
-     * {@code p & q}
+     * {@code
+     * p & q
+     * }
      * </pre>
      * <p>
      * The subterms are printed using {@link #printTermContinuingBlock(Term)}.

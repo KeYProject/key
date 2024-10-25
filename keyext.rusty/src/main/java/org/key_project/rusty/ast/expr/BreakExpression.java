@@ -21,9 +21,6 @@ public record BreakExpression(@Nullable Label label,@Nullable Expr expr)implemen
 
 @Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("break");if(label!=null){sb.append(" ").append(label);}if(expr!=null){sb.append(" ").append(expr);}sb.append(";");return sb.toString();}
 
-    @Override
-    public Type type(Services services) {
-    // Is it never?
-         return TupleType.UNIT;
-    }
-}
+@Override public Type type(Services services){
+// Is it never?
+return TupleType.UNIT;}}
