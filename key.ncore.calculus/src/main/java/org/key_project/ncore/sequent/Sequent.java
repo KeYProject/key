@@ -13,9 +13,15 @@ import org.jspecify.annotations.NonNull;
  * Subclasses must add {@code create} methods
  */
 public abstract class Sequent implements Iterable<SequentFormula> {
-    private final Semisequent antecedent;
 
+    private final Semisequent antecedent;
     private final Semisequent succedent;
+
+    /** used by NILSequent implementations */
+    protected Sequent(Semisequent emptySemisequent) {
+        this.antecedent = emptySemisequent;
+        this.succedent = emptySemisequent;
+    }
 
     /** creates new Sequent with antecedence and succedence */
     protected Sequent(Semisequent antecedent, Semisequent succedent) {

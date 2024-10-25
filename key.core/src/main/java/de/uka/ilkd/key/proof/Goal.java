@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

@@ -18,7 +18,7 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
     private final ImmutableList<SequentFormula> seqList;
 
     /** used by inner class Empty */
-    private Semisequent() {
+    protected Semisequent() {
         seqList = ImmutableSLList.nil();
     }
 

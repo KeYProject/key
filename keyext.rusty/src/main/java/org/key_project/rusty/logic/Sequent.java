@@ -60,8 +60,7 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent {
      *
      */
     private Sequent() {
-        super(Semisequent.EMPTY_SEMISEQUENT,
-            Semisequent.EMPTY_SEMISEQUENT);
+        super(Semisequent.EMPTY_SEMISEQUENT);
     }
 
     /** creates new Sequent with antecedence and succedence */

@@ -16,7 +16,7 @@ public class Semisequent extends org.key_project.ncore.sequent.Semisequent {
 
     /** used by inner class Empty */
     private Semisequent() {
-        super(ImmutableSLList.nil());
+        super();
     }
 
     /**

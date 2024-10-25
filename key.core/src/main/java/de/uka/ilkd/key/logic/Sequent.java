@@ -23,9 +23,9 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#createSuccSequent} or by inserting formulas directly into
  * {@link Sequent#EMPTY_SEQUENT}.
  */
-public class Sequent implements Iterable<SequentFormula> {
+public class Sequent extends org.key_project.ncore.sequent.Sequent {
 
-    public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
+    public static final Sequent EMPTY_SEQUENT = new NILSequent();
 
     /**
      * creates a new Sequent with empty succedent
@@ -69,174 +69,27 @@ public class Sequent implements Iterable<SequentFormula> {
         }
         return new Sequent(Semisequent.EMPTY_SEMISEQUENT, succ);
     }
-
-    private final Semisequent antecedent;
-
-    private final Semisequent succedent;
-
     /**
      * must only be called by NILSequent
      *
      */
     private Sequent() {
-        antecedent = Semisequent.EMPTY_SEMISEQUENT;
-        succedent = Semisequent.EMPTY_SEMISEQUENT;
+        super(Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
     }
 
     /** creates new Sequent with antecedence and succedence */
     private Sequent(Semisequent antecedent, Semisequent succedent) {
-        assert !antecedent.isEmpty() || !succedent.isEmpty();
-        this.antecedent = antecedent;
-        this.succedent = succedent;
+        super(antecedent, succedent);
     }
 
-    /**
-     * adds a formula to the antecedent (or succedent) of the sequent. Depending on the value of
-     * first the formulas are inserted at the beginning or end of the ante-/succedent.
-     * (NOTICE:Sequent determines index using identy (==) not equality.)
-     *
-     * @param cf the SequentFormula to be added
-     * @param antec boolean selecting the correct semisequent where to insert the formulas. If set
-     *        to true, the antecedent is taken otherwise the succedent.
-     * @param first boolean if true the formula is added at the beginning of the ante-/succedent,
-     *        otherwise to the end
-     * @return a SequentChangeInfo which contains the new sequent and information which formulas
-     *         have been added or removed
-     */
-    public SequentChangeInfo addFormula(SequentFormula cf, boolean antec, boolean first) {
-
-        final Semisequent seq = antec ? antecedent : succedent;
-
-        final SemisequentChangeInfo semiCI = first ? seq.insertFirst(cf) : seq.insertLast(cf);
-
-        return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-            composeSequent(antec, semiCI.semisequent()), this);
+    @Override
+    public Semisequent succedent() {
+        return (Semisequent) super.succedent();
     }
 
-    /**
-     * adds a formula to the sequent at the given position. (NOTICE:Sequent determines index using
-     * identy (==) not equality.)
-     *
-     * @param cf a SequentFormula to be added
-     * @param p a PosInOccurrence describes position in the sequent
-     * @return a SequentChangeInfo which contains the new sequent and information which formulas
-     *         have been added or removed
-     */
-    public SequentChangeInfo addFormula(SequentFormula cf, PosInOccurrence p) {
-        final Semisequent seq = getSemisequent(p);
-
-        final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.sequentFormula()), cf);
-
-        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
-    }
-
-    /**
-     * adds list of formulas to the antecedent (or succedent) of the sequent. Depending on the value
-     * of first the formulas are inserted at the beginning or end of the ante-/succedent.
-     * (NOTICE:Sequent determines index using identity (==) not equality.)
-     *
-     * @param insertions the IList<SequentFormula> to be added
-     * @param antec boolean selecting the correct semisequent where to insert the formulas. If set
-     *        to true, the antecedent is taken otherwise the succedent.
-     * @param first boolean if true the formulas are added at the beginning of the ante-/succedent,
-     *        otherwise to the end
-     * @return a SequentChangeInfo which contains the new sequent and information which formulas
-     *         have been added or removed
-     */
-    public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions, boolean antec,
-            boolean first) {
-
-        final Semisequent seq = antec ? antecedent : succedent;
-
-        final SemisequentChangeInfo semiCI =
-            first ? seq.insertFirst(insertions) : seq.insertLast(insertions);
-
-        return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-            composeSequent(antec, semiCI.semisequent()), this);
-    }
-
-    /**
-     * adds the formulas of list insertions to the sequent starting at position p. (NOTICE:Sequent
-     * determines index using identy (==) not equality.)
-     *
-     * @param insertions a IList<SequentFormula> with the formulas to be added
-     * @param p the PosInOccurrence describing the position where to insert the formulas
-     * @return a SequentChangeInfo which contains the new sequent and information which formulas
-     *         have been added or removed
-     */
-    public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions,
-            PosInOccurrence p) {
-        final Semisequent seq = getSemisequent(p);
-
-        final SemisequentChangeInfo semiCI =
-            seq.insert(seq.indexOf(p.sequentFormula()), insertions);
-
-        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
-    }
-
-    /**
-     * Replace a formula at the specified index.
-     *
-     * @param formulaNr where to replace the formula
-     * @param replacement the new sequent formula
-     * @return a SequentChangeInfo which contains the new sequent and information which formulas
-     *         have been added or removed
-     */
-    public SequentChangeInfo replaceFormula(int formulaNr, SequentFormula replacement) {
-        checkFormulaIndex(formulaNr);
-        formulaNr--;
-        boolean inAntec = formulaNr < antecedent.size();
-
-        Semisequent seq = inAntec ? antecedent : succedent;
-        int idx = inAntec ? formulaNr : formulaNr - antecedent.size();
-
-        final SemisequentChangeInfo semiCI = seq.replace(idx, replacement);
-
-        return SequentChangeInfo.createSequentChangeInfo(inAntec, semiCI,
-            composeSequent(inAntec, semiCI.semisequent()), this);
-    }
-
-    /** returns semisequent of the antecedent to work with */
+    @Override
     public Semisequent antecedent() {
-        return antecedent;
-    }
-
-    /**
-     * replaces the formula at the given position with another one (NOTICE:Sequent determines index
-     * using identity (==) not equality.)
-     *
-     * @param newCF the SequentFormula replacing the old one
-     * @param p a PosInOccurrence describes position in the sequent
-     * @return a SequentChangeInfo which contains the new sequent and information which formulas
-     *         have been added or removed
-     */
-    public SequentChangeInfo changeFormula(SequentFormula newCF, PosInOccurrence p) {
-        final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, newCF);
-
-        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
-    }
-
-    /**
-     * replaces the formula at position p with the head of the given list and adds the remaining
-     * list elements to the sequent (NOTICE:Sequent determines index using identity (==) not
-     * equality.)
-     *
-     * @param replacements the IList<SequentFormula> whose head replaces the formula at position p
-     *        and adds the rest of the list behind the changed formula
-     * @param p a PosInOccurrence describing the position of the formula to be replaced
-     * @return a SequentChangeInfo which contains the new sequent and information which formulas
-     *         have been added or removed
-     */
-    public SequentChangeInfo changeFormula(ImmutableList<SequentFormula> replacements,
-            PosInOccurrence p) {
-
-        final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, replacements);
-
-        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
-            semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+        return (Semisequent) super.antecedent();
     }
 
     /**
@@ -247,7 +100,9 @@ public class Sequent implements Iterable<SequentFormula> {
      * @param semiSeq the {@link Semisequent} to use
      * @return the resulting sequent
      */
-    private Sequent composeSequent(boolean antec, Semisequent semiSeq) {
+    private Sequent composeSequent(boolean antec, org.key_project.ncore.sequent.Semisequent semiSeq) {
+        final var antecedent = antecedent();
+        final var succedent = succedent();
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent.isEmpty()) {
                 return EMPTY_SEQUENT;
@@ -259,8 +114,8 @@ public class Sequent implements Iterable<SequentFormula> {
         if ((antec && semiSeq == antecedent) || (!antec && semiSeq == succedent)) {
             return this;
         }
-
-        return new Sequent(antec ? semiSeq : antecedent, antec ? succedent : semiSeq);
+        final Semisequent semiSequent = (Semisequent) semiSeq;
+        return new Sequent(antec ? semiSequent : antecedent, antec ? succedent : semiSequent);
     }
 
     /**
@@ -269,7 +124,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * @return true iff the sequent consists of two instances of Semisequent.EMPTY_SEMISEQUENT
      */
     public boolean isEmpty() {
-        return antecedent.isEmpty() && succedent.isEmpty();
+        return antecedent().isEmpty() && succedent().isEmpty();
     }
 
     @Override
@@ -424,8 +279,6 @@ public class Sequent implements Iterable<SequentFormula> {
     }
 
     private static final class NILSequent extends Sequent {
-        private static final NILSequent INSTANCE = new NILSequent();
-
         private NILSequent() {
         }
 
