@@ -62,8 +62,8 @@ subprojects {
     version = rootProject.version
 
     java {
-        sourceCompatibility = 17
-        targetCompatibility = 17
+        sourceCompatibility = 21
+        targetCompatibility = 21
     }
 
     repositories {
@@ -100,8 +100,8 @@ subprojects {
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-        // Setting the release to Java 17
-        options.release = 17
+        // Setting the release to Java 21
+        options.release = 21
     }
 
     tasks.withType(Javadoc) {
@@ -109,9 +109,7 @@ subprojects {
         options.addBooleanOption 'Xdoclint:none', true
         //options.verbose()
         options.encoding = 'UTF-8'
-        if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
-        }
+        options.addBooleanOption('html5', true)
     }
 
     tasks.withType(Test) {//Configure all tests
