@@ -53,12 +53,13 @@ public class Semisequent extends org.key_project.ncore.sequent.Semisequent {
 
     @Override
     protected boolean equalsModRenaming(org.key_project.ncore.sequent.SequentFormula sf1,
-                                        org.key_project.ncore.sequent.SequentFormula sf2) {
+            org.key_project.ncore.sequent.SequentFormula sf2) {
         return RENAMING_TERM_PROPERTY.equalsModThisProperty(sf1.formula(), sf2.formula());
     }
 
     @Override
-    protected SemisequentChangeInfo createSemisequentChangeInfo(ImmutableList<org.key_project.ncore.sequent.SequentFormula> seqList) {
+    protected SemisequentChangeInfo createSemisequentChangeInfo(
+            ImmutableList<org.key_project.ncore.sequent.SequentFormula> seqList) {
         return null;
     }
 
@@ -83,7 +84,8 @@ public class Semisequent extends org.key_project.ncore.sequent.Semisequent {
      * creates a new Semisequent with the Semisequent elements in seqList
      */
     public Semisequent(SequentFormula seqFormula) {
-        super(ImmutableSLList.<org.key_project.ncore.sequent.SequentFormula>nil().append(seqFormula));
+        super(
+            ImmutableSLList.<org.key_project.ncore.sequent.SequentFormula>nil().append(seqFormula));
     }
 
     // inner class used to represent an empty semisequent

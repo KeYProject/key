@@ -6,9 +6,9 @@ package de.uka.ilkd.key.logic.equality;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.JavaBlock;
-
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -83,8 +83,8 @@ public class RenamingTermProperty implements Property<Term> {
      * @param cmpBoundVars variables bound above the current position
      */
     private static boolean compareBoundVariables(QuantifiableVariable ownVar,
-                                                 QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
-                                                 ImmutableList<QuantifiableVariable> cmpBoundVars) {
+            QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars) {
 
         final int ownNum = indexOf(ownVar, ownBoundVars);
         final int cmpNum = indexOf(cmpVar, cmpBoundVars);
