@@ -4,6 +4,8 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.visitor.Visitor;
 
@@ -38,5 +40,8 @@ public record IfLetExpression(Pattern pattern, Expr expr, BlockExpression then, 
             if (elseExpr != null) sb.append(" else ").append(elseExpr);
             return sb.toString();
         }
-
+    @Override
+    public Type type(Services services) {
+        return then.type(services);
+    }
 }

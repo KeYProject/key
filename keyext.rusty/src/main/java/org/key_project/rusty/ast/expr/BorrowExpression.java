@@ -4,6 +4,9 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.ReferenceType;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -14,4 +17,10 @@ public record BorrowExpression(boolean isDouble,boolean mut,Expr expr)implements
 
 @Override public int getChildCount(){return 1;}
 
-@Override public String toString(){StringBuilder sb=new StringBuilder();if(isDouble){sb.append("&&");}else{sb.append("&");}if(mut)sb.append("mut");sb.append(" ");sb.append(expr);return sb.toString();}}
+@Override public String toString(){StringBuilder sb=new StringBuilder();if(isDouble){sb.append("&&");}else{sb.append("&");}if(mut)sb.append("mut");sb.append(" ");sb.append(expr);return sb.toString();}
+
+    @Override
+    public Type type(Services services) {
+        return ReferenceType.get(expr.type(services), mut);
+    }
+}

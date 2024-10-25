@@ -4,7 +4,10 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Label;
+import org.key_project.rusty.ast.abstraction.TupleType;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -36,5 +39,10 @@ public record PredicateLoopExpression(@Nullable Label label, Expr pred, BlockExp
         if (label != null) sb.append(label).append(": ");
         sb.append("while ").append(pred).append(' ').append(body);
         return sb.toString();
+    }
+
+    @Override
+    public Type type(Services services) {
+        return TupleType.UNIT;
     }
 }

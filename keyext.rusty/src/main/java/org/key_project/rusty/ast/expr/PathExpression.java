@@ -4,7 +4,9 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Identifier;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -31,5 +33,10 @@ public record PathExpression(Identifier var) implements Expr {
     @Override
     public void visit(Visitor v) {
         throw new RuntimeException("Shouldn't be called");
+    }
+
+    @Override
+    public Type type(Services services) {
+        throw new UnsupportedOperationException();
     }
 }

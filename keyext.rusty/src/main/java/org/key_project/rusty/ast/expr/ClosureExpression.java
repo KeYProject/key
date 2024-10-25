@@ -4,6 +4,8 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableArray;
@@ -17,4 +19,9 @@ public record ClosureExpression(boolean move, ImmutableArray<ClosureParam>params
 
 @Override public int getChildCount(){return params.size()+1 + (ty != null ? 1 : 0);}
 
-@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("|");for(int i=0;i<params.size();i++){if(i>0){sb.append(", ");}sb.append(params.get(i));}sb.append("|");if(ty!=null){sb.append(" -> ").append(ty);}sb.append(body);return sb.toString();}}
+@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("|");for(int i=0;i<params.size();i++){if(i>0){sb.append(", ");}sb.append(params.get(i));}sb.append("|");if(ty!=null){sb.append(" -> ").append(ty);}sb.append(body);return sb.toString();}
+    @Override
+    public Type type(Services services) {
+        throw new UnsupportedOperationException();
+    }
+}

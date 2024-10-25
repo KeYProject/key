@@ -10,6 +10,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.abstraction.PrimitiveType;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.RustType;
@@ -22,8 +24,19 @@ public abstract class ProgramSVSort extends SortImpl {
     // ----------- Types of Expression Program SVs ----------------------------
     public static final ProgramSVSort LEFT_HAND_SIDE = new LeftHandSideSort();
     public static final ProgramSVSort VARIABLE = new ProgramVariableSort();
+    // TODO: remove
     public static final ProgramSVSort U32Variable = new SortedVariableSort("u32");
     public static final ProgramSVSort SIMPLE_EXPRESSION = new SimpleExpressionSort();
+    public static final ProgramSVSort SIMPLE_EXPRESSION_U8 =
+        new TypedSimpleExpressionSort(PrimitiveType.U8);
+    public static final ProgramSVSort SIMPLE_EXPRESSION_U16 =
+        new TypedSimpleExpressionSort(PrimitiveType.U16);
+    public static final ProgramSVSort SIMPLE_EXPRESSION_U32 =
+        new TypedSimpleExpressionSort(PrimitiveType.U32);
+    public static final ProgramSVSort SIMPLE_EXPRESSION_U64 =
+        new TypedSimpleExpressionSort(PrimitiveType.U64);
+    public static final ProgramSVSort SIMPLE_EXPRESSION_U128 =
+        new TypedSimpleExpressionSort(PrimitiveType.U128);
     public static final ProgramSVSort NON_SIMPLE_EXPRESSION = new NonSimpleExpressionSort();
     public static final ProgramSVSort EXPRESSION = new ExpressionSort();
     public static final ProgramSVSort BLOCK_EXPRESSION = new BlockExpressionSort();
@@ -276,6 +289,21 @@ public abstract class ProgramSVSort extends SortImpl {
         public boolean canStandFor(RustyProgramElement check, Services services) {
             return NON_SIMPLE_EXPRESSION.canStandFor(check, services)
                     && BOOL_EXPRESSION.canStandFor(check, services);
+        }
+    }
+
+    private static class TypedSimpleExpressionSort extends SimpleExpressionSort {
+        private final Type type;
+
+        public TypedSimpleExpressionSort(PrimitiveType type) {
+            super(new Name("Rust" + type.toString().toUpperCase() + "Expression"));
+            this.type = type;
+        }
+
+        @Override
+        public boolean canStandFor(RustyProgramElement check, Services services) {
+            return super.canStandFor(check, services) && check instanceof Expr e
+                    && e.type(services) == type;
         }
     }
 }

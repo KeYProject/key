@@ -10,6 +10,7 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.ProgramConstruct;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
@@ -202,5 +203,10 @@ public final class ProgramSV extends OperatorSV
             return false;
         }
         return ((ProgramSVSort) sort()).canStandFor(match, services);
+    }
+
+    @Override
+    public Type type(Services services) {
+        throw new UnsupportedOperationException();
     }
 }

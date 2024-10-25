@@ -4,6 +4,8 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -14,4 +16,8 @@ public record TupleIndexingExpression(Expr base,int index)implements Expr{@Overr
 
 @Override public int getChildCount(){return 1;}
 
-@Override public String toString(){return base+"."+index;}}
+@Override public String toString(){return base+"."+index;}
+    @Override
+    public Type type(Services services) {
+        throw new UnsupportedOperationException();
+    }}

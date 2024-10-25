@@ -9,8 +9,10 @@ import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.rule.MatchConditions;
@@ -58,5 +60,10 @@ public class ProgramVariable extends AbstractSortedOperator implements Expr, Upd
     @Override
     public void visit(Visitor v) {
         v.performActionOnProgramVariable(this);
+    }
+
+    @Override
+    public Type type(Services services) {
+        return type.getRustyType();
     }
 }

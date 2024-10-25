@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.TupleType;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.ExtList;
 
@@ -78,4 +81,8 @@ public final class AssignmentExpression implements Expr {
         return Objects.hash(lhs, rhs);
     }
 
+    @Override
+    public Type type(Services services) {
+        return TupleType.UNIT;
+    }
 }
