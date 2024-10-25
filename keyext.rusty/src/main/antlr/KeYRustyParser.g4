@@ -17,3 +17,6 @@ varexpId
  | NEW_DEPENDING_ON
  | NEW
  ;
+
+elementary_update_term: a=mutating_update_term (ASSIGN b=mutating_update_term)?;
+mutating_update_term: a=equivalence_term (MUTATE b=equivalence_term)?;

@@ -122,6 +122,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         return a;
     }
 
+    public Term visitMutating_update_term(KeYRustyParser.Mutating_update_termContext ctx) {
+        Term a = accept(ctx.a);
+        Term b = accept(ctx.b);
+        if (b != null) {
+            return getServices().getTermBuilder().mutating(a, b);
+        }
+        return a;
+    }
+
     @Override
     public Term visitEquivalence_term(KeYRustyParser.Equivalence_termContext ctx) {
         Term a = accept(ctx.a);
@@ -840,7 +849,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * Handles "[sort]::a.name.or.something.else"
      *
      * @param ctx
-     * @return a Term or an operator, depending the referenced object.
+     * @return a Term or an operator, depending on the referenced object.
      */
     @Override
     public Object visitFuncpred_name(KeYRustyParser.Funcpred_nameContext ctx) {
