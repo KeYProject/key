@@ -687,19 +687,23 @@ public class Converter {
     }
 
     private Pattern convertRangeInclusivePattern(RustyParser.RangeInclusivePatternContext ctx) {
-        throw new IllegalArgumentException("TODO @ TR");
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Inclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
     }
 
     private Pattern convertRangeFromPattern(RustyParser.RangeFromPatternContext ctx) {
-        throw new IllegalArgumentException("TODO @ TR");
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound()),
+            RangePattern.Bounds.Exclusive, null);
     }
 
     private Pattern convertRangeToInclusivePattern(RustyParser.RangeToInclusivePatternContext ctx) {
-        throw new IllegalArgumentException("TODO @ TR");
+        return new RangePattern(null,
+            RangePattern.Bounds.Inclusive, convertRangePatternBound(ctx.rangePatternBound()));
     }
 
     private Pattern convertObsoleteRangePattern(RustyParser.ObsoleteRangePatternContext ctx) {
-        throw new IllegalArgumentException("TODO @ TR");
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Obsolete, convertRangePatternBound(ctx.rangePatternBound(1)));
     }
 
     private Expr convertRangePatternBound(RustyParser.RangePatternBoundContext ctx) {

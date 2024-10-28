@@ -795,7 +795,7 @@ public class SchemaConverter {
     }
 
     private Pattern convertRangePattern(
-            org.key_project.rusty.parsing.RustySchemaParser.RangePatternContext ctx) {
+            RustySchemaParser.RangePatternContext ctx) {
         if (ctx.rangeExclusivePattern() != null)
             return convertRangeExclusivePattern(ctx.rangeExclusivePattern());
         if (ctx.rangeInclusivePattern() != null)
@@ -810,33 +810,37 @@ public class SchemaConverter {
     }
 
     private Pattern convertRangeExclusivePattern(
-            org.key_project.rusty.parsing.RustySchemaParser.RangeExclusivePatternContext ctx) {
+            RustySchemaParser.RangeExclusivePatternContext ctx) {
         return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
             RangePattern.Bounds.Exclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
     }
 
     private Pattern convertRangeInclusivePattern(
-            org.key_project.rusty.parsing.RustySchemaParser.RangeInclusivePatternContext ctx) {
-        throw new IllegalArgumentException("TODO @ TR");
+            RustySchemaParser.RangeInclusivePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Inclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
     }
 
     private Pattern convertRangeFromPattern(
-            org.key_project.rusty.parsing.RustySchemaParser.RangeFromPatternContext ctx) {
-        throw new IllegalArgumentException("TODO @ TR");
+            RustySchemaParser.RangeFromPatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound()),
+            RangePattern.Bounds.Exclusive, null);
     }
 
     private Pattern convertRangeToInclusivePattern(
-            org.key_project.rusty.parsing.RustySchemaParser.RangeToInclusivePatternContext ctx) {
-        throw new IllegalArgumentException("TODO @ TR");
+            RustySchemaParser.RangeToInclusivePatternContext ctx) {
+        return new RangePattern(null,
+            RangePattern.Bounds.Inclusive, convertRangePatternBound(ctx.rangePatternBound()));
     }
 
     private Pattern convertObsoleteRangePattern(
-            org.key_project.rusty.parsing.RustySchemaParser.ObsoleteRangePatternContext ctx) {
-        throw new IllegalArgumentException("TODO @ TR");
+            RustySchemaParser.ObsoleteRangePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Obsolete, convertRangePatternBound(ctx.rangePatternBound(1)));
     }
 
     private Expr convertRangePatternBound(
-            org.key_project.rusty.parsing.RustySchemaParser.RangePatternBoundContext ctx) {
+            RustySchemaParser.RangePatternBoundContext ctx) {
         if (ctx.schemaVariable() != null) {
             return (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
         }
