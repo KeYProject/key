@@ -40,10 +40,10 @@ static def getDate() {
 }
 
 // The $BUILD_NUMBER is an environment variable set by Jenkins.
-def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
+def build = System.env.BUILD_NUMBER == null ? "-dev" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key-project"
-version = "2.13.0$build"
+version = "2.12.4$build"
 
 subprojects {
     apply plugin: "java"
