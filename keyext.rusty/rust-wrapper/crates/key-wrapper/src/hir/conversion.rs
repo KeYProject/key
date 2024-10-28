@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use rustc_hir as hir;
-use rustc_middle::{hir::map::Map, query::Key, ty::TyCtxt};
+use rustc_middle::ty::TyCtxt;
 use rustc_span::{
     def_id::{DefIndex as HirDefIndex, LocalDefId as HirLocalDefId},
     symbol::Ident as HirIdent,
@@ -179,8 +179,8 @@ impl<'hir> FromHir<'hir, hir::def::Res> for Res {
                 is_trait_impl,
             } => Self::SelfTyAlias {
                 alias_to: (&alias_to).into(),
-                forbid_generic: forbid_generic,
-                is_trait_impl: is_trait_impl,
+                forbid_generic,
+                is_trait_impl,
             },
             rustc_hir::def::Res::SelfCtor(def_id) => Self::SelfCtor((&def_id).into()),
             rustc_hir::def::Res::Local(id) => Self::Local(id.into()),
