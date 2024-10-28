@@ -32,7 +32,7 @@ public record IfExpression(Expr condition, ThenBranch thenExpr, @Nullable ElseBr
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("if ").append(condition).append(thenExpr);
+        sb.append("if ").append(condition).append(" ").append(thenExpr);
         if (elseExpr != null) sb.append(" else ").append(elseExpr);
         return sb.toString();
     }
