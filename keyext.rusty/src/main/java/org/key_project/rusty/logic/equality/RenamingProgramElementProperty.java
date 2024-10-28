@@ -110,7 +110,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             if (next instanceof IdentPattern ip) {
                 hashCode = 31 * hashCode + (ip.isMutable() ? 1 : 0);
                 hashCode = 31 * hashCode + (ip.isReference() ? 1 : 0);
-                absMap.add(((Identifier) ip.getChild(0)).name());
+                absMap.add(ip.name());
             } else if (next instanceof ProgramVariable || next instanceof Identifier) {
                 Name name =
                     next instanceof ProgramVariable pv ? pv.name() : ((Identifier) next).name();
@@ -189,9 +189,7 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
 
         // Once Rust programs are parsed with the Rust Parser, this should be changed to not just
         // use the name of the Identifier
-        Name ipName = ((Identifier) ip.getChild(0)).name();
-        Name otherName = ((Identifier) other.getChild(0)).name();
-        nat.add(ipName, otherName);
+        nat.add(ip.name(), other.name());
         return true;
     }
 
