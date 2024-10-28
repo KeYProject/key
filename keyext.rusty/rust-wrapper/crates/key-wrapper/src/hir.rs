@@ -4,12 +4,14 @@ use expr::*;
 use item::*;
 use pat::*;
 use stmt::*;
+use ty::*;
 
 pub mod conversion;
 pub mod expr;
 pub mod item;
 pub mod pat;
 pub mod stmt;
+pub mod ty;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Crate {
@@ -17,7 +19,7 @@ pub struct Crate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct Symbol(pub u32);
+pub struct Symbol(String);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct BytePos(pub u32);
@@ -221,16 +223,16 @@ pub enum NonMacroAttrKind {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum PrimHirTy {
-    Int(IntHirTy),
-    Uint(UintHirTy),
-    Float(FloatHirTy),
+    Int(IntTy),
+    Uint(UintTy),
+    Float(FloatTy),
     Str,
     Bool,
     Char,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub enum IntHirTy {
+pub enum IntTy {
     Isize,
     I8,
     I16,
@@ -240,7 +242,7 @@ pub enum IntHirTy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub enum UintHirTy {
+pub enum UintTy {
     Usize,
     U8,
     U16,
@@ -250,7 +252,7 @@ pub enum UintHirTy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub enum FloatHirTy {
+pub enum FloatTy {
     F16,
     F32,
     F64,

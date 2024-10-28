@@ -1,5 +1,7 @@
+use std::collections::HashMap;
+
 use rustc_hir as hir;
-use rustc_middle::{hir::map::Map, ty::TyCtxt};
+use rustc_middle::{hir::map::Map, query::Key, ty::TyCtxt};
 use rustc_span::{
     def_id::{DefIndex as HirDefIndex, LocalDefId as HirLocalDefId},
     symbol::Ident as HirIdent,
@@ -12,8 +14,13 @@ pub fn convert(tcx: TyCtxt<'_>) -> Crate {
     let hir = tcx.hir();
     let m = hir.root_module();
     Crate {
-        top_mod: m.hir_into(hir),
+        top_mod: m.hir_into(tcx),
     }
+}
+
+pub struct ConversionCtxt<'tcx> {
+    pub types: HashMap<HirId, Ty>,
+    pub tcx: TyCtxt<'tcx>,
 }
 
 /// Allows translating from `T` to `Self`, where `T` is a HIR structure. Since
@@ -25,7 +32,7 @@ where
     /// Translate from `value` to `Self`, where `T` is a HIR structure. Since
     /// some structures reference bodies, we require access to the HIR via
     /// `hir`.
-    fn from_hir(value: T, hir: Map<'hir>) -> Self;
+    fn from_hir(value: T, tcx: TyCtxt<'hir>) -> Self;
 }
 
 /// Allows translating from `Self` to `T`, where `Self` is a HIR structure.
@@ -39,26 +46,27 @@ where
     /// Translate from `self` to `T`, where `self` is a HIR structure. Since
     /// some structures reference bodies, we require access to the HIR via
     /// `hir`.
-    fn hir_into(self, hir: Map<'hir>) -> T;
+    fn hir_into(self, tcx: TyCtxt<'hir>) -> T;
 }
 
 impl<'hir, T, U> HirInto<'hir, U> for T
 where
     U: FromHir<'hir, T>,
+    T: std::fmt::Debug,
 {
-    fn hir_into(self, hir: Map<'hir>) -> U {
-        U::from_hir(self, hir)
+    fn hir_into(self, tcx: TyCtxt<'hir>) -> U {
+        U::from_hir(self, tcx)
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Mod<'hir>> for Mod {
-    fn from_hir(value: &'hir hir::Mod<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Mod<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Mod {
             spans: value.spans.into(),
             items: value
                 .item_ids
                 .iter()
-                .map(|id| hir.item(*id).hir_into(hir))
+                .map(|id| tcx.hir().item(*id).hir_into(tcx))
                 .collect(),
         }
     }
@@ -105,11 +113,11 @@ impl From<HirDefIndex> for DefIndex {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Item<'hir>> for Item {
-    fn from_hir(value: &'hir hir::Item<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Item<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Item {
             ident: value.ident.into(),
             owner_id: value.owner_id.into(),
-            kind: (&value.kind).hir_into(hir),
+            kind: (&value.kind).hir_into(tcx),
             span: value.span.into(),
             vis_span: value.vis_span.into(),
         }
@@ -127,13 +135,13 @@ impl From<HirIdent> for Ident {
 
 impl From<HirSymbol> for Symbol {
     fn from(value: HirSymbol) -> Self {
-        Symbol(value.as_u32())
+        Symbol(value.to_ident_string())
     }
 }
 
 impl From<&HirSymbol> for Symbol {
     fn from(value: &HirSymbol) -> Self {
-        Symbol(value.as_u32())
+        Symbol(value.to_ident_string())
     }
 }
 
@@ -145,57 +153,97 @@ impl From<hir::OwnerId> for OwnerId {
     }
 }
 
+impl<'hir> FromHir<'hir, Vec<hir::def::Res>> for Vec<Res> {
+    fn from_hir(value: Vec<hir::def::Res>, tcx: TyCtxt<'hir>) -> Self {
+        let mut res = Vec::with_capacity(value.len());
+        for i in value {
+            res.push(i.hir_into(tcx));
+        }
+        res
+    }
+}
+
+impl<'hir> FromHir<'hir, hir::def::Res> for Res {
+    fn from_hir(value: hir::def::Res, _: TyCtxt<'hir>) -> Self {
+        match value {
+            rustc_hir::def::Res::Def(def_kind, def_id) => {
+                Self::Def((&def_kind).into(), (&def_id).into())
+            }
+            rustc_hir::def::Res::PrimTy(prim_ty) => Self::PrimTy((&prim_ty).into()),
+            rustc_hir::def::Res::SelfTyParam { trait_ } => Self::SelfTyParam {
+                trait_: (&trait_).into(),
+            },
+            rustc_hir::def::Res::SelfTyAlias {
+                alias_to,
+                forbid_generic,
+                is_trait_impl,
+            } => Self::SelfTyAlias {
+                alias_to: (&alias_to).into(),
+                forbid_generic: forbid_generic,
+                is_trait_impl: is_trait_impl,
+            },
+            rustc_hir::def::Res::SelfCtor(def_id) => Self::SelfCtor((&def_id).into()),
+            rustc_hir::def::Res::Local(id) => Self::Local(id.into()),
+            rustc_hir::def::Res::ToolMod => Self::ToolMod,
+            rustc_hir::def::Res::NonMacroAttr(non_macro_attr_kind) => {
+                Self::NonMacroAttr((&non_macro_attr_kind).into())
+            }
+            rustc_hir::def::Res::Err => Self::Err,
+        }
+    }
+}
+
 impl<'hir> FromHir<'hir, &'hir hir::ItemKind<'hir>> for ItemKind {
-    fn from_hir(value: &'hir hir::ItemKind<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::ItemKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::ItemKind::ExternCrate(symbol) => ItemKind::ExternCrate(symbol.map(|s| s.into())),
             hir::ItemKind::Use(path, use_kind) => ItemKind::Use(
                 Path {
                     span: path.span.into(),
-                    res: path.res.as_slice().hir_into(hir),
-                    segments: path.segments.iter().map(|s| s.hir_into(hir)).collect(),
+                    res: path.res.clone().into_vec().hir_into(tcx),
+                    segments: path.segments.iter().map(|s| s.hir_into(tcx)).collect(),
                 },
                 use_kind.into(),
             ),
             hir::ItemKind::Static(hir_ty, m, body) => Self::Static(
-                (*hir_ty).hir_into(hir),
+                (*hir_ty).hir_into(tcx),
                 matches!(m, hir::Mutability::Mut),
-                hir.body(*body).hir_into(hir),
+                tcx.hir().body(*body).hir_into(tcx),
             ),
             hir::ItemKind::Const(hir_ty, generics, body) => Self::Const(
-                (*hir_ty).hir_into(hir),
-                (*generics).hir_into(hir),
-                hir.body(*body).hir_into(hir),
+                (*hir_ty).hir_into(tcx),
+                (*generics).hir_into(tcx),
+                tcx.hir().body(*body).hir_into(tcx),
             ),
             hir::ItemKind::Fn(fn_sig, generics, body) => Self::Fn(
-                fn_sig.hir_into(hir),
-                (*generics).hir_into(hir),
-                hir.body(*body).hir_into(hir),
+                fn_sig.hir_into(tcx),
+                (*generics).hir_into(tcx),
+                tcx.hir().body(*body).hir_into(tcx),
             ),
-            hir::ItemKind::Mod(m) => Self::Mod((*m).hir_into(hir)),
+            hir::ItemKind::Mod(m) => Self::Mod((*m).hir_into(tcx)),
             hir::ItemKind::TyAlias(hir_ty, generics) => {
-                Self::TyAlias((*hir_ty).hir_into(hir), (*generics).hir_into(hir))
+                Self::TyAlias((*hir_ty).hir_into(tcx), (*generics).hir_into(tcx))
             }
             hir::ItemKind::Enum(enum_def, generics) => {
-                Self::Enum(enum_def.hir_into(hir), (*generics).hir_into(hir))
+                Self::Enum(enum_def.hir_into(tcx), (*generics).hir_into(tcx))
             }
             hir::ItemKind::Struct(data, generics) => {
-                Self::Struct(data.hir_into(hir), (*generics).hir_into(hir))
+                Self::Struct(data.hir_into(tcx), (*generics).hir_into(tcx))
             }
             hir::ItemKind::Union(data, generics) => {
-                Self::Union(data.hir_into(hir), (*generics).hir_into(hir))
+                Self::Union(data.hir_into(tcx), (*generics).hir_into(tcx))
             }
             hir::ItemKind::Trait(auto, safe, generics, bounds, refs) => Self::Trait(
                 matches!(auto, hir::IsAuto::Yes),
                 matches!(safe, hir::Safety::Safe),
-                (*generics).hir_into(hir),
-                (*bounds).hir_into(hir),
+                (*generics).hir_into(tcx),
+                (*bounds).hir_into(tcx),
                 refs.iter().map(Into::into).collect(),
             ),
             hir::ItemKind::TraitAlias(generics, bounds) => {
-                Self::TraitAlias((*generics).hir_into(hir), (*bounds).hir_into(hir))
+                Self::TraitAlias((*generics).hir_into(tcx), (*bounds).hir_into(tcx))
             }
-            hir::ItemKind::Impl(i) => Self::Impl((*i).hir_into(hir)),
+            hir::ItemKind::Impl(i) => Self::Impl((*i).hir_into(tcx)),
             hir::ItemKind::Macro(..) => todo!(),
             hir::ItemKind::ForeignMod { .. } => todo!(),
             hir::ItemKind::GlobalAsm(..) => todo!(),
@@ -204,10 +252,10 @@ impl<'hir> FromHir<'hir, &'hir hir::ItemKind<'hir>> for ItemKind {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::FnSig<'hir>> for FnSig {
-    fn from_hir(value: &'hir hir::FnSig<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::FnSig<'hir>, tcx: TyCtxt<'hir>) -> Self {
         FnSig {
             header: value.header.into(),
-            decl: value.decl.hir_into(hir),
+            decl: value.decl.hir_into(tcx),
             span: value.span.into(),
         }
     }
@@ -224,35 +272,35 @@ impl From<hir::FnHeader> for FnHeader {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::EnumDef<'hir>> for EnumDef {
-    fn from_hir(value: &'hir hir::EnumDef<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::EnumDef<'hir>, tcx: TyCtxt<'hir>) -> Self {
         EnumDef {
-            variants: value.variants.hir_into(hir),
+            variants: value.variants.hir_into(tcx),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Variant<'hir>> for Variant {
-    fn from_hir(value: &'hir hir::Variant<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Variant<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Variant {
             ident: value.ident.into(),
             hir_id: value.hir_id.into(),
             def_id: value.def_id.into(),
-            data: (&value.data).hir_into(hir),
-            disr_expr: value.disr_expr.map(|e| e.hir_into(hir)),
+            data: (&value.data).hir_into(tcx),
+            disr_expr: value.disr_expr.map(|e| e.hir_into(tcx)),
             span: value.span.into(),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::VariantData<'hir>> for VariantData {
-    fn from_hir(value: &'hir hir::VariantData<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::VariantData<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::VariantData::Struct { fields, recovered } => Self::Struct {
-                fields: (*fields).hir_into(hir),
+                fields: (*fields).hir_into(tcx),
                 recovered: matches!(recovered, rustc_ast::Recovered::Yes(_)),
             },
             hir::VariantData::Tuple(fs, hir_id, lid) => {
-                Self::Tuple((*fs).hir_into(hir), hir_id.into(), (*lid).into())
+                Self::Tuple((*fs).hir_into(tcx), hir_id.into(), (*lid).into())
             }
             hir::VariantData::Unit(hir_id, lid) => Self::Unit(hir_id.into(), (*lid).into()),
         }
@@ -260,14 +308,14 @@ impl<'hir> FromHir<'hir, &'hir hir::VariantData<'hir>> for VariantData {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::FieldDef<'hir>> for FieldDef {
-    fn from_hir(value: &'hir hir::FieldDef<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::FieldDef<'hir>, tcx: TyCtxt<'hir>) -> Self {
         FieldDef {
             span: value.span.into(),
             vis_span: value.vis_span.into(),
             ident: value.ident.into(),
             hir_id: value.hir_id.into(),
             def_id: value.def_id.into(),
-            ty: value.ty.hir_into(hir),
+            ty: value.ty.hir_into(tcx),
         }
     }
 }
@@ -292,17 +340,17 @@ impl From<hir::TraitItemId> for TraitItemId {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Impl<'hir>> for Impl {
-    fn from_hir(value: &'hir hir::Impl<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Impl<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Impl {
             constness: matches!(value.constness, hir::Constness::Const),
             safety: matches!(value.safety, hir::Safety::Safe),
             polarity: value.polarity.into(),
             defaultness: value.defaultness.into(),
             defaultness_span: value.defaultness_span.map(Into::into),
-            generics: value.generics.hir_into(hir),
-            of_trait: value.of_trait.as_ref().map(|t| (t).hir_into(hir)),
-            self_ty: value.self_ty.hir_into(hir),
-            items: value.items.hir_into(hir),
+            generics: value.generics.hir_into(tcx),
+            of_trait: value.of_trait.as_ref().map(|t| (t).hir_into(tcx)),
+            self_ty: value.self_ty.hir_into(tcx),
+            items: value.items.hir_into(tcx),
         }
     }
 }
@@ -326,10 +374,10 @@ impl From<hir::Defaultness> for Defaultness {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Generics<'hir>> for Generics {
-    fn from_hir(value: &'hir hir::Generics<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Generics<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Generics {
-            params: value.params.hir_into(hir),
-            predicates: value.predicates.hir_into(hir),
+            params: value.params.hir_into(tcx),
+            predicates: value.predicates.hir_into(tcx),
             has_where_clause_predicates: value.has_where_clause_predicates,
             where_clause_span: value.where_clause_span.into(),
             span: value.span.into(),
@@ -338,24 +386,24 @@ impl<'hir> FromHir<'hir, &'hir hir::Generics<'hir>> for Generics {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::WherePredicate<'hir>> for WherePredicate {
-    fn from_hir(value: &'hir hir::WherePredicate<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::WherePredicate<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::WherePredicate::BoundPredicate(b) => Self::Bound(b.hir_into(hir)),
-            hir::WherePredicate::RegionPredicate(r) => Self::Region(r.hir_into(hir)),
-            hir::WherePredicate::EqPredicate(e) => Self::Eq(e.hir_into(hir)),
+            hir::WherePredicate::BoundPredicate(b) => Self::Bound(b.hir_into(tcx)),
+            hir::WherePredicate::RegionPredicate(r) => Self::Region(r.hir_into(tcx)),
+            hir::WherePredicate::EqPredicate(e) => Self::Eq(e.hir_into(tcx)),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::WhereBoundPredicate<'hir>> for WhereBoundPredicate {
-    fn from_hir(value: &'hir hir::WhereBoundPredicate<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::WhereBoundPredicate<'hir>, tcx: TyCtxt<'hir>) -> Self {
         WhereBoundPredicate {
             hir_id: value.hir_id.into(),
             span: value.span.into(),
             origin: value.origin.into(),
-            bound_generic_params: value.bound_generic_params.hir_into(hir),
-            bounded_ty: value.bounded_ty.hir_into(hir),
-            bounds: value.bounds.hir_into(hir),
+            bound_generic_params: value.bound_generic_params.hir_into(tcx),
+            bounded_ty: value.bounded_ty.hir_into(tcx),
+            bounds: value.bounds.hir_into(tcx),
         }
     }
 }
@@ -371,28 +419,28 @@ impl From<hir::PredicateOrigin> for PredicateOrigin {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::WhereRegionPredicate<'hir>> for WhereRegionPredicate {
-    fn from_hir(value: &'hir hir::WhereRegionPredicate<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::WhereRegionPredicate<'hir>, tcx: TyCtxt<'hir>) -> Self {
         WhereRegionPredicate {
             span: value.span.into(),
             in_where_clause: value.in_where_clause,
             lifetime: value.lifetime.into(),
-            bounds: value.bounds.hir_into(hir),
+            bounds: value.bounds.hir_into(tcx),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::WhereEqPredicate<'hir>> for WhereEqPredicate {
-    fn from_hir(value: &'hir hir::WhereEqPredicate<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::WhereEqPredicate<'hir>, tcx: TyCtxt<'hir>) -> Self {
         WhereEqPredicate {
             span: value.span.into(),
-            lhs_ty: value.lhs_ty.hir_into(hir),
-            rhs_ty: value.rhs_ty.hir_into(hir),
+            lhs_ty: value.lhs_ty.hir_into(tcx),
+            rhs_ty: value.rhs_ty.hir_into(tcx),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::ImplItemRef> for ImplItemRef {
-    fn from_hir(value: &'hir hir::ImplItemRef, _: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::ImplItemRef, _: TyCtxt<'hir>) -> Self {
         ImplItemRef {
             id: value.id.into(),
             ident: value.ident.into(),
@@ -424,18 +472,19 @@ impl From<hir::AssocItemKind> for AssocItemKind {
 impl<'hir, R, T> FromHir<'hir, &'hir hir::Path<'hir, R>> for Path<T>
 where
     T: FromHir<'hir, &'hir R>,
+    R: std::fmt::Debug,
 {
-    fn from_hir(value: &'hir hir::Path<'hir, R>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Path<'hir, R>, tcx: TyCtxt<'hir>) -> Self {
         Path {
             span: value.span.into(),
-            res: (&value.res).hir_into(hir),
-            segments: value.segments.iter().map(|s| s.hir_into(hir)).collect(),
+            res: (&value.res).hir_into(tcx),
+            segments: value.segments.iter().map(|s| s.hir_into(tcx)).collect(),
         }
     }
 }
 
 /* impl<'hir> FromHir<'hir, &'hir [hir::def::Res]> for Vec<Res> {
-    fn from_hir(value: &'hir [hir::def::Res], hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir [hir::def::Res], tcx: TyCtxt<'hir>) -> Self {
         todo!()
     }
 } */
@@ -451,12 +500,12 @@ impl From<&hir::UseKind> for UseKind {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::PathSegment<'hir>> for PathSegment {
-    fn from_hir(value: &'hir hir::PathSegment<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::PathSegment<'hir>, tcx: TyCtxt<'hir>) -> Self {
         PathSegment {
             ident: value.ident.into(),
             hir_id: value.hir_id.into(),
             res: value.res.into(),
-            args: value.args.map(|a| a.hir_into(hir)),
+            args: value.args.map(|a| a.hir_into(tcx)),
             infer_args: value.infer_args,
         }
     }
@@ -510,10 +559,10 @@ impl From<hir::def::Res> for Res {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::GenericArgs<'hir>> for GenericArgs {
-    fn from_hir(value: &'hir hir::GenericArgs<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::GenericArgs<'hir>, tcx: TyCtxt<'hir>) -> Self {
         GenericArgs {
-            args: value.args.hir_into(hir),
-            constraints: value.constraints.hir_into(hir),
+            args: value.args.hir_into(tcx),
+            constraints: value.constraints.hir_into(tcx),
             parenthesized: value.parenthesized.into(),
             span_ext: value.span_ext.into(),
         }
@@ -521,65 +570,65 @@ impl<'hir> FromHir<'hir, &'hir hir::GenericArgs<'hir>> for GenericArgs {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::GenericArg<'hir>> for GenericArg {
-    fn from_hir(value: &'hir hir::GenericArg<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::GenericArg<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::GenericArg::Lifetime(l) => Self::Lifetime((*l).into()),
-            hir::GenericArg::Type(ty) => Self::Type((*ty).hir_into(hir)),
-            hir::GenericArg::Const(c) => Self::Const((*c).hir_into(hir)),
+            hir::GenericArg::Type(ty) => Self::Type((*ty).hir_into(tcx)),
+            hir::GenericArg::Const(c) => Self::Const((*c).hir_into(tcx)),
             hir::GenericArg::Infer(i) => Self::Infer(i.into()),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::AssocItemConstraint<'hir>> for AssocItemConstraint {
-    fn from_hir(value: &'hir hir::AssocItemConstraint<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::AssocItemConstraint<'hir>, tcx: TyCtxt<'hir>) -> Self {
         AssocItemConstraint {
             hir_id: value.hir_id.into(),
             ident: value.ident.into(),
-            gen_args: value.gen_args.hir_into(hir),
-            kind: (&value.kind).hir_into(hir),
+            gen_args: value.gen_args.hir_into(tcx),
+            kind: (&value.kind).hir_into(tcx),
             span: value.span.into(),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::AssocItemConstraintKind<'hir>> for AssocItemConstraintKind {
-    fn from_hir(value: &'hir hir::AssocItemConstraintKind<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::AssocItemConstraintKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::AssocItemConstraintKind::Equality { term } => AssocItemConstraintKind::Equality {
-                term: term.hir_into(hir),
+                term: term.hir_into(tcx),
             },
             hir::AssocItemConstraintKind::Bound { bounds } => AssocItemConstraintKind::Bound {
-                bounds: (*bounds).hir_into(hir),
+                bounds: (*bounds).hir_into(tcx),
             },
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Term<'hir>> for Term {
-    fn from_hir(value: &'hir hir::Term<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Term<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::Term::Ty(ty) => Self::Ty((*ty).hir_into(hir)),
-            hir::Term::Const(c) => Self::Const((*c).hir_into(hir)),
+            hir::Term::Ty(ty) => Self::Ty((*ty).hir_into(tcx)),
+            hir::Term::Const(c) => Self::Const((*c).hir_into(tcx)),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::GenericBound<'hir>> for GenericBound {
-    fn from_hir(value: &'hir hir::GenericBound<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::GenericBound<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::GenericBound::Trait(r) => GenericBound::Trait(r.hir_into(hir)),
+            hir::GenericBound::Trait(r) => GenericBound::Trait(r.hir_into(tcx)),
             hir::GenericBound::Outlives(l) => GenericBound::Outlives((*l).into()),
-            hir::GenericBound::Use(args, sp) => Self::Use((*args).hir_into(hir), (*sp).into()),
+            hir::GenericBound::Use(args, sp) => Self::Use((*args).hir_into(tcx), (*sp).into()),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::PreciseCapturingArg<'hir>> for PreciseCapturingArg {
-    fn from_hir(value: &'hir hir::PreciseCapturingArg<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::PreciseCapturingArg<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::PreciseCapturingArg::Lifetime(l) => Self::Lifetime((*l).into()),
-            hir::PreciseCapturingArg::Param(a) => Self::Param(a.hir_into(hir)),
+            hir::PreciseCapturingArg::Param(a) => Self::Param(a.hir_into(tcx)),
         }
     }
 }
@@ -587,43 +636,43 @@ impl<'hir> FromHir<'hir, &'hir hir::PreciseCapturingArg<'hir>> for PreciseCaptur
 impl<'hir> FromHir<'hir, &'hir hir::PreciseCapturingNonLifetimeArg>
     for PreciseCapturingNonLifetimeArg
 {
-    fn from_hir(value: &'hir hir::PreciseCapturingNonLifetimeArg, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::PreciseCapturingNonLifetimeArg, tcx: TyCtxt<'hir>) -> Self {
         PreciseCapturingNonLifetimeArg {
             hir_id: value.hir_id.into(),
             ident: value.ident.into(),
-            res: (&value.res).hir_into(hir),
+            res: (&value.res).hir_into(tcx),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::PolyTraitRef<'hir>> for PolyTraitRef {
-    fn from_hir(value: &'hir hir::PolyTraitRef<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::PolyTraitRef<'hir>, tcx: TyCtxt<'hir>) -> Self {
         PolyTraitRef {
-            bound_generic_params: value.bound_generic_params.hir_into(hir),
-            trait_ref: (&value.trait_ref).hir_into(hir),
+            bound_generic_params: value.bound_generic_params.hir_into(tcx),
+            trait_ref: (&value.trait_ref).hir_into(tcx),
             span: value.span.into(),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::TraitRef<'hir>> for TraitRef {
-    fn from_hir(value: &'hir hir::TraitRef<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::TraitRef<'hir>, tcx: TyCtxt<'hir>) -> Self {
         TraitRef {
-            path: value.path.hir_into(hir),
+            path: value.path.hir_into(tcx),
             hir_ref_id: value.hir_ref_id.into(),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::GenericParam<'hir>> for GenericParam {
-    fn from_hir(value: &'hir hir::GenericParam<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::GenericParam<'hir>, tcx: TyCtxt<'hir>) -> Self {
         GenericParam {
             hir_id: value.hir_id.into(),
             def_id: value.def_id.into(),
             name: value.name.into(),
             span: value.span.into(),
             pure_wrt_drop: value.pure_wrt_drop,
-            kind: (&value.kind).hir_into(hir),
+            kind: (&value.kind).hir_into(tcx),
             colon_span: value.colon_span.map(Into::into),
             source: value.source.into(),
         }
@@ -641,11 +690,11 @@ impl From<hir::ParamName> for ParamName {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::GenericParamKind<'hir>> for GenericParamKind {
-    fn from_hir(value: &'hir hir::GenericParamKind<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::GenericParamKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::GenericParamKind::Lifetime { kind } => Self::Lifetime { kind: kind.into() },
             hir::GenericParamKind::Type { default, synthetic } => Self::Type {
-                default: default.map(|ty| ty.hir_into(hir)),
+                default: default.map(|ty| ty.hir_into(tcx)),
                 synthetic: *synthetic,
             },
             hir::GenericParamKind::Const {
@@ -654,8 +703,8 @@ impl<'hir> FromHir<'hir, &'hir hir::GenericParamKind<'hir>> for GenericParamKind
                 is_host_effect,
                 synthetic,
             } => Self::Const {
-                ty: (*ty).hir_into(hir),
-                default: default.map(|d| d.hir_into(hir)),
+                ty: (*ty).hir_into(tcx),
+                default: default.map(|d| d.hir_into(tcx)),
                 is_host_effect: *is_host_effect,
                 synthetic: *synthetic,
             },
@@ -685,32 +734,32 @@ impl From<&hir::MissingLifetimeKind> for MissingLifetimeKind {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::ConstArg<'hir>> for ConstArg {
-    fn from_hir(value: &'hir hir::ConstArg<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::ConstArg<'hir>, tcx: TyCtxt<'hir>) -> Self {
         ConstArg {
             hir_id: value.hir_id.into(),
-            kind: (&value.kind).hir_into(hir),
+            kind: (&value.kind).hir_into(tcx),
             is_desugared_from_effects: value.is_desugared_from_effects,
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::ConstArgKind<'hir>> for ConstArgKind {
-    fn from_hir(value: &'hir hir::ConstArgKind<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::ConstArgKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::ConstArgKind::Path(qpath) => Self::Path(qpath.hir_into(hir)),
-            hir::ConstArgKind::Anon(anon_const) => Self::Anon((*anon_const).hir_into(hir)),
+            hir::ConstArgKind::Path(qpath) => Self::Path(qpath.hir_into(tcx)),
+            hir::ConstArgKind::Anon(anon_const) => Self::Anon((*anon_const).hir_into(tcx)),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::QPath<'hir>> for QPath {
-    fn from_hir(value: &'hir hir::QPath<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::QPath<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::QPath::Resolved(ty, p) => {
-                Self::Resolved(ty.map(|t| t.hir_into(hir)), (*p).hir_into(hir))
+                Self::Resolved(ty.map(|t| t.hir_into(tcx)), (*p).hir_into(tcx))
             }
             hir::QPath::TypeRelative(ty, seg) => {
-                Self::TypeRelative((*ty).hir_into(hir), (*seg).hir_into(hir))
+                Self::TypeRelative((*ty).hir_into(tcx), (*seg).hir_into(tcx))
             }
             hir::QPath::LangItem(li, sp) => Self::LangItem(li.into(), (*sp).into()),
         }
@@ -919,40 +968,40 @@ impl From<&hir::LangItem> for LangItem {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Ty<'hir>> for HirTy {
-    fn from_hir(value: &'hir hir::Ty<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Ty<'hir>, tcx: TyCtxt<'hir>) -> Self {
         HirTy {
             hir_id: value.hir_id.into(),
-            kind: Box::new((&value.kind).hir_into(hir)),
+            kind: Box::new((&value.kind).hir_into(tcx)),
             span: value.span.into(),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::TyKind<'hir>> for HirTyKind {
-    fn from_hir(value: &'hir hir::TyKind<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::TyKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::TyKind::InferDelegation(id, kind) => Self::InferDelegation(id.into(), kind.into()),
-            hir::TyKind::Slice(ty) => Self::Slice((*ty).hir_into(hir)),
-            hir::TyKind::Array(ty, l) => Self::Array((*ty).hir_into(hir), l.hir_into(hir)),
-            hir::TyKind::Ptr(ty) => Self::Ptr(ty.hir_into(hir)),
-            hir::TyKind::Ref(l, ty) => Self::Ref((*l).into(), ty.hir_into(hir)),
-            hir::TyKind::BareFn(ty) => Self::BareFn((*ty).hir_into(hir)),
+            hir::TyKind::Slice(ty) => Self::Slice((*ty).hir_into(tcx)),
+            hir::TyKind::Array(ty, l) => Self::Array((*ty).hir_into(tcx), l.hir_into(tcx)),
+            hir::TyKind::Ptr(ty) => Self::Ptr(ty.hir_into(tcx)),
+            hir::TyKind::Ref(l, ty) => Self::Ref((*l).into(), ty.hir_into(tcx)),
+            hir::TyKind::BareFn(ty) => Self::BareFn((*ty).hir_into(tcx)),
             hir::TyKind::Never => Self::Never,
-            hir::TyKind::Tup(tys) => Self::Tup((*tys).hir_into(hir)),
-            hir::TyKind::AnonAdt(id) => Self::AnonAdt(hir.item(*id).hir_into(hir)),
-            hir::TyKind::Path(path) => Self::Path(path.hir_into(hir)),
+            hir::TyKind::Tup(tys) => Self::Tup((*tys).hir_into(tcx)),
+            hir::TyKind::AnonAdt(id) => Self::AnonAdt(tcx.hir().item(*id).hir_into(tcx)),
+            hir::TyKind::Path(path) => Self::Path(path.hir_into(tcx)),
             hir::TyKind::OpaqueDef(..) => {
                 todo!()
             }
             hir::TyKind::TraitObject(ts, l, syn) => Self::TraitObject(
-                ts.iter().map(|r| r.hir_into(hir)).collect(),
+                ts.iter().map(|r| r.hir_into(tcx)).collect(),
                 (*l).into(),
                 syn.into(),
             ),
-            hir::TyKind::Typeof(c) => Self::Typeof((*c).hir_into(hir)),
+            hir::TyKind::Typeof(c) => Self::Typeof((*c).hir_into(tcx)),
             hir::TyKind::Infer => Self::Infer,
             hir::TyKind::Err(_) => Self::Err,
-            hir::TyKind::Pat(ty, p) => Self::Pat((*ty).hir_into(hir), (*p).hir_into(hir)),
+            hir::TyKind::Pat(ty, p) => Self::Pat((*ty).hir_into(tcx), (*p).hir_into(tcx)),
         }
     }
 }
@@ -967,20 +1016,20 @@ impl From<&hir::InferDelegationKind> for InferDelegationKind {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::MutTy<'hir>> for MutHirTy {
-    fn from_hir(value: &'hir hir::MutTy<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::MutTy<'hir>, tcx: TyCtxt<'hir>) -> Self {
         MutHirTy {
-            ty: value.ty.hir_into(hir),
+            ty: value.ty.hir_into(tcx),
             mutbl: matches!(value.mutbl, hir::Mutability::Mut),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::BareFnTy<'hir>> for BareFnHirTy {
-    fn from_hir(value: &'hir hir::BareFnTy<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::BareFnTy<'hir>, tcx: TyCtxt<'hir>) -> Self {
         BareFnHirTy {
             safety: matches!(value.safety, hir::Safety::Safe),
-            generic_params: value.generic_params.hir_into(hir),
-            decl: value.decl.hir_into(hir),
+            generic_params: value.generic_params.hir_into(tcx),
+            decl: value.decl.hir_into(tcx),
             param_names: value.param_names.iter().copied().map(Into::into).collect(),
         }
     }
@@ -997,7 +1046,7 @@ impl From<&rustc_ast::TraitObjectSyntax> for TraitObjectSyntax {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::def::Res> for Res {
-    fn from_hir(value: &'hir hir::def::Res, _: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::def::Res, _: TyCtxt<'hir>) -> Self {
         match value {
             hir::def::Res::Def(kind, id) => Self::Def(kind.into(), id.into()),
             hir::def::Res::PrimTy(ty) => Self::PrimTy(ty.into()),
@@ -1130,7 +1179,7 @@ impl From<&hir::PrimTy> for PrimHirTy {
     }
 }
 
-impl From<&rustc_ast::IntTy> for IntHirTy {
+impl From<&rustc_ast::IntTy> for IntTy {
     fn from(value: &rustc_ast::IntTy) -> Self {
         match value {
             rustc_ast::IntTy::Isize => Self::Isize,
@@ -1143,7 +1192,7 @@ impl From<&rustc_ast::IntTy> for IntHirTy {
     }
 }
 
-impl From<&rustc_ast::UintTy> for UintHirTy {
+impl From<&rustc_ast::UintTy> for UintTy {
     fn from(value: &rustc_ast::UintTy) -> Self {
         match value {
             rustc_ast::UintTy::Usize => Self::Usize,
@@ -1156,7 +1205,7 @@ impl From<&rustc_ast::UintTy> for UintHirTy {
     }
 }
 
-impl From<&rustc_ast::FloatTy> for FloatHirTy {
+impl From<&rustc_ast::FloatTy> for FloatTy {
     fn from(value: &rustc_ast::FloatTy) -> Self {
         match value {
             rustc_ast::FloatTy::F16 => Self::F16,
@@ -1194,30 +1243,30 @@ impl From<&hir::def::NonMacroAttrKind> for NonMacroAttrKind {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::AnonConst> for AnonConst {
-    fn from_hir(value: &'hir hir::AnonConst, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::AnonConst, tcx: TyCtxt<'hir>) -> Self {
         AnonConst {
             hir_id: value.hir_id.into(),
             def_id: value.def_id.into(),
-            body: hir.body(value.body).hir_into(hir),
+            body: tcx.hir().body(value.body).hir_into(tcx),
             span: value.span.into(),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Body<'hir>> for Body {
-    fn from_hir(value: &'hir hir::Body<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Body<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Body {
-            params: value.params.hir_into(hir),
-            value: value.value.hir_into(hir),
+            params: value.params.hir_into(tcx),
+            value: value.value.hir_into(tcx),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Param<'hir>> for Param {
-    fn from_hir(value: &'hir hir::Param<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Param<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Param {
             hir_id: value.hir_id.into(),
-            pat: value.pat.hir_into(hir),
+            pat: value.pat.hir_into(tcx),
             ty_span: value.ty_span.into(),
             span: value.span.into(),
         }
@@ -1225,10 +1274,10 @@ impl<'hir> FromHir<'hir, &'hir hir::Param<'hir>> for Param {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Pat<'hir>> for Pat {
-    fn from_hir(value: &'hir hir::Pat<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Pat<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Pat {
             hir_id: value.hir_id.into(),
-            kind: Box::new((&value.kind).hir_into(hir)),
+            kind: Box::new((&value.kind).hir_into(tcx)),
             span: value.span.into(),
             default_binding_modes: value.default_binding_modes,
         }
@@ -1236,40 +1285,40 @@ impl<'hir> FromHir<'hir, &'hir hir::Pat<'hir>> for Pat {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::PatKind<'hir>> for PatKind {
-    fn from_hir(value: &'hir hir::PatKind<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::PatKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::PatKind::Wild => Self::Wild,
             hir::PatKind::Binding(m, id, ident, p) => Self::Binding(
                 m.into(),
                 id.into(),
                 (*ident).into(),
-                p.map(|p| p.hir_into(hir)),
+                p.map(|p| p.hir_into(tcx)),
             ),
             hir::PatKind::Struct(path, fs, rest) => {
-                Self::Struct(path.hir_into(hir), (*fs).hir_into(hir), *rest)
+                Self::Struct(path.hir_into(tcx), (*fs).hir_into(tcx), *rest)
             }
             hir::PatKind::TupleStruct(path, ps, ddp) => {
-                Self::TupleStruct(path.hir_into(hir), (*ps).hir_into(hir), ddp.into())
+                Self::TupleStruct(path.hir_into(tcx), (*ps).hir_into(tcx), ddp.into())
             }
-            hir::PatKind::Or(ps) => Self::Or((*ps).hir_into(hir)),
+            hir::PatKind::Or(ps) => Self::Or((*ps).hir_into(tcx)),
             hir::PatKind::Never => Self::Never,
-            hir::PatKind::Path(p) => Self::Path(p.hir_into(hir)),
-            hir::PatKind::Tuple(ps, ddp) => Self::Tuple((*ps).hir_into(hir), ddp.into()),
-            hir::PatKind::Box(p) => Self::Box((*p).hir_into(hir)),
-            hir::PatKind::Deref(p) => Self::Deref((*p).hir_into(hir)),
+            hir::PatKind::Path(p) => Self::Path(p.hir_into(tcx)),
+            hir::PatKind::Tuple(ps, ddp) => Self::Tuple((*ps).hir_into(tcx), ddp.into()),
+            hir::PatKind::Box(p) => Self::Box((*p).hir_into(tcx)),
+            hir::PatKind::Deref(p) => Self::Deref((*p).hir_into(tcx)),
             hir::PatKind::Ref(p, m) => {
-                Self::Ref((*p).hir_into(hir), matches!(m, hir::Mutability::Mut))
+                Self::Ref((*p).hir_into(tcx), matches!(m, hir::Mutability::Mut))
             }
-            hir::PatKind::Lit(e) => Self::Lit((*e).hir_into(hir)),
+            hir::PatKind::Lit(e) => Self::Lit((*e).hir_into(tcx)),
             hir::PatKind::Range(l, r, i) => Self::Range(
-                l.map(|e| e.hir_into(hir)),
-                r.map(|e| e.hir_into(hir)),
+                l.map(|e| e.hir_into(tcx)),
+                r.map(|e| e.hir_into(tcx)),
                 matches!(i, hir::RangeEnd::Included),
             ),
             hir::PatKind::Slice(ps, p, pss) => Self::Slice(
-                (*ps).hir_into(hir),
-                p.map(|p| p.hir_into(hir)),
-                (*pss).hir_into(hir),
+                (*ps).hir_into(tcx),
+                p.map(|p| p.hir_into(tcx)),
+                (*pss).hir_into(tcx),
             ),
             hir::PatKind::Err(_) => Self::Err,
         }
@@ -1293,11 +1342,11 @@ impl From<hir::ByRef> for ByRef {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::PatField<'hir>> for PatField {
-    fn from_hir(value: &'hir hir::PatField<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::PatField<'hir>, tcx: TyCtxt<'hir>) -> Self {
         PatField {
             hir_id: value.hir_id.into(),
             ident: value.ident.into(),
-            pat: value.pat.hir_into(hir),
+            pat: value.pat.hir_into(tcx),
             is_shorthand: value.is_shorthand,
             span: value.span.into(),
         }
@@ -1314,96 +1363,96 @@ impl From<&hir::DotDotPos> for DotDotPos {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Expr<'hir>> for Expr {
-    fn from_hir(value: &'hir hir::Expr<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Expr<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Expr {
             hir_id: value.hir_id.into(),
-            kind: Box::new((&value.kind).hir_into(hir)),
+            kind: Box::new((&value.kind).hir_into(tcx)),
             span: value.span.into(),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::ExprKind<'hir>> for ExprKind {
-    fn from_hir(value: &'hir hir::ExprKind<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::ExprKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::ExprKind::ConstBlock(c) => Self::ConstBlock(c.hir_into(hir)),
-            hir::ExprKind::Array(es) => Self::Array((*es).hir_into(hir)),
-            hir::ExprKind::Call(e, es) => Self::Call((*e).hir_into(hir), (*es).hir_into(hir)),
+            hir::ExprKind::ConstBlock(c) => Self::ConstBlock(c.hir_into(tcx)),
+            hir::ExprKind::Array(es) => Self::Array((*es).hir_into(tcx)),
+            hir::ExprKind::Call(e, es) => Self::Call((*e).hir_into(tcx), (*es).hir_into(tcx)),
             hir::ExprKind::MethodCall(p, e, es, sp) => Self::MethodCall(
-                (*p).hir_into(hir),
-                (*e).hir_into(hir),
-                (*es).hir_into(hir),
+                (*p).hir_into(tcx),
+                (*e).hir_into(tcx),
+                (*es).hir_into(tcx),
                 (*sp).into(),
             ),
-            hir::ExprKind::Tup(es) => Self::Tup((*es).hir_into(hir)),
+            hir::ExprKind::Tup(es) => Self::Tup((*es).hir_into(tcx)),
             hir::ExprKind::Binary(op, l, r) => {
-                Self::Binary(op.into(), (*l).hir_into(hir), (*r).hir_into(hir))
+                Self::Binary(op.into(), (*l).hir_into(tcx), (*r).hir_into(tcx))
             }
-            hir::ExprKind::Unary(op, e) => Self::Unary(op.into(), (*e).hir_into(hir)),
+            hir::ExprKind::Unary(op, e) => Self::Unary(op.into(), (*e).hir_into(tcx)),
             hir::ExprKind::Lit(l) => Self::Lit((*l).into()),
-            hir::ExprKind::Cast(e, ty) => Self::Cast((*e).hir_into(hir), (*ty).hir_into(hir)),
-            hir::ExprKind::Type(e, ty) => Self::Type((*e).hir_into(hir), (*ty).hir_into(hir)),
-            hir::ExprKind::DropTemps(e) => Self::DropTemps((*e).hir_into(hir)),
-            hir::ExprKind::Let(l) => Self::Let((*l).hir_into(hir)),
+            hir::ExprKind::Cast(e, ty) => Self::Cast((*e).hir_into(tcx), (*ty).hir_into(tcx)),
+            hir::ExprKind::Type(e, ty) => Self::Type((*e).hir_into(tcx), (*ty).hir_into(tcx)),
+            hir::ExprKind::DropTemps(e) => Self::DropTemps((*e).hir_into(tcx)),
+            hir::ExprKind::Let(l) => Self::Let((*l).hir_into(tcx)),
             hir::ExprKind::If(c, t, e) => Self::If(
-                (*c).hir_into(hir),
-                (*t).hir_into(hir),
-                e.map(|e| e.hir_into(hir)),
+                (*c).hir_into(tcx),
+                (*t).hir_into(tcx),
+                e.map(|e| e.hir_into(tcx)),
             ),
             hir::ExprKind::Loop(b, l, s, sp) => Self::Loop(
-                (*b).hir_into(hir),
+                (*b).hir_into(tcx),
                 l.map(Into::into),
                 s.into(),
                 (*sp).into(),
             ),
             hir::ExprKind::Match(e, arms, s) => {
-                Self::Match((*e).hir_into(hir), (*arms).hir_into(hir), s.into())
+                Self::Match((*e).hir_into(tcx), (*arms).hir_into(tcx), s.into())
             }
-            hir::ExprKind::Closure(c) => Self::Closure((*c).hir_into(hir)),
-            hir::ExprKind::Block(b, l) => Self::Block((*b).hir_into(hir), l.map(Into::into)),
+            hir::ExprKind::Closure(c) => Self::Closure((*c).hir_into(tcx)),
+            hir::ExprKind::Block(b, l) => Self::Block((*b).hir_into(tcx), l.map(Into::into)),
             hir::ExprKind::Assign(l, r, sp) => {
-                Self::Assign((*l).hir_into(hir), (*r).hir_into(hir), (*sp).into())
+                Self::Assign((*l).hir_into(tcx), (*r).hir_into(tcx), (*sp).into())
             }
             hir::ExprKind::AssignOp(op, l, r) => {
-                Self::AssignOp(op.into(), (*l).hir_into(hir), (*r).hir_into(hir))
+                Self::AssignOp(op.into(), (*l).hir_into(tcx), (*r).hir_into(tcx))
             }
-            hir::ExprKind::Field(e, i) => Self::Field((*e).hir_into(hir), (*i).into()),
+            hir::ExprKind::Field(e, i) => Self::Field((*e).hir_into(tcx), (*i).into()),
             hir::ExprKind::Index(b, i, sp) => {
-                Self::Index((*b).hir_into(hir), (*i).hir_into(hir), (*sp).into())
+                Self::Index((*b).hir_into(tcx), (*i).hir_into(tcx), (*sp).into())
             }
-            hir::ExprKind::Path(p) => Self::Path(p.hir_into(hir)),
+            hir::ExprKind::Path(p) => Self::Path(p.hir_into(tcx)),
             hir::ExprKind::AddrOf(raw, m, e) => Self::AddrOf(
                 matches!(raw, hir::BorrowKind::Raw),
                 matches!(m, hir::Mutability::Mut),
-                (*e).hir_into(hir),
+                (*e).hir_into(tcx),
             ),
-            hir::ExprKind::Break(d, e) => Self::Break(d.into(), e.map(|e| e.hir_into(hir))),
+            hir::ExprKind::Break(d, e) => Self::Break(d.into(), e.map(|e| e.hir_into(tcx))),
             hir::ExprKind::Continue(d) => Self::Continue(d.into()),
-            hir::ExprKind::Ret(e) => Self::Ret(e.map(|e| e.hir_into(hir))),
-            hir::ExprKind::Become(e) => Self::Become((*e).hir_into(hir)),
+            hir::ExprKind::Ret(e) => Self::Ret(e.map(|e| e.hir_into(tcx))),
+            hir::ExprKind::Become(e) => Self::Become((*e).hir_into(tcx)),
             hir::ExprKind::InlineAsm(..) => todo!(),
             hir::ExprKind::OffsetOf(ty, is) => Self::OffsetOf(
-                (*ty).hir_into(hir),
+                (*ty).hir_into(tcx),
                 is.iter().copied().map(Into::into).collect(),
             ),
             hir::ExprKind::Struct(path, fs, e) => Self::Struct(
-                (*path).hir_into(hir),
-                (*fs).hir_into(hir),
-                e.map(|e| e.hir_into(hir)),
+                (*path).hir_into(tcx),
+                (*fs).hir_into(tcx),
+                e.map(|e| e.hir_into(tcx)),
             ),
-            hir::ExprKind::Repeat(e, l) => Self::Repeat((*e).hir_into(hir), l.hir_into(hir)),
-            hir::ExprKind::Yield(e, s) => Self::Yield((*e).hir_into(hir), s.into()),
+            hir::ExprKind::Repeat(e, l) => Self::Repeat((*e).hir_into(tcx), l.hir_into(tcx)),
+            hir::ExprKind::Yield(e, s) => Self::Yield((*e).hir_into(tcx), s.into()),
             hir::ExprKind::Err(_) => Self::Err,
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::ConstBlock> for ConstBlock {
-    fn from_hir(value: &'hir hir::ConstBlock, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::ConstBlock, tcx: TyCtxt<'hir>) -> Self {
         ConstBlock {
             hir_id: value.hir_id.into(),
             def_id: value.def_id.into(),
-            body: hir.body(value.body).hir_into(hir),
+            body: tcx.hir().body(value.body).hir_into(tcx),
         }
     }
 }
@@ -1476,12 +1525,12 @@ impl From<&rustc_ast::LitFloatType> for LitFloatType {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::LetExpr<'hir>> for LetExpr {
-    fn from_hir(value: &'hir hir::LetExpr<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::LetExpr<'hir>, tcx: TyCtxt<'hir>) -> Self {
         LetExpr {
             span: value.span.into(),
-            pat: value.pat.hir_into(hir),
-            ty: value.ty.map(|ty| ty.hir_into(hir)),
-            init: value.init.hir_into(hir),
+            pat: value.pat.hir_into(tcx),
+            ty: value.ty.map(|ty| ty.hir_into(tcx)),
+            init: value.init.hir_into(tcx),
             recovered: matches!(value.recovered, rustc_ast::Recovered::Yes(_)),
         }
     }
@@ -1498,13 +1547,13 @@ impl From<&hir::LoopSource> for LoopSource {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Arm<'hir>> for Arm {
-    fn from_hir(value: &'hir hir::Arm<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Arm<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Arm {
             hir_id: value.hir_id.into(),
             span: value.span.into(),
-            pat: value.pat.hir_into(hir),
-            guard: value.guard.map(|e| e.hir_into(hir)),
-            body: value.body.hir_into(hir),
+            pat: value.pat.hir_into(tcx),
+            guard: value.guard.map(|e| e.hir_into(tcx)),
+            body: value.body.hir_into(tcx),
         }
     }
 }
@@ -1523,15 +1572,15 @@ impl From<&hir::MatchSource> for MatchSource {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Closure<'hir>> for Closure {
-    fn from_hir(value: &'hir hir::Closure<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Closure<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Closure {
             def_id: value.def_id.into(),
             binder: value.binder.into(),
             constness: matches!(value.constness, hir::Constness::Const),
             capture_clause: value.capture_clause.into(),
-            bound_generic_params: value.bound_generic_params.hir_into(hir),
-            fn_decl: value.fn_decl.hir_into(hir),
-            body: hir.body(value.body).hir_into(hir),
+            bound_generic_params: value.bound_generic_params.hir_into(tcx),
+            fn_decl: value.fn_decl.hir_into(tcx),
+            body: tcx.hir().body(value.body).hir_into(tcx),
             fn_decl_span: value.fn_decl_span.into(),
             fn_arg_span: value.fn_arg_span.map(Into::into),
         }
@@ -1559,10 +1608,10 @@ impl From<hir::CaptureBy> for CaptureBy {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::FnDecl<'hir>> for FnDecl {
-    fn from_hir(value: &'hir hir::FnDecl<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::FnDecl<'hir>, tcx: TyCtxt<'hir>) -> Self {
         FnDecl {
-            inputs: value.inputs.hir_into(hir),
-            output: value.output.hir_into(hir),
+            inputs: value.inputs.hir_into(tcx),
+            output: value.output.hir_into(tcx),
             c_variadic: value.c_variadic,
             implicit_self: value.implicit_self.into(),
             lifetime_elision_allowed: value.lifetime_elision_allowed,
@@ -1571,10 +1620,10 @@ impl<'hir> FromHir<'hir, &'hir hir::FnDecl<'hir>> for FnDecl {
 }
 
 impl<'hir> FromHir<'hir, hir::FnRetTy<'hir>> for FnRetTy {
-    fn from_hir(value: hir::FnRetTy<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: hir::FnRetTy<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::FnRetTy::DefaultReturn(sp) => Self::DefaultReturn(sp.into()),
-            hir::FnRetTy::Return(ty) => Self::Return(ty.hir_into(hir)),
+            hir::FnRetTy::Return(ty) => Self::Return(ty.hir_into(tcx)),
         }
     }
 }
@@ -1592,10 +1641,10 @@ impl From<hir::ImplicitSelfKind> for ImplicitSelfKind {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Block<'hir>> for Block {
-    fn from_hir(value: &'hir hir::Block<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Block<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Block {
-            stmts: value.stmts.hir_into(hir),
-            expr: value.expr.map(|e| e.hir_into(hir)),
+            stmts: value.stmts.hir_into(tcx),
+            expr: value.expr.map(|e| e.hir_into(tcx)),
             hir_id: value.hir_id.into(),
             rules: value.rules.into(),
             span: value.span.into(),
@@ -1605,33 +1654,33 @@ impl<'hir> FromHir<'hir, &'hir hir::Block<'hir>> for Block {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::Stmt<'hir>> for Stmt {
-    fn from_hir(value: &'hir hir::Stmt<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::Stmt<'hir>, tcx: TyCtxt<'hir>) -> Self {
         Stmt {
             hir_id: value.hir_id.into(),
-            kind: (&value.kind).hir_into(hir),
+            kind: (&value.kind).hir_into(tcx),
             span: value.span.into(),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::StmtKind<'hir>> for StmtKind {
-    fn from_hir(value: &'hir hir::StmtKind<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::StmtKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::StmtKind::Let(l) => Self::Let((*l).hir_into(hir)),
-            hir::StmtKind::Item(i) => Self::Item(hir.item(*i).hir_into(hir)),
-            hir::StmtKind::Expr(e) => Self::Expr((*e).hir_into(hir)),
-            hir::StmtKind::Semi(e) => Self::Semi((*e).hir_into(hir)),
+            hir::StmtKind::Let(l) => Self::Let((*l).hir_into(tcx)),
+            hir::StmtKind::Item(i) => Self::Item(tcx.hir().item(*i).hir_into(tcx)),
+            hir::StmtKind::Expr(e) => Self::Expr((*e).hir_into(tcx)),
+            hir::StmtKind::Semi(e) => Self::Semi((*e).hir_into(tcx)),
         }
     }
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::LetStmt<'hir>> for LetStmt {
-    fn from_hir(value: &'hir hir::LetStmt<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::LetStmt<'hir>, tcx: TyCtxt<'hir>) -> Self {
         LetStmt {
-            pat: value.pat.hir_into(hir),
-            ty: value.ty.map(|ty| ty.hir_into(hir)),
-            init: value.init.map(|e| e.hir_into(hir)),
-            els: value.els.map(|b| b.hir_into(hir)),
+            pat: value.pat.hir_into(tcx),
+            ty: value.ty.map(|ty| ty.hir_into(tcx)),
+            init: value.init.map(|e| e.hir_into(tcx)),
+            els: value.els.map(|b| b.hir_into(tcx)),
             hir_id: value.hir_id.into(),
             span: value.span.into(),
             source: value.source.into(),
@@ -1733,11 +1782,11 @@ impl From<hir::LoopIdError> for LoopIdError {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::ExprField<'hir>> for ExprField {
-    fn from_hir(value: &'hir hir::ExprField<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::ExprField<'hir>, tcx: TyCtxt<'hir>) -> Self {
         ExprField {
             hir_id: value.hir_id.into(),
             ident: value.ident.into(),
-            expr: value.expr.hir_into(hir),
+            expr: value.expr.hir_into(tcx),
             span: value.span.into(),
             is_shorthand: value.is_shorthand,
         }
@@ -1745,10 +1794,10 @@ impl<'hir> FromHir<'hir, &'hir hir::ExprField<'hir>> for ExprField {
 }
 
 impl<'hir> FromHir<'hir, &'hir hir::ArrayLen<'hir>> for ArrayLen {
-    fn from_hir(value: &'hir hir::ArrayLen<'hir>, hir: Map<'hir>) -> Self {
+    fn from_hir(value: &'hir hir::ArrayLen<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::ArrayLen::Infer(ia) => Self::Infer(ia.into()),
-            hir::ArrayLen::Body(c) => Self::Body((*c).hir_into(hir)),
+            hir::ArrayLen::Body(c) => Self::Body((*c).hir_into(tcx)),
         }
     }
 }
@@ -1785,9 +1834,10 @@ impl From<hir::GenericParamSource> for GenericParamSource {
 impl<'hir, T, S> FromHir<'hir, &'hir [T]> for Vec<S>
 where
     S: FromHir<'hir, &'hir T>,
+    T: std::fmt::Debug,
 {
-    fn from_hir(value: &'hir [T], hir: Map<'hir>) -> Self {
-        value.hir_into(hir)
+    fn from_hir(value: &'hir [T], tcx: TyCtxt<'hir>) -> Self {
+        value.iter().map(|i| i.hir_into(tcx)).collect()
     }
 }
 

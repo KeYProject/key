@@ -51,6 +51,7 @@ impl Wrapper {
 impl Callbacks for Wrapper {
     fn after_analysis<'tcx>(&mut self, _: &Compiler, q: &'tcx Queries<'tcx>) -> Compilation {
         q.global_ctxt().unwrap().enter(|tcx| {
+            eprintln!("Starting conversion");
             self.converted = Some(convert(tcx));
             self.print();
         });

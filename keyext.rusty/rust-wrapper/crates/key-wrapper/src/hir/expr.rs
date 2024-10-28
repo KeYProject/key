@@ -81,14 +81,14 @@ pub enum StrStyle {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LitIntType {
-    Signed(IntHirTy),
-    Unsigned(UintHirTy),
+    Signed(IntTy),
+    Unsigned(UintTy),
     Unsuffixed,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum LitFloatType {
-    Suffixed(FloatHirTy),
+    Suffixed(FloatTy),
     Unsuffixed,
 }
 
