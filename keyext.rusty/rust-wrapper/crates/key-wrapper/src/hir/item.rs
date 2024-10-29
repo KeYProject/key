@@ -10,11 +10,25 @@ pub struct Item {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum ItemKind {
-    ExternCrate(Option<Symbol>),
-    Use(UsePath, UseKind),
-    Static(HirTy, bool, Body),
-    Const(HirTy, Generics, Body),
+    ExternCrate {
+        symbol: Option<Symbol>,
+    },
+    Use {
+        path: UsePath,
+        use_kind: UseKind,
+    },
+    Static {
+        ty: HirTy,
+        r#const: bool,
+        body: Body,
+    },
+    Const {
+        ty: HirTy,
+        generics: Generics,
+        body: Body,
+    },
     Fn {
         sig: FnSig,
         generics: Generics,
@@ -23,20 +37,45 @@ pub enum ItemKind {
         body: Body,
     },
     //Macro(MacroDef, MacroKind),
-    Mod(Mod),
+    Mod {
+        r#mod: Mod,
+    },
     /* ForeignMod {
         abi: Abi,
         items: [ForeignItemRef],
     }, */
     //GlobalAsm(InlineAsm),
-    TyAlias(HirTy, Generics),
+    TyAlias {
+        ty: HirTy,
+        generics: Generics,
+    },
     //OpaqueTy(OpaqueTy),
-    Enum(EnumDef, Generics),
-    Struct(VariantData, Generics),
-    Union(VariantData, Generics),
-    Trait(bool, bool, Generics, GenericBounds, Vec<TraitItemRef>),
-    TraitAlias(Generics, GenericBounds),
-    Impl(Impl),
+    Enum {
+        def: EnumDef,
+        generics: Generics,
+    },
+    Struct {
+        data: VariantData,
+        generics: Generics,
+    },
+    Union {
+        data: VariantData,
+        generics: Generics,
+    },
+    Trait {
+        field1: bool,
+        field2: bool,
+        generics: Generics,
+        bounds: GenericBounds,
+        refs: Vec<TraitItemRef>,
+    },
+    TraitAlias {
+        generics: Generics,
+        bounds: GenericBounds,
+    },
+    Impl {
+        r#impl: Impl,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -157,23 +196,54 @@ pub struct ImplItemRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum HirTyKind {
-    InferDelegation(DefId, InferDelegationKind),
-    Slice(HirTy),
-    Array(HirTy, ArrayLen),
-    Ptr(MutHirTy),
-    Ref(Lifetime, MutHirTy),
-    BareFn(BareFnHirTy),
+    InferDelegation {
+        def_id: DefId,
+        kind: InferDelegationKind,
+    },
+    Slice {
+        ty: HirTy,
+    },
+    Array {
+        ty: HirTy,
+        len: ArrayLen,
+    },
+    Ptr {
+        ty: MutHirTy,
+    },
+    Ref {
+        lifetime: Lifetime,
+        ty: MutHirTy,
+    },
+    BareFn {
+        ty: BareFnHirTy,
+    },
     Never,
-    Tup(Vec<HirTy>),
-    AnonAdt(Item),
-    Path(QPath),
+    Tup {
+        tys: Vec<HirTy>,
+    },
+    AnonAdt {
+        item: Item,
+    },
+    Path {
+        path: QPath,
+    },
     // OpaqueDef(Item, Vec<GenericArg>, bool),
-    TraitObject(Vec<PolyTraitRef>, Lifetime, TraitObjectSyntax),
-    Typeof(AnonConst),
+    TraitObject {
+        refs: Vec<PolyTraitRef>,
+        lifetime: Lifetime,
+        syntax: TraitObjectSyntax,
+    },
+    Typeof {
+        r#const: AnonConst,
+    },
     Infer,
     Err,
-    Pat(HirTy, Pat),
+    Pat {
+        ty: HirTy,
+        pat: Pat,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

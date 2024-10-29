@@ -74,6 +74,7 @@ pub struct Generics {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum WherePredicate {
     Bound(WhereBoundPredicate),
     Region(WhereRegionPredicate),
@@ -91,6 +92,7 @@ pub struct WhereBoundPredicate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum PredicateOrigin {
     WhereClause,
     GenericParam,
@@ -115,6 +117,7 @@ pub struct WhereEqPredicate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum Defaultness {
     Default { has_value: bool },
     Final,
@@ -138,9 +141,17 @@ pub struct Path<R = Res> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct Def(pub DefKind, pub DefId);
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum Res<Id = HirId> {
-    Def(DefKind, DefId),
-    PrimTy(PrimHirTy),
+    Def {
+        def: Def,
+    },
+    PrimTy {
+        ty: PrimHirTy,
+    },
     SelfTyParam {
         trait_: DefId,
     },
@@ -150,7 +161,9 @@ pub enum Res<Id = HirId> {
         is_trait_impl: bool,
     },
     SelfCtor(DefId),
-    Local(Id),
+    Local {
+        id: Id,
+    },
     ToolMod,
     NonMacroAttr(NonMacroAttrKind),
     Err,
@@ -175,6 +188,11 @@ pub struct DefId {
 pub struct CrateNum(pub u32);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+/// the second field is true iff it is a function ctor
+pub struct Ctor(pub CtorOf, pub bool);
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum DefKind {
     Mod,
     Struct,
@@ -195,8 +213,7 @@ pub enum DefKind {
         mutability: bool,
         nested: bool,
     },
-    /// the second field is true iff it is a function ctor
-    Ctor(CtorOf, bool),
+    Ctor(Ctor),
     AssocFn,
     AssocConst,
     Macro(MacroKind),
@@ -217,6 +234,7 @@ pub enum DefKind {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum NonMacroAttrKind {
     Builtin(Symbol),
     Tool,
@@ -225,10 +243,11 @@ pub enum NonMacroAttrKind {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum PrimHirTy {
-    Int(IntTy),
-    Uint(UintTy),
-    Float(FloatTy),
+    Int { ty: IntTy },
+    Uint { ty: UintTy },
+    Float { ty: FloatTy },
     Str,
     Bool,
     Char,
@@ -462,10 +481,11 @@ pub struct AnonConst {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum QPath {
-    Resolved(Option<HirTy>, Path),
-    TypeRelative(HirTy, PathSegment),
-    LangItem(LangItem, Span),
+    Resolved { ty: Option<HirTy>, path: Path },
+    TypeRelative { ty: HirTy, seg: PathSegment },
+    LangItem { item: LangItem, span: Span },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

@@ -1,0 +1,24 @@
+package org.key_project.rusty.parser.hir.pat;
+
+import org.key_project.rusty.parser.hir.HirAdapter;
+import org.key_project.rusty.parser.hir.HirId;
+import org.key_project.rusty.parser.hir.Ident;
+import org.key_project.rusty.parser.hir.QPath;
+
+public interface PatKind {
+    record Wild() implements PatKind {}
+    record Binding(BindingMode mode, HirId hirId, Ident ident, Pat pat) implements PatKind{}
+    record Path(QPath path) implements PatKind {}
+
+    class Adapter extends HirAdapter<PatKind> {
+        @Override
+        public Class<? extends PatKind> getType(String tag) {
+            return switch (tag) {
+                case "Wild" -> Wild.class;
+                case "Binding" -> Binding.class;
+                case "Path" -> Path.class;
+                default -> null;
+            };
+        }
+    }
+}

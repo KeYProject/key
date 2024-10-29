@@ -9,30 +9,72 @@ pub struct Pat {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum PatKind {
     Wild,
-    Binding(BindingMode, HirId, Ident, Option<Pat>),
-    Struct(QPath, Vec<PatField>, bool),
-    TupleStruct(QPath, Vec<Pat>, DotDotPos),
-    Or(Vec<Pat>),
+    Binding {
+        mode: BindingMode,
+        hir_id: HirId,
+        ident: Ident,
+        pat: Option<Pat>,
+    },
+    Struct {
+        path: QPath,
+        fields: Vec<PatField>,
+        rest: bool,
+    },
+    TupleStruct {
+        path: QPath,
+        pats: Vec<Pat>,
+        dot_dot_pos: DotDotPos,
+    },
+    Or {
+        pats: Vec<Pat>,
+    },
     Never,
-    Path(QPath),
-    Tuple(Vec<Pat>, DotDotPos),
-    Box(Pat),
-    Deref(Pat),
-    Ref(Pat, bool),
-    Lit(Expr),
-    Range(Option<Expr>, Option<Expr>, bool),
-    Slice(Vec<Pat>, Option<Pat>, Vec<Pat>),
+    Path {
+        path: QPath,
+    },
+    Tuple {
+        pats: Vec<Pat>,
+        dot_dot_pos: DotDotPos,
+    },
+    Box {
+        pat: Pat,
+    },
+    Deref {
+        pat: Pat,
+    },
+    Ref {
+        pat: Pat,
+        r#mut: bool,
+    },
+    Lit {
+        expr: Expr,
+    },
+    Range {
+        lhs: Option<Expr>,
+        rhs: Option<Expr>,
+        inclusive: bool,
+    },
+    Slice {
+        start: Vec<Pat>,
+        mid: Option<Pat>,
+        rest: Vec<Pat>,
+    },
     Err,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct BindingMode(pub ByRef, pub bool);
+pub struct BindingMode {
+    pub by_ref: ByRef,
+    pub r#mut: bool,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum ByRef {
-    Yes(bool),
+    Yes { r#mut: bool },
     No,
 }
 

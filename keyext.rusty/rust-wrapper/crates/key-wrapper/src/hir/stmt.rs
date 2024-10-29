@@ -8,11 +8,12 @@ pub struct Stmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum StmtKind {
-    Let(LetStmt),
-    Item(Item),
-    Expr(Expr),
-    Semi(Expr),
+    Let { r#let: LetStmt },
+    Item { item: Item },
+    Expr { expr: Expr },
+    Semi { expr: Expr },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -31,5 +32,5 @@ pub enum LocalSource {
     Normal,
     AsyncFn,
     AwaitDesugar,
-    AssignDesugar(Span),
+    AssignDesugar { span: Span },
 }

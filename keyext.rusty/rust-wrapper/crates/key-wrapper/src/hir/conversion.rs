@@ -8,6 +8,8 @@ use rustc_span::{
     BytePos as HirBytePos, Span as HirSpan, Symbol as HirSymbol,
 };
 use type_extract::extract_types;
+use Ctor;
+use Def;
 
 use super::*;
 
@@ -167,10 +169,12 @@ impl<'hir> FromHir<'hir, Vec<hir::def::Res>> for Vec<Res> {
 impl<'hir> FromHir<'hir, hir::def::Res> for Res {
     fn from_hir(value: hir::def::Res, _: TyCtxt<'hir>) -> Self {
         match value {
-            rustc_hir::def::Res::Def(def_kind, def_id) => {
-                Self::Def((&def_kind).into(), (&def_id).into())
-            }
-            rustc_hir::def::Res::PrimTy(prim_ty) => Self::PrimTy((&prim_ty).into()),
+            rustc_hir::def::Res::Def(def_kind, def_id) => Self::Def {
+                def: Def((&def_kind).into(), (&def_id).into()),
+            },
+            rustc_hir::def::Res::PrimTy(prim_ty) => Self::PrimTy {
+                ty: (&prim_ty).into(),
+            },
             rustc_hir::def::Res::SelfTyParam { trait_ } => Self::SelfTyParam {
                 trait_: (&trait_).into(),
             },
@@ -184,7 +188,7 @@ impl<'hir> FromHir<'hir, hir::def::Res> for Res {
                 is_trait_impl: is_trait_impl,
             },
             rustc_hir::def::Res::SelfCtor(def_id) => Self::SelfCtor((&def_id).into()),
-            rustc_hir::def::Res::Local(id) => Self::Local(id.into()),
+            rustc_hir::def::Res::Local(id) => Self::Local { id: id.into() },
             rustc_hir::def::Res::ToolMod => Self::ToolMod,
             rustc_hir::def::Res::NonMacroAttr(non_macro_attr_kind) => {
                 Self::NonMacroAttr((&non_macro_attr_kind).into())
@@ -197,58 +201,69 @@ impl<'hir> FromHir<'hir, hir::def::Res> for Res {
 impl<'hir> FromHir<'hir, &'hir hir::ItemKind<'hir>> for ItemKind {
     fn from_hir(value: &'hir hir::ItemKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::ItemKind::ExternCrate(symbol) => ItemKind::ExternCrate(symbol.map(|s| s.into())),
-            hir::ItemKind::Use(path, use_kind) => ItemKind::Use(
-                Path {
+            hir::ItemKind::ExternCrate(symbol) => ItemKind::ExternCrate {
+                symbol: symbol.map(|s| s.into()),
+            },
+            hir::ItemKind::Use(path, use_kind) => ItemKind::Use {
+                path: Path {
                     span: path.span.into(),
                     res: path.res.clone().into_vec().hir_into(tcx),
                     segments: path.segments.iter().map(|s| s.hir_into(tcx)).collect(),
                 },
-                use_kind.into(),
-            ),
-            hir::ItemKind::Static(hir_ty, m, body) => Self::Static(
-                (*hir_ty).hir_into(tcx),
-                matches!(m, hir::Mutability::Mut),
-                tcx.hir().body(*body).hir_into(tcx),
-            ),
-            hir::ItemKind::Const(hir_ty, generics, body) => Self::Const(
-                (*hir_ty).hir_into(tcx),
-                (*generics).hir_into(tcx),
-                tcx.hir().body(*body).hir_into(tcx),
-            ),
+                use_kind: use_kind.into(),
+            },
+            hir::ItemKind::Static(hir_ty, m, body) => Self::Static {
+                ty: (*hir_ty).hir_into(tcx),
+                r#const: matches!(m, hir::Mutability::Mut),
+                body: tcx.hir().body(*body).hir_into(tcx),
+            },
+            hir::ItemKind::Const(hir_ty, generics, body) => Self::Const {
+                ty: (*hir_ty).hir_into(tcx),
+                generics: (*generics).hir_into(tcx),
+                body: tcx.hir().body(*body).hir_into(tcx),
+            },
             hir::ItemKind::Fn(fn_sig, generics, body) => Self::Fn {
                 sig: fn_sig.hir_into(tcx),
                 generics: (*generics).hir_into(tcx),
                 body_id: body.clone(),
                 body: tcx.hir().body(*body).hir_into(tcx),
             },
-            hir::ItemKind::Mod(m) => Self::Mod((*m).hir_into(tcx)),
-            hir::ItemKind::TyAlias(hir_ty, generics) => {
-                Self::TyAlias((*hir_ty).hir_into(tcx), (*generics).hir_into(tcx))
-            }
-            hir::ItemKind::Enum(enum_def, generics) => {
-                Self::Enum(enum_def.hir_into(tcx), (*generics).hir_into(tcx))
-            }
-            hir::ItemKind::Struct(data, generics) => {
-                Self::Struct(data.hir_into(tcx), (*generics).hir_into(tcx))
-            }
-            hir::ItemKind::Union(data, generics) => {
-                Self::Union(data.hir_into(tcx), (*generics).hir_into(tcx))
-            }
-            hir::ItemKind::Trait(auto, safe, generics, bounds, refs) => Self::Trait(
-                matches!(auto, hir::IsAuto::Yes),
-                matches!(safe, hir::Safety::Safe),
-                (*generics).hir_into(tcx),
-                (*bounds).hir_into(tcx),
-                refs.iter().map(Into::into).collect(),
-            ),
-            hir::ItemKind::TraitAlias(generics, bounds) => {
-                Self::TraitAlias((*generics).hir_into(tcx), (*bounds).hir_into(tcx))
-            }
-            hir::ItemKind::Impl(i) => Self::Impl((*i).hir_into(tcx)),
-            hir::ItemKind::Macro(..) => todo!(),
-            hir::ItemKind::ForeignMod { .. } => todo!(),
-            hir::ItemKind::GlobalAsm(..) => todo!(),
+            hir::ItemKind::Mod(m) => Self::Mod {
+                r#mod: (*m).hir_into(tcx),
+            },
+            hir::ItemKind::TyAlias(hir_ty, generics) => Self::TyAlias {
+                ty: (*hir_ty).hir_into(tcx),
+                generics: (*generics).hir_into(tcx),
+            },
+            hir::ItemKind::Enum(enum_def, generics) => Self::Enum {
+                def: enum_def.hir_into(tcx),
+                generics: (*generics).hir_into(tcx),
+            },
+            hir::ItemKind::Struct(data, generics) => Self::Struct {
+                data: data.hir_into(tcx),
+                generics: (*generics).hir_into(tcx),
+            },
+            hir::ItemKind::Union(data, generics) => Self::Union {
+                data: data.hir_into(tcx),
+                generics: (*generics).hir_into(tcx),
+            },
+            hir::ItemKind::Trait(auto, safe, generics, bounds, refs) => Self::Trait {
+                field1: matches!(auto, hir::IsAuto::Yes),
+                field2: matches!(safe, hir::Safety::Safe),
+                generics: (*generics).hir_into(tcx),
+                bounds: (*bounds).hir_into(tcx),
+                refs: refs.iter().map(Into::into).collect(),
+            },
+            hir::ItemKind::TraitAlias(generics, bounds) => Self::TraitAlias {
+                generics: (*generics).hir_into(tcx),
+                bounds: (*bounds).hir_into(tcx),
+            },
+            hir::ItemKind::Impl(i) => Self::Impl {
+                r#impl: (*i).hir_into(tcx),
+            },
+            hir::ItemKind::Macro(..) => todo!("Macro"),
+            hir::ItemKind::ForeignMod { .. } => todo!("ForeignMod"),
+            hir::ItemKind::GlobalAsm(..) => todo!("Asm"),
         }
     }
 }
@@ -537,8 +552,10 @@ impl From<hir::ItemLocalId> for ItemLocalId {
 impl From<hir::def::Res> for Res {
     fn from(value: hir::def::Res) -> Self {
         match &value {
-            hir::def::Res::Def(kind, id) => Self::Def(kind.into(), id.into()),
-            hir::def::Res::PrimTy(ty) => Self::PrimTy(ty.into()),
+            hir::def::Res::Def(kind, id) => Self::Def {
+                def: Def(kind.into(), id.into()),
+            },
+            hir::def::Res::PrimTy(ty) => Self::PrimTy { ty: ty.into() },
             hir::def::Res::SelfTyParam { trait_ } => Self::SelfTyParam {
                 trait_: trait_.into(),
             },
@@ -552,7 +569,7 @@ impl From<hir::def::Res> for Res {
                 is_trait_impl: *is_trait_impl,
             },
             hir::def::Res::SelfCtor(id) => Self::SelfCtor(id.into()),
-            hir::def::Res::Local(id) => Self::Local(id.into()),
+            hir::def::Res::Local(id) => Self::Local { id: id.into() },
             hir::def::Res::ToolMod => Self::ToolMod,
             hir::def::Res::NonMacroAttr(kind) => Self::NonMacroAttr(kind.into()),
             hir::def::Res::Err => Self::Err,
@@ -757,13 +774,18 @@ impl<'hir> FromHir<'hir, &'hir hir::ConstArgKind<'hir>> for ConstArgKind {
 impl<'hir> FromHir<'hir, &'hir hir::QPath<'hir>> for QPath {
     fn from_hir(value: &'hir hir::QPath<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::QPath::Resolved(ty, p) => {
-                Self::Resolved(ty.map(|t| t.hir_into(tcx)), (*p).hir_into(tcx))
-            }
-            hir::QPath::TypeRelative(ty, seg) => {
-                Self::TypeRelative((*ty).hir_into(tcx), (*seg).hir_into(tcx))
-            }
-            hir::QPath::LangItem(li, sp) => Self::LangItem(li.into(), (*sp).into()),
+            hir::QPath::Resolved(ty, p) => Self::Resolved {
+                ty: ty.map(|t| t.hir_into(tcx)),
+                path: (*p).hir_into(tcx),
+            },
+            hir::QPath::TypeRelative(ty, seg) => Self::TypeRelative {
+                ty: (*ty).hir_into(tcx),
+                seg: (*seg).hir_into(tcx),
+            },
+            hir::QPath::LangItem(li, sp) => Self::LangItem {
+                item: li.into(),
+                span: (*sp).into(),
+            },
         }
     }
 }
@@ -982,28 +1004,54 @@ impl<'hir> FromHir<'hir, &'hir hir::Ty<'hir>> for HirTy {
 impl<'hir> FromHir<'hir, &'hir hir::TyKind<'hir>> for HirTyKind {
     fn from_hir(value: &'hir hir::TyKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::TyKind::InferDelegation(id, kind) => Self::InferDelegation(id.into(), kind.into()),
-            hir::TyKind::Slice(ty) => Self::Slice((*ty).hir_into(tcx)),
-            hir::TyKind::Array(ty, l) => Self::Array((*ty).hir_into(tcx), l.hir_into(tcx)),
-            hir::TyKind::Ptr(ty) => Self::Ptr(ty.hir_into(tcx)),
-            hir::TyKind::Ref(l, ty) => Self::Ref((*l).into(), ty.hir_into(tcx)),
-            hir::TyKind::BareFn(ty) => Self::BareFn((*ty).hir_into(tcx)),
+            hir::TyKind::InferDelegation(id, kind) => Self::InferDelegation {
+                def_id: id.into(),
+                kind: kind.into(),
+            },
+            hir::TyKind::Slice(ty) => Self::Slice {
+                ty: (*ty).hir_into(tcx),
+            },
+            hir::TyKind::Array(ty, l) => Self::Array {
+                ty: (*ty).hir_into(tcx),
+                len: l.hir_into(tcx),
+            },
+            hir::TyKind::Ptr(ty) => Self::Ptr {
+                ty: ty.hir_into(tcx),
+            },
+            hir::TyKind::Ref(l, ty) => Self::Ref {
+                lifetime: (*l).into(),
+                ty: ty.hir_into(tcx),
+            },
+            hir::TyKind::BareFn(ty) => Self::BareFn {
+                ty: (*ty).hir_into(tcx),
+            },
             hir::TyKind::Never => Self::Never,
-            hir::TyKind::Tup(tys) => Self::Tup((*tys).hir_into(tcx)),
-            hir::TyKind::AnonAdt(id) => Self::AnonAdt(tcx.hir().item(*id).hir_into(tcx)),
-            hir::TyKind::Path(path) => Self::Path(path.hir_into(tcx)),
+            hir::TyKind::Tup(tys) => Self::Tup {
+                tys: (*tys).hir_into(tcx),
+            },
+            hir::TyKind::AnonAdt(id) => Self::AnonAdt {
+                item: tcx.hir().item(*id).hir_into(tcx),
+            },
+            hir::TyKind::Path(path) => Self::Path {
+                path: path.hir_into(tcx),
+            },
             hir::TyKind::OpaqueDef(..) => {
-                todo!()
+                todo!("OpagueDef")
             }
-            hir::TyKind::TraitObject(ts, l, syn) => Self::TraitObject(
-                ts.iter().map(|r| r.hir_into(tcx)).collect(),
-                (*l).into(),
-                syn.into(),
-            ),
-            hir::TyKind::Typeof(c) => Self::Typeof((*c).hir_into(tcx)),
+            hir::TyKind::TraitObject(ts, l, syn) => Self::TraitObject {
+                refs: ts.iter().map(|r| r.hir_into(tcx)).collect(),
+                lifetime: (*l).into(),
+                syntax: syn.into(),
+            },
+            hir::TyKind::Typeof(c) => Self::Typeof {
+                r#const: (*c).hir_into(tcx),
+            },
             hir::TyKind::Infer => Self::Infer,
             hir::TyKind::Err(_) => Self::Err,
-            hir::TyKind::Pat(ty, p) => Self::Pat((*ty).hir_into(tcx), (*p).hir_into(tcx)),
+            hir::TyKind::Pat(ty, p) => Self::Pat {
+                ty: (*ty).hir_into(tcx),
+                pat: (*p).hir_into(tcx),
+            },
         }
     }
 }
@@ -1050,8 +1098,10 @@ impl From<&rustc_ast::TraitObjectSyntax> for TraitObjectSyntax {
 impl<'hir> FromHir<'hir, &'hir hir::def::Res> for Res {
     fn from_hir(value: &'hir hir::def::Res, _: TyCtxt<'hir>) -> Self {
         match value {
-            hir::def::Res::Def(kind, id) => Self::Def(kind.into(), id.into()),
-            hir::def::Res::PrimTy(ty) => Self::PrimTy(ty.into()),
+            hir::def::Res::Def(kind, id) => Self::Def {
+                def: Def(kind.into(), id.into()),
+            },
+            hir::def::Res::PrimTy(ty) => Self::PrimTy { ty: ty.into() },
             hir::def::Res::SelfTyParam { trait_ } => Self::SelfTyParam {
                 trait_: trait_.into(),
             },
@@ -1065,7 +1115,7 @@ impl<'hir> FromHir<'hir, &'hir hir::def::Res> for Res {
                 is_trait_impl: *is_trait_impl,
             },
             hir::def::Res::SelfCtor(id) => Self::SelfCtor(id.into()),
-            hir::def::Res::Local(id) => Self::Local(id.into()),
+            hir::def::Res::Local(id) => Self::Local { id: id.into() },
             hir::def::Res::ToolMod => Self::ToolMod,
             hir::def::Res::NonMacroAttr(kind) => Self::NonMacroAttr(kind.into()),
             hir::def::Res::Err => Self::Err,
@@ -1126,8 +1176,12 @@ impl From<&hir::def::DefKind> for DefKind {
                 mutability: false,
                 nested: *nested,
             },
-            hir::def::DefKind::Ctor(of, hir::def::CtorKind::Fn) => Self::Ctor(of.into(), true),
-            hir::def::DefKind::Ctor(of, hir::def::CtorKind::Const) => Self::Ctor(of.into(), false),
+            hir::def::DefKind::Ctor(of, hir::def::CtorKind::Fn) => {
+                Self::Ctor(Ctor(of.into(), true))
+            }
+            hir::def::DefKind::Ctor(of, hir::def::CtorKind::Const) => {
+                Self::Ctor(Ctor(of.into(), false))
+            }
             hir::def::DefKind::AssocFn => Self::AssocFn,
             hir::def::DefKind::AssocConst => Self::AssocConst,
             hir::def::DefKind::Macro(kind) => Self::Macro(kind.into()),
@@ -1171,9 +1225,9 @@ impl From<&rustc_span::MacroKind> for MacroKind {
 impl From<&hir::PrimTy> for PrimHirTy {
     fn from(value: &hir::PrimTy) -> Self {
         match value {
-            hir::PrimTy::Int(i) => Self::Int(i.into()),
-            hir::PrimTy::Uint(i) => Self::Uint(i.into()),
-            hir::PrimTy::Float(f) => Self::Float(f.into()),
+            hir::PrimTy::Int(i) => Self::Int { ty: i.into() },
+            hir::PrimTy::Uint(i) => Self::Uint { ty: i.into() },
+            hir::PrimTy::Float(f) => Self::Float { ty: f.into() },
             hir::PrimTy::Str => Self::Str,
             hir::PrimTy::Bool => Self::Bool,
             hir::PrimTy::Char => Self::Char,
@@ -1290,38 +1344,56 @@ impl<'hir> FromHir<'hir, &'hir hir::PatKind<'hir>> for PatKind {
     fn from_hir(value: &'hir hir::PatKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
             hir::PatKind::Wild => Self::Wild,
-            hir::PatKind::Binding(m, id, ident, p) => Self::Binding(
-                m.into(),
-                id.into(),
-                (*ident).into(),
-                p.map(|p| p.hir_into(tcx)),
-            ),
-            hir::PatKind::Struct(path, fs, rest) => {
-                Self::Struct(path.hir_into(tcx), (*fs).hir_into(tcx), *rest)
-            }
-            hir::PatKind::TupleStruct(path, ps, ddp) => {
-                Self::TupleStruct(path.hir_into(tcx), (*ps).hir_into(tcx), ddp.into())
-            }
-            hir::PatKind::Or(ps) => Self::Or((*ps).hir_into(tcx)),
+            hir::PatKind::Binding(m, id, ident, p) => Self::Binding {
+                mode: m.into(),
+                hir_id: id.into(),
+                ident: (*ident).into(),
+                pat: p.map(|p| p.hir_into(tcx)),
+            },
+            hir::PatKind::Struct(path, fs, rest) => Self::Struct {
+                path: path.hir_into(tcx),
+                fields: (*fs).hir_into(tcx),
+                rest: *rest,
+            },
+            hir::PatKind::TupleStruct(path, ps, ddp) => Self::TupleStruct {
+                path: path.hir_into(tcx),
+                pats: (*ps).hir_into(tcx),
+                dot_dot_pos: ddp.into(),
+            },
+            hir::PatKind::Or(ps) => Self::Or {
+                pats: (*ps).hir_into(tcx),
+            },
             hir::PatKind::Never => Self::Never,
-            hir::PatKind::Path(p) => Self::Path(p.hir_into(tcx)),
-            hir::PatKind::Tuple(ps, ddp) => Self::Tuple((*ps).hir_into(tcx), ddp.into()),
-            hir::PatKind::Box(p) => Self::Box((*p).hir_into(tcx)),
-            hir::PatKind::Deref(p) => Self::Deref((*p).hir_into(tcx)),
-            hir::PatKind::Ref(p, m) => {
-                Self::Ref((*p).hir_into(tcx), matches!(m, hir::Mutability::Mut))
-            }
-            hir::PatKind::Lit(e) => Self::Lit((*e).hir_into(tcx)),
-            hir::PatKind::Range(l, r, i) => Self::Range(
-                l.map(|e| e.hir_into(tcx)),
-                r.map(|e| e.hir_into(tcx)),
-                matches!(i, hir::RangeEnd::Included),
-            ),
-            hir::PatKind::Slice(ps, p, pss) => Self::Slice(
-                (*ps).hir_into(tcx),
-                p.map(|p| p.hir_into(tcx)),
-                (*pss).hir_into(tcx),
-            ),
+            hir::PatKind::Path(p) => Self::Path {
+                path: p.hir_into(tcx),
+            },
+            hir::PatKind::Tuple(ps, ddp) => Self::Tuple {
+                pats: (*ps).hir_into(tcx),
+                dot_dot_pos: ddp.into(),
+            },
+            hir::PatKind::Box(p) => Self::Box {
+                pat: (*p).hir_into(tcx),
+            },
+            hir::PatKind::Deref(p) => Self::Deref {
+                pat: (*p).hir_into(tcx),
+            },
+            hir::PatKind::Ref(p, m) => Self::Ref {
+                pat: (*p).hir_into(tcx),
+                r#mut: matches!(m, hir::Mutability::Mut),
+            },
+            hir::PatKind::Lit(e) => Self::Lit {
+                expr: (*e).hir_into(tcx),
+            },
+            hir::PatKind::Range(l, r, i) => Self::Range {
+                lhs: l.map(|e| e.hir_into(tcx)),
+                rhs: r.map(|e| e.hir_into(tcx)),
+                inclusive: matches!(i, hir::RangeEnd::Included),
+            },
+            hir::PatKind::Slice(ps, p, pss) => Self::Slice {
+                start: (*ps).hir_into(tcx),
+                mid: p.map(|p| p.hir_into(tcx)),
+                rest: (*pss).hir_into(tcx),
+            },
             hir::PatKind::Err(_) => Self::Err,
         }
     }
@@ -1329,15 +1401,18 @@ impl<'hir> FromHir<'hir, &'hir hir::PatKind<'hir>> for PatKind {
 
 impl From<&hir::BindingMode> for BindingMode {
     fn from(value: &hir::BindingMode) -> Self {
-        BindingMode(value.0.into(), matches!(value.1, hir::Mutability::Mut))
+        BindingMode {
+            by_ref: value.0.into(),
+            r#mut: matches!(value.1, hir::Mutability::Mut),
+        }
     }
 }
 
 impl From<hir::ByRef> for ByRef {
     fn from(value: hir::ByRef) -> Self {
         match value {
-            hir::ByRef::Yes(hir::Mutability::Mut) => ByRef::Yes(true),
-            hir::ByRef::Yes(hir::Mutability::Not) => ByRef::Yes(false),
+            hir::ByRef::Yes(hir::Mutability::Mut) => ByRef::Yes { r#mut: true },
+            hir::ByRef::Yes(hir::Mutability::Not) => ByRef::Yes { r#mut: false },
             hir::ByRef::No => ByRef::No,
         }
     }
@@ -1377,73 +1452,128 @@ impl<'hir> FromHir<'hir, &'hir hir::Expr<'hir>> for Expr {
 impl<'hir> FromHir<'hir, &'hir hir::ExprKind<'hir>> for ExprKind {
     fn from_hir(value: &'hir hir::ExprKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::ExprKind::ConstBlock(c) => Self::ConstBlock(c.hir_into(tcx)),
-            hir::ExprKind::Array(es) => Self::Array((*es).hir_into(tcx)),
-            hir::ExprKind::Call(e, es) => Self::Call((*e).hir_into(tcx), (*es).hir_into(tcx)),
-            hir::ExprKind::MethodCall(p, e, es, sp) => Self::MethodCall(
-                (*p).hir_into(tcx),
-                (*e).hir_into(tcx),
-                (*es).hir_into(tcx),
-                (*sp).into(),
-            ),
-            hir::ExprKind::Tup(es) => Self::Tup((*es).hir_into(tcx)),
-            hir::ExprKind::Binary(op, l, r) => {
-                Self::Binary(op.into(), (*l).hir_into(tcx), (*r).hir_into(tcx))
-            }
-            hir::ExprKind::Unary(op, e) => Self::Unary(op.into(), (*e).hir_into(tcx)),
-            hir::ExprKind::Lit(l) => Self::Lit((*l).into()),
-            hir::ExprKind::Cast(e, ty) => Self::Cast((*e).hir_into(tcx), (*ty).hir_into(tcx)),
-            hir::ExprKind::Type(e, ty) => Self::Type((*e).hir_into(tcx), (*ty).hir_into(tcx)),
-            hir::ExprKind::DropTemps(e) => Self::DropTemps((*e).hir_into(tcx)),
-            hir::ExprKind::Let(l) => Self::Let((*l).hir_into(tcx)),
-            hir::ExprKind::If(c, t, e) => Self::If(
-                (*c).hir_into(tcx),
-                (*t).hir_into(tcx),
-                e.map(|e| e.hir_into(tcx)),
-            ),
-            hir::ExprKind::Loop(b, l, s, sp) => Self::Loop(
-                (*b).hir_into(tcx),
-                l.map(Into::into),
-                s.into(),
-                (*sp).into(),
-            ),
-            hir::ExprKind::Match(e, arms, s) => {
-                Self::Match((*e).hir_into(tcx), (*arms).hir_into(tcx), s.into())
-            }
-            hir::ExprKind::Closure(c) => Self::Closure((*c).hir_into(tcx)),
-            hir::ExprKind::Block(b, l) => Self::Block((*b).hir_into(tcx), l.map(Into::into)),
-            hir::ExprKind::Assign(l, r, sp) => {
-                Self::Assign((*l).hir_into(tcx), (*r).hir_into(tcx), (*sp).into())
-            }
-            hir::ExprKind::AssignOp(op, l, r) => {
-                Self::AssignOp(op.into(), (*l).hir_into(tcx), (*r).hir_into(tcx))
-            }
-            hir::ExprKind::Field(e, i) => Self::Field((*e).hir_into(tcx), (*i).into()),
-            hir::ExprKind::Index(b, i, sp) => {
-                Self::Index((*b).hir_into(tcx), (*i).hir_into(tcx), (*sp).into())
-            }
-            hir::ExprKind::Path(p) => Self::Path(p.hir_into(tcx)),
-            hir::ExprKind::AddrOf(raw, m, e) => Self::AddrOf(
-                matches!(raw, hir::BorrowKind::Raw),
-                matches!(m, hir::Mutability::Mut),
-                (*e).hir_into(tcx),
-            ),
-            hir::ExprKind::Break(d, e) => Self::Break(d.into(), e.map(|e| e.hir_into(tcx))),
-            hir::ExprKind::Continue(d) => Self::Continue(d.into()),
-            hir::ExprKind::Ret(e) => Self::Ret(e.map(|e| e.hir_into(tcx))),
-            hir::ExprKind::Become(e) => Self::Become((*e).hir_into(tcx)),
-            hir::ExprKind::InlineAsm(..) => todo!(),
-            hir::ExprKind::OffsetOf(ty, is) => Self::OffsetOf(
-                (*ty).hir_into(tcx),
-                is.iter().copied().map(Into::into).collect(),
-            ),
-            hir::ExprKind::Struct(path, fs, e) => Self::Struct(
-                (*path).hir_into(tcx),
-                (*fs).hir_into(tcx),
-                e.map(|e| e.hir_into(tcx)),
-            ),
-            hir::ExprKind::Repeat(e, l) => Self::Repeat((*e).hir_into(tcx), l.hir_into(tcx)),
-            hir::ExprKind::Yield(e, s) => Self::Yield((*e).hir_into(tcx), s.into()),
+            hir::ExprKind::ConstBlock(c) => Self::ConstBlock {
+                block: c.hir_into(tcx),
+            },
+            hir::ExprKind::Array(es) => Self::Array {
+                exprs: (*es).hir_into(tcx),
+            },
+            hir::ExprKind::Call(e, es) => Self::Call {
+                callee: (*e).hir_into(tcx),
+                args: (*es).hir_into(tcx),
+            },
+            hir::ExprKind::MethodCall(p, e, es, sp) => Self::MethodCall {
+                segment: (*p).hir_into(tcx),
+                callee: (*e).hir_into(tcx),
+                args: (*es).hir_into(tcx),
+                span: (*sp).into(),
+            },
+            hir::ExprKind::Tup(es) => Self::Tup {
+                exprs: (*es).hir_into(tcx),
+            },
+            hir::ExprKind::Binary(op, l, r) => Self::Binary {
+                op: op.into(),
+                left: (*l).hir_into(tcx),
+                right: (*r).hir_into(tcx),
+            },
+            hir::ExprKind::Unary(op, e) => Self::Unary {
+                op: op.into(),
+                expr: (*e).hir_into(tcx),
+            },
+            hir::ExprKind::Lit(l) => Self::Lit { lit: (*l).into() },
+            hir::ExprKind::Cast(e, ty) => Self::Cast {
+                expr: (*e).hir_into(tcx),
+                ty: (*ty).hir_into(tcx),
+            },
+            hir::ExprKind::Type(e, ty) => Self::Type {
+                expr: (*e).hir_into(tcx),
+                ty: (*ty).hir_into(tcx),
+            },
+            hir::ExprKind::DropTemps(e) => Self::DropTemps {
+                expr: (*e).hir_into(tcx),
+            },
+            hir::ExprKind::Let(l) => Self::Let {
+                r#let: (*l).hir_into(tcx),
+            },
+            hir::ExprKind::If(c, t, e) => Self::If {
+                cond: (*c).hir_into(tcx),
+                then: (*t).hir_into(tcx),
+                r#else: e.map(|e| e.hir_into(tcx)),
+            },
+            hir::ExprKind::Loop(b, l, s, sp) => Self::Loop {
+                block: (*b).hir_into(tcx),
+                label: l.map(Into::into),
+                src: s.into(),
+                span: (*sp).into(),
+            },
+            hir::ExprKind::Match(e, arms, s) => Self::Match {
+                expr: (*e).hir_into(tcx),
+                arms: (*arms).hir_into(tcx),
+                src: s.into(),
+            },
+            hir::ExprKind::Closure(c) => Self::Closure {
+                closure: (*c).hir_into(tcx),
+            },
+            hir::ExprKind::Block(b, l) => Self::Block {
+                block: (*b).hir_into(tcx),
+                label: l.map(Into::into),
+            },
+            hir::ExprKind::Assign(l, r, sp) => Self::Assign {
+                left: (*l).hir_into(tcx),
+                right: (*r).hir_into(tcx),
+                span: (*sp).into(),
+            },
+            hir::ExprKind::AssignOp(op, l, r) => Self::AssignOp {
+                op: op.into(),
+                left: (*l).hir_into(tcx),
+                right: (*r).hir_into(tcx),
+            },
+            hir::ExprKind::Field(e, i) => Self::Field {
+                expr: (*e).hir_into(tcx),
+                field: (*i).into(),
+            },
+            hir::ExprKind::Index(b, i, sp) => Self::Index {
+                base: (*b).hir_into(tcx),
+                idx: (*i).hir_into(tcx),
+                span: (*sp).into(),
+            },
+            hir::ExprKind::Path(p) => Self::Path {
+                path: p.hir_into(tcx),
+            },
+            hir::ExprKind::AddrOf(raw, m, e) => Self::AddrOf {
+                raw: matches!(raw, hir::BorrowKind::Raw),
+                r#mut: matches!(m, hir::Mutability::Mut),
+                expr: (*e).hir_into(tcx),
+            },
+            hir::ExprKind::Break(d, e) => Self::Break {
+                dest: d.into(),
+                expr: e.map(|e| e.hir_into(tcx)),
+            },
+            hir::ExprKind::Continue(d) => Self::Continue { dest: d.into() },
+            hir::ExprKind::Ret(e) => Self::Ret {
+                expr: e.map(|e| e.hir_into(tcx)),
+            },
+            hir::ExprKind::Become(e) => Self::Become {
+                expr: (*e).hir_into(tcx),
+            },
+            hir::ExprKind::InlineAsm(..) => todo!("InlineAsm"),
+            hir::ExprKind::OffsetOf(ty, is) => Self::OffsetOf {
+                ty: (*ty).hir_into(tcx),
+                idents: is.iter().copied().map(Into::into).collect(),
+            },
+            hir::ExprKind::Struct(path, fs, e) => Self::Struct {
+                path: (*path).hir_into(tcx),
+                fields: (*fs).hir_into(tcx),
+                rest: e.map(|e| e.hir_into(tcx)),
+            },
+            hir::ExprKind::Repeat(e, l) => Self::Repeat {
+                expr: (*e).hir_into(tcx),
+                len: l.hir_into(tcx),
+            },
+            hir::ExprKind::Yield(e, s) => Self::Yield {
+                expr: (*e).hir_into(tcx),
+                src: s.into(),
+            },
             hir::ExprKind::Err(_) => Self::Err,
         }
     }
@@ -1481,18 +1611,29 @@ impl From<&hir::Lit> for Lit {
 impl From<&rustc_ast::LitKind> for LitKind {
     fn from(value: &rustc_ast::LitKind) -> Self {
         match value {
-            rustc_ast::LitKind::Str(sym, sty) => Self::Str(sym.into(), sty.into()),
-            rustc_ast::LitKind::ByteStr(bytes, sty) => {
-                Self::ByteStr((*bytes).iter().copied().collect(), sty.into())
-            }
-            rustc_ast::LitKind::CStr(bytes, sty) => {
-                Self::CStr((*bytes).iter().copied().collect(), sty.into())
-            }
-            rustc_ast::LitKind::Byte(b) => Self::Byte(*b),
-            rustc_ast::LitKind::Char(c) => Self::Char(*c),
-            rustc_ast::LitKind::Int(v, ty) => Self::Int(v.0, ty.into()),
-            rustc_ast::LitKind::Float(sym, ty) => Self::Float(sym.into(), ty.into()),
-            rustc_ast::LitKind::Bool(b) => Self::Bool(*b),
+            rustc_ast::LitKind::Str(sym, sty) => Self::Str {
+                symbol: sym.into(),
+                style: sty.into(),
+            },
+            rustc_ast::LitKind::ByteStr(bytes, sty) => Self::ByteStr {
+                bytes: (*bytes).iter().copied().collect(),
+                style: sty.into(),
+            },
+            rustc_ast::LitKind::CStr(bytes, sty) => Self::CStr {
+                bytes: (*bytes).iter().copied().collect(),
+                style: sty.into(),
+            },
+            rustc_ast::LitKind::Byte(b) => Self::Byte { byte: *b },
+            rustc_ast::LitKind::Char(c) => Self::Char { char: *c },
+            rustc_ast::LitKind::Int(v, ty) => Self::Int {
+                value: v.0,
+                ty: ty.into(),
+            },
+            rustc_ast::LitKind::Float(sym, ty) => Self::Float {
+                symbol: sym.into(),
+                ty: ty.into(),
+            },
+            rustc_ast::LitKind::Bool(b) => Self::Bool { value: *b },
             rustc_ast::LitKind::Err(_) => Self::Err,
         }
     }
@@ -1510,8 +1651,8 @@ impl From<&rustc_ast::StrStyle> for StrStyle {
 impl From<&rustc_ast::LitIntType> for LitIntType {
     fn from(value: &rustc_ast::LitIntType) -> Self {
         match value {
-            rustc_ast::LitIntType::Signed(ty) => Self::Signed(ty.into()),
-            rustc_ast::LitIntType::Unsigned(ty) => Self::Unsigned(ty.into()),
+            rustc_ast::LitIntType::Signed(ty) => Self::Signed { ty: ty.into() },
+            rustc_ast::LitIntType::Unsigned(ty) => Self::Unsigned { ty: ty.into() },
             rustc_ast::LitIntType::Unsuffixed => Self::Unsuffixed,
         }
     }
@@ -1668,10 +1809,18 @@ impl<'hir> FromHir<'hir, &'hir hir::Stmt<'hir>> for Stmt {
 impl<'hir> FromHir<'hir, &'hir hir::StmtKind<'hir>> for StmtKind {
     fn from_hir(value: &'hir hir::StmtKind<'hir>, tcx: TyCtxt<'hir>) -> Self {
         match value {
-            hir::StmtKind::Let(l) => Self::Let((*l).hir_into(tcx)),
-            hir::StmtKind::Item(i) => Self::Item(tcx.hir().item(*i).hir_into(tcx)),
-            hir::StmtKind::Expr(e) => Self::Expr((*e).hir_into(tcx)),
-            hir::StmtKind::Semi(e) => Self::Semi((*e).hir_into(tcx)),
+            hir::StmtKind::Let(l) => Self::Let {
+                r#let: (*l).hir_into(tcx),
+            },
+            hir::StmtKind::Item(i) => Self::Item {
+                item: tcx.hir().item(*i).hir_into(tcx),
+            },
+            hir::StmtKind::Expr(e) => Self::Expr {
+                expr: (*e).hir_into(tcx),
+            },
+            hir::StmtKind::Semi(e) => Self::Semi {
+                expr: (*e).hir_into(tcx),
+            },
         }
     }
 }
@@ -1696,7 +1845,7 @@ impl From<hir::LocalSource> for LocalSource {
             hir::LocalSource::Normal => Self::Normal,
             hir::LocalSource::AsyncFn => Self::AsyncFn,
             hir::LocalSource::AwaitDesugar => Self::AwaitDesugar,
-            hir::LocalSource::AssignDesugar(sp) => Self::AssignDesugar(sp.into()),
+            hir::LocalSource::AssignDesugar(sp) => Self::AssignDesugar { span: sp.into() },
         }
     }
 }
@@ -1705,7 +1854,7 @@ impl From<hir::BlockCheckMode> for BlockCheckMode {
     fn from(value: hir::BlockCheckMode) -> Self {
         match value {
             hir::BlockCheckMode::DefaultBlock => Self::DefaultBlock,
-            hir::BlockCheckMode::UnsafeBlock(s) => Self::UnsafeBlock(s.into()),
+            hir::BlockCheckMode::UnsafeBlock(s) => Self::UnsafeBlock { src: s.into() },
         }
     }
 }
@@ -1994,7 +2143,7 @@ impl<'tcx> FromHir<'tcx, &rustc_middle::ty::AliasTy<'tcx>> for AliasTy {
 impl<'tcx> FromHir<'tcx, rustc_middle::ty::GenericArgKind<'tcx>> for GenericTyArgKind {
     fn from_hir(value: rustc_middle::ty::GenericArgKind<'tcx>, tcx: TyCtxt<'tcx>) -> Self {
         match value {
-            rustc_type_ir::GenericArgKind::Lifetime(_) => todo!(),
+            rustc_type_ir::GenericArgKind::Lifetime(_) => todo!("Lifetime"),
             rustc_type_ir::GenericArgKind::Type(ty) => Self::Type((&ty).hir_into(tcx)),
             rustc_type_ir::GenericArgKind::Const(c) => Self::Const((&c).hir_into(tcx)),
         }
@@ -2004,14 +2153,14 @@ impl<'tcx> FromHir<'tcx, rustc_middle::ty::GenericArgKind<'tcx>> for GenericTyAr
 impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Const<'tcx>> for Const {
     fn from_hir(value: &rustc_middle::ty::Const<'tcx>, tcx: TyCtxt<'tcx>) -> Self {
         match value.kind() {
-            rustc_type_ir::ConstKind::Param(_) => todo!(),
-            rustc_type_ir::ConstKind::Infer(infer_const) => todo!(),
-            rustc_type_ir::ConstKind::Bound(debruijn_index, _) => todo!(),
-            rustc_type_ir::ConstKind::Placeholder(_) => todo!(),
-            rustc_type_ir::ConstKind::Unevaluated(unevaluated_const) => todo!(),
-            rustc_type_ir::ConstKind::Value(_, _) => todo!(),
+            rustc_type_ir::ConstKind::Param(_) => todo!("Param"),
+            rustc_type_ir::ConstKind::Infer(infer_const) => todo!("Infer"),
+            rustc_type_ir::ConstKind::Bound(debruijn_index, _) => todo!("Bound"),
+            rustc_type_ir::ConstKind::Placeholder(_) => todo!("PlaceHolder"),
+            rustc_type_ir::ConstKind::Unevaluated(unevaluated_const) => todo!("Uneval"),
+            rustc_type_ir::ConstKind::Value(_, _) => todo!("Val"),
             rustc_type_ir::ConstKind::Error(_) => Self::Error,
-            rustc_type_ir::ConstKind::Expr(e) => todo!(),
+            rustc_type_ir::ConstKind::Expr(e) => todo!("Expr"),
         }
     }
 }

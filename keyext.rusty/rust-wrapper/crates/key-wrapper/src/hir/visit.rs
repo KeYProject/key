@@ -54,12 +54,20 @@ pub fn visit_item<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a Item) {
 
 pub fn visit_item_kind<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a ItemKind) {
     match x {
-        ItemKind::ExternCrate(_) => {}
-        ItemKind::Use(..) => {}
-        ItemKind::Static(_, _, body) => {
+        ItemKind::ExternCrate { symbol: _ } => {}
+        ItemKind::Use { .. } => {}
+        ItemKind::Static {
+            ty: _,
+            r#const: _,
+            body,
+        } => {
             v.visit_body(body);
         }
-        ItemKind::Const(_, _, body) => {
+        ItemKind::Const {
+            ty: _,
+            generics: _,
+            body,
+        } => {
             v.visit_body(body);
         }
         ItemKind::Fn {
@@ -70,14 +78,14 @@ pub fn visit_item_kind<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a ItemKind) {
         } => {
             v.visit_body(body);
         }
-        ItemKind::Mod(m) => v.visit_mod(m),
-        ItemKind::TyAlias(..) => {}
-        ItemKind::Enum(..) => {}
-        ItemKind::Struct(..) => {}
-        ItemKind::Union(..) => {}
-        ItemKind::Trait(..) => {}
-        ItemKind::TraitAlias(..) => {}
-        ItemKind::Impl(i) => v.visit_impl(i),
+        ItemKind::Mod { r#mod: m } => v.visit_mod(m),
+        ItemKind::TyAlias { .. } => {}
+        ItemKind::Enum { .. } => {}
+        ItemKind::Struct { .. } => {}
+        ItemKind::Union { .. } => {}
+        ItemKind::Trait { .. } => {}
+        ItemKind::TraitAlias { .. } => {}
+        ItemKind::Impl { r#impl: i } => v.visit_impl(i),
     }
 }
 

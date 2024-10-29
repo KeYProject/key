@@ -8,39 +8,134 @@ pub struct Expr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum ExprKind {
-    ConstBlock(ConstBlock),
-    Array(Vec<Expr>),
-    Call(Expr, Vec<Expr>),
-    MethodCall(PathSegment, Expr, Vec<Expr>, Span),
-    Tup(Vec<Expr>),
-    Binary(BinOp, Expr, Expr),
-    Unary(UnOp, Expr),
-    Lit(Lit),
-    Cast(Expr, HirTy),
-    Type(Expr, HirTy),
-    DropTemps(Expr),
-    Let(LetExpr),
-    If(Expr, Expr, Option<Expr>),
-    Loop(Block, Option<Label>, LoopSource, Span),
-    Match(Expr, Vec<Arm>, MatchSource),
-    Closure(Closure),
-    Block(Block, Option<Label>),
-    Assign(Expr, Expr, Span),
-    AssignOp(BinOp, Expr, Expr),
-    Field(Expr, Ident),
-    Index(Expr, Expr, Span),
-    Path(QPath),
-    AddrOf(bool, bool, Expr),
-    Break(Destination, Option<Expr>),
-    Continue(Destination),
-    Ret(Option<Expr>),
-    Become(Expr),
+    ConstBlock {
+        block: ConstBlock,
+    },
+    Array {
+        exprs: Vec<Expr>,
+    },
+    Call {
+        callee: Expr,
+        args: Vec<Expr>,
+    },
+    MethodCall {
+        segment: PathSegment,
+        callee: Expr,
+        args: Vec<Expr>,
+        span: Span,
+    },
+    Tup {
+        exprs: Vec<Expr>,
+    },
+    Binary {
+        op: BinOp,
+        left: Expr,
+        right: Expr,
+    },
+    Unary {
+        op: UnOp,
+        expr: Expr,
+    },
+    Lit {
+        lit: Lit,
+    },
+    Cast {
+        expr: Expr,
+        ty: HirTy,
+    },
+    Type {
+        expr: Expr,
+        ty: HirTy,
+    },
+    DropTemps {
+        expr: Expr,
+    },
+    Let {
+        r#let: LetExpr,
+    },
+    If {
+        cond: Expr,
+        then: Expr,
+        r#else: Option<Expr>,
+    },
+    Loop {
+        block: Block,
+        label: Option<Label>,
+        src: LoopSource,
+        span: Span,
+    },
+    Match {
+        expr: Expr,
+        arms: Vec<Arm>,
+        src: MatchSource,
+    },
+    Closure {
+        closure: Closure,
+    },
+    Block {
+        block: Block,
+        label: Option<Label>,
+    },
+    Assign {
+        left: Expr,
+        right: Expr,
+        span: Span,
+    },
+    AssignOp {
+        op: BinOp,
+        left: Expr,
+        right: Expr,
+    },
+    Field {
+        expr: Expr,
+        field: Ident,
+    },
+    Index {
+        base: Expr,
+        idx: Expr,
+        span: Span,
+    },
+    Path {
+        path: QPath,
+    },
+    AddrOf {
+        raw: bool,
+        r#mut: bool,
+        expr: Expr,
+    },
+    Break {
+        dest: Destination,
+        expr: Option<Expr>,
+    },
+    Continue {
+        dest: Destination,
+    },
+    Ret {
+        expr: Option<Expr>,
+    },
+    Become {
+        expr: Expr,
+    },
     //InlineAsm(InlineAsm),
-    OffsetOf(HirTy, Vec<Ident>),
-    Struct(QPath, Vec<ExprField>, Option<Expr>),
-    Repeat(Expr, ArrayLen),
-    Yield(Expr, YieldSource),
+    OffsetOf {
+        ty: HirTy,
+        idents: Vec<Ident>,
+    },
+    Struct {
+        path: QPath,
+        fields: Vec<ExprField>,
+        rest: Option<Expr>,
+    },
+    Repeat {
+        expr: Expr,
+        len: ArrayLen,
+    },
+    Yield {
+        expr: Expr,
+        src: YieldSource,
+    },
     Err,
 }
 
@@ -61,15 +156,16 @@ pub enum UnOp {
 pub type Lit = Spanned<LitKind>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum LitKind {
-    Str(Symbol, StrStyle),
-    ByteStr(Vec<u8>, StrStyle),
-    CStr(Vec<u8>, StrStyle),
-    Byte(u8),
-    Char(char),
-    Int(u128, LitIntType),
-    Float(Symbol, LitFloatType),
-    Bool(bool),
+    Str { symbol: Symbol, style: StrStyle },
+    ByteStr { bytes: Vec<u8>, style: StrStyle },
+    CStr { bytes: Vec<u8>, style: StrStyle },
+    Byte { byte: u8 },
+    Char { char: char },
+    Int { value: u128, ty: LitIntType },
+    Float { symbol: Symbol, ty: LitFloatType },
+    Bool { value: bool },
     Err,
 }
 
@@ -80,9 +176,10 @@ pub enum StrStyle {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum LitIntType {
-    Signed(IntTy),
-    Unsigned(UintTy),
+    Signed { ty: IntTy },
+    Unsigned { ty: UintTy },
     Unsuffixed,
 }
 
@@ -164,9 +261,10 @@ pub struct Block {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum BlockCheckMode {
     DefaultBlock,
-    UnsafeBlock(UnsafeSource),
+    UnsafeBlock { src: UnsafeSource },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

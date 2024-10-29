@@ -82,8 +82,8 @@ public class Converter {
     }
 
     public Crate convertCrate(org.key_project.rusty.parsing.RustyParser.CrateContext ctx) {
-        return new Crate(ctx.item().stream().map(this::convertItem)
-                .collect(ImmutableList.collector()));
+        return new Crate(new Mod(ctx.item().stream().map(this::convertItem)
+                .collect(ImmutableList.collector())));
     }
 
 

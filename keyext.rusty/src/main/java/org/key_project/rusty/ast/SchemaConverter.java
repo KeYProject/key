@@ -115,10 +115,9 @@ public class SchemaConverter {
 
     private Crate convertCrate(
             org.key_project.rusty.parsing.RustySchemaParser.CrateContext ctx) {
-        return new Crate(ctx.item().stream().map(this::convertItem)
-                .collect(ImmutableList.collector()));
+        return new Crate(new Mod(ctx.item().stream().map(this::convertItem)
+                .collect(ImmutableList.collector())));
     }
-
 
     private Item convertItem(org.key_project.rusty.parsing.RustySchemaParser.ItemContext ctx) {
         // TODO: Rework
