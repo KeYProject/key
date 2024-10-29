@@ -13,9 +13,8 @@ use super::*;
 pub fn convert(tcx: TyCtxt<'_>) -> Crate {
     let hir = tcx.hir();
     let m = hir.root_module();
-    Crate {
-        top_mod: m.hir_into(tcx),
-    }
+    let top_mod = m.hir_into(tcx);
+    Crate { top_mod }
 }
 
 pub struct ConversionCtxt<'tcx> {
@@ -179,8 +178,8 @@ impl<'hir> FromHir<'hir, hir::def::Res> for Res {
                 is_trait_impl,
             } => Self::SelfTyAlias {
                 alias_to: (&alias_to).into(),
-                forbid_generic,
-                is_trait_impl,
+                forbid_generic: forbid_generic,
+                is_trait_impl: is_trait_impl,
             },
             rustc_hir::def::Res::SelfCtor(def_id) => Self::SelfCtor((&def_id).into()),
             rustc_hir::def::Res::Local(id) => Self::Local(id.into()),
@@ -1871,6 +1870,179 @@ impl From<hir::GenericArgsParentheses> for GenericArgsParentheses {
                 GenericArgsParentheses::ReturnTypeNotation
             }
             hir::GenericArgsParentheses::ParenSugar => GenericArgsParentheses::ParenSugar,
+        }
+    }
+}
+
+impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Ty<'tcx>> for Ty {
+    fn from_hir(value: &rustc_middle::ty::Ty<'tcx>, tcx: TyCtxt<'tcx>) -> Self {
+        match value.kind() {
+            rustc_type_ir::TyKind::Bool => Self::Bool,
+            rustc_type_ir::TyKind::Char => Self::Char,
+            rustc_type_ir::TyKind::Int(int_ty) => Self::Int(int_ty.into()),
+            rustc_type_ir::TyKind::Uint(uint_ty) => Self::Uint(uint_ty.into()),
+            rustc_type_ir::TyKind::Float(float_ty) => Self::Float(float_ty.into()),
+            rustc_type_ir::TyKind::Adt(def, args) => todo!(),
+            rustc_type_ir::TyKind::Foreign(did) => Self::Foreign(did.into()),
+            rustc_type_ir::TyKind::Str => Self::Str,
+            rustc_type_ir::TyKind::Array(ty, len) => {
+                Self::Array(Box::new(ty.hir_into(tcx)), Box::new(len.hir_into(tcx)))
+            }
+            rustc_type_ir::TyKind::Pat(ty, pat) => todo!(),
+            rustc_type_ir::TyKind::Slice(ty) => todo!(),
+            rustc_type_ir::TyKind::RawPtr(ty, mutability) => todo!(),
+            rustc_type_ir::TyKind::Ref(_, ty, mutability) => todo!(),
+            rustc_type_ir::TyKind::FnDef(did, args) => todo!(),
+            rustc_type_ir::TyKind::FnPtr(binder, fn_header) => todo!(),
+            rustc_type_ir::TyKind::Dynamic(binders, _, dyn_kind) => todo!(),
+            rustc_type_ir::TyKind::Closure(_, _) => todo!(),
+            rustc_type_ir::TyKind::CoroutineClosure(_, _) => todo!(),
+            rustc_type_ir::TyKind::Coroutine(_, _) => todo!(),
+            rustc_type_ir::TyKind::CoroutineWitness(_, _) => todo!(),
+            rustc_type_ir::TyKind::Never => Self::Never,
+            rustc_type_ir::TyKind::Tuple(tys) => todo!(),
+            rustc_type_ir::TyKind::Alias(alias_ty_kind, alias_ty) => {
+                Self::Alias(alias_ty_kind.into(), alias_ty.hir_into(tcx))
+            }
+            rustc_type_ir::TyKind::Param(p) => todo!(),
+            rustc_type_ir::TyKind::Bound(debruijn_index, ty) => todo!(),
+            rustc_type_ir::TyKind::Placeholder(p) => Self::Placeholder(p.hir_into(tcx)),
+            rustc_type_ir::TyKind::Infer(infer_ty) => {
+                todo!("Infer types should probably not be encountered at this point")
+            }
+            rustc_type_ir::TyKind::Error(_) => Self::Error,
+        }
+    }
+}
+
+impl From<&rustc_middle::ty::IntTy> for IntTy {
+    fn from(value: &rustc_middle::ty::IntTy) -> Self {
+        match value {
+            rustc_type_ir::IntTy::Isize => Self::Isize,
+            rustc_type_ir::IntTy::I8 => Self::I8,
+            rustc_type_ir::IntTy::I16 => Self::I16,
+            rustc_type_ir::IntTy::I32 => Self::I32,
+            rustc_type_ir::IntTy::I64 => Self::I64,
+            rustc_type_ir::IntTy::I128 => Self::I128,
+        }
+    }
+}
+
+impl From<&rustc_middle::ty::UintTy> for UintTy {
+    fn from(value: &rustc_middle::ty::UintTy) -> Self {
+        match value {
+            rustc_type_ir::UintTy::Usize => Self::Usize,
+            rustc_type_ir::UintTy::U8 => Self::U8,
+            rustc_type_ir::UintTy::U16 => Self::U16,
+            rustc_type_ir::UintTy::U32 => Self::U32,
+            rustc_type_ir::UintTy::U64 => Self::U64,
+            rustc_type_ir::UintTy::U128 => Self::U128,
+        }
+    }
+}
+
+impl From<&rustc_middle::ty::FloatTy> for FloatTy {
+    fn from(value: &rustc_middle::ty::FloatTy) -> Self {
+        match value {
+            rustc_type_ir::FloatTy::F16 => Self::F16,
+            rustc_type_ir::FloatTy::F32 => Self::F32,
+            rustc_type_ir::FloatTy::F64 => Self::F64,
+            rustc_type_ir::FloatTy::F128 => Self::F128,
+        }
+    }
+}
+
+impl From<&rustc_middle::ty::AliasTyKind> for AliasTyKind {
+    fn from(value: &rustc_middle::ty::AliasTyKind) -> Self {
+        match value {
+            rustc_type_ir::AliasTyKind::Projection => Self::Projection,
+            rustc_type_ir::AliasTyKind::Inherent => Self::Inherent,
+            rustc_type_ir::AliasTyKind::Opaque => Self::Opaque,
+            rustc_type_ir::AliasTyKind::Weak => Self::Weak,
+        }
+    }
+}
+
+impl<'tcx> FromHir<'tcx, &rustc_middle::ty::AliasTy<'tcx>> for AliasTy {
+    fn from_hir(value: &rustc_middle::ty::AliasTy<'tcx>, tcx: TyCtxt<'tcx>) -> Self {
+        Self {
+            args: value
+                .args
+                .iter()
+                .map(|i| i.unpack().hir_into(tcx))
+                .collect(),
+            def_id: (&value.def_id).into(),
+        }
+    }
+}
+
+impl<'tcx> FromHir<'tcx, rustc_middle::ty::GenericArgKind<'tcx>> for GenericTyArgKind {
+    fn from_hir(value: rustc_middle::ty::GenericArgKind<'tcx>, tcx: TyCtxt<'tcx>) -> Self {
+        match value {
+            rustc_type_ir::GenericArgKind::Lifetime(_) => todo!(),
+            rustc_type_ir::GenericArgKind::Type(ty) => Self::Type((&ty).hir_into(tcx)),
+            rustc_type_ir::GenericArgKind::Const(c) => Self::Const((&c).hir_into(tcx)),
+        }
+    }
+}
+
+impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Const<'tcx>> for Const {
+    fn from_hir(value: &rustc_middle::ty::Const<'tcx>, tcx: TyCtxt<'tcx>) -> Self {
+        match value.kind() {
+            rustc_type_ir::ConstKind::Param(_) => todo!(),
+            rustc_type_ir::ConstKind::Infer(infer_const) => todo!(),
+            rustc_type_ir::ConstKind::Bound(debruijn_index, _) => todo!(),
+            rustc_type_ir::ConstKind::Placeholder(_) => todo!(),
+            rustc_type_ir::ConstKind::Unevaluated(unevaluated_const) => todo!(),
+            rustc_type_ir::ConstKind::Value(_, _) => todo!(),
+            rustc_type_ir::ConstKind::Error(_) => Self::Error,
+            rustc_type_ir::ConstKind::Expr(e) => todo!(),
+        }
+    }
+}
+
+impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Placeholder<rustc_middle::ty::BoundTy>>
+    for Placeholder<BoundTy>
+{
+    fn from_hir(
+        value: &rustc_middle::ty::Placeholder<rustc_middle::ty::BoundTy>,
+        tcx: TyCtxt<'tcx>,
+    ) -> Self {
+        Placeholder {
+            universe: value.universe.into(),
+            bound: (&value.bound).hir_into(tcx),
+        }
+    }
+}
+
+impl From<rustc_middle::ty::UniverseIndex> for UniverseIndex {
+    fn from(value: rustc_middle::ty::UniverseIndex) -> Self {
+        UniverseIndex(value.as_u32())
+    }
+}
+
+impl<'tcx> FromHir<'tcx, &rustc_middle::ty::BoundTy> for BoundTy {
+    fn from_hir(value: &rustc_middle::ty::BoundTy, tcx: TyCtxt<'tcx>) -> Self {
+        BoundTy {
+            var: value.var.into(),
+            kind: (&value.kind).hir_into(tcx),
+        }
+    }
+}
+
+impl From<rustc_middle::ty::BoundVar> for BoundVar {
+    fn from(value: rustc_middle::ty::BoundVar) -> Self {
+        Self(value.as_u32())
+    }
+}
+
+impl<'tcx> FromHir<'tcx, &rustc_middle::ty::BoundTyKind> for BoundTyKind {
+    fn from_hir(value: &rustc_middle::ty::BoundTyKind, tcx: TyCtxt<'tcx>) -> Self {
+        match value {
+            rustc_middle::ty::BoundTyKind::Anon => Self::Anon,
+            rustc_middle::ty::BoundTyKind::Param(def_id, symbol) => {
+                Self::Param(def_id.into(), symbol.into())
+            }
         }
     }
 }

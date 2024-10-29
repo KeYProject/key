@@ -85,7 +85,7 @@ pub enum Const {
     Unevaluated(UnevaluatedConst),
     Value(Ty, ValTree),
     Error,
-    Expr(Expr),
+    Expr(ConstExpr),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -103,6 +103,26 @@ pub enum InferConst {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ConstVid(pub u32);
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ConstExpr {
+    pub kind: ConstExprKind,
+    pub args: Vec<GenericTyArgKind>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum ConstExprKind {
+    Binop(BinOp),
+    UnOp(UnOp),
+    FunctionCall,
+    Cast(CastKind),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum CastKind {
+    As,
+    Use,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct EffectVid(pub u32);
@@ -204,8 +224,15 @@ pub enum AliasTyKind {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct AliasTy {
-    pub args: GenericArgs,
+    pub args: Vec<GenericTyArgKind>,
     pub def_id: DefId,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum GenericTyArgKind {
+    //Lifetime(Region)
+    Type(Ty),
+    Const(Const),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

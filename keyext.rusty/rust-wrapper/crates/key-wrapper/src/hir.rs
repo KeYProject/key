@@ -12,6 +12,8 @@ pub mod item;
 pub mod pat;
 pub mod stmt;
 pub mod ty;
+pub mod type_extract;
+pub mod visit;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Crate {
@@ -27,12 +29,12 @@ pub struct BytePos(pub u32);
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct SyntaxContext(u32);
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
 pub struct LocalDefId {
     pub local_def_index: DefIndex,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
 pub struct DefIndex(pub u32);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -49,7 +51,7 @@ pub struct Ident {
     pub span: Span,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
 pub struct OwnerId {
     pub def_id: LocalDefId,
 }
@@ -153,13 +155,13 @@ pub enum Res<Id = HirId> {
     Err,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
 pub struct HirId {
     pub owner: OwnerId,
     pub local_id: ItemLocalId,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
 pub struct ItemLocalId(pub u32);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

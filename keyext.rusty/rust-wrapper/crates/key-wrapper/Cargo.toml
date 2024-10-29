@@ -8,6 +8,7 @@ edition = "2021"
 serde = { version = "1.0.213", features = ["serde_derive"] }
 clap = { version = "4.5.20", features = ["derive", "env"] }
 serde_json = "1.0.132"
+paste = "1.0.15"
 
 [package.metadata.rust-analyzer]
 rustc_private = true

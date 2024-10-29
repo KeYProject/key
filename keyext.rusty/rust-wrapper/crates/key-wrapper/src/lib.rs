@@ -6,6 +6,7 @@ extern crate rustc_hir;
 extern crate rustc_interface;
 extern crate rustc_middle;
 extern crate rustc_span;
+extern crate rustc_type_ir;
 
 pub mod callbacks;
 pub mod hir;
