@@ -3,7 +3,11 @@ use std::collections::HashMap;
 use rustc_hir::BodyId;
 use rustc_middle::ty::TyCtxt;
 
-use super::{conversion::HirInto, visit::Visit, HirId, Mod, OwnerId, Ty};
+use super::{
+    conversion::HirInto,
+    visit::{visit_item_kind, Visit},
+    HirId, ItemKind, Mod, OwnerId, Ty,
+};
 
 pub fn extract_types(m: &Mod, tcx: TyCtxt) -> HashMap<HirId, Ty> {
     let mut c = Collector::new(tcx);
@@ -28,13 +32,26 @@ impl<'tcx> Collector<'tcx> {
 }
 
 impl<'a, 'tcx> Visit<'a> for Collector<'tcx> {
+    fn visit_item_kind(&mut self, t: &'a super::ItemKind) {
+        if let ItemKind::Fn {
+            sig: _,
+            generics: _,
+            body_id,
+            body: _,
+        } = t
+        {
+            self.last_body_id = Some(body_id.clone());
+        }
+        visit_item_kind(self, t)
+    }
+
     fn visit_body(&mut self, _: &'a super::Body) {
         let id = self
             .last_body_id
             .take()
             .expect("expected body id to be set");
 
-        let owner: OwnerId = id.hir_id.expect_owner().into();
+        let owner: OwnerId = id.hir_id.owner.into();
 
         let res = self.tcx.typeck_body(id);
 

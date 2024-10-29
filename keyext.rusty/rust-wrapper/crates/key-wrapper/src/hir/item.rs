@@ -15,7 +15,13 @@ pub enum ItemKind {
     Use(UsePath, UseKind),
     Static(HirTy, bool, Body),
     Const(HirTy, Generics, Body),
-    Fn(FnSig, Generics, Body),
+    Fn {
+        sig: FnSig,
+        generics: Generics,
+        #[serde(skip)]
+        body_id: rustc_hir::BodyId,
+        body: Body,
+    },
     //Macro(MacroDef, MacroKind),
     Mod(Mod),
     /* ForeignMod {

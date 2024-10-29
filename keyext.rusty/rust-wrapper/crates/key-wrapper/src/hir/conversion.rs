@@ -7,6 +7,7 @@ use rustc_span::{
     symbol::Ident as HirIdent,
     BytePos as HirBytePos, Span as HirSpan, Symbol as HirSymbol,
 };
+use type_extract::extract_types;
 
 use super::*;
 
@@ -14,7 +15,8 @@ pub fn convert(tcx: TyCtxt<'_>) -> Crate {
     let hir = tcx.hir();
     let m = hir.root_module();
     let top_mod = m.hir_into(tcx);
-    Crate { top_mod }
+    let types = extract_types(&top_mod, tcx).into_iter().collect();
+    Crate { top_mod, types }
 }
 
 pub struct ConversionCtxt<'tcx> {
@@ -214,11 +216,12 @@ impl<'hir> FromHir<'hir, &'hir hir::ItemKind<'hir>> for ItemKind {
                 (*generics).hir_into(tcx),
                 tcx.hir().body(*body).hir_into(tcx),
             ),
-            hir::ItemKind::Fn(fn_sig, generics, body) => Self::Fn(
-                fn_sig.hir_into(tcx),
-                (*generics).hir_into(tcx),
-                tcx.hir().body(*body).hir_into(tcx),
-            ),
+            hir::ItemKind::Fn(fn_sig, generics, body) => Self::Fn {
+                sig: fn_sig.hir_into(tcx),
+                generics: (*generics).hir_into(tcx),
+                body_id: body.clone(),
+                body: tcx.hir().body(*body).hir_into(tcx),
+            },
             hir::ItemKind::Mod(m) => Self::Mod((*m).hir_into(tcx)),
             hir::ItemKind::TyAlias(hir_ty, generics) => {
                 Self::TyAlias((*hir_ty).hir_into(tcx), (*generics).hir_into(tcx))
@@ -1882,36 +1885,48 @@ impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Ty<'tcx>> for Ty {
             rustc_type_ir::TyKind::Int(int_ty) => Self::Int(int_ty.into()),
             rustc_type_ir::TyKind::Uint(uint_ty) => Self::Uint(uint_ty.into()),
             rustc_type_ir::TyKind::Float(float_ty) => Self::Float(float_ty.into()),
-            rustc_type_ir::TyKind::Adt(def, args) => todo!(),
+            rustc_type_ir::TyKind::Adt(def, args) => todo!("Adt"),
             rustc_type_ir::TyKind::Foreign(did) => Self::Foreign(did.into()),
             rustc_type_ir::TyKind::Str => Self::Str,
             rustc_type_ir::TyKind::Array(ty, len) => {
                 Self::Array(Box::new(ty.hir_into(tcx)), Box::new(len.hir_into(tcx)))
             }
-            rustc_type_ir::TyKind::Pat(ty, pat) => todo!(),
-            rustc_type_ir::TyKind::Slice(ty) => todo!(),
-            rustc_type_ir::TyKind::RawPtr(ty, mutability) => todo!(),
-            rustc_type_ir::TyKind::Ref(_, ty, mutability) => todo!(),
-            rustc_type_ir::TyKind::FnDef(did, args) => todo!(),
-            rustc_type_ir::TyKind::FnPtr(binder, fn_header) => todo!(),
-            rustc_type_ir::TyKind::Dynamic(binders, _, dyn_kind) => todo!(),
-            rustc_type_ir::TyKind::Closure(_, _) => todo!(),
-            rustc_type_ir::TyKind::CoroutineClosure(_, _) => todo!(),
-            rustc_type_ir::TyKind::Coroutine(_, _) => todo!(),
-            rustc_type_ir::TyKind::CoroutineWitness(_, _) => todo!(),
+            rustc_type_ir::TyKind::Pat(ty, pat) => todo!("Pat"),
+            rustc_type_ir::TyKind::Slice(ty) => todo!("Slice"),
+            rustc_type_ir::TyKind::RawPtr(ty, mutability) => todo!("RawPtr"),
+            rustc_type_ir::TyKind::Ref(_, ty, mutability) => {
+                Self::Ref(Box::new(ty.hir_into(tcx)), mut_to_bool(mutability))
+            }
+            rustc_type_ir::TyKind::FnDef(did, args) => todo!("FnDef"),
+            rustc_type_ir::TyKind::FnPtr(binder, fn_header) => todo!("FnPtr"),
+            rustc_type_ir::TyKind::Dynamic(binders, _, dyn_kind) => todo!("Dyn"),
+            rustc_type_ir::TyKind::Closure(_, _) => todo!("Closure"),
+            rustc_type_ir::TyKind::CoroutineClosure(_, _) => todo!("CoClosure"),
+            rustc_type_ir::TyKind::Coroutine(_, _) => todo!("Co"),
+            rustc_type_ir::TyKind::CoroutineWitness(_, _) => todo!("CoWit"),
             rustc_type_ir::TyKind::Never => Self::Never,
-            rustc_type_ir::TyKind::Tuple(tys) => todo!(),
+            rustc_type_ir::TyKind::Tuple(tys) => {
+                Self::Tuple(tys.iter().map(|ty| (&ty).hir_into(tcx)).collect())
+            }
             rustc_type_ir::TyKind::Alias(alias_ty_kind, alias_ty) => {
                 Self::Alias(alias_ty_kind.into(), alias_ty.hir_into(tcx))
             }
-            rustc_type_ir::TyKind::Param(p) => todo!(),
-            rustc_type_ir::TyKind::Bound(debruijn_index, ty) => todo!(),
+            rustc_type_ir::TyKind::Param(p) => todo!("Param"),
+            rustc_type_ir::TyKind::Bound(debruijn_index, ty) => todo!("Bound"),
             rustc_type_ir::TyKind::Placeholder(p) => Self::Placeholder(p.hir_into(tcx)),
             rustc_type_ir::TyKind::Infer(infer_ty) => {
                 todo!("Infer types should probably not be encountered at this point")
             }
             rustc_type_ir::TyKind::Error(_) => Self::Error,
         }
+    }
+}
+
+#[inline]
+fn mut_to_bool(m: &rustc_ast_ir::Mutability) -> bool {
+    match m {
+        rustc_ast::Mutability::Not => false,
+        rustc_ast::Mutability::Mut => true,
     }
 }
 

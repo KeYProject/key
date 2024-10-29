@@ -28,7 +28,7 @@ pub enum Ty {
     Coroutine(DefId, Vec<GenericArg>),
     CoroutineWitness(DefId, Vec<GenericArg>),
     Never,
-    Tuple(Vec<Box<Ty>>),
+    Tuple(Vec<Ty>),
     Alias(AliasTyKind, AliasTy),
     Param(ParamTy),
     Bound(DebruijnIndex, BoundTy),

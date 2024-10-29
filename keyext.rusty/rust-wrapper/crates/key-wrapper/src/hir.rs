@@ -18,6 +18,7 @@ pub mod visit;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Crate {
     pub top_mod: Mod,
+    pub types: Vec<(HirId, Ty)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

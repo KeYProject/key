@@ -42,17 +42,17 @@ create_visitor_traits! {
   expr: Expr
 }
 
-fn visit_mod<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a Mod) {
+pub fn visit_mod<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a Mod) {
     for i in &x.items {
         v.visit_item(i);
     }
 }
 
-fn visit_item<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a Item) {
+pub fn visit_item<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a Item) {
     v.visit_item_kind(&x.kind);
 }
 
-fn visit_item_kind<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a ItemKind) {
+pub fn visit_item_kind<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a ItemKind) {
     match x {
         ItemKind::ExternCrate(_) => {}
         ItemKind::Use(..) => {}
@@ -62,7 +62,12 @@ fn visit_item_kind<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a ItemKind) {
         ItemKind::Const(_, _, body) => {
             v.visit_body(body);
         }
-        ItemKind::Fn(_, _, body) => {
+        ItemKind::Fn {
+            sig: _,
+            generics: _,
+            body_id: _,
+            body,
+        } => {
             v.visit_body(body);
         }
         ItemKind::Mod(m) => v.visit_mod(m),
@@ -76,12 +81,12 @@ fn visit_item_kind<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a ItemKind) {
     }
 }
 
-fn visit_body<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a Body) {
+pub fn visit_body<'a, V: Visit<'a> + ?Sized>(v: &mut V, x: &'a Body) {
     v.visit_expr(&x.value);
 }
 
-fn visit_impl<'a, V: Visit<'a> + ?Sized>(_v: &mut V, _x: &'a Impl) {}
+pub fn visit_impl<'a, V: Visit<'a> + ?Sized>(_v: &mut V, _x: &'a Impl) {}
 
-fn visit_expr<'a, V: Visit<'a> + ?Sized>(_v: &mut V, _x: &'a Expr) {
+pub fn visit_expr<'a, V: Visit<'a> + ?Sized>(_v: &mut V, _x: &'a Expr) {
     // TODO: Get to any bodies, e.g. in closures
 }
