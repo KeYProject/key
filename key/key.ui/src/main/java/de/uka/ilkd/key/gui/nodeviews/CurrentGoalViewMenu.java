@@ -15,6 +15,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.loopinvgen.LIGNew;
+import de.uka.ilkd.key.loopinvgen.LoopInvariantGenerationResult;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -38,6 +40,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.*;
 
@@ -215,10 +218,19 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
     private void createLoopInvGen(MenuControl control) {
         addSeparator();
-        add(new JButton("LoopInvGeneration"));
-        PosInOccurrence pos = getPos().getPosInOccurrence();
-        System.out.println(ProofSaver.printAnything(pos.subTerm(), mediator.getServices()));
-        System.out.println(pos.isInAntec() + ": " + pos.posInTerm());
+        JMenuItem loopInvGeneration = add(new JMenuItem("LoopInvGeneration"));
+        loopInvGeneration.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PosInOccurrence pos = getPos().getPosInOccurrence();
+                System.out.println(ProofSaver.printAnything(pos.subTerm(), mediator.getServices()));
+                System.out.println(pos.isInAntec() + ": " + pos.posInTerm());
+
+                final LIGNew loopInvGenerator = new LIGNew(mediator.getSelectedGoal().sequent(), mediator.getServices());
+                LoopInvariantGenerationResult result = loopInvGenerator.generate();
+                System.out.println(result.toString());
+            }
+        });
     }
 
     private void addMacroMenu() {

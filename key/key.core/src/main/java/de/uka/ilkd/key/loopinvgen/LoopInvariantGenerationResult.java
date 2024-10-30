@@ -4,7 +4,7 @@ import de.uka.ilkd.key.logic.Term;
 
 import java.util.Set;
 
-class LoopInvariantGenerationResult {
+public class LoopInvariantGenerationResult {
     private final Set<Term> conjuncts;
     private final int numberOfLASTIteration;
 
