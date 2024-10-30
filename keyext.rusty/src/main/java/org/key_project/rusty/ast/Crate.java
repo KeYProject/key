@@ -3,12 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.visitor.Visitor;
-import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -26,8 +23,10 @@ public class Crate implements RustyProgramElement {
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-       if (n == 0) {return topMod;}
-       throw new IndexOutOfBoundsException("Crate has only 1 child");
+        if (n == 0) {
+            return topMod;
+        }
+        throw new IndexOutOfBoundsException("Crate has only 1 child");
     }
 
     @Override

@@ -1,7 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.GsonBuilder;
 import org.key_project.rusty.parser.hir.expr.BlockCheckMode;
 import org.key_project.rusty.parser.hir.expr.ExprKind;
 import org.key_project.rusty.parser.hir.expr.LitIntTy;
@@ -14,6 +15,9 @@ import org.key_project.rusty.parser.hir.pat.ByRef;
 import org.key_project.rusty.parser.hir.pat.PatKind;
 import org.key_project.rusty.parser.hir.stmt.LocalSource;
 import org.key_project.rusty.parser.hir.stmt.StmtKind;
+
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.GsonBuilder;
 
 public record Crate(Mod topMod) {
     public static Crate parseJSON(String json) {

@@ -11,8 +11,10 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.logic.SVPlace;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
+import org.key_project.rusty.logic.op.MutRef;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.match.instructions.Instruction;
@@ -112,6 +114,8 @@ public class TacletMatchProgram {
             }
             final RustyProgramElement patternPrg = mod.program().program();
             program.add(Instruction.matchProgram(patternPrg));
+        } else if (op instanceof MutRef mr && mr.getPlace() instanceof SVPlace sv) {
+            program.add(Instruction.matchPlaceSV(sv));
         } else {
             program.add(Instruction.matchOp(op));
         }
