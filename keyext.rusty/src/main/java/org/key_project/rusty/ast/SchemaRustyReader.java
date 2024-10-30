@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.jspecify.annotations.NonNull;
 
-public class SchemaRustyReader extends RustyReader {
+public class SchemaRustyReader extends AntlrRustyReader {
     private Namespace<@NonNull SchemaVariable> svNS;
 
     public SchemaRustyReader(Services services, NamespaceSet nss) {

@@ -20,19 +20,25 @@ public class Context {
         this.varNS = varNS;
     }
 
-    public String buildFunction(String block) {
+    public String buildFunction(String block, boolean withAttrs) {
         var sb = new StringBuilder();
+        sb.append(
+            "#[allow(non_snake_case, unused_mut, dead_code, unused_assignments, unused_variables)]\n");
         sb.append("fn ").append(TMP_FN_NAME).append("(");
         for (ProgramVariable pv : varNS.allElements()) {
             sb.append(pv.name()).append(": ");
             sb.append(getType(pv));
             sb.append(", ");
         }
-        sb.append(") -> ");
-        // TODO: Right now, we demand that the block has a value of type
-        sb.append("u32");
+        sb.append(") {");
         sb.append(block);
+        sb.append(";\n");
+        sb.append("}");
         return sb.toString();
+    }
+
+    public String buildFunction(String block) {
+        return buildFunction(block, false);
     }
 
     private String getType(ProgramVariable pv) {

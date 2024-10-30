@@ -34,6 +34,10 @@ public class Mod implements RustyProgramElement {
         return items.map(Item::toString).stream().collect(Collectors.joining("\n"));
     }
 
+    public ImmutableList<Item> getItems() {
+        return items;
+    }
+
     @Override
     public void visit(Visitor v) {
         throw new RuntimeException("Shouldn't be called");

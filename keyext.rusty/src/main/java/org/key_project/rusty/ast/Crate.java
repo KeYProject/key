@@ -5,6 +5,7 @@ package org.key_project.rusty.ast;
 
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -37,5 +38,12 @@ public class Crate implements RustyProgramElement {
     @Override
     public void visit(Visitor v) {
         throw new RuntimeException("Shouldn't be called");
+    }
+
+    public Function getVerificationTarget() {
+        return (Function) topMod.getItems()
+                .filter(i -> i instanceof Function fn
+                        && fn.name().toString().equals(Context.TMP_FN_NAME))
+                .stream().findAny().get();
     }
 }

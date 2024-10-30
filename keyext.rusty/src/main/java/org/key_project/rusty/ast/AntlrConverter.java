@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.Nullable;
 
-public class Converter {
+public class AntlrConverter {
     // TODO: Rework this properly
     private final Map<String, VariableDeclaration> variables = new HashMap<>();
     private final Map<VariableDeclaration, ProgramVariable> programVariables = new HashMap<>();
@@ -47,7 +47,7 @@ public class Converter {
     private KeYRustyType declaredType = null;
     private boolean inContextFunction = false;
 
-    public Converter(Services services) {
+    public AntlrConverter(Services services) {
         this.services = services;
     }
 

@@ -17,7 +17,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.RustyReader;
+import org.key_project.rusty.ast.AntlrRustyReader;
 import org.key_project.rusty.ast.SchemaRustyReader;
 import org.key_project.rusty.ldt.LDT;
 import org.key_project.rusty.logic.*;
@@ -654,7 +654,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
 
             if (srb.rustyBlock == null) {
-                RustyReader rr = new RustyReader(services, nss);
+                AntlrRustyReader rr = new AntlrRustyReader(services, nss);
                 try {
                     srb.rustyBlock =
                         rr.readBlockWithProgramVariables(programVariables(), cleanRusty);

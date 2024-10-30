@@ -13,10 +13,10 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.jspecify.annotations.NonNull;
 
-public class RustyReader {
+public class AntlrRustyReader {
     private final Services services;
 
-    public RustyReader(Services services, NamespaceSet nss) {
+    public AntlrRustyReader(Services services, NamespaceSet nss) {
         this.services = services;
     }
 
@@ -37,7 +37,7 @@ public class RustyReader {
             new org.key_project.rusty.parsing.RustyLexer(CharStreams.fromString(fn));
         var ts = new CommonTokenStream(lexer);
         var parser = new org.key_project.rusty.parsing.RustyParser(ts);
-        var converter = new Converter(services);
+        var converter = new AntlrConverter(services);
         var converted = converter.convertFunction(parser.function_());
         return new RustyBlock(converted.body());
     }

@@ -8,7 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.key_project.rusty.ast.Converter;
+import org.key_project.rusty.ast.AntlrConverter;
 import org.key_project.rusty.parsing.RustyLexer;
 import org.key_project.rusty.parsing.RustyParser;
 
@@ -26,7 +26,7 @@ public class Test {
             var crate = parser.crate();
             System.out.println(crate.item(0).function_().blockExpr().stmts().expr().getText());
             System.out.println(crate.getText());
-            var converter = new Converter(new Services());
+            var converter = new AntlrConverter(new Services());
             var converted = converter.convertCrate(crate);
             System.out.println(converted);
         } catch (IOException e) {

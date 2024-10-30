@@ -5,6 +5,7 @@ package org.key_project.rusty;
 
 import java.io.*;
 
+import org.key_project.rusty.ast.HirRustyReader;
 import org.key_project.rusty.parser.hir.Crate;
 
 import org.junit.jupiter.api.Test;
@@ -28,5 +29,11 @@ public class JSON {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void write() throws IOException {
+        var reader = new HirRustyReader(null, null);
+        reader.readBlockWithEmptyContext("{let a = 0;}");
     }
 }
