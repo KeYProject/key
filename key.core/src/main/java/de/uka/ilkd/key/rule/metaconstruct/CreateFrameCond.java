@@ -11,16 +11,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -36,7 +36,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 public final class CreateFrameCond extends AbstractTermTransformer {
 
     public CreateFrameCond() {
-        super(new Name("#createFrameCond"), 4);
+        super(new Name("#createFrameCond"), 5);
     }
 
     @Override
@@ -46,8 +46,10 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             (ProgramVariable) term.sub(1).op();
         final ProgramVariable savedHeapBeforePV = //
             (ProgramVariable) term.sub(2).op();
+        final var localVarsBeforeSV = //
+            (ProgramSV) term.sub(3).op();
         final ProgramVariable permissionsHeapBeforePV = //
-            (ProgramVariable) term.sub(3).op();
+            (ProgramVariable) term.sub(4).op();
 
         final LoopSpecification loopSpec = //
             MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
@@ -61,6 +63,22 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
         final Term frameCondition =
             createFrameCondition(loopSpec, isTransaction, heapToBeforeLoopMap, services);
+
+        // Add update for overwritten local vars that might appear in the assignable clause. See
+        // Issue #3524.
+        @SuppressWarnings("unchecked")
+        final var localVarsMap = (ImmutableMap<LocationVariable, LocationVariable>) svInst
+                .getInstantiation(localVarsBeforeSV);
+        if (localVarsMap != null && !localVarsMap.isEmpty()) {
+            var tb = services.getTermBuilder();
+            ImmutableList<Term> updates = ImmutableSLList.nil();
+            for (var entry : localVarsMap) {
+                updates = updates.append(tb.elementary(tb.var(entry.key()), tb.var(entry.value())));
+            }
+            var parUp = tb.parallel(updates);
+
+            return tb.apply(parUp, frameCondition);
+        }
 
         return frameCondition;
     }
@@ -102,7 +120,6 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
             frameCondition = frameCondition == null ? fc : tb.and(frameCondition, fc);
         }
-
         return frameCondition;
     }
 
