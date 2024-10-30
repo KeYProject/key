@@ -370,23 +370,6 @@ public class BasicTest {
         System.out.println("\nAfter :\n" + proof.openGoals().head().sequent());
     }
 
-    @Test
-    public void test() {
-        TacletForTests.clear();
-        TacletForTests.parse(new RustProfile());
-        Semisequent antec = parseTermForSemisequent("");
-        Semisequent succ =
-            parseTermForSemisequent(
-                "\\<{ i += 2u32; 1u32 }\\>true");
-        Sequent s = Sequent.createSequent(antec, succ);
-        var proof = new Proof(new Name("Test children"), s, TacletForTests.initConfig());
-        applyRule("testHiddenChildren",
-            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false),
-            proof);
-        assertEquals(1, proof.openGoals().size());
-        System.out.println("\nAfter testHiddenChildren:\n" + proof.openGoals().head().sequent());
-    }
 
     @Test
     public void testIfUnfold() {
