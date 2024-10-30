@@ -609,17 +609,7 @@ public class PrettyPrinter implements Visitor {
         if (x.left() != null) {
             x.left().visit(this);
         }
-        switch (x.bounds()) {
-        case Inclusive:
-            layouter.print("..=");
-            break;
-        case Exclusive:
-            layouter.print("..");
-            break;
-        case Obsolete:
-            layouter.print("...");
-            break;
-        }
+        layouter.print(x.bounds().toString());
         if (x.right() != null) {
             x.right().visit(this);
         }
