@@ -37,7 +37,9 @@ public class PrettyPrinter implements Visitor {
     private boolean usePrettyPrinting;
     private boolean useUnicodeSymbols;
 
-    /** creates a new PrettyPrinter */
+    /**
+     * creates a new PrettyPrinter
+     */
     public PrettyPrinter(PosTableLayouter out) {
         this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true);
     }
@@ -606,8 +608,6 @@ public class PrettyPrinter implements Visitor {
 
     }
 
-    }
-
     @Override
     public void performActionOnRangepattern(RangePattern x) {
         if (x.left() != null) {
@@ -655,5 +655,5 @@ public class PrettyPrinter implements Visitor {
         layouter.print(" ");
         layouter.print(x.toString());
         layouter.print(" ");
-
+    }
 }
