@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -15,6 +19,9 @@ import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableMap;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a program
@@ -82,6 +89,15 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
             addChildren(instArray);
         } else if (inst instanceof Term && ((Term) inst).op() instanceof ProgramInLogic) {
             addChild(services.getTypeConverter().convertToProgramElement((Term) inst));
+        } else if (inst instanceof ImmutableMap<?, ?>) {
+            @SuppressWarnings("unchecked")
+            final ImmutableMap<@NonNull LocationVariable, LocationVariable> map =
+                (ImmutableMap<@NonNull LocationVariable, LocationVariable>) inst;
+            List<LocationVariable> lst = new ArrayList<>();
+            for (var e : map) {
+                lst.add(e.value());
+            }
+            addChildren(new ImmutableArray<>(lst));
         } else {
             throw new IllegalStateException(
                 "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);

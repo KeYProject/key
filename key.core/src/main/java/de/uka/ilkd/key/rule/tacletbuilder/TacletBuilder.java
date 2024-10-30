@@ -324,6 +324,10 @@ public abstract class TacletBuilder<T extends Taclet> {
         this.origin = origin;
     }
 
+    public void addNewLocalVars(SchemaVariable sv0, SchemaVariable sv1) {
+
+    }
+
     public static class TacletBuilderException extends IllegalArgumentException {
 
 
