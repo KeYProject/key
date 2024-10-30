@@ -7,19 +7,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableArray;
 
-public record AltPattern(ImmutableArray<Pattern> alternatives) implements Pattern {
-    @Override
-    public SyntaxElement getChild(int n) {
-        return null;
-    }
+public record AltPattern(ImmutableArray<Pattern>alternatives)implements Pattern{@Override public SyntaxElement getChild(int n){return null;}
 
-    @Override
-    public int getChildCount() {
-        return 0;
-    }
+@Override public int getChildCount(){return 0;}
 
-    @Override
-    public void visit(Visitor v) {
-        v.performActionOnAltPattern(this);
-    }
-}
+@Override public void visit(Visitor v){v.performActionOnAltPattern(this);}}

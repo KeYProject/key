@@ -19,6 +19,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
+import org.key_project.rusty.logic.op.AbstractTermTransformer;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -127,7 +128,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         Operator[] operators =
             new Operator[] { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new Name(varfuncName)),
-                functions().lookup(name) };
+                functions().lookup(name), AbstractTermTransformer.name2metaop(varfuncName) };
 
         for (Operator op : operators) {
             if (op != null) {

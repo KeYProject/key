@@ -17,7 +17,7 @@ public interface TermTransformer extends org.key_project.logic.op.SortedOperator
         /* TODO: check */ TerminalSyntaxElement {
 
     /**
-     * initiates term transformation of <tt>term</tt>. Note the top level operator of of parameter
+     * initiates term transformation of <tt>term</tt>. Note the top level operator of parameter
      * <tt>term</tt> has to be <em>this</em> term transformer.
      */
     Term transform(Term term, SVInstantiations svInst, Services services);

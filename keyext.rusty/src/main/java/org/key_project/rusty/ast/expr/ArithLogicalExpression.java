@@ -4,7 +4,9 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -31,7 +33,7 @@ public enum Operator implements RustyProgramElement {
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException("Operator has no children");
     }
 
@@ -42,7 +44,7 @@ public enum Operator implements RustyProgramElement {
 
     @Override
     public void visit(Visitor v) {
-        // Operator should stay invisible to the visitors and therefore no visit is needed
+        v.performActionOnArithLogicalOperator(this);
     }
 
 }
@@ -71,5 +73,10 @@ public enum Operator implements RustyProgramElement {
     @Override
     public void visit(Visitor v) {
         v.performActionOnArithLogicalExpression(this);
+    }
+
+    @Override
+    public Type type(Services services) {
+        return left.type(services);
     }
 }

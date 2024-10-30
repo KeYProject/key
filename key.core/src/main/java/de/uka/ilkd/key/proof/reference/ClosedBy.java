@@ -13,9 +13,8 @@ import de.uka.ilkd.key.proof.Proof;
  * This is always looked up using {@link Node#lookup(Class)} on the node of that branch.
  *
  * @param proof The proof referenced.
- * @param node  The node referenced.
+ * @param node The node referenced.
  * @param nodesToSkip If the referenced proof has dependency graph information: proof steps to skip.
  * @author Arne Keller
  */
-public record ClosedBy(Proof proof, Node node, Set<Node> nodesToSkip) {
-}
+public record ClosedBy(Proof proof,Node node,Set<Node>nodesToSkip){}

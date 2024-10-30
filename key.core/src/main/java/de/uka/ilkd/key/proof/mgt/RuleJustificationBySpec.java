@@ -7,13 +7,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.Contract;
 
 
-public record RuleJustificationBySpec(Contract spec) implements RuleJustification {
-    /**
-     * Contracts for stubs are considered axioms; other contracts not.
-     */
-    public boolean isAxiomJustification() {
-        return spec.getTarget() instanceof IProgramMethod
-                && !((IProgramMethod) spec.getTarget()).isModel()
-                && ((IProgramMethod) spec.getTarget()).getBody() == null;
-    }
-}
+public record RuleJustificationBySpec(Contract spec)implements RuleJustification{
+/**
+ * Contracts for stubs are considered axioms; other contracts not.
+ */
+public boolean isAxiomJustification(){return spec.getTarget()instanceof IProgramMethod&&!((IProgramMethod)spec.getTarget()).isModel()&&((IProgramMethod)spec.getTarget()).getBody()==null;}}

@@ -23,6 +23,7 @@ import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.SubstOp;
+import org.key_project.rusty.logic.op.TermTransformer;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -342,5 +343,30 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
             computedResult = t;
         }
         return computedResult;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subtreeEntered(Term subtreeRoot) {
+        tacletTermStack.push(subtreeRoot);
+    }
+
+    /**
+     * this method is called in execPreOrder and execPostOrder in class Term when leaving the
+     * subtree rooted in the term subtreeRoot. Default implementation is to do nothing. Subclasses
+     * can override this method when the visitor behaviour depends on information bound to
+     * subtrees.
+     *
+     * @param subtreeRoot root of the subtree which the visitor leaves.
+     */
+    @Override
+    public void subtreeLeft(Term subtreeRoot) {
+        tacletTermStack.pop();
+        if (subtreeRoot.op() instanceof TermTransformer mop) {
+            final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);
+            pushNew(newTerm);
+        }
     }
 }

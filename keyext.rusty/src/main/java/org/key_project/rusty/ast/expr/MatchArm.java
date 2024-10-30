@@ -4,7 +4,9 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.visitor.Visitor;
 
@@ -17,12 +19,6 @@ public record MatchArm(Pattern pattern,@Nullable Expr guard,Expr body)implements
 
 @Override public int getChildCount(){return 2+(guard==null?0:1);}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(pattern);
-        if (guard != null) {sb.append(" if ").append(guard);}
-        sb.append(" => ").append(body);
-        return "";
-    }
-}
+@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append(pattern);if(guard!=null){sb.append(" if ").append(guard);}sb.append(" => ").append(body);return"";}
+
+public Type type(Services services){return body().type(services);}}

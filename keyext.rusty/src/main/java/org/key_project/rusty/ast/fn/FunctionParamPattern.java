@@ -10,30 +10,10 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record FunctionParamPattern(Pattern pattern, RustType type) implements FunctionParam {
-    @Override
-    public int getChildCount() {
-        return 1;
-    }
+public record FunctionParamPattern(Pattern pattern,RustType type)implements FunctionParam{@Override public int getChildCount(){return 1;}
 
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0) {
-            return pattern;
-        }
-        if (n == 1) {
-            return type;
-        }
-        throw new IndexOutOfBoundsException("Param has only 2 children");
-    }
+@Override public @NonNull SyntaxElement getChild(int n){if(n==0){return pattern;}if(n==1){return type;}throw new IndexOutOfBoundsException("Param has only 2 children");}
 
-    @Override
-    public String toString() {
-        return pattern.toString() + ": " + type.toString();
-    }
+@Override public String toString(){return pattern.toString()+": "+type.toString();}
 
-    @Override
-    public void visit(Visitor v) {
-        throw new RuntimeException("Shouldn't be called");
-    }
-}
+@Override public void visit(Visitor v){throw new RuntimeException("Shouldn't be called");}}

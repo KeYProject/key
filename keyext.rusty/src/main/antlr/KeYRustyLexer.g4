@@ -5,3 +5,9 @@ import KeYLexer;
 {
 package org.key_project.rusty.parser;
 }
+
+MUTATE
+:   '*->'
+    ;
+
+REF_M : 'refM';

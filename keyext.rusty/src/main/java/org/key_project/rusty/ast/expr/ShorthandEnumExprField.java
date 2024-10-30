@@ -8,19 +8,8 @@ import org.key_project.rusty.ast.Identifier;
 
 import org.jspecify.annotations.NonNull;
 
-public record ShorthandEnumExprField(Identifier ident) implements EnumExprField {
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        if( n == 0) return ident; throw new IndexOutOfBoundsException("ShorthandEnumExprField has 1 child");
-    }
+public record ShorthandEnumExprField(Identifier ident)implements EnumExprField{@Override public @NonNull SyntaxElement getChild(int n){if(n==0)return ident;throw new IndexOutOfBoundsException("ShorthandEnumExprField has 1 child");}
 
-    @Override
-    public int getChildCount() {
-        return 1;
-    }
+@Override public int getChildCount(){return 1;}
 
-    @Override
-    public String toString() {
-        return ident.toString();
-    }
-}
+@Override public String toString(){return ident.toString();}}

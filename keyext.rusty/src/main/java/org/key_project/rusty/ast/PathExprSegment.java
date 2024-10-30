@@ -5,14 +5,8 @@ package org.key_project.rusty.ast;
 
 import org.key_project.logic.SyntaxElement;
 
-public record PathExprSegment(PathIdentSegment segment) implements SyntaxElement {
-    @Override
-    public SyntaxElement getChild(int n) {
-        return null;
-    }
+public record PathExprSegment(PathIdentSegment segment)implements SyntaxElement{@Override public SyntaxElement getChild(int n){return null;}
 
-    @Override
-    public int getChildCount() {
-        return 0;
-    }
-}
+@Override public int getChildCount(){return 0;}
+
+@Override public String toString(){return segment.toString();}}

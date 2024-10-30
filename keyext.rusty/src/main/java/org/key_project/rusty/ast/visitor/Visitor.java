@@ -11,6 +11,7 @@ import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.ReferenceRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -131,4 +132,14 @@ public interface Visitor {
     void performActionOnWildCardPattern(WildCardPattern x);
 
     void performActionOnRangepattern(RangePattern x);
+
+    void performActionOnReferenceRustType(ReferenceRustType x);
+
+    void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x);
+
+    void performActionOnComparisonOperator(ComparisonExpression.Operator x);
+
+    void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x);
+
+    void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x);
 }

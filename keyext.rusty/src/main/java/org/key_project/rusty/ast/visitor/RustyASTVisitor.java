@@ -13,6 +13,7 @@ import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.ReferenceRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -329,6 +330,31 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnRangepattern(RangePattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnReferenceRustType(ReferenceRustType x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnComparisonOperator(ComparisonExpression.Operator x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x) {
         doDefaultAction(x);
     }
 }

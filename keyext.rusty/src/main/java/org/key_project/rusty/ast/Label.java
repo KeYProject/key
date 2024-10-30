@@ -8,14 +8,6 @@ import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NonNull;
 
-public record Label(Name name) implements SyntaxElement {
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        throw new IndexOutOfBoundsException("Label has no children");
-    }
+public record Label(Name name)implements SyntaxElement{@Override public @NonNull SyntaxElement getChild(int n){throw new IndexOutOfBoundsException("Label has no children");}
 
-    @Override
-    public int getChildCount() {
-        return 0;
-    }
-}
+@Override public int getChildCount(){return 0;}}

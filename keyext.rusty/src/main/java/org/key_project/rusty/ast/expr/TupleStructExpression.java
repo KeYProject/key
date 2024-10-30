@@ -6,7 +6,9 @@ package org.key_project.rusty.ast.expr;
 import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.PathInExpression;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -18,4 +20,6 @@ public record TupleStructExpression(PathInExpression path,ImmutableArray<Expr>el
 
 @Override public int getChildCount(){return 1+elements.size();}
 
-@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append(path);sb.append("(");for(int i=0;i<elements.size();i++){if(i>0){sb.append(", ");}sb.append(elements.get(i));}sb.append(")");return sb.toString();}}
+@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append(path);sb.append("(");for(int i=0;i<elements.size();i++){if(i>0){sb.append(", ");}sb.append(elements.get(i));}sb.append(")");return sb.toString();}
+
+@Override public Type type(Services services){throw new UnsupportedOperationException();}}

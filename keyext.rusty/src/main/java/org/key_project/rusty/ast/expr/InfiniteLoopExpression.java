@@ -4,7 +4,9 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Label;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
@@ -16,11 +18,6 @@ public record InfiniteLoopExpression(@Nullable Label label,BlockExpression body)
 
 @Override public int getChildCount(){return 1;}
 
-    @Override
-    public String toString() {
-    StringBuilder sb = new StringBuilder();
-    if (label != null) sb.append(label).append(": ");
-    sb.append("loop ").append(body);
-        return sb.toString();
-    }
-}
+@Override public String toString(){StringBuilder sb=new StringBuilder();if(label!=null)sb.append(label).append(": ");sb.append("loop ").append(body);return sb.toString();}
+
+@Override public Type type(Services services){throw new UnsupportedOperationException();}}

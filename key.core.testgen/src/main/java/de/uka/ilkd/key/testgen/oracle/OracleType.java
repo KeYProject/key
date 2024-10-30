@@ -5,12 +5,12 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import org.key_project.logic.sort.Sort;
 
-public record OracleType(Sort s) implements OracleTerm {
+public record OracleType(Sort s)implements OracleTerm{
 
-    public String toString() {
+public String toString(){
 
-        return s.name().toString();
+return s.name().toString();
 
-    }
+}
 
 }

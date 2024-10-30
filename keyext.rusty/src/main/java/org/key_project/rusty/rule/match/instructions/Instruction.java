@@ -8,6 +8,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.logic.SVPlace;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.*;
@@ -70,6 +71,10 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
 
     public static MatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
         return new MatchElementaryUpdateInstruction(elementaryUpdate);
+    }
+
+    public static MatchInstruction matchPlaceSV(SVPlace sv) {
+        return new MatchPlaceSVInstruction(sv);
     }
 
     protected final Op op;

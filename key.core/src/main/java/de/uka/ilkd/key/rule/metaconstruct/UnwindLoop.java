@@ -29,7 +29,15 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * <pre>
  * {@code
- * if (i<10) l1:{ l2:{ i++; } while (i<10) { i++; } }
+ * if (i < 10)
+ *     l1: {
+ *         l2: {
+ *             i++;
+ *         }
+ *         while (i < 10) {
+ *             i++;
+ *         }
+ *     }
  * }
  * </pre>
  *

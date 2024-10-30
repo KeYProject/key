@@ -41,6 +41,9 @@ public class ProofCollections {
         simple.loadable("if.proof");
         simple.loadable("iflet.proof");
 
+        var refs = c.group("references");
+        refs.loadable("shared-ref.proof");
+        refs.loadable("mutable-ref.proof");
         return c;
     }
 }

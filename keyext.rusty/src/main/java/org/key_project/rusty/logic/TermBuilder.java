@@ -266,6 +266,10 @@ public class TermBuilder {
         }
     }
 
+    public Term mutating(Term lhs, Term rhs) {
+        return tf.createTerm(MutatingUpdate.MUTATING_UPDATE, lhs, rhs);
+    }
+
     public Term skip() {
         return tf.createTerm(UpdateJunctor.SKIP);
     }
@@ -518,5 +522,9 @@ public class TermBuilder {
     public Term subst(SubstOp op, QuantifiableVariable substVar, Term substTerm, Term origTerm) {
         return tf.createTerm(op, new ImmutableArray<>(substTerm, origTerm),
             new ImmutableArray<>(substVar));
+    }
+
+    public Term mutRef(MutRef mRef) {
+        return tf.createTerm(mRef);
     }
 }

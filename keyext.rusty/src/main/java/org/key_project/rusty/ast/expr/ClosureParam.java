@@ -10,24 +10,8 @@ import org.key_project.rusty.ast.ty.RustType;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record ClosureParam(@NonNull Pattern pattern, @Nullable RustType ty) implements SyntaxElement {
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0) {return pattern;}
-        if (n == 1 && ty != null) {return ty;}
-        throw new IndexOutOfBoundsException("ClosureParam has only 2 children");
-    }
+public record ClosureParam(@NonNull Pattern pattern,@Nullable RustType ty)implements SyntaxElement{@Override public @NonNull SyntaxElement getChild(int n){if(n==0){return pattern;}if(n==1&&ty!=null){return ty;}throw new IndexOutOfBoundsException("ClosureParam has only 2 children");}
 
-    @Override
-    public int getChildCount() {
-        return 2;
-    }
+@Override public int getChildCount(){return 2;}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(pattern);
-        if (ty != null) {sb.append(": ").append(ty);}
-        return sb.toString();
-    }
-}
+@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append(pattern);if(ty!=null){sb.append(": ").append(ty);}return sb.toString();}}

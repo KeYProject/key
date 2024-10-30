@@ -104,6 +104,11 @@ public class PosInOccurrence {
         return new PIOPathIteratorImpl();
     }
 
+    /** toString */
+    public String toString() {
+        return "Term " + posInTerm() + " of " + sequentFormula();
+    }
+
     private final class PIOPathIteratorImpl implements PIOPathIterator {
         int child;
         int count = 0;

@@ -17,42 +17,14 @@ import org.jspecify.annotations.NonNull;
 /**
  * A schema variable standing for a type in SchemaRust
  */
-public record SchemaRustType(SchemaType type) implements RustType {
-    @Override
-    public void visit(Visitor v) {
-        v.performActionOnSchemaRustType(this);
-    }
+public record SchemaRustType(SchemaType type)implements RustType{@Override public void visit(Visitor v){v.performActionOnSchemaRustType(this);}
 
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        throw new IndexOutOfBoundsException(getClass() + " has no children");
-    }
+@Override public @NonNull SyntaxElement getChild(int n){throw new IndexOutOfBoundsException(getClass()+" has no children");}
 
-    @Override
-    public int getChildCount() {
-        return 0;
-    }
+@Override public int getChildCount(){return 0;}
 
-    @Override
-    public String toString() {
-        return type.toString();
-    }
+@Override public String toString(){return type.toString();}
 
-    @Override
-    public MatchConditions match(SourceData source, MatchConditions mc) {
-        final Services services = source.getServices();
-        final RustyProgramElement src = source.getSource();
-        SVInstantiations instantiations = mc.getInstantiations();
+@Override public MatchConditions match(SourceData source,MatchConditions mc){final Services services=source.getServices();final RustyProgramElement src=source.getSource();SVInstantiations instantiations=mc.getInstantiations();
 
-        final Object instant = instantiations.getInstantiation(type.sv());
-        if (instant == null) {
-            instantiations = instantiations.add(type.sv(), src, services);
-            mc = mc.setInstantiations(instantiations);
-            if (mc == null) {return mc;}
-        }else         if (!instant.equals(src)) {
-            return null;
-        }
-        source.next();
-        return mc;
-    }
-}
+final Object instant=instantiations.getInstantiation(type.sv());if(instant==null){instantiations=instantiations.add(type.sv(),src,services);mc=mc.setInstantiations(instantiations);if(mc==null){return mc;}}else if(!instant.equals(src)){return null;}source.next();return mc;}}

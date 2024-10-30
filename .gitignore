@@ -73,3 +73,6 @@ checkstyle-diff.txt
 /key.ncore/src/main/gen/
 /key.ncore/src/main/antlr/KeYLexer.tokens
 /keyext.rusty/src/main/gen/
+
+# to be generated
+keyext.rusty/src/main/resources/librust_wrapper.a

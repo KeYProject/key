@@ -9,27 +9,11 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-public record ProgramList(ImmutableArray<RustyProgramElement> list) implements SyntaxElement {
-    public ProgramList {
-        assert list != null
-                : "Constructor of ProgramList must" + " not be called with null argument";
-    }
+public record ProgramList(ImmutableArray<RustyProgramElement>list)implements SyntaxElement{public ProgramList{assert list!=null:"Constructor of ProgramList must"+" not be called with null argument";}
 
-    public boolean equals(Object o) {
-        if (!(o instanceof ProgramList)) {
-            return false;
-        }
-        return list.equals(((ProgramList) o).list);
-    }
+public boolean equals(Object o){if(!(o instanceof ProgramList)){return false;}return list.equals(((ProgramList)o).list);}
 
 
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        return list.get(n);
-    }
+@Override public @NonNull SyntaxElement getChild(int n){return list.get(n);}
 
-    @Override
-    public int getChildCount() {
-        return list.size();
-    }
-}
+@Override public int getChildCount(){return list.size();}}
