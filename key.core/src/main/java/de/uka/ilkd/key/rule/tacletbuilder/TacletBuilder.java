@@ -323,7 +323,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     public void setOrigin(String origin) {
         this.origin = origin;
     }
-    
+
     public static class TacletBuilderException extends IllegalArgumentException {
 
 
