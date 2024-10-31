@@ -3,5 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir.item;
 
-public record Use() implements ItemKind {
+import org.key_project.rusty.parser.hir.Path;
+import org.key_project.rusty.parser.hir.Res;
+import org.key_project.util.collection.ImmutableArray;
+
+public record Use(Path<ImmutableArray<Res>> path, UseKind kind) implements ItemKind {
+    public enum UseKind {
+        Single, Glob, ListStem
+    }
 }

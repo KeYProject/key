@@ -11,9 +11,11 @@ import org.jspecify.annotations.NonNull;
 
 public class ExpressionStatement implements Statement {
     private final Expr expression;
+    private final boolean semi;
 
-    public ExpressionStatement(Expr expression) {
+    public ExpressionStatement(Expr expression, boolean semi) {
         this.expression = expression;
+        this.semi = semi;
     }
 
     @Override
