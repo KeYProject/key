@@ -28,8 +28,22 @@ public class LoopInvGenMenuItem extends JMenuItem {
 
                 final LIGNew loopInvGenerator = new LIGNew(mediator.getSelectedGoal().sequent(), mediator.getServices());
                 LoopInvariantGenerationResult result = loopInvGenerator.generate();
-                System.out.println(result.toString());
+                showResultInWindow(result.toString());
             }
         });
+    }
+
+    private static void showResultInWindow(String text) {
+        JFrame frame = new JFrame("Loop Invariant Generation Result");
+        JTextArea textArea = new JTextArea(20, 40);
+        textArea.setText(text);
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+
+        frame.add(scrollPane);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setVisible(true);
     }
 }
