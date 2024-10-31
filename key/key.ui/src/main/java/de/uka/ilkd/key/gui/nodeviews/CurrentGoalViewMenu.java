@@ -15,13 +15,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.loopinvgen.LIGNew;
-import de.uka.ilkd.key.loopinvgen.LoopInvariantGenerationResult;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.*;
@@ -40,7 +37,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.*;
 
@@ -172,7 +168,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         createBuiltInRuleMenu(builtInList, control);
-        createLoopInvGen(control);
+        createLoopInvGen();
         createDelayedCutJoinMenu(control);
         createMergeRuleMenu();
 
@@ -216,21 +212,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
     }
 
-    private void createLoopInvGen(MenuControl control) {
+    private void createLoopInvGen() {
         addSeparator();
-        JMenuItem loopInvGeneration = add(new JMenuItem("LoopInvGeneration"));
-        loopInvGeneration.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PosInOccurrence pos = getPos().getPosInOccurrence();
-                System.out.println(ProofSaver.printAnything(pos.subTerm(), mediator.getServices()));
-                System.out.println(pos.isInAntec() + ": " + pos.posInTerm());
-
-                final LIGNew loopInvGenerator = new LIGNew(mediator.getSelectedGoal().sequent(), mediator.getServices());
-                LoopInvariantGenerationResult result = loopInvGenerator.generate();
-                System.out.println(result.toString());
-            }
-        });
+        JMenuItem loopInvGeneration = add(new LoopInvGenMenuItem(mediator, getPos()));
     }
 
     private void addMacroMenu() {
