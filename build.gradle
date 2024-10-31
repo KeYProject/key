@@ -21,7 +21,7 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "7.0.0.BETA2"
+    id "com.diffplug.spotless" version "7.0.0.BETA4"
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.44"
