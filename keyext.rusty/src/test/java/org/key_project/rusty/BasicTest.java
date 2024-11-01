@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Goal;
@@ -298,9 +297,9 @@ public class BasicTest {
                 .lookup(new Name("i")) != null;
         var services = TacletForTests.services();
         var intSort = services.getNamespaces().sorts().lookup("int");
-        var intType = new KeYRustyType(intSort);
-        var i_old = new ProgramVariable(new Name("i_old"), intSort, intType);
-        var j_old = new ProgramVariable(new Name("j_old"), intSort, intType);
+        var u32 = services.getRustInfo().getKeYRustyType("u32");
+        var i_old = new ProgramVariable(new Name("i_old"), intSort, u32);
+        var j_old = new ProgramVariable(new Name("j_old"), intSort, u32);
         TacletForTests.services().getNamespaces().programVariables().add(i_old);
         TacletForTests.services().getNamespaces().programVariables().add(j_old);
 

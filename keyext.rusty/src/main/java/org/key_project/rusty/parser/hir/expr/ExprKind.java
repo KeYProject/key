@@ -24,6 +24,8 @@ public interface ExprKind {
 
     record Assign(Expr left, Expr right, Span span) implements ExprKind {}
 
+    record AssignOp(BinOp op, Expr left, Expr right) implements ExprKind {}
+
     record Path(QPath path) implements ExprKind {}
 
     record AddrOf(boolean raw, boolean mut, Expr expr) implements ExprKind {}
@@ -39,6 +41,7 @@ public interface ExprKind {
                 case "If" -> If.class;
                 case "Block" -> BlockExpr.class;
                 case "Assign" -> Assign.class;
+                case "AssignOp" -> AssignOp.class;
                 case "Path" -> Path.class;
                 case "AddrOf" -> AddrOf.class;
                 default -> null;

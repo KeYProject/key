@@ -140,8 +140,10 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(RustyProgramElement pe, Services services) {
-            if (pe instanceof NegationExpression ne
-                    && ne.getChild(0) instanceof IntegerLiteralExpression) {
+            if (pe instanceof UnaryExpression ue
+                    && (ue.op() == UnaryExpression.Operator.Neg
+                            || ue.op() == UnaryExpression.Operator.Not)
+                    && ue.getChild(0) instanceof IntegerLiteralExpression) {
                 return true;
             }
 

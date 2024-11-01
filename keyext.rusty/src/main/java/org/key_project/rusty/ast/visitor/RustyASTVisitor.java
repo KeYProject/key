@@ -79,11 +79,6 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     }
 
     @Override
-    public void performActionOnNegationExpression(NegationExpression x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnProgramVariable(ProgramVariable x) {
         doDefaultAction(x);
     }
@@ -315,11 +310,6 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnReferenceRustType(ReferenceRustType x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x) {
         doDefaultAction(x);
     }
 

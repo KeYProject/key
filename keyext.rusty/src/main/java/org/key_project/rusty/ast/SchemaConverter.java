@@ -410,20 +410,20 @@ public class SchemaConverter {
         var left = convertExpr(ctx.expr(0));
         var right = convertExpr(ctx.expr(1));
         var opCtx = ctx.compoundAssignOperator();
-        var op = opCtx.PLUSEQ() != null ? CompoundAssignmentExpression.Operator.Plus
-                : opCtx.MINUSEQ() != null ? CompoundAssignmentExpression.Operator.Minus
-                        : opCtx.STAREQ() != null ? CompoundAssignmentExpression.Operator.Divide
+        var op = opCtx.PLUSEQ() != null ? BinaryExpression.Operator.Add
+                : opCtx.MINUSEQ() != null ? BinaryExpression.Operator.Sub
+                        : opCtx.STAREQ() != null ? BinaryExpression.Operator.Mul
                                 : opCtx.PERCENTEQ() != null
-                                        ? CompoundAssignmentExpression.Operator.Modulo
+                                        ? BinaryExpression.Operator.Rem
                                         : opCtx.ANDEQ() != null
-                                                ? CompoundAssignmentExpression.Operator.And
+                                                ? BinaryExpression.Operator.BitAnd
                                                 : opCtx.OREQ() != null
-                                                        ? CompoundAssignmentExpression.Operator.Or
+                                                        ? BinaryExpression.Operator.BitOr
                                                         : opCtx.CARETEQ() != null
-                                                                ? CompoundAssignmentExpression.Operator.Xor
+                                                                ? BinaryExpression.Operator.BitXor
                                                                 : opCtx.SHLEQ() != null
-                                                                        ? CompoundAssignmentExpression.Operator.Shl
-                                                                        : CompoundAssignmentExpression.Operator.Shr;
+                                                                        ? BinaryExpression.Operator.Shl
+                                                                        : BinaryExpression.Operator.Shr;
         return new CompoundAssignmentExpression(left, op, right);
     }
 

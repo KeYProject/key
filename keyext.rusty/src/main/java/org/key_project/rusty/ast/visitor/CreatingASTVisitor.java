@@ -120,11 +120,6 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
     }
 
     @Override
-    public void performActionOnNegationExpression(NegationExpression x) {
-        throw new RuntimeException("TODO @ DD");
-    }
-
-    @Override
     public void performActionOnProgramVariable(ProgramVariable x) {
         throw new RuntimeException("TODO @ DD");
     }

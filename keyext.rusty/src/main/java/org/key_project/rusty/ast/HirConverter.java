@@ -144,6 +144,7 @@ public class HirConverter {
             case ExprKind.Path(var e) -> convertPathExpr(e);
             case ExprKind.AddrOf e -> convertAddrOf(e);
             case ExprKind.Assign e -> convertAssign(e);
+            case ExprKind.AssignOp e -> convertAssignOp(e);
             case ExprKind.Binary e -> convertBinary(e);
             case ExprKind.Unary e -> convertUnary(e);
             default -> throw new IllegalArgumentException("Unknown expression: " + expr);
@@ -168,6 +169,16 @@ public class HirConverter {
                         case UintTy.U128 -> IntegerLiteralExpression.IntegerSuffix.u128;
                         case UintTy.Usize -> IntegerLiteralExpression.IntegerSuffix.usize;
                     });
+            case LitKind.Int(var val, LitIntTy.Signed(var intTy)) -> new IntegerLiteralExpression(
+                    new BigInteger(String.valueOf(val)), switch (intTy) {
+                case Isize -> IntegerLiteralExpression.IntegerSuffix.isize;
+                case I8 -> IntegerLiteralExpression.IntegerSuffix.i8;
+                case I16 -> IntegerLiteralExpression.IntegerSuffix.i16;
+                case I32 -> IntegerLiteralExpression.IntegerSuffix.i32;
+                case I64 -> IntegerLiteralExpression.IntegerSuffix.i64;
+                case I128 -> IntegerLiteralExpression.IntegerSuffix.i128;
+            }
+            );
             case LitKind.Int(var val, LitIntTy.Unsuffixed u) ->
                     new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), null);
             default -> throw new IllegalArgumentException("Unknown lit: " + expr.node());
@@ -194,6 +205,11 @@ public class HirConverter {
 
     private AssignmentExpression convertAssign(ExprKind.Assign assign) {
         return new AssignmentExpression(convertExpr(assign.left()), convertExpr(assign.right()));
+    }
+
+    private CompoundAssignmentExpression convertAssignOp(ExprKind.AssignOp assignOp) {
+        return new CompoundAssignmentExpression(convertExpr(assignOp.left()),
+            convertBinOp(assignOp.op().node()), convertExpr(assignOp.right()));
     }
 
     private BinaryExpression convertBinary(ExprKind.Binary binary) {

@@ -212,11 +212,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnNegationExpression(NegationExpression x) {
-        printUnaryOperator(x.op().toString(), true, x.expr());
-    }
-
-    @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
         if (!(x instanceof ProgramSV)) {
             throw new UnsupportedOperationException(
@@ -331,13 +326,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnComparisonExpression(ComparisonExpression x) {
-        x.left().visit(this);
-        x.op().visit(this);
-        x.right().visit(this);
-    }
-
-    @Override
     public void performActionOnRangeExpression(RangeExpression x) {
         if (x.left() != null) {
             x.left().visit(this);
@@ -351,7 +339,9 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x) {
         x.left().visit(this);
+        layouter.print(" ");
         x.op().visit(this);
+        layouter.print("= ");
         x.right().visit(this);
     }
 
@@ -585,20 +575,6 @@ public class PrettyPrinter implements Visitor {
             layouter.print(" ");
         }
         x.inner().visit(this);
-    }
-
-    @Override
-    public void performActionOnComparisonOperator(ComparisonExpression.Operator x) {
-        layouter.print(" ");
-        layouter.print(x.toString());
-        layouter.print(" ");
-    }
-
-    @Override
-    public void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x) {
-        layouter.print(" ");
-        layouter.print(x.toString());
-        layouter.print(" ");
     }
 
     @Override

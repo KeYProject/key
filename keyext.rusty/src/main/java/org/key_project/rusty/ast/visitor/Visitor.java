@@ -31,8 +31,6 @@ public interface Visitor {
 
     void performActionOnIntegerLiteralExpression(IntegerLiteralExpression x);
 
-    void performActionOnNegationExpression(NegationExpression x);
-
     void performActionOnSchemaVariable(SchemaVariable x);
 
     void performActionOnProgramVariable(ProgramVariable x);
@@ -56,8 +54,6 @@ public interface Visitor {
     void performActionOnDereferenceExpression(DereferenceExpression x);
 
     void performActionOnTypeCastExpression(TypeCastExpression x);
-
-    void performActionOnComparisonExpression(ComparisonExpression x);
 
     void performActionOnRangeExpression(RangeExpression x);
 
@@ -128,10 +124,6 @@ public interface Visitor {
     void performActionOnWildCardPattern(WildCardPattern x);
 
     void performActionOnReferenceRustType(ReferenceRustType x);
-
-    void performActionOnComparisonOperator(ComparisonExpression.Operator x);
-
-    void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x);
 
     void performActionOnBinaryExpression(BinaryExpression x);
 

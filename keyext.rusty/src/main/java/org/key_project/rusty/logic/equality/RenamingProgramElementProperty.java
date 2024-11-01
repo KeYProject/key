@@ -11,6 +11,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.rusty.ast.Identifier;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.ast.pat.IdentPattern;
 import org.key_project.rusty.logic.NameAbstractionTable;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -63,8 +64,8 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
             // First nodes can never be null as cursor is initialized with 'this'
             next1 = c1.getCurrentNode();
             next2 = c2.getCurrentNode();
-            if (next1 instanceof IdentPattern ip) {
-                if (!handleIdentPattern(ip, next2, nat)) {
+            if (next1 instanceof BindingPattern bp) {
+                if (!handleBindingPattern(bp, next2, nat)) {
                     return false;
                 }
             } else if (next1 instanceof ProgramVariable || next1 instanceof Identifier) {
@@ -165,32 +166,32 @@ public class RenamingProgramElementProperty implements Property<RustyProgramElem
     }
 
     /**
-     * Handles the special case of comparing a {@link IdentPattern} to a
+     * Handles the special case of comparing a {@link BindingPattern} to a
      * {@link SyntaxElement}.
      *
-     * @param ip the {@link IdentPattern} to be compared
+     * @param bp the {@link BindingPattern} to be compared
      * @param se the {@link SyntaxElement} to be compared
      * @param nat the {@link NameAbstractionTable} the variable of {@code vs} should be added to
      * @return {@code true} iff {@code se} is of the same class as {@code vs} and has the same
      *         number of children, dimensions and type
      */
-    private boolean handleIdentPattern(IdentPattern ip, SyntaxElement se,
+    private boolean handleBindingPattern(BindingPattern bp, SyntaxElement se,
             NameAbstractionTable nat) {
-        if (se == ip) {
+        if (se == bp) {
             return true;
         }
-        if (se.getClass() != ip.getClass()) {
+        if (se.getClass() != bp.getClass()) {
             return false;
         }
-        final IdentPattern other = (IdentPattern) se;
-        if (ip.isMutable() != other.isMutable() || ip.isReference() != other.isReference()) {
+        final var other = (BindingPattern) se;
+        if (bp.mut() != other.mut() || bp.ref() != other.ref() || bp.mutRef() != other.mutRef()) {
             return false;
         }
 
         // Once Rust programs are parsed with the Rust Parser, this should be changed to not just
         // use the name of the Identifier
-        Name ipName = ((Identifier) ip.getChild(0)).name();
-        Name otherName = ((Identifier) other.getChild(0)).name();
+        Name ipName = ((ProgramVariable) bp.getChild(0)).name();
+        Name otherName = ((ProgramVariable) other.getChild(0)).name();
         nat.add(ipName, otherName);
         return true;
     }

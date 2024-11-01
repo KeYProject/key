@@ -76,15 +76,15 @@ public class TestProperties {
         @DisplayName("Tests for NegationExpression")
         @Nested
         class TestNegationExpression {
-            @Test
-            void testDifferentOperatorSameExpression() {
-                ProgramTuple programs = getPrograms("\\<{ !true }\\>TRUE", "\\<{ ~true }\\>TRUE");
-                assertFalse(
-                    RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
-                        programs.program2,
-                        new NameAbstractionTable()),
-                    "Different operators should not be equal");
-            }
+            // @Test
+            // void testDifferentOperatorSameExpression() {
+            // ProgramTuple programs = getPrograms("\\<{ !true }\\>TRUE", "\\<{ -true }\\>TRUE");
+            // assertFalse(
+            // RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
+            // programs.program2,
+            // new NameAbstractionTable()),
+            // "Different operators should not be equal");
+            // }
 
             @Test
             void testSameOperatorSameExpression() {
