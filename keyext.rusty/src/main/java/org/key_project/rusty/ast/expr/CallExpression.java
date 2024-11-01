@@ -11,12 +11,45 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-public record CallExpression(Expr callee,ImmutableArray<Expr>params)implements Expr{@Override public void visit(Visitor v){v.performActionOnCallExpression(this);}
+//spotless:off
+public record CallExpression(Expr callee, ImmutableArray<Expr> params) implements Expr {
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnCallExpression(this);
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(n==0){return callee;}--n;return params.get(n);}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) {
+            return callee;
+        }
+        --n;
+        return params.get(n);
+    }
 
-@Override public int getChildCount(){return 1+params.size();}
+    @Override
+    public int getChildCount() {
+        return 1 + params.size();
+    }
 
-@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append(callee);sb.append("(");for(int i=0;i<params.size();i++){if(i>0){sb.append(", ");}sb.append(params.get(i));}sb.append(")");return sb.toString();}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(callee);
+        sb.append("(");
+        for (int i = 0; i < params.size(); i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(params.get(i));
+        }
+        sb.append(")");
+        return sb.toString();
+    }
 
-@Override public Type type(Services services){throw new UnsupportedOperationException();}}
+    @Override
+    public Type type(Services services) {
+        throw new UnsupportedOperationException();
+    }
+}
+//spotless:on

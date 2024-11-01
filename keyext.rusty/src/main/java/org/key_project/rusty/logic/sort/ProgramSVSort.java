@@ -13,6 +13,7 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -44,6 +45,7 @@ public abstract class ProgramSVSort extends SortImpl {
     public static final ProgramSVSort SIMPLE_BOOL_EXPRESSION = new SimpleBoolExpressionSort();
     public static final ProgramSVSort NON_SIMPLE_BOOL_EXPRESSION =
         new NonSimpleBoolExpressionSort();
+    public static final ProgramSVSort PATTERN = new PatternSort();
 
     // ----------- Types of Statement Program SVs -----------------------------
     public static final ProgramSVSort STATEMENT = new StatementSort();
@@ -87,8 +89,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(RustyProgramElement pe, Services services) {
-            // TODO: unify PathExpr and PV?
-            return pe instanceof ProgramVariable || pe instanceof PathExpression;
+            return pe instanceof ProgramVariable;
         }
     }
 
@@ -304,6 +305,17 @@ public abstract class ProgramSVSort extends SortImpl {
         public boolean canStandFor(RustyProgramElement check, Services services) {
             return super.canStandFor(check, services) && check instanceof Expr e
                     && e.type(services) == type;
+        }
+    }
+
+    private static class PatternSort extends ProgramSVSort {
+        public PatternSort() {
+            super(new Name("Pattern"));
+        }
+
+        @Override
+        public boolean canStandFor(RustyProgramElement check, Services services) {
+            return check instanceof Pattern;
         }
     }
 }

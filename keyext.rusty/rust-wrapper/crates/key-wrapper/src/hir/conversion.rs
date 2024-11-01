@@ -17,7 +17,10 @@ pub fn convert(tcx: TyCtxt<'_>) -> Crate {
     let hir = tcx.hir();
     let m = hir.root_module();
     let top_mod = m.hir_into(tcx);
-    let types = extract_types(&top_mod, tcx).into_iter().collect();
+    let types = extract_types(&top_mod, tcx)
+        .into_iter()
+        .map(Into::into)
+        .collect();
     Crate { top_mod, types }
 }
 
@@ -170,7 +173,10 @@ impl<'hir> FromHir<'hir, hir::def::Res> for Res {
     fn from_hir(value: hir::def::Res, _: TyCtxt<'hir>) -> Self {
         match value {
             rustc_hir::def::Res::Def(def_kind, def_id) => Self::Def {
-                def: Def((&def_kind).into(), (&def_id).into()),
+                def: Def {
+                    kind: (&def_kind).into(),
+                    id: (&def_id).into(),
+                },
             },
             rustc_hir::def::Res::PrimTy(prim_ty) => Self::PrimTy {
                 ty: (&prim_ty).into(),
@@ -553,7 +559,10 @@ impl From<hir::def::Res> for Res {
     fn from(value: hir::def::Res) -> Self {
         match &value {
             hir::def::Res::Def(kind, id) => Self::Def {
-                def: Def(kind.into(), id.into()),
+                def: Def {
+                    kind: kind.into(),
+                    id: id.into(),
+                },
             },
             hir::def::Res::PrimTy(ty) => Self::PrimTy { ty: ty.into() },
             hir::def::Res::SelfTyParam { trait_ } => Self::SelfTyParam {
@@ -1099,7 +1108,10 @@ impl<'hir> FromHir<'hir, &'hir hir::def::Res> for Res {
     fn from_hir(value: &'hir hir::def::Res, _: TyCtxt<'hir>) -> Self {
         match value {
             hir::def::Res::Def(kind, id) => Self::Def {
-                def: Def(kind.into(), id.into()),
+                def: Def {
+                    kind: kind.into(),
+                    id: id.into(),
+                },
             },
             hir::def::Res::PrimTy(ty) => Self::PrimTy { ty: ty.into() },
             hir::def::Res::SelfTyParam { trait_ } => Self::SelfTyParam {
@@ -1498,7 +1510,7 @@ impl<'hir> FromHir<'hir, &'hir hir::ExprKind<'hir>> for ExprKind {
             hir::ExprKind::If(c, t, e) => Self::If {
                 cond: (*c).hir_into(tcx),
                 then: (*t).hir_into(tcx),
-                r#else: e.map(|e| e.hir_into(tcx)),
+                els: e.map(|e| e.hir_into(tcx)),
             },
             hir::ExprKind::Loop(b, l, s, sp) => Self::Loop {
                 block: (*b).hir_into(tcx),
@@ -2031,21 +2043,25 @@ impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Ty<'tcx>> for Ty {
         match value.kind() {
             rustc_type_ir::TyKind::Bool => Self::Bool,
             rustc_type_ir::TyKind::Char => Self::Char,
-            rustc_type_ir::TyKind::Int(int_ty) => Self::Int(int_ty.into()),
-            rustc_type_ir::TyKind::Uint(uint_ty) => Self::Uint(uint_ty.into()),
-            rustc_type_ir::TyKind::Float(float_ty) => Self::Float(float_ty.into()),
+            rustc_type_ir::TyKind::Int(int_ty) => Self::Int { ty: int_ty.into() },
+            rustc_type_ir::TyKind::Uint(uint_ty) => Self::Uint { ty: uint_ty.into() },
+            rustc_type_ir::TyKind::Float(float_ty) => Self::Float {
+                ty: float_ty.into(),
+            },
             rustc_type_ir::TyKind::Adt(def, args) => todo!("Adt"),
-            rustc_type_ir::TyKind::Foreign(did) => Self::Foreign(did.into()),
+            rustc_type_ir::TyKind::Foreign(did) => Self::Foreign { def_id: did.into() },
             rustc_type_ir::TyKind::Str => Self::Str,
-            rustc_type_ir::TyKind::Array(ty, len) => {
-                Self::Array(Box::new(ty.hir_into(tcx)), Box::new(len.hir_into(tcx)))
-            }
+            rustc_type_ir::TyKind::Array(ty, len) => Self::Array {
+                ty: Box::new(ty.hir_into(tcx)),
+                len: Box::new(len.hir_into(tcx)),
+            },
             rustc_type_ir::TyKind::Pat(ty, pat) => todo!("Pat"),
             rustc_type_ir::TyKind::Slice(ty) => todo!("Slice"),
             rustc_type_ir::TyKind::RawPtr(ty, mutability) => todo!("RawPtr"),
-            rustc_type_ir::TyKind::Ref(_, ty, mutability) => {
-                Self::Ref(Box::new(ty.hir_into(tcx)), mut_to_bool(mutability))
-            }
+            rustc_type_ir::TyKind::Ref(_, ty, mutability) => Self::Ref {
+                ty: Box::new(ty.hir_into(tcx)),
+                r#mut: mut_to_bool(mutability),
+            },
             rustc_type_ir::TyKind::FnDef(did, args) => todo!("FnDef"),
             rustc_type_ir::TyKind::FnPtr(binder, fn_header) => todo!("FnPtr"),
             rustc_type_ir::TyKind::Dynamic(binders, _, dyn_kind) => todo!("Dyn"),
@@ -2054,15 +2070,18 @@ impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Ty<'tcx>> for Ty {
             rustc_type_ir::TyKind::Coroutine(_, _) => todo!("Co"),
             rustc_type_ir::TyKind::CoroutineWitness(_, _) => todo!("CoWit"),
             rustc_type_ir::TyKind::Never => Self::Never,
-            rustc_type_ir::TyKind::Tuple(tys) => {
-                Self::Tuple(tys.iter().map(|ty| (&ty).hir_into(tcx)).collect())
-            }
-            rustc_type_ir::TyKind::Alias(alias_ty_kind, alias_ty) => {
-                Self::Alias(alias_ty_kind.into(), alias_ty.hir_into(tcx))
-            }
+            rustc_type_ir::TyKind::Tuple(tys) => Self::Tuple {
+                tys: tys.iter().map(|ty| (&ty).hir_into(tcx)).collect(),
+            },
+            rustc_type_ir::TyKind::Alias(alias_ty_kind, alias_ty) => Self::Alias {
+                kind: alias_ty_kind.into(),
+                ty: alias_ty.hir_into(tcx),
+            },
             rustc_type_ir::TyKind::Param(p) => todo!("Param"),
             rustc_type_ir::TyKind::Bound(debruijn_index, ty) => todo!("Bound"),
-            rustc_type_ir::TyKind::Placeholder(p) => Self::Placeholder(p.hir_into(tcx)),
+            rustc_type_ir::TyKind::Placeholder(p) => Self::Placeholder {
+                placeholder: p.hir_into(tcx),
+            },
             rustc_type_ir::TyKind::Infer(infer_ty) => {
                 todo!("Infer types should probably not be encountered at this point")
             }

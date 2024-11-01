@@ -16,12 +16,32 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record Function(Name name,org.key_project.util.collection.ImmutableArray<FunctionParam>params,RustType returnType,BlockExpression body)implements Item,Named{
+//spotless:off
+public record Function(Name name, org.key_project.util.collection.ImmutableArray<FunctionParam> params,
+                       RustType returnType, BlockExpression body) implements Item, Named {
 
-@Override public int getChildCount(){return 3+params.size();}
+    @Override
+    public int getChildCount() {
+        return 3 + params.size();
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(0<=n&&n<params.size())return Objects.requireNonNull(params.get(n));n-=params.size();if(n==0)return returnType;if(n==1)return body;throw new IndexOutOfBoundsException("No child at index "+n);}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (0 <= n && n < params.size()) return Objects.requireNonNull(params.get(n));
+        n -= params.size();
+        if (n == 0) return returnType;
+        if (n == 1) return body;
+        throw new IndexOutOfBoundsException("No child at index " + n);
+    }
 
-@Override public String toString(){return"fn "+name()+"("+params.stream().map(Object::toString).collect(Collectors.joining(", "))+") -> "+returnType+" "+body;}
+    @Override
+    public String toString() {
+        return "fn " + name() + "(" + params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ") -> " + returnType + " " + body;
+    }
 
-@Override public void visit(Visitor v){throw new RuntimeException("TODO @ DD");}}
+    @Override
+    public void visit(Visitor v) {
+        throw new RuntimeException("TODO @ DD");
+    }
+}
+//spotless:on

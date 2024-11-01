@@ -7,12 +7,18 @@ import org.key_project.rusty.parser.hir.HirAdapter;
 import org.key_project.rusty.parser.hir.QPath;
 import org.key_project.rusty.parser.hir.Span;
 
+import org.jspecify.annotations.Nullable;
+
 public interface ExprKind {
     record Binary(BinOp op, Expr left, Expr right) implements ExprKind {}
 
     record Unary(UnOp op, Expr expr) implements ExprKind {}
 
     record LitExpr(Lit lit) implements ExprKind {}
+
+    record DropTemps(Expr expr) implements ExprKind {}
+
+    record If(Expr cond, Expr then, @Nullable Expr els) implements ExprKind {}
 
     record BlockExpr(Block block) implements ExprKind {}
 
@@ -29,6 +35,8 @@ public interface ExprKind {
                 case "Binary" -> Binary.class;
                 case "Unary" -> Unary.class;
                 case "Lit" -> LitExpr.class;
+                case "DropTemps" -> DropTemps.class;
+                case "If" -> If.class;
                 case "Block" -> BlockExpr.class;
                 case "Assign" -> Assign.class;
                 case "Path" -> Path.class;

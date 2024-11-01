@@ -8,7 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.expr.ArithLogicalExpression;
+import org.key_project.rusty.ast.expr.BinaryExpression;
 import org.key_project.rusty.ast.expr.IntegerLiteralExpression;
 import org.key_project.rusty.ast.expr.LiteralExpression;
 import org.key_project.rusty.logic.TermBuilder;
@@ -181,23 +181,23 @@ public class IntLDT extends LDT {
     }
 
     @Override
-    public Function getFuctionFor(ArithLogicalExpression.Operator op, Services services) {
+    public Function getFunctionFor(BinaryExpression.Operator op, Services services) {
         return null;
     }
 
     @Override
-    public boolean isResponsible(ArithLogicalExpression.Operator op, Term[] subs,
+    public boolean isResponsible(BinaryExpression.Operator op, Term[] subs,
             Services services) {
         return false;
     }
 
     @Override
-    public boolean isResponsible(ArithLogicalExpression.Operator op, Term sub, Services services) {
+    public boolean isResponsible(BinaryExpression.Operator op, Term sub, Services services) {
         return false;
     }
 
     @Override
-    public boolean isResponsible(ArithLogicalExpression.Operator op, Term left, Term right,
+    public boolean isResponsible(BinaryExpression.Operator op, Term left, Term right,
             Services services) {
         return false;
     }

@@ -5,7 +5,6 @@ package org.key_project.rusty.ast.expr;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
@@ -52,7 +51,7 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
 
     @Override
     public int getChildCount() {
-        return statements.size() + 1;
+        return statements.size() + (value == null ? 0 : 1);
     }
 
     public ImmutableList<Statement> getStatements() {
@@ -65,10 +64,20 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
 
     @Override
     public String toString() {
-        return "{\n"
-            + statements.stream().map(s -> "\t" + s.toString()).collect(Collectors.joining("\n"))
-            + "\n\t" + value.toString()
-            + "\n}";
+        var sb = new StringBuilder();
+        sb.append("{\n");
+        for (var s : statements) {
+            sb.append("\t");
+            sb.append(s.toString());
+            sb.append("\n");
+        }
+        if (value != null) {
+            sb.append("\t");
+            sb.append(value);
+            sb.append("\n");
+        }
+        sb.append("}");
+        return sb.toString();
     }
 
     @Override

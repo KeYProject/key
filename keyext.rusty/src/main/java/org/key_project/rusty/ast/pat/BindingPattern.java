@@ -5,22 +5,39 @@ package org.key_project.rusty.ast.pat;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.visitor.Visitor;
+import org.key_project.rusty.logic.op.ProgramVariable;
 
 import org.jspecify.annotations.Nullable;
 
-public record BindingPattern(boolean ref, boolean mutRef, boolean mut, @Nullable Pattern opt)implements Pattern {
+//spotless:off
+public record BindingPattern(boolean ref, boolean mutRef, boolean mut, ProgramVariable pv,
+                             @Nullable Pattern opt) implements Pattern {
     @Override
     public void visit(Visitor v) {
-
+        v.performActionOnBindingPattern(this);
     }
 
     @Override
     public SyntaxElement getChild(int n) {
-        return null;
+        if (n == 0) return pv;
+        if (n == 1 && opt != null) {
+            return opt;
+        }
+        throw new IndexOutOfBoundsException("BindingPattern has only " + getChildCount() + " children");
     }
 
     @Override
     public int getChildCount() {
-        return 0;
+        return opt == null ? 1 : 2;
+    }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        if (mut) sb.append("mut ");
+        sb.append(pv);
+        if (opt != null) sb.append(" @ ").append(opt);
+        return sb.toString();
     }
 }
+//spotless:on

@@ -9,38 +9,42 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
-public record UnaryExpression(Operator op,Expr expr)implements Expr{
+import org.jspecify.annotations.NonNull;
 
-public enum Operator implements RustyProgramElement {
-    Deref("*"),
-    Not("!"),
-    Neg("-"),;
+// spotless:off
+public record UnaryExpression(Operator op, Expr expr) implements Expr {
 
-    private final String symbol;
+    public enum Operator implements RustyProgramElement {
+        Deref("*"),
+        Not("!"),
+        Neg("-"),
+        ;
 
-    Operator(String s) {
-        symbol = s;
-    }
+        private final String symbol;
 
-    @Override
-    public String toString() {
-        return symbol;
-    }
+        Operator(String s) {
+            symbol = s;
+        }
 
-    @Override
-    public void visit(Visitor v) {
+        @Override
+        public String toString() {
+            return symbol;
+        }
 
-    }
+        @Override
+        public void visit(Visitor v) {
+            v.performActionOnUnaryOperator(this);
+        }
 
-    @Override
-    public SyntaxElement getChild(int n) {
-        return null;
-    }
+        @Override
+        public @NonNull SyntaxElement getChild(int n) {
+            throw new IndexOutOfBoundsException("Operator has no children");
+        }
 
-    @Override
-    public int getChildCount() {
-        return 0;
-    }
+        @Override
+        public int getChildCount() {
+            return 0;
+        }
 
     }
 
@@ -51,16 +55,21 @@ public enum Operator implements RustyProgramElement {
 
     @Override
     public void visit(Visitor v) {
-
+        v.performActionOnUnaryExpression(this);
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
-        return null;
+    public @NonNull SyntaxElement getChild(int n) {
+        return switch (n) {
+            case 0 -> op;
+            case 1 -> expr;
+            default -> throw new IndexOutOfBoundsException("UnaryExpression has only 2 children");
+        };
     }
 
     @Override
     public int getChildCount() {
-        return 0;
+        return 2;
     }
 }
+//spotless:on

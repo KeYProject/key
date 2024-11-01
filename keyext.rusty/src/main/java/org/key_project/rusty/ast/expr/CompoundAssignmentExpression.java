@@ -12,6 +12,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
+// spotless:off
 public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) implements Expr {
     @Override
     public void visit(Visitor v) {
@@ -77,4 +78,6 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
         public void visit(Visitor v) {
             v.performActionOnCompoundAssignmentOperator(this);
         }
-    }}
+    }
+}
+//spotless:on

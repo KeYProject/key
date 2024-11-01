@@ -30,6 +30,10 @@ public class ExpressionStatement implements Statement {
         return expression;
     }
 
+    public boolean hasSemi() {
+        return semi;
+    }
+
     @Override
     public int getChildCount() {
         return 1;

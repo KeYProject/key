@@ -5,5 +5,7 @@ package org.key_project.rusty.ast;
 
 import org.key_project.util.collection.ImmutableArray;
 
+//spotless:off
 public record Path<R>(R res, ImmutableArray<PathSegment> segments) {
 }
+//spotless:on

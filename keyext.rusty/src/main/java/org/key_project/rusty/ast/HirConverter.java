@@ -4,12 +4,11 @@
 package org.key_project.rusty.ast;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.abstraction.PrimitiveType;
+import org.key_project.rusty.ast.abstraction.*;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.fn.Function;
@@ -23,17 +22,12 @@ import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.ItemStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
-import org.key_project.rusty.ast.ty.PathRustType;
-import org.key_project.rusty.ast.ty.PrimitiveRustType;
-import org.key_project.rusty.ast.ty.RustType;
-import org.key_project.rusty.ast.ty.TupleRustType;
+import org.key_project.rusty.ast.ty.*;
+import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.parser.hir.HirId;
 import org.key_project.rusty.parser.hir.Ident;
-import org.key_project.rusty.parser.hir.QPath;
 import org.key_project.rusty.parser.hir.expr.*;
-import org.key_project.rusty.parser.hir.hirty.HirTy;
-import org.key_project.rusty.parser.hir.hirty.HirTyKind;
-import org.key_project.rusty.parser.hir.hirty.PrimHirTy;
-import org.key_project.rusty.parser.hir.hirty.UintTy;
+import org.key_project.rusty.parser.hir.hirty.*;
 import org.key_project.rusty.parser.hir.item.Fn;
 import org.key_project.rusty.parser.hir.item.FnRetTy;
 import org.key_project.rusty.parser.hir.item.ImplicitSelfKind;
@@ -43,6 +37,7 @@ import org.key_project.rusty.parser.hir.pat.PatKind;
 import org.key_project.rusty.parser.hir.stmt.LetStmt;
 import org.key_project.rusty.parser.hir.stmt.Stmt;
 import org.key_project.rusty.parser.hir.stmt.StmtKind;
+import org.key_project.rusty.parser.hir.ty.Ty;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -57,7 +52,22 @@ public class HirConverter {
         return services;
     }
 
+    private final Map<HirId, ProgramVariable> pvs = new HashMap<>();
+    private final Map<HirId, Type> types = new HashMap<>();
+
+    private ProgramVariable getPV(HirId id) {
+        return Objects.requireNonNull(pvs.get(id), "Unknown variable " + id);
+    }
+
+    private void declarePV(HirId id, ProgramVariable pv) {
+        pvs.put(id, pv);
+    }
+
     public Crate convertCrate(org.key_project.rusty.parser.hir.Crate crate) {
+        for (var m : crate.types()) {
+            var ty = convertTy(m.ty());
+            types.put(m.hirId(), ty);
+        }
         return new Crate(convertMod(crate.topMod()));
     }
 
@@ -82,10 +92,10 @@ public class HirConverter {
 
     private Item convertUse(org.key_project.rusty.parser.hir.item.Use use) {
         var path = convertPath(use.path(), rs -> {
-            var lst = rs.stream().map(this::convertRes).toList();
+            var lst = Arrays.stream(rs).map(this::convertRes).toList();
             return new ImmutableArray<>(lst);
         });
-        var kind = switch (use.kind()) {
+        var kind = switch (use.useKind()) {
         case org.key_project.rusty.parser.hir.item.Use.UseKind.Single -> Use.UseKind.Single;
         case org.key_project.rusty.parser.hir.item.Use.UseKind.Glob -> Use.UseKind.Glob;
         case org.key_project.rusty.parser.hir.item.Use.UseKind.ListStem -> Use.UseKind.ListStem;
@@ -94,6 +104,7 @@ public class HirConverter {
     }
 
     private Function convertFn(Fn fn, String ident) {
+        boolean isCtxFn = ident.equals(Context.TMP_FN_NAME);
         var name = new Name(ident);
         int paramLength = fn.sig().decl().inputs().length;
         int selfCount = 0;
@@ -104,7 +115,7 @@ public class HirConverter {
         for (int i = 0; i < paramLength; i++) {
             var ty = fn.sig().decl().inputs()[i];
             var pat = fn.body().params()[i].pat();
-            params.add(new FunctionParamPattern(convertPat(pat), convertHirTy(ty)));
+            params.add(new FunctionParamPattern(convertPat(pat, isCtxFn), convertHirTy(ty)));
         }
         var retTy = convertFnRetTy(fn.sig().decl().output());
         var body = (BlockExpression) convertExpr(fn.body().value());
@@ -112,7 +123,7 @@ public class HirConverter {
     }
 
     private RustType convertFnRetTy(FnRetTy retTy) {
-        return switch(retTy) {
+        return switch (retTy) {
             case FnRetTy.DefaultReturn x -> TupleRustType.UNIT;
             case FnRetTy.Return r -> convertHirTy(r.ty());
             default -> throw new IllegalArgumentException("Unknown return type: " + retTy);
@@ -126,13 +137,15 @@ public class HirConverter {
 
     private Expr convertExpr(org.key_project.rusty.parser.hir.expr.Expr expr) {
         return switch (expr.kind()) {
-          case   ExprKind.BlockExpr e -> convertBlockExpr(e);
-            case   ExprKind.LitExpr(var e) -> convertLitExpr(e);
-            case   ExprKind.Path(var e) -> convertPathExpr(e);
-            case   ExprKind.AddrOf e -> convertAddrOf(e);
-            case   ExprKind.Assign e -> convertAssign(e);
-            case   ExprKind.Binary e -> convertBinary(e);
-            case   ExprKind.Unary e -> convertUnary(e);
+            case ExprKind.BlockExpr e -> convertBlockExpr(e);
+            case ExprKind.LitExpr(var e) -> convertLitExpr(e);
+            case ExprKind.If e -> convertIfExpr(e);
+            case ExprKind.DropTemps(var e) -> convertExpr(e);
+            case ExprKind.Path(var e) -> convertPathExpr(e);
+            case ExprKind.AddrOf e -> convertAddrOf(e);
+            case ExprKind.Assign e -> convertAssign(e);
+            case ExprKind.Binary e -> convertBinary(e);
+            case ExprKind.Unary e -> convertUnary(e);
             default -> throw new IllegalArgumentException("Unknown expression: " + expr);
         };
     }
@@ -146,25 +159,37 @@ public class HirConverter {
     private LiteralExpression convertLitExpr(Lit expr) {
         return switch (expr.node()) {
             case LitKind.Bool(var v) -> new BooleanLiteralExpression(v);
-            case LitKind.Int(var val, LitIntTy.Unsigned(var uintTy)) -> new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), switch(uintTy){
-                case UintTy.U8 -> IntegerLiteralExpression.IntegerSuffix.u8;
-                case UintTy.U16 -> IntegerLiteralExpression.IntegerSuffix.u16;
-                case UintTy.U32 -> IntegerLiteralExpression.IntegerSuffix.u32;
-                case UintTy.U64 -> IntegerLiteralExpression.IntegerSuffix.u64;
-                case UintTy.U128 -> IntegerLiteralExpression.IntegerSuffix.u128;
-                case UintTy.Usize -> IntegerLiteralExpression.IntegerSuffix.usize;
-            });
-            case LitKind.Int(var val, LitIntTy.Unsuffixed u) -> new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), null);
+            case LitKind.Int(var val, LitIntTy.Unsigned(var uintTy)) ->
+                    new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), switch (uintTy) {
+                        case UintTy.U8 -> IntegerLiteralExpression.IntegerSuffix.u8;
+                        case UintTy.U16 -> IntegerLiteralExpression.IntegerSuffix.u16;
+                        case UintTy.U32 -> IntegerLiteralExpression.IntegerSuffix.u32;
+                        case UintTy.U64 -> IntegerLiteralExpression.IntegerSuffix.u64;
+                        case UintTy.U128 -> IntegerLiteralExpression.IntegerSuffix.u128;
+                        case UintTy.Usize -> IntegerLiteralExpression.IntegerSuffix.usize;
+                    });
+            case LitKind.Int(var val, LitIntTy.Unsuffixed u) ->
+                    new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), null);
             default -> throw new IllegalArgumentException("Unknown lit: " + expr.node());
         };
     }
 
-    private Expr convertPathExpr(QPath path) {
-        return null;
+    private IfExpression convertIfExpr(ExprKind.If i) {
+        return new IfExpression(convertExpr(i.cond()), (ThenBranch) convertExpr(i.then()),
+            i.els() == null ? null : (ElseBranch) convertExpr(i.els()));
+    }
+
+    private Expr convertPathExpr(org.key_project.rusty.parser.hir.QPath path) {
+        if (path instanceof org.key_project.rusty.parser.hir.QPath.Resolved r
+                && r.path().segments().length == 1
+                && r.path().res() instanceof org.key_project.rusty.parser.hir.Res.Local lr) {
+            return getPV(lr.id());
+        }
+        throw new IllegalArgumentException("Unknown path: " + path);
     }
 
     private BorrowExpression convertAddrOf(ExprKind.AddrOf addrOf) {
-        return new BorrowExpression(false, addrOf.mut(), convertExpr(addrOf.expr()));
+        return new BorrowExpression(addrOf.mut(), convertExpr(addrOf.expr()));
     }
 
     private AssignmentExpression convertAssign(ExprKind.Assign assign) {
@@ -225,32 +250,48 @@ public class HirConverter {
     }
 
     private RustType convertHirTy(HirTy ty) {
-        return switch (ty.kind()){
+        return switch (ty.kind()) {
             case HirTyKind.Path p -> convertPathHirTy(p);
+            case HirTyKind.Ref(var m) -> convertMutHirTy(m);
             default -> throw new IllegalArgumentException("Unknown hirty type: " + ty);
         };
     }
 
     private RustType convertPathHirTy(HirTyKind.Path ty) {
-        if (ty.path() instanceof QPath.Resolved r && r.ty() == null && r.path().res() instanceof PrimHirTy pty) {
-            var primTy = switch(pty) {
-                case PrimHirTy.Bool b -> PrimitiveType.BOOL;
-                case PrimHirTy.Uint(var uintTy) -> switch (uintTy) {
-                    case UintTy.U8 -> PrimitiveType.U8;
-                    case UintTy.U16 -> PrimitiveType.U16;
-                    case UintTy.U32 -> PrimitiveType.U32;
-                    case UintTy.U64 -> PrimitiveType.U64;
-                    case UintTy.U128 -> PrimitiveType.U128;
-                    case UintTy.Usize -> PrimitiveType.USIZE;
-                };
-                default -> throw new IllegalArgumentException("Unknown prim type: " + ty);
-            };
-            return new PrimitiveRustType(primTy);
+        if (ty.path() instanceof org.key_project.rusty.parser.hir.QPath.Resolved r && r.ty() == null
+                && r.path().res() instanceof org.key_project.rusty.parser.hir.Res.PrimTy pty) {
+            return convertPrimHirType(pty.ty());
         }
         return new PathRustType();
     }
 
+    private RustType convertMutHirTy(MutHirTy m) {
+        RustType inner = convertHirTy(m.ty());
+        boolean isMut = m.mutbl();
+        return new ReferenceRustType(isMut, inner, ReferenceType.get(inner.type(), isMut));
+    }
+
+    private PrimitiveRustType convertPrimHirType(PrimHirTy pty) {
+        var primTy = switch (pty) {
+            case PrimHirTy.Bool b -> PrimitiveType.BOOL;
+            case PrimHirTy.Uint(var uintTy) -> switch (uintTy) {
+                case UintTy.U8 -> PrimitiveType.U8;
+                case UintTy.U16 -> PrimitiveType.U16;
+                case UintTy.U32 -> PrimitiveType.U32;
+                case UintTy.U64 -> PrimitiveType.U64;
+                case UintTy.U128 -> PrimitiveType.U128;
+                case UintTy.Usize -> PrimitiveType.USIZE;
+            };
+            default -> throw new IllegalArgumentException("Unknown prim type: " + pty);
+        };
+        return new PrimitiveRustType(primTy);
+    }
+
     private Pattern convertPat(Pat pat) {
+        return convertPat(pat, false);
+    }
+
+    private Pattern convertPat(Pat pat, boolean isCtxFnParam) {
         return switch (pat.kind()) {
             case PatKind.Binding p -> {
                 boolean ref = false;
@@ -260,8 +301,17 @@ public class HirConverter {
                     mutRef = y.mut();
                 }
                 boolean mut = p.mode().mut();
+                var name = new Name(convertIdent(p.ident()));
+                var id = p.hirId();
+                ProgramVariable pv;
+                if (isCtxFnParam) {
+                    pv = services.getNamespaces().programVariables().lookup(name);
+                } else {
+                    pv = new ProgramVariable(name, services.getRustInfo().getKeYRustyType(types.get(id)));
+                }
+                declarePV(id, pv);
                 Pattern opt = p.pat() == null ? null : convertPat(p.pat());
-                yield new BindingPattern(ref, mutRef, mut, opt);
+                yield new BindingPattern(ref, mutRef, mut, pv, opt);
             }
             case PatKind.Wild w -> WildCardPattern.WILDCARD;
             case PatKind.Path p -> {
@@ -278,11 +328,50 @@ public class HirConverter {
         return new Path<>(res, new ImmutableArray<>(segments));
     }
 
+    private QPath convertQPath(org.key_project.rusty.parser.hir.QPath qPath) {
+        return switch (qPath) {
+            case org.key_project.rusty.parser.hir.QPath.Resolved(var selfTy, var path) ->
+                    new QPathResolved(convertHirTy(selfTy), convertPath(path, this::convertRes));
+            default -> throw new IllegalArgumentException("Unknown path: " + qPath);
+        };
+    }
+
     private PathSegment convertPathSegment(org.key_project.rusty.parser.hir.PathSegment segment) {
         return new PathSegment(segment.ident().name(), convertRes(segment.res()));
     }
 
     private Res convertRes(org.key_project.rusty.parser.hir.Res res) {
-        return null;
+        return switch (res) {
+            case org.key_project.rusty.parser.hir.Res.PrimTy(var ty) -> convertPrimHirType(ty);
+            case org.key_project.rusty.parser.hir.Res.Local(var id) -> getPV(id);
+            case org.key_project.rusty.parser.hir.Res.DefRes(var def) -> new ResDef();
+            case org.key_project.rusty.parser.hir.Res.Err e -> new ResErr();
+            default -> throw new IllegalArgumentException("Unknown hirty type: " + res);
+        };
+    }
+
+    private Type convertTy(Ty ty) {
+        return switch (ty) {
+            case Ty.Bool b -> PrimitiveType.BOOL;
+            case Ty.Int(var i) -> switch (i) {
+                case Isize -> PrimitiveType.ISIZE;
+                case I8 -> PrimitiveType.I8;
+                case I16 -> PrimitiveType.I16;
+                case I32 -> PrimitiveType.I32;
+                case I64 -> PrimitiveType.I64;
+                case I128 -> PrimitiveType.I128;
+            };
+            case Ty.Uint(var u) -> switch (u) {
+                case Usize -> PrimitiveType.USIZE;
+                case U8 -> PrimitiveType.U8;
+                case U16 -> PrimitiveType.U16;
+                case U32 -> PrimitiveType.U32;
+                case U64 -> PrimitiveType.U64;
+                case U128 -> PrimitiveType.U128;
+            };
+            case Ty.Ref(var t, var m) -> ReferenceType.get(convertTy(t), m);
+            case Ty.Tuple(var ts) -> TupleType.getInstance(Arrays.stream(ts).map(this::convertTy).toList());
+            default -> throw new IllegalArgumentException("Unknown ty: " + ty);
+        };
     }
 }

@@ -10,14 +10,32 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record Identifier(Name name)implements Named,RustyProgramElement{
+//spotless:off
+public record Identifier(Name name) implements Named, RustyProgramElement {
 
-@Override public @NonNull Name name(){return name;}
+    @Override
+    public @NonNull Name name() {
+        return name;
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){throw new IndexOutOfBoundsException("Identifier has no children");}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Identifier has no children");
+    }
 
-@Override public int getChildCount(){return 0;}
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
 
-@Override public String toString(){return name().toString();}
+    @Override
+    public String toString() {
+        return name().toString();
+    }
 
-@Override public void visit(Visitor v){throw new RuntimeException("Should never be called");}}
+    @Override
+    public void visit(Visitor v) {
+        throw new RuntimeException("Should never be called");
+    }
+}
+//spotless:on

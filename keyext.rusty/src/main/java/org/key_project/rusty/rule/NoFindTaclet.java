@@ -14,7 +14,8 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
- * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet is not attached to
+ * Used to implement a Taclet that has no <I>find</I> part. This useKind of taclet is not attached
+ * to
  * term or formula, but to a complete sequent. A typical representant is the <code>cut</code> rule.
  */
 public class NoFindTaclet extends Taclet {

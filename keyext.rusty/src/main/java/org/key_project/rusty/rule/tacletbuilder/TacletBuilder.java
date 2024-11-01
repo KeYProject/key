@@ -191,7 +191,8 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     /**
      * adds a new goal descriptions to the goal descriptions of the Taclet. The TacletGoalTemplate
-     * must be of the appropriate kind (Rewrite/Ante/Succ), otherwise an IllegalArgumentException is
+     * must be of the appropriate useKind (Rewrite/Ante/Succ), otherwise an IllegalArgumentException
+     * is
      * thrown.
      */
     public abstract void addTacletGoalTemplate(TacletGoalTemplate goal);

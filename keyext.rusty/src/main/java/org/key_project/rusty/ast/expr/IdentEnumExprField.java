@@ -8,8 +8,23 @@ import org.key_project.rusty.ast.Identifier;
 
 import org.jspecify.annotations.NonNull;
 
-public record IdentEnumExprField(Identifier ident,Expr expr)implements EnumExprField{@Override public @NonNull SyntaxElement getChild(int n){if(n==0)return ident;if(n==1)return expr;throw new IndexOutOfBoundsException("IdentEnumExprField has only 2 children");}
+//spotless:off
+public record IdentEnumExprField(Identifier ident, Expr expr) implements EnumExprField {
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) return ident;
+        if (n == 1) return expr;
+        throw new IndexOutOfBoundsException("IdentEnumExprField has only 2 children");
+    }
 
-@Override public int getChildCount(){return 2;}
+    @Override
+    public int getChildCount() {
+        return 2;
+    }
 
-@Override public String toString(){return ident+": "+expr;}}
+    @Override
+    public String toString() {
+        return ident + ": " + expr;
+    }
+}
+//spotless:on

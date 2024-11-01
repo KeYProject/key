@@ -28,11 +28,11 @@ public class Modality extends org.key_project.logic.op.Modality {
         new WeakHashMap<>();
 
     /**
-     * Retrieves the modality of the given kind and program.
+     * Retrieves the modality of the given useKind and program.
      *
-     * @param kind the kind of the modality such as diamond or box
+     * @param kind the useKind of the modality such as diamond or box
      * @param rb the program of this modality
-     * @return the modality of the given kind and program.
+     * @return the modality of the given useKind and program.
      */
     public static Modality getModality(RustyModalityKind kind, RustyBlock rb) {
         var pair = new Pair<>(kind, rb.program());
@@ -105,7 +105,7 @@ public class Modality extends org.key_project.logic.op.Modality {
         }
 
         /**
-         * Whether this modality is termination sensitive, i.e., it is a "diamond-kind" modality.
+         * Whether this modality is termination sensitive, i.e., it is a "diamond-useKind" modality.
          */
         public boolean terminationSensitive() {
             return (this == DIA);

@@ -11,9 +11,11 @@ import org.jspecify.annotations.Nullable;
 /**
  * An {@code extern crate} item, with optional original crate name if the crate was renamed.
  * E.g., {@code extern crate foo} or {@code extern crate foo_bar as foo}.
+ *
  * @param ident
  * @param origIdent
  */
+//spotless:off
 public record ExternCrate(String ident, @Nullable String origIdent) implements Item {
     @Override
     public void visit(Visitor v) {
@@ -30,3 +32,4 @@ public record ExternCrate(String ident, @Nullable String origIdent) implements I
         return 0;
     }
 }
+//spotless:on

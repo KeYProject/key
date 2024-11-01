@@ -5,8 +5,21 @@ package org.key_project.rusty.ast;
 
 import org.key_project.logic.SyntaxElement;
 
-public record PathIdentSegment(Identifier ident)implements SyntaxElement{@Override public SyntaxElement getChild(int n){return null;}
+//spotless:off
+public record PathIdentSegment(Identifier ident) implements SyntaxElement {
+    @Override
+    public SyntaxElement getChild(int n) {
+        return null;
+    }
 
-@Override public int getChildCount(){return 0;}
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
 
-@Override public String toString(){return ident.toString();}}
+    @Override
+    public String toString() {
+        return ident.toString();
+    }
+}
+//spotless:on

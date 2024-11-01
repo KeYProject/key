@@ -10,6 +10,7 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.Res;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.abstraction.Type;
@@ -19,7 +20,8 @@ import org.key_project.rusty.rule.MatchConditions;
 
 import org.jspecify.annotations.NonNull;
 
-public class ProgramVariable extends AbstractSortedOperator implements Expr, UpdateableOperator {
+public class ProgramVariable extends AbstractSortedOperator
+        implements Expr, UpdateableOperator, Res {
     private final KeYRustyType type;
 
     public ProgramVariable(Name name, Sort s, KeYRustyType type) {

@@ -7,6 +7,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
+//spotless:off
 public record PathRustType() implements RustType {
     @Override
     public Type type() {
@@ -28,3 +29,4 @@ public record PathRustType() implements RustType {
         return 0;
     }
 }
+//spotless:on

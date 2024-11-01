@@ -22,10 +22,12 @@ public class Context {
 
     public String buildFunction(String block, boolean withAttrs) {
         var sb = new StringBuilder();
-        sb.append(
-            "#[allow(non_snake_case, unused_mut, dead_code, unused_assignments, unused_variables)]\n");
+        if (withAttrs)
+            sb.append(
+                "#[allow(non_snake_case, unused_mut, dead_code, unused_assignments, unused_variables)]\n");
         sb.append("fn ").append(TMP_FN_NAME).append("(");
         for (ProgramVariable pv : varNS.allElements()) {
+            sb.append("mut ");
             sb.append(pv.name()).append(": ");
             sb.append(getType(pv));
             sb.append(", ");
@@ -42,6 +44,6 @@ public class Context {
     }
 
     private String getType(ProgramVariable pv) {
-        return "u32";
+        return pv.getKeYRustyType().getRustyType().toString();
     }
 }

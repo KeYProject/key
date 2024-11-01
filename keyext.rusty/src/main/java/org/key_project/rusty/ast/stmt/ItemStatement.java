@@ -7,6 +7,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.Item;
 import org.key_project.rusty.ast.visitor.Visitor;
 
+//spotless:off
 public record ItemStatement(Item item) implements Statement {
     @Override
     public void visit(Visitor v) {
@@ -23,3 +24,4 @@ public record ItemStatement(Item item) implements Statement {
         return 0;
     }
 }
+//spotless:on

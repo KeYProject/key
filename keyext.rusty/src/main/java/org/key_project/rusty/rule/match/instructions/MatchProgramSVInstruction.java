@@ -8,9 +8,8 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.expr.ArithLogicalExpression;
+import org.key_project.rusty.ast.expr.BinaryExpression;
 import org.key_project.rusty.ast.expr.LiteralExpression;
-import org.key_project.rusty.ast.expr.PathExpression;
 import org.key_project.rusty.ldt.LDT;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -124,14 +123,11 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
         if (pe instanceof ProgramVariable pv) {
             return tb.var(pv);
         }
-        if (pe instanceof PathExpression path) {
-            return tb.var(services.getNamespaces().programVariables().lookup(path.var().name()));
-        }
         if (pe instanceof LiteralExpression lit) {
             return convertLiteralExpression(lit, services);
         }
-        if (pe instanceof ArithLogicalExpression ale) {
-            return convertArithLogicalExpression(ale, services);
+        if (pe instanceof BinaryExpression ale) {
+            return convertBinaryExpression(ale, services);
         }
         throw new IllegalArgumentException(
             "Unknown or not convertible ProgramElement " + pe + " of type "
@@ -139,7 +135,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
     }
 
     // TODO: Generalize to all operators (once we have them)
-    public static Term convertArithLogicalExpression(ArithLogicalExpression ale,
+    public static Term convertBinaryExpression(BinaryExpression ale,
             Services services) {
         var tb = services.getTermBuilder();
         final var subs = new Term[] { convertToLogicElement(ale.left(), services),
@@ -148,13 +144,13 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
         var op = ale.op();
         var responsibleLDT = getResponsibleLDT(op, subs, services);
         if (responsibleLDT != null) {
-            return tb.func(responsibleLDT.getFuctionFor(op, services), subs);
+            return tb.func(responsibleLDT.getFunctionFor(op, services), subs);
         }
         throw new IllegalArgumentException(
             "could not handle" + " this operator: " + op);
     }
 
-    public static LDT getResponsibleLDT(ArithLogicalExpression.Operator op, Term[] subs,
+    public static LDT getResponsibleLDT(BinaryExpression.Operator op, Term[] subs,
             Services services) {
         for (LDT ldt : services.getLDTs()) {
             if (ldt.isResponsible(op, subs, services)) {

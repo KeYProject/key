@@ -12,7 +12,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 
 // spotless:off
-public record BorrowExpression(boolean isDouble, boolean mut, Expr expr) implements Expr {
+public record BorrowExpression(boolean mut, Expr expr) implements Expr {
     @Override
     public void visit(Visitor v) {
         v.performActionOnBorrowExpression(this);
@@ -32,13 +32,8 @@ public record BorrowExpression(boolean isDouble, boolean mut, Expr expr) impleme
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (isDouble) {
-            sb.append("&&");
-        } else {
-            sb.append("&");
-        }
-        if (mut) sb.append("mut");
-        sb.append(" ");
+        sb.append("&");
+        if (mut) sb.append("mut ");
         sb.append(expr);
         return sb.toString();
     }

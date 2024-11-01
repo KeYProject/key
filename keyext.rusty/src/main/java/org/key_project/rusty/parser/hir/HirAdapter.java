@@ -5,10 +5,7 @@ package org.key_project.rusty.parser.hir;
 
 import java.lang.reflect.Type;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 
 public abstract class HirAdapter<T> implements JsonDeserializer<T> {
     @Override
@@ -20,7 +17,13 @@ public abstract class HirAdapter<T> implements JsonDeserializer<T> {
         if (clazz == null) {
             throw new JsonParseException("(" + getClass() + ") Unknown serde_tag: " + tag);
         }
-        return jsonDeserializationContext.deserialize(obj, clazz);
+        try {
+            return jsonDeserializationContext.deserialize(obj, clazz);
+        } catch (JsonSyntaxException e) {
+            System.err.println(
+                "Error while deserializing " + getClass() + "::" + tag + ": " + e.getMessage());
+            throw e;
+        }
     }
 
     public abstract Class<? extends T> getType(String tag);

@@ -6,7 +6,7 @@ package org.key_project.rusty.ast.visitor;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.AssignmentExpression;
-import org.key_project.rusty.ast.pat.IdentPattern;
+import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.pat.SchemaVarPattern;
 import org.key_project.rusty.ast.ty.SchemaRustType;
@@ -75,8 +75,8 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
             changeList.removeFirst();
             Pattern pat = changeList.removeFirstOccurrence(Pattern.class);
             if (pat != null) {
-                if (pat instanceof IdentPattern ip) {
-                    var pv = ip.programVariable();
+                if (pat instanceof BindingPattern b) {
+                    var pv = b.pv();
                     stack.pop();
                     var el = new ExtList();
                     assert pv != null;

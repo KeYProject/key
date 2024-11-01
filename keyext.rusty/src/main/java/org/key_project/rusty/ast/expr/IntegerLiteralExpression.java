@@ -75,7 +75,8 @@ public class IntegerLiteralExpression extends LiteralExpression {
 
     @Override
     public String toString() {
-        return value + suffix.toString();
+        String suff = suffix == null ? "" : suffix.toString();
+        return value + suff;
     }
 
     @Override

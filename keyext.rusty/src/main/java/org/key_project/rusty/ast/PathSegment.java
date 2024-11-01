@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast;
 
-
+//spotless:off
 public record PathSegment(String ident, Res res) {
 }
+//spotless:on

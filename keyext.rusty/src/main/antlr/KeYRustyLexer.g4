@@ -6,6 +6,8 @@ import KeYLexer;
 package org.key_project.rusty.parser;
 }
 
+MUT : 'mut';
+
 MUTATE
 :   '*->'
     ;

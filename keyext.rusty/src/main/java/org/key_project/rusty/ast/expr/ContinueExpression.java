@@ -13,10 +13,56 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record ContinueExpression(@Nullable Label label,@Nullable Expr expr)implements Expr{@Override public void visit(Visitor v){v.performActionOnContinueExpression(this);}
+//spotless:off
+public record ContinueExpression(@Nullable Label label, @Nullable Expr expr) implements Expr {
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnContinueExpression(this);
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(n==0&&label!=null){return label;}if(label!=null){--n;}if(n==0&&expr!=null){return expr;}throw new IndexOutOfBoundsException("ContinueExpression has only "+getChildCount()+" children");}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0 && label != null) {
+            return label;
+        }
+        if (label != null) {
+            --n;
+        }
+        if (n == 0 && expr != null) {
+            return expr;
+        }
+        throw new IndexOutOfBoundsException("ContinueExpression has only " + getChildCount() + " children");
+    }
 
-@Override public int getChildCount(){int c=0;if(label!=null){++c;}if(expr!=null){++c;}return c;}
+    @Override
+    public int getChildCount() {
+        int c = 0;
+        if (label != null) {
+            ++c;
+        }
+        if (expr != null) {
+            ++c;
+        }
+        return c;
+    }
 
-@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("continue");if(label!=null){sb.append(" ").append(label);}if(expr!=null){sb.append(" ").append(expr);}sb.append(";");return sb.toString();}@Override public Type type(Services services){return TupleType.UNIT;}}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("continue");
+        if (label != null) {
+            sb.append(" ").append(label);
+        }
+        if (expr != null) {
+            sb.append(" ").append(expr);
+        }
+        sb.append(";");
+        return sb.toString();
+    }
+
+    @Override
+    public Type type(Services services) {
+        return TupleType.UNIT;
+    }
+}
+//spotless:on

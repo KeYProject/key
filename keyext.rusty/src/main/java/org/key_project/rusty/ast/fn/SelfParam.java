@@ -10,12 +10,28 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record SelfParam(boolean reference,boolean mut,@Nullable RustType ty)implements FunctionParam{@Override public void visit(Visitor v){v.performActionOnSelfParam(this);}
+//spotless:off
+public record SelfParam(boolean reference, boolean mut, @Nullable RustType ty) implements FunctionParam {
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnSelfParam(this);
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(n==0)return ty;throw new IndexOutOfBoundsException(getClass()+" has 1 child");}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) return ty;
+        throw new IndexOutOfBoundsException(getClass() + " has 1 child");
+    }
 
-@Override public int getChildCount(){return 1;}
+    @Override
+    public int getChildCount() {
+        return 1;
+    }
 
-@Override public RustType type(){
+    @Override
+    public RustType type() {
 // TODO
-return ty;}}
+        return ty;
+    }
+}
+//spotless:on

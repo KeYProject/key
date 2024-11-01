@@ -10,10 +10,34 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record TupleIndexingExpression(Expr base,int index)implements Expr{@Override public void visit(Visitor v){v.performActionOnTupleIndexingExpression(this);}
+//spotless:off
+public record TupleIndexingExpression(Expr base, int index) implements Expr {
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnTupleIndexingExpression(this);
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(n==0){return base;}throw new IndexOutOfBoundsException("FieldExpression has less than "+n+" children");}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) {
+            return base;
+        }
+        throw new IndexOutOfBoundsException("FieldExpression has less than " + n + " children");
+    }
 
-@Override public int getChildCount(){return 1;}
+    @Override
+    public int getChildCount() {
+        return 1;
+    }
 
-@Override public String toString(){return base+"."+index;}@Override public Type type(Services services){throw new UnsupportedOperationException();}}
+    @Override
+    public String toString() {
+        return base + "." + index;
+    }
+
+    @Override
+    public Type type(Services services) {
+        throw new UnsupportedOperationException();
+    }
+}
+//spotless:on

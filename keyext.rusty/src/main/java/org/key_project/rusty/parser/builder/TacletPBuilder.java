@@ -375,12 +375,11 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private KeYRustyType getOrCreateRustyType(String sortId, ParserRuleContext ctx) {
-        /*
-         * KeYRustyType t = getJavaInfo().getKeYJavaType(sortId);
-         * if (t != null) {
-         * return t;
-         * }
-         */
+        KeYRustyType t = services.getRustInfo().getKeYRustyType(sortId);
+        if (t != null) {
+            return t;
+        }
+
         return new KeYRustyType(visitSortId(sortId, ctx));
     }
 

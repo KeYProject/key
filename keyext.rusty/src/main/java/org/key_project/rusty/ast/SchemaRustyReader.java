@@ -5,6 +5,7 @@ package org.key_project.rusty.ast;
 
 import org.key_project.logic.Namespace;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -13,7 +14,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.jspecify.annotations.NonNull;
 
-public class SchemaRustyReader extends AntlrRustyReader {
+public class SchemaRustyReader extends HirRustyReader {
     private Namespace<@NonNull SchemaVariable> svNS;
 
     public SchemaRustyReader(Services services, NamespaceSet nss) {
@@ -39,6 +40,7 @@ public class SchemaRustyReader extends AntlrRustyReader {
         var parser = new org.key_project.rusty.parsing.RustySchemaParser(ts);
         var converter = new SchemaConverter(svNS, getServices());
         var converted = converter.convertFunction(parser.function_());
-        return new RustyBlock(converted.body());
+        var firstStmt = (ExpressionStatement) converted.body().getStatements().get(0);
+        return new RustyBlock(firstStmt.getExpression());
     }
 }

@@ -1,0 +1,87 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package org.key_project.rusty;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.sort.Sort;
+import org.key_project.rusty.ast.abstraction.*;
+
+import org.jspecify.annotations.NonNull;
+
+public final class RustInfo {
+    private Map<Type, KeYRustyType> type2KRTCache;
+    private Services services;
+
+    public RustInfo(Services services) {
+        this.services = services;
+        type2KRTCache = new HashMap<>();
+    }
+
+    public KeYRustyType getKeYRustyType(String name) {
+        KeYRustyType result = getPrimitiveKeYRustyType(name);
+        // TODO: ADTs etc.
+        return result;
+    }
+
+    public KeYRustyType getKeYRustyType(Type type) {
+        if (type2KRTCache.containsKey(type)) {
+            return type2KRTCache.get(type);
+        }
+        if (type instanceof PrimitiveType pt) {
+            return getPrimitiveKeYRustyType(pt);
+        }
+        if (type instanceof TupleType tt && tt == TupleType.UNIT) {
+            var sort = services.getNamespaces().sorts().lookup("unit");
+            var krt = new KeYRustyType(type, sort);
+            type2KRTCache.put(type, krt);
+            return krt;
+        }
+        if (type instanceof ReferenceType rt) {
+            Sort sort = services.getMRefManager().getRefSort(rt.getSort(services), rt.isMut());
+            var krt = new KeYRustyType(type, sort);
+            type2KRTCache.put(type, krt);
+            return krt;
+        }
+        throw new IllegalArgumentException("Unsupported type: " + type);
+    }
+
+    private KeYRustyType getPrimitiveKeYRustyType(String name) {
+        PrimitiveType type = PrimitiveType.get(name);
+        if (type != null) {
+            return getPrimitiveKeYRustyType(type);
+        } else {
+            return null;
+        }
+    }
+
+    private KeYRustyType getPrimitiveKeYRustyType(PrimitiveType type) {
+        if (type == null) {
+            throw new IllegalArgumentException("Given type is null");
+        }
+
+        if (type2KRTCache != null && type2KRTCache.containsKey(type)) {
+            return type2KRTCache.get(type);
+        }
+        Name ldtName = type.getCorrespondingLDTName();
+
+        Namespace<@NonNull Sort> sorts = services.getNamespaces().sorts();
+        Sort sort = sorts.lookup(ldtName);
+
+        if (sort == null) {
+            throw new IllegalStateException(
+                "Could not find sort " + ldtName + " for type: " + type);
+        }
+
+        var result = new KeYRustyType(type, sort);
+        if (type2KRTCache != null) {
+            type2KRTCache.put(type, result);
+        }
+
+        return result;
+    }
+}

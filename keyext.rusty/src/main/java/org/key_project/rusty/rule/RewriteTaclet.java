@@ -150,9 +150,9 @@ public class RewriteTaclet extends FindTaclet {
     }
 
     /**
-     * returns the int encoding the kind of state restriction this rewrite taclet must obey
+     * returns the int encoding the useKind of state restriction this rewrite taclet must obey
      *
-     * @return the int encoding the kind of state restriction this rewrite taclet must obey
+     * @return the int encoding the useKind of state restriction this rewrite taclet must obey
      */
     public ApplicationRestriction getApplicationRestriction() {
         return applicationRestriction;

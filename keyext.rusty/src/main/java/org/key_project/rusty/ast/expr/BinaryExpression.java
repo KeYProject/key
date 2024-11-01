@@ -11,6 +11,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
+// spotless:off
 public record BinaryExpression(Operator op, Expr left, Expr right) implements Expr {
     @Override
     public Type type(Services services) {
@@ -19,17 +20,27 @@ public record BinaryExpression(Operator op, Expr left, Expr right) implements Ex
 
     @Override
     public void visit(Visitor v) {
-
+        v.performActionOnBinaryExpression(this);
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
-        return null;
+    public @NonNull SyntaxElement getChild(int n) {
+        return switch (n) {
+            case 0 -> left;
+            case 1 -> op;
+            case 2 -> right;
+            default -> throw new IndexOutOfBoundsException("BinaryExpression has only 3 children");
+        };
     }
 
     @Override
     public int getChildCount() {
-        return 0;
+        return 3;
+    }
+
+    @Override
+    public String toString() {
+        return left + " " + op + " " + right;
     }
 
     public enum Operator implements RustyProgramElement {
@@ -65,7 +76,7 @@ public record BinaryExpression(Operator op, Expr left, Expr right) implements Ex
 
         @Override
         public void visit(Visitor v) {
-
+            v.performActionOnBinaryOperator(this);
         }
 
         @Override
@@ -77,4 +88,6 @@ public record BinaryExpression(Operator op, Expr left, Expr right) implements Ex
         public int getChildCount() {
             return 0;
         }
-    }}
+    }
+}
+//spotless:on

@@ -34,6 +34,14 @@ public class JSON {
     @Test
     void write() throws IOException {
         var reader = new HirRustyReader(null, null);
-        reader.readBlockWithEmptyContext("{let a = 0;}");
+        var block = reader.readBlockWithEmptyContext("{\n" +
+            "        let i = 0; let mut b = false;\n" +
+            "        let x = &i;\n" +
+            "        let j = i;\n" +
+            "        let y = &j;\n" +
+            "        b = x == y;\n" +
+            "        b\n" +
+            "    }");
+        System.out.println(block);
     }
 }

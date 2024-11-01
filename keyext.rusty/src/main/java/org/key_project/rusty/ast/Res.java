@@ -3,5 +3,5 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast;
 
-public interface Res {
+public interface Res extends RustyProgramElement {
 }

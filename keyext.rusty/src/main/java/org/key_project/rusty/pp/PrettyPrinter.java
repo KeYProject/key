@@ -149,17 +149,6 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-
-    @Override
-    public void performActionOnArithLogicalExpression(ArithLogicalExpression x) {
-        layouter.beginC();
-        x.left().visit(this);
-        layouter.print(" ");
-        layouter.print(x.op().toString());
-        layouter.brk();
-        x.right().visit(this);
-    }
-
     @Override
     public void performActionOnAssignmentExpression(AssignmentExpression x) {
         x.lhs().visit(this);
@@ -319,7 +308,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnBorrowExpression(BorrowExpression x) {
-        layouter.print(x.isDouble() ? "&&" : "&");
+        layouter.print("&");
         if (x.mut()) {
             layouter.keyWord("mut");
             layouter.print(" ");
@@ -357,13 +346,6 @@ public class PrettyPrinter implements Visitor {
         if (x.right() != null) {
             x.right().visit(this);
         }
-    }
-
-    @Override
-    public void performActionOnLazyBooleanExpression(LazyBooleanExpression x) {
-        x.left().visit(this);
-        x.op().visit(this);
-        x.right().visit(this);
     }
 
     @Override
@@ -620,16 +602,40 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x) {
+    public void performActionOnBinaryExpression(BinaryExpression x) {
+        x.left().visit(this);
         layouter.print(" ");
-        layouter.print(x.toString());
+        x.op().visit(this);
         layouter.print(" ");
+        x.right().visit(this);
     }
 
     @Override
-    public void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x) {
-        layouter.print(" ");
+    public void performActionOnBinaryOperator(BinaryExpression.Operator x) {
         layouter.print(x.toString());
-        layouter.print(" ");
+    }
+
+    @Override
+    public void performActionOnUnaryExpression(UnaryExpression x) {
+        x.op().visit(this);
+        x.expr().visit(this);
+    }
+
+    @Override
+    public void performActionOnUnaryOperator(UnaryExpression.Operator x) {
+        layouter.print(x.toString());
+    }
+
+    @Override
+    public void performActionOnBindingPattern(BindingPattern x) {
+        if (x.ref()) {
+            layouter.keyWord("ref");
+            layouter.print(" ");
+        }
+        x.pv().visit(this);
+        if (x.opt() != null) {
+            layouter.print(" @ ");
+            x.opt().visit(this);
+        }
     }
 }

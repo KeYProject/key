@@ -54,11 +54,6 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     protected abstract void doDefaultAction(RustyProgramElement node);
 
     @Override
-    public void performActionOnArithLogicalExpression(ArithLogicalExpression x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnAssignmentExpression(AssignmentExpression x) {
         doDefaultAction(x);
     }
@@ -124,11 +119,6 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     }
 
     @Override
-    public void performActionOnComparisonExpression(ComparisonExpression x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x) {
         doDefaultAction(x);
     }
@@ -180,11 +170,6 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnIndexExpression(IndexExpression x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnLazyBooleanExpression(LazyBooleanExpression x) {
         doDefaultAction(x);
     }
 
@@ -334,22 +319,32 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     }
 
     @Override
-    public void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x) {
-        doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnComparisonOperator(ComparisonExpression.Operator x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x) {
         doDefaultAction(x);
     }
 
     @Override
-    public void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x) {
+    public void performActionOnBinaryExpression(BinaryExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnBinaryOperator(BinaryExpression.Operator x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnUnaryExpression(UnaryExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnUnaryOperator(UnaryExpression.Operator x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnBindingPattern(BindingPattern x) {
         doDefaultAction(x);
     }
 }
