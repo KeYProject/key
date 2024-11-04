@@ -12,11 +12,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
 
 /**
  * Initializes the "before loop" update needed for the modifiable clause.
@@ -37,7 +33,7 @@ import org.jspecify.annotations.NonNull;
 public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
 
     public CreateBeforeLoopUpdate() {
-        super(new Name("#createBeforeLoopUpdate"), 5);
+        super(new Name("#createBeforeLoopUpdate"), 4);
     }
 
     @Override
@@ -46,18 +42,10 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
 
         final Term anonHeapTerm = term.sub(1);
         final Term anonSavedHeapTerm = term.sub(2);
-        final Term localVarsBeforeSV = term.sub(3);
-        final Term anonPermissionsHeapTerm = term.sub(4);
-
-        // We have a SV for the local vars written to in the loop. Get its inst, which is a map from
-        // the original variable to its "before" version.
-        @SuppressWarnings("unchecked")
-        final var localVarsBefore =
-            (ImmutableMap<@NonNull LocationVariable, LocationVariable>) svInst
-                    .getInstantiation((SchemaVariable) localVarsBeforeSV.op());
+        final Term anonPermissionsHeapTerm = term.sub(3);
 
         return createBeforeLoopUpdate(MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
-            MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm, localVarsBefore,
+            MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
             anonPermissionsHeapTerm, services);
     }
 
@@ -76,7 +64,6 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
      */
     private static Term createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
             Term anonHeapTerm, Term anonSavedHeapTerm,
-            ImmutableMap<@NonNull LocationVariable, LocationVariable> localVarsBefore,
             Term anonPermissionsHeapTerm,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
@@ -94,16 +81,6 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
                 tb.elementary((UpdateableOperator) anonPermissionsHeapTerm.op(),
                     tb.var(heapLDT.getPermissionHeap())));
-        }
-
-        if (!localVarsBefore.isEmpty()) {
-            ImmutableList<Term> updates = ImmutableSLList.nil();
-            for (var entry : localVarsBefore) {
-                // {i_before := i}
-                updates = updates.append(tb.elementary(tb.var(entry.value()), tb.var(entry.key())));
-            }
-            var parUp = tb.parallel(updates);
-            beforeLoopUpdate = tb.parallel(beforeLoopUpdate, parUp);
         }
 
         return beforeLoopUpdate;
