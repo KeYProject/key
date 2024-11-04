@@ -162,7 +162,7 @@ public class TacletBuilderManipulators {
         };
 
     public static final TacletBuilderCommand NEW_LOCAL_VARS = new ConstructorBasedBuilder(
-        "newLocalVars", NewLocalVarsCondition.class, SV, SV);
+        "newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
         public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
