@@ -45,7 +45,19 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     private Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
 
+    private boolean axiomMode;
+
     private final List<Taclet> topLevelTaclets = new ArrayList<>(2048);
+
+    /**
+     * Current required choices for taclets
+     */
+    private ChoiceExpr requiredChoices = ChoiceExpr.TRUE;
+
+    /**
+     * Required choices for taclet goals.
+     */
+    private ChoiceExpr goalChoice = ChoiceExpr.TRUE;
 
     // --------------------------
     // Constructors
@@ -76,17 +88,17 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitRulesOrAxioms(KeYRustyParser.RulesOrAxiomsContext ctx) {
         enableRustySchemaMode();
-        // if (ctx.RULES() != null) {
-        // axiomMode = false;
-        // }
-        // if (ctx.AXIOMS() != null) {
-        // axiomMode = true;
-        // }
-        // ChoiceExpr choices = accept(ctx.choices);
-        // this.requiredChoices = Objects.requireNonNullElse(choices, ChoiceExpr.TRUE);
+        if (ctx.RULES() != null) {
+            axiomMode = false;
+        }
+        if (ctx.AXIOMS() != null) {
+            axiomMode = true;
+        }
+        ChoiceExpr choices = accept(ctx.choices);
+        this.requiredChoices = Objects.requireNonNullElse(choices, ChoiceExpr.TRUE);
         List<Taclet> seq = mapOf(ctx.taclet());
         topLevelTaclets.addAll(seq);
-        // disableJavaSchemaMode();
+        disableJavaSchemaMode();
         return null;
     }
 
@@ -132,17 +144,17 @@ public class TacletPBuilder extends ExpressionBuilder {
             tacletAnnotations = tacletAnnotations.add(TacletAnnotation.LEMMA);
         }
         String name = ctx.name.getText();
-        // ChoiceExpr ch = accept(ctx.option_list());
-        // var choices = requiredChoices;
-        // if (ch != null) {
-        // choices = ChoiceExpr.and(ch, choices);
-        // }
+        ChoiceExpr ch = accept(ctx.option_list());
+        var choices = requiredChoices;
+        if (ch != null) {
+            choices = ChoiceExpr.and(ch, choices);
+        }
 
         Term form = accept(ctx.form);
         if (form != null) {
-            // if (!axiomMode) {
-            // semanticError(ctx, "formula rules are only permitted for \\axioms");
-            // }
+            if (!axiomMode) {
+                semanticError(ctx, "formula rules are only permitted for \\axioms");
+            }
             TacletBuilder<?> b = createTacletBuilderFor(null,
                 new ApplicationRestriction(ApplicationRestriction.NONE), ctx);
             currentTBuilder.push(b);
@@ -153,7 +165,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
             addGoalTemplate(null, null, addSeq, noTaclets, noSV, ctx);
             b.setName(new Name(name));
-            // b.setChoices(choices);
+            b.setChoices(choices);
             b.setAnnotations(tacletAnnotations);
             // b.setOrigin(BuilderHelpers.getPosition(ctx));
             Taclet r = b.getTaclet();
@@ -170,9 +182,6 @@ public class TacletPBuilder extends ExpressionBuilder {
             ifSeq = accept(ctx.ifSeq);
         }
 
-        // TODO ask about how this should done with the enum
-        // does it make sense to use an enum when you change the value to something
-        // that no enum element has initially?
         ApplicationRestriction applicationRestriction =
             new ApplicationRestriction(ApplicationRestriction.NONE);
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
@@ -200,7 +209,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         accept(ctx.goalspecs());
         mapOf(ctx.varexplist());
         accept(ctx.modifiers());
-        // b.setChoices(choices);
+        b.setChoices(choices);
         b.setAnnotations(tacletAnnotations);
         // b.setOrigin(BuilderHelpers.getPosition(ctx));
         try {
@@ -393,9 +402,68 @@ public class TacletPBuilder extends ExpressionBuilder {
         return mapOf(ctx.goalspecwithoption());
     }
 
-    // -----------------------------------------------------------------------------------------
-    // Here we leave out methods from visitGoalspecwithoption(...) to visitOption_expr_not(...)
-    // -----------------------------------------------------------------------------------------
+    @Override
+    public Object visitGoalspecwithoption(KeYRustyParser.GoalspecwithoptionContext ctx) {
+        ChoiceExpr expr = accept(ctx.option_list());
+        goalChoice = expr == null ? ChoiceExpr.TRUE : expr;
+        accept(ctx.goalspec());
+        return null;
+    }
+
+    @Override
+    public Choice visitOption(KeYRustyParser.OptionContext ctx) {
+        String choice = ctx.getText();
+        Choice c = choices().lookup(choice);
+        if (c == null) {
+            semanticError(ctx, "Could not find choice: %s", choice);
+        }
+        return c;
+    }
+
+    @Override
+    public ChoiceExpr visitOption_list(KeYRustyParser.Option_listContext ctx) {
+        return ctx.option_expr().stream()
+                .map(it -> (ChoiceExpr) accept(it))
+                .reduce(ChoiceExpr::and)
+                .orElse(ChoiceExpr.TRUE);
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_or(KeYRustyParser.Option_expr_orContext ctx) {
+        return ChoiceExpr.or(accept(ctx.option_expr(0)), accept(ctx.option_expr(1)));
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_paren(KeYRustyParser.Option_expr_parenContext ctx) {
+        return accept(ctx.option_expr());
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_prop(KeYRustyParser.Option_expr_propContext ctx) {
+        String category = ctx.option().cat.getText();
+        String value = ctx.option().value.getText();
+        String choiceStr = category + ":" + value;
+        /*
+         * Make sure that the choice (category and value!) is known to KeY, i.e. that it is declared
+         * in the file `optionsDeclarations.key`. This prevents from accidentally deactivating
+         * (parts of) taclets due to non-existing choices (see
+         * https://github.com/KeYProject/key/issues/3352).
+         */
+        if (choices().lookup(choiceStr) == null) {
+            semanticError(ctx, "Could not find choice: %s", category + ":" + choiceStr);
+        }
+        return ChoiceExpr.variable(ctx.option().cat.getText(), ctx.option().value.getText());
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_not(KeYRustyParser.Option_expr_notContext ctx) {
+        return ChoiceExpr.not(accept(ctx.option_expr()));
+    }
+
+    @Override
+    public ChoiceExpr visitOption_expr_and(KeYRustyParser.Option_expr_andContext ctx) {
+        return ChoiceExpr.and(accept(ctx.option_expr(0)), accept(ctx.option_expr(1)));
+    }
 
     @Override
     public Object visitGoalspec(KeYRustyParser.GoalspecContext ctx) {

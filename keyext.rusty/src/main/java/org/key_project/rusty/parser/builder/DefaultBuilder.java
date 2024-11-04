@@ -19,6 +19,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.abstraction.ReferenceType;
 import org.key_project.rusty.ast.abstraction.Type;
+import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.AbstractTermTransformer;
@@ -84,6 +85,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     protected Namespace<RuleSet> ruleSets() {
         return namespaces().ruleSets();
+    }
+
+    protected Namespace<Choice> choices() {
+        return namespaces().choices();
     }
 
     protected Namespace<@NonNull ProgramVariable> programVariables() {

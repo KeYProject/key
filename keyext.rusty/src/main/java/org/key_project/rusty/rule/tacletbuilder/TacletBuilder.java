@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -39,6 +41,8 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     protected ImmutableList<VariableCondition> variableConditions =
         ImmutableSLList.nil();
+    protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
+    protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
         DefaultImmutableSet.nil();
 
@@ -219,6 +223,14 @@ public abstract class TacletBuilder<T extends Taclet> {
      * IllegalStateException.
      */
     public abstract T getTaclet();
+
+    public ChoiceExpr getChoices() {
+        return choices;
+    }
+
+    public void setChoices(ChoiceExpr choices) {
+        this.choices = choices;
+    }
 
     public static class TacletBuilderException extends IllegalArgumentException {
         private final Name tacletName;

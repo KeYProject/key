@@ -21,15 +21,18 @@ public class NamespaceSet {
     private Namespace<@NonNull Function> funcNS = new Namespace<>();
     private Namespace<@NonNull RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<@NonNull Sort> sortNS = new Namespace<>();
+    private Namespace<@NonNull Choice> choiceNS = new Namespace<>();
 
     public NamespaceSet() {}
 
     public NamespaceSet(Namespace<@NonNull QuantifiableVariable> varNS,
             Namespace<@NonNull ProgramVariable> progVarNS, Namespace<@NonNull Function> funcNS,
+            Namespace<@NonNull Choice> choiceNS,
             Namespace<@NonNull Sort> sortNS) {
         this.varNS = varNS;
         this.progVarNS = progVarNS;
         this.funcNS = funcNS;
+        this.choiceNS = choiceNS;
         this.sortNS = sortNS;
     }
 
@@ -71,6 +74,14 @@ public class NamespaceSet {
 
     public void setSorts(Namespace<@NonNull Sort> sortNS) {
         this.sortNS = sortNS;
+    }
+
+    public Namespace<@NonNull Choice> choices() {
+        return choiceNS;
+    }
+
+    public void setChoices(Namespace<@NonNull Choice> choiceNS) {
+        this.choiceNS = choiceNS;
     }
 
     public void add(NamespaceSet ns) {
@@ -116,12 +127,14 @@ public class NamespaceSet {
 
     public NamespaceSet copy() {
         return new NamespaceSet(variables().copy(), programVariables().copy(), functions().copy(),
+            choiceNS.copy(),
             sorts().copy());
     }
 
     @Override
     public String toString() {
         return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n" + "Variables: "
-            + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n";
+            + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n" + "Choices: "
+            + choices();
     }
 }
