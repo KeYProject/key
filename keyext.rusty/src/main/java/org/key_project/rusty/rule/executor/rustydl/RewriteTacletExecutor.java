@@ -70,7 +70,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             // Then there was no replacewith...
             // This is strange in a RewriteTaclet, but who knows...
             // However, term label refactorings have to be performed.
-            throw new RuntimeException("TODO @ DD");
+            // TODO: labels?
         }
     }
 

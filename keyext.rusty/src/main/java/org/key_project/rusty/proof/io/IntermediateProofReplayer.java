@@ -234,7 +234,6 @@ public class IntermediateProofReplayer {
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm, Goal currGoal)
             throws TacletAppConstructionException {
-
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;

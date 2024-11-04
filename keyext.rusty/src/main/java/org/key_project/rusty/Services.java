@@ -31,6 +31,8 @@ public class Services implements LogicServices {
     private Proof proof;
     private Profile profile;
 
+    private final ServiceCaches caches;
+
     /**
      * variable namer for inner renaming
      */
@@ -44,6 +46,7 @@ public class Services implements LogicServices {
     public Services() {
         this.tf = new TermFactory();
         this.tb = new TermBuilder(tf, this);
+        this.caches = new ServiceCaches();
         counters = new LinkedHashMap<>();
         mRefManager = new RefSortManager(this);
         rustInfo = new RustInfo(this);
@@ -64,6 +67,7 @@ public class Services implements LogicServices {
         this.profile = services.profile;
         this.counters = services.counters;
         this.mRefManager = services.mRefManager;
+        this.caches = services.caches;
         rustInfo = services.rustInfo;
     }
 
@@ -161,5 +165,9 @@ public class Services implements LogicServices {
 
     public RustInfo getRustInfo() {
         return rustInfo;
+    }
+
+    public ServiceCaches getCaches() {
+        return caches;
     }
 }

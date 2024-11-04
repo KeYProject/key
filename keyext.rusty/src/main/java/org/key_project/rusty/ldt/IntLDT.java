@@ -14,6 +14,7 @@ import org.key_project.rusty.ast.expr.LiteralExpression;
 import org.key_project.rusty.logic.TermBuilder;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class IntLDT extends LDT {
     public static final Name NAME = new Name("int");
@@ -200,5 +201,22 @@ public class IntLDT extends LDT {
     public boolean isResponsible(BinaryExpression.Operator op, Term left, Term right,
             Services services) {
         return false;
+    }
+
+    @Override
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
+        return switch (operationName) {
+        case "gt" -> getGreaterThan();
+        case "geq" -> getGreaterOrEquals();
+        case "lt" -> getLessThan();
+        case "leq" -> getLessOrEquals();
+        case "div" -> getDiv();
+        case "mul" -> getMul();
+        case "add" -> getAdd();
+        case "sub" -> getSub();
+        case "mod" -> getMod();
+        case "neg" -> getNeg();
+        default -> null;
+        };
     }
 }
