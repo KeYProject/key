@@ -4366,19 +4366,6 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 	      }
 	   )
 	   |
-	   (
-       	   "#declare-local-loop-vars" "("
-       	         activeAccess = PrimaryExpression()
-       	   ")" ";"
-       	      {
-       		  result = factory.createRKeYMetaConstruct();
-       		  setPrefixInfo(result);
-       		  result.setChild((Statement)activeAccess);
-       		  result.setName("#declare-local-loop-vars");
-       		  return result;
-       	      }
-       	   )
-	  |
 	  (
 	   "#resolve-multiple-var-decl" "(" stat = Statement() ")" ";"
 	      {
