@@ -5,6 +5,7 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.executor.rustydl.AntecTacletExecutor;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -36,8 +37,8 @@ public class AntecTaclet extends FindTaclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
             ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, find, prefixMap,
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, attrs, find, prefixMap, choices,
             tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
@@ -73,6 +74,6 @@ public class AntecTaclet extends FindTaclet {
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new AntecTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
-            ignoreTopLevelUpdates, prefixMap, tacletAnnotations);
+            ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
     }
 }

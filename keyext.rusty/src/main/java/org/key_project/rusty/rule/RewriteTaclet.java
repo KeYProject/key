@@ -6,6 +6,7 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.PIOPathIterator;
 import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.op.IfThenElse;
@@ -117,18 +118,19 @@ public class RewriteTaclet extends FindTaclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, find, prefixMap,
-            p_applicationRestriction, false, tacletAnnotations);
+            p_applicationRestriction, choices, false, tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ApplicationRestriction p_applicationRestriction, boolean surviveSymbExec,
+            ApplicationRestriction p_applicationRestriction, ChoiceExpr choices,
+            boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, attrs, find, prefixMap,
-            surviveSymbExec, tacletAnnotations);
+            choices, surviveSymbExec, tacletAnnotations);
         applicationRestriction = p_applicationRestriction;
         createTacletServices();
     }
@@ -200,7 +202,7 @@ public class RewriteTaclet extends FindTaclet {
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
-            prefixMap, applicationRestriction, tacletAnnotations);
+            prefixMap, applicationRestriction, choices, tacletAnnotations);
     }
 
     public MatchConditions checkPrefix(PosInOccurrence p_pos, MatchConditions p_mc) {

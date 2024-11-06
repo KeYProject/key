@@ -5,6 +5,7 @@ package org.key_project.rusty.rule.tacletbuilder;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -230,6 +231,20 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     public void setChoices(ChoiceExpr choices) {
         this.choices = choices;
+    }
+
+    /**
+     * adds a mapping from GoalTemplate <code>gt</code> to SetOf<Choice> <code>soc</code>
+     */
+    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ChoiceExpr soc) {
+        if (goal2Choices == null) {
+            goal2Choices = new LinkedHashMap<>();
+        }
+        goal2Choices.put(gt, soc);
+    }
+
+    public HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
+        return goal2Choices;
     }
 
     public static class TacletBuilderException extends IllegalArgumentException {

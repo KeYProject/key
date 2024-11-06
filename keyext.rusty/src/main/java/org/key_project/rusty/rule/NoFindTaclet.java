@@ -5,6 +5,7 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.executor.rustydl.NoFindTacletExecutor;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -35,9 +36,9 @@ public class NoFindTaclet extends Taclet {
     public NoFindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, attrs, prefixMap,
-            tacletAnnotations);
+            choices, tacletAnnotations);
         createTacletServices();
     }
 
@@ -72,6 +73,6 @@ public class NoFindTaclet extends Taclet {
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new NoFindTaclet(new Name(s), applPart, goalTemplates(), attrs,
-            prefixMap, tacletAnnotations);
+            prefixMap, choices, tacletAnnotations);
     }
 }

@@ -76,7 +76,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
             new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
             goals, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
-            tacletAnnotations);
+            choices, tacletAnnotations);
         // t.setOrigin(origin);
         return t;
     }
