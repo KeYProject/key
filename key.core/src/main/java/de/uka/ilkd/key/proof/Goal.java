@@ -33,8 +33,8 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.ncore.sequent.PosInOccurrence;
-import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.ncore.sequent.Sequent;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

@@ -23,6 +23,12 @@ public abstract class Sequent<SF extends SequentFormula> implements Iterable<SF>
         this.succedent = emptySemisequent;
     }
 
+    /** used by NILSequent implementations */
+    protected Sequent(Semisequent emptySemisequent) {
+        this.antecedent = emptySemisequent;
+        this.succedent = emptySemisequent;
+    }
+
     /** creates new Sequent with antecedence and succedence */
     protected Sequent(Semisequent<SF> antecedent, Semisequent<SF> succedent) {
         assert !antecedent.isEmpty() || !succedent.isEmpty();
