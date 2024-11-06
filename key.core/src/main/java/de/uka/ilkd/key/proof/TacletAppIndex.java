@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -172,12 +172,13 @@ public class TacletAppIndex {
         return getGoal() == null || getSequent() != getNode().sequent();
     }
 
-    private SemisequentTacletAppIndex getIndex(PosInOccurrence pos) {
+    private SemisequentTacletAppIndex getIndex(org.key_project.ncore.sequent.PosInOccurrence pos) {
         ensureIndicesExist();
         return pos.isInAntec() ? antecIndex : succIndex;
     }
 
-    private ImmutableList<TacletApp> getFindTacletWithPos(PosInOccurrence pos, TacletFilter filter,
+    private ImmutableList<TacletApp> getFindTacletWithPos(
+            org.key_project.ncore.sequent.PosInOccurrence pos, TacletFilter filter,
             Services services) {
         Debug.assertFalse(pos == null);
         ImmutableList<NoPosTacletApp> tacletInsts = getFindTaclet(pos, filter);
@@ -190,7 +191,8 @@ public class TacletAppIndex {
      *
      * @param pos the PosInOccurrence to focus
      */
-    public ImmutableList<TacletApp> getTacletAppAt(PosInOccurrence pos, TacletFilter filter,
+    public ImmutableList<TacletApp> getTacletAppAt(
+            org.key_project.ncore.sequent.PosInOccurrence pos, TacletFilter filter,
             Services services) {
         ImmutableList<TacletApp> sal = getFindTacletWithPos(pos, filter, services);
         return prepend(sal, getNoFindTaclet(filter, services));
@@ -204,7 +206,7 @@ public class TacletAppIndex {
      * @return list of all created TacletApps
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
-            PosInOccurrence pos, Services services) {
+            org.key_project.ncore.sequent.PosInOccurrence pos, Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
@@ -219,7 +221,8 @@ public class TacletAppIndex {
         return result;
     }
 
-    static TacletApp createTacletApp(NoPosTacletApp tacletApp, PosInOccurrence pos,
+    static TacletApp createTacletApp(NoPosTacletApp tacletApp,
+            org.key_project.ncore.sequent.PosInOccurrence pos,
             Services services) {
         if (tacletApp.taclet() instanceof FindTaclet) {
             return tacletApp.setPosInOccurrence(pos, services);
@@ -247,7 +250,8 @@ public class TacletAppIndex {
      * @param pos the PosInOccurrence to focus
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
+    public ImmutableList<NoPosTacletApp> getRewriteTaclet(
+            org.key_project.ncore.sequent.PosInOccurrence pos,
             TacletFilter filter) {
 
         final Iterator<NoPosTacletApp> it = getFindTaclet(pos, filter).iterator();
@@ -272,7 +276,8 @@ public class TacletAppIndex {
      * @param pos the PosInOccurrence to focus
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos, TacletFilter filter) {
+    public ImmutableList<NoPosTacletApp> getFindTaclet(
+            org.key_project.ncore.sequent.PosInOccurrence pos, TacletFilter filter) {
         return getIndex(pos).getTacletAppAt(pos, filter);
     }
 

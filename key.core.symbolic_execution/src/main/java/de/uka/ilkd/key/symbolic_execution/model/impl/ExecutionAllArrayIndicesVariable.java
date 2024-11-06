@@ -5,7 +5,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -64,7 +63,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionAllArrayIndicesVariable(IExecutionNode<?> parentNode, Node proofNode,
-            PosInOccurrence modalityPIO, ExecutionValue parentValue,
+            org.key_project.ncore.sequent.PosInOccurrence modalityPIO, ExecutionValue parentValue,
             IProgramVariable arrayProgramVariable, Term additionalCondition) {
         super(parentNode, proofNode, modalityPIO, parentValue, arrayProgramVariable,
             additionalCondition);

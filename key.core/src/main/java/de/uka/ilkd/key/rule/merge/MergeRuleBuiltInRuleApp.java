@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
@@ -52,12 +51,12 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts) {
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         super(rule, pio, ifInsts);
     }
 
     public MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts, Node mergeNode,
             ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
             SymbolicExecutionStateWithProgCnt thisSEState,
             ImmutableList<SymbolicExecutionState> mergePartnerStates, Term distForm,
@@ -78,7 +77,8 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setIfInsts(
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

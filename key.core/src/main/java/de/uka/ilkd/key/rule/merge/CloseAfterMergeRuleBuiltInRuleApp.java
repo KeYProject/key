@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -52,7 +51,8 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setIfInsts(
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

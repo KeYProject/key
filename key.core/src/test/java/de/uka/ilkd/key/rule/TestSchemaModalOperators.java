@@ -151,7 +151,7 @@ public class TestSchemaModalOperators {
             "Schemamodality " + osv + " has not been instantiated");
         assertSame(Modality.JavaModalityKind.DIA, mc.getInstantiations().getInstantiation(osv));
 
-        PosInOccurrence pos =
+        org.key_project.ncore.sequent.PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
         PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
         Term instReplace =
@@ -168,8 +168,9 @@ public class TestSchemaModalOperators {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal1);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
-        PosInOccurrence applyPos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
-            PosInTerm.getTopLevel(), false);
+        org.key_project.ncore.sequent.PosInOccurrence applyPos =
+            new PosInOccurrence(goal.sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
@@ -202,8 +203,9 @@ public class TestSchemaModalOperators {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal2);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
-        PosInOccurrence applyPos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
-            PosInTerm.getTopLevel(), false);
+        org.key_project.ncore.sequent.PosInOccurrence applyPos =
+            new PosInOccurrence(goal.sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
@@ -232,8 +234,9 @@ public class TestSchemaModalOperators {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal3);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
-        PosInOccurrence applyPos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
-            PosInTerm.getTopLevel(), false);
+        org.key_project.ncore.sequent.PosInOccurrence applyPos =
+            new PosInOccurrence(goal.sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");

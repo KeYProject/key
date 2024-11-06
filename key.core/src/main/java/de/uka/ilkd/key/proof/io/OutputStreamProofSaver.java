@@ -696,7 +696,8 @@ public class OutputStreamProofSaver {
         ps.append(")\n");
     }
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(Sequent seq,
+            org.key_project.ncore.sequent.PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
@@ -780,9 +781,10 @@ public class OutputStreamProofSaver {
         return s.toString();
     }
 
-    public String builtinRuleIfInsts(Node node, ImmutableList<PosInOccurrence> ifInsts) {
+    public String builtinRuleIfInsts(Node node,
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         StringBuilder s = new StringBuilder();
-        for (final PosInOccurrence ifInst : ifInsts) {
+        for (final org.key_project.ncore.sequent.PosInOccurrence ifInst : ifInsts) {
             s.append(" (ifInst \"\" ");
             s.append(posInOccurrence2Proof(node.sequent(), ifInst));
             s.append(")");

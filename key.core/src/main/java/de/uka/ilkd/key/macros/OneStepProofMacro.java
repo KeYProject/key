@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * Apply a single proof step.
@@ -42,7 +42,8 @@ public class OneStepProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
         return new OneStepStrategy(proof.getActiveStrategy());
     }
 
@@ -74,7 +75,8 @@ public class OneStepProofMacro extends StrategyProofMacro {
          * can be applied.
          */
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+                Goal goal) {
             if (counter == 0 && delegate.isApprovedApp(app, pio, goal)) {
                 counter++;
                 return true;
@@ -84,7 +86,8 @@ public class OneStepProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(RuleApp app,
+                org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             return delegate.computeCost(app, pio, goal, mState);
 

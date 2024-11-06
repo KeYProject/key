@@ -30,7 +30,6 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -648,13 +647,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
         return checkApplicability(goal, pio);
     }
 
 
     // focus must be top level succedent
-    static boolean checkApplicability(Goal g, PosInOccurrence pio) {
+    static boolean checkApplicability(Goal g, org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
         }
@@ -684,7 +683,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private void setupWdGoal(final Goal goal, final LoopSpecification inv, final Term update,
             final Term selfTerm, final LocationVariable heap, final Term anonHeap,
             final Term localAnonUpdate, final ImmutableSet<LocationVariable> localIns,
-            PosInOccurrence pio, Services services) {
+            org.key_project.ncore.sequent.PosInOccurrence pio, Services services) {
         if (goal == null) {
             return;
         }

@@ -6,6 +6,8 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 
+import org.key_project.logic.IntIterator;
+
 /**
  * this class describes the position of a statement in a program.
  */
@@ -194,7 +196,7 @@ public class PosInProgram {
      *
      * @return an iterator over the list defining the position in a term.
      */
-    public IntIterator iterator() {
+    public org.key_project.logic.IntIterator iterator() {
         return new PosArrayIntIterator(this);
     }
 

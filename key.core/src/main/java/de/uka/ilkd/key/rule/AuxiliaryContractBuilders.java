@@ -1138,7 +1138,7 @@ public final class AuxiliaryContractBuilders {
         /**
          * The position at which the rule is applied.
          */
-        private final PosInOccurrence occurrence;
+        private final org.key_project.ncore.sequent.PosInOccurrence occurrence;
 
         /**
          * Services.
@@ -1164,7 +1164,8 @@ public final class AuxiliaryContractBuilders {
         public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
                 final TermLabelState termLabelState, final Instantiation instantiation,
                 final List<Label> labels, final AuxiliaryContract.Variables variables,
-                final PosInOccurrence occurrence, final Services services,
+                final org.key_project.ncore.sequent.PosInOccurrence occurrence,
+                final Services services,
                 final AbstractAuxiliaryContractRule rule) {
             this.application = application;
             this.termLabelState = termLabelState;

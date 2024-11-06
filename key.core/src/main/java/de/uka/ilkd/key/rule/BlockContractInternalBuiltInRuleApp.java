@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -40,7 +39,8 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
      * @param heaps the heap context.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
-            final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,
+            final PosInOccurrence occurrence,
+            final ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInstantiations,
             final JavaStatement statement, final BlockContract contract,
             final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
@@ -60,7 +60,7 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     @Override
     public BlockContractInternalBuiltInRuleApp setIfInsts(
-            final ImmutableList<PosInOccurrence> ifInstantiations) {
+            final ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;
     }

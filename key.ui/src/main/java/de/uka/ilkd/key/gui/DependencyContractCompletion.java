@@ -7,7 +7,6 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -19,6 +18,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * This class completes the instantiation for a dependency contract applications. The user is
@@ -34,9 +35,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         cApp = cApp.tryToInstantiateContract(services);
 
-        final List<PosInOccurrence> steps = UseDependencyContractRule
+        final List<org.key_project.ncore.sequent.PosInOccurrence> steps = UseDependencyContractRule
                 .getSteps(cApp.getHeapContext(), cApp.posInOccurrence(), goal.sequent(), services);
-        PosInOccurrence step = letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
+        org.key_project.ncore.sequent.PosInOccurrence step =
+            letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
         if (step == null) {
             return null;
         }
@@ -52,8 +54,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
      * @param services
      * @return
      */
-    private static PosInOccurrence letUserChooseStep(List<LocationVariable> heapContext,
-            List<PosInOccurrence> steps, boolean forced, Services services) {
+    private static org.key_project.ncore.sequent.PosInOccurrence letUserChooseStep(
+            List<LocationVariable> heapContext,
+            List<org.key_project.ncore.sequent.PosInOccurrence> steps, boolean forced,
+            Services services) {
         assert heapContext != null;
 
         if (steps.size() == 0) {
@@ -86,7 +90,8 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return findCorrespondingStep(steps, resultHeaps);
     }
 
-    public static PosInOccurrence findCorrespondingStep(List<PosInOccurrence> steps,
+    public static org.key_project.ncore.sequent.PosInOccurrence findCorrespondingStep(
+            List<org.key_project.ncore.sequent.PosInOccurrence> steps,
             Term[] resultHeaps) {
         // find corresponding step
         for (PosInOccurrence step : steps) {
@@ -105,10 +110,11 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return null;
     }
 
-    public static void extractHeaps(List<LocationVariable> heapContext, List<PosInOccurrence> steps,
+    public static void extractHeaps(List<LocationVariable> heapContext,
+            List<org.key_project.ncore.sequent.PosInOccurrence> steps,
             final TermStringWrapper[] heaps, final LogicPrinter lp) {
         int i = 0;
-        for (PosInOccurrence step : steps) {
+        for (org.key_project.ncore.sequent.PosInOccurrence step : steps) {
             Operator op = step.subTerm().op();
             // necessary distinction (see bug #1232)
             // subterm may either be an observer or a heap term already

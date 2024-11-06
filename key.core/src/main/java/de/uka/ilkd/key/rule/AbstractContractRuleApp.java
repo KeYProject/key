@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -27,7 +26,8 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, Contract contract) {
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts,
+            Contract contract) {
         super(rule, pio, ifInsts);
         this.instantiation = contract;
     }

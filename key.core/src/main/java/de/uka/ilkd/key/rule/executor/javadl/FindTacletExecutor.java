@@ -45,7 +45,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent, PosInOccurrence posOfFind, MatchConditions matchCond,
+            SequentChangeInfo currentSequent,
+            org.key_project.ncore.sequent.PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services);
 
 
@@ -68,7 +69,9 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyAdd(Sequent add, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            SequentChangeInfo currentSequent,
+            org.key_project.ncore.sequent.PosInOccurrence whereToAdd,
+            org.key_project.ncore.sequent.PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
 
 
@@ -111,7 +114,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
              * update position information, as original formula may no longer be in the current
              * sequent
              */
-            final PosInOccurrence posWhereToAdd =
+            final org.key_project.ncore.sequent.PosInOccurrence posWhereToAdd =
                 updatePositionInformation(tacletApp, gt, currentSequent);
 
             applyAdd(gt.sequent(), termLabelState, currentSequent, posWhereToAdd,
@@ -168,9 +171,10 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param currentSequent the current sequent (the one of the new goal)
      * @return the PosInOccurrence object describing where to add the formula
      */
-    private PosInOccurrence updatePositionInformation(TacletApp tacletApp, TacletGoalTemplate gt,
+    private org.key_project.ncore.sequent.PosInOccurrence updatePositionInformation(
+            TacletApp tacletApp, TacletGoalTemplate gt,
             SequentChangeInfo currentSequent) {
-        PosInOccurrence result = tacletApp.posInOccurrence();
+        org.key_project.ncore.sequent.PosInOccurrence result = tacletApp.posInOccurrence();
 
         if (result != null && gt.replaceWithExpressionAsObject() != null) {
             final boolean inAntec = result.isInAntec();

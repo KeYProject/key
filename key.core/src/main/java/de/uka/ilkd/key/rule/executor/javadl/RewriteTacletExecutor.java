@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -23,7 +21,9 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         extends FindTacletExecutor<TacletKind> {
@@ -37,7 +37,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      * does the work for applyReplacewith (wraps recursion)
      */
     private Term replace(Term term, Term with, TermLabelState termLabelState,
-            TacletLabelHint labelHint, PosInOccurrence posOfFind, IntIterator it,
+            TacletLabelHint labelHint, org.key_project.ncore.sequent.PosInOccurrence posOfFind,
+            org.key_project.logic.IntIterator it,
             MatchConditions mc, Sort maxSort, Goal goal, Services services, RuleApp ruleApp) {
         if (it.hasNext()) {
             final int indexOfNextSubTerm = it.next();
@@ -64,7 +65,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
 
 
     private SequentFormula applyReplacewithHelper(Goal goal, TermLabelState termLabelState,
-            RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind, Services services,
+            RewriteTacletGoalTemplate gt, org.key_project.ncore.sequent.PosInOccurrence posOfFind,
+            Services services,
             MatchConditions matchCond, RuleApp ruleApp) {
         final Term term = posOfFind.sequentFormula().formula();
         final IntIterator it = posOfFind.posInTerm().iterator();
@@ -100,7 +102,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent, PosInOccurrence posOfFind, MatchConditions matchCond,
+            SequentChangeInfo currentSequent,
+            org.key_project.ncore.sequent.PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services) {
         if (gt instanceof RewriteTacletGoalTemplate) {
             final SequentFormula cf = applyReplacewithHelper(goal, termLabelState,
@@ -137,7 +140,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            SequentChangeInfo currentSequent,
+            org.key_project.ncore.sequent.PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
         if (posOfFind.isInAntec()) {
             addToAntec(add.antecedent(), termLabelState,

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -39,7 +39,8 @@ public abstract class SubtermGenerator implements TermGenerator {
      */
     public static TermGenerator leftTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            public Iterator<Term> generate(RuleApp app,
+                    org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal,
                     MutableState mState) {
                 return new LeftIterator(getTermInst(app, pos, goal, mState), mState,
                     goal.proof().getServices());
@@ -53,7 +54,8 @@ public abstract class SubtermGenerator implements TermGenerator {
      */
     public static TermGenerator rightTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            public Iterator<Term> generate(RuleApp app,
+                    org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal,
                     MutableState mState) {
                 return new RightIterator(getTermInst(app, pos, goal, mState), mState,
                     goal.proof().getServices());

@@ -4,13 +4,14 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 /**
@@ -32,7 +33,7 @@ public class NotBelowQuantifierFeature extends BinaryFeature {
     /**
      * @return true iff the given position is in the scope of a quantifier
      */
-    private boolean belowQuantifier(PosInOccurrence pos) {
+    private boolean belowQuantifier(org.key_project.ncore.sequent.PosInOccurrence pos) {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {

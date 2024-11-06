@@ -70,7 +70,7 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     private LinkedList<MergePartner> candidates = null;
     private Services services = null;
-    private Pair<Goal, PosInOccurrence> mergeGoalPio = null;
+    private Pair<Goal, org.key_project.ncore.sequent.PosInOccurrence> mergeGoalPio = null;
 
     /** The chosen goals. */
     private SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
@@ -299,7 +299,8 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param candidates Potential merge candidates.
      * @param services The services object.
      */
-    public MergePartnerSelectionDialog(Goal mergeGoal, PosInOccurrence pio,
+    public MergePartnerSelectionDialog(Goal mergeGoal,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             ImmutableList<MergePartner> candidates, Services services) {
 
         this();
@@ -508,7 +509,8 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param pio Position indicating subterm to highlight.
      * @param area The editor pane to add the highlighted goal to.
      */
-    private void setHighlightedSequentForArea(Goal goal, PosInOccurrence pio, JEditorPane area) {
+    private void setHighlightedSequentForArea(Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence pio, JEditorPane area) {
 
         String subterm = LogicPrinter.quickPrintTerm(pio.subTerm(), services);
 

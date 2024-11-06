@@ -343,7 +343,8 @@ public class IntermediateProofReplayer {
 
                             partnerNodeInfo.add(new PartnerNode(
                                 currNode,
-                                PosInOccurrence.findInSequent(currGoal.sequent(),
+                                org.key_project.ncore.sequent.PosInOccurrence.findInSequent(
+                                    currGoal.sequent(),
                                     appInterm.getPosInfo().first, appInterm.getPosInfo().second),
                                 currNodeInterm));
                         } else {
@@ -449,7 +450,7 @@ public class IntermediateProofReplayer {
         final Sequent seq = currGoal.sequent();
 
         TacletApp ourApp;
-        PosInOccurrence pos = null;
+        org.key_project.ncore.sequent.PosInOccurrence pos = null;
 
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
@@ -467,7 +468,8 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+                pos = org.key_project.ncore.sequent.PosInOccurrence
+                        .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
 
                 /*
                  * part of the fix for #1716: ensure that position of find term
@@ -554,7 +556,7 @@ public class IntermediateProofReplayer {
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
 
         Contract currContract = null;
-        ImmutableList<PosInOccurrence> builtinIfInsts = null;
+        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> builtinIfInsts = null;
 
         // Load contracts, if applicable
         if (currInterm.getContract() != null) {
@@ -577,8 +579,10 @@ public class IntermediateProofReplayer {
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
 
                 try {
-                    final PosInOccurrence ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
-                        currIfInstFormula, currIfInstPosInTerm);
+                    final org.key_project.ncore.sequent.PosInOccurrence ifInst =
+                        org.key_project.ncore.sequent.PosInOccurrence.findInSequent(
+                            currGoal.sequent(),
+                            currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 } catch (RuntimeException | AssertionError e) {
                     reportError(
@@ -633,7 +637,8 @@ public class IntermediateProofReplayer {
                 throw new SkipSMTRuleException();
             } else {
                 String name = smtProblem.getSuccessfulSolver().name();
-                ImmutableList<PosInOccurrence> unsatCore = SMTFocusResults.getUnsatCore(smtProblem);
+                ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> unsatCore =
+                    SMTFocusResults.getUnsatCore(smtProblem);
                 if (unsatCore != null) {
                     return SMTRuleApp.RULE.createApp(name, unsatCore);
                 } else {
@@ -647,7 +652,8 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+                pos = org.key_project.ncore.sequent.PosInOccurrence
+                        .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
             } catch (RuntimeException e) {
                 throw new BuiltInConstructionException("Wrong position information.", e);
             }

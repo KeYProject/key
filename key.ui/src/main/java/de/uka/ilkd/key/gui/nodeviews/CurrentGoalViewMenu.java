@@ -28,7 +28,6 @@ import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -51,6 +50,7 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -194,7 +194,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         addClipboardItem(control);
 
         if (getPos() != null) {
-            PosInOccurrence occ = getPos().getPosInOccurrence();
+            org.key_project.ncore.sequent.PosInOccurrence occ = getPos().getPosInOccurrence();
             if (occ != null && occ.posInTerm() != null) {
                 Term t = occ.subTerm();
                 createAbbrevSection(t, control);

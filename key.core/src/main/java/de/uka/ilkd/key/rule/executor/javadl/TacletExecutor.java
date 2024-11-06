@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SemisequentChangeInfo;
@@ -78,7 +77,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @return the (partially) instantiated term
      */
     protected Term syntacticalReplace(Term term, TermLabelState termLabelState,
-            TacletLabelHint labelHint, PosInOccurrence applicationPosInOccurrence,
+            TacletLabelHint labelHint,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
             MatchConditions mc, Goal goal, RuleApp ruleApp) {
         final SyntacticalReplaceVisitor srVisitor =
             new SyntacticalReplaceVisitor(termLabelState, labelHint, applicationPosInOccurrence,
@@ -99,7 +99,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      *        (only looked at if pos == null)
      */
     private void addToPosWithoutInst(SequentFormula frm, SequentChangeInfo currentSequent,
-            PosInOccurrence pos, boolean antec) {
+            org.key_project.ncore.sequent.PosInOccurrence pos, boolean antec) {
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(frm, pos));
         } else {
@@ -125,7 +125,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      */
     private SequentFormula instantiateReplacement(TermLabelState termLabelState,
             SequentFormula schemaFormula, MatchConditions matchCond,
-            PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            TacletLabelHint labelHint, Goal goal,
             RuleApp tacletApp) {
 
         final SVInstantiations svInst = matchCond.getInstantiations();
@@ -157,7 +158,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
             TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            MatchConditions matchCond, Goal goal,
             RuleApp tacletApp) {
 
         ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
@@ -187,7 +189,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param services the Services encapsulating all java information
      */
     protected void replaceAtPos(Semisequent semi, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
+            SequentChangeInfo currentSequent, org.key_project.ncore.sequent.PosInOccurrence pos,
+            MatchConditions matchCond,
             TacletLabelHint labelHint, Goal goal, RuleApp ruleApp, Services services) {
         final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
             termLabelState, labelHint, pos, matchCond, goal, ruleApp);
@@ -212,8 +215,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param matchCond the MatchConditions containing in particular
      */
     private void addToPos(Semisequent semi, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent, PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, boolean antec, TacletLabelHint labelHint,
+            SequentChangeInfo currentSequent, org.key_project.ncore.sequent.PosInOccurrence pos,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, boolean antec,
+            TacletLabelHint labelHint,
             MatchConditions matchCond, Goal goal, RuleApp tacletApp) {
 
         final ImmutableList<SequentFormula> replacements =
@@ -244,8 +248,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      *        schemavariables
      */
     protected void addToAntec(Semisequent semi, TermLabelState termLabelState,
-            TacletLabelHint labelHint, SequentChangeInfo currentSequent, PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            TacletLabelHint labelHint, SequentChangeInfo currentSequent,
+            org.key_project.ncore.sequent.PosInOccurrence pos,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            MatchConditions matchCond, Goal goal,
             RuleApp tacletApp) {
         addToPos(semi, termLabelState, currentSequent, pos, applicationPosInOccurrence, true,
             labelHint, matchCond, goal, tacletApp);
@@ -268,8 +274,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param goal the Goal that knows the node the formulae have to be added
      */
     protected void addToSucc(Semisequent semi, TermLabelState termLabelState,
-            TacletLabelHint labelHint, SequentChangeInfo currentSequent, PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            TacletLabelHint labelHint, SequentChangeInfo currentSequent,
+            org.key_project.ncore.sequent.PosInOccurrence pos,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            MatchConditions matchCond, Goal goal,
             RuleApp ruleApp) {
         addToPos(semi, termLabelState, currentSequent, pos, applicationPosInOccurrence, false,
             labelHint, matchCond, goal, ruleApp);
@@ -331,7 +339,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
 
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
-            SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
+            SequentChangeInfo currentSequent, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence posOfFind,
             Services services, MatchConditions matchCond) {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {

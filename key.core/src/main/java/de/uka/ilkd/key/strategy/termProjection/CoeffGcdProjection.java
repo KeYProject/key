@@ -6,13 +6,14 @@ package de.uka.ilkd.key.strategy.termProjection;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * Given a monomial and a polynomial, this projection computes the gcd of all numerical

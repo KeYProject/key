@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -171,12 +171,14 @@ public class QueryExpandCost implements Feature {
      * @param goal The goal.
      * @return The number of repetitive rule applications.
      */
-    protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected int queryExpandAlreadyAppliedAtPos(RuleApp app,
+            org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal) {
         int count = 0;
         ImmutableList<RuleApp> appliedRuleApps = goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
             for (RuleApp appliedRuleApp : appliedRuleApps) {
-                final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
+                final org.key_project.ncore.sequent.PosInOccurrence pio =
+                    appliedRuleApp.posInOccurrence();
                 if (pio != null) {
                     final Term oldterm = pio.subTerm();
                     final Term curterm = pos.subTerm();

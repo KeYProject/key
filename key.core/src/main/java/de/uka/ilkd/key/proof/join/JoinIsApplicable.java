@@ -6,12 +6,13 @@ package de.uka.ilkd.key.proof.join;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -35,7 +36,8 @@ public class JoinIsApplicable {
      * @return The list of possible join partner objects -- may be empty (then, the join is not
      *         applicable).
      */
-    public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence pio) {
+    public List<ProspectivePartner> isApplicable(Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return new LinkedList<>();
         }
@@ -49,7 +51,8 @@ public class JoinIsApplicable {
      * @param pio Selected formula (symblic state - program counter part) for the join.
      * @return The list of possible join partners.
      */
-    public List<ProspectivePartner> computeProspecitvePartner(Goal goal, PosInOccurrence pio) {
+    public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence pio) {
         assert !pio.isInAntec();
         List<ProspectivePartner> partners = new LinkedList<>();
 

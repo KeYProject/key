@@ -8,7 +8,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -183,7 +182,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public boolean isApplicable(final Goal goal,
+            final org.key_project.ncore.sequent.PosInOccurrence occurrence) {
         if (InfFlowCheckInfo.isInfFlow(goal)) {
             return false;
         } else if (occursNotAtTopLevelInSuccedent(occurrence)) {

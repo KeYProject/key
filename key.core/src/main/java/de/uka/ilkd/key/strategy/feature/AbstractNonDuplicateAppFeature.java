@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -32,14 +32,16 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * to be decided by the subclasses
      */
     protected abstract boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            PosInOccurrence newPio, PosInOccurrence oldPio);
+            org.key_project.ncore.sequent.PosInOccurrence newPio,
+            org.key_project.ncore.sequent.PosInOccurrence oldPio);
 
     /**
      * Check whether the old rule application <code>ruleCmp</code> is a duplicate of the new
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp, PosInOccurrence newPio) {
+    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp,
+            org.key_project.ncore.sequent.PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -121,7 +123,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * soon as we have reached a point where the formula containing the focus no longer occurs in
      * the sequent
      */
-    protected boolean noDuplicateFindTaclet(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean noDuplicateFindTaclet(TacletApp app,
+            org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal) {
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();

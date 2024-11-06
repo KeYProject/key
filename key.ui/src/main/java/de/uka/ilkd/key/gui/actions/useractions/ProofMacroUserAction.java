@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * User action to apply a proof macro.
@@ -21,7 +22,7 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
     /**
      * The position to apply the macro on.
      */
-    private final PosInOccurrence pio;
+    private final org.key_project.ncore.sequent.PosInOccurrence pio;
 
     public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, PosInOccurrence pio,
             Proof proof) {

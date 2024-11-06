@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 public abstract class CompareCostsFeature extends BinaryFeature {
 
@@ -18,7 +19,8 @@ public abstract class CompareCostsFeature extends BinaryFeature {
 
     public static Feature less(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+            protected boolean filter(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+                    Goal goal,
                     MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)
                         .compareTo(b.computeCost(app, pos, goal, mState)) < 0;
@@ -28,7 +30,8 @@ public abstract class CompareCostsFeature extends BinaryFeature {
 
     public static Feature leq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+            protected boolean filter(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+                    Goal goal,
                     MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)
                         .compareTo(b.computeCost(app, pos, goal, mState)) <= 0;

@@ -7,7 +7,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -129,7 +128,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
         boolean applicable = false;
         if (pio != null) {
             // abort if inside of transformer
@@ -149,14 +148,15 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
 
     /**
      * Checks if the query term is supported. The functionality is identical to
-     * {@link QueryExpand#isApplicable(Goal, PosInOccurrence)}.
+     * {@link QueryExpand#isApplicable(Goal, org.key_project.ncore.sequent.PosInOccurrence)}.
      *
      * @param goal The {@link Goal}.
      * @param pmTerm The {@link Term} to with the query to check.
      * @param pio The {@link PosInOccurrence} in the {@link Goal}.
      * @return {@code true} is applicable, {@code false} is not applicable
      */
-    private boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
+    private boolean isApplicableQuery(Goal goal, Term pmTerm,
+            org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pmTerm.op() instanceof IProgramMethod pm && pmTerm.freeVars().isEmpty()) {
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic()
@@ -191,7 +191,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             throws RuleAbortException {
         try {
             // Extract required Terms from goal
-            PosInOccurrence pio = ruleApp.posInOccurrence();
+            org.key_project.ncore.sequent.PosInOccurrence pio = ruleApp.posInOccurrence();
             Sequent goalSequent = goal.sequent();
             SequentFormula equalitySF = pio.sequentFormula();
             Term equalityTerm = pio.subTerm();

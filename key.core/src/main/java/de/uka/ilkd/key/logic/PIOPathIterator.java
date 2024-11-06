@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import org.key_project.logic.IntIterator;
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * This interface represents an iterator, iterating the nodes on the path between the root of a term
  * and a position within the term, given by a <code>PosInOccurrence</code>-object

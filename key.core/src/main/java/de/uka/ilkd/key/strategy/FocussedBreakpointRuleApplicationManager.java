@@ -8,12 +8,12 @@ import java.util.Optional;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -35,7 +35,8 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     public FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
-            Goal goal, Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
+            Goal goal, Optional<org.key_project.ncore.sequent.PosInOccurrence> focussedSubterm,
+            Optional<String> breakpoint) {
         this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
                 .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
             breakpoint);
@@ -75,7 +76,7 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, org.key_project.ncore.sequent.PosInOccurrence pos) {
         if (mayAddRule(rule, pos)) {
             delegate.ruleAdded(rule, pos);
         }
@@ -94,7 +95,7 @@ public class FocussedBreakpointRuleApplicationManager
         delegate.rulesAdded(applicableRules, pos);
     }
 
-    private boolean mayAddRule(RuleApp rule, PosInOccurrence pos) {
+    private boolean mayAddRule(RuleApp rule, org.key_project.ncore.sequent.PosInOccurrence pos) {
         if (!breakpoint.isPresent()) {
             return true;
         }
@@ -114,7 +115,7 @@ public class FocussedBreakpointRuleApplicationManager
         return true;
     }
 
-    private static boolean isJavaPIO(PosInOccurrence pio) {
+    private static boolean isJavaPIO(org.key_project.ncore.sequent.PosInOccurrence pio) {
         return pio != null && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
     }
 

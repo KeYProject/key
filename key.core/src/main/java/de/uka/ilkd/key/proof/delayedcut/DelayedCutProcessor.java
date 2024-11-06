@@ -164,7 +164,8 @@ public class DelayedCutProcessor implements Runnable {
         return goal.apply(app);
     }
 
-    private ImmutableList<Goal> apply(final String tacletName, Goal goal, PosInOccurrence pio) {
+    private ImmutableList<Goal> apply(final String tacletName, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence pio) {
         TacletFilter filter = new TacletFilter() {
             @Override
             protected boolean filter(Taclet taclet) {
@@ -188,7 +189,7 @@ public class DelayedCutProcessor implements Runnable {
 
         SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
 
-        PosInOccurrence pio =
+        org.key_project.ncore.sequent.PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel(), cut.isDecisionPredicateInAntecendet());
 
         ImmutableList<Goal> result = apply(getHideTacletName(cut), goal, pio);
@@ -335,7 +336,8 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private void check(Goal goal, final RuleApp app, PosInOccurrence newPos, Services services) {
+    private void check(Goal goal, final RuleApp app,
+            org.key_project.ncore.sequent.PosInOccurrence newPos, Services services) {
         if (newPos == null) {
             return;
         }
@@ -391,7 +393,8 @@ public class DelayedCutProcessor implements Runnable {
         int formulaNumber =
             pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
                 oldRuleApp.posInOccurrence().sequentFormula());
-        return PosInOccurrence.findInSequent(pair.goal.sequent(), formulaNumber,
+        return org.key_project.ncore.sequent.PosInOccurrence.findInSequent(pair.goal.sequent(),
+            formulaNumber,
             oldRuleApp.posInOccurrence().posInTerm());
     }
 
