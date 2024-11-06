@@ -9,7 +9,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
-public class Sequent extends org.key_project.ncore.sequent.Sequent {
+public class Sequent extends org.key_project.ncore.sequent.Sequent<SequentFormula> {
     public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
 
     /**
@@ -60,8 +60,7 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent {
      *
      */
     private Sequent() {
-        super(Semisequent.EMPTY_SEMISEQUENT,
-            Semisequent.EMPTY_SEMISEQUENT);
+        super(Semisequent.EMPTY_SEMISEQUENT);
     }
 
     /** creates new Sequent with antecedence and succedence */
@@ -89,7 +88,7 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent {
      */
     @Override
     protected Sequent composeSequent(boolean antec,
-            org.key_project.ncore.sequent.Semisequent semiSeq) {
+            org.key_project.ncore.sequent.Semisequent<SequentFormula> semiSeq) {
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent().isEmpty()) {
                 return EMPTY_SEQUENT;
@@ -118,8 +117,8 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent {
         }
 
         @Override
-        public @NonNull Iterator<org.key_project.ncore.sequent.SequentFormula> iterator() {
-            return ImmutableSLList.<org.key_project.ncore.sequent.SequentFormula>nil().iterator();
+        public @NonNull Iterator<SequentFormula> iterator() {
+            return ImmutableSLList.<SequentFormula>nil().iterator();
         }
     }
 }

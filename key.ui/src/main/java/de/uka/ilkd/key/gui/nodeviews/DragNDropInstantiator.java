@@ -20,8 +20,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -30,6 +28,7 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.key_project.ncore.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -310,7 +309,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @return the taclet apps as given in <tt>tacletApps</tt> but with position information
      */
     private ImmutableList<PosTacletApp> addPositionInformation(ImmutableList<TacletApp> tacletApps,
-            PosInOccurrence findPos, Services services) {
+            org.key_project.ncore.sequent.PosInOccurrence findPos, Services services) {
 
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.nil();
         for (TacletApp tacletApp : tacletApps) {
@@ -339,7 +338,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @return the {@link ImmutableList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
-            Sequent seq, PosInOccurrence ifPIO, Services services) {
+            Sequent seq, org.key_project.ncore.sequent.PosInOccurrence ifPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
 
@@ -400,7 +399,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @return the {@link ImmutableList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
-            PosInOccurrence missingSVPIO, Services services) {
+            org.key_project.ncore.sequent.PosInOccurrence missingSVPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
         if (missingSVPIO == null) {

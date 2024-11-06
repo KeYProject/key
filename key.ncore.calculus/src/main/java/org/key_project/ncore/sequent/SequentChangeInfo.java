@@ -13,26 +13,26 @@ import org.key_project.util.collection.ImmutableSLList;
  * lists. The situation where this can happen is that a list of formulas had to be added to the
  * sequent and the list has not been redundancy free.
  */
-public class SequentChangeInfo {
+public class SequentChangeInfo<SF extends SequentFormula> {
     /**
      * change information related to the antecedent, this means the there added and removed formulas
      */
-    private SemisequentChangeInfo antecedent;
+    private SemisequentChangeInfo<SF> antecedent;
 
     /**
      * change information related to the antecedent, this means the there added and removed formulas
      */
-    private SemisequentChangeInfo succedent;
+    private SemisequentChangeInfo<SF> succedent;
 
     /**
      * the sequent before the changes
      */
-    private final Sequent originalSequent;
+    private final Sequent<SF> originalSequent;
 
     /**
      * the sequent after the changes
      */
-    private Sequent resultingSequent;
+    private Sequent<SF> resultingSequent;
 
     /**
      * creates a new sequent change info whose semisequent described by the value of the selector
@@ -48,12 +48,13 @@ public class SequentChangeInfo {
      * @return the sequent change information object describing the complete changes made to the
      *         sequent together with the operations result.
      */
-    public static SequentChangeInfo createSequentChangeInfo(boolean antec,
-            SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
+    public static <SF extends SequentFormula> SequentChangeInfo<SF> createSequentChangeInfo(
+            boolean antec,
+            SemisequentChangeInfo<SF> semiCI, Sequent<SF> result, Sequent<SF> original) {
         if (antec) {
-            return new SequentChangeInfo(semiCI, null, result, original);
+            return new SequentChangeInfo<>(semiCI, null, result, original);
         } else {
-            return new SequentChangeInfo(null, semiCI, result, original);
+            return new SequentChangeInfo<>(null, semiCI, result, original);
         }
     }
 
@@ -68,9 +69,10 @@ public class SequentChangeInfo {
      * @return the sequent change information object describing the complete changes made to the
      *         sequent together with the operations result.
      */
-    public static SequentChangeInfo createSequentChangeInfo(SemisequentChangeInfo anteCI,
-            SemisequentChangeInfo sucCI, Sequent result, Sequent original) {
-        return new SequentChangeInfo(anteCI, sucCI, result, original);
+    public static <SF extends SequentFormula> SequentChangeInfo<SF> createSequentChangeInfo(
+            SemisequentChangeInfo<SF> anteCI,
+            SemisequentChangeInfo<SF> sucCI, Sequent<SF> result, Sequent<SF> original) {
+        return new SequentChangeInfo<>(anteCI, sucCI, result, original);
     }
 
     /**
@@ -82,16 +84,17 @@ public class SequentChangeInfo {
      * @param resultingSequent the Sequent being the result of the changes
      * @param originalSequent the Sequent that has been transformed
      */
-    private SequentChangeInfo(SemisequentChangeInfo antecedent, SemisequentChangeInfo succedent,
-            Sequent resultingSequent, Sequent originalSequent) {
+    private SequentChangeInfo(SemisequentChangeInfo<SF> antecedent,
+            SemisequentChangeInfo<SF> succedent,
+            Sequent<SF> resultingSequent, Sequent<SF> originalSequent) {
         this.antecedent = antecedent;
         this.succedent = succedent;
         this.resultingSequent = resultingSequent;
         this.originalSequent = originalSequent;
     }
 
-    public SequentChangeInfo copy() {
-        return new SequentChangeInfo(
+    public SequentChangeInfo<SF> copy() {
+        return new SequentChangeInfo<>(
             antecedent == null ? null : antecedent.copy(),
             succedent == null ? null : succedent.copy(),
             resultingSequent,
@@ -119,7 +122,7 @@ public class SequentChangeInfo {
                 : (succedent != null && succedent.hasChanged());
     }
 
-    public SemisequentChangeInfo getSemisequentChangeInfo(boolean antec) {
+    public SemisequentChangeInfo<SF> getSemisequentChangeInfo(boolean antec) {
         return antec ? antecedent : succedent;
     }
 
@@ -132,7 +135,7 @@ public class SequentChangeInfo {
      *        antecedent; false means succedent)
      * @return list of formulas added to the selected semisequent
      */
-    public ImmutableList<SequentFormula> addedFormulas(boolean antec) {
+    public ImmutableList<SF> addedFormulas(boolean antec) {
         return antec
                 ? (antecedent != null ? antecedent.addedFormulas() : ImmutableSLList.nil())
                 : (succedent != null ? succedent.addedFormulas() : ImmutableSLList.nil());
@@ -147,7 +150,7 @@ public class SequentChangeInfo {
      *        antecedent; false means succedent)
      * @return list of formulas removed from the selected semisequent
      */
-    public ImmutableList<SequentFormula> removedFormulas(boolean antec) {
+    public ImmutableList<SF> removedFormulas(boolean antec) {
         return antec
                 ? (antecedent != null ? antecedent.removedFormulas() : ImmutableSLList.nil())
                 : (succedent != null ? succedent.removedFormulas() : ImmutableSLList.nil());
@@ -162,7 +165,7 @@ public class SequentChangeInfo {
      *        antecedent; false means succedent)
      * @return list of formulas modified within the selected semisequent
      */
-    public ImmutableList<FormulaChangeInfo> modifiedFormulas(boolean antec) {
+    public ImmutableList<FormulaChangeInfo<SF>> modifiedFormulas(boolean antec) {
         return antec
                 ? (antecedent != null ? antecedent.modifiedFormulas() : ImmutableSLList.nil())
                 : (succedent != null ? succedent.modifiedFormulas() : ImmutableSLList.nil());
@@ -174,9 +177,9 @@ public class SequentChangeInfo {
      *
      * @return list of formulas modified to sequent
      */
-    public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
-        final ImmutableList<FormulaChangeInfo> modifiedFormulasAntec = modifiedFormulas(true);
-        final ImmutableList<FormulaChangeInfo> modifiedFormulasSucc = modifiedFormulas(false);
+    public ImmutableList<FormulaChangeInfo<SF>> modifiedFormulas() {
+        final ImmutableList<FormulaChangeInfo<SF>> modifiedFormulasAntec = modifiedFormulas(true);
+        final ImmutableList<FormulaChangeInfo<SF>> modifiedFormulasSucc = modifiedFormulas(false);
 
         return concatenateHelper(modifiedFormulasAntec, modifiedFormulasSucc);
     }
@@ -188,7 +191,7 @@ public class SequentChangeInfo {
      *        antecedent; false means succedent)
      * @return list of formulas rejected when trying to add to the selected semisequent
      */
-    public ImmutableList<SequentFormula> rejectedFormulas(boolean antec) {
+    public ImmutableList<SF> rejectedFormulas(boolean antec) {
         return antec
                 ? (antecedent != null ? antecedent.rejectedFormulas() : ImmutableSLList.nil())
                 : (succedent != null ? succedent.rejectedFormulas() : ImmutableSLList.nil());
@@ -220,8 +223,8 @@ public class SequentChangeInfo {
      * takes over ownership over {@code succ} and does not release it. This means when invoking the
      * method it must be ensured that {@code succ} is never used afterwards.
      */
-    public void combine(SequentChangeInfo succ) {
-        final SequentChangeInfo antec = this;
+    public void combine(SequentChangeInfo<SF> succ) {
+        final SequentChangeInfo<SF> antec = this;
         if (antec == succ) {
             return;
         }
@@ -249,7 +252,7 @@ public class SequentChangeInfo {
     /**
      * @return the original sequent
      */
-    public Sequent getOriginalSequent() {
+    public Sequent<SF> getOriginalSequent() {
         return originalSequent;
     }
 
@@ -258,7 +261,7 @@ public class SequentChangeInfo {
      *
      * @return the resulting sequent
      */
-    public Sequent sequent() {
+    public Sequent<SF> sequent() {
         return resultingSequent;
     }
 

@@ -6,13 +6,14 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * Enumerate potential subformulas of a formula that could be used for a cut (taclet cut_direct).

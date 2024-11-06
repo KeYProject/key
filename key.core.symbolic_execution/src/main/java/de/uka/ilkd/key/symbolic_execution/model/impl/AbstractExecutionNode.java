@@ -11,7 +11,6 @@ import java.util.Map;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
@@ -73,7 +72,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The {@link PosInOccurrence} of the modality or its updates.
      */
-    private PosInOccurrence modalityPIO;
+    private org.key_project.ncore.sequent.PosInOccurrence modalityPIO;
 
     /**
      * The up to know discovered completed {@link IExecutionBlockStartNode}s.
@@ -369,7 +368,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public PosInOccurrence getModalityPIO() {
+    public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
         if (modalityPIO == null) {
             modalityPIO = lazyComputeModalityPIO();
         }
@@ -382,10 +381,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      *
      * @return The {@link PosInOccurrence}s of the modality or its updates.
      */
-    protected PosInOccurrence lazyComputeModalityPIO() {
-        PosInOccurrence originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
+    protected org.key_project.ncore.sequent.PosInOccurrence lazyComputeModalityPIO() {
+        org.key_project.ncore.sequent.PosInOccurrence originalPio =
+            getProofNode().getAppliedRuleApp().posInOccurrence();
         // Try to go back to the parent which provides the updates
-        PosInOccurrence pio = originalPio;
+        org.key_project.ncore.sequent.PosInOccurrence pio = originalPio;
         Term term = pio.subTerm();
         if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
             pio = pio.up();

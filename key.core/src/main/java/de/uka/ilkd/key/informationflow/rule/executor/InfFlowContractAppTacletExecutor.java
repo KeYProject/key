@@ -39,8 +39,10 @@ public class InfFlowContractAppTacletExecutor
 
     @Override
     protected void addToAntec(Semisequent semi, TermLabelState termLabelState,
-            TacletLabelHint labelHint, SequentChangeInfo currentSequent, PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            TacletLabelHint labelHint, SequentChangeInfo currentSequent,
+            org.key_project.ncore.sequent.PosInOccurrence pos,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            MatchConditions matchCond, Goal goal,
             RuleApp tacletApp) {
         final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
             termLabelState, labelHint, pos, matchCond, goal, tacletApp);

@@ -803,7 +803,8 @@ public class MergeRuleUtils {
         final Semisequent semiseq =
             antec ? goal.sequent().antecedent() : goal.sequent().succedent();
         for (final SequentFormula f : semiseq) {
-            final PosInOccurrence gPio = new PosInOccurrence(f, PosInTerm.getTopLevel(), antec);
+            final org.key_project.ncore.sequent.PosInOccurrence gPio =
+                new PosInOccurrence(f, PosInTerm.getTopLevel(), antec);
             goal.removeFormula(gPio);
         }
     }
@@ -1026,9 +1027,10 @@ public class MergeRuleUtils {
      * @param pio Position of update-program counter formula in goal.
      * @param services The services object.
      * @return An SE state (U,C).
-     * @see #sequentToSETriple(Node, PosInOccurrence, Services)
+     * @see #sequentToSETriple(Node, org.key_project.ncore.sequent.PosInOccurrence, Services)
      */
-    public static SymbolicExecutionState sequentToSEPair(Node node, PosInOccurrence pio,
+    public static SymbolicExecutionState sequentToSEPair(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             Services services) {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio, services);
@@ -1057,7 +1059,7 @@ public class MergeRuleUtils {
      * @return An SE state (U,C,p).
      */
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
-            PosInOccurrence pio, Services services) {
+            org.key_project.ncore.sequent.PosInOccurrence pio, Services services) {
 
         ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent().asList());
@@ -1087,7 +1089,8 @@ public class MergeRuleUtils {
 
     /**
      * Convenience method for converting a whole list of goal-pio combinations to symbolic execution
-     * states; relies on {@link #sequentToSETriple(Node, PosInOccurrence, Services)}.
+     * states; relies on
+     * {@link #sequentToSETriple(Node, org.key_project.ncore.sequent.PosInOccurrence, Services)}.
      *
      * @param sequentInfos Goals and PosInOccurrences specifying merge partners and the positions of
      *        the program counter-post condition formulae in the goals.

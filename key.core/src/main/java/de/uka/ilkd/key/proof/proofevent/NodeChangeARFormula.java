@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.proofevent;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 /**
@@ -11,9 +11,9 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  */
 public abstract class NodeChangeARFormula implements NodeChange {
 
-    final PosInOccurrence pos;
+    final org.key_project.ncore.sequent.PosInOccurrence pos;
 
-    public NodeChangeARFormula(PosInOccurrence p_pos) {
+    public NodeChangeARFormula(org.key_project.ncore.sequent.PosInOccurrence p_pos) {
         pos = p_pos;
     }
 

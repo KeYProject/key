@@ -8,7 +8,6 @@ import java.util.List;
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.useractions.ProofRuleUserAction;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Node;
@@ -18,6 +17,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * Listener object to record various user actions (currently only rule applications)
@@ -52,7 +53,8 @@ public class StateChangeListener implements InteractionListener {
     }
 
     @Override
-    public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc,
+    public void runMacro(Node node, ProofMacro macro,
+            org.key_project.ncore.sequent.PosInOccurrence posInOcc,
             ProofMacroFinishedInfo info) {
 
     }

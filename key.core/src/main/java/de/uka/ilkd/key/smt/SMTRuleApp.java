@@ -36,7 +36,8 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         this(rule, pio, null, successfulSolverName);
     }
 
-    SMTRuleApp(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> unsatCore,
+    SMTRuleApp(SMTRule rule, PosInOccurrence pio,
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> unsatCore,
             String successfulSolverName) {
         super(rule, pio, unsatCore);
         this.title = "SMT: " + successfulSolverName;
@@ -81,7 +82,7 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
          * @return rule application instance
          */
         public SMTRuleApp createApp(String successfulSolverName,
-                ImmutableList<PosInOccurrence> unsatCore) {
+                ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> unsatCore) {
             return new SMTRuleApp(this, null, unsatCore, successfulSolverName);
         }
 
@@ -92,7 +93,7 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
 
 
         @Override
-        public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+        public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
             return false;
         }
 
@@ -139,7 +140,8 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public SMTRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public SMTRuleApp setIfInsts(
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -157,7 +159,7 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
     public SMTRuleApp tryToInstantiate(Goal goal) {
         SMTRuleApp app = RULE.createApp(pio, goal.proof().getServices());
         Sequent seq = goal.sequent();
-        List<PosInOccurrence> ifInsts = new ArrayList<>();
+        List<org.key_project.ncore.sequent.PosInOccurrence> ifInsts = new ArrayList<>();
         for (SequentFormula ante : seq.antecedent()) {
             ifInsts.add(new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
         }

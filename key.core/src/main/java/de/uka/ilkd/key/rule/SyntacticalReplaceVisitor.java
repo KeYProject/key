@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -42,7 +43,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     /** the termbuilder used to construct terms */
     protected final TermBuilder tb;
     private Term computedResult = null;
-    protected final PosInOccurrence applicationPosInOccurrence;
+    protected final org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
     protected final RuleApp ruleApp;
@@ -75,7 +76,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
     private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            SVInstantiations svInst, Goal goal,
             Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = goal.getOverlayServices();
@@ -106,7 +108,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
     protected SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, Services services,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            Services services,
             Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = services;
@@ -136,7 +139,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param ruleApp the rule application
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            SVInstantiations svInst, Goal goal,
             Rule rule, RuleApp ruleApp) {
         this(termLabelState, labelHint, applicationPosInOccurrence, svInst, goal, rule, ruleApp,
             true);

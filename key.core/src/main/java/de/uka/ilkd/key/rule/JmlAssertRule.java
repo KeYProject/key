@@ -74,7 +74,8 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
+    public boolean isApplicable(Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence occurrence) {
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -110,7 +111,7 @@ public final class JmlAssertRule implements BuiltInRule {
         }
         final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
-        final PosInOccurrence occurrence = ruleApp.posInOccurrence();
+        final org.key_project.ncore.sequent.PosInOccurrence occurrence = ruleApp.posInOccurrence();
 
         final Term formula = occurrence.subTerm();
         final Term update = UpdateApplication.getUpdate(formula);
@@ -157,13 +158,15 @@ public final class JmlAssertRule implements BuiltInRule {
         return result;
     }
 
-    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update,
+    private void setUpValidityRule(Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence occurrence, Term update,
             Term condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence, Term update, Term target,
+    private void setUpUsageGoal(Goal goal, org.key_project.ncore.sequent.PosInOccurrence occurrence,
+            Term update, Term target,
             Term condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);

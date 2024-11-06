@@ -11,8 +11,6 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -39,6 +37,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.logic.PosInTerm;
 import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -592,7 +591,7 @@ public class MergeRule implements BuiltInRule {
      * @return true iff a suitable top level formula for merging.
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
         return isOfAdmissibleForm(goal, pio, true);
     }
 
@@ -606,7 +605,8 @@ public class MergeRule implements BuiltInRule {
      * @param doMergePartnerCheck Checks for available merge partners iff this flag is set to true.
      * @return true iff a suitable top level formula for merging.
      */
-    public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence pio,
+    public static boolean isOfAdmissibleForm(Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             boolean doMergePartnerCheck) {
         // We admit top level formulas of the form \<{ ... }\> phi
         // and U \<{ ... }\> phi, where U must be an update
@@ -671,7 +671,7 @@ public class MergeRule implements BuiltInRule {
      * @return A list of suitable merge partners. May be empty if none exist.
      */
     public static ImmutableList<MergePartner> findPotentialMergePartners(Goal goal,
-            PosInOccurrence pio) {
+            org.key_project.ncore.sequent.PosInOccurrence pio) {
 
         final Services services = goal.proof().getServices();
 

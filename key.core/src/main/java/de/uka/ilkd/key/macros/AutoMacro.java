@@ -13,7 +13,6 @@ import java.util.stream.StreamSupport;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * The macro {@link AutoMacro} is a customizable {@link ProofMacro} for use in proof scripts. It is
@@ -151,7 +151,7 @@ public class AutoMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
         return new AutoMacroFilterStrategy(proof.getActiveStrategy(), breakpoint,
                 allowSplits, whitelist, symbexOnly, onlyHumanReadable);
     }
@@ -244,7 +244,7 @@ public class AutoMacro extends StrategyProofMacro {
             return super.isApprovedApp(app, pio, goal);
         }
 
-        private boolean isJavaPIO(PosInOccurrence pio) {
+        private boolean isJavaPIO(org.key_project.ncore.sequent.PosInOccurrence pio) {
             return pio != null
                     && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
         }

@@ -75,7 +75,7 @@ public class TestVariableNamer {
     }
 
 
-    private PosInOccurrence constructPIO(SequentFormula formula) {
+    private org.key_project.ncore.sequent.PosInOccurrence constructPIO(SequentFormula formula) {
         return new PosInOccurrence(formula, PosInTerm.getTopLevel(), true);
     }
 
@@ -151,7 +151,7 @@ public class TestVariableNamer {
         LocationVariable v = constructProgramVariable(name);
         SequentFormula formula = constructFormula(v);
         Goal goal = constructGoal(formula);
-        PosInOccurrence pio = constructPIO(formula);
+        org.key_project.ncore.sequent.PosInOccurrence pio = constructPIO(formula);
         v = vn.rename(v, goal, pio);
         assertEquals("x", v.getProgramElementName().getProgramName());
     }
@@ -162,7 +162,7 @@ public class TestVariableNamer {
         VariableNamer vn = services.getVariableNamer();
         ProgramVariable v, w;
 
-        PosInOccurrence pio = constructPIO(formulaWithX);
+        org.key_project.ncore.sequent.PosInOccurrence pio = constructPIO(formulaWithX);
         Goal goal = constructGoal(formulaWithX);
 
         v = vn.rename(y, goal, pio);
@@ -204,7 +204,7 @@ public class TestVariableNamer {
         VariableNamer vn = services.getVariableNamer();
         ProgramElementName proposal;
 
-        PosInOccurrence pio = constructPIO(formulaWithVar_1);
+        org.key_project.ncore.sequent.PosInOccurrence pio = constructPIO(formulaWithVar_1);
         Goal goal = constructGoal(formulaWithVar_1);
 
         proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null, services);
@@ -224,7 +224,7 @@ public class TestVariableNamer {
         VariableNamer vn = services.getVariableNamer();
         ProgramVariable v;
 
-        PosInOccurrence pio = constructPIO(formulaWithX_1);
+        org.key_project.ncore.sequent.PosInOccurrence pio = constructPIO(formulaWithX_1);
         Goal goal = constructGoal(formulaWithX_1);
         proof.getNamespaces().programVariables().addSafely(xx);
         addGlobal(goal, xx);

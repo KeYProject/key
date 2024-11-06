@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;

@@ -21,8 +21,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
@@ -37,6 +35,8 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
+import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingSettingsProvider;
@@ -363,7 +363,7 @@ public final class DependencyAnalyzer {
             // mark all available formulas as useful
             Sequent seq = goal.sequent();
             for (int i = 1; i <= seq.size(); i++) {
-                PosInOccurrence pio =
+                org.key_project.ncore.sequent.PosInOccurrence pio =
                     PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
                 GraphNode node = graph.getGraphNode(proof, goal.node().getBranchLocation(), pio);
                 usefulFormulas.add(node);

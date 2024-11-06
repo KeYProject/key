@@ -40,7 +40,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * Key used in {@link TermLabelState} by the {@link StayOnOperatorTermLabelPolicy} to indicate
      * that a refactoring below an update ({@link RefactoringScope#APPLICATION_BELOW_UPDATES}) is
      * required, which will be performed by
-     * {@link #refactorBelowUpdates(PosInOccurrence, Term, LabelCollection)}.
+     * {@link #refactorBelowUpdates(org.key_project.ncore.sequent.PosInOccurrence, Term, LabelCollection)}.
      * <p>
      * This is for instance required for the following rules:
      * <ul>
@@ -110,7 +110,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
             return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
@@ -144,7 +145,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, LabelCollection labels) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
             refactorSpecificationApplication(term, services, labels, hint);
@@ -215,7 +217,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param term The {@link Term} which is now refactored.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    private void refactorBelowUpdates(PosInOccurrence applicationPosInOccurrence, Term term,
+    private void refactorBelowUpdates(
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence, Term term,
             LabelCollection labels) {
         Term applicationTerm =
             applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;

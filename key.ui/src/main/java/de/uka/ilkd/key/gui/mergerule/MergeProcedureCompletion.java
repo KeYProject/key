@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import de.uka.ilkd.key.gui.mergerule.predicateabstraction.PredicateAbstractionCompletion;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -42,7 +41,7 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
         return new MergeProcedureCompletion<>() {
             @Override
             public T complete(
-                    T proc, Pair<Goal, PosInOccurrence> mergeGoalPio,
+                    T proc, Pair<Goal, org.key_project.ncore.sequent.PosInOccurrence> mergeGoalPio,
                     Collection<MergePartner> partners) {
                 return completion.apply(proc);
             }
@@ -58,7 +57,8 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
      * @param partners The {@link MergePartner}s chosen.
      * @return The completed {@link MergeProcedure}.
      */
-    public abstract C complete(final C proc, final Pair<Goal, PosInOccurrence> mergeGoalPio,
+    public abstract C complete(final C proc,
+            final Pair<Goal, org.key_project.ncore.sequent.PosInOccurrence> mergeGoalPio,
             final Collection<MergePartner> partners);
 
     /**

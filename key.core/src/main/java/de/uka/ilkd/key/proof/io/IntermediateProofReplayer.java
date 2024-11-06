@@ -114,7 +114,7 @@ public class IntermediateProofReplayer {
         new LinkedList<>();
 
     /** Maps join node IDs to previously seen join partners */
-    private final HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
+    private final HashMap<Integer, HashSet<Triple<Node, org.key_project.ncore.sequent.PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
         new HashMap<>();
 
     /** The current open goal */
@@ -265,7 +265,7 @@ public class IntermediateProofReplayer {
                             (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
 
                         if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
-                            HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
+                            HashSet<Triple<Node, org.key_project.ncore.sequent.PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
                                 joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
 
                             if (partnerNodesInfo == null
@@ -310,7 +310,7 @@ public class IntermediateProofReplayer {
                                     }
 
                                     // Now add children of partner nodes
-                                    for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    for (Triple<Node, org.key_project.ncore.sequent.PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                         Iterator<Node> children =
                                             partnerNodeInfo.first.childrenIterator();
                                         LinkedList<NodeIntermediate> intermChildren =
@@ -328,13 +328,14 @@ public class IntermediateProofReplayer {
                             }
                         } else if (appInterm instanceof MergePartnerAppIntermediate joinPartnerApp) {
                             // Register this partner node
-                            HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
+                            HashSet<Triple<Node, org.key_project.ncore.sequent.PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
                                 joinPartnerNodes.computeIfAbsent(joinPartnerApp.getMergeNodeId(),
                                     k -> new HashSet<>());
 
                             partnerNodeInfo.add(new Triple<>(
                                 currNode,
-                                PosInOccurrence.findInSequent(currGoal.sequent(),
+                                org.key_project.ncore.sequent.PosInOccurrence.findInSequent(
+                                    currGoal.sequent(),
                                     appInterm.getPosInfo().first, appInterm.getPosInfo().second),
                                 currNodeInterm));
                         } else {
@@ -440,7 +441,7 @@ public class IntermediateProofReplayer {
         final Sequent seq = currGoal.sequent();
 
         TacletApp ourApp;
-        PosInOccurrence pos = null;
+        org.key_project.ncore.sequent.PosInOccurrence pos = null;
 
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
@@ -458,7 +459,8 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+                pos = org.key_project.ncore.sequent.PosInOccurrence
+                        .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
 
                 /*
                  * part of the fix for #1716: ensure that position of find term
@@ -545,7 +547,7 @@ public class IntermediateProofReplayer {
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
 
         Contract currContract = null;
-        ImmutableList<PosInOccurrence> builtinIfInsts = null;
+        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> builtinIfInsts = null;
 
         // Load contracts, if applicable
         if (currInterm.getContract() != null) {
@@ -568,8 +570,10 @@ public class IntermediateProofReplayer {
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
 
                 try {
-                    final PosInOccurrence ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
-                        currIfInstFormula, currIfInstPosInTerm);
+                    final org.key_project.ncore.sequent.PosInOccurrence ifInst =
+                        org.key_project.ncore.sequent.PosInOccurrence.findInSequent(
+                            currGoal.sequent(),
+                            currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 } catch (RuntimeException | AssertionError e) {
                     reportError(
@@ -624,7 +628,8 @@ public class IntermediateProofReplayer {
                 throw new SkipSMTRuleException();
             } else {
                 String name = smtProblem.getSuccessfulSolver().name();
-                ImmutableList<PosInOccurrence> unsatCore = SMTFocusResults.getUnsatCore(smtProblem);
+                ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> unsatCore =
+                    SMTFocusResults.getUnsatCore(smtProblem);
                 if (unsatCore != null) {
                     return SMTRuleApp.RULE.createApp(name, unsatCore);
                 } else {
@@ -638,7 +643,8 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+                pos = org.key_project.ncore.sequent.PosInOccurrence
+                        .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
             } catch (RuntimeException e) {
                 throw new BuiltInConstructionException("Wrong position information.", e);
             }
@@ -714,7 +720,7 @@ public class IntermediateProofReplayer {
      */
     private MergeRuleBuiltInRuleApp instantiateJoinApp(final MergeAppIntermediate joinAppInterm,
             final Node currNode,
-            final Set<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo,
+            final Set<Triple<Node, org.key_project.ncore.sequent.PosInOccurrence, NodeIntermediate>> partnerNodesInfo,
             final Services services) throws SkipSMTRuleException, BuiltInConstructionException {
         final MergeRuleBuiltInRuleApp joinApp =
             (MergeRuleBuiltInRuleApp) constructBuiltinApp(joinAppInterm, currGoal);
@@ -803,7 +809,7 @@ public class IntermediateProofReplayer {
         }
 
         ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
-        for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+        for (Triple<Node, org.key_project.ncore.sequent.PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
 
             final Triple<Term, Term, Term> ownSEState =
                 sequentToSETriple(currNode, joinApp.posInOccurrence(), services);

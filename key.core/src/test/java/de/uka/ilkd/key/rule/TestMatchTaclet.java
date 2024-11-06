@@ -253,7 +253,7 @@ public class TestMatchTaclet {
                     .semisequent());
         TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
         index.add(close_rule.taclet());
-        PosInOccurrence pio =
+        org.key_project.ncore.sequent.PosInOccurrence pio =
             new PosInOccurrence(new SequentFormula(closeable_two), PosInTerm.getTopLevel(), false);
 
         TacletApp tacletApp =

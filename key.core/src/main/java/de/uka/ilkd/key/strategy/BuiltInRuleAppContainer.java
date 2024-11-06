@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -26,7 +25,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * was created
      */
     private final FormulaTag positionTag;
-    private final PosInOccurrence applicationPosition;
+    private final org.key_project.ncore.sequent.PosInOccurrence applicationPosition;
 
     private final IBuiltInRuleApp bir;
 
@@ -36,7 +35,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // constructors
     // -------------------------------------------------------------------------
 
-    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio, RuleAppCost cost,
+    private BuiltInRuleAppContainer(IBuiltInRuleApp bir,
+            org.key_project.ncore.sequent.PosInOccurrence pio, RuleAppCost cost,
             Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
@@ -59,7 +59,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         if (applicationPosition == null) {
             return bir.rule().isApplicable(goal, null);
         } else {
-            final PosInOccurrence topPos = goal.getFormulaTagManager().getPosForTag(positionTag);
+            final org.key_project.ncore.sequent.PosInOccurrence topPos =
+                goal.getFormulaTagManager().getPosForTag(positionTag);
             if (topPos == null) {
                 // the formula does not exist anymore, bail out
                 return false;
@@ -74,7 +75,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * Copied from FindTaclet.
      */
     private PosInOccurrence getPosInOccurrence(Goal p_goal) {
-        final PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
+        final org.key_project.ncore.sequent.PosInOccurrence topPos =
+            p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
         assert topPos != null;
 
@@ -93,7 +95,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * @return container for the currently applicable BuiltInRuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    static RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
+    static RuleAppContainer createAppContainer(IBuiltInRuleApp bir,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             Goal goal) {
         final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
         return new BuiltInRuleAppContainer(bir, pio, cost, goal);
@@ -106,7 +109,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static ImmutableList<RuleAppContainer> createInitialAppContainers(
-            ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio, Goal goal) {
+            ImmutableList<IBuiltInRuleApp> birs, org.key_project.ncore.sequent.PosInOccurrence pio,
+            Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         for (IBuiltInRuleApp bir : birs) {
@@ -124,7 +128,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
             return ImmutableSLList.nil();
         }
 
-        final PosInOccurrence pio = getPosInOccurrence(goal);
+        final org.key_project.ncore.sequent.PosInOccurrence pio = getPosInOccurrence(goal);
 
         RuleAppContainer container = createAppContainer(bir, pio, goal);
         if (container.getCost() instanceof TopRuleAppCost) {

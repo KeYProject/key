@@ -6,7 +6,6 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Node;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
@@ -89,7 +89,7 @@ public class ServiceCaches {
      */
     private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<>(1000);
 
-    private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
+    private final LRUCache<org.key_project.ncore.sequent.PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
         new LRUCache<>(1000);
 
     private final LRUCache<Operator, Integer> introductionTimeCache =
@@ -135,7 +135,7 @@ public class ServiceCaches {
         new LRUCache<>(5000);
 
     /** Cache used by the exhaustive macro */
-    private final Map<Node, PosInOccurrence> exhaustiveMacroCache =
+    private final Map<Node, org.key_project.ncore.sequent.PosInOccurrence> exhaustiveMacroCache =
         new WeakHashMap<>();
 
     /** Cache used by the ifinstantiator */
@@ -166,7 +166,7 @@ public class ServiceCaches {
         return betaCandidates;
     }
 
-    public final LRUCache<PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
+    public final LRUCache<org.key_project.ncore.sequent.PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
         return ifThenElseMalusCache;
     }
 

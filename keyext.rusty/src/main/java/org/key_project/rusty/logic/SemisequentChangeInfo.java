@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
-import org.key_project.ncore.sequent.Semisequent;
 import org.key_project.util.collection.ImmutableList;
 
-public class SemisequentChangeInfo extends org.key_project.ncore.sequent.SemisequentChangeInfo {
+public class SemisequentChangeInfo
+        extends org.key_project.ncore.sequent.SemisequentChangeInfo<SequentFormula> {
     public SemisequentChangeInfo() {
     }
 
     public SemisequentChangeInfo(
-            ImmutableList<org.key_project.ncore.sequent.SequentFormula> formulas) {
+            ImmutableList<SequentFormula> formulas) {
         super(formulas);
     }
 

@@ -1545,7 +1545,7 @@ public class SymbolicExecutionTreeBuilder {
      * @param node The {@link Node} on which the loop invariant rule is applied.
      */
     protected void initNewLoopBodyMethodCallStack(Node node) {
-        PosInOccurrence childPIO = SymbolicExecutionUtil
+        org.key_project.ncore.sequent.PosInOccurrence childPIO = SymbolicExecutionUtil
                 .findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
         initNewMethodCallStack(node, childPIO);
     }
@@ -1558,7 +1558,7 @@ public class SymbolicExecutionTreeBuilder {
      * @param node The {@link Node} on which the block contract rule is applied.
      */
     protected void initNewValidiityMethodCallStack(Node node) {
-        PosInOccurrence childPIO = SymbolicExecutionUtil
+        org.key_project.ncore.sequent.PosInOccurrence childPIO = SymbolicExecutionUtil
                 .findModalityWithMaxSymbolicExecutionLabelId(node.child(0).sequent());
         initNewMethodCallStack(node, childPIO);
     }
@@ -1570,7 +1570,8 @@ public class SymbolicExecutionTreeBuilder {
      * @param childPIO The {@link PosInOccurrence} where the modality has a new symbolic execution
      *        label counter.
      */
-    protected void initNewMethodCallStack(Node currentNode, PosInOccurrence childPIO) {
+    protected void initNewMethodCallStack(Node currentNode,
+            org.key_project.ncore.sequent.PosInOccurrence childPIO) {
         Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =

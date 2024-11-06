@@ -7,7 +7,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -23,7 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 public class UseDependencyContractApp extends AbstractContractRuleApp {
 
-    private final PosInOccurrence step;
+    private final org.key_project.ncore.sequent.PosInOccurrence step;
     private List<LocationVariable> heapContext;
 
     public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio) {
@@ -31,12 +30,13 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
     public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio,
-            Contract instantiation, PosInOccurrence step) {
+            Contract instantiation, org.key_project.ncore.sequent.PosInOccurrence step) {
         this(builtInRule, pio, ImmutableSLList.nil(), instantiation, step);
     }
 
     public UseDependencyContractApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, Contract contract, PosInOccurrence step) {
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts, Contract contract,
+            org.key_project.ncore.sequent.PosInOccurrence step) {
         super(rule, pio, ifInsts, contract);
         this.step = step;
 
@@ -56,9 +56,10 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     private UseDependencyContractApp computeStep(Sequent seq, Services services) {
         assert this.step == null;
-        final List<PosInOccurrence> steps = UseDependencyContractRule
+        final List<org.key_project.ncore.sequent.PosInOccurrence> steps = UseDependencyContractRule
                 .getSteps(this.getHeapContext(), this.posInOccurrence(), seq, services);
-        PosInOccurrence l_step = UseDependencyContractRule.findStepInIfInsts(steps, this, services);
+        org.key_project.ncore.sequent.PosInOccurrence l_step =
+            UseDependencyContractRule.findStepInIfInsts(steps, this, services);
         assert l_step != null;/*
                                * : "The strategy failed to properly " +
                                * "instantiate the base heap!\n" + "at: " +
@@ -69,11 +70,11 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
 
-    public PosInOccurrence step() {
+    public org.key_project.ncore.sequent.PosInOccurrence step() {
         return step;
     }
 
-    public UseDependencyContractApp setStep(PosInOccurrence p_step) {
+    public UseDependencyContractApp setStep(org.key_project.ncore.sequent.PosInOccurrence p_step) {
         assert this.step == null;
         return new UseDependencyContractApp(rule(), posInOccurrence(), ifInsts(), instantiation,
             p_step);
@@ -157,7 +158,8 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
 
     @Override
-    public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public UseDependencyContractApp setIfInsts(
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
         // return new UseDependencyContractApp(builtInRule, pio, ifInsts, instantiation, step);

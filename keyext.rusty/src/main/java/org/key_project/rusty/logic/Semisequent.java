@@ -3,20 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
-import org.key_project.ncore.sequent.SemisequentChangeInfo;
-import org.key_project.ncore.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static org.key_project.rusty.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
-public class Semisequent extends org.key_project.ncore.sequent.Semisequent {
+public class Semisequent extends org.key_project.ncore.sequent.Semisequent<SequentFormula> {
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
 
     /** used by inner class Empty */
     private Semisequent() {
-        super(ImmutableSLList.nil());
+        super();
     }
 
     /**

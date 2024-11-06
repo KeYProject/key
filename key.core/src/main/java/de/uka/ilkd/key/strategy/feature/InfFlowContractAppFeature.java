@@ -10,7 +10,6 @@ import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -49,8 +49,9 @@ public class InfFlowContractAppFeature implements Feature {
      * <code>equals</code> or <code>eqEquals</code> (checking for same or equal formulas), which has
      * to be decided by the subclasses
      */
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
-            PosInOccurrence oldPio) {
+    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
+            org.key_project.ncore.sequent.PosInOccurrence newPio,
+            org.key_project.ncore.sequent.PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
     }
 
@@ -69,7 +70,8 @@ public class InfFlowContractAppFeature implements Feature {
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp, PosInOccurrence newPio) {
+    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp,
+            org.key_project.ncore.sequent.PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -82,7 +84,7 @@ public class InfFlowContractAppFeature implements Feature {
             if (!(cmp instanceof PosTacletApp)) {
                 return false;
             }
-            final PosInOccurrence oldPio = cmp.posInOccurrence();
+            final org.key_project.ncore.sequent.PosInOccurrence oldPio = cmp.posInOccurrence();
             if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
             }
@@ -150,7 +152,8 @@ public class InfFlowContractAppFeature implements Feature {
      * soon as we have reached a point where the formula containing the focus no longer occurs in
      * the sequent
      */
-    protected boolean duplicateFindTaclet(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean duplicateFindTaclet(TacletApp app,
+            org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert app.ifFormulaInstantiations().size() >= 1
                 : "Featureis only applicable to rules with at least one assumes.";

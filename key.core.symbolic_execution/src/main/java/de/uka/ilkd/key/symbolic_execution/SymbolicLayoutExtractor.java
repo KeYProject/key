@@ -194,7 +194,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      */
-    public SymbolicLayoutExtractor(Node node, PosInOccurrence modalityPio, boolean useUnicode,
+    public SymbolicLayoutExtractor(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence modalityPio, boolean useUnicode,
             boolean usePrettyPrinting, boolean simplifyConditions) {
         super(node, modalityPio);
         this.settings = new ModelSettings(useUnicode, usePrettyPrinting, simplifyConditions);

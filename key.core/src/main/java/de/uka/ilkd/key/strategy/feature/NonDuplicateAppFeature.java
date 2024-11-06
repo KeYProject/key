@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 /**
@@ -16,7 +16,8 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppFeature();
 
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         if (!app.ifInstsComplete()) {
             return true;
         }
@@ -24,7 +25,8 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return noDuplicateFindTaclet(app, pos, goal);
     }
 
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
+    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
+            org.key_project.ncore.sequent.PosInOccurrence newPio,
             PosInOccurrence oldPio) {
         return oldPio.equals(newPio);
     }

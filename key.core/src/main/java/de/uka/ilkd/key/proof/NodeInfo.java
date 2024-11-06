@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -31,6 +31,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 
@@ -78,7 +79,7 @@ public class NodeInfo {
     private String notes;
 
     /** Information about changes respective to the parent of this node. */
-    private SequentChangeInfo sequentChangeInfo;
+    private SequentChangeInfo<SequentFormula> sequentChangeInfo;
 
     public NodeInfo(Node node) {
         this.node = node;

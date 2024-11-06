@@ -46,7 +46,7 @@ public abstract class AbstractUpdateExtractor {
     /**
      * The {@link PosInOccurrence} of the modality or its updates.
      */
-    protected final PosInOccurrence modalityPio;
+    protected final org.key_project.ncore.sequent.PosInOccurrence modalityPio;
 
     /**
      * An incremented number used to give each pre value an unique name.
@@ -59,7 +59,8 @@ public abstract class AbstractUpdateExtractor {
      * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
      * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
      */
-    public AbstractUpdateExtractor(Node node, PosInOccurrence modalityPio) {
+    public AbstractUpdateExtractor(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence modalityPio) {
         assert node != null;
         assert modalityPio != null;
         this.node = node;
@@ -210,7 +211,7 @@ public abstract class AbstractUpdateExtractor {
             Set<Term> updateValueObjectsToFill, Set<Term> objectsToIgnore)
             throws ProofInputException {
         // Go up in parent hierarchy and collect updates on all update applications
-        PosInOccurrence pio = modalityPio;
+        org.key_project.ncore.sequent.PosInOccurrence pio = modalityPio;
         while (pio != null) {
             Term updateApplication = pio.subTerm();
             if (updateApplication.op() == UpdateApplication.UPDATE_APPLICATION) {
@@ -1255,7 +1256,8 @@ public abstract class AbstractUpdateExtractor {
      * @param currentLayout Is current layout?
      * @return The original updates.
      */
-    protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence pio,
+    protected ImmutableList<Term> computeOriginalUpdates(
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             boolean currentLayout) {
         ImmutableList<Term> originalUpdates;
         if (!currentLayout) {

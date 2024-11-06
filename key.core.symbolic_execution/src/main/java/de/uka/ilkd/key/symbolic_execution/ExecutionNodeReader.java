@@ -16,7 +16,6 @@ import javax.xml.parsers.SAXParserFactory;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -35,6 +34,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -1472,7 +1472,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
             return null;
         }
 
@@ -2416,7 +2416,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
             return null;
         }
     }
@@ -2851,7 +2851,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
             return null;
         }
     }
@@ -2977,7 +2977,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
             return null;
         }
 
