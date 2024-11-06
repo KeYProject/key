@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -304,7 +303,8 @@ public class NoPosTacletApp extends TacletApp {
      *
      * @return TacletApp with the resulting instantiations or null
      */
-    public NoPosTacletApp matchFind(PosInOccurrence pos, Services services) {
+    public NoPosTacletApp matchFind(org.key_project.ncore.sequent.PosInOccurrence pos,
+            Services services) {
         NoPosTacletApp result = matchFind(pos, services, null);
         return result;
     }
@@ -315,7 +315,8 @@ public class NoPosTacletApp extends TacletApp {
      * expensive pos.subTerm() while matching during a recursive descent in a term (where the
      * current subterm is known anyway).
      */
-    public NoPosTacletApp matchFind(PosInOccurrence pos, Services services, Term t) {
+    public NoPosTacletApp matchFind(org.key_project.ncore.sequent.PosInOccurrence pos,
+            Services services, Term t) {
         if ((t == null) && (pos != null)) {
             t = pos.subTerm();
         }
@@ -357,7 +358,8 @@ public class NoPosTacletApp extends TacletApp {
     }
 
 
-    protected MatchConditions setupMatchConditions(PosInOccurrence pos, TermServices services) {
+    protected MatchConditions setupMatchConditions(
+            org.key_project.ncore.sequent.PosInOccurrence pos, TermServices services) {
         SVInstantiations svInst = taclet() instanceof NoFindTaclet ? instantiations()
                 : instantiations().clearUpdateContext();
 

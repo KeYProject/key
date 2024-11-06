@@ -115,7 +115,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         // hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();
 
-        PosInOccurrence pio = new PosInOccurrence(toHide, pit, antec);
+        org.key_project.ncore.sequent.PosInOccurrence pio = new PosInOccurrence(toHide, pit, antec);
 
         Set<SchemaVariable> svs = tac.collectSchemaVars();
         assert svs.size() == 1;

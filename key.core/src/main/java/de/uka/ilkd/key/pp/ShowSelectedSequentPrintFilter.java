@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 
 import org.key_project.util.collection.ImmutableList;
@@ -19,14 +18,14 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     /**
      * The position of the only sub-formula to show.
      */
-    private final PosInOccurrence pos;
+    private final org.key_project.ncore.sequent.PosInOccurrence pos;
 
     /**
      * Create a new {@link ShowSelectedSequentPrintFilter}.
      *
      * @param pos the position of the only sub-formula to show.
      */
-    public ShowSelectedSequentPrintFilter(PosInOccurrence pos) {
+    public ShowSelectedSequentPrintFilter(org.key_project.ncore.sequent.PosInOccurrence pos) {
         this.pos = pos;
     }
 
@@ -72,7 +71,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
          */
         private final SequentFormula original;
 
-        private Entry(PosInOccurrence pos) {
+        private Entry(org.key_project.ncore.sequent.PosInOccurrence pos) {
             filtered = new SequentFormula(pos.subTerm());
             original = pos.sequentFormula();
         }

@@ -68,7 +68,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
          */
         @Override
         public SMTRuleApp createApp(String successfulSolverName,
-                ImmutableList<PosInOccurrence> unsatCore) {
+                ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> unsatCore) {
             return new SMTRuleApp(this, null, unsatCore, successfulSolverName);
         }
 
@@ -76,6 +76,13 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
         public SMTRuleApp createApp(PosInOccurrence pos, TermServices services) {
             return new SMTRuleApp(this, null, "");
         }
+
+
+        @Override
+        public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+            return false;
+        }
+
 
         /**
          * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
@@ -116,7 +123,8 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
     }
 
     @Override
-    public SMTRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public SMTRuleApp setIfInsts(
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -134,7 +142,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
     public SMTRuleApp tryToInstantiate(Goal goal) {
         SMTRuleApp app = RULE.createApp(pio, goal.proof().getServices());
         Sequent seq = goal.sequent();
-        List<PosInOccurrence> ifInsts = new ArrayList<>();
+        List<org.key_project.ncore.sequent.PosInOccurrence> ifInsts = new ArrayList<>();
         for (SequentFormula ante : seq.antecedent()) {
             ifInsts.add(new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
         }

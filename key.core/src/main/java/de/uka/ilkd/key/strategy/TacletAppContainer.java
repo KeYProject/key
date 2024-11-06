@@ -8,13 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -52,13 +52,15 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return instantiator.getResults();
     }
 
-    protected static TacletAppContainer createContainer(NoPosTacletApp p_app, PosInOccurrence p_pio,
+    protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
+            org.key_project.ncore.sequent.PosInOccurrence p_pio,
             Goal p_goal, boolean p_initial) {
         return createContainer(p_app, p_pio, p_goal,
             p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), p_initial);
     }
 
-    private static TacletAppContainer createContainer(NoPosTacletApp p_app, PosInOccurrence p_pio,
+    private static TacletAppContainer createContainer(NoPosTacletApp p_app,
+            org.key_project.ncore.sequent.PosInOccurrence p_pio,
             Goal p_goal, RuleAppCost p_cost, boolean p_initial) {
         // This relies on the fact that the method <code>Goal.getTime()</code>
         // never returns a value less than zero
@@ -183,7 +185,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     protected static ImmutableList<RuleAppContainer> createInitialAppContainers(
-            ImmutableList<NoPosTacletApp> p_app, PosInOccurrence p_pio, Goal p_goal) {
+            ImmutableList<NoPosTacletApp> p_app,
+            org.key_project.ncore.sequent.PosInOccurrence p_pio, Goal p_goal) {
 
         List<RuleAppCost> costs = new LinkedList<>();
 
@@ -210,7 +213,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * @return list of containers for currently applicable TacletApps, the cost may be an instance
      *         of <code>TopRuleAppCost</code>.
      */
-    static RuleAppContainer createAppContainers(NoPosTacletApp p_app, PosInOccurrence p_pio,
+    static RuleAppContainer createAppContainers(NoPosTacletApp p_app,
+            org.key_project.ncore.sequent.PosInOccurrence p_pio,
             Goal p_goal) {
         if (!(p_pio == null ? p_app.taclet() instanceof NoFindTaclet
                 : p_app.taclet() instanceof FindTaclet))
@@ -262,7 +266,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     protected abstract boolean isStillApplicable(Goal p_goal);
 
-    protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
+    protected org.key_project.ncore.sequent.PosInOccurrence getPosInOccurrence(Goal p_goal) {
         return null;
     }
 

@@ -14,7 +14,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * This interface has to be implemented by all classes that want to act as a rule in the calculus.
  */
-public interface Rule extends org.key_project.ncore.rules.Rule<Goal, RuleApp>, HasOrigin {
+public interface Rule extends org.key_project.ncore.rules.Rule, HasOrigin {
 
     /**
      * the rule is applied on the given goal using the information of rule application.

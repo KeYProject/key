@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -26,7 +25,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
     /**
      * The {@link PosInOccurrence} of the modality of interest.
      */
-    private final PosInOccurrence modalityPIO;
+    private final org.key_project.ncore.sequent.PosInOccurrence modalityPIO;
 
     /**
      * The return value as human readable {@link String}.
@@ -53,7 +52,8 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * @param condition The optional condition or {@code null} if no condition is available.
      */
     public ExecutionMethodReturnValue(ITreeSettings settings, Node proofNode,
-            PosInOccurrence modalityPIO, Term returnValue, Term condition) {
+            org.key_project.ncore.sequent.PosInOccurrence modalityPIO, Term returnValue,
+            Term condition) {
         super(settings, proofNode);
         assert returnValue != null;
         assert modalityPIO != null;
@@ -156,7 +156,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public PosInOccurrence getModalityPIO() {
+    public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
         return modalityPIO;
     }
 }

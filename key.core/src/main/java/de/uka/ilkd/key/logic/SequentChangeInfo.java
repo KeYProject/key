@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -13,7 +14,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * lists. The situation where this can happen is that a list of formulas had to be added to the
  * sequent and the list has not been redundancy free.
  */
-public class SequentChangeInfo {
+public class SequentChangeInfoY {
 
     /**
      * change information related to the antecedent, this means the there added and removed formulas

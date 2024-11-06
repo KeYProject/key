@@ -68,7 +68,8 @@ public abstract class AbstractSlicer {
     public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation,
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         // Solve this reference
-        PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
+        org.key_project.ncore.sequent.PosInOccurrence pio =
+            seedNode.getAppliedRuleApp().posInOccurrence();
         Term topLevel = pio.sequentFormula().formula();
         Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
         Services services = seedNode.proof().getServices();
@@ -94,7 +95,8 @@ public abstract class AbstractSlicer {
             throw new IllegalStateException(
                 "No rule applied on seed Node '" + seedNode.serialNr() + "'.");
         }
-        PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
+        org.key_project.ncore.sequent.PosInOccurrence pio =
+            seedNode.getAppliedRuleApp().posInOccurrence();
         Term applicationTerm = pio.subTerm();
         Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(applicationTerm);
         Term modalityTerm = pair.second;
@@ -208,7 +210,8 @@ public abstract class AbstractSlicer {
      *         supported.
      */
     protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
-        PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+        org.key_project.ncore.sequent.PosInOccurrence pio =
+            node.getAppliedRuleApp().posInOccurrence();
         Term topLevel = pio.sequentFormula().formula();
         Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(topLevel);
         Term modalityTerm = pair.second;

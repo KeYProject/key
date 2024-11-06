@@ -9,8 +9,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -26,6 +24,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.logic.PosInTerm;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -100,7 +99,8 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param newTerm The new {@link Term}.
      * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
      */
-    protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {
+    protected static SequentFormula replace(org.key_project.ncore.sequent.PosInOccurrence pio,
+            Term newTerm, Services services) {
         // Iterate along the PosInOccurrence and collect the parents and indices
         Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<>();
         Term root = pio.sequentFormula().formula();

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 /**
@@ -334,6 +335,7 @@ public abstract class AbstractBetaFeature implements Feature {
         return doComputation(pos, findTerm, goal.proof().getServices().getCaches());
     }
 
-    protected abstract RuleAppCost doComputation(PosInOccurrence pos, Term findTerm,
+    protected abstract RuleAppCost doComputation(org.key_project.ncore.sequent.PosInOccurrence pos,
+            Term findTerm,
             ServiceCaches caches);
 }

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -20,7 +19,7 @@ public interface BuiltInRule extends Rule {
      * that a rule application will change the goal (this decision is made due to performance
      * reasons)
      */
-    boolean isApplicable(Goal goal, PosInOccurrence pio);
+    boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio);
 
     boolean isApplicableOnSubTerms();
 

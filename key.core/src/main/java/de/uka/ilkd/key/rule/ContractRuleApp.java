@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -90,7 +89,8 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     }
 
     @Override
-    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public ContractRuleApp setIfInsts(
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         super.setMutable(ifInsts);
         return this;
     }

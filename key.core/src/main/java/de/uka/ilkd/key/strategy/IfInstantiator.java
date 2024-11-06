@@ -6,8 +6,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.FormulaTag;
@@ -22,6 +20,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool.IfInstantiationCache;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.ncore.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -160,7 +159,8 @@ public class IfInstantiator {
         final boolean antec = p_ifInstantiation.inAntec();
 
         final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula();
-        final PosInOccurrence pio = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
+        final org.key_project.ncore.sequent.PosInOccurrence pio =
+            new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
         final FormulaTagManager tagManager = goal.getFormulaTagManager();
 

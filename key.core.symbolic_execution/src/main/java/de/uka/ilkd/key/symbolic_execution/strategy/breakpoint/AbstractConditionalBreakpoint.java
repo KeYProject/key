@@ -353,7 +353,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         ApplyStrategyInfo info = null;
         try {
             // initialize values
-            PosInOccurrence pio = ruleApp.posInOccurrence();
+            org.key_project.ncore.sequent.PosInOccurrence pio = ruleApp.posInOccurrence();
             Term term = pio.subTerm();
             getProof().getServices().getTermBuilder();
             term = TermBuilder.goBelowUpdates(term);

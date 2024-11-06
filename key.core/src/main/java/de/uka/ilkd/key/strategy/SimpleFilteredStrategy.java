@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
@@ -45,7 +45,8 @@ public class SimpleFilteredStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+            Goal goal,
             MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
             return TopRuleAppCost.INSTANCE;
@@ -70,7 +71,8 @@ public class SimpleFilteredStrategy implements Strategy {
      *
      * @return true iff the rule should be applied, false otherwise
      */
-    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+            Goal goal) {
         // do not apply a rule twice
         return !(app instanceof TacletApp) || NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,
             goal, new MutableState()) != TopRuleAppCost.INSTANCE;

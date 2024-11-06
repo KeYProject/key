@@ -31,7 +31,8 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -91,7 +92,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private JTree tree;
 
     /** The currently highlighted position. */
-    private PosInOccurrence highlight;
+    private org.key_project.ncore.sequent.PosInOccurrence highlight;
 
     /** The button for the {@link #nodeLinkAction} */
 
@@ -193,7 +194,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     public OriginTermLabelVisualizer(PosInOccurrence pos, Node node, Services services) {
         super(node,
             "Origin for node " + node.serialNr() + ": " + (pos == null ? "whole sequent"
-                    : LogicPrinter.quickPrintTerm(pos.subTerm(), services).replaceAll("\\s+", " ")),
+                    : LogicPrinter.quickPrintTerm((Term) pos.subTerm(), services).replaceAll("\\s+",
+                        " ")),
             "Node " + node.serialNr());
 
         this.services = services;
@@ -414,7 +416,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         } else {
             PosInTerm completePos = termPio.posInTerm();
 
-            IntIterator it = pio.posInTerm().iterator();
+            org.key_project.logic.IntIterator it = pio.posInTerm().iterator();
             while (it.hasNext()) {
                 completePos = completePos.down(it.next());
             }
@@ -430,7 +432,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return result;
     }
 
-    private void buildModel(TreeNode parentNode, PosInOccurrence parentPos,
+    private void buildModel(TreeNode parentNode,
+            org.key_project.ncore.sequent.PosInOccurrence parentPos,
             DefaultTreeModel treeModel) {
         if (parentPos == null) {
             int index = 0;
@@ -461,7 +464,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 ++index;
             }
         } else {
-            ImmutableArray<Term> children = parentPos.subTerm().subs();
+            var children = parentPos.subTerm().subs();
 
             for (int i = 0; i < children.size(); ++i) {
                 TreeNode childNode = new TreeNode(parentPos.down(i));
@@ -493,7 +496,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
-    private ImmutableList<Integer> getPosTablePath(PosInOccurrence pos) {
+    private ImmutableList<Integer> getPosTablePath(
+            org.key_project.ncore.sequent.PosInOccurrence pos) {
         if (pos == null) {
             return ImmutableSLList.<Integer>nil().prepend(0);
         }
@@ -541,12 +545,13 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return result;
     }
 
-    private String getTooltipText(PosInOccurrence pio) {
+    private String getTooltipText(org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
 
-        OriginTermLabel label = (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
+        OriginTermLabel label =
+            (OriginTermLabel) ((Term) pio.subTerm()).getLabel(OriginTermLabel.NAME);
         Origin origin = OriginTermLabel.getOrigin(pio);
 
         return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin)
@@ -565,7 +570,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
             TreeNode node = (TreeNode) value;
 
-            PosInOccurrence pio = node.pos;
+            org.key_project.ncore.sequent.PosInOccurrence pio = node.pos;
             Term term = node.term;
             assert pio.subTerm().equals(term);
 
@@ -637,15 +642,16 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             this.pos = pos;
 
             if (pos != null) {
-                this.term = pos.subTerm();
+                this.term = (Term) pos.subTerm();
             }
         }
     }
 
     private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
-        private final PosInOccurrence pos;
+        private final org.key_project.ncore.sequent.PosInOccurrence pos;
 
-        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni, Services services) {
+        TermViewLogicPrinter(org.key_project.ncore.sequent.PosInOccurrence pos, NotationInfo ni,
+                Services services) {
             super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
             this.pos = pos;
         }
@@ -681,7 +687,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         private InitialPositionTable posTable = new InitialPositionTable();
         private final Node node;
 
-        TermView(PosInOccurrence pos, Node node, MainWindow mainWindow) {
+        TermView(org.key_project.ncore.sequent.PosInOccurrence pos, Node node,
+                MainWindow mainWindow) {
             super(mainWindow);
             this.node = node;
 

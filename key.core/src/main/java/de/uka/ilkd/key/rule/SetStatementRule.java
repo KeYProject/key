@@ -43,7 +43,8 @@ public final class SetStatementRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
+    public boolean isApplicable(Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence occurrence) {
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -79,7 +80,7 @@ public final class SetStatementRule implements BuiltInRule {
 
         final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
-        final PosInOccurrence occurrence = ruleApp.posInOccurrence();
+        final org.key_project.ncore.sequent.PosInOccurrence occurrence = ruleApp.posInOccurrence();
         final Term formula = occurrence.subTerm();
         assert formula.op() instanceof UpdateApplication
                 : "Currently, this can only be applied if there is an update application in front of the modality";

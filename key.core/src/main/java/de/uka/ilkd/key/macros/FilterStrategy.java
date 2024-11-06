@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -11,6 +10,8 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 public abstract class FilterStrategy implements Strategy {
 
@@ -21,12 +22,14 @@ public abstract class FilterStrategy implements Strategy {
     }
 
     @Override
-    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+            Goal goal) {
         return delegate.isApprovedApp(app, pio, goal);
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+            Goal goal,
             MutableState mState) {
         if (!isApprovedApp(app, pio, goal)) {
             return TopRuleAppCost.INSTANCE;

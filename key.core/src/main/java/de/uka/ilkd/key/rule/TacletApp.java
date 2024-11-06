@@ -111,7 +111,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return set of the bound variables
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-            SVInstantiations instantiations, PosInOccurrence pos) {
+            SVInstantiations instantiations, org.key_project.ncore.sequent.PosInOccurrence pos) {
 
         ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
@@ -952,14 +952,16 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      *
      * <p>
      * <b>CAUTION:</b> If you call this method, consider to call
-     * {@link NoPosTacletApp#matchFind(PosInOccurrence, Services)} first (if applicable) as
+     * {@link NoPosTacletApp#matchFind(org.key_project.ncore.sequent.PosInOccurrence, Services)}
+     * first (if applicable) as
      * otherwise the TacletApp may become invalid. (This happened sometimes during interactive
      * proofs).
      *
      * @param pos the PosInOccurrence of the newl created PosTacletApp
      * @return the new TacletApp
      */
-    public PosTacletApp setPosInOccurrence(PosInOccurrence pos, Services services) {
+    public PosTacletApp setPosInOccurrence(org.key_project.ncore.sequent.PosInOccurrence pos,
+            Services services) {
         if (taclet() instanceof NoFindTaclet) {
             throw new IllegalStateException("Cannot add position to an taclet" + " without find");
         }
@@ -1192,7 +1194,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return true iff all variable conditions x not free in y are hold
      */
     public static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations,
-            PosInOccurrence pos) {
+            org.key_project.ncore.sequent.PosInOccurrence pos) {
 
         Iterator<SchemaVariable> it = instantiations.svIterator();
         while (it.hasNext()) {
@@ -1215,7 +1217,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @param pos the PosInOccurrence describing a subterm in Term
      * @return a set of logic variables that are bound above the specified subterm
      */
-    protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(PosInOccurrence pos) {
+    protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(
+            org.key_project.ncore.sequent.PosInOccurrence pos) {
         ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         PIOPathIterator it = pos.iterator();

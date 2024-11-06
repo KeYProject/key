@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -25,7 +24,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     /**
      * The {@link PosInOccurrence} of the modality of interest.
      */
-    private final PosInOccurrence modalityPIO;
+    private final org.key_project.ncore.sequent.PosInOccurrence modalityPIO;
 
     /**
      * Constructor.
@@ -35,7 +34,8 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      *        {@link IExecutionNode}.
      * @param term The {@link Term} representing the constraint.
      */
-    public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO,
+    public ExecutionConstraint(ITreeSettings settings, Node proofNode,
+            org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
             Term term) {
         super(settings, proofNode);
         assert term != null;
@@ -72,7 +72,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      * {@inheritDoc}
      */
     @Override
-    public PosInOccurrence getModalityPIO() {
+    public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
         return modalityPIO;
     }
 }

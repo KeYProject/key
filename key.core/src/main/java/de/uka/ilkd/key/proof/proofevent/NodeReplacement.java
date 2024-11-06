@@ -7,14 +7,13 @@ package de.uka.ilkd.key.proof.proofevent;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 
+import org.key_project.ncore.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -128,7 +127,8 @@ public class NodeReplacement {
         removeNodeChanges(p_cf, p_inAntec);
 
         if (!oldSS.contains(p_cf) && newSS.contains(p_cf)) {
-            PosInOccurrence pio = new PosInOccurrence(p_cf, PosInTerm.getTopLevel(), p_inAntec);
+            org.key_project.ncore.sequent.PosInOccurrence pio =
+                new PosInOccurrence(p_cf, PosInTerm.getTopLevel(), p_inAntec);
             addNodeChange(new NodeChangeAddFormula(pio));
         }
     }
@@ -142,7 +142,8 @@ public class NodeReplacement {
      */
     private void addAddedRedundantChange(SequentFormula p_cf, boolean p_inAntec) {
 
-        final PosInOccurrence pio = new PosInOccurrence(p_cf, PosInTerm.getTopLevel(), p_inAntec);
+        final org.key_project.ncore.sequent.PosInOccurrence pio =
+            new PosInOccurrence(p_cf, PosInTerm.getTopLevel(), p_inAntec);
         addNodeChange(new NodeRedundantAddChange(pio));
 
     }
@@ -156,7 +157,8 @@ public class NodeReplacement {
         removeNodeChanges(p_cf, p_inAntec);
 
         if (oldSS.contains(p_cf)) {
-            PosInOccurrence pio = new PosInOccurrence(p_cf, PosInTerm.getTopLevel(), p_inAntec);
+            org.key_project.ncore.sequent.PosInOccurrence pio =
+                new PosInOccurrence(p_cf, PosInTerm.getTopLevel(), p_inAntec);
             addNodeChange(new NodeChangeRemoveFormula(pio));
         }
     }
@@ -169,7 +171,7 @@ public class NodeReplacement {
         Iterator<NodeChange> it = changes.iterator();
         changes = ImmutableSLList.nil();
         NodeChange oldNC;
-        PosInOccurrence oldPio;
+        org.key_project.ncore.sequent.PosInOccurrence oldPio;
 
         while (it.hasNext()) {
             oldNC = it.next();

@@ -10,7 +10,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -20,7 +19,8 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A multi-threaded taclet index implementation. It executes method
- * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, Services)} using multiple
+ * {@link #matchTaclets(ImmutableList, RuleFilter, org.key_project.ncore.sequent.PosInOccurrence, Services)}
+ * using multiple
  * threads (depending on the number of taclets being matched and number of available processors).
  *
  * Do not create this index directly. Use the {@link TacletIndexKit#createTacletIndex()} resp.
@@ -69,7 +69,8 @@ final class MultiThreadedTacletIndex extends TacletIndex {
      */
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
-            RuleFilter p_filter, PosInOccurrence pos, Services services) {
+            RuleFilter p_filter, org.key_project.ncore.sequent.PosInOccurrence pos,
+            Services services) {
 
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (tacletApps == null) {
@@ -123,7 +124,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
         private final int lower;
         private final int upper;
         private final Services services;
-        private final PosInOccurrence pos;
+        private final org.key_project.ncore.sequent.PosInOccurrence pos;
         private final RuleFilter ruleFilter;
 
         /**
@@ -139,7 +140,8 @@ final class MultiThreadedTacletIndex extends TacletIndex {
          * @param services the {@link Services}
          */
         public TacletSetMatchTask(NoPosTacletApp[] toMatch, int lower, int upper,
-                PosInOccurrence pos, RuleFilter ruleFilter, Services services) {
+                org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter ruleFilter,
+                Services services) {
             this.toMatch = toMatch;
             this.lower = lower;
             this.upper = upper;

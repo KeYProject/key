@@ -63,7 +63,7 @@ public class QueryExpand implements BuiltInRule {
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
-        final PosInOccurrence pio = ruleApp.posInOccurrence();
+        final org.key_project.ncore.sequent.PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term query = pio.subTerm();
 
         // new goal
@@ -609,7 +609,7 @@ public class QueryExpand implements BuiltInRule {
      * is useful for <code>QueryExpandCost</cost>.
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pio != null && pio.subTerm().op() instanceof IProgramMethod
                 && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();

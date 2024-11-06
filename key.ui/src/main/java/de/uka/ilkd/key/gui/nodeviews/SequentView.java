@@ -817,7 +817,8 @@ public abstract class SequentView extends JEditorPane {
                 ImmutableList<FormulaChangeInfo> modified =
                     node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
                 for (FormulaChangeInfo fci : modified) {
-                    PosInOccurrence positionOfMod = fci.positionOfModification();
+                    org.key_project.ncore.sequent.PosInOccurrence positionOfMod =
+                        fci.positionOfModification();
                     pio_age_list.add(new PIO_age(positionOfMod, age));
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
@@ -886,7 +887,7 @@ public abstract class SequentView extends JEditorPane {
                 if (!pair.active || pair.get_age() > max_age) {
                     continue;
                 }
-                PosInOccurrence pio = pair.get_pio();
+                org.key_project.ncore.sequent.PosInOccurrence pio = pair.get_pio();
                 Color color = computeColorForAge(max_age, pair.get_age());
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
                 if (pfp != null) {
@@ -1027,16 +1028,16 @@ public abstract class SequentView extends JEditorPane {
      * @author jschiffl
      */
     static class PIO_age {
-        PosInOccurrence pio;
+        org.key_project.ncore.sequent.PosInOccurrence pio;
         final int age;
         boolean active = true;
 
-        public PIO_age(PosInOccurrence pio, int age) {
+        public PIO_age(org.key_project.ncore.sequent.PosInOccurrence pio, int age) {
             this.pio = pio;
             this.age = age;
         }
 
-        public PosInOccurrence get_pio() {
+        public org.key_project.ncore.sequent.PosInOccurrence get_pio() {
             return pio;
         }
 
@@ -1044,7 +1045,7 @@ public abstract class SequentView extends JEditorPane {
             return age;
         }
 
-        public void set_pio(PosInOccurrence pio) {
+        public void set_pio(org.key_project.ncore.sequent.PosInOccurrence pio) {
             this.pio = pio;
 
         }

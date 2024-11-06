@@ -165,7 +165,8 @@ public class RewriteTaclet extends FindTaclet {
      * @return the new instantiations with the additional updates, or <code>null</code>, if program
      *         modalities appear above <code>p_pos</code>
      */
-    public MatchConditions checkPrefix(PosInOccurrence p_pos, MatchConditions p_mc) {
+    public MatchConditions checkPrefix(org.key_project.ncore.sequent.PosInOccurrence p_pos,
+            MatchConditions p_mc) {
         int polarity = p_pos.isInAntec() ? -1 : 1; // init polarity
         SVInstantiations svi = p_mc.getInstantiations();
         // this is assumed to hold

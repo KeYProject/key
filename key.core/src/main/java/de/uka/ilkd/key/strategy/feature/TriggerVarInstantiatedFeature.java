@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 

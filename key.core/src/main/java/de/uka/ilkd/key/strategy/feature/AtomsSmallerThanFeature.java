@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.op.Function;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 /**
@@ -36,7 +36,8 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
         return new AtomsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         return lessThan(collectAtoms(left.toTerm(app, pos, goal, mState)),
             collectAtoms(right.toTerm(app, pos, goal, mState)), pos, goal);
     }

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -67,7 +66,7 @@ public interface IExecutionElement {
      *
      * @return The {@link PosInOccurrence} of the modality of interest including updates.
      */
-    PosInOccurrence getModalityPIO();
+    org.key_project.ncore.sequent.PosInOccurrence getModalityPIO();
 
     /**
      * Returns the {@link NodeInfo} of {@link #getProofNode()}.

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * This class is used to hold information about modified formulas.
  *
@@ -10,7 +12,7 @@ package de.uka.ilkd.key.logic;
  * @param newFormula             modified formula
  * @see SequentChangeInfo
  */
-public record FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
+public record FormulaChangeInfo(org.key_project.ncore.sequent.PosInOccurrence positionOfModification, SequentFormula newFormula) {
 
     public SequentFormula getOriginalFormula() {
         return positionOfModification().sequentFormula();

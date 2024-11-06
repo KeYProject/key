@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -15,6 +14,8 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 /**
@@ -44,7 +45,8 @@ public class ForEachCP implements Feature {
         this.body = body;
     }
 
-    public RuleAppCost computeCost(final RuleApp app, final PosInOccurrence pos, final Goal goal,
+    public RuleAppCost computeCost(final RuleApp app,
+            final org.key_project.ncore.sequent.PosInOccurrence pos, final Goal goal,
             MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
@@ -98,7 +100,7 @@ public class ForEachCP implements Feature {
             }
         }
 
-        private final PosInOccurrence pos;
+        private final org.key_project.ncore.sequent.PosInOccurrence pos;
         private final RuleApp app;
         private final Goal goal;
         private final MutableState mState;

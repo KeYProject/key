@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -259,7 +258,7 @@ public final class TruthValueTracingUtil {
                     }
                 }
             } else if (parent.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp app) {
-                PosInOccurrence parentPio = null;
+                org.key_project.ncore.sequent.PosInOccurrence parentPio = null;
                 for (RuleApp protocolApp : app.getProtocol()) {
                     if (parentPio != null) {
                         updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(),
@@ -282,8 +281,9 @@ public final class TruthValueTracingUtil {
                 if (parentPio != null) {
                     assert 1 == parent.childrenCount()
                             : "Implementaton of the OneStepSimplifierRule has changed.";
-                    PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(
-                        parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
+                    org.key_project.ncore.sequent.PosInOccurrence childPio =
+                        SymbolicExecutionUtil.posInOccurrenceToOtherSequent(
+                            parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
                     updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName,
                         services.getTermBuilder(), nodeResult);
                 }
@@ -327,7 +327,7 @@ public final class TruthValueTracingUtil {
             Name termLabelName) {
         List<LabelOccurrence> result = new LinkedList<>();
         // Search for labels in find part
-        PosInOccurrence pio = tacletApp.posInOccurrence();
+        org.key_project.ncore.sequent.PosInOccurrence pio = tacletApp.posInOccurrence();
         if (pio != null) {
             Term term = pio.subTerm();
             if (term != null) {
@@ -443,8 +443,9 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResultBasedOnNewMinorIdsOSS(
-            final PosInOccurrence childPio,
-            final PosInOccurrence parentPio, final Name termLabelName, final TermBuilder tb,
+            final org.key_project.ncore.sequent.PosInOccurrence childPio,
+            final org.key_project.ncore.sequent.PosInOccurrence parentPio, final Name termLabelName,
+            final TermBuilder tb,
             final Map<String, MultiEvaluationResult> results) {
         if (parentPio != null) {
             // Check application term and all of its children and grand children
@@ -456,7 +457,7 @@ public final class TruthValueTracingUtil {
                 }
             });
             // Check application term parents
-            PosInOccurrence currentPio = parentPio;
+            org.key_project.ncore.sequent.PosInOccurrence currentPio = parentPio;
             while (!currentPio.isTopLevel()) {
                 currentPio = currentPio.up();
                 checkForNewMinorIdsOSS(childPio.sequentFormula(), currentPio.subTerm(),
@@ -477,7 +478,8 @@ public final class TruthValueTracingUtil {
      */
     private static void checkForNewMinorIdsOSS(
             SequentFormula onlyChangedChildSF, Term term,
-            Name termLabelName, PosInOccurrence parentPio, TermBuilder tb,
+            Name termLabelName, org.key_project.ncore.sequent.PosInOccurrence parentPio,
+            TermBuilder tb,
             Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
@@ -532,7 +534,8 @@ public final class TruthValueTracingUtil {
         final Node parentNode = childNode.parent();
         if (parentNode != null) {
             final RuleApp parentRuleApp = parentNode.getAppliedRuleApp();
-            final PosInOccurrence parentPio = parentRuleApp.posInOccurrence();
+            final org.key_project.ncore.sequent.PosInOccurrence parentPio =
+                parentRuleApp.posInOccurrence();
             if (parentPio != null) {
                 // Check application term and all of its children and grand children
                 parentPio.subTerm().execPreOrder(new DefaultVisitor() {
@@ -543,7 +546,7 @@ public final class TruthValueTracingUtil {
                     }
                 });
                 // Check application term parents
-                PosInOccurrence currentPio = parentPio;
+                org.key_project.ncore.sequent.PosInOccurrence currentPio = parentPio;
                 while (!currentPio.isTopLevel()) {
                     currentPio = currentPio.up();
                     checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio,
@@ -574,7 +577,8 @@ public final class TruthValueTracingUtil {
      */
     private static void checkForNewMinorIds(
             Node childNode, Term term, Name termLabelName,
-            PosInOccurrence parentPio, TermBuilder tb, Map<String, MultiEvaluationResult> results) {
+            org.key_project.ncore.sequent.PosInOccurrence parentPio, TermBuilder tb,
+            Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
             Term replacement =

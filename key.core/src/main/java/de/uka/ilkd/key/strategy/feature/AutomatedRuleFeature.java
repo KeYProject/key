@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * This feature checks if a rule may be applied automatically. Currently this does not apply to

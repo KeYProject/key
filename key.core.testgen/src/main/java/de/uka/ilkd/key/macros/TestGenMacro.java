@@ -6,7 +6,6 @@ package de.uka.ilkd.key.macros;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -19,10 +18,12 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 public class TestGenMacro extends StrategyProofMacro {
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
         return new TestGenStrategy(proof.getActiveStrategy());
     }
 
@@ -80,7 +81,8 @@ class TestGenStrategy extends FilterStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+            Goal goal,
             MutableState mState) {
         if (TestGenStrategy.isUnwindRule(app.rule())) {
             return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);

@@ -24,7 +24,7 @@ public class FormulaTagManager {
     private final HashMap<FormulaTag, FormulaInfo> tagToFormulaInfo;
 
     /** Key: PosInOccurrence Value: FormulaTag */
-    private final HashMap<PosInOccurrence, FormulaTag> pioToTag;
+    private final HashMap<org.key_project.ncore.sequent.PosInOccurrence, FormulaTag> pioToTag;
 
     /**
      * Create a new manager that is initialised with the formulas of the given sequent
@@ -36,7 +36,7 @@ public class FormulaTagManager {
     }
 
     private FormulaTagManager(HashMap<FormulaTag, FormulaInfo> p_tagToPIO,
-            HashMap<PosInOccurrence, FormulaTag> p_pioToTag) {
+            HashMap<org.key_project.ncore.sequent.PosInOccurrence, FormulaTag> p_pioToTag) {
         tagToFormulaInfo = p_tagToPIO;
         pioToTag = p_pioToTag;
     }
@@ -44,7 +44,7 @@ public class FormulaTagManager {
     /**
      * @return the tag of the formula at the given position
      */
-    public FormulaTag getTagForPos(PosInOccurrence p_pio) {
+    public FormulaTag getTagForPos(org.key_project.ncore.sequent.PosInOccurrence p_pio) {
         return pioToTag.get(p_pio);
     }
 
@@ -53,7 +53,7 @@ public class FormulaTagManager {
      *         returned <code>PosInOccurrence</code> can be obsolete and refer to a previous node.
      *         If no formula is assigned to the given tag, <code>null</code> is returned
      */
-    public PosInOccurrence getPosForTag(FormulaTag p_tag) {
+    public org.key_project.ncore.sequent.PosInOccurrence getPosForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
         if (info == null) {
             return null;
@@ -103,7 +103,7 @@ public class FormulaTagManager {
 
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.addedFormulas(p_antec)) {
-            final PosInOccurrence pio =
+            final org.key_project.ncore.sequent.PosInOccurrence pio =
                 new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
@@ -111,7 +111,7 @@ public class FormulaTagManager {
 
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.removedFormulas(p_antec)) {
-            final PosInOccurrence pio =
+            final org.key_project.ncore.sequent.PosInOccurrence pio =
                 new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             removeTag(pio);
         }
@@ -120,7 +120,7 @@ public class FormulaTagManager {
     @SuppressWarnings("unchecked")
     public Object clone() {
         return new FormulaTagManager((HashMap<FormulaTag, FormulaInfo>) tagToFormulaInfo.clone(),
-            (HashMap<PosInOccurrence, FormulaTag>) pioToTag.clone());
+            (HashMap<org.key_project.ncore.sequent.PosInOccurrence, FormulaTag>) pioToTag.clone());
     }
 
     public FormulaTagManager copy() {
@@ -149,7 +149,8 @@ public class FormulaTagManager {
         final Semisequent ss = p_antec ? seq.antecedent() : seq.succedent();
 
         for (SequentFormula s : ss) {
-            final PosInOccurrence pio = new PosInOccurrence(s, PosInTerm.getTopLevel(), p_antec);
+            final org.key_project.ncore.sequent.PosInOccurrence pio =
+                new PosInOccurrence(s, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
@@ -159,7 +160,7 @@ public class FormulaTagManager {
      *
      * @param p_pio The formula for which a new tag is supposed to be created
      */
-    private void createNewTag(PosInOccurrence p_pio, Goal p_goal) {
+    private void createNewTag(org.key_project.ncore.sequent.PosInOccurrence p_pio, Goal p_goal) {
         final FormulaTag tag = new FormulaTag();
         tagToFormulaInfo.put(tag, new FormulaInfo(p_pio, p_goal.getTime()));
         pioToTag.put(p_pio, tag);
@@ -168,7 +169,7 @@ public class FormulaTagManager {
     /**
      * Remove the entries for the given formulas from the maps
      */
-    private void removeTag(PosInOccurrence p_pio) {
+    private void removeTag(org.key_project.ncore.sequent.PosInOccurrence p_pio) {
         final FormulaTag tag = getTagForPos(p_pio);
 
         Debug.assertFalse(tag == null, "Tried to remove a tag that does not exist");
@@ -181,7 +182,8 @@ public class FormulaTagManager {
     private void updateTag(FormulaChangeInfo p_info, Sequent p_newSeq, Goal p_goal) {
 
 
-        final PosInOccurrence oldPIO = p_info.positionOfModification().topLevel();
+        final org.key_project.ncore.sequent.PosInOccurrence oldPIO =
+            p_info.positionOfModification().topLevel();
         final FormulaTag tag = getTagForPos(oldPIO);
         final FormulaInfo oldInfo = getFormulaInfo(tag);
         final FormulaInfo newInfo = oldInfo.addModification(p_info, p_newSeq, p_goal.getTime());
@@ -230,7 +232,7 @@ public class FormulaTagManager {
                 + "]";
         }
 
-        public final PosInOccurrence pio;
+        public final org.key_project.ncore.sequent.PosInOccurrence pio;
         /**
          * All modifications that have been applied to the formula since the creation of the tag.
          * The most recent modification is the first element of the list
@@ -243,11 +245,12 @@ public class FormulaTagManager {
          */
         public final long age;
 
-        public FormulaInfo(PosInOccurrence p_pio, long p_age) {
+        public FormulaInfo(org.key_project.ncore.sequent.PosInOccurrence p_pio, long p_age) {
             this(p_pio, ImmutableSLList.nil(), p_age);
         }
 
-        private FormulaInfo(PosInOccurrence p_pio, ImmutableList<FormulaChangeInfo> p_modifications,
+        private FormulaInfo(org.key_project.ncore.sequent.PosInOccurrence p_pio,
+                ImmutableList<FormulaChangeInfo> p_modifications,
                 long p_age) {
             pio = p_pio;
             modifications = p_modifications;
@@ -255,8 +258,9 @@ public class FormulaTagManager {
         }
 
         public FormulaInfo addModification(FormulaChangeInfo p_info, Sequent p_newSeq, long p_age) {
-            final PosInOccurrence newPIO = new PosInOccurrence(p_info.newFormula(),
-                PosInTerm.getTopLevel(), pio.isInAntec());
+            final org.key_project.ncore.sequent.PosInOccurrence newPIO =
+                new PosInOccurrence(p_info.newFormula(),
+                    PosInTerm.getTopLevel(), pio.isInAntec());
 
             return new FormulaInfo(newPIO, modifications.prepend(p_info), p_age);
         }

@@ -85,7 +85,7 @@ public class OriginTermLabel implements TermLabel {
      * @param pio the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
-    public static Origin getOrigin(PosInOccurrence pio) {
+    public static Origin getOrigin(org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
@@ -255,7 +255,8 @@ public class OriginTermLabel implements TermLabel {
             SequentFormula newFormula = new SequentFormula(
                 OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
             SequentChangeInfo change = seq.changeFormula(newFormula,
-                PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel()));
+                org.key_project.ncore.sequent.PosInOccurrence.findInSequent(seq, i,
+                    PosInTerm.getTopLevel()));
 
             if (changes == null) {
                 changes = change;

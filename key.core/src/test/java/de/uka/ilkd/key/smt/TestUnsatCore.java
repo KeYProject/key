@@ -7,14 +7,14 @@ import java.io.File;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.key_project.ncore.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.helper.FindResources;
 
@@ -42,13 +42,16 @@ class TestUnsatCore {
         Node n = p.findAny(node -> node.getAppliedRuleApp() instanceof SMTRuleApp);
         SMTRuleApp app = ((SMTRuleApp) n.getAppliedRuleApp());
         Assertions.assertEquals("Z3", app.getSuccessfulSolverName());
-        ImmutableList<PosInOccurrence> ifs = app.ifInsts();
+        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifs = app.ifInsts();
         Assertions.assertTrue(
-            ifs.contains(PosInOccurrence.findInSequent(n.sequent(), 1, PosInTerm.getTopLevel())));
+            ifs.contains(org.key_project.ncore.sequent.PosInOccurrence.findInSequent(n.sequent(), 1,
+                PosInTerm.getTopLevel())));
         Assertions.assertTrue(
-            ifs.contains(PosInOccurrence.findInSequent(n.sequent(), 2, PosInTerm.getTopLevel())));
+            ifs.contains(org.key_project.ncore.sequent.PosInOccurrence.findInSequent(n.sequent(), 2,
+                PosInTerm.getTopLevel())));
         Assertions.assertTrue(
-            ifs.contains(PosInOccurrence.findInSequent(n.sequent(), 3, PosInTerm.getTopLevel())));
+            ifs.contains(org.key_project.ncore.sequent.PosInOccurrence.findInSequent(n.sequent(), 3,
+                PosInTerm.getTopLevel())));
         Assertions.assertTrue(
             ifs.contains(PosInOccurrence.findInSequent(n.sequent(), 7, PosInTerm.getTopLevel())));
         Assertions.assertEquals(4, ifs.size());

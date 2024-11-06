@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.LexPathOrdering;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermOrdering;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -21,7 +21,8 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     private final TermOrdering termOrdering = new LexPathOrdering();
 
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal currentGoal) {
+    protected boolean lessThan(Term t1, Term t2,
+            org.key_project.ncore.sequent.PosInOccurrence focus, Goal currentGoal) {
         return compare(t1, t2) < 0;
     }
 

@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 /**
@@ -38,7 +39,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.checker = checker;
         }
 
-        public final boolean check(PosInOccurrence pio) {
+        public final boolean check(org.key_project.ncore.sequent.PosInOccurrence pio) {
             return checker.check(pio);
         }
     }
@@ -58,7 +59,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.modifier = modifier;
         }
 
-        PosInOccurrence modifyPosistion(PosInOccurrence pos) {
+        org.key_project.ncore.sequent.PosInOccurrence modifyPosistion(
+                org.key_project.ncore.sequent.PosInOccurrence pos) {
             return modifier.modifyPosistion(pos);
         }
     }
@@ -107,7 +109,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers
@@ -127,7 +130,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * @param pos the PosInOccurrence to be checked.
      * @return true, if all PrefixCheckers return true
      */
-    private boolean checkPrefix(PosInOccurrence pos) {
+    private boolean checkPrefix(org.key_project.ncore.sequent.PosInOccurrence pos) {
         // iterate through the prefix and let the prefix checkers do their work
         for (PrefixChecker prefixChecker : prefixCheckers) {
             if (!prefixChecker.check(pos)) {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.proofevent;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * An instance of this class informs the listerns if a formula has been tried to add to the sequent
@@ -11,14 +11,14 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 public class NodeRedundantAddChange implements NodeChange {
 
     /** the PosInOccurrence of the formula that has been tried to add */
-    private final PosInOccurrence pio;
+    private final org.key_project.ncore.sequent.PosInOccurrence pio;
 
     /**
      * creates an instance
      *
      * @param pio the PosInOccurrence of the formula that has been tried to add
      */
-    public NodeRedundantAddChange(PosInOccurrence pio) {
+    public NodeRedundantAddChange(org.key_project.ncore.sequent.PosInOccurrence pio) {
         this.pio = pio;
     }
 

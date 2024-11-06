@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -26,10 +25,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     protected final BuiltInRule builtInRule;
 
     protected final PosInOccurrence pio;
-    protected ImmutableList<PosInOccurrence> ifInsts;
+    protected ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts;
 
     protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts) {
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
         this.pio = pio;
         this.ifInsts = (ifInsts == null ? ImmutableSLList.nil() : ifInsts);
@@ -44,7 +43,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * what is going on there This restores the behaviour as it was before my previous commit for
      * the moment
      */
-    public void setMutable(ImmutableList<PosInOccurrence> ifInsts) {
+    public void setMutable(ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts) {
         this.ifInsts = ifInsts;
     }
 
@@ -80,10 +79,11 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
 
     @Override
-    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
+    public abstract IBuiltInRuleApp setIfInsts(
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts);
 
     @Override
-    public ImmutableList<PosInOccurrence> ifInsts() {
+    public ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts() {
         return ifInsts;
     }
 
@@ -140,8 +140,8 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
                 && Objects.equals(getHeapContext(), that.getHeapContext()))) {
             return false;
         }
-        ImmutableList<PosInOccurrence> ifInsts1 = ifInsts();
-        ImmutableList<PosInOccurrence> ifInsts2 = that.ifInsts();
+        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts1 = ifInsts();
+        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts2 = that.ifInsts();
         if (ifInsts1.size() != ifInsts2.size()) {
             return false;
         }

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -42,14 +41,16 @@ public interface ProofControl {
      *
      * @return a list of Taclets with all applicable RewriteTaclets
      */
-    ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos);
+    ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal,
+            org.key_project.ncore.sequent.PosInOccurrence pos);
 
     /**
      * collects all applicable FindTaclets of the current goal (called by the SequentViewer)
      *
      * @return a list of Taclets with all applicable FindTaclets
      */
-    ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos);
+    ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal,
+            org.key_project.ncore.sequent.PosInOccurrence pos);
 
     /**
      * collects all applicable NoFindTaclets of the current goal (called by the SequentViewer)
@@ -65,7 +66,8 @@ public interface ProofControl {
      */
     ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
 
-    boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos);
+    boolean selectedTaclet(Taclet taclet, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence pos);
 
     /**
      * Apply a RuleApp and continue with update simplification or strategy application according to
@@ -168,7 +170,7 @@ public interface ProofControl {
      */
     void startAndWaitForAutoMode(Proof proof);
 
-    void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
+    void startFocussedAutoMode(org.key_project.ncore.sequent.PosInOccurrence focus, Goal goal);
 
     /**
      * Runs the given {@link ProofMacro} at the given {@link PosInOccurrence} on the given
@@ -179,5 +181,6 @@ public interface ProofControl {
      * @param posInOcc The exact {@link PosInOccurrence} at which the {@link ProofMacro} is started
      *        at.
      */
-    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc);
+    void runMacro(Node node, ProofMacro macro,
+            org.key_project.ncore.sequent.PosInOccurrence posInOcc);
 }

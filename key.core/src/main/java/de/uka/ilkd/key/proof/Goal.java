@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -31,6 +31,9 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.ncore.sequent.SequentChangeInfo;
+import org.key_project.ncore.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -362,13 +365,13 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * @param sci SequentChangeInfo containing the sequent to be set and describing the applied
      *        changes to the sequent of the node currently pointed to by this goal
      */
-    public void setSequent(SequentChangeInfo sci) {
+    public void setSequent(SequentChangeInfo<SequentFormula> sci) {
         assert sci.getOriginalSequent() == node().sequent();
         if (!sci.hasChanged()) {
             assert sci.sequent().equals(sci.getOriginalSequent());
             return;
         }
-        node().setSequent(sci.sequent());
+        node().setSequent((Sequent) sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
         var time = System.nanoTime();
         // updates the index

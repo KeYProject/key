@@ -4,9 +4,10 @@
 package org.key_project.ncore.proof;
 
 import org.key_project.ncore.sequent.Sequent;
+import org.key_project.ncore.sequent.SequentFormula;
 
 public interface ProofGoal<G extends ProofGoal<G>> {
     ProofObject<G> proof();
 
-    Sequent sequent();
+    Sequent<? extends SequentFormula> sequent();
 }

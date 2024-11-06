@@ -7,7 +7,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -38,7 +37,7 @@ public abstract class AbstractBlockContractBuiltInRuleApp
      * @param ifInstantiations if instantiations.
      */
     public AbstractBlockContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
-            ImmutableList<PosInOccurrence> ifInstantiations) {
+            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 

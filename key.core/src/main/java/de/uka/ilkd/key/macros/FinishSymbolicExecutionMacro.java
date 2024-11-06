@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * The macro FinishSymbolicExecutionMacro continues automatic rule application until there is no
@@ -71,7 +71,8 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(proof.getActiveStrategy());
     }
 

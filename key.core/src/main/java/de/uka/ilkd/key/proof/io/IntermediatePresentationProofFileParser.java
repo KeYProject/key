@@ -9,12 +9,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.*;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;

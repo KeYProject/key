@@ -6,7 +6,6 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -71,7 +70,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      *        conditions.
      * @throws ProofInputException Occurred Exception
      */
-    public ExecutionVariableExtractor(Node node, PosInOccurrence modalityPio,
+    public ExecutionVariableExtractor(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence modalityPio,
             IExecutionNode<?> executionNode, Term condition, boolean simplifyConditions)
             throws ProofInputException {
         super(node, modalityPio);
@@ -403,7 +403,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param additionalCondition An optional additional condition to consider.
          */
         public StateExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-                PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
+                org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
+                IProgramVariable programVariable, Term arrayIndex,
                 Term additionalCondition) {
             super(parentNode.getSettings(), proofNode, programVariable, null, arrayIndex,
                 additionalCondition, modalityPIO);
@@ -489,7 +490,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
          */
         public ExtractedExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-                PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
+                org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
+                IProgramVariable programVariable, Term arrayIndex,
                 Term arrayStartIndex, Term arrayEndIndex, Term additionalCondition,
                 ExtractedExecutionValue parentValue) {
             super(parentNode.getSettings(), proofNode, programVariable, parentValue, arrayIndex,

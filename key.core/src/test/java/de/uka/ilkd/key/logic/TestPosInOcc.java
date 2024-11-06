@@ -40,7 +40,7 @@ public class TestPosInOcc {
         terms[1] = TB.func(f, new Term[] { terms[0] });
         terms[2] = TB.func(p, new Term[] { terms[1] });
 
-        PosInOccurrence pio =
+        org.key_project.ncore.sequent.PosInOccurrence pio =
             new PosInOccurrence(new SequentFormula(terms[2]), PosInTerm.getTopLevel(), true);
 
         PIOPathIterator it = pio.iterator();
@@ -93,13 +93,14 @@ public class TestPosInOcc {
         terms2[3] = TB.func(p, new Term[] { terms2[2] });
         SequentFormula cfma2 = new SequentFormula(terms2[3]);
 
-        final PosInOccurrence topPIO = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), true);
+        final org.key_project.ncore.sequent.PosInOccurrence topPIO =
+            new PosInOccurrence(cfma, PosInTerm.getTopLevel(), true);
 
 
         // Test without metavariables involved
-        PosInOccurrence pio = topPIO.down(0);
+        org.key_project.ncore.sequent.PosInOccurrence pio = topPIO.down(0);
         assertSame(pio.subTerm(), terms[1]);
-        PosInOccurrence pio2 = pio.replaceConstrainedFormula(cfma);
+        org.key_project.ncore.sequent.PosInOccurrence pio2 = pio.replaceConstrainedFormula(cfma);
         assertEquals(pio, pio2);
         pio = pio.replaceConstrainedFormula(cfma2);
         assertSame(pio.subTerm(), terms2[2]);

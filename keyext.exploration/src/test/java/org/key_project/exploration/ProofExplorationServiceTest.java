@@ -148,7 +148,7 @@ public class ProofExplorationServiceTest {
         ImmutableList<Goal> goals = currentProof.openGoals();
         assertSame(1, goals.size(), "Prerequisite for test");
         Sequent sequent = goals.head().node().sequent();
-        PosInOccurrence pio =
+        org.key_project.ncore.sequent.PosInOccurrence pio =
             new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
         expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0).formula(),
             change);

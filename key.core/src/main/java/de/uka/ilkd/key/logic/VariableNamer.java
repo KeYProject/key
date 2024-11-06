@@ -33,6 +33,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -147,7 +148,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * returns the program contained in a PosInOccurrence
      */
-    protected ProgramElement getProgramFromPIO(PosInOccurrence pio) {
+    protected ProgramElement getProgramFromPIO(org.key_project.ncore.sequent.PosInOccurrence pio) {
         Term progTerm;
         if (pio != null && (progTerm = findProgramInTerm(pio.subTerm())) != null) {
             return progTerm.javaBlock().program();
@@ -304,7 +305,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the renamed version of the var parameter
      */
     public abstract LocationVariable rename(LocationVariable var, Goal goal,
-            PosInOccurrence posOfFind);
+            org.key_project.ncore.sequent.PosInOccurrence posOfFind);
 
 
 
@@ -348,7 +349,8 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the name proposal, or null if no proposal is available
      */
     protected ProgramElementName getNameProposalForSchemaVariable(String basename,
-            SchemaVariable sv, PosInOccurrence posOfFind, PosInProgram posOfDeclaration,
+            SchemaVariable sv, org.key_project.ncore.sequent.PosInOccurrence posOfFind,
+            PosInProgram posOfDeclaration,
             ImmutableList<String> previousProposals, Services services) {
         ProgramElementName result = null;
 

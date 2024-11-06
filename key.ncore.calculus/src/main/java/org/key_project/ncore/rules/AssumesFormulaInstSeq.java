@@ -14,22 +14,23 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Instantiation of an if-formula that is a formula of an existing sequent.
  */
-public class AssumesFormulaInstSeq implements AssumesFormulaInstantiation {
+public class AssumesFormulaInstSeq<SF extends SequentFormula>
+        implements AssumesFormulaInstantiation {
     /**
      * Sequent and formula
      */
-    private final Sequent seq;
+    private final Sequent<SF> seq;
     private final boolean antec; // formula is in antecedent?
     private final SequentFormula cf;
 
-    public AssumesFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf) {
+    public AssumesFormulaInstSeq(Sequent<SF> p_seq, boolean antec, SequentFormula p_cf) {
         seq = p_seq;
         this.antec = antec;
         cf = p_cf;
     }
 
 
-    public AssumesFormulaInstSeq(Sequent seq, int formulaNr) {
+    public AssumesFormulaInstSeq(Sequent<SF> seq, int formulaNr) {
         this(seq, seq.numberInAntec(formulaNr), seq.getFormulabyNr(formulaNr));
     }
 
@@ -50,27 +51,30 @@ public class AssumesFormulaInstSeq implements AssumesFormulaInstantiation {
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(Sequent p_s,
+    private static <SF extends SequentFormula> ImmutableArray<AssumesFormulaInstantiation> createListHelp(
+            Sequent<SF> p_s,
             boolean antec) {
-        Semisequent semi;
+        Semisequent<SF> semi;
         if (antec) {
             semi = p_s.antecedent();
         } else {
             semi = p_s.succedent();
         }
 
-        final AssumesFormulaInstSeq[] assumesInstFromSeq = new AssumesFormulaInstSeq[semi.size()];
+        final AssumesFormulaInstSeq<SF>[] assumesInstFromSeq =
+            new AssumesFormulaInstSeq[semi.size()];
         int i = assumesInstFromSeq.length - 1;
 
         for (final var sf : semi) {
-            assumesInstFromSeq[i] = new AssumesFormulaInstSeq(p_s, antec, sf);
+            assumesInstFromSeq[i] = new AssumesFormulaInstSeq<>(p_s, antec, sf);
             --i;
         }
 
         return new ImmutableArray<>(assumesInstFromSeq);
     }
 
-    public static ImmutableArray<AssumesFormulaInstantiation> createList(Sequent p_s, boolean antec,
+    public static <SF extends SequentFormula> ImmutableArray<AssumesFormulaInstantiation> createList(
+            Sequent<SF> p_s, boolean antec,
             LogicServices services) {
         return createListHelp(p_s, antec);
     }
@@ -82,7 +86,7 @@ public class AssumesFormulaInstSeq implements AssumesFormulaInstantiation {
 
     @Override
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof AssumesFormulaInstSeq other)) {
+        if (!(p_obj instanceof AssumesFormulaInstSeq<?> other)) {
             return false;
         }
         return seq == other.seq && cf == other.cf && antec == other.antec;

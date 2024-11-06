@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -27,7 +26,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, Term)}
+ * {@link TermLabelManager#refactorGoal(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Rule, Goal, Object, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
@@ -108,7 +107,8 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @return The required {@link RefactoringScope}.
      */
     RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm);
 
     /**
@@ -130,7 +130,8 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, LabelCollection labels);
 
     /**

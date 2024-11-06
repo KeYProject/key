@@ -4,13 +4,14 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 
 /**
@@ -29,7 +30,7 @@ public class AllowedCutPositionFeature extends BinaryFeature {
         return onlyBelowRightJunctors(pos);
     }
 
-    private boolean onlyBelowRightJunctors(PosInOccurrence pos) {
+    private boolean onlyBelowRightJunctors(org.key_project.ncore.sequent.PosInOccurrence pos) {
         boolean negated = pos.isInAntec();
         final PIOPathIterator it = pos.iterator();
 

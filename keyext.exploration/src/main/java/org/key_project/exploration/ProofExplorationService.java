@@ -142,7 +142,8 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public Node applyChangeFormula(@NonNull Goal g, @NonNull PosInOccurrence pio,
+    public Node applyChangeFormula(@NonNull Goal g,
+            @NonNull org.key_project.ncore.sequent.PosInOccurrence pio,
             @NonNull Term term, @NonNull Term newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
@@ -183,7 +184,8 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    private TacletApp soundChange(@NonNull PosInOccurrence pio, @NonNull Term term,
+    private TacletApp soundChange(@NonNull org.key_project.ncore.sequent.PosInOccurrence pio,
+            @NonNull Term term,
             @NonNull Term newTerm) {
         Taclet cut = getCutTaclet();
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
@@ -193,7 +195,7 @@ public class ProofExplorationService {
         return app;
     }
 
-    public void soundHide(Goal g, PosInOccurrence pio, Term term) {
+    public void soundHide(Goal g, org.key_project.ncore.sequent.PosInOccurrence pio, Term term) {
         TacletApp app = createHideTerm(pio);
         ExplorationNodeData explorationNodeData = ExplorationNodeData.get(g.node());
         explorationNodeData.setExplorationAction("Hide " + term);
@@ -201,7 +203,7 @@ public class ProofExplorationService {
         result.forEach(goal -> ExplorationNodeData.get(goal.node()));
     }
 
-    private TacletApp createHideTerm(PosInOccurrence pio) {
+    private TacletApp createHideTerm(org.key_project.ncore.sequent.PosInOccurrence pio) {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
         MatchConditions match = tap.getMatcher().matchFind(pio.subTerm(),
             MatchConditions.EMPTY_MATCHCONDITIONS, services);

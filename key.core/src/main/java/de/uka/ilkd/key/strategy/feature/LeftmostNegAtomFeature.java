@@ -5,12 +5,13 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * Feature that returns zero if there is no atom with negative polarity on a common d-path and on

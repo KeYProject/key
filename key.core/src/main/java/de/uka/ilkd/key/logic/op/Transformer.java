@@ -5,13 +5,13 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -76,7 +76,7 @@ public class Transformer extends JFunction {
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
-    public static boolean inTransformer(PosInOccurrence pio) {
+    public static boolean inTransformer(org.key_project.ncore.sequent.PosInOccurrence pio) {
         boolean trans = false;
         if (pio == null) {
             return false;

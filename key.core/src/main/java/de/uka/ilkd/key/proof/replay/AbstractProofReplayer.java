@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -46,6 +44,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
@@ -122,7 +121,7 @@ public abstract class AbstractProofReplayer {
         final String ruleName = ruleApp.rule().displayName();
 
         Contract currContract = null;
-        ImmutableList<PosInOccurrence> builtinIfInsts = null;
+        ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> builtinIfInsts = null;
 
         // Load contracts, if applicable
         if (ruleApp.rule() instanceof UseOperationContractRule
@@ -136,9 +135,10 @@ public abstract class AbstractProofReplayer {
 
         // Load ifInsts, if applicable
         builtinIfInsts = ImmutableSLList.nil();
-        for (PosInOccurrence oldFormulaPio : RuleAppUtil
+        for (org.key_project.ncore.sequent.PosInOccurrence oldFormulaPio : RuleAppUtil
                 .ifInstsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)) {
-            PosInOccurrence newFormula = findInNewSequent(oldFormulaPio, currGoal.sequent());
+            org.key_project.ncore.sequent.PosInOccurrence newFormula =
+                findInNewSequent(oldFormulaPio, currGoal.sequent());
             if (newFormula == null) {
                 throw new IllegalStateException(String.format(
                     "did not locate built-in ifInst during slicing @ rule name %s, serial nr %d",
@@ -156,7 +156,8 @@ public abstract class AbstractProofReplayer {
 
         if (originalStep.getAppliedRuleApp().posInOccurrence() != null) { // otherwise we have no
                                                                           // pos
-            PosInOccurrence oldPos = originalStep.getAppliedRuleApp().posInOccurrence();
+            org.key_project.ncore.sequent.PosInOccurrence oldPos =
+                originalStep.getAppliedRuleApp().posInOccurrence();
             pos = findInNewSequent(oldPos, currGoal.sequent());
             if (pos == null) {
                 throw new IllegalStateException("failed to find new formula");
@@ -174,8 +175,9 @@ public abstract class AbstractProofReplayer {
             } else {
                 useContractRule = UseDependencyContractRule.INSTANCE;
                 // copy over the mysterious "step"
-                PosInOccurrence step = findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
-                    currGoal.sequent());
+                org.key_project.ncore.sequent.PosInOccurrence step =
+                    findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
+                        currGoal.sequent());
                 contractApp = (((UseDependencyContractRule) useContractRule)
                         .createApp(pos)).setContract(currContract).setStep(step);
             }
@@ -231,7 +233,7 @@ public abstract class AbstractProofReplayer {
         }
 
         TacletApp ourApp = null;
-        PosInOccurrence pos = null;
+        org.key_project.ncore.sequent.PosInOccurrence pos = null;
 
         Taclet t = proof.getInitConfig()
                 .lookupActiveTaclet(new Name(tacletName));
@@ -256,7 +258,8 @@ public abstract class AbstractProofReplayer {
         }
         Services services = proof.getServices();
 
-        PosInOccurrence oldPos = originalStep.getAppliedRuleApp().posInOccurrence();
+        org.key_project.ncore.sequent.PosInOccurrence oldPos =
+            originalStep.getAppliedRuleApp().posInOccurrence();
         if (oldPos != null) { // otherwise we have no pos
             pos = findInNewSequent(oldPos, currGoal.sequent());
             if (pos == null) {
@@ -276,7 +279,7 @@ public abstract class AbstractProofReplayer {
             getInterestingInstantiations(instantantions), services);
 
         ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
-        List<Pair<PosInOccurrence, Boolean>> oldFormulas = RuleAppUtil
+        List<Pair<org.key_project.ncore.sequent.PosInOccurrence, Boolean>> oldFormulas = RuleAppUtil
                 .ifInstsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)
                 .stream()
                 .map(x -> new Pair<>(x, true))
@@ -292,9 +295,10 @@ public abstract class AbstractProofReplayer {
                 }
             }
         }
-        for (Pair<PosInOccurrence, Boolean> oldFormulaPioSpec : oldFormulas) {
-            PosInOccurrence oldFormulaPio = oldFormulaPioSpec.first;
-            PosInOccurrence newPio = findInNewSequent(oldFormulaPio, currGoal.sequent());
+        for (Pair<org.key_project.ncore.sequent.PosInOccurrence, Boolean> oldFormulaPioSpec : oldFormulas) {
+            org.key_project.ncore.sequent.PosInOccurrence oldFormulaPio = oldFormulaPioSpec.first;
+            org.key_project.ncore.sequent.PosInOccurrence newPio =
+                findInNewSequent(oldFormulaPio, currGoal.sequent());
             if (newPio == null) {
                 throw new IllegalStateException(String.format(
                     "did not locate ifInst during slicing @ rule name %s, serial nr %d",
@@ -332,7 +336,8 @@ public abstract class AbstractProofReplayer {
      * @param newSequent sequent
      * @return the formula in the sequent, or null if not found
      */
-    private PosInOccurrence findInNewSequent(PosInOccurrence oldPos, Sequent newSequent) {
+    private PosInOccurrence findInNewSequent(org.key_project.ncore.sequent.PosInOccurrence oldPos,
+            Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();

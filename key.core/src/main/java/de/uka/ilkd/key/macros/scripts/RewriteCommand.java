@@ -47,12 +47,14 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     /**
      * List of PosInOcc that haven't been successfully replaced
      */
-    private final List<PosInOccurrence> failposInOccs = new ArrayList<>();
+    private final List<org.key_project.ncore.sequent.PosInOccurrence> failposInOccs =
+        new ArrayList<>();
 
     /**
      * List of PosInOcc that successfully replaced
      */
-    private final List<PosInOccurrence> succposInOccs = new ArrayList<>();
+    private final List<org.key_project.ncore.sequent.PosInOccurrence> succposInOccs =
+        new ArrayList<>();
 
     /**
      * Constructs this rewrite command.
@@ -82,7 +84,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         ImmutableList<TacletApp> allApps = findAllTacletApps(args, state);
 
         // filter all taclets for being applicable on the find term
-        List<PosInOccurrence> failposInOccs = findAndExecReplacement(args, allApps, state);
+        List<org.key_project.ncore.sequent.PosInOccurrence> failposInOccs =
+            findAndExecReplacement(args, allApps, state);
 
         // if not all find terms successfully replaced, apply cut
         if (failposInOccs.size() >= 1) {
@@ -138,7 +141,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * Filter tacletapps: term = find && result = replace and execute taclet that matches the
      * conditions
      **/
-    private List<PosInOccurrence> findAndExecReplacement(Parameters p,
+    private List<org.key_project.ncore.sequent.PosInOccurrence> findAndExecReplacement(Parameters p,
             ImmutableList<TacletApp> list, EngineState state) {
 
         // Find taclet that transforms find term to replace term, when applied on find term
@@ -207,7 +210,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pio PosInOccurrence of the to be returned term
      * @return term at pio
      */
-    public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
+    public Term getTermAtPos(SequentFormula sf, org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pio.isTopLevel()) {
             return sf.formula();
 
@@ -225,7 +228,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pit
      * @return subterm
      */
-    private Term getSubTerm(Term t, IntIterator pit) {
+    private Term getSubTerm(Term t, org.key_project.logic.IntIterator pit) {
         if (pit.hasNext()) {
             int i = pit.next();
             return getSubTerm(t.sub(i), pit);

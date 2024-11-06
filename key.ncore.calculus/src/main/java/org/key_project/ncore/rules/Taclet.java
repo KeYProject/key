@@ -401,7 +401,7 @@ public abstract class Taclet
         return tacletAsString;
     }
 
-    public TacletExecutor<?, ?, ?> getExecutor() {
+    public TacletExecutor<?, ?, ?, ?> getExecutor() {
         return executor;
     }
 

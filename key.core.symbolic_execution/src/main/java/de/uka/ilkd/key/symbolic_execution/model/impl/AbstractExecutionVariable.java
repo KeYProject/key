@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -44,7 +43,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     /**
      * The {@link PosInOccurrence} of the modality of interest.
      */
-    private final PosInOccurrence modalityPIO;
+    private final org.key_project.ncore.sequent.PosInOccurrence modalityPIO;
 
     /**
      * Constructor.
@@ -60,7 +59,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      */
     public AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
             IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,
-            Term additionalCondition, PosInOccurrence modalityPIO) {
+            Term additionalCondition, org.key_project.ncore.sequent.PosInOccurrence modalityPIO) {
         super(settings, proofNode);
         this.programVariable = programVariable;
         this.parentValue = parentValue;
@@ -142,7 +141,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public PosInOccurrence getModalityPIO() {
+    public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
         return modalityPIO;
     }
 }

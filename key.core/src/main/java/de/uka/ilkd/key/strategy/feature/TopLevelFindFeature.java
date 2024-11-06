@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.ncore.sequent.PosInOccurrence;
 
 /**
  * Feature for investigating whether the focus of a rule application is a top-level formula, a
@@ -16,17 +17,17 @@ import de.uka.ilkd.key.rule.TacletApp;
 public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
 
     private static abstract class TopLevelWithoutUpdate extends TopLevelFindFeature {
-        protected abstract boolean matches(PosInOccurrence pos);
+        protected abstract boolean matches(org.key_project.ncore.sequent.PosInOccurrence pos);
 
-        protected boolean checkPosition(PosInOccurrence pos) {
+        protected boolean checkPosition(org.key_project.ncore.sequent.PosInOccurrence pos) {
             return pos.isTopLevel() && matches(pos);
         }
     }
 
     private static abstract class TopLevelWithUpdate extends TopLevelFindFeature {
-        protected abstract boolean matches(PosInOccurrence pos);
+        protected abstract boolean matches(org.key_project.ncore.sequent.PosInOccurrence pos);
 
-        protected boolean checkPosition(PosInOccurrence pos) {
+        protected boolean checkPosition(org.key_project.ncore.sequent.PosInOccurrence pos) {
             if (!pos.isTopLevel()) {
                 final PIOPathIterator it = pos.iterator();
                 while (it.next() != -1) {
@@ -41,37 +42,37 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
     }
 
     public final static Feature ANTEC_OR_SUCC = new TopLevelWithoutUpdate() {
-        protected boolean matches(PosInOccurrence pos) {
+        protected boolean matches(org.key_project.ncore.sequent.PosInOccurrence pos) {
             return true;
         }
     };
 
     public final static Feature ANTEC = new TopLevelWithoutUpdate() {
-        protected boolean matches(PosInOccurrence pos) {
+        protected boolean matches(org.key_project.ncore.sequent.PosInOccurrence pos) {
             return pos.isInAntec();
         }
     };
 
     public final static Feature SUCC = new TopLevelWithoutUpdate() {
-        protected boolean matches(PosInOccurrence pos) {
+        protected boolean matches(org.key_project.ncore.sequent.PosInOccurrence pos) {
             return !pos.isInAntec();
         }
     };
 
     public final static Feature ANTEC_OR_SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
-        protected boolean matches(PosInOccurrence pos) {
+        protected boolean matches(org.key_project.ncore.sequent.PosInOccurrence pos) {
             return true;
         }
     };
 
     public final static Feature ANTEC_WITH_UPDATE = new TopLevelWithUpdate() {
-        protected boolean matches(PosInOccurrence pos) {
+        protected boolean matches(org.key_project.ncore.sequent.PosInOccurrence pos) {
             return pos.isInAntec();
         }
     };
 
     public final static Feature SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
-        protected boolean matches(PosInOccurrence pos) {
+        protected boolean matches(org.key_project.ncore.sequent.PosInOccurrence pos) {
             return !pos.isInAntec();
         }
     };
@@ -81,6 +82,6 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
         return checkPosition(pos);
     }
 
-    protected abstract boolean checkPosition(PosInOccurrence pos);
+    protected abstract boolean checkPosition(org.key_project.ncore.sequent.PosInOccurrence pos);
 
 }

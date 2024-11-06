@@ -53,7 +53,8 @@ public class SemisequentTacletAppIndex {
      */
     private void addTermIndex(SequentFormula cfma, Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
-        final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
+        final org.key_project.ncore.sequent.PosInOccurrence pos =
+            new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
         termIndices = termIndices.put(cfma, TermTacletAppIndex.create(pos, services, tacletIndex,
             listener, ruleFilter, indexCaches));
     }
@@ -68,7 +69,8 @@ public class SemisequentTacletAppIndex {
         final TermTacletAppIndex oldIndex = termIndices.get(cfma);
         assert oldIndex != null : "Term index that is supposed to be updated " + "does not exist";
 
-        final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
+        final org.key_project.ncore.sequent.PosInOccurrence pos =
+            new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
         termIndices = termIndices.put(cfma,
             oldIndex.addTaclets(filter, pos, services, tacletIndex, listener));
@@ -133,8 +135,10 @@ public class SemisequentTacletAppIndex {
             {
                 addTermIndex(newFor, services, tacletIndex, listener);
             } else {
-                final PosInOccurrence oldPos = info.positionOfModification();
-                final PosInOccurrence newPos = oldPos.replaceConstrainedFormula(newFor);
+                final org.key_project.ncore.sequent.PosInOccurrence oldPos =
+                    info.positionOfModification();
+                final org.key_project.ncore.sequent.PosInOccurrence newPos =
+                    oldPos.replaceConstrainedFormula(newFor);
                 termIndices = termIndices.put(newFor,
                     oldIndex.update(newPos, services, tacletIndex, listener, indexCaches));
             }
@@ -183,14 +187,15 @@ public class SemisequentTacletAppIndex {
     /**
      * Get term index for the formula to which position <code>pos</code> points
      */
-    private TermTacletAppIndex getTermIndex(PosInOccurrence pos) {
+    private TermTacletAppIndex getTermIndex(org.key_project.ncore.sequent.PosInOccurrence pos) {
         return termIndices.get(pos.sequentFormula());
     }
 
     /**
      * @return all taclet apps for the given position
      */
-    public ImmutableList<NoPosTacletApp> getTacletAppAt(PosInOccurrence pos, RuleFilter filter) {
+    public ImmutableList<NoPosTacletApp> getTacletAppAt(
+            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter filter) {
         TermTacletAppIndex termIndex = getTermIndex(pos);
         return termIndex.getTacletAppAt(pos, filter);
     }
@@ -198,7 +203,8 @@ public class SemisequentTacletAppIndex {
     /**
      * @return all taclet apps for or below the given position
      */
-    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos, RuleFilter filter,
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(
+            org.key_project.ncore.sequent.PosInOccurrence pos, RuleFilter filter,
             Services services) {
         return getTermIndex(pos).getTacletAppAtAndBelow(pos, filter, services);
     }
@@ -257,7 +263,8 @@ public class SemisequentTacletAppIndex {
         for (final ImmutableMapEntry<SequentFormula, TermTacletAppIndex> entry : termIndices) {
             final SequentFormula cfma = entry.key();
             final TermTacletAppIndex index = entry.value();
-            final PosInOccurrence pio = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
+            final org.key_project.ncore.sequent.PosInOccurrence pio =
+                new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
             index.reportTacletApps(pio, l);
         }

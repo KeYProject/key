@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -21,7 +20,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 /**
  * <p>
  * A {@link TermLabelUpdate} is used by
- * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
+ * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, org.key_project.ncore.sequent.PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
  * to add or remove maintained {@link TermLabel}s which will be added to the new {@link Term}.
  * </p>
  * <p>
@@ -58,7 +57,8 @@ public interface TermLabelUpdate extends RuleSpecificTask {
      * @param labels The {@link Set} of {@link TermLabel}s to modify.
      */
     void updateLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Term modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
             Set<TermLabel> labels);
 }

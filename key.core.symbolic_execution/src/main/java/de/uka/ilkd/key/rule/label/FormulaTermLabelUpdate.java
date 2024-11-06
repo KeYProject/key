@@ -46,7 +46,8 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      * {@inheritDoc}
      */
     public void updateLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Term modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
             Set<TermLabel> labels) {
         if (hint instanceof TacletLabelHint tacletHint) {

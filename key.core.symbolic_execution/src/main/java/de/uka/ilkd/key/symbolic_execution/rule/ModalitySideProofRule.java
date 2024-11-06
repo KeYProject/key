@@ -8,7 +8,11 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -80,7 +84,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
         boolean applicable = false;
         if (pio != null && pio.isTopLevel()) {
             // abort if inside of transformer
@@ -126,7 +130,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             throws RuleAbortException {
         try {
             // Extract required Terms from goal
-            PosInOccurrence pio = ruleApp.posInOccurrence();
+            org.key_project.ncore.sequent.PosInOccurrence pio = ruleApp.posInOccurrence();
             Term topLevelTerm = pio.subTerm();
             Pair<ImmutableList<Term>, Term> updatesAndTerm =
                 TermBuilder.goBelowUpdates2(topLevelTerm);

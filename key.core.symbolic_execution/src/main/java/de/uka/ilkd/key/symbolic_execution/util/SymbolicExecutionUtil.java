@@ -510,7 +510,8 @@ public final class SymbolicExecutionUtil {
      *         predicate which will contain the value.
      */
     public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
-            Node node, PosInOccurrence pio, Term additionalConditions, IProgramVariable variable) {
+            Node node, org.key_project.ncore.sequent.PosInOccurrence pio, Term additionalConditions,
+            IProgramVariable variable) {
         // Make sure that correct parameters are given
         assert node != null;
         assert variable instanceof ProgramVariable;
@@ -542,7 +543,8 @@ public final class SymbolicExecutionUtil {
      *         predicate which will contain the value.
      */
     public static SiteProofVariableValueInput createExtractTermSequent(Services sideProofServices,
-            Node node, PosInOccurrence pio, Term additionalConditions, Term term,
+            Node node, org.key_project.ncore.sequent.PosInOccurrence pio, Term additionalConditions,
+            Term term,
             boolean keepUpdates) {
         // Make sure that correct parameters are given
         assert node != null;
@@ -568,7 +570,7 @@ public final class SymbolicExecutionUtil {
      * Helper class which represents the return value of
      * {@link SymbolicExecutionUtil#createExtractReturnVariableValueSequent(Services, TypeReference, IProgramMethod, ReferencePrefix, Node, Node, IProgramVariable)}
      * and
-     * {@link SymbolicExecutionUtil#createExtractVariableValueSequent(Services, Node, PosInOccurrence, Term, IProgramVariable)}.
+     * {@link SymbolicExecutionUtil#createExtractVariableValueSequent(Services, Node, org.key_project.ncore.sequent.PosInOccurrence, Term, IProgramVariable)}.
      *
      * @author Martin Hentschel
      */
@@ -750,7 +752,8 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException
      */
     public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node,
-            Node proofNode, PosInOccurrence modalityPIO, Term condition)
+            Node proofNode, org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
+            Term condition)
             throws ProofInputException {
         if (node.getSettings().variablesAreOnlyComputedFromUpdates()) {
             ExecutionVariableExtractor extractor = new ExecutionVariableExtractor(proofNode,
@@ -771,7 +774,8 @@ public final class SymbolicExecutionUtil {
      * @return The created {@link IExecutionVariable}s.
      */
     public static IExecutionVariable[] createAllExecutionVariables(IExecutionNode<?> node,
-            Node proofNode, PosInOccurrence modalityPIO, Term condition) {
+            Node proofNode, org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
+            Term condition) {
         if (proofNode != null) {
             List<IProgramVariable> variables = new LinkedList<>();
             // Add self variable
@@ -957,7 +961,8 @@ public final class SymbolicExecutionUtil {
      * @return The found {@link IProgramVariable} with the current {@code this}/{@code self}
      *         reference or {@code null} if no one is available.
      */
-    public static IProgramVariable findSelfTerm(Node node, PosInOccurrence pio) {
+    public static IProgramVariable findSelfTerm(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pio != null) {
             Term term = pio.subTerm();
             term = TermBuilder.goBelowUpdates(term);
@@ -1301,11 +1306,12 @@ public final class SymbolicExecutionUtil {
      * @return The modality {@link PosInOccurrence} with the maximal ID if available or {@code null}
      *         otherwise.
      */
-    public static PosInOccurrence findModalityWithMaxSymbolicExecutionLabelId(Sequent sequent) {
+    public static org.key_project.ncore.sequent.PosInOccurrence findModalityWithMaxSymbolicExecutionLabelId(
+            Sequent sequent) {
         if (sequent != null) {
-            PosInOccurrence nextAntecedent =
+            org.key_project.ncore.sequent.PosInOccurrence nextAntecedent =
                 findModalityWithMaxSymbolicExecutionLabelId(sequent.antecedent(), true);
-            PosInOccurrence nextSuccedent =
+            org.key_project.ncore.sequent.PosInOccurrence nextSuccedent =
                 findModalityWithMaxSymbolicExecutionLabelId(sequent.succedent(), false);
             if (nextAntecedent != null) {
                 if (nextSuccedent != null) {
@@ -1334,15 +1340,16 @@ public final class SymbolicExecutionUtil {
      * @param inAntec {@code true} antecedent, {@code false} succedent.
      * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
      */
-    public static PosInOccurrence findModalityWithMaxSymbolicExecutionLabelId(
+    public static org.key_project.ncore.sequent.PosInOccurrence findModalityWithMaxSymbolicExecutionLabelId(
             Semisequent semisequent, boolean inAntec) {
         if (semisequent != null) {
             int maxId = Integer.MIN_VALUE;
-            PosInOccurrence maxPio = null;
+            org.key_project.ncore.sequent.PosInOccurrence maxPio = null;
             for (SequentFormula sf : semisequent) {
                 PosInTerm current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
                 if (current != null) {
-                    PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
+                    org.key_project.ncore.sequent.PosInOccurrence pio =
+                        new PosInOccurrence(sf, current, inAntec);
                     SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
                     if (maxPio == null || label.id() > maxId) {
                         maxPio = pio;
@@ -1384,11 +1391,12 @@ public final class SymbolicExecutionUtil {
      * @return The modality {@link PosInOccurrence} with the maximal ID if available or {@code null}
      *         otherwise.
      */
-    public static PosInOccurrence findModalityWithMinSymbolicExecutionLabelId(Sequent sequent) {
+    public static org.key_project.ncore.sequent.PosInOccurrence findModalityWithMinSymbolicExecutionLabelId(
+            Sequent sequent) {
         if (sequent != null) {
-            PosInOccurrence nextAntecedent =
+            org.key_project.ncore.sequent.PosInOccurrence nextAntecedent =
                 findModalityWithMinSymbolicExecutionLabelId(sequent.antecedent(), true);
-            PosInOccurrence nextSuccedent =
+            org.key_project.ncore.sequent.PosInOccurrence nextSuccedent =
                 findModalityWithMinSymbolicExecutionLabelId(sequent.succedent(), false);
             if (nextAntecedent != null) {
                 if (nextSuccedent != null) {
@@ -1419,15 +1427,16 @@ public final class SymbolicExecutionUtil {
      * @return The modality {@link PosInOccurrence} with the minimal ID if available or {@code null}
      *         otherwise.
      */
-    public static PosInOccurrence findModalityWithMinSymbolicExecutionLabelId(
+    public static org.key_project.ncore.sequent.PosInOccurrence findModalityWithMinSymbolicExecutionLabelId(
             Semisequent semisequent, boolean inAntec) {
         if (semisequent != null) {
             int maxId = Integer.MIN_VALUE;
-            PosInOccurrence minPio = null;
+            org.key_project.ncore.sequent.PosInOccurrence minPio = null;
             for (SequentFormula sf : semisequent) {
                 PosInTerm current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
                 if (current != null) {
-                    PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
+                    org.key_project.ncore.sequent.PosInOccurrence pio =
+                        new PosInOccurrence(sf, current, inAntec);
                     SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
                     if (minPio == null || label.id() < maxId) {
                         minPio = pio;
@@ -1631,7 +1640,7 @@ public final class SymbolicExecutionUtil {
     public static int computeStackSize(RuleApp ruleApp) {
         int result = 0;
         if (ruleApp != null) {
-            PosInOccurrence posInOc = ruleApp.posInOccurrence();
+            org.key_project.ncore.sequent.PosInOccurrence posInOc = ruleApp.posInOccurrence();
             if (posInOc != null) {
                 Term subTerm = posInOc.subTerm();
                 if (subTerm != null) {
@@ -1710,7 +1719,8 @@ public final class SymbolicExecutionUtil {
      * @return The parent {@link Node} of the given {@link Node} which is also a set node or
      *         {@code null} if no parent node was found.
      */
-    public static Node findMethodCallNode(Node node, PosInOccurrence pio) {
+    public static Node findMethodCallNode(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (node != null && pio != null) {
             // Get current program method
             Term term = pio.subTerm();
@@ -1851,7 +1861,8 @@ public final class SymbolicExecutionUtil {
                 "Branch condition of null pointer check is not supported.");
         } else if (childIndex == 2) {
             // Assumption: Original formula in parent is replaced
-            PosInOccurrence pio = parent.getAppliedRuleApp().posInOccurrence();
+            org.key_project.ncore.sequent.PosInOccurrence pio =
+                parent.getAppliedRuleApp().posInOccurrence();
             Term workingTerm = posInOccurrenceInOtherNode(parent, pio, node);
             if (workingTerm == null) {
                 throw new ProofInputException("Term not find in precondition branch, implementation"
@@ -2404,9 +2415,11 @@ public final class SymbolicExecutionUtil {
      * @return The {@link Term} in the other {@link Node} described by the {@link PosInOccurrence}
      *         or {@code null} if not available.
      */
-    public static Term posInOccurrenceInOtherNode(Node original, PosInOccurrence pio,
+    public static Term posInOccurrenceInOtherNode(Node original,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             Node toApplyOn) {
-        PosInOccurrence appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
+        org.key_project.ncore.sequent.PosInOccurrence appliedPIO =
+            posInOccurrenceToOtherSequent(original, pio, toApplyOn);
         if (appliedPIO != null) {
             return appliedPIO.subTerm();
         } else {
@@ -2425,9 +2438,11 @@ public final class SymbolicExecutionUtil {
      * @return The {@link Term} in the other {@link Sequent} described by the
      *         {@link PosInOccurrence} or {@code null} if not available.
      */
-    public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence pio,
+    public static Term posInOccurrenceInOtherNode(Sequent original,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             Sequent toApplyOn) {
-        PosInOccurrence appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
+        org.key_project.ncore.sequent.PosInOccurrence appliedPIO =
+            posInOccurrenceToOtherSequent(original, pio, toApplyOn);
         if (appliedPIO != null) {
             return appliedPIO.subTerm();
         } else {
@@ -2445,7 +2460,8 @@ public final class SymbolicExecutionUtil {
      * @return The {@link PosInOccurrence} in the other {@link Node} described by the
      *         {@link PosInOccurrence} or {@code null} if not available.
      */
-    public static PosInOccurrence posInOccurrenceToOtherSequent(Node original, PosInOccurrence pio,
+    public static org.key_project.ncore.sequent.PosInOccurrence posInOccurrenceToOtherSequent(
+            Node original, org.key_project.ncore.sequent.PosInOccurrence pio,
             Node toApplyTo) {
         if (original != null && toApplyTo != null) {
             return posInOccurrenceToOtherSequent(original.sequent(), pio, toApplyTo.sequent());
@@ -2465,8 +2481,9 @@ public final class SymbolicExecutionUtil {
      * @return The {@link PosInOccurrence} in the other {@link Sequent} described by the
      *         {@link PosInOccurrence} or {@code null} if not available.
      */
-    public static PosInOccurrence posInOccurrenceToOtherSequent(Sequent original,
-            PosInOccurrence pio, Sequent toApplyTo) {
+    public static org.key_project.ncore.sequent.PosInOccurrence posInOccurrenceToOtherSequent(
+            Sequent original,
+            org.key_project.ncore.sequent.PosInOccurrence pio, Sequent toApplyTo) {
         if (original != null && pio != null && toApplyTo != null) {
             // Search index of formula in original sequent
             SequentFormula originalSF = pio.sequentFormula();
@@ -2668,7 +2685,8 @@ public final class SymbolicExecutionUtil {
      * @return The found {@link Term} or {@code null} if not available.
      */
     private static Term findReplacement(Semisequent semisequent,
-            final PosInOccurrence posInOccurrence, final Term replaceTerm) {
+            final org.key_project.ncore.sequent.PosInOccurrence posInOccurrence,
+            final Term replaceTerm) {
         SequentFormula sf = CollectionUtil.search(semisequent,
             element -> checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm));
         return sf != null ? sf.formula() : null;
@@ -2682,7 +2700,8 @@ public final class SymbolicExecutionUtil {
      * @param replaceTerm The {@link Term} to compare with.
      * @return {@code true} equal modulo labels, {@code false} not equal at all.
      */
-    private static boolean checkReplaceTerm(Term toCheck, PosInOccurrence posInOccurrence,
+    private static boolean checkReplaceTerm(Term toCheck,
+            org.key_project.ncore.sequent.PosInOccurrence posInOccurrence,
             Term replaceTerm) {
         Term termAtPio = followPosInOccurrence(posInOccurrence, toCheck);
         if (termAtPio != null) {
@@ -2701,9 +2720,10 @@ public final class SymbolicExecutionUtil {
      * @return The found sub {@link Term} or {@code null} if the {@link PosInOccurrence} is not
      *         compatible.
      */
-    public static Term followPosInOccurrence(PosInOccurrence posInOccurrence, Term term) {
+    public static Term followPosInOccurrence(
+            org.key_project.ncore.sequent.PosInOccurrence posInOccurrence, Term term) {
         boolean matches = true;
-        IntIterator iter = posInOccurrence.posInTerm().iterator();
+        org.key_project.logic.IntIterator iter = posInOccurrence.posInTerm().iterator();
         while (matches && iter.hasNext()) {
             int index = iter.next();
             if (index < term.arity()) {
@@ -2893,7 +2913,8 @@ public final class SymbolicExecutionUtil {
      * @param newSuccedent The new succedent.
      * @return The created {@link Sequent}.
      */
-    public static Sequent createSequentToProveWithNewSuccedent(Node node, PosInOccurrence pio,
+    public static Sequent createSequentToProveWithNewSuccedent(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             Term newSuccedent) {
         return createSequentToProveWithNewSuccedent(node, pio, null, newSuccedent, false);
     }
@@ -2923,7 +2944,8 @@ public final class SymbolicExecutionUtil {
      * @param newSuccedent The new succedent.
      * @return The created {@link Sequent}.
      */
-    public static Sequent createSequentToProveWithNewSuccedent(Node node, PosInOccurrence pio,
+    public static Sequent createSequentToProveWithNewSuccedent(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             Term additionalAntecedent, Term newSuccedent, boolean addResultLabel) {
         if (pio != null) {
             // Get the updates from the return node which includes the value interested in.
@@ -3011,7 +3033,8 @@ public final class SymbolicExecutionUtil {
      * @param updates The updates to use.
      * @return The created {@link Sequent}.
      */
-    public static Sequent createSequentToProveWithNewSuccedent(Node node, PosInOccurrence pio,
+    public static Sequent createSequentToProveWithNewSuccedent(Node node,
+            org.key_project.ncore.sequent.PosInOccurrence pio,
             Term additionalAntecedent, Term newSuccedent, ImmutableList<Term> updates,
             boolean addResultLabel) {
         final TermBuilder tb = node.proof().getServices().getTermBuilder();
@@ -3642,7 +3665,7 @@ public final class SymbolicExecutionUtil {
      */
     public static IProgramVariable extractExceptionVariable(Proof proof) {
         Node root = proof.root();
-        PosInOccurrence modalityTermPIO =
+        org.key_project.ncore.sequent.PosInOccurrence modalityTermPIO =
             SymbolicExecutionUtil.findModalityWithMinSymbolicExecutionLabelId(root.sequent());
         Term modalityTerm = modalityTermPIO != null ? modalityTermPIO.subTerm() : null;
         if (modalityTerm != null) {
@@ -4277,7 +4300,8 @@ public final class SymbolicExecutionUtil {
      * @param pio The {@link PosInOccurrence} to check.
      * @return validitiy branch, {@code false} otherwise.
      */
-    public static boolean isBlockContractValidityBranch(PosInOccurrence pio) {
+    public static boolean isBlockContractValidityBranch(
+            org.key_project.ncore.sequent.PosInOccurrence pio) {
         if (pio != null) {
             Term applicationTerm = TermBuilder.goBelowUpdates(pio.subTerm());
             return applicationTerm.getLabel(BlockContractValidityTermLabel.NAME) != null;

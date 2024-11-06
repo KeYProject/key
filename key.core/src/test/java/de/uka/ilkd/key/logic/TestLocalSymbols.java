@@ -151,8 +151,9 @@ public class TestLocalSymbols {
         Goal goal = goals.head();
 
         TacletApp app;
-        PosInOccurrence pio = new PosInOccurrence(goal.node().sequent().getFormulabyNr(formulaNo),
-            PosInTerm.getTopLevel(), false);
+        org.key_project.ncore.sequent.PosInOccurrence pio =
+            new PosInOccurrence(goal.node().sequent().getFormulabyNr(formulaNo),
+                PosInTerm.getTopLevel(), false);
 
         app = rule.matchFind(pio, services);
         app = app.setPosInOccurrence(pio, services);

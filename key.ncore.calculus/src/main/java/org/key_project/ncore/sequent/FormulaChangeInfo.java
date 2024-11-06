@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.ncore.sequent;
 
-public record FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
+public record FormulaChangeInfo<SF extends SequentFormula>(PosInOccurrence positionOfModification, SF newFormula) {
 
-    public SequentFormula getOriginalFormula() {
-        return positionOfModification().sequentFormula();
+    public SF getOriginalFormula() {
+        return (SF) positionOfModification().sequentFormula();
     }
 
     /**
