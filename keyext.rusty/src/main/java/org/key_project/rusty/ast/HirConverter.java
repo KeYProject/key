@@ -180,7 +180,7 @@ public class HirConverter {
             }
             );
             case LitKind.Int(var val, LitIntTy.Unsuffixed u) ->
-                    new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), null);
+                    new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), IntegerLiteralExpression.IntegerSuffix.None);
             default -> throw new IllegalArgumentException("Unknown lit: " + expr.node());
         };
     }
