@@ -90,6 +90,15 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
     }
 
     @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof RewriteTacletGoalTemplate other)
+                || !super.equalsModProofIrrelevancy(obj)) {
+            return false;
+        }
+        return replacewith.equalsModProofIrrelevancy(other.replacewith);
+    }
+
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result * super.hashCode();
