@@ -632,12 +632,18 @@ public class SchemaConverter {
 
     private IfLetExpression convertIfLetExpr(
             org.key_project.rusty.parsing.RustySchemaParser.IfLetExprContext ctx) {
-        var pat = convertPattern(ctx.pattern());
+        var pat = ctx.pattern() != null ? convertPattern(ctx.pattern())
+                : (ProgramSV) lookupSchemaVariable(ctx.patternSV.getText().substring(2));
         var expr = convertExpr(ctx.expr());
-        var then = convertBlockExpr(ctx.blockExpr(0));
-        var else_ = ctx.blockExpr().size() > 1 ? convertBlockExpr(ctx.blockExpr(1))
-                : ctx.ifExpr() != null ? convertIfExpr(ctx.ifExpr())
-                        : ctx.ifLetExpr() != null ? convertIfLetExpr(ctx.ifLetExpr()) : null;
+        var then = ctx.thenBlock != null ? convertBlockExpr(ctx.thenBlock)
+                : (ProgramSV) lookupSchemaVariable(ctx.thenSV.getText().substring(2));
+        var else_ = ctx.elseBlock != null ? convertBlockExpr(ctx.elseBlock)
+                : ctx.elseIf != null ? convertIfExpr(ctx.elseIf)
+                        : ctx.elseIfLet != null ? convertIfLetExpr(ctx.elseIfLet)
+                                : ctx.elseSV != null
+                                        ? (ProgramSV) lookupSchemaVariable(
+                                            ctx.elseSV.getText().substring(2))
+                                        : null;
         return new IfLetExpression(pat, expr, then, else_);
     }
 
@@ -781,7 +787,75 @@ public class SchemaConverter {
                 return WildCardPattern.WILDCARD;
             }
         }
+        if (ctx.rangePattern() != null) {
+            return convertRangePattern(ctx.rangePattern());
+        }
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
+    }
+
+    private Pattern convertRangePattern(
+            RustySchemaParser.RangePatternContext ctx) {
+        if (ctx.rangeExclusivePattern() != null)
+            return convertRangeExclusivePattern(ctx.rangeExclusivePattern());
+        if (ctx.rangeInclusivePattern() != null)
+            return convertRangeInclusivePattern(ctx.rangeInclusivePattern());
+        if (ctx.rangeFromPattern() != null)
+            return convertRangeFromPattern(ctx.rangeFromPattern());
+        if (ctx.rangeToInclusivePattern() != null)
+            return convertRangeToInclusivePattern(ctx.rangeToInclusivePattern());
+        if (ctx.obsoleteRangePattern() != null)
+            return convertObsoleteRangePattern(ctx.obsoleteRangePattern());
+        throw new IllegalArgumentException("Unknown range pattern " + ctx.getText());
+    }
+
+    private Pattern convertRangeExclusivePattern(
+            RustySchemaParser.RangeExclusivePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Exclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
+    }
+
+    private Pattern convertRangeInclusivePattern(
+            RustySchemaParser.RangeInclusivePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Inclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
+    }
+
+    private Pattern convertRangeFromPattern(
+            RustySchemaParser.RangeFromPatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound()),
+            RangePattern.Bounds.Exclusive, null);
+    }
+
+    private Pattern convertRangeToInclusivePattern(
+            RustySchemaParser.RangeToInclusivePatternContext ctx) {
+        return new RangePattern(null,
+            RangePattern.Bounds.Inclusive, convertRangePatternBound(ctx.rangePatternBound()));
+    }
+
+    private Pattern convertObsoleteRangePattern(
+            RustySchemaParser.ObsoleteRangePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Obsolete, convertRangePatternBound(ctx.rangePatternBound(1)));
+    }
+
+    private Expr convertRangePatternBound(
+            RustySchemaParser.RangePatternBoundContext ctx) {
+        if (ctx.schemaVariable() != null) {
+            return (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
+        }
+        if (ctx.INTEGER_LITERAL() != null) {
+            var text = ctx.INTEGER_LITERAL().getText();
+            var signed = text.contains("i");
+            var split = text.split("[ui]");
+            var size = split[split.length - 1];
+            var suffix = IntegerLiteralExpression.IntegerSuffix.get(signed, size);
+            var lit = split[0];
+            var value = new BigInteger(
+                lit);
+            return new IntegerLiteralExpression(value, suffix);
+        }
+        // TODO implement more bounds (char, byte, float, pathexpression)
+        throw new IllegalArgumentException("Unknown rangePatternBound: " + ctx.getText());
     }
 
     private RustType convertRustType(

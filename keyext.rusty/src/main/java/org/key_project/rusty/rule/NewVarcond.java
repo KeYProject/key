@@ -34,4 +34,8 @@ public class NewVarcond {
     public SchemaVariable getPeerSchemaVariable() {
         return peerSV;
     }
+
+    public KeYRustyType getType() {
+        return type;
+    }
 }
