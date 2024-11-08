@@ -1,7 +1,5 @@
 \profile "Rust Profile";
 
-\withOptions intRules:ignoreOverFlow;
-
 \programVariables {
     u32 a;
     u32 b;

@@ -33,6 +33,37 @@ public class ProofSettings {
 
     private final ChoiceSettings choiceSettings = new ChoiceSettings();
 
+    /**
+     * create a proof settings object. When you add a new settings object, PLEASE UPDATE THE LIST
+     * ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING INTEGERS DIRECTLY
+     */
+    private ProofSettings() {
+        addSettings(choiceSettings);
+    }
+
+    /*
+     * copy constructor - substitutes .clone() in classes implementing Settings
+     */
+    public ProofSettings(ProofSettings toCopy) {
+        this();
+        var result = new Configuration();
+        lastLoadedProperties = toCopy.lastLoadedProperties;
+        lastLoadedConfiguration = toCopy.lastLoadedConfiguration;
+        for (Settings s : toCopy.settings) {
+            s.writeSettings(result);
+        }
+        for (Settings s : settings) {
+            s.readSettings(result);
+        }
+    }
+
+    public void addSettings(Settings settings) {
+        this.settings.add(settings);
+        if (lastLoadedConfiguration != null) {
+            settings.readSettings(lastLoadedConfiguration);
+        }
+    }
+
     private static ProofSettings loadedSettings() {
         ProofSettings ps = new ProofSettings();
         ps.loadSettings();

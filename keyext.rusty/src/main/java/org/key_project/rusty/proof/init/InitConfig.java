@@ -255,13 +255,14 @@ public class InitConfig {
     public InitConfig copyWithServices(Services services) {
         InitConfig ic = new InitConfig(services);
         if (settings != null) {
-            ic.setSettings(new ProofSettings());// settings));
+            ic.setSettings(new ProofSettings(ProofSettings.DEFAULT_SETTINGS));// settings));
         }
 
         ic.setTaclet2Builder(
             (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;
         ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
+        ic.setActivatedChoices(activatedChoices);
         return ic;
     }
 

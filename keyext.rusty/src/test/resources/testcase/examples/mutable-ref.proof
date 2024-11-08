@@ -1,5 +1,7 @@
 \profile "Rust Profile";
 
+\withOptions intRules:rustSemantics;
+
 \programVariables {
     u32 a;
     u32 b;

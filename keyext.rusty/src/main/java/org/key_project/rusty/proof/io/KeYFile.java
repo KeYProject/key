@@ -286,6 +286,9 @@ public class KeYFile implements EnvInput {
         KeYAst.File ctx = getParseContext();
         KeYIO io = new KeYIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
+        ChoiceInformation choice = getParseContext().getChoices();
+        // we ignore the namespace of choice finder.
+        initConfig.addCategory2DefaultChoices(choice.getDefaultOptions());
 
         return io.getWarnings().stream().map(BuildingIssue::message).toList();
     }

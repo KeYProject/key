@@ -52,7 +52,14 @@ public abstract class KeYAst<T extends ParserRuleContext> {
         }
 
         public @Nullable ProofSettings findProofSettings() {
-            return null;
+            ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+
+            if (ctx.preferences() != null && ctx.preferences().c != null) {
+                var cb = new ConfigurationBuilder();
+                var c = (Configuration) ctx.preferences().c.accept(cb);
+                settings.readSettings(c);
+            }
+            return settings;
         }
 
         public Includes getIncludes(URL base) {

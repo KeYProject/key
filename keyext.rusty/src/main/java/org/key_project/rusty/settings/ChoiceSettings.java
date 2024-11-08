@@ -4,7 +4,6 @@
 package org.key_project.rusty.settings;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -126,42 +125,6 @@ public class ChoiceSettings extends AbstractSettings {
             }
         }
         setDefaultChoices(defaultTmp);
-    }
-
-    /**
-     * gets a Properties object and has to perform the necessary steps in order to change this
-     * object in a way that it represents the stored settings
-     */
-    public void readSettings(Properties props) {
-        String choiceSequence = props.getProperty("[" + CATEGORY + "]" + KEY_DEFAULT_CHOICES);
-        // set choices
-        if (choiceSequence != null) {
-            StringTokenizer st = new StringTokenizer(choiceSequence, ",");
-            while (st.hasMoreTokens()) {
-                StringTokenizer st2 = new StringTokenizer(st.nextToken().trim(), "-");
-                String category = st2.nextToken().trim();
-                String def = st2.nextToken().trim();
-                category2Default.put(category, def);
-
-            }
-        }
-    }
-
-    /**
-     * implements the method required by the Settings interface. The settings are written to the
-     * given Properties object. Only entries of
-     * the form &lt; key &gt; = &lt; value &gt; (,&lt;
-     * value &gt;)* are allowed.
-     * <p>
-     * * @param props the Properties object where to write the
-     * settings as (key, value) pair
-     */
-    @Override
-    public void writeSettings(Properties props) {
-        var choiceSequence = category2Default.entrySet().stream()
-                .map(entry -> entry.getKey() + "-" + entry.getValue())
-                .collect(Collectors.joining(" , "));
-        props.setProperty("[" + CATEGORY + "]" + KEY_DEFAULT_CHOICES, choiceSequence);
     }
 
     @Override

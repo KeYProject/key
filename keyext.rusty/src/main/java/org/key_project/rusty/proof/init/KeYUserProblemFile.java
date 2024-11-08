@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.parser.ChoiceInformation;
 import org.key_project.rusty.parser.KeYAst;
 import org.key_project.rusty.parser.ProofReplayer;
 import org.key_project.rusty.proof.Proof;
@@ -83,6 +84,10 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
+
+        ChoiceInformation ci = getParseContext().getChoices();
+        settings.getChoiceSettings().updateWith(ci.getActivatedChoices());
+        initConfig.setActivatedChoices(settings.getChoiceSettings().getDefaultChoicesAsSet());
 
         ImmutableSet<String> warnings = DefaultImmutableSet.nil();
 

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.settings;
 
-import java.util.Properties;
 
 import org.jspecify.annotations.NonNull;
 
@@ -12,24 +11,6 @@ import org.jspecify.annotations.NonNull;
  * (like active heuristics, which LDTs to use etc.)
  */
 public interface Settings {
-    /**
-     * gets a Properties object and has to perform the necessary steps in order to change this
-     * object in a way that it represents the stored settings
-     *
-     * @deprecated Deprecated in favour of {@link #readSettings(Configuration)}
-     */
-    @Deprecated
-    void readSettings(Properties props);
-
-    /**
-     * The settings to store are written to the given Properties object.
-     *
-     * @param props the Properties object where to write the settings as (key, value) pair
-     * @deprecated Deprecated in favour of {@link #writeSettings(Configuration)}
-     */
-    @Deprecated
-    void writeSettings(Properties props);
-
     /**
      * This method transfers the given configuration information into the local states. The setter
      * methods are used
