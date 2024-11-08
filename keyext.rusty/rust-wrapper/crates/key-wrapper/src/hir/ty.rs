@@ -3,37 +3,95 @@ use std::{collections::HashMap, num::NonZero};
 use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "serde_tag")]
 pub enum Ty {
     Bool,
     Char,
-    Int(IntTy),
-    Uint(UintTy),
-    Float(FloatTy),
-    Adt(AdtDef, Vec<GenericArg>),
-    Foreign(DefId),
+    Int {
+        ty: IntTy,
+    },
+    Uint {
+        ty: UintTy,
+    },
+    Float {
+        ty: FloatTy,
+    },
+    Adt {
+        def: AdtDef,
+        args: Vec<GenericArg>,
+    },
+    Foreign {
+        def_id: DefId,
+    },
     Str,
-    Array(Box<Ty>, Box<Const>),
-    Pat(Box<Ty>, Box<Pattern>),
-    Slice(Box<Ty>),
-    RawPtr(Box<Ty>, bool),
-    Ref(/* Region, */ Box<Ty>, bool),
-    FnDef(DefId, Vec<GenericArg>),
-    FnPtr(Binder<FnSigTys>, FnHeader),
-    Dynamic(
-        Vec<Binder<ExistentialPredicate>>,
-        /* Region, */ DynKind,
-    ),
-    Closure(DefId, Vec<GenericArg>),
-    CoroutineClosure(DefId, Vec<GenericArg>),
-    Coroutine(DefId, Vec<GenericArg>),
-    CoroutineWitness(DefId, Vec<GenericArg>),
+    Array {
+        ty: Box<Ty>,
+        len: Box<Const>,
+    },
+    Pat {
+        ty: Box<Ty>,
+        pat: Box<Pattern>,
+    },
+    Slice {
+        ty: Box<Ty>,
+    },
+    RawPtr {
+        ty: Box<Ty>,
+        r#mut: bool,
+    },
+    Ref {
+        ty: Box<Ty>,
+        r#mut: bool,
+    },
+    FnDef {
+        def_id: DefId,
+        args: Vec<GenericArg>,
+    },
+    FnPtr {
+        binder: Binder<FnSigTys>,
+        header: FnHeader,
+    },
+    Dynamic {
+        binders: Vec<Binder<ExistentialPredicate>>,
+        kind: DynKind,
+    },
+    Closure {
+        def_id: DefId,
+        args: Vec<GenericArg>,
+    },
+    CoroutineClosure {
+        def_id: DefId,
+        args: Vec<GenericArg>,
+    },
+    Coroutine {
+        def_id: DefId,
+        args: Vec<GenericArg>,
+    },
+    CoroutineWitness {
+        def_id: DefId,
+        args: Vec<GenericArg>,
+    },
     Never,
-    Tuple(Vec<Ty>),
-    Alias(AliasTyKind, AliasTy),
-    Param(ParamTy),
-    Bound(DebruijnIndex, BoundTy),
-    Placeholder(Placeholder<BoundTy>),
-    Infer(InferTy),
+    Tuple {
+        tys: Vec<Ty>,
+    },
+    Alias {
+        kind: AliasTyKind,
+        ty: AliasTy,
+    },
+    Param {
+        ty: ParamTy,
+    },
+    Bound {
+        idx: DebruijnIndex,
+        ty: BoundTy,
+    },
+    Placeholder {
+        placeholder: Placeholder<BoundTy>,
+    },
+    Infer {
+        infer: InferTy,
+    },
     Error,
 }
 

@@ -46,7 +46,7 @@ public class ContextBlockExpression extends BlockExpression {
         if (expr instanceof BlockExpression || expr instanceof IfExpression
                 || expr instanceof IfLetExpression
                 || expr instanceof MatchExpression) {
-            stmts = stmts.append(new ExpressionStatement(expr));
+            stmts = stmts.append(new ExpressionStatement(expr, false));
         }
         return stmts;
     }

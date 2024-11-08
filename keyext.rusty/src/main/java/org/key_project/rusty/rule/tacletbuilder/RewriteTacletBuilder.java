@@ -10,16 +10,17 @@ import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
 import org.key_project.rusty.rule.TacletApplPart;
 
 public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T> {
-
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable If the value is equal
      * to
      * <ul>
-     * <li>{@link ApplicationRestriction#None} no state restrictions are posed</li>
-     * <li>{@link ApplicationRestriction#SameUpdateLevel} then <code>\assumes</code> must match on a
+     * <li>{@link ApplicationRestriction#NONE} no state restrictions are posed</li>
+     * <li>{@link ApplicationRestriction#SAME_UPDATE_LEVEL} then <code>\assumes</code> must match on
+     * a
      * formula within the same state as <code>\find</code> rsp. <code>\add</code>. For efficiency no
      * modalities are allowed above the <code>\find</code> position</li>
-     * <li>{@link ApplicationRestriction#InSequentState} the <code>\find</code> part is only allowed
+     * <li>{@link ApplicationRestriction#IN_SEQUENT_STATE} the <code>\find</code> part is only
+     * allowed
      * to
      * match on formulas which are evaluated in the same state as the sequent</li>
      * </ul>
@@ -74,7 +75,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
             new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
             goals, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
-            surviveSmbExec, tacletAnnotations);
+            choices, surviveSmbExec, tacletAnnotations);
         // t.setOrigin(origin);
         return (T) t;
     }

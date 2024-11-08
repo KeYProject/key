@@ -14,8 +14,40 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record PredicatePatternLoopExpression(@Nullable Label label,Pattern pattern,Expr expr,BlockExpression body)implements LoopExpression{@Override public void visit(Visitor v){v.performActionOnPredicatePatternLoopExpression(this);}
+//spotless:off
+public record PredicatePatternLoopExpression(@Nullable Label label, Pattern pattern, Expr expr,
+                                             BlockExpression body) implements LoopExpression {
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnPredicatePatternLoopExpression(this);
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(n==0&&label!=null){return label;}if(label!=null){--n;}if(n==0)return pattern;if(n==1)return expr;if(n==2)return body;throw new IndexOutOfBoundsException();}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0 && label != null) {
+            return label;
+        }
+        if (label != null) {
+            --n;
+        }
+        if (n == 0) return pattern;
+        if (n == 1) return expr;
+        if (n == 2) return body;
+        throw new IndexOutOfBoundsException();
+    }
 
-@Override public int getChildCount(){int c=0;if(label!=null){++c;}return c+3;}@Override public Type type(Services services){return TupleType.UNIT;}}
+    @Override
+    public int getChildCount() {
+        int c = 0;
+        if (label != null) {
+            ++c;
+        }
+        return c + 3;
+    }
+
+    @Override
+    public Type type(Services services) {
+        return TupleType.UNIT;
+    }
+}
+//spotless:on

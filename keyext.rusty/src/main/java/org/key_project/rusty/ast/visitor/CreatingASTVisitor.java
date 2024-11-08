@@ -67,11 +67,6 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
     }
 
     @Override
-    public void performActionOnArithLogicalExpression(ArithLogicalExpression x) {
-        throw new RuntimeException("TODO @ DD");
-    }
-
-    @Override
     public void performActionOnAssignmentExpression(AssignmentExpression x) {
         var def = new DefaultAction(x) {
             @Override
@@ -125,11 +120,6 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
     }
 
     @Override
-    public void performActionOnNegationExpression(NegationExpression x) {
-        throw new RuntimeException("TODO @ DD");
-    }
-
-    @Override
     public void performActionOnProgramVariable(ProgramVariable x) {
         throw new RuntimeException("TODO @ DD");
     }
@@ -150,7 +140,7 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             Expr expr = changeList.removeFirstOccurrence(Expr.class);
-            addChild(new ExpressionStatement(expr));
+            addChild(new ExpressionStatement(expr, x.hasSemi()));
             changed();
         } else {
             doDefaultAction(x);

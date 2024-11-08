@@ -18,7 +18,22 @@ pub mod visit;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Crate {
     pub top_mod: Mod,
-    pub types: Vec<(HirId, Ty)>,
+    pub types: Vec<HirIdTypeMapping>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct HirIdTypeMapping {
+    pub hir_id: HirId,
+    pub ty: Ty,
+}
+
+impl From<(HirId, Ty)> for HirIdTypeMapping {
+    fn from(value: (HirId, Ty)) -> Self {
+        Self {
+            hir_id: value.0,
+            ty: value.1,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -141,7 +156,10 @@ pub struct Path<R = Res> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct Def(pub DefKind, pub DefId);
+pub struct Def {
+    pub kind: DefKind,
+    pub id: DefId,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(tag = "serde_tag")]

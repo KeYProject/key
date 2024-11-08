@@ -70,7 +70,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
         if (initConfig.getSettings() == null) {
             // if no settings have been assigned yet, take default settings
-            initConfig.setSettings(new ProofSettings());
+            initConfig.setSettings(new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
         }
 
         final Services services = this.initConfig.getServices();

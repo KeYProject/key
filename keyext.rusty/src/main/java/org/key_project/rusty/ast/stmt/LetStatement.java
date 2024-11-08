@@ -20,7 +20,7 @@ public class LetStatement implements Statement, VariableDeclaration {
     private final RustType type;
     private final Expr init;
 
-    public LetStatement(Pattern pat, RustType type, @Nullable Expr init) {
+    public LetStatement(Pattern pat, @Nullable RustType type, @Nullable Expr init) {
         this.pat = pat;
         this.type = type;
         this.init = init;
@@ -38,10 +38,12 @@ public class LetStatement implements Statement, VariableDeclaration {
         if (n == 0) {
             return pat;
         }
-        if (n == 1) {
+        --n;
+        if (n == 0 && type != null) {
             return type;
         }
-        if (n == 2 && init != null) {
+        --n;
+        if (n == 0 && init != null) {
             return init;
         }
         throw new IndexOutOfBoundsException("LetStatement has " + getChildCount() + " children");
@@ -49,7 +51,14 @@ public class LetStatement implements Statement, VariableDeclaration {
 
     @Override
     public int getChildCount() {
-        return init == null ? 2 : 3;
+        int res = 1;
+        if (type != null) {
+            res += 1;
+        }
+        if (init != null) {
+            res += 1;
+        }
+        return res;
     }
 
     public RustType type() {
@@ -71,7 +80,10 @@ public class LetStatement implements Statement, VariableDeclaration {
     @Override
     public String toString() {
         var sb = new StringBuilder();
-        sb.append("let ").append(pat).append(": ").append(type);
+        sb.append("let ").append(pat);
+        if (type != null) {
+            sb.append(": ").append(type);
+        }
         if (hasInit()) {
             sb.append(" = ").append(init);
         }

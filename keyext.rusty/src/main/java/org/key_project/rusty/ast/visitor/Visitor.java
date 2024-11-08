@@ -21,8 +21,6 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
  * that calls the doActionAt<NodeType> method. Similar to the pretty print mechanism.
  */
 public interface Visitor {
-    void performActionOnArithLogicalExpression(ArithLogicalExpression x);
-
     void performActionOnAssignmentExpression(AssignmentExpression x);
 
     void performActionOnBlockExpression(BlockExpression x);
@@ -32,8 +30,6 @@ public interface Visitor {
     void performActionOnContextBlockExpression(ContextBlockExpression x);
 
     void performActionOnIntegerLiteralExpression(IntegerLiteralExpression x);
-
-    void performActionOnNegationExpression(NegationExpression x);
 
     void performActionOnSchemaVariable(SchemaVariable x);
 
@@ -59,11 +55,7 @@ public interface Visitor {
 
     void performActionOnTypeCastExpression(TypeCastExpression x);
 
-    void performActionOnComparisonExpression(ComparisonExpression x);
-
     void performActionOnRangeExpression(RangeExpression x);
-
-    void performActionOnLazyBooleanExpression(LazyBooleanExpression x);
 
     void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x);
 
@@ -135,11 +127,13 @@ public interface Visitor {
 
     void performActionOnReferenceRustType(ReferenceRustType x);
 
-    void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x);
+    void performActionOnBinaryExpression(BinaryExpression x);
 
-    void performActionOnComparisonOperator(ComparisonExpression.Operator x);
+    void performActionOnBinaryOperator(BinaryExpression.Operator x);
 
-    void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x);
+    void performActionOnUnaryExpression(UnaryExpression x);
 
-    void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x);
+    void performActionOnUnaryOperator(UnaryExpression.Operator x);
+
+    void performActionOnBindingPattern(BindingPattern x);
 }

@@ -151,17 +151,6 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-
-    @Override
-    public void performActionOnArithLogicalExpression(ArithLogicalExpression x) {
-        layouter.beginC();
-        x.left().visit(this);
-        layouter.print(" ");
-        layouter.print(x.op().toString());
-        layouter.brk();
-        x.right().visit(this);
-    }
-
     @Override
     public void performActionOnAssignmentExpression(AssignmentExpression x) {
         x.lhs().visit(this);
@@ -222,11 +211,6 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnIntegerLiteralExpression(IntegerLiteralExpression x) {
         layouter.print(x.toString());
-    }
-
-    @Override
-    public void performActionOnNegationExpression(NegationExpression x) {
-        printUnaryOperator(x.op().toString(), true, x.expr());
     }
 
     @Override
@@ -321,7 +305,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnBorrowExpression(BorrowExpression x) {
-        layouter.print(x.isDouble() ? "&&" : "&");
+        layouter.print("&");
         if (x.mut()) {
             layouter.keyWord("mut");
             layouter.print(" ");
@@ -344,13 +328,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnComparisonExpression(ComparisonExpression x) {
-        x.left().visit(this);
-        x.op().visit(this);
-        x.right().visit(this);
-    }
-
-    @Override
     public void performActionOnRangeExpression(RangeExpression x) {
         if (x.left() != null) {
             x.left().visit(this);
@@ -362,16 +339,11 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnLazyBooleanExpression(LazyBooleanExpression x) {
-        x.left().visit(this);
-        x.op().visit(this);
-        x.right().visit(this);
-    }
-
-    @Override
     public void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x) {
         x.left().visit(this);
+        layouter.print(" ");
         x.op().visit(this);
+        layouter.print("= ");
         x.right().visit(this);
     }
 
@@ -630,30 +602,40 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnComparisonOperator(ComparisonExpression.Operator x) {
+    public void performActionOnBinaryExpression(BinaryExpression x) {
+        x.left().visit(this);
         layouter.print(" ");
-        layouter.print(x.toString());
+        x.op().visit(this);
         layouter.print(" ");
+        x.right().visit(this);
     }
 
     @Override
-    public void performActionOnCompoundAssignmentOperator(CompoundAssignmentExpression.Operator x) {
-        layouter.print(" ");
+    public void performActionOnBinaryOperator(BinaryExpression.Operator x) {
         layouter.print(x.toString());
-        layouter.print(" ");
     }
 
     @Override
-    public void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x) {
-        layouter.print(" ");
-        layouter.print(x.toString());
-        layouter.print(" ");
+    public void performActionOnUnaryExpression(UnaryExpression x) {
+        x.op().visit(this);
+        x.expr().visit(this);
     }
 
     @Override
-    public void performActionOnLazyBooleanOperator(LazyBooleanExpression.Operator x) {
-        layouter.print(" ");
+    public void performActionOnUnaryOperator(UnaryExpression.Operator x) {
         layouter.print(x.toString());
-        layouter.print(" ");
+    }
+
+    @Override
+    public void performActionOnBindingPattern(BindingPattern x) {
+        if (x.ref()) {
+            layouter.keyWord("ref");
+            layouter.print(" ");
+        }
+        x.pv().visit(this);
+        if (x.opt() != null) {
+            layouter.print(" @ ");
+            x.opt().visit(this);
+        }
     }
 }

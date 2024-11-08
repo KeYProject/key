@@ -12,7 +12,9 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record IfExpression(Expr condition, ThenBranch thenExpr, @Nullable ElseBranch elseExpr) implements Expr, ElseBranch {
+//spotless:off
+public record IfExpression(Expr condition, ThenBranch thenExpr,
+                           @Nullable ElseBranch elseExpr) implements Expr, ElseBranch {
     @Override
     public void visit(Visitor v) {
         v.performActionOnIfExpression(this);
@@ -34,7 +36,7 @@ public record IfExpression(Expr condition, ThenBranch thenExpr, @Nullable ElseBr
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("if ").append(condition).append(" ").append(thenExpr);
+        sb.append("if ").append(condition).append(thenExpr);
         if (elseExpr != null) sb.append(" else ").append(elseExpr);
         return sb.toString();
     }
@@ -44,3 +46,4 @@ public record IfExpression(Expr condition, ThenBranch thenExpr, @Nullable ElseBr
         return thenExpr.type(services);
     }
 }
+//spotless:on

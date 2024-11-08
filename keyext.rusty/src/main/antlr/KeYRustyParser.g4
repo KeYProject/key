@@ -32,3 +32,6 @@ primitive_term:
   ;
 
 mRef_term : REF_M LESS simple_ident GREATER;
+
+typemapping
+    : (AND MUT?)? simple_ident;

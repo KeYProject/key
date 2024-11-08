@@ -52,13 +52,26 @@ public abstract class KeYAst<T extends ParserRuleContext> {
         }
 
         public @Nullable ProofSettings findProofSettings() {
-            return null;
+            ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+
+            if (ctx.preferences() != null && ctx.preferences().c != null) {
+                var cb = new ConfigurationBuilder();
+                var c = (Configuration) ctx.preferences().c.accept(cb);
+                settings.readSettings(c);
+            }
+            return settings;
         }
 
         public Includes getIncludes(URL base) {
             IncludeFinder finder = new IncludeFinder(base);
             accept(finder);
             return finder.getIncludes();
+        }
+
+        public ChoiceInformation getChoices() {
+            ChoiceFinder finder = new ChoiceFinder();
+            accept(finder);
+            return finder.getChoiceInformation();
         }
 
         public ProblemInformation getProblemInformation() {

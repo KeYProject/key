@@ -15,11 +15,12 @@ import org.key_project.rusty.parser.hir.pat.ByRef;
 import org.key_project.rusty.parser.hir.pat.PatKind;
 import org.key_project.rusty.parser.hir.stmt.LocalSource;
 import org.key_project.rusty.parser.hir.stmt.StmtKind;
+import org.key_project.rusty.parser.hir.ty.Ty;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.GsonBuilder;
 
-public record Crate(Mod topMod) {
+public record Crate(Mod topMod, HirTyMapping[] types) {
     public static Crate parseJSON(String json) {
         var gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .registerTypeAdapter(ItemKind.class, new ItemKind.Adapter())
@@ -36,6 +37,8 @@ public record Crate(Mod topMod) {
                 .registerTypeAdapter(ExprKind.class, new ExprKind.Adapter())
                 .registerTypeAdapter(ByRef.class, new ByRef.Adapter())
                 .registerTypeAdapter(StmtKind.class, new StmtKind.Adapter())
+                .registerTypeAdapter(DefKind.class, new DefKind.Adapter())
+                .registerTypeAdapter(Ty.class, new Ty.Adapter())
                 .create();
         return gson.fromJson(json, Crate.class);
     }

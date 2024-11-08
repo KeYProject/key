@@ -234,7 +234,6 @@ public class IntermediateProofReplayer {
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm, Goal currGoal)
             throws TacletAppConstructionException {
-
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
@@ -264,7 +263,7 @@ public class IntermediateProofReplayer {
 
                 /*
                  * part of the fix for #1716: ensure that position of find term
-                 * (antecedent/succedent) matches the kind of the taclet.
+                 * (antecedent/succedent) matches the useKind of the taclet.
                  */
                 Taclet taclet = ourApp.taclet();
                 if (taclet instanceof AntecTaclet && !pos.isInAntec()) {

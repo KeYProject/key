@@ -17,6 +17,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.ast.abstraction.ReferenceType;
+import org.key_project.rusty.ast.abstraction.Type;
+import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.AbstractTermTransformer;
@@ -82,6 +85,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     protected Namespace<RuleSet> ruleSets() {
         return namespaces().ruleSets();
+    }
+
+    protected Namespace<Choice> choices() {
+        return namespaces().choices();
     }
 
     protected Namespace<@NonNull ProgramVariable> programVariables() {
@@ -233,11 +240,17 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     public KeYRustyType visitTypemapping(KeYRustyParser.TypemappingContext ctx) {
-        StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
-        Sort sort = lookupSort(type.toString());
-        KeYRustyType krt = null;
-        if (sort != null) {
-            krt = new KeYRustyType(null, sort);
+        String type = visitSimple_ident(ctx.simple_ident());
+        KeYRustyType krt = services.getRustInfo().getKeYRustyType(type);
+        if (ctx.AND() != null) {
+            boolean mut = ctx.MUT() != null;
+            Type ty = ReferenceType.get(krt.getRustyType(), mut);
+            krt = services.getRustInfo().getKeYRustyType(ty);
+        } else if (krt == null) {
+            Sort sort = lookupSort(type);
+            if (sort != null) {
+                krt = new KeYRustyType(null, sort);
+            }
         }
 
         if (krt == null) {

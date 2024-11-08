@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -40,48 +42,63 @@ public class HirRustyReader {
      * @param context recoder.java.CompilationUnit in which the block has to be interprested
      * @return the parsed and resolved JavaBlock
      */
-    public RustyBlock readBlock(String block, Context context) throws IOException {
-        var fn = context.buildFunction(block);
-        Path tmpDir = Files.createTempDirectory("KeYTempFileMod_" + block.hashCode());
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try (var s = Files.walk(tmpDir)) {
-                s.sorted(Comparator.reverseOrder()).forEach(path -> {
-                    try {
-                        Files.delete(path);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-            } catch (IOException e) {
+    public RustyBlock readBlock(String block, Context context) {
+        try {
+            var fn = context.buildFunction(block, true);
+            Path tmpDir = Files.createTempDirectory("KeYTempFileMod_" + block.hashCode());
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try (var s = Files.walk(tmpDir)) {
+                    s.sorted(Comparator.reverseOrder()).forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
+            Files.copy(Path.of("./src/main/resources/rust-toolchain.toml"),
+                tmpDir.resolve("rust-toolchain.toml"));
+            Files.copy(Path.of("./src/main/resources/Cargo.toml"), tmpDir.resolve("Cargo.toml"));
+            Path src = tmpDir.resolve("src");
+            Files.createDirectory(src);
+            Path lib = Files.createFile(src.resolve("lib.rs"));
+            System.out.println(fn);
+            Files.writeString(lib, fn, StandardCharsets.UTF_8, StandardOpenOption.WRITE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+
+            var command = new String[] { "cargo", "key", "-o", "hir.json" };
+            try {
+                Process cmd = Runtime.getRuntime().exec(command, null, tmpDir.toFile());
+                var stdErr = cmd.getErrorStream();
+                var errReader = new BufferedReader(new InputStreamReader(stdErr));
+                var sb = new StringBuilder();
+                String line;
+                while ((line = errReader.readLine()) != null) {
+                    sb.append(line).append("\n");
+                }
+                stdErr.close();
+                int code = cmd.waitFor();
+                // TODO: report error
+                assert code == 0 : sb.toString();
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        }));
-        Files.copy(Path.of("./src/main/resources/rust-toolchain.toml"),
-            tmpDir.resolve("rust-toolchain.toml"));
-        Files.copy(Path.of("./src/main/resources/Cargo.toml"), tmpDir.resolve("Cargo.toml"));
-        Path src = tmpDir.resolve("src");
-        Files.createDirectory(src);
-        Path lib = Files.createFile(src.resolve("lib.rs"));
-        Files.writeString(lib, fn, StandardCharsets.UTF_8, StandardOpenOption.WRITE,
-            StandardOpenOption.TRUNCATE_EXISTING);
-
-        String command = "cargo key -o hir.json";
-        try {
-            int code = Runtime.getRuntime().exec(command, null, tmpDir.toFile()).waitFor();
-            assert code == 0;
-        } catch (InterruptedException e) {
+            var hir = Files.readString(tmpDir.resolve("hir.json"), Charset.defaultCharset());
+            var crate = Crate.parseJSON(hir);
+            var converter = new HirConverter(services);
+            var converted = converter.convertCrate(crate);
+            BlockExpression body = converted.getVerificationTarget().body();
+            var es = (ExpressionStatement) body.getStatements().get(0);
+            return new RustyBlock(es.getExpression());
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        var hir = Files.readString(tmpDir.resolve("hir.json"), Charset.defaultCharset());
-        var crate = Crate.parseJSON(hir);
-        var converter = new HirConverter(services);
-        var converted = converter.convertCrate(crate);
-        BlockExpression body = converted.getVerificationTarget().body();
-        var es = (ExpressionStatement) body.getStatements().get(0);
-        return new RustyBlock(es.getExpression());
     }
 
-    public RustyBlock readBlockWithEmptyContext(String s) throws IOException {
+    public RustyBlock readBlockWithEmptyContext(String s) {
         return readBlock(s, createEmptyContext());
     }
 

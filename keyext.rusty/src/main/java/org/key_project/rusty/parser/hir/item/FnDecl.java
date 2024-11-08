@@ -7,7 +7,9 @@ import java.util.Arrays;
 
 import org.key_project.rusty.parser.hir.hirty.HirTy;
 
-public record FnDecl(HirTy[] inputs, FnRetTy output, boolean cVariadic, ImplicitSelfKind implicitSelf, boolean lifetimeElisionAllowed) {
+//spotless:off
+public record FnDecl(HirTy[] inputs, FnRetTy output, boolean cVariadic, ImplicitSelfKind implicitSelf,
+                     boolean lifetimeElisionAllowed) {
     @Override
     public String toString() {
         return "FnDecl{" +
@@ -19,3 +21,4 @@ public record FnDecl(HirTy[] inputs, FnRetTy output, boolean cVariadic, Implicit
                 '}';
     }
 }
+//spotless:on

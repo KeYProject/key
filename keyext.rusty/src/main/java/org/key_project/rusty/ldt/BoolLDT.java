@@ -7,7 +7,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.expr.ArithLogicalExpression;
+import org.key_project.rusty.ast.expr.BinaryExpression;
 import org.key_project.rusty.ast.expr.BooleanLiteralExpression;
 import org.key_project.rusty.ast.expr.LiteralExpression;
 
@@ -82,13 +82,13 @@ public class BoolLDT extends LDT {
     }
 
     @Override
-    public Function getFuctionFor(ArithLogicalExpression.Operator op, Services services) {
+    public Function getFunctionFor(BinaryExpression.Operator op, Services services) {
         assert false;
         return null;
     }
 
     @Override
-    public boolean isResponsible(ArithLogicalExpression.Operator op, Term[] subs,
+    public boolean isResponsible(BinaryExpression.Operator op, Term[] subs,
             Services services) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services);
@@ -99,14 +99,14 @@ public class BoolLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(ArithLogicalExpression.Operator op, Term left, Term right,
+    public boolean isResponsible(BinaryExpression.Operator op, Term left, Term right,
             Services services) {
         return false;
 
     }
 
     @Override
-    public boolean isResponsible(ArithLogicalExpression.Operator op, Term sub,
+    public boolean isResponsible(BinaryExpression.Operator op, Term sub,
             Services services) {
         return false;
     }

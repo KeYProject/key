@@ -110,11 +110,11 @@ public class ProgramContextAdder {
 
         int childrenToAdd = putInLength + childLeft;
 
-        if (wrapper instanceof BlockExpression)
+        if (wrapper instanceof BlockExpression be && be.getValue() != null)
             --childrenToAdd;
 
         if (childLeft == 0 || lastChild == -1) {
-            return putIn;
+            return new BlockExpression(putIn.getStatements(), putIn.getValue());
         }
 
         ImmutableList<Statement> body = ImmutableSLList.nil();

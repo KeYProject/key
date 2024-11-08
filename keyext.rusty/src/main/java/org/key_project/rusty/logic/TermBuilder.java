@@ -527,4 +527,8 @@ public class TermBuilder {
     public Term mutRef(MutRef mRef) {
         return tf.createTerm(mRef);
     }
+
+    public Term sharedRef(SharedRef instance, Term term) {
+        return tf.createTerm(instance, term);
+    }
 }

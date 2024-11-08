@@ -10,12 +10,33 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record RepeatedArrayExpression(Expr expr,Expr size)implements Expr{@Override public void visit(Visitor v){v.performActionOnRepeatedArrayExpression(this);}
+//spotless:off
+public record RepeatedArrayExpression(Expr expr, Expr size) implements Expr {
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnRepeatedArrayExpression(this);
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(n==0)return expr;if(n==1)return size;throw new IndexOutOfBoundsException("RepeatedArrayExpression has only 2 children");}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) return expr;
+        if (n == 1) return size;
+        throw new IndexOutOfBoundsException("RepeatedArrayExpression has only 2 children");
+    }
 
-@Override public int getChildCount(){return 2;}
+    @Override
+    public int getChildCount() {
+        return 2;
+    }
 
-@Override public String toString(){return"["+expr+"; "+size+"]";}
+    @Override
+    public String toString() {
+        return "[" + expr + "; " + size + "]";
+    }
 
-@Override public Type type(Services services){throw new UnsupportedOperationException();}}
+    @Override
+    public Type type(Services services) {
+        throw new UnsupportedOperationException();
+    }
+}
+//spotless:on

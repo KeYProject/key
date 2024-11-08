@@ -22,13 +22,16 @@ public class Services implements LogicServices {
      */
     private NamespaceSet namespaces = new NamespaceSet();
     private LDTs ldts;
-    private MutRefSortManager mRefManager;
+    private RefSortManager mRefManager;
+    private RustInfo rustInfo;
 
     private final TermFactory tf;
     private final TermBuilder tb;
 
     private Proof proof;
     private Profile profile;
+
+    private final ServiceCaches caches;
 
     /**
      * variable namer for inner renaming
@@ -43,8 +46,10 @@ public class Services implements LogicServices {
     public Services() {
         this.tf = new TermFactory();
         this.tb = new TermBuilder(tf, this);
+        this.caches = new ServiceCaches();
         counters = new LinkedHashMap<>();
-        mRefManager = new MutRefSortManager(this);
+        mRefManager = new RefSortManager(this);
+        rustInfo = new RustInfo(this);
     }
 
     public Services(Profile profile) {
@@ -62,6 +67,8 @@ public class Services implements LogicServices {
         this.profile = services.profile;
         this.counters = services.counters;
         this.mRefManager = services.mRefManager;
+        this.caches = services.caches;
+        rustInfo = services.rustInfo;
     }
 
     public NamespaceSet getNamespaces() {
@@ -80,7 +87,7 @@ public class Services implements LogicServices {
         return tf;
     }
 
-    public MutRefSortManager getMRefManager() {
+    public RefSortManager getMRefManager() {
         return mRefManager;
     }
 
@@ -154,5 +161,13 @@ public class Services implements LogicServices {
 
     public void addNameProposal(Name name) {
         // TODO @ DD
+    }
+
+    public RustInfo getRustInfo() {
+        return rustInfo;
+    }
+
+    public ServiceCaches getCaches() {
+        return caches;
     }
 }

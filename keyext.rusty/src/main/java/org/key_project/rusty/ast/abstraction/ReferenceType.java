@@ -29,7 +29,7 @@ public final class ReferenceType implements Type {
     private ReferenceType(boolean isMut, Type inner) {
         this.isMut = isMut;
         this.inner = inner;
-        String pre = isMut ? "MRef_" : "Ref_";
+        String pre = isMut ? "&mut " : "&";
         name = new Name(pre + inner.toString());
     }
 

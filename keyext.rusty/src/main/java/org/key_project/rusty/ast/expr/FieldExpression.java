@@ -11,12 +11,37 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record FieldExpression(Expr base,Identifier field)implements Expr{@Override public void visit(Visitor v){v.performActionOnFieldExpression(this);}
+//spotless:off
+public record FieldExpression(Expr base, Identifier field) implements Expr {
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnFieldExpression(this);
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(n==0){return base;}if(n==1){return field;}throw new IndexOutOfBoundsException("FieldExpression has less than "+n+" children");}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) {
+            return base;
+        }
+        if (n == 1) {
+            return field;
+        }
+        throw new IndexOutOfBoundsException("FieldExpression has less than " + n + " children");
+    }
 
-@Override public int getChildCount(){return 2;}
+    @Override
+    public int getChildCount() {
+        return 2;
+    }
 
-@Override public String toString(){return base+"."+field;}
+    @Override
+    public String toString() {
+        return base + "." + field;
+    }
 
-@Override public Type type(Services services){throw new UnsupportedOperationException();}}
+    @Override
+    public Type type(Services services) {
+        throw new UnsupportedOperationException();
+    }
+}
+//spotless:on

@@ -184,9 +184,13 @@ public class TacletIndex {
         final Term indexTerm = tac.find();
         if (indexTerm.op() instanceof Modality mod) {
             final RustyProgramElement prg = mod.program().program();
-            indexObj = prg.getChild(0);
-            if (!(indexObj instanceof SchemaVariable)) {
-                indexObj = indexObj.getClass();
+            if (prg.getChildCount() == 0) {
+                indexObj = Modality.class;
+            } else {
+                indexObj = prg.getChild(0);
+                if (!(indexObj instanceof SchemaVariable)) {
+                    indexObj = indexObj.getClass();
+                }
             }
         } else {
             indexObj = indexTerm.op();

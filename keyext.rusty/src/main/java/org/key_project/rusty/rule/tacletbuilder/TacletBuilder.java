@@ -3,12 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.logic.Choice;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -39,6 +44,8 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     protected ImmutableList<VariableCondition> variableConditions =
         ImmutableSLList.nil();
+    protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
+    protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
         DefaultImmutableSet.nil();
 
@@ -191,7 +198,8 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     /**
      * adds a new goal descriptions to the goal descriptions of the Taclet. The TacletGoalTemplate
-     * must be of the appropriate kind (Rewrite/Ante/Succ), otherwise an IllegalArgumentException is
+     * must be of the appropriate useKind (Rewrite/Ante/Succ), otherwise an IllegalArgumentException
+     * is
      * thrown.
      */
     public abstract void addTacletGoalTemplate(TacletGoalTemplate goal);
@@ -218,6 +226,50 @@ public abstract class TacletBuilder<T extends Taclet> {
      * IllegalStateException.
      */
     public abstract T getTaclet();
+
+    public ChoiceExpr getChoices() {
+        return choices;
+    }
+
+    public void setChoices(ChoiceExpr choices) {
+        this.choices = choices;
+    }
+
+    /**
+     * adds a mapping from GoalTemplate <code>gt</code> to SetOf<Choice> <code>soc</code>
+     */
+    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ChoiceExpr soc) {
+        if (goal2Choices == null) {
+            goal2Choices = new LinkedHashMap<>();
+        }
+        goal2Choices.put(gt, soc);
+    }
+
+    public HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
+        return goal2Choices;
+    }
+
+    public T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
+        if (goal2Choices == null || goals.isEmpty()) {
+            return getTaclet();
+        }
+        ImmutableList<TacletGoalTemplate> oldGoals = goals;
+        Iterator<TacletGoalTemplate> it = oldGoals.iterator();
+        T result;
+        while (it.hasNext()) {
+            TacletGoalTemplate gt = it.next();
+            if (goal2Choices.get(gt) != null && !goal2Choices.get(gt).eval(active)) {
+                goals = goals.removeAll(gt);
+            }
+        }
+        if (goals.isEmpty()) {
+            result = null;
+        } else {
+            result = getTaclet();
+        }
+        goals = oldGoals;
+        return result;
+    }
 
     public static class TacletBuilderException extends IllegalArgumentException {
         private final Name tacletName;

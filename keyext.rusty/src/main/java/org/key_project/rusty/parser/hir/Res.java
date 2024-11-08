@@ -10,12 +10,18 @@ public interface Res {
 
     record Local(HirId id) implements Res{}
 
+    record DefRes(Def def)implements Res{}
+
+    record Err() implements Res {}
+
     class Adapter extends HirAdapter<Res> {
         @Override
         public Class<? extends Res> getType(String tag) {
             return switch (tag) {
                 case "PrimTy" -> PrimTy.class;
                 case "Local" -> Local.class;
+                case "Err" -> Err.class;
+                case "Def" -> DefRes.class;
                 default -> null;
             };
         }

@@ -11,7 +11,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.expr.ArithLogicalExpression;
+import org.key_project.rusty.ast.expr.BinaryExpression;
 import org.key_project.rusty.ast.expr.LiteralExpression;
 
 import org.jspecify.annotations.NonNull;
@@ -81,15 +81,15 @@ public abstract class LDT implements Named {
 
     public abstract Term translateLiteral(LiteralExpression lit, Services services);
 
-    public abstract Function getFuctionFor(ArithLogicalExpression.Operator op, Services services);
+    public abstract Function getFunctionFor(BinaryExpression.Operator op, Services services);
 
-    public abstract boolean isResponsible(ArithLogicalExpression.Operator op, Term[] subs,
+    public abstract boolean isResponsible(BinaryExpression.Operator op, Term[] subs,
             Services services);
 
-    public abstract boolean isResponsible(ArithLogicalExpression.Operator op, Term sub,
+    public abstract boolean isResponsible(BinaryExpression.Operator op, Term sub,
             Services services);
 
-    public abstract boolean isResponsible(ArithLogicalExpression.Operator op, Term left, Term right,
+    public abstract boolean isResponsible(BinaryExpression.Operator op, Term left, Term right,
             Services services);
 
     public Sort targetSort() {

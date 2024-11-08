@@ -17,20 +17,65 @@ import org.jspecify.annotations.NonNull;
 
 import static org.key_project.rusty.rule.match.instructions.MatchProgramSVInstruction.convertToLogicElement;
 
-public record SchemaVarPattern(boolean reference,boolean mut,OperatorSV operatorSV)implements Pattern{@Override public @NonNull SyntaxElement getChild(int n){if(n==0)return operatorSV;throw new IndexOutOfBoundsException("SchemaVarPattern has only one child");}
+//spotless:off
+public record SchemaVarPattern(boolean reference, boolean mut, OperatorSV operatorSV) implements Pattern {
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) return operatorSV;
+        throw new IndexOutOfBoundsException("SchemaVarPattern has only one child");
+    }
 
-@Override public int getChildCount(){return 1;}
+    @Override
+    public int getChildCount() {
+        return 1;
+    }
 
-@Override public MatchConditions match(SourceData source,MatchConditions mc){final Services services=source.getServices();final RustyProgramElement src=source.getSource();
+    @Override
+    public MatchConditions match(SourceData source, MatchConditions mc) {
+        final Services services = source.getServices();
+        final RustyProgramElement src = source.getSource();
 
-final SVInstantiations instantiations=mc.getInstantiations();final Object instant=instantiations.getInstantiation(operatorSV);if(instant==null||instant.equals(src)||(instant instanceof Term t&&t.op().equals(src))){mc=addPatternInstantiation(src,mc,instantiations,instant,services);if(mc==null){return null;}}else{return null;}source.next();return mc;}
+        final SVInstantiations instantiations = mc.getInstantiations();
+        final Object instant = instantiations.getInstantiation(operatorSV);
+        if (instant == null || instant.equals(src) || (instant instanceof Term t && t.op().equals(src))) {
+            mc = addPatternInstantiation(src, mc, instantiations, instant, services);
+            if (mc == null) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+        source.next();
+        return mc;
+    }
 
-private MatchConditions addPatternInstantiation(RustyProgramElement pe,MatchConditions mc,SVInstantiations insts,Object foundInst,Services services){if(mc==null){return null;}
+    private MatchConditions addPatternInstantiation(RustyProgramElement pe, MatchConditions mc, SVInstantiations insts, Object foundInst, Services services) {
+        if (mc == null) {
+            return null;
+        }
 
-if(foundInst!=null){final Object newInst;if(foundInst instanceof Term){newInst=convertToLogicElement(pe,services);}else{newInst=pe;}
+        if (foundInst != null) {
+            final Object newInst;
+            if (foundInst instanceof Term) {
+                newInst = convertToLogicElement(pe, services);
+            } else {
+                newInst = pe;
+            }
 
-if(foundInst.equals(newInst)){return mc;}else{return null;}}
+            if (foundInst.equals(newInst)) {
+                return mc;
+            } else {
+                return null;
+            }
+        }
 
-insts=insts.add(operatorSV,pe,services);return insts==null?null:mc.setInstantiations(insts);}
+        insts = insts.add(operatorSV, pe, services);
+        return insts == null ? null : mc.setInstantiations(insts);
+    }
 
-@Override public void visit(Visitor v){v.performActionOnSchemaVarPattern(this);}}
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnSchemaVarPattern(this);
+    }
+}
+//spotless:on

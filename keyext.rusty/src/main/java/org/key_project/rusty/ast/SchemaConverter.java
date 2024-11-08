@@ -22,10 +22,7 @@ import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
-import org.key_project.rusty.ast.ty.PrimitiveRustType;
-import org.key_project.rusty.ast.ty.RustType;
-import org.key_project.rusty.ast.ty.SchemaRustType;
-import org.key_project.rusty.ast.ty.TypeOf;
+import org.key_project.rusty.ast.ty.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -132,7 +129,8 @@ public class SchemaConverter {
         ImmutableArray<FunctionParam> params =
             convertFunctionParams(ctx.functionParams());
         inContextFunction = false;
-        RustType returnType = convertRustType(ctx.functionRetTy().type_());
+        RustType returnType = ctx.functionRetTy() == null ? TupleRustType.UNIT
+                : convertRustType(ctx.functionRetTy().type_());
         BlockExpression body =
             convertBlockExpr(
                 ctx.blockExpr());
@@ -305,21 +303,25 @@ public class SchemaConverter {
     private BorrowExpression convertBorrowExpression(
             org.key_project.rusty.parsing.RustySchemaParser.BorrowExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
-        return new BorrowExpression(ctx.ANDAND() != null, ctx.KW_MUT() != null, base);
+        var e = new BorrowExpression(ctx.KW_MUT() != null, base);
+        if (ctx.ANDAND() != null) {
+            e = new BorrowExpression(false, e);
+        }
+        return e;
     }
 
-    private DereferenceExpression convertDereferenceExpression(
+    private UnaryExpression convertDereferenceExpression(
             org.key_project.rusty.parsing.RustySchemaParser.DereferenceExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
-        return new DereferenceExpression(base);
+        return new UnaryExpression(UnaryExpression.Operator.Deref, base);
     }
 
-    private NegationExpression convertNegationExpression(
+    private UnaryExpression convertNegationExpression(
             org.key_project.rusty.parsing.RustySchemaParser.NegationExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
         var op =
-            ctx.NOT() != null ? NegationExpression.Operator.Not : NegationExpression.Operator.Neg;
-        return new NegationExpression(base, op);
+            ctx.NOT() != null ? UnaryExpression.Operator.Not : UnaryExpression.Operator.Neg;
+        return new UnaryExpression(op, base);
     }
 
     private TypeCastExpression convertTypeCastExpression(
@@ -331,57 +333,57 @@ public class SchemaConverter {
 
     private Expr convertArithmeticOrLogicalExpression(
             org.key_project.rusty.parsing.RustySchemaParser.ArithmeticOrLogicalExpressionContext ctx) {
-        ArithLogicalExpression.Operator op = null;
+        BinaryExpression.Operator op = null;
         if (ctx.AND() != null)
-            op = ArithLogicalExpression.Operator.BitwiseAnd;
+            op = BinaryExpression.Operator.BitAnd;
         if (ctx.OR() != null)
-            op = ArithLogicalExpression.Operator.BitwiseOr;
+            op = BinaryExpression.Operator.BitOr;
         if (ctx.CARET() != null)
-            op = ArithLogicalExpression.Operator.BitwiseXor;
+            op = BinaryExpression.Operator.BitXor;
         if (ctx.PLUS() != null)
-            op = ArithLogicalExpression.Operator.Plus;
+            op = BinaryExpression.Operator.Add;
         if (ctx.MINUS() != null)
-            op = ArithLogicalExpression.Operator.Minus;
+            op = BinaryExpression.Operator.Sub;
         if (ctx.PERCENT() != null)
-            op = ArithLogicalExpression.Operator.Modulo;
+            op = BinaryExpression.Operator.Rem;
         if (ctx.STAR() != null)
-            op = ArithLogicalExpression.Operator.Multiply;
+            op = BinaryExpression.Operator.Mul;
         if (ctx.SLASH() != null)
-            op = ArithLogicalExpression.Operator.Divide;
+            op = BinaryExpression.Operator.Div;
         if (ctx.shl() != null)
-            op = ArithLogicalExpression.Operator.Shl;
+            op = BinaryExpression.Operator.Shl;
         if (ctx.shr() != null)
-            op = ArithLogicalExpression.Operator.Shr;
+            op = BinaryExpression.Operator.Shr;
         assert op != null;
-        return new ArithLogicalExpression(convertExpr(ctx.expr(0)), op,
+        return new BinaryExpression(op, convertExpr(ctx.expr(0)),
             convertExpr(ctx.expr(1)));
     }
 
-    private ComparisonExpression convertComparisonExpression(
+    private BinaryExpression convertComparisonExpression(
             org.key_project.rusty.parsing.RustySchemaParser.ComparisonExpressionContext ctx) {
         var left = convertExpr(ctx.expr(0));
         var right = convertExpr(ctx.expr(1));
         var opCtx = ctx.comparisonOperator();
-        var op = opCtx.EQEQ() != null ? ComparisonExpression.Operator.Equal
-                : opCtx.GT() != null ? ComparisonExpression.Operator.Greater
-                        : opCtx.LT() != null ? ComparisonExpression.Operator.Less
-                                : opCtx.NE() != null ? ComparisonExpression.Operator.NotEqual
+        var op = opCtx.EQEQ() != null ? BinaryExpression.Operator.Eq
+                : opCtx.GT() != null ? BinaryExpression.Operator.Gt
+                        : opCtx.LT() != null ? BinaryExpression.Operator.Lt
+                                : opCtx.NE() != null ? BinaryExpression.Operator.Ne
                                         : opCtx.GE() != null
-                                                ? ComparisonExpression.Operator.GreaterOrEqual
+                                                ? BinaryExpression.Operator.Ge
                                                 : opCtx.LE() != null
-                                                        ? ComparisonExpression.Operator.LessOrEqual
+                                                        ? BinaryExpression.Operator.Le
                                                         : null;
         assert op != null;
-        return new ComparisonExpression(left, op, right);
+        return new BinaryExpression(op, left, right);
     }
 
-    private LazyBooleanExpression convertLazyBooleanExpression(
+    private BinaryExpression convertLazyBooleanExpression(
             org.key_project.rusty.parsing.RustySchemaParser.LazyBooleanExpressionContext ctx) {
         var left = convertExpr(ctx.expr(0));
         var right = convertExpr(ctx.expr(1));
-        var op = ctx.ANDAND() != null ? LazyBooleanExpression.Operator.And
-                : LazyBooleanExpression.Operator.Or;
-        return new LazyBooleanExpression(left, op, right);
+        var op = ctx.ANDAND() != null ? BinaryExpression.Operator.And
+                : BinaryExpression.Operator.Or;
+        return new BinaryExpression(op, left, right);
     }
 
     private RangeExpression convertRangeExpression(
@@ -408,20 +410,20 @@ public class SchemaConverter {
         var left = convertExpr(ctx.expr(0));
         var right = convertExpr(ctx.expr(1));
         var opCtx = ctx.compoundAssignOperator();
-        var op = opCtx.PLUSEQ() != null ? CompoundAssignmentExpression.Operator.Plus
-                : opCtx.MINUSEQ() != null ? CompoundAssignmentExpression.Operator.Minus
-                        : opCtx.STAREQ() != null ? CompoundAssignmentExpression.Operator.Divide
+        var op = opCtx.PLUSEQ() != null ? BinaryExpression.Operator.Add
+                : opCtx.MINUSEQ() != null ? BinaryExpression.Operator.Sub
+                        : opCtx.STAREQ() != null ? BinaryExpression.Operator.Mul
                                 : opCtx.PERCENTEQ() != null
-                                        ? CompoundAssignmentExpression.Operator.Modulo
+                                        ? BinaryExpression.Operator.Rem
                                         : opCtx.ANDEQ() != null
-                                                ? CompoundAssignmentExpression.Operator.And
+                                                ? BinaryExpression.Operator.BitAnd
                                                 : opCtx.OREQ() != null
-                                                        ? CompoundAssignmentExpression.Operator.Or
+                                                        ? BinaryExpression.Operator.BitOr
                                                         : opCtx.CARETEQ() != null
-                                                                ? CompoundAssignmentExpression.Operator.Xor
+                                                                ? BinaryExpression.Operator.BitXor
                                                                 : opCtx.SHLEQ() != null
-                                                                        ? CompoundAssignmentExpression.Operator.Shl
-                                                                        : CompoundAssignmentExpression.Operator.Shr;
+                                                                        ? BinaryExpression.Operator.Shl
+                                                                        : BinaryExpression.Operator.Shr;
         return new CompoundAssignmentExpression(left, op, right);
     }
 
@@ -539,6 +541,9 @@ public class SchemaConverter {
             org.key_project.rusty.parsing.RustySchemaParser.StandardBlockExprContext ctx) {
         var stmtsCtx = ctx.stmts();
 
+        if (stmtsCtx == null)
+            return new BlockExpression(ImmutableSLList.nil(), null);
+
         var stmts = stmtsCtx.stmt().stream().map(this::convertStmt)
                 .collect(ImmutableList.collector());
         if (!stmts.isEmpty() && stmts.get(stmts.size() - 1) instanceof ProgramSV psv
@@ -554,7 +559,7 @@ public class SchemaConverter {
             }
             return new BlockExpression(firstStmts, psv);
         }
-        var value = convertExpr(stmtsCtx.expr());
+        var value = stmtsCtx.expr() == null ? null : convertExpr(stmtsCtx.expr());
 
         return new BlockExpression(stmts, value);
     }
@@ -694,8 +699,9 @@ public class SchemaConverter {
     private Statement convertExprStmt(
             org.key_project.rusty.parsing.RustySchemaParser.ExprStmtContext ctx) {
         if (ctx.expr() != null)
-            return new ExpressionStatement(convertExpr(ctx.expr()));
-        return new ExpressionStatement(convertExprWithBlock(ctx.exprWithBlock()));
+            return new ExpressionStatement(convertExpr(ctx.expr()), ctx.SEMI() != null);
+        return new ExpressionStatement(convertExprWithBlock(ctx.exprWithBlock()),
+            ctx.SEMI() != null);
     }
 
     private Statement convertLetStmt(

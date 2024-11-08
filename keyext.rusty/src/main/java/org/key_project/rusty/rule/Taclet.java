@@ -9,6 +9,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.BoundVarsVisitor;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
@@ -31,6 +32,9 @@ public abstract class Taclet implements Rule {
 
     /** name displayed by the pretty printer */
     private final String displayName;
+
+    /** the set of taclet options for this taclet */
+    protected final ChoiceExpr choices;
 
     /**
      * the <tt>if</tt> sequent of the taclet
@@ -115,7 +119,7 @@ public abstract class Taclet implements Rule {
     protected Taclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            boolean surviveSmbExec,
+            ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
         this.name = name;
@@ -125,6 +129,7 @@ public abstract class Taclet implements Rule {
         varsNewDependingOn = applPart.varsNewDependingOn();
         variableConditions = applPart.variableConditions();
         this.goalTemplates = goalTemplates;
+        this.choices = choices;
         this.prefixMap = prefixMap;
         this.displayName = attrs.displayName() == null ? name.toString() : attrs.displayName();
         this.surviveSymbExec = surviveSmbExec;
@@ -157,8 +162,8 @@ public abstract class Taclet implements Rule {
     protected Taclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, attrs, prefixMap, false,
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        this(name, applPart, goalTemplates, attrs, prefixMap, choices, false,
             tacletAnnotations);
     }
 
@@ -484,4 +489,8 @@ public abstract class Taclet implements Rule {
     }
 
     public abstract Taclet setName(String s);
+
+    public ChoiceExpr getChoices() {
+        return choices;
+    }
 }

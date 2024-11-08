@@ -17,6 +17,7 @@ import org.jspecify.annotations.NonNull;
 
 public class IntegerLiteralExpression extends LiteralExpression {
     public enum IntegerSuffix {
+        None,
         u8,
         u16,
         u32,
@@ -75,7 +76,8 @@ public class IntegerLiteralExpression extends LiteralExpression {
 
     @Override
     public String toString() {
-        return value + suffix.toString();
+        String suff = suffix == IntegerSuffix.None ? "" : suffix.toString();
+        return value + suff;
     }
 
     @Override
@@ -120,6 +122,7 @@ public class IntegerLiteralExpression extends LiteralExpression {
     @Override
     public Type type(Services services) {
         return switch (suffix) {
+        case None -> null;
         case u8 -> PrimitiveType.U8;
         case u16 -> PrimitiveType.U16;
         case u32 -> PrimitiveType.U32;

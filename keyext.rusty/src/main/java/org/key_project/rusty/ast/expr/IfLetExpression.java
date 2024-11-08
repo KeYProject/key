@@ -12,7 +12,9 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record IfLetExpression(Pattern pattern, Expr expr, ThenBranch then, @Nullable Expr elseExpr) implements Expr {
+//spotless:off
+public record IfLetExpression(Pattern pattern, Expr expr, BlockExpression then,
+                              @Nullable Expr elseExpr) implements Expr {
     @Override
     public void visit(Visitor v) {
         v.performActionOnIfLetExpression(this);
@@ -20,10 +22,18 @@ public record IfLetExpression(Pattern pattern, Expr expr, ThenBranch then, @Null
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        if (n == 0) {return pattern;}
-        if (n == 1) {return expr;}
-        if (n == 2) {return then;}
-        if (n == 3 && elseExpr != null) {return elseExpr;}
+        if (n == 0) {
+            return pattern;
+        }
+        if (n == 1) {
+            return expr;
+        }
+        if (n == 2) {
+            return then;
+        }
+        if (n == 3 && elseExpr != null) {
+            return elseExpr;
+        }
         throw new IndexOutOfBoundsException("IfLetExpression  has less than " + n + " children");
     }
 
@@ -31,7 +41,6 @@ public record IfLetExpression(Pattern pattern, Expr expr, ThenBranch then, @Null
     public int getChildCount() {
         return 3 + (elseExpr == null ? 0 : 1);
     }
-
 
     @Override
     public String toString() {
@@ -41,9 +50,9 @@ public record IfLetExpression(Pattern pattern, Expr expr, ThenBranch then, @Null
         return sb.toString();
     }
 
-
     @Override
     public Type type(Services services) {
         return then.type(services);
     }
 }
+//spotless:on

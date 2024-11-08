@@ -7,6 +7,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.BoundVarsVisitor;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
@@ -53,9 +54,9 @@ public abstract class FindTaclet extends Taclet {
     protected FindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            boolean surviveSymbExec,
+            ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, prefixMap, surviveSymbExec,
+        super(name, applPart, goalTemplates, attrs, prefixMap, choices, surviveSymbExec,
             tacletAnnotations);
         this.find = find;
     }
@@ -78,8 +79,8 @@ public abstract class FindTaclet extends Taclet {
     protected FindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, attrs, find, prefixMap, false,
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        this(name, applPart, goalTemplates, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
     }
 

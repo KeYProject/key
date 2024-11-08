@@ -5,14 +5,14 @@ package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.TupleType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) implements Expr {
+// spotless:off
+public record CompoundAssignmentExpression(Expr left, BinaryExpression.Operator op, Expr right) implements Expr {
     @Override
     public void visit(Visitor v) {
         v.performActionOnCompoundAssignmentExpression(this);
@@ -43,38 +43,5 @@ public record CompoundAssignmentExpression(Expr left, Operator op, Expr right) i
     public Type type(Services services) {
         return TupleType.UNIT;
     }
-
-    public enum Operator implements RustyProgramElement {
-        Plus, Minus, Multiply, Divide, Modulo, And, Or, Xor, Shl, Shr;
-
-        @Override
-        public String toString() {
-            return switch (this) {
-                case Plus -> "+=";
-                case Minus -> "-=";
-                case Multiply -> "*=";
-                case Divide -> "/=";
-                case Modulo -> "%=";
-                case And -> "&=";
-                case Or -> "|=";
-                case Xor -> "^=";
-                case Shl -> "<<=";
-                case Shr -> ">>=";
-            };
-        }
-
-        @Override
-        public SyntaxElement getChild(int n) {
-            throw new IndexOutOfBoundsException("Operator has no children");
-        }
-
-        @Override
-        public int getChildCount() {
-            return 0;
-        }
-
-        @Override
-        public void visit(Visitor v) {
-            v.performActionOnCompoundAssignmentOperator(this);
-        }
-    }}
+}
+//spotless:on
