@@ -71,5 +71,10 @@ public record UnaryExpression(Operator op, Expr expr) implements Expr {
     public int getChildCount() {
         return 2;
     }
+
+    @Override
+    public String toString() {
+        return op.toString() + expr;
+    }
 }
 //spotless:on
