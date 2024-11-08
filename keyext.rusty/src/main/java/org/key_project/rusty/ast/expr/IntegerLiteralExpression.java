@@ -122,7 +122,7 @@ public class IntegerLiteralExpression extends LiteralExpression {
     @Override
     public Type type(Services services) {
         return switch (suffix) {
-            case None -> null;
+        case None -> null;
         case u8 -> PrimitiveType.U8;
         case u16 -> PrimitiveType.U16;
         case u32 -> PrimitiveType.U32;

@@ -27,7 +27,7 @@
         (rule "letIdentPat" (formula "1") (term "1,1"))
         (rule "borrowShared" (formula "1") (term "1,1"))
         (rule "equalityComparisonSimple" (formula "1") (term "1,1,1"))
-        (rule "emptyModality" (formula "1") (term "1,1,1,1"))
+        (rule "emptyModalityValue" (formula "1") (term "1,1,1,1"))
         (rule "sequentialToParallel2" (formula "1"))
         (rule "simplifyUpdate3" (formula "1") (term "1,0"))
         (rule "sequentialToParallel2" (formula "1"))

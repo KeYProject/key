@@ -20,9 +20,22 @@ import org.key_project.rusty.settings.Configuration;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.jspecify.annotations.NonNull;
 
 public final class ParsingFacade {
     private ParsingFacade() {
+    }
+
+    /**
+     * Extracts the choice information from the given the parsed files {@code ctxs}.
+     *
+     * @param ctxs non-null list
+     */
+    public static @NonNull ChoiceInformation getChoices(@NonNull List<KeYAst.File> ctxs) {
+        ChoiceInformation ci = new ChoiceInformation();
+        ChoiceFinder finder = new ChoiceFinder(ci);
+        ctxs.forEach(it -> it.accept(finder));
+        return ci;
     }
 
     private static KeYRustyParser createParser(CharStream stream) {

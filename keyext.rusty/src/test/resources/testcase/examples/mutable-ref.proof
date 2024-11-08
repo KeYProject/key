@@ -69,7 +69,7 @@
         )
         (branch
             (rule "sequentialToParallel2" (formula "1"))
-            (rule "emptyModality" (formula "1") (term "1"))
+            (rule "emptyModalityValue" (formula "1") (term "1"))
             (rule "applyOnElementary" (formula "1") (term "1,0"))
             (rule "simplifyUpdate2" (formula "1"))
             (rule "applyOnRigidFormula" (formula "1"))

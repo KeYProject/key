@@ -61,6 +61,12 @@ public abstract class KeYAst<T extends ParserRuleContext> {
             return finder.getIncludes();
         }
 
+        public ChoiceInformation getChoices() {
+            ChoiceFinder finder = new ChoiceFinder();
+            accept(finder);
+            return finder.getChoiceInformation();
+        }
+
         public ProblemInformation getProblemInformation() {
             FindProblemInformation fpi = new FindProblemInformation();
             ctx.accept(fpi);

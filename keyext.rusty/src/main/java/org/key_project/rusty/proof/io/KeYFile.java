@@ -14,10 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.parser.KeYAst;
-import org.key_project.rusty.parser.KeYIO;
-import org.key_project.rusty.parser.ParsingFacade;
-import org.key_project.rusty.parser.ProblemInformation;
+import org.key_project.rusty.parser.*;
 import org.key_project.rusty.parser.builder.ProblemFinder;
 import org.key_project.rusty.parser.builder.TacletPBuilder;
 import org.key_project.rusty.proof.init.Includes;
@@ -245,8 +242,8 @@ public class KeYFile implements EnvInput {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
         // read .key file
-        // ChoiceInformation ci = getParseContext().getChoices();
-        // initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
+        ChoiceInformation ci = getParseContext().getChoices();
+        initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
         var warnings = new ArrayList<String>();
         warnings.addAll(readSorts());

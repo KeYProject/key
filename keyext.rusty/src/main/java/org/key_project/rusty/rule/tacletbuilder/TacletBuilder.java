@@ -6,11 +6,13 @@ package org.key_project.rusty.rule.tacletbuilder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
@@ -245,6 +247,28 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     public HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
         return goal2Choices;
+    }
+
+    public T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
+        if (goal2Choices == null || goals.isEmpty()) {
+            return getTaclet();
+        }
+        ImmutableList<TacletGoalTemplate> oldGoals = goals;
+        Iterator<TacletGoalTemplate> it = oldGoals.iterator();
+        T result;
+        while (it.hasNext()) {
+            TacletGoalTemplate gt = it.next();
+            if (goal2Choices.get(gt) != null && !goal2Choices.get(gt).eval(active)) {
+                goals = goals.removeAll(gt);
+            }
+        }
+        if (goals.isEmpty()) {
+            result = null;
+        } else {
+            result = getTaclet();
+        }
+        goals = oldGoals;
+        return result;
     }
 
     public static class TacletBuilderException extends IllegalArgumentException {

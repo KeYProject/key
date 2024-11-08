@@ -541,6 +541,9 @@ public class SchemaConverter {
             org.key_project.rusty.parsing.RustySchemaParser.StandardBlockExprContext ctx) {
         var stmtsCtx = ctx.stmts();
 
+        if (stmtsCtx == null)
+            return new BlockExpression(ImmutableSLList.nil(), null);
+
         var stmts = stmtsCtx.stmt().stream().map(this::convertStmt)
                 .collect(ImmutableList.collector());
         if (!stmts.isEmpty() && stmts.get(stmts.size() - 1) instanceof ProgramSV psv

@@ -13,6 +13,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -21,6 +22,8 @@ import org.key_project.rusty.logic.sort.SortImpl;
 import org.key_project.rusty.parser.KeYRustyParser;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
+
+import org.antlr.v4.runtime.Token;
 
 public class DeclarationBuilder extends DefaultBuilder {
     private final Map<String, String> category2Default = new HashMap<>();
@@ -31,7 +34,8 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYRustyParser.DeclsContext ctx) {
-        mapMapOf(ctx.sort_decls(),
+        mapMapOf(ctx.option_decls(), ctx.options_choice(),
+            ctx.sort_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
         return null;
     }
@@ -65,6 +69,37 @@ public class DeclarationBuilder extends DefaultBuilder {
                 }
             }
         }
+        return null;
+    }
+
+    @Override
+    public Object visitChoice(KeYRustyParser.ChoiceContext ctx) {
+        String cat = ctx.category.getText();
+        for (KeYRustyParser.OptionDeclContext optdecl : ctx.optionDecl()) {
+            Token catctx = optdecl.IDENT;
+            String name = cat + ":" + catctx.getText();
+            Choice c = choices().lookup(new Name(name));
+            if (c == null) {
+                c = new Choice(catctx.getText(), cat);
+                choices().add(c);
+            }
+            category2Default.putIfAbsent(cat, name);
+        }
+        category2Default.computeIfAbsent(cat, it -> {
+            choices().add(new Choice("On", cat));
+            choices().add(new Choice("Off", cat));
+            return cat + ":On";
+        });
+        return null;
+    }
+
+    @Override
+    public Object visitOption_decls(KeYRustyParser.Option_declsContext ctx) {
+        return mapOf(ctx.choice());
+    }
+
+    @Override
+    public Object visitOptions_choice(KeYRustyParser.Options_choiceContext ctx) {
         return null;
     }
 

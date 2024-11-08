@@ -31,7 +31,7 @@
         (branch
            (rule "emptyBlock" (formula "2") (term "1"))
            (rule "assignment" (formula "2") (term "1"))
-           (rule "emptyModality" (formula "2") (term "1,1"))
+           (rule "emptyModalityValue" (formula "2") (term "1,1"))
            (rule "simplifyUpdate2" (formula "2"))
            (rule "applyOnRigidFormula" (formula "2"))
            (rule "applyOnPV" (formula "2") (term "0"))

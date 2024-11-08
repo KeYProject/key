@@ -40,7 +40,6 @@ import org.jspecify.annotations.Nullable;
 import static java.text.MessageFormat.format;
 
 public class TacletPBuilder extends ExpressionBuilder {
-
     private final Deque<TacletBuilder<?>> currentTBuilder = new ArrayDeque<>(8);
 
     private Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
@@ -450,7 +449,7 @@ public class TacletPBuilder extends ExpressionBuilder {
          * https://github.com/KeYProject/key/issues/3352).
          */
         if (choices().lookup(choiceStr) == null) {
-            semanticError(ctx, "Could not find choice: %s", category + ":" + choiceStr);
+            semanticError(ctx, "Could not find choice: %s", choiceStr);
         }
         return ChoiceExpr.variable(ctx.option().cat.getText(), ctx.option().value.getText());
     }

@@ -43,6 +43,10 @@ public class ProofCollections {
         var refs = c.group("references");
         refs.loadable("shared-ref.proof");
         refs.loadable("mutable-ref.proof");
+
+        var choices = c.group("choices");
+        choices.loadable("sub-no-check.proof");
+
         return c;
     }
 }

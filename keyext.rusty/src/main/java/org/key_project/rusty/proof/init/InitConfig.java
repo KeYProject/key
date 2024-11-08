@@ -288,8 +288,8 @@ public class InitConfig {
         for (Taclet t : taclets) {
             TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
             if (t.getChoices().eval(choices)) {
-                if (b != null) {
-                    t = b.getTaclet();
+                if (b != null && b.getGoal2Choices() != null) {
+                    t = b.getTacletWithoutInactiveGoalTemplates(choices);
                 }
 
                 if (t != null) {
@@ -298,5 +298,37 @@ public class InitConfig {
             }
         }
         activatedTacletCache = Collections.unmodifiableMap(tacletCache);
+    }
+
+    /**
+     * Adds default choices given in {@code init}. Not overriding previous default choices.
+     */
+    public void addCategory2DefaultChoices(@NonNull Map<String, String> init) {
+        boolean changed = false;
+        for (final Map.Entry<String, String> entry : init.entrySet()) {
+            changed = addCategoryDefaultChoice(entry.getKey(), entry.getValue()) || changed;
+        }
+        if (changed) {
+            // FIXME weigl: I do not understand why the default choices are back progragated!
+            // For me this is a design flaw.
+            Map<String, String> clone =
+                new HashMap<>(category2DefaultChoice);
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+            // invalidate active taclet cache
+            activatedTacletCache = null;
+        }
+    }
+
+    /**
+     * Adds a default option for a category. It does override previous default choices.
+     *
+     * @return true if the default was successfully set
+     */
+    public boolean addCategoryDefaultChoice(@NonNull String category, @NonNull String choice) {
+        if (!category2DefaultChoice.containsKey(category)) {
+            category2DefaultChoice.put(category, choice);
+            return true;
+        }
+        return false;
     }
 }
