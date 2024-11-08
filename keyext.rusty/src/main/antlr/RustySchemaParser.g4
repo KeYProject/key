@@ -4,8 +4,8 @@ import RustyParser;
 
 options { tokenVocab = RustySchemaLexer; }
 blockExpr
-   : '{' 'c#' stmts? '#c' '}' # ContextBlockExpr
-   | '{' stmts? '}' # StandardBlockExpr
+   : LCURLYBRACE CONTEXT_START stmts? CONTEXT_END RCURLYBRACE # ContextBlockExpr
+   | LCURLYBRACE stmts? RCURLYBRACE # StandardBlockExpr
    ;
 
 expr
@@ -51,7 +51,7 @@ expr
    ;
 
 stmt
-   : ';'
+   : SEMI
    | item
    | letStmt
    | exprStmt
@@ -68,6 +68,15 @@ identifierPattern
 
 schemaVariable
    : SCHEMA_IDENTIFIER
+   ;
+
+rangePatternBound
+   : schemaVariable
+   | CHAR_LITERAL
+   | BYTE_LITERAL
+   | MINUS? INTEGER_LITERAL
+   // | MINUS? FLOAT_LITERAL
+   | pathExpr
    ;
 
 typeNoBounds
@@ -89,10 +98,14 @@ typeNoBounds
    ;
 
 ifExpr
-   : 'if' expr (thenBlock=blockExpr | thenSV=schemaVariable) ('else' (elseBlock=blockExpr | elseIf=ifExpr | elseSV=schemaVariable))?
+   : KW_IF expr (thenBlock=blockExpr | thenSV=schemaVariable) (KW_ELSE (elseBlock=blockExpr | elseIf=ifExpr | elseSV=schemaVariable))?
    ;
 
+ifLetExpr
+  : KW_IF KW_LET (pattern | patternSV=schemaVariable) EQ expr (thenBlock=blockExpr | thenSV=schemaVariable) (KW_ELSE (elseBlock=blockExpr | elseIf=ifExpr | elseIfLet=ifLetExpr | elseSV=schemaVariable))?
+  ;
+
 typeOf
-   : TYPE_OF '(' expr ')'
+   : TYPE_OF LPAREN expr RPAREN
    ;
 

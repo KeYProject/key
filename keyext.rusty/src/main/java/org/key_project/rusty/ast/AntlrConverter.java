@@ -665,7 +665,65 @@ public class AntlrConverter {
                 return WildCardPattern.WILDCARD;
             }
         }
+        if (ctx.rangePattern() != null) {
+            return convertRangePattern(ctx.rangePattern());
+        }
         throw new IllegalArgumentException("Unknown pattern " + ctx.getText());
+    }
+
+    private Pattern convertRangePattern(RustyParser.RangePatternContext ctx) {
+        if (ctx.rangeExclusivePattern() != null)
+            return convertRangeExclusivePattern(ctx.rangeExclusivePattern());
+        if (ctx.rangeInclusivePattern() != null)
+            return convertRangeInclusivePattern(ctx.rangeInclusivePattern());
+        if (ctx.rangeFromPattern() != null)
+            return convertRangeFromPattern(ctx.rangeFromPattern());
+        if (ctx.rangeToInclusivePattern() != null)
+            return convertRangeToInclusivePattern(ctx.rangeToInclusivePattern());
+        if (ctx.obsoleteRangePattern() != null)
+            return convertObsoleteRangePattern(ctx.obsoleteRangePattern());
+        throw new IllegalArgumentException("Unknown range pattern " + ctx.getText());
+    }
+
+    private Pattern convertRangeExclusivePattern(RustyParser.RangeExclusivePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Exclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
+    }
+
+    private Pattern convertRangeInclusivePattern(RustyParser.RangeInclusivePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Inclusive, convertRangePatternBound(ctx.rangePatternBound(1)));
+    }
+
+    private Pattern convertRangeFromPattern(RustyParser.RangeFromPatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound()),
+            RangePattern.Bounds.Exclusive, null);
+    }
+
+    private Pattern convertRangeToInclusivePattern(RustyParser.RangeToInclusivePatternContext ctx) {
+        return new RangePattern(null,
+            RangePattern.Bounds.Inclusive, convertRangePatternBound(ctx.rangePatternBound()));
+    }
+
+    private Pattern convertObsoleteRangePattern(RustyParser.ObsoleteRangePatternContext ctx) {
+        return new RangePattern(convertRangePatternBound(ctx.rangePatternBound(0)),
+            RangePattern.Bounds.Obsolete, convertRangePatternBound(ctx.rangePatternBound(1)));
+    }
+
+    private Expr convertRangePatternBound(RustyParser.RangePatternBoundContext ctx) {
+        if (ctx.INTEGER_LITERAL() != null) {
+            var text = ctx.INTEGER_LITERAL().getText();
+            var signed = text.contains("i");
+            var split = text.split("[ui]");
+            var size = split[split.length - 1];
+            var suffix = IntegerLiteralExpression.IntegerSuffix.get(signed, size);
+            var lit = split[0];
+            var value = new BigInteger(
+                lit);
+            return new IntegerLiteralExpression(value, suffix);
+        }
+        // TODO implement more bounds (char, byte, float, pathexpression)
+        throw new IllegalArgumentException("Unknown rangePatternBound: " + ctx.getText());
     }
 
     private RustType convertRustType(org.key_project.rusty.parsing.RustyParser.Type_Context ctx) {

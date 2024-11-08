@@ -37,7 +37,9 @@ public class PrettyPrinter implements Visitor {
     private boolean usePrettyPrinting;
     private boolean useUnicodeSymbols;
 
-    /** creates a new PrettyPrinter */
+    /**
+     * creates a new PrettyPrinter
+     */
     public PrettyPrinter(PosTableLayouter out) {
         this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true);
     }
@@ -530,7 +532,18 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnIfLetExpression(IfLetExpression x) {
-
+        layouter.keyWord("if").print(" ");
+        layouter.keyWord("let").print(" ");
+        x.pattern().visit(this);
+        layouter.print(" = ");
+        x.expr().visit(this);
+        layouter.print(" ");
+        x.then().visit(this);
+        if (x.elseExpr() != null) {
+            layouter.print(" ");
+            layouter.keyWord("else").print(" ");
+            x.elseExpr().visit(this);
+        }
     }
 
     @Override
@@ -593,6 +606,17 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnWildCardPattern(WildCardPattern x) {
 
+    }
+
+    @Override
+    public void performActionOnRangepattern(RangePattern x) {
+        if (x.left() != null) {
+            x.left().visit(this);
+        }
+        layouter.print(x.bounds().toString());
+        if (x.right() != null) {
+            x.right().visit(this);
+        }
     }
 
     @Override

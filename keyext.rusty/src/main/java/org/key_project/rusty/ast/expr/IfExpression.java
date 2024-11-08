@@ -12,12 +12,35 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record IfExpression(Expr condition,ThenBranch thenExpr,@Nullable ElseBranch elseExpr)implements Expr,ElseBranch{@Override public void visit(Visitor v){v.performActionOnIfExpression(this);}
+public record IfExpression(Expr condition, ThenBranch thenExpr, @Nullable ElseBranch elseExpr) implements Expr, ElseBranch {
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnIfExpression(this);
+    }
 
-@Override public @NonNull SyntaxElement getChild(int n){if(n==0)return condition;if(n==1)return thenExpr;if(n==2&&elseExpr!=null)return elseExpr;throw new IndexOutOfBoundsException("IfExpression has less than "+n+" children");}
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        if (n == 0) return condition;
+        if (n == 1) return thenExpr;
+        if (n == 2 && elseExpr != null) return elseExpr;
+        throw new IndexOutOfBoundsException("IfExpression has less than " + n + " children");
+    }
 
-@Override public int getChildCount(){return 2+(elseExpr==null?0:1);}
+    @Override
+    public int getChildCount() {
+        return 2 + (elseExpr == null ? 0 : 1);
+    }
 
-@Override public String toString(){StringBuilder sb=new StringBuilder();sb.append("if ").append(condition).append(thenExpr);if(elseExpr!=null)sb.append(" else ").append(elseExpr);return sb.toString();}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("if ").append(condition).append(" ").append(thenExpr);
+        if (elseExpr != null) sb.append(" else ").append(elseExpr);
+        return sb.toString();
+    }
 
-@Override public Type type(Services services){return thenExpr.type(services);}}
+    @Override
+    public Type type(Services services) {
+        return thenExpr.type(services);
+    }
+}

@@ -738,9 +738,31 @@ restPattern
    ;
 
 rangePattern
-   : rangePatternBound DOTDOTEQ rangePatternBound # InclusiveRangePattern
-   | rangePatternBound DOTDOT # HalfOpenRangePattern
-   | rangePatternBound DOTDOTDOT rangePatternBound # ObsoleteRangePattern
+   : rangeExclusivePattern
+   | rangeInclusivePattern
+   | rangeFromPattern
+   | rangeToInclusivePattern
+   | obsoleteRangePattern
+   ;
+
+rangeExclusivePattern
+   : rangePatternBound DOTDOT rangePatternBound
+   ;
+
+rangeInclusivePattern
+   : rangePatternBound DOTDOTEQ rangePatternBound
+   ;
+
+rangeFromPattern
+   : rangePatternBound DOTDOT
+   ;
+
+rangeToInclusivePattern
+   : DOTDOTEQ rangePatternBound
+   ;
+
+obsoleteRangePattern
+   : rangePatternBound DOTDOTDOT rangePatternBound
    ;
 
 rangePatternBound
@@ -748,7 +770,7 @@ rangePatternBound
    | BYTE_LITERAL
    | MINUS? INTEGER_LITERAL
    // | MINUS? FLOAT_LITERAL
-   | pathPattern
+   | pathExpr
    ;
 
 referencePattern

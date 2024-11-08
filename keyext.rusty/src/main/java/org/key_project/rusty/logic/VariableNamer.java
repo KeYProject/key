@@ -11,6 +11,8 @@ import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.InstantiationProposer;
+import org.key_project.rusty.proof.Node;
+import org.key_project.rusty.rule.NewVarcond;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.util.collection.ImmutableList;
 
@@ -45,6 +47,35 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     public VariableNamer(Services services) {
         this.services = services;
+    }
+
+    /**
+     * proposes a unique name for the instantiation of a schema variable
+     * <p>
+     * <strong>Warning:</strong> The current version does not yet guarantee a unique name,
+     * but it is very important that this is implemented in the future.
+     *
+     * @param app the taclet app
+     * @param var the schema variable to be instantiated
+     * @param services not used
+     * @param undoAnchor not used
+     * @param previousProposals list of names which should be considered taken, or null
+     * @return the name proposal, or null if no proposal is available
+     */
+    public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
+            ImmutableList<String> previousProposals) {
+        // TODO change this to be the real version of VariableNamer in key.core
+        // Currently, a very basic approach is taken that uses the first letter of the type
+        // similar to what is done in VariableNamer#getBaseNameProposal(Type type) in key.core
+        NewVarcond nv = app.taclet().varDeclaredNew(var);
+        String name = nv.getType().name().toString();
+        String result;
+        if (!name.isEmpty()) {
+            result = name.substring(0, 1).toLowerCase();
+        } else {
+            result = "x"; // use default name otherwise
+        }
+        return result;
     }
 
     // precondition: sv.sort()==ProgramSVSort.VARIABLE

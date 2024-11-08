@@ -131,6 +131,8 @@ public interface Visitor {
 
     void performActionOnWildCardPattern(WildCardPattern x);
 
+    void performActionOnRangepattern(RangePattern x);
+
     void performActionOnReferenceRustType(ReferenceRustType x);
 
     void performActionOnArithLogicalOperator(ArithLogicalExpression.Operator x);

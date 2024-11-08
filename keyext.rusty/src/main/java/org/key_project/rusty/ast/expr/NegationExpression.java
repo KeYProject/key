@@ -5,6 +5,7 @@ package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
@@ -12,7 +13,7 @@ import org.jspecify.annotations.NonNull;
 
 public record NegationExpression(Expr expr,org.key_project.rusty.ast.expr.NegationExpression.Operator op)implements Expr{
 
-public enum Operator implements SyntaxElement {
+public enum Operator implements RustyProgramElement {
     Neg, Not;
 
     @Override
@@ -33,7 +34,12 @@ public enum Operator implements SyntaxElement {
         return 0;
     }
 
+    @Override
+    public void visit(Visitor v) {
+        // Operator should stay invisible to the visitors and therefore no visit is needed
     }
+
+}
 
     @Override
     public String toString() {

@@ -48,7 +48,7 @@ public class TestProperties {
             @Test
             void testDifferentOperatorSameExpressions() {
                 ProgramTuple programs =
-                    getPrograms("\\<{ 1u32 + 2u32 }\\>TRUE", "\\<{ 1u32 - 2u32 }\\>TRUE");
+                    getPrograms("\\<{ 1u32 + 2u32 }\\>true", "\\<{ 1u32 - 2u32 }\\>true");
                 assertFalse(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -59,7 +59,7 @@ public class TestProperties {
             @Test
             void testSameOperatorSameExpressions() {
                 ProgramTuple programs =
-                    getPrograms("\\<{ -1i32 + 2i32 }\\>TRUE", "\\<{ -1i32 + 2i32 }\\>TRUE");
+                    getPrograms("\\<{ -1i32 + 2i32 }\\>true", "\\<{ -1i32 + 2i32 }\\>true");
                 assertTrue(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -78,7 +78,7 @@ public class TestProperties {
         class TestNegationExpression {
             @Test
             void testDifferentOperatorSameExpression() {
-                ProgramTuple programs = getPrograms("\\<{ !true }\\>TRUE", "\\<{ ~true }\\>TRUE");
+                ProgramTuple programs = getPrograms("\\<{ !true }\\>true", "\\<{ ~true }\\>true");
                 assertFalse(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -88,7 +88,7 @@ public class TestProperties {
 
             @Test
             void testSameOperatorSameExpression() {
-                ProgramTuple programs = getPrograms("\\<{ !false }\\>TRUE", "\\<{ !false }\\>TRUE");
+                ProgramTuple programs = getPrograms("\\<{ !false }\\>true", "\\<{ !false }\\>true");
                 assertTrue(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -102,7 +102,7 @@ public class TestProperties {
 
             @Test
             void testSameOperatorDifferentExpression() {
-                ProgramTuple programs = getPrograms("\\<{ !false }\\>TRUE", "\\<{ !true }\\>TRUE");
+                ProgramTuple programs = getPrograms("\\<{ !false }\\>true", "\\<{ !true }\\>true");
                 assertFalse(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -117,7 +117,7 @@ public class TestProperties {
             @Test
             void testDifferentOperatorSameExpressions() {
                 ProgramTuple programs =
-                    getPrograms("\\<{ 1u32 < 2u32 }\\>TRUE", "\\<{ 1u32 > 2u32 }\\>TRUE");
+                    getPrograms("\\<{ 1u32 < 2u32 }\\>true", "\\<{ 1u32 > 2u32 }\\>true");
                 assertFalse(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -128,7 +128,7 @@ public class TestProperties {
             @Test
             void testSameOperatorSameExpressions() {
                 ProgramTuple programs =
-                    getPrograms("\\<{ 1u32 <= 2u32 }\\>TRUE", "\\<{ 1u32 <= 2u32 }\\>TRUE");
+                    getPrograms("\\<{ 1u32 <= 2u32 }\\>true", "\\<{ 1u32 <= 2u32 }\\>true");
                 assertTrue(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -147,7 +147,7 @@ public class TestProperties {
             @Test
             void testDifferentOperatorSameExpressions() {
                 ProgramTuple programs =
-                    getPrograms("\\<{ i += 5u32 }\\>TRUE", "\\<{ i -= 5u32 }\\>TRUE");
+                    getPrograms("\\<{ i += 5u32 }\\>true", "\\<{ i -= 5u32 }\\>true");
                 assertFalse(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -158,7 +158,7 @@ public class TestProperties {
             @Test
             void testSameOperatorSameExpressions() {
                 ProgramTuple programs =
-                    getPrograms("\\<{ i *= 5u32 }\\>TRUE", "\\<{ i *= 5u32 }\\>TRUE");
+                    getPrograms("\\<{ i *= 5u32 }\\>true", "\\<{ i *= 5u32 }\\>true");
                 assertTrue(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -175,8 +175,8 @@ public class TestProperties {
         class TestSimplePrograms {
             @Test
             public void testLetDifferentNames() {
-                ProgramTuple programs = getPrograms("\\<{ let i: u32 = 5u32; 1u32 }\\>TRUE",
-                    "\\<{ let j: u32 = 5u32; 1u32 }\\>TRUE");
+                ProgramTuple programs = getPrograms("\\<{ let i: u32 = 5u32; 1u32 }\\>true",
+                    "\\<{ let j: u32 = 5u32; 1u32 }\\>true");
                 assertTrue(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -191,8 +191,8 @@ public class TestProperties {
             @Test
             void testMultipleLetAndAssignment() {
                 ProgramTuple programs = getPrograms(
-                    "\\<{ let mut i: u32 = 0u32; let mut j: u32 = 1u32; i = 2u32; j = i; 1u32}\\>TRUE",
-                    "\\<{ let mut i: u32 = 0u32; let mut k: u32 = 1u32; i = 2u32; k = i; 1u32}\\>TRUE");
+                    "\\<{ let mut i: u32 = 0u32; let mut j: u32 = 1u32; i = 2u32; j = i; 1u32}\\>true",
+                    "\\<{ let mut i: u32 = 0u32; let mut k: u32 = 1u32; i = 2u32; k = i; 1u32}\\>true");
                 assertTrue(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,
@@ -207,8 +207,8 @@ public class TestProperties {
             @Test
             void testAssignmentShadowedVariable() {
                 ProgramTuple programs = getPrograms(
-                    "\\<{ let mut i: u32 = 0u32; let mut i: u32 = 1u32; i = 2u32; 1u32}\\>TRUE",
-                    "\\<{ let mut j: u32 = 0u32; let mut k: u32 = 1u32; k = 2u32; 1u32}\\>TRUE");
+                    "\\<{ let mut i: u32 = 0u32; let mut i: u32 = 1u32; i = 2u32; 1u32}\\>true",
+                    "\\<{ let mut j: u32 = 0u32; let mut k: u32 = 1u32; k = 2u32; 1u32}\\>true");
                 assertTrue(
                     RENAMING_PROGRAM_ELEMENT_PROPERTY.equalsModThisProperty(programs.program1,
                         programs.program2,

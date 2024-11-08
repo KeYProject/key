@@ -329,6 +329,11 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     }
 
     @Override
+    public void performActionOnRangepattern(RangePattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnReferenceRustType(ReferenceRustType x) {
         doDefaultAction(x);
     }
