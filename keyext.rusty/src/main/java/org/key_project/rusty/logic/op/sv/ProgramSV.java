@@ -206,7 +206,7 @@ public final class ProgramSV extends OperatorSV
     }
 
     @Override
-    public Type type(Services services) {
+    public Type type() {
         throw new UnsupportedOperationException();
     }
 }

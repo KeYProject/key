@@ -4,7 +4,6 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.visitor.Visitor;
@@ -13,7 +12,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 //spotless:off
-public record IfLetExpression(Pattern pattern, Expr expr, BlockExpression then,
+public record IfLetExpression(Pattern pattern, Expr expr, ThenBranch then,
                               @Nullable Expr elseExpr) implements Expr {
     @Override
     public void visit(Visitor v) {
@@ -51,8 +50,8 @@ public record IfLetExpression(Pattern pattern, Expr expr, BlockExpression then,
     }
 
     @Override
-    public Type type(Services services) {
-        return then.type(services);
+    public Type type() {
+        return then.type();
     }
 }
 //spotless:on

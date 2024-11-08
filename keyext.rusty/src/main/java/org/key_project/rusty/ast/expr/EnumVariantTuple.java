@@ -6,7 +6,6 @@ package org.key_project.rusty.ast.expr;
 import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
@@ -46,7 +45,7 @@ public record EnumVariantTuple(PathInExpression path, ImmutableArray<Expr> eleme
     }
 
     @Override
-    public Type type(Services services) {
+    public Type type() {
         throw new UnsupportedOperationException();
     }
 }

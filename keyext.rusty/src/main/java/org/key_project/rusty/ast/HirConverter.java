@@ -14,10 +14,7 @@ import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.FunctionParam;
 import org.key_project.rusty.ast.fn.FunctionParamPattern;
-import org.key_project.rusty.ast.pat.BindingPattern;
-import org.key_project.rusty.ast.pat.PathPattern;
-import org.key_project.rusty.ast.pat.Pattern;
-import org.key_project.rusty.ast.pat.WildCardPattern;
+import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.ItemStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
@@ -26,7 +23,11 @@ import org.key_project.rusty.ast.ty.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.parser.hir.HirId;
 import org.key_project.rusty.parser.hir.Ident;
-import org.key_project.rusty.parser.hir.expr.*;
+import org.key_project.rusty.parser.hir.expr.BinOpKind;
+import org.key_project.rusty.parser.hir.expr.ExprKind;
+import org.key_project.rusty.parser.hir.expr.Lit;
+import org.key_project.rusty.parser.hir.expr.LitIntTy;
+import org.key_project.rusty.parser.hir.expr.LitKind;
 import org.key_project.rusty.parser.hir.hirty.*;
 import org.key_project.rusty.parser.hir.item.Fn;
 import org.key_project.rusty.parser.hir.item.FnRetTy;
@@ -136,28 +137,31 @@ public class HirConverter {
     }
 
     private Expr convertExpr(org.key_project.rusty.parser.hir.expr.Expr expr) {
+        var id = expr.hirId();
+        var ty = Objects.requireNonNull(types.get(id), "No type for " + expr);
         return switch (expr.kind()) {
-            case ExprKind.BlockExpr e -> convertBlockExpr(e);
-            case ExprKind.LitExpr(var e) -> convertLitExpr(e);
-            case ExprKind.If e -> convertIfExpr(e);
+            case ExprKind.BlockExpr e -> convertBlockExpr(e, ty);
+            case ExprKind.LitExpr(var e) -> convertLitExpr(e, ty);
+            case ExprKind.Let(var l) -> convertLetExpr(l, ty);
+            case ExprKind.If e -> convertIfExpr(e, ty);
             case ExprKind.DropTemps(var e) -> convertExpr(e);
             case ExprKind.Path(var e) -> convertPathExpr(e);
-            case ExprKind.AddrOf e -> convertAddrOf(e);
-            case ExprKind.Assign e -> convertAssign(e);
-            case ExprKind.AssignOp e -> convertAssignOp(e);
-            case ExprKind.Binary e -> convertBinary(e);
-            case ExprKind.Unary e -> convertUnary(e);
+            case ExprKind.AddrOf e -> convertAddrOf(e, ty);
+            case ExprKind.Assign e -> convertAssign(e, ty);
+            case ExprKind.AssignOp e -> convertAssignOp(e, ty);
+            case ExprKind.Binary e -> convertBinary(e, ty);
+            case ExprKind.Unary e -> convertUnary(e, ty);
             default -> throw new IllegalArgumentException("Unknown expression: " + expr);
         };
     }
 
-    private BlockExpression convertBlockExpr(ExprKind.BlockExpr expr) {
+    private BlockExpression convertBlockExpr(ExprKind.BlockExpr expr, Type type) {
         var stmts = Arrays.stream(expr.block().stmts()).map(this::convertStmt).toList();
         var value = expr.block().expr() == null ? null : convertExpr(expr.block().expr());
-        return new BlockExpression(ImmutableList.fromList(stmts), value);
+        return new BlockExpression(ImmutableList.fromList(stmts), value, type);
     }
 
-    private LiteralExpression convertLitExpr(Lit expr) {
+    private LiteralExpression convertLitExpr(Lit expr, Type type) {
         return switch (expr.node()) {
             case LitKind.Bool(var v) -> new BooleanLiteralExpression(v);
             case LitKind.Int(var val, LitIntTy.Unsigned(var uintTy)) ->
@@ -168,7 +172,7 @@ public class HirConverter {
                         case UintTy.U64 -> IntegerLiteralExpression.IntegerSuffix.u64;
                         case UintTy.U128 -> IntegerLiteralExpression.IntegerSuffix.u128;
                         case UintTy.Usize -> IntegerLiteralExpression.IntegerSuffix.usize;
-                    });
+                    }, type);
             case LitKind.Int(var val, LitIntTy.Signed(var intTy)) -> new IntegerLiteralExpression(
                     new BigInteger(String.valueOf(val)), switch (intTy) {
                 case Isize -> IntegerLiteralExpression.IntegerSuffix.isize;
@@ -177,17 +181,25 @@ public class HirConverter {
                 case I32 -> IntegerLiteralExpression.IntegerSuffix.i32;
                 case I64 -> IntegerLiteralExpression.IntegerSuffix.i64;
                 case I128 -> IntegerLiteralExpression.IntegerSuffix.i128;
-            }
+            },type
             );
             case LitKind.Int(var val, LitIntTy.Unsuffixed u) ->
-                    new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), IntegerLiteralExpression.IntegerSuffix.None);
+                    new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), IntegerLiteralExpression.IntegerSuffix.None,type);
             default -> throw new IllegalArgumentException("Unknown lit: " + expr.node());
         };
     }
 
-    private IfExpression convertIfExpr(ExprKind.If i) {
+    private LetExpression convertLetExpr(org.key_project.rusty.parser.hir.expr.LetExpr let,
+            Type type) {
+        var pat = convertPat(let.pat());
+        var ty = let.ty() == null ? null : convertHirTy(let.ty());
+        var init = convertExpr(let.init());
+        return new LetExpression(pat, ty, init, type);
+    }
+
+    private IfExpression convertIfExpr(ExprKind.If i, Type type) {
         return new IfExpression(convertExpr(i.cond()), (ThenBranch) convertExpr(i.then()),
-            i.els() == null ? null : (ElseBranch) convertExpr(i.els()));
+            i.els() == null ? null : (ElseBranch) convertExpr(i.els()), type);
     }
 
     private Expr convertPathExpr(org.key_project.rusty.parser.hir.QPath path) {
@@ -199,30 +211,31 @@ public class HirConverter {
         throw new IllegalArgumentException("Unknown path: " + path);
     }
 
-    private BorrowExpression convertAddrOf(ExprKind.AddrOf addrOf) {
-        return new BorrowExpression(addrOf.mut(), convertExpr(addrOf.expr()));
+    private BorrowExpression convertAddrOf(ExprKind.AddrOf addrOf, Type type) {
+        return new BorrowExpression(addrOf.mut(), convertExpr(addrOf.expr()), type);
     }
 
-    private AssignmentExpression convertAssign(ExprKind.Assign assign) {
-        return new AssignmentExpression(convertExpr(assign.left()), convertExpr(assign.right()));
+    private AssignmentExpression convertAssign(ExprKind.Assign assign, Type type) {
+        return new AssignmentExpression(convertExpr(assign.left()), convertExpr(assign.right()),
+            type);
     }
 
-    private CompoundAssignmentExpression convertAssignOp(ExprKind.AssignOp assignOp) {
+    private CompoundAssignmentExpression convertAssignOp(ExprKind.AssignOp assignOp, Type type) {
         return new CompoundAssignmentExpression(convertExpr(assignOp.left()),
-            convertBinOp(assignOp.op().node()), convertExpr(assignOp.right()));
+            convertBinOp(assignOp.op().node()), convertExpr(assignOp.right()), type);
     }
 
-    private BinaryExpression convertBinary(ExprKind.Binary binary) {
+    private BinaryExpression convertBinary(ExprKind.Binary binary, Type type) {
         return new BinaryExpression(convertBinOp(binary.op().node()), convertExpr(binary.left()),
-            convertExpr(binary.right()));
+            convertExpr(binary.right()), type);
     }
 
-    private UnaryExpression convertUnary(ExprKind.Unary unary) {
+    private UnaryExpression convertUnary(ExprKind.Unary unary, Type type) {
         return new UnaryExpression(switch (unary.op()) {
         case Deref -> UnaryExpression.Operator.Deref;
         case Not -> UnaryExpression.Operator.Not;
         case Neg -> UnaryExpression.Operator.Neg;
-        }, convertExpr(unary.expr()));
+        }, convertExpr(unary.expr()), type);
     }
 
     private BinaryExpression.Operator convertBinOp(BinOpKind binOp) {
@@ -332,6 +345,12 @@ public class HirConverter {
             case PatKind.Wild w -> WildCardPattern.WILDCARD;
             case PatKind.Path p -> {
                 yield new PathPattern();
+            }
+            case PatKind.Range r -> {
+                var left = r.lhs() == null ? null: convertExpr(r.lhs());
+                var right = r.rhs() == null ? null: convertExpr(r.rhs());
+                var bounds = r.inclusive() ? RangePattern.Bounds.Inclusive : RangePattern.Bounds.Exclusive;
+                yield new RangePattern(left, bounds, right);
             }
             default -> throw new IllegalArgumentException("Unknown pat: " + pat);
         };

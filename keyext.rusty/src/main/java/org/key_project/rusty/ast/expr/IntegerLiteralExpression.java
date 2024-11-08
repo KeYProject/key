@@ -7,8 +7,6 @@ import java.math.BigInteger;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.ldt.IntLDT;
@@ -57,11 +55,12 @@ public class IntegerLiteralExpression extends LiteralExpression {
 
     private final BigInteger value;
     private final IntegerSuffix suffix;
+    private final Type type;
 
-
-    public IntegerLiteralExpression(BigInteger value, IntegerSuffix suffix) {
+    public IntegerLiteralExpression(BigInteger value, IntegerSuffix suffix, Type type) {
         this.value = value;
         this.suffix = suffix;
+        this.type = type;
     }
 
     @Override
@@ -120,21 +119,7 @@ public class IntegerLiteralExpression extends LiteralExpression {
     }
 
     @Override
-    public Type type(Services services) {
-        return switch (suffix) {
-        case None -> null;
-        case u8 -> PrimitiveType.U8;
-        case u16 -> PrimitiveType.U16;
-        case u32 -> PrimitiveType.U32;
-        case u64 -> PrimitiveType.U64;
-        case u128 -> PrimitiveType.U128;
-        case usize -> PrimitiveType.USIZE;
-        case i8 -> PrimitiveType.I8;
-        case i16 -> PrimitiveType.I16;
-        case i32 -> PrimitiveType.I32;
-        case i64 -> PrimitiveType.I64;
-        case i128 -> PrimitiveType.I128;
-        case isize -> PrimitiveType.ISIZE;
-        };
+    public Type type() {
+        return type;
     }
 }

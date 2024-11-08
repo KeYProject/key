@@ -136,4 +136,6 @@ public interface Visitor {
     void performActionOnUnaryOperator(UnaryExpression.Operator x);
 
     void performActionOnBindingPattern(BindingPattern x);
+
+    void performActionOnLetExpression(LetExpression x);
 }

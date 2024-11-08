@@ -4,7 +4,6 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Label;
 import org.key_project.rusty.ast.abstraction.TupleType;
 import org.key_project.rusty.ast.abstraction.Type;
@@ -61,7 +60,7 @@ public record ContinueExpression(@Nullable Label label, @Nullable Expr expr) imp
     }
 
     @Override
-    public Type type(Services services) {
+    public Type type() {
         return TupleType.UNIT;
     }
 }

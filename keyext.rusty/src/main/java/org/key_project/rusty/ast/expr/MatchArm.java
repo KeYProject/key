@@ -4,9 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.visitor.Visitor;
 
@@ -51,10 +49,6 @@ public record MatchArm(Pattern pattern, @Nullable Expr guard, Expr body) impleme
         }
         sb.append(" => ").append(body);
         return "";
-    }
-
-    public Type type(Services services) {
-        return body().type(services);
     }
 }
 //spotless:on

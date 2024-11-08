@@ -18,6 +18,8 @@ public interface ExprKind {
 
     record DropTemps(Expr expr) implements ExprKind {}
 
+    record Let(LetExpr let) implements ExprKind {}
+
     record If(Expr cond, Expr then, @Nullable Expr els) implements ExprKind {}
 
     record BlockExpr(Block block) implements ExprKind {}
@@ -38,6 +40,7 @@ public interface ExprKind {
                 case "Unary" -> Unary.class;
                 case "Lit" -> LitExpr.class;
                 case "DropTemps" -> DropTemps.class;
+                case "Let" -> Let.class;
                 case "If" -> If.class;
                 case "Block" -> BlockExpr.class;
                 case "Assign" -> Assign.class;

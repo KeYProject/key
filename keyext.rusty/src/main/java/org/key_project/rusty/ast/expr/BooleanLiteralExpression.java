@@ -5,7 +5,6 @@ package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
@@ -68,7 +67,7 @@ public class BooleanLiteralExpression extends LiteralExpression {
     }
 
     @Override
-    public Type type(Services services) {
+    public Type type() {
         return PrimitiveType.BOOL;
     }
 }

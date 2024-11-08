@@ -9,7 +9,6 @@ import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Res;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
@@ -65,7 +64,7 @@ public class ProgramVariable extends AbstractSortedOperator
     }
 
     @Override
-    public Type type(Services services) {
+    public Type type() {
         return type.getRustyType();
     }
 }

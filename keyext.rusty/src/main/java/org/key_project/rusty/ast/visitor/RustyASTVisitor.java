@@ -342,4 +342,9 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     public void performActionOnBindingPattern(BindingPattern x) {
         doDefaultAction(x);
     }
+
+    @Override
+    public void performActionOnLetExpression(LetExpression x) {
+        doDefaultAction(x);
+    }
 }

@@ -235,7 +235,7 @@ public class SchemaConverter {
 
             var value = new BigInteger(
                 lit);
-            return new IntegerLiteralExpression(value, suffix);
+            return new IntegerLiteralExpression(value, suffix, null);
         }
 
         throw new IllegalArgumentException("Expected boolean or integer literal");
@@ -303,9 +303,9 @@ public class SchemaConverter {
     private BorrowExpression convertBorrowExpression(
             org.key_project.rusty.parsing.RustySchemaParser.BorrowExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
-        var e = new BorrowExpression(ctx.KW_MUT() != null, base);
+        var e = new BorrowExpression(ctx.KW_MUT() != null, base, null);
         if (ctx.ANDAND() != null) {
-            e = new BorrowExpression(false, e);
+            e = new BorrowExpression(false, e, null);
         }
         return e;
     }
@@ -313,7 +313,7 @@ public class SchemaConverter {
     private UnaryExpression convertDereferenceExpression(
             org.key_project.rusty.parsing.RustySchemaParser.DereferenceExpressionContext ctx) {
         var base = convertExpr(ctx.expr());
-        return new UnaryExpression(UnaryExpression.Operator.Deref, base);
+        return new UnaryExpression(UnaryExpression.Operator.Deref, base, null);
     }
 
     private UnaryExpression convertNegationExpression(
@@ -321,7 +321,7 @@ public class SchemaConverter {
         var base = convertExpr(ctx.expr());
         var op =
             ctx.NOT() != null ? UnaryExpression.Operator.Not : UnaryExpression.Operator.Neg;
-        return new UnaryExpression(op, base);
+        return new UnaryExpression(op, base, null);
     }
 
     private TypeCastExpression convertTypeCastExpression(
@@ -356,7 +356,7 @@ public class SchemaConverter {
             op = BinaryExpression.Operator.Shr;
         assert op != null;
         return new BinaryExpression(op, convertExpr(ctx.expr(0)),
-            convertExpr(ctx.expr(1)));
+            convertExpr(ctx.expr(1)), null);
     }
 
     private BinaryExpression convertComparisonExpression(
@@ -374,7 +374,7 @@ public class SchemaConverter {
                                                         ? BinaryExpression.Operator.Le
                                                         : null;
         assert op != null;
-        return new BinaryExpression(op, left, right);
+        return new BinaryExpression(op, left, right, null);
     }
 
     private BinaryExpression convertLazyBooleanExpression(
@@ -383,7 +383,7 @@ public class SchemaConverter {
         var right = convertExpr(ctx.expr(1));
         var op = ctx.ANDAND() != null ? BinaryExpression.Operator.And
                 : BinaryExpression.Operator.Or;
-        return new BinaryExpression(op, left, right);
+        return new BinaryExpression(op, left, right, null);
     }
 
     private RangeExpression convertRangeExpression(
@@ -402,7 +402,7 @@ public class SchemaConverter {
             org.key_project.rusty.parsing.RustySchemaParser.AssignmentExpressionContext ctx) {
         var lhs = convertExpr(ctx.expr(0));
         var rhs = convertExpr(ctx.expr(1));
-        return new AssignmentExpression(lhs, rhs);
+        return new AssignmentExpression(lhs, rhs, null);
     }
 
     private CompoundAssignmentExpression convertCompoundAssignmentExpression(
@@ -424,7 +424,7 @@ public class SchemaConverter {
                                                                 : opCtx.SHLEQ() != null
                                                                         ? BinaryExpression.Operator.Shl
                                                                         : BinaryExpression.Operator.Shr;
-        return new CompoundAssignmentExpression(left, op, right);
+        return new CompoundAssignmentExpression(left, op, right, null);
     }
 
     private ContinueExpression convertContinueExpression(
@@ -542,7 +542,7 @@ public class SchemaConverter {
         var stmtsCtx = ctx.stmts();
 
         if (stmtsCtx == null)
-            return new BlockExpression(ImmutableSLList.nil(), null);
+            return new BlockExpression(ImmutableSLList.nil(), null, null);
 
         var stmts = stmtsCtx.stmt().stream().map(this::convertStmt)
                 .collect(ImmutableList.collector());
@@ -557,11 +557,11 @@ public class SchemaConverter {
             for (int i = 0; i < stmts.size() - 1; i++) {
                 firstStmts = firstStmts.append(stmts.get(i));
             }
-            return new BlockExpression(firstStmts, psv);
+            return new BlockExpression(firstStmts, psv, null);
         }
         var value = stmtsCtx.expr() == null ? null : convertExpr(stmtsCtx.expr());
 
-        return new BlockExpression(stmts, value);
+        return new BlockExpression(stmts, value, null);
     }
 
     private ContextBlockExpression convertContextBlockExpr(
@@ -632,7 +632,7 @@ public class SchemaConverter {
                                 ? (ProgramSV) lookupSchemaVariable(
                                     ctx.elseSV.getText().substring(2))
                                 : null;
-        return new IfExpression(cond, then, else_);
+        return new IfExpression(cond, then, else_, null);
     }
 
     private IfLetExpression convertIfLetExpr(
@@ -858,7 +858,7 @@ public class SchemaConverter {
             var lit = split[0];
             var value = new BigInteger(
                 lit);
-            return new IntegerLiteralExpression(value, suffix);
+            return new IntegerLiteralExpression(value, suffix, null);
         }
         // TODO implement more bounds (char, byte, float, pathexpression)
         throw new IllegalArgumentException("Unknown rangePatternBound: " + ctx.getText());

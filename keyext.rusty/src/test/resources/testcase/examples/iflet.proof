@@ -1,13 +1,18 @@
 \profile "Rust Profile";
 
+\programVariables {
+    u32 a;
+}
+
 \problem {
-\<{
-  let n: u32 = 1u32;
-  if let 1u32..10u32 = n {
-    n
-  };
-  1u32
-}\> true
+    \<{
+        let n: u32 = 1u32;
+        a = if let 1u32..10u32 = n {
+            n
+        } else {
+            0
+        };
+    }\> true
 }
 
 \proof {

@@ -638,4 +638,17 @@ public class PrettyPrinter implements Visitor {
             x.opt().visit(this);
         }
     }
+
+    @Override
+    public void performActionOnLetExpression(LetExpression x) {
+        layouter.keyWord("let");
+        layouter.print(" ");
+        x.pat().visit(this);
+        if (x.ty() != null) {
+            layouter.print(": ");
+            x.ty().visit(this);
+        }
+        layouter.print(" = ");
+        x.init().visit(this);
+    }
 }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.ElseBranch;
 import org.key_project.rusty.ast.ProgramPrefixUtil;
 import org.key_project.rusty.ast.abstraction.Type;
@@ -25,17 +24,20 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
     protected final ImmutableList<Statement> statements;
     protected final Expr value;
     private final int prefixLength;
+    private final Type type;
 
-    public BlockExpression(ImmutableList<Statement> statements, Expr value) {
+    public BlockExpression(ImmutableList<Statement> statements, Expr value, Type type) {
         this.statements = statements;
         this.value = value;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
+        this.type = type;
     }
 
     public BlockExpression(ExtList children) {
         statements = ImmutableList.of(children.collect(Statement.class));
         value = children.get(Expr.class);
+        type = children.get(Type.class);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
     }
@@ -158,7 +160,7 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
     }
 
     @Override
-    public Type type(Services services) {
-        return value.type(services);
+    public Type type() {
+        return type;
     }
 }

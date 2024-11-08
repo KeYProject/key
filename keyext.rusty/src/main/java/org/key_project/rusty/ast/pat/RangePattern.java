@@ -16,37 +16,39 @@ import org.jspecify.annotations.Nullable;
  * <a href="https://doc.rust-lang.org/reference/patterns.html#range-patterns">RangePattern
  * Grammar</a>
  */
-public record RangePattern(@Nullable Expr left,Bounds bounds,@Nullable Expr right)implements Pattern{public enum Bounds
-        implements RustyProgramElement {
-    Inclusive("..="), Exclusive(".."), Obsolete("...");
+// spotless:off
+public record RangePattern(@Nullable Expr left, Bounds bounds, @Nullable Expr right) implements Pattern {
+    public enum Bounds
+            implements RustyProgramElement {
+        Inclusive("..="), Exclusive(".."), Obsolete("...");
 
-    private final String bounds;
+        private final String bounds;
 
-    Bounds(String bounds) {
-        this.bounds = bounds;
+        Bounds(String bounds) {
+            this.bounds = bounds;
+        }
+
+        @Override
+        public String toString() {
+            return bounds;
+        }
+
+        @Override
+        public SyntaxElement getChild(int n) {
+            return null;
+        }
+
+        @Override
+        public int getChildCount() {
+            return 0;
+        }
+
+        @Override
+        public void visit(Visitor v) {
+            // Bounds should stay invisible to the visitors and therefore no visit is needed
+        }
+
     }
-
-    @Override
-    public String toString() {
-        return bounds;
-    }
-
-    @Override
-    public SyntaxElement getChild(int n) {
-        return null;
-    }
-
-    @Override
-    public int getChildCount() {
-        return 0;
-    }
-
-    @Override
-    public void visit(Visitor v) {
-        // Bounds should stay invisible to the visitors and therefore no visit is needed
-    }
-
-}
 
     @Override
     public void visit(Visitor v) {
@@ -65,7 +67,7 @@ public record RangePattern(@Nullable Expr left,Bounds bounds,@Nullable Expr righ
         if (n == 0 && right != null)
             return right;
         throw new IndexOutOfBoundsException(
-            "RangePattern has only " + getChildCount() + " children");
+                "RangePattern has only " + getChildCount() + " children");
     }
 
     @Override
@@ -89,3 +91,4 @@ public record RangePattern(@Nullable Expr left,Bounds bounds,@Nullable Expr righ
         return sb.toString();
     }
 }
+//spotless:on

@@ -4,15 +4,13 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.abstraction.ReferenceType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
 // spotless:off
-public record BorrowExpression(boolean mut, Expr expr) implements Expr {
+public record BorrowExpression(boolean mut, Expr expr, Type type) implements Expr {
     @Override
     public void visit(Visitor v) {
         v.performActionOnBorrowExpression(this);
@@ -36,11 +34,6 @@ public record BorrowExpression(boolean mut, Expr expr) implements Expr {
         if (mut) sb.append("mut ");
         sb.append(expr);
         return sb.toString();
-    }
-
-    @Override
-    public Type type(Services services) {
-        return ReferenceType.get(expr.type(services), mut);
     }
 }
 //spotless:on
