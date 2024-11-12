@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
@@ -54,11 +55,6 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
         public static final Name name = new Name("SMTRule");
 
         @Override
-        public ExternalSolverRule newRule() {
-            return new SMTRule();
-        }
-
-        @Override
         public SMTRuleApp createApp(String successfulSolverName) {
             return new SMTRuleApp(this, null, successfulSolverName);
         }
@@ -91,6 +87,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
          * @return a list with an identical goal as the given <tt>goal</tt>
          */
         @Override
+        @NonNull
         public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
                 goal.proof().getInitConfig().registerRule(RULE, () -> false);
