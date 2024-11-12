@@ -29,6 +29,7 @@ public class NamespaceSet {
             Namespace<@NonNull ProgramVariable> progVarNS, Namespace<@NonNull Function> funcNS,
             Namespace<@NonNull Choice> choiceNS,
             Namespace<@NonNull Sort> sortNS) {
+        assert varNS != null;
         this.varNS = varNS;
         this.progVarNS = progVarNS;
         this.funcNS = funcNS;
@@ -136,5 +137,42 @@ public class NamespaceSet {
         return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n" + "Variables: "
             + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n" + "Choices: "
             + choices();
+    }
+
+    /**
+     * looks up for the symbol in the namespaces sort, functions and programVariables
+     *
+     * @param name the Name to look up
+     * @return the element of the given name or null
+     */
+    public Named lookupLogicSymbol(Name name) {
+        return lookup(name, logicAsArray());
+    }
+
+    /**
+     * returns all namespaces with symbols that may occur in a real sequent (this means all
+     * namespaces without variables, choices and ruleSets)
+     */
+    private Namespace<?>[] logicAsArray() {
+        return new Namespace[] { programVariables(), sorts(), functions() };
+    }
+
+    public void flushToParent() {
+        for (Namespace<?> ns : asArray()) {
+            ns.flushToParent();
+        }
+    }
+
+    public NamespaceSet getParent() {
+        return new NamespaceSet(varNS.parent(), progVarNS.parent(), funcNS.parent(),
+            choiceNS.parent(), sortNS.parent());
+    }
+
+    // TODO MU: Rename into sth with wrap or similar
+    public NamespaceSet copyWithParent() {
+        return new NamespaceSet(new Namespace<>(variables()),
+            new Namespace<>(programVariables()), new Namespace<>(functions()),
+            new Namespace<>(choices()),
+            new Namespace<>(sorts()));
     }
 }

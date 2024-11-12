@@ -7,20 +7,60 @@
 \problem {
     \<{
         let n: u32 = 1u32;
-        a = if let 1u32..10u32 = n {
-            n
+        if let 1u32..10u32 = n {
+            a = n;
         } else {
-            0
+            a = 0;
         };
     }\> true
 }
 
 \proof {
-(branch "dummy ID"
-(rule "letIdentPatAssign" (formula "1"))
-(rule "letIdentPat" (formula "1"))
-(rule "assignment" (formula "1"))
-(rule "ifLetExclusive" (formula "1") (term "1"))
- (opengoal "==>  {n:=Z(1(#))}    \\<{   let b: bool = 1u32 <= n && n < 10u32;   if b {        n      };      1u32    }\\> true")
-)
+    (branch "dummy ID"
+        (rule "letIdentPatAssign" (formula "1"))
+        (rule "letIdentPat" (formula "1"))
+        (rule "assignment" (formula "1"))
+        (rule "ifLetExclusiveElse" (formula "1") (term "1"))
+        (rule "letIdentPatAssign" (formula "1") (term "1"))
+        (rule "letIdentPat" (formula "1") (term "1"))
+        (rule "compoundAndNonSimple" (formula "1") (term "1"))
+        (rule "conditionNotSimple" (formula "1") (term "1"))
+        (rule "letIdentPat" (formula "1") (term "1"))
+        (rule "compoundNotBoolNonSimple" (formula "1") (term "1"))
+        (rule "letIdentPatAssign" (formula "1") (term "1"))
+        (rule "letIdentPat" (formula "1") (term "1"))
+        (rule "less_equal_than_comparison" (formula "1") (term "1"))
+        (rule "applyOnRigidFormula" (formula "1"))
+        (rule "applyOnRigidFormula" (formula "1") (term "0"))
+        (rule "applyOnPV" (formula "1") (term "1,0"))
+        (rule "simplifyUpdate1" (formula "1") (term "0,0"))
+        (rule "leq_literals" (formula "1") (term "0"))
+        (rule "ifthenelse_true_for" (formula "1"))
+        (rule "assignment" (formula "1") (term "1"))
+        (rule "sequentialToParallel2" (formula "1"))
+        (rule "simplifyUpdate3" (formula "1") (term "1,0"))
+        (rule "compoundNotBoolSimple" (formula "1") (term "1"))
+        (rule "sequentialToParallel2" (formula "1"))
+        (rule "simplifyUpdate3" (formula "1") (term "1,0"))
+        (rule "applyOnElementary" (formula "1") (term "1,0"))
+        (rule "applyOnRigidTerm" (formula "1") (term "0,1,0"))
+        (rule "applyOnRigidFormula" (formula "1") (term "0,0,1,0"))
+        (rule "applyOnPV" (formula "1") (term "0,0,0,1,0"))
+        (rule "simplifyUpdate1" (formula "1") (term "1,0,0,1,0"))
+        (rule "eqClose" (formula "1") (term "0,0,1,0"))
+        (rule "ifthenelse_true" (formula "1") (term "0,1,0"))
+        (rule "simplifyUpdate1" (formula "1") (term "0,1,0"))
+        (rule "simplifyUpdate2" (formula "1"))
+        (rule "condition" (formula "1") (term "1"))
+        (rule "ifElse" (formula "1") (term "1"))
+        (rule "applyOnRigidFormula" (formula "1"))
+        (rule "applyOnRigidFormula" (formula "1") (term "0"))
+        (rule "simplifyUpdate1" (formula "1") (term "0,0"))
+        (rule "applyOnPV" (formula "1") (term "0,0"))
+        (rule "simplifyUpdate1" (formula "1") (term "1,0"))
+        (rule "bool_not_equal_2" (formula "1") (term "0"))
+        (rule "ifthenelse_false_for" (formula "1"))
+        (rule "assignBlockValue" (formula "1") (term "1"))
+        (opengoal "==>  {n:=Z(1(#))}    \\<{   b = 1u32 <= n && n < 10u32;   if b {        n      };      1u32    }\\> true")
+    )
 }

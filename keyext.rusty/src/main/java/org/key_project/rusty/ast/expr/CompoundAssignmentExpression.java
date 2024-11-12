@@ -4,13 +4,15 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.TupleType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
 // spotless:off
-public record CompoundAssignmentExpression(Expr left, BinaryExpression.Operator op, Expr right, Type type) implements Expr {
+public record CompoundAssignmentExpression(Expr left, BinaryExpression.Operator op, Expr right) implements Expr {
     @Override
     public void visit(Visitor v) {
         v.performActionOnCompoundAssignmentExpression(this);
@@ -35,6 +37,11 @@ public record CompoundAssignmentExpression(Expr left, BinaryExpression.Operator 
     @Override
     public String toString() {
         return left + " " + op + " " + right;
+    }
+
+    @Override
+    public Type type(Services services) {
+        return TupleType.UNIT;
     }
 }
 //spotless:on

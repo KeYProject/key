@@ -7,6 +7,7 @@ import java.math.BigInteger;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.ldt.IntLDT;
@@ -119,7 +120,7 @@ public class IntegerLiteralExpression extends LiteralExpression {
     }
 
     @Override
-    public Type type() {
+    public Type type(Services services) {
         return type;
     }
 }

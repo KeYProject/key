@@ -14,6 +14,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.ast.expr.Expr;
+import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.BoundVariable;
 import org.key_project.rusty.logic.op.LogicVariable;
@@ -30,7 +32,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public abstract class TacletApp implements RuleApp {
-    /** the taclet for which the application information is collected */
+    /**
+     * the taclet for which the application information is collected
+     */
     private final @NonNull Taclet taclet;
 
     /**
@@ -454,7 +458,6 @@ public abstract class TacletApp implements RuleApp {
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable variable : uninstantiatedVars()) {
-
             if (!(variable instanceof OperatorSV operatorSv)) {
                 continue;
             }
@@ -470,7 +473,6 @@ public abstract class TacletApp implements RuleApp {
                     app.getProgramElement(proposal, (ProgramSV) operatorSv, services);
                 app = app.addCheckedInstantiation(operatorSv, pe, services, true);
                 proposals = proposals.append(proposal);
-
             } else if (operatorSv instanceof SkolemTermSV) {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
@@ -841,43 +843,32 @@ public abstract class TacletApp implements RuleApp {
         // Currently a simplified version is used
         Sort svSort = sv.sort();
         if (svSort == ProgramSVSort.VARIABLE) {
-            NewVarcond nv = taclet.varDeclaredNew(sv);
-            if (nv != null) {
-                KeYRustyType krt = nv.getType();
-                assert krt != null
-                        : "This version of getProgramElement currently only works with NewVarconds with KeYRustyTypes";
-                // return new Identifier(new Name(instantiation));\
+            NewVarcond nvc = taclet.varDeclaredNew(sv);
+            if (nvc != null) {
+                KeYRustyType krt;
+                Object o = nvc.getTypeDefiningObject();
+                if (o instanceof SchemaVariable peerSV) {
+                    final Object peerInst = instantiations().getInstantiation(peerSV);
+                    if (peerInst instanceof RustType rt) {
+                        krt = services.getRustInfo().getKeYRustyType(rt.type());
+                    } else {
+                        Expr peerInstExpr;
+                        /*
+                         * if (peerInst instanceof Term) {
+                         * peerInstExpr = tc.convertToProgramElement((Term) peerInst);
+                         * } else
+                         */ {
+                            peerInstExpr = (Expr) peerInst;
+                        }
+                        krt = services.getRustInfo().getKeYRustyType(peerInstExpr.type(services));
+                    }
+                } else {
+                    krt = (KeYRustyType) o;
+                }
+                assert krt != null : "could not find krt for: " + o;
                 return new ProgramVariable(new Name(instantiation), krt);
             }
         }
-
-        // if (svSort == ProgramSVSort.VARIABLE) {
-        // NewVarcond nvc = taclet.varDeclaredNew(sv);
-        // if (nvc != null) {
-        // KeYRustyType krt;
-        // Object o = nvc.getTypeDefiningObject();
-        // if (o instanceof SchemaVariable peerSV) {
-        // final TypeConverter tc = services.getTypeConverter();
-        // final Object peerInst = instantiations().getInstantiation(peerSV);
-        // if (peerInst instanceof TypeReference) {
-        // krt = ((TypeReference) peerInst).getKeYJavaType();
-        // } else {
-        // Expr peerInstExpr;
-        // if (peerInst instanceof Term) {
-        // peerInstExpr = tc.convertToProgramElement((Term) peerInst);
-        // } else {
-        // peerInstExpr = (Expr) peerInst;
-        // }
-        // krt = tc.getKeYJavaType(peerInstExpr,
-        // instantiations().getContextInstantiation().activeStatementContext());
-        // }
-        // } else {
-        // krt = (KeYRustyType) o;
-        // }
-        // assert krt != null : "could not find krt for: " + o;
-        // return new ProgramVariable(VariableNamer.parseName(instantiation), krt);
-        // }
-        // }
         return null;
     }
 
@@ -898,11 +889,9 @@ public abstract class TacletApp implements RuleApp {
      * @throws IllegalInstantiationException exception thrown if <code>sv</code> cannot be
      *         instantiated with <code>pe</code> no matter if in general or due to side conditions
      *         posed by this particular application
-     *
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv, RustyProgramElement pe,
             Services services, boolean interesting) {
-
         final MatchConditions cond =
             taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
 

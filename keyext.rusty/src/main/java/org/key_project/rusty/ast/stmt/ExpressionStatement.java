@@ -6,10 +6,13 @@ package org.key_project.rusty.ast.stmt;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.visitor.Visitor;
+import org.key_project.rusty.logic.PosInProgram;
+import org.key_project.rusty.logic.ProgramPrefix;
+import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-public class ExpressionStatement implements Statement {
+public class ExpressionStatement implements Statement, ProgramPrefix {
     private final Expr expression;
     private final boolean semi;
 
@@ -64,4 +67,42 @@ public class ExpressionStatement implements Statement {
     public void visit(Visitor v) {
         v.performActionOnExpressionStatement(this);
     }
+
+    @Override
+    public boolean hasNextPrefixElement() {
+        return getChildCount() != 0 && expression instanceof ProgramPrefix;
+    }
+
+    @Override
+    public ProgramPrefix getNextPrefixElement() {
+        if (hasNextPrefixElement()) {
+            return (ProgramPrefix) expression;
+        }
+        throw new IndexOutOfBoundsException("No next prefix element " + this);
+    }
+
+    @Override
+    public ProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
+    }
+
+    @Override
+    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+        if (hasNextPrefixElement()) {
+            return new ImmutableArray<>((ProgramPrefix) expression);
+        }
+        return new ImmutableArray<>();
+    }
+
+    @Override
+    public PosInProgram getFirstActiveChildPos() {
+        return PosInProgram.ZERO;
+    }
+
+    @Override
+    public int getPrefixLength() {
+        return hasNextPrefixElement() ? 1 : 0;
+    }
+
+
 }

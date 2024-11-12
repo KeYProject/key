@@ -5,6 +5,7 @@ package org.key_project.rusty.logic;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
@@ -19,15 +20,45 @@ public class InnerVariableNamer extends VariableNamer {
 
     @Override
     public ProgramVariable rename(ProgramVariable var, Goal goal, PosInOccurrence posOfFind) {
-        String name = var.name().toString();
-        int idx = 0;
-        Name newName = null;
+        var name = var.name();
+        BasenameAndIndex bai = getBasenameAndIndex(name);
+        Iterable<Name> globals = wrapGlobals(goal.getNode().getLocalProgVars());
+        map.clear();
 
-        do {
-            newName = new Name(name + "_" + idx);
-        } while (services.getNamespaces().lookup(newName) != null);
+        Name newName = new Name(bai.basename() + (bai.index() == 0 ? "" : "_" + bai.index()));
+        int newcounter = getMaxCounterInGlobalsAndProgram(bai.basename(), globals,
+            getProgramFromPIO(posOfFind), null);
+        final NamespaceSet namespaces = services.getNamespaces();
 
-        return new ProgramVariable(newName, var.getKeYRustyType());
+        while (!isUniqueInGlobals(newName.toString(), globals)
+                || namespaces.lookupLogicSymbol(newName) != null) {
+            newcounter += 1;
+            newName = new Name(bai.basename() + "_" + newcounter);
+        }
+
+        ProgramVariable newVar = var;
+        if (!newName.equals(name)) {
+            newVar = new ProgramVariable(newName, var.getKeYRustyType());
+            map.put(var, newVar);
+            renamingHistory = map;
+        }
+
+        assert isUniqueInGlobals(newVar.name().toString(), globals);
+        assert services.getNamespaces().lookupLogicSymbol(newVar.name()) == null;
+        return newVar;
+    }
+
+    /**
+     * returns the maximum counter for the passed basename in the passed globals and the passed
+     * program
+     */
+    private int getMaxCounterInGlobalsAndProgram(String basename,
+            Iterable<Name> globals, RustyProgramElement program,
+            PosInProgram posOfDeclaration) {
+        int maxInGlobals = getMaxCounterInGlobals(basename, globals);
+        int maxInProgram = getMaxCounterInProgram(basename, program, posOfDeclaration);
+
+        return (Math.max(maxInGlobals, maxInProgram));
     }
 
 

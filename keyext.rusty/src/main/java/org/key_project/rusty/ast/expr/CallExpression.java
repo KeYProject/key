@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableArray;
@@ -47,7 +48,7 @@ public record CallExpression(Expr callee, ImmutableArray<Expr> params) implement
     }
 
     @Override
-    public Type type() {
+    public Type type(Services services) {
         throw new UnsupportedOperationException();
     }
 }

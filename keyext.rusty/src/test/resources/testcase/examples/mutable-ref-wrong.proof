@@ -80,7 +80,7 @@
             (rule "add_literals" (formula "1") (term "0"))
             (rule "equal_literals" (formula "1"))
             (rule "false_right" (formula "1"))
-            // cannot close!
+            (opengoal "==>")
         )
     )
 }

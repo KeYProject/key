@@ -8,7 +8,6 @@ import java.rmi.UnexpectedException;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.expr.ContextBlockExpression;
-import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.logic.IntIterator;
 import org.key_project.rusty.logic.PosInProgram;
@@ -78,7 +77,7 @@ public class ProgramContextAdder {
             return be;
         var body = wrapper.getStatements().tail();
         body = body.prepend((Statement) replacement);
-        return new BlockExpression(body, wrapper.getValue(), wrapper.type());
+        return new BlockExpression(body, wrapper.getValue());
     }
 
     /**
@@ -115,8 +114,7 @@ public class ProgramContextAdder {
             --childrenToAdd;
 
         if (childLeft == 0 || lastChild == -1) {
-            return new BlockExpression(putIn.getStatements(), putIn.getValue(),
-                ((Expr) wrapper).type());
+            return new BlockExpression(putIn.getStatements(), putIn.getValue());
         }
 
         ImmutableList<Statement> body = ImmutableSLList.nil();
@@ -129,7 +127,6 @@ public class ProgramContextAdder {
             }
         }
 
-        return new BlockExpression(body, ((BlockExpression) wrapper).getValue(),
-            ((BlockExpression) wrapper).type());
+        return new BlockExpression(body, ((BlockExpression) wrapper).getValue());
     }
 }

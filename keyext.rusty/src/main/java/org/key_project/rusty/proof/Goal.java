@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
+import java.util.Collection;
+
+import org.key_project.logic.op.Function;
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
@@ -41,7 +44,11 @@ public final class Goal implements ProofGoal {
     }
 
     public Goal(Node n, TacletIndex tacletIndex, Services services) {
-        this(n, tacletIndex, services.getNamespaces().copy());
+        this.node = n;
+        this.ruleAppIndex = new RuleAppIndex(tacletIndex, this, services);
+        appliedRuleApps = ImmutableSLList.nil();
+        localNamespaces =
+            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent();
     }
 
     /**
@@ -123,6 +130,8 @@ public final class Goal implements ProofGoal {
                 proof.closeGoal(goalList.head());
             }
         }
+
+        adaptNamespacesNewGoals(goalList);
 
         return goalList;
     }
@@ -245,6 +254,34 @@ public final class Goal implements ProofGoal {
 
     public Services getOverlayServices() {
         return proof().getServices().getOverlay(getLocalNamespaces());
+    }
+
+    /*
+     * when the new goals are created during splitting, their namespaces cannot be fixed yet as new
+     * symbols may still be added.
+     *
+     * Now, remember the freshly created symbols in the nodes and set fresh local namespaces.
+     *
+     * The
+     */
+    private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
+        Collection<ProgramVariable> newProgVars = localNamespaces.programVariables().elements();
+        Collection<Function> newFunctions = localNamespaces.functions().elements();
+
+        localNamespaces.flushToParent();
+
+        boolean first = true;
+        for (Goal goal : goalList) {
+            goal.getNode().addLocalProgVars(newProgVars);
+            goal.getNode().addLocalFunctions(newFunctions);
+
+            if (first) {
+                first = false;
+            } else {
+                goal.localNamespaces = localNamespaces.getParent().copy().copyWithParent();
+            }
+
+        }
     }
 
     @Override

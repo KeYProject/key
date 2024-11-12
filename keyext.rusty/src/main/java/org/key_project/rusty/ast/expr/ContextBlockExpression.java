@@ -31,12 +31,12 @@ public class ContextBlockExpression extends BlockExpression {
     private final int patternPrefixLength;
 
     public ContextBlockExpression(ImmutableList<Statement> statements) {
-        super(statements, null, null);
+        super(statements, null);
         patternPrefixLength = this.getPrefixLength();
     }
 
     public ContextBlockExpression(ExtList children) {
-        super(convertExtList(children), null, null);
+        super(convertExtList(children), null);
         patternPrefixLength = this.getPrefixLength();
     }
 
@@ -44,7 +44,6 @@ public class ContextBlockExpression extends BlockExpression {
         var stmts = ImmutableList.of(children.collect(Statement.class));
         var expr = children.get(Expr.class);
         if (expr instanceof BlockExpression || expr instanceof IfExpression
-                || expr instanceof IfLetExpression
                 || expr instanceof MatchExpression) {
             stmts = stmts.append(new ExpressionStatement(expr, false));
         }

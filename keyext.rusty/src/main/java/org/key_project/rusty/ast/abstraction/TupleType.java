@@ -11,6 +11,9 @@ import java.util.Map;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.ty.RustType;
+import org.key_project.rusty.ast.ty.TupleRustType;
+import org.key_project.util.collection.ImmutableArray;
 
 public class TupleType implements Type {
     public static final TupleType UNIT = getInstance(new ArrayList<>());
@@ -41,5 +44,11 @@ public class TupleType implements Type {
     @Override
     public Name name() {
         return null;
+    }
+
+    @Override
+    public RustType toRustType(Services services) {
+        return new TupleRustType(
+            new ImmutableArray<>(types.stream().map(t -> t.toRustType(services)).toList()));
     }
 }

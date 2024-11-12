@@ -146,10 +146,10 @@ public class HirConverter {
             case ExprKind.If e -> convertIfExpr(e, ty);
             case ExprKind.DropTemps(var e) -> convertExpr(e);
             case ExprKind.Path(var e) -> convertPathExpr(e);
-            case ExprKind.AddrOf e -> convertAddrOf(e, ty);
+            case ExprKind.AddrOf e -> convertAddrOf(e);
             case ExprKind.Assign e -> convertAssign(e, ty);
-            case ExprKind.AssignOp e -> convertAssignOp(e, ty);
-            case ExprKind.Binary e -> convertBinary(e, ty);
+            case ExprKind.AssignOp e -> convertAssignOp(e);
+            case ExprKind.Binary e -> convertBinary(e);
             case ExprKind.Unary e -> convertUnary(e, ty);
             default -> throw new IllegalArgumentException("Unknown expression: " + expr);
         };
@@ -158,7 +158,7 @@ public class HirConverter {
     private BlockExpression convertBlockExpr(ExprKind.BlockExpr expr, Type type) {
         var stmts = Arrays.stream(expr.block().stmts()).map(this::convertStmt).toList();
         var value = expr.block().expr() == null ? null : convertExpr(expr.block().expr());
-        return new BlockExpression(ImmutableList.fromList(stmts), value, type);
+        return new BlockExpression(ImmutableList.fromList(stmts), value);
     }
 
     private LiteralExpression convertLitExpr(Lit expr, Type type) {
@@ -194,7 +194,7 @@ public class HirConverter {
         var pat = convertPat(let.pat());
         var ty = let.ty() == null ? null : convertHirTy(let.ty());
         var init = convertExpr(let.init());
-        return new LetExpression(pat, ty, init, type);
+        return new LetExpression(pat, ty, init);
     }
 
     private IfExpression convertIfExpr(ExprKind.If i, Type type) {
@@ -211,23 +211,22 @@ public class HirConverter {
         throw new IllegalArgumentException("Unknown path: " + path);
     }
 
-    private BorrowExpression convertAddrOf(ExprKind.AddrOf addrOf, Type type) {
-        return new BorrowExpression(addrOf.mut(), convertExpr(addrOf.expr()), type);
+    private BorrowExpression convertAddrOf(ExprKind.AddrOf addrOf) {
+        return new BorrowExpression(addrOf.mut(), convertExpr(addrOf.expr()));
     }
 
     private AssignmentExpression convertAssign(ExprKind.Assign assign, Type type) {
-        return new AssignmentExpression(convertExpr(assign.left()), convertExpr(assign.right()),
-            type);
+        return new AssignmentExpression(convertExpr(assign.left()), convertExpr(assign.right()));
     }
 
-    private CompoundAssignmentExpression convertAssignOp(ExprKind.AssignOp assignOp, Type type) {
+    private CompoundAssignmentExpression convertAssignOp(ExprKind.AssignOp assignOp) {
         return new CompoundAssignmentExpression(convertExpr(assignOp.left()),
-            convertBinOp(assignOp.op().node()), convertExpr(assignOp.right()), type);
+            convertBinOp(assignOp.op().node()), convertExpr(assignOp.right()));
     }
 
-    private BinaryExpression convertBinary(ExprKind.Binary binary, Type type) {
+    private BinaryExpression convertBinary(ExprKind.Binary binary) {
         return new BinaryExpression(convertBinOp(binary.op().node()), convertExpr(binary.left()),
-            convertExpr(binary.right()), type);
+            convertExpr(binary.right()));
     }
 
     private UnaryExpression convertUnary(ExprKind.Unary unary, Type type) {
@@ -235,7 +234,7 @@ public class HirConverter {
         case Deref -> UnaryExpression.Operator.Deref;
         case Not -> UnaryExpression.Operator.Not;
         case Neg -> UnaryExpression.Operator.Neg;
-        }, convertExpr(unary.expr()), type);
+        }, convertExpr(unary.expr()));
     }
 
     private BinaryExpression.Operator convertBinOp(BinOpKind binOp) {

@@ -6,6 +6,7 @@ package org.key_project.rusty.ast.abstraction;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 
 import org.jspecify.annotations.NonNull;
@@ -25,6 +26,11 @@ public record SchemaType(ProgramSV sv) implements Type {
     @Override
     public String toString() {
         return sv.toString();
+    }
+
+    @Override
+    public RustType toRustType(Services services) {
+        throw new UnsupportedOperationException();
     }
 }
 //spotless:on

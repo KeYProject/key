@@ -322,7 +322,7 @@ public class IntermediateProofReplayer {
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
 
         if (!ourApp.complete()) {
-            ourApp = ourApp.tryToInstantiate(proof.getServices());
+            ourApp = ourApp.tryToInstantiate(currGoal.getOverlayServices());
         }
 
         return ourApp;

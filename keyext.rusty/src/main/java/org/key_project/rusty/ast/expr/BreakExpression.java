@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Label;
 import org.key_project.rusty.ast.abstraction.TupleType;
 import org.key_project.rusty.ast.abstraction.Type;
@@ -60,7 +61,7 @@ public record BreakExpression(@Nullable Label label, @Nullable Expr expr) implem
     }
 
     @Override
-    public Type type() {
+    public Type type(Services services) {
 // Is it never?
         return TupleType.UNIT;
     }

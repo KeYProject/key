@@ -5,12 +5,15 @@ package org.key_project.rusty.proof;
 
 import java.util.*;
 
+import org.key_project.logic.op.Function;
 import org.key_project.rusty.logic.RenamingTable;
 import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
@@ -55,6 +58,18 @@ public class Node implements Iterable<Node> {
     private ImmutableList<RenamingTable> renamings;
 
     /**
+     * a linked list of the locally generated program variables. It extends the list of the parent
+     * node.
+     */
+    private ImmutableList<ProgramVariable> localProgVars = ImmutableSLList.nil();
+
+    /**
+     * a linked list of the locally generated function symbols. It extends the list of the parent
+     * node.
+     */
+    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
+
+    /**
      * creates an empty node that is root and leaf.
      */
     public Node(Proof proof) {
@@ -77,6 +92,10 @@ public class Node implements Iterable<Node> {
     public Node(Proof proof, Sequent seq, @Nullable Node parent) {
         this(proof, seq);
         this.parent = parent;
+        if (parent != null) {
+            localProgVars = parent.localProgVars;
+            localFunctions = parent.localFunctions;
+        }
     }
 
     /**
@@ -232,6 +251,40 @@ public class Node implements Iterable<Node> {
 
     public boolean isClosed() {
         return closed;
+    }
+
+    /**
+     * Returns the set of created program variables known in this node.
+     * <p>
+     * In the resulting list, the newest additions come first.
+     *
+     * @return a non-null immutable list of program variables.
+     */
+    public ImmutableList<ProgramVariable> getLocalProgVars() {
+        return localProgVars;
+    }
+
+    public void addLocalProgVars(Iterable<? extends ProgramVariable> elements) {
+        for (var pv : elements) {
+            localProgVars = localProgVars.prepend(pv);
+        }
+    }
+
+    public void addLocalFunctions(Collection<? extends Function> elements) {
+        for (Function op : elements) {
+            localFunctions = localFunctions.prepend(op);
+        }
+    }
+
+    /**
+     * Returns the set of freshly created function symbols known to this node.
+     * <br>
+     * In the resulting list, the newest additions come first.
+     *
+     * @return a non-null immutable list of function symbols.
+     */
+    public Iterable<Function> getLocalFunctions() {
+        return localFunctions;
     }
 
     /**

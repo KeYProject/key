@@ -6,7 +6,10 @@ package org.key_project.rusty.ast.abstraction;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.ty.RustType;
 
 public interface Type extends Named {
     Sort getSort(Services services);
+
+    RustType toRustType(Services services);
 }

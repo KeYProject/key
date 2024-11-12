@@ -7,18 +7,24 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 //spotless:off
 public record BindingPattern(boolean ref, boolean mutRef, boolean mut, ProgramVariable pv,
                              @Nullable Pattern opt) implements Pattern {
+
+public     BindingPattern {
+       assert pv != null : "BindingPattern cannot have a null variable";
+    }
+
     @Override
     public void visit(Visitor v) {
         v.performActionOnBindingPattern(this);
     }
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         if (n == 0) return pv;
         if (n == 1 && opt != null) {
             return opt;

@@ -38,4 +38,8 @@ public class NewVarcond {
     public KeYRustyType getType() {
         return type;
     }
+
+    public Object getTypeDefiningObject() {
+        return type != null ? type : peerSV;
+    }
 }

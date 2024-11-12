@@ -111,12 +111,12 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
 
     @Override
     public void performActionOnBooleanLiteralExpression(BooleanLiteralExpression x) {
-        throw new RuntimeException("TODO @ DD");
+        doDefaultAction(x);
     }
 
     @Override
     public void performActionOnIntegerLiteralExpression(IntegerLiteralExpression x) {
-        throw new RuntimeException("TODO @ DD");
+        doDefaultAction(x);
     }
 
     @Override
@@ -153,6 +153,50 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
             @Override
             RustyProgramElement createNewElement(ExtList changeList) {
                 return new LetStatement(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnUnaryExpression(UnaryExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new UnaryExpression(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnLetExpression(LetExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new LetExpression(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnIfExpression(IfExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new IfExpression(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnBinaryExpression(BinaryExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new BinaryExpression(changeList);
             }
         };
         def.doAction(x);

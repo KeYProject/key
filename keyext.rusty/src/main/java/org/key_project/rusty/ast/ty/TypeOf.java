@@ -36,7 +36,7 @@ public final class TypeOf implements RustType {
 
     @Override
     public void visit(Visitor v) {
-
+        v.performActionOnTypeOf(this);
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
 import org.key_project.rusty.ast.ty.ReferenceRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
+import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -503,22 +504,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnIfLetExpression(IfLetExpression x) {
-        layouter.keyWord("if").print(" ");
-        layouter.keyWord("let").print(" ");
-        x.pattern().visit(this);
-        layouter.print(" = ");
-        x.expr().visit(this);
-        layouter.print(" ");
-        x.then().visit(this);
-        if (x.elseExpr() != null) {
-            layouter.print(" ");
-            layouter.keyWord("else").print(" ");
-            x.elseExpr().visit(this);
-        }
-    }
-
-    @Override
     public void performActionOnExpressionStatement(ExpressionStatement x) {
         x.getExpression().visit(this);
         layouter.print(";");
@@ -650,5 +635,10 @@ public class PrettyPrinter implements Visitor {
         }
         layouter.print(" = ");
         x.init().visit(this);
+    }
+
+    @Override
+    public void performActionOnTypeOf(TypeOf x) {
+        throw new UnsupportedOperationException();
     }
 }

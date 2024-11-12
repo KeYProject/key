@@ -9,6 +9,8 @@ import java.util.Map;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.ty.PrimitiveRustType;
+import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ldt.BoolLDT;
 import org.key_project.rusty.ldt.IntLDT;
 
@@ -77,5 +79,10 @@ public final class PrimitiveType implements Type {
      */
     public Name getCorrespondingLDTName() {
         return ldtName;
+    }
+
+    @Override
+    public RustType toRustType(Services services) {
+        return new PrimitiveRustType(this);
     }
 }

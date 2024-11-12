@@ -13,6 +13,7 @@ import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.ty.PrimitiveRustType;
 import org.key_project.rusty.ast.ty.ReferenceRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
+import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
@@ -103,8 +104,6 @@ public interface Visitor {
 
     void performActionOnMatchArm(MatchArm x);
 
-    void performActionOnIfLetExpression(IfLetExpression x);
-
     void performActionOnExpressionStatement(ExpressionStatement x);
 
     void performActionOnPrimitiveRustType(PrimitiveRustType x);
@@ -138,4 +137,6 @@ public interface Visitor {
     void performActionOnBindingPattern(BindingPattern x);
 
     void performActionOnLetExpression(LetExpression x);
+
+    void performActionOnTypeOf(TypeOf x);
 }

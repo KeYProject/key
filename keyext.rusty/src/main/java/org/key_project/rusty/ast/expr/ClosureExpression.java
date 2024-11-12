@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ast.visitor.Visitor;
@@ -55,7 +56,7 @@ public record ClosureExpression(boolean move, ImmutableArray<ClosureParam> param
     }
 
     @Override
-    public Type type() {
+    public Type type(Services services) {
         throw new UnsupportedOperationException();
     }
 }

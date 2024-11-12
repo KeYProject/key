@@ -42,7 +42,8 @@ public class LetStatement implements Statement, VariableDeclaration {
         if (n == 0 && type != null) {
             return type;
         }
-        --n;
+        if (type != null)
+            --n;
         if (n == 0 && init != null) {
             return init;
         }
@@ -102,14 +103,17 @@ public class LetStatement implements Statement, VariableDeclaration {
         if (init == null && other.init != null || init != null && !init.equals(other.init)) {
             return false;
         }
-        return pat.equals(other.pat) && type.equals(other.type);
+        if (type == null && other.type != null || type != null && !type.equals(other.type)) {
+            return false;
+        }
+        return pat.equals(other.pat);
     }
 
     @Override
     public int hashCode() {
         int hashcode = 5;
         hashcode = 31 * hashcode + pat.hashCode();
-        hashcode = 31 * hashcode + type.hashCode();
+        hashcode = 31 * hashcode + (type == null ? 0 : type.hashCode());
         hashcode = 31 * hashcode + (init == null ? 0 : init.hashCode());
         return hashcode;
     }

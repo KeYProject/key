@@ -149,7 +149,7 @@ public class Services implements LogicServices {
         return s;
     }
 
-    public Services getOverlay(NamespaceSet localNamespaces) {
+    public Services getOverlay(NamespaceSet namespaces) {
         Services result = new Services(this);
         result.setNamespaces(namespaces);
         return result;

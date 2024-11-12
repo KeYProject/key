@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
@@ -33,8 +34,8 @@ public record GroupedExpression(Expr expr) implements Expr {
     }
 
     @Override
-    public Type type() {
-        return expr.type();
+    public Type type(Services services) {
+        return expr.type(services);
     }
 }
 //spotless:on

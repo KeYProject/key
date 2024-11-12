@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.TupleType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.ExtList;
@@ -16,12 +18,11 @@ import org.jspecify.annotations.NonNull;
 public final class AssignmentExpression implements Expr {
     private final Expr lhs;
     private final Expr rhs;
-    private final Type type;
+    private final Type type = TupleType.UNIT;
 
-    public AssignmentExpression(Expr lhs, Expr rhs, Type type) {
+    public AssignmentExpression(Expr lhs, Expr rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
-        this.type = type;
     }
 
     public AssignmentExpression(ExtList changeList) {
@@ -29,7 +30,6 @@ public final class AssignmentExpression implements Expr {
         assert exprs.length == 2 : Arrays.toString(exprs);
         lhs = exprs[0];
         rhs = exprs[1];
-        type = changeList.get(Type.class);
     }
 
 
@@ -83,7 +83,7 @@ public final class AssignmentExpression implements Expr {
     }
 
     @Override
-    public Type type() {
+    public Type type(Services services) {
         return type;
     }
 }

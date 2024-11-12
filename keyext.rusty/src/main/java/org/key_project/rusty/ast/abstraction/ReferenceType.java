@@ -10,6 +10,8 @@ import java.util.Objects;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.ty.ReferenceRustType;
+import org.key_project.rusty.ast.ty.RustType;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -72,4 +74,8 @@ public final class ReferenceType implements Type {
         return name.toString();
     }
 
+    @Override
+    public RustType toRustType(Services services) {
+        return new ReferenceRustType(isMut, inner.toRustType(services), this);
+    }
 }

@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.expr;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Label;
 import org.key_project.rusty.ast.abstraction.TupleType;
 import org.key_project.rusty.ast.abstraction.Type;
@@ -53,7 +54,7 @@ public record IteratorLoopExpression(@Nullable Label label, Pattern pattern, Exp
     }
 
     @Override
-    public Type type() {
+    public Type type(Services services) {
         return TupleType.UNIT;
     }
 }

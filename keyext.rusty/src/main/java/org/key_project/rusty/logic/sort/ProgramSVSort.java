@@ -306,7 +306,7 @@ public abstract class ProgramSVSort extends SortImpl {
         @Override
         public boolean canStandFor(RustyProgramElement check, Services services) {
             return super.canStandFor(check, services) && check instanceof Expr e
-                    && e.type() == type;
+                    && e.type(services) == type;
         }
     }
 
