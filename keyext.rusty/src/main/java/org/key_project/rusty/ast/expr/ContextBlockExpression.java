@@ -15,7 +15,7 @@ import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.IntIterator;
 import org.key_project.rusty.logic.PosInProgram;
-import org.key_project.rusty.logic.ProgramPrefix;
+import org.key_project.rusty.logic.PossibleProgramPrefix;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.ExtList;
@@ -88,11 +88,11 @@ public class ContextBlockExpression extends BlockExpression {
         final RustyProgramElement src = newSource.getSource();
         final Services services = source.getServices();
 
-        final ProgramPrefix prefix;
+        final PossibleProgramPrefix prefix;
         int pos = -1;
         PosInProgram relPos = PosInProgram.TOP;
 
-        if (src instanceof ProgramPrefix pre) {
+        if (src instanceof PossibleProgramPrefix pre) {
             prefix = pre;
             final int srcPrefixLength = prefix.getPrefixLength();
 
@@ -102,7 +102,7 @@ public class ContextBlockExpression extends BlockExpression {
 
             pos = srcPrefixLength - patternPrefixLength;
 
-            ProgramPrefix firstActiveStatement = getPrefixElementAt(prefix, pos);
+            PossibleProgramPrefix firstActiveStatement = getPrefixElementAt(prefix, pos);
 
             relPos = firstActiveStatement.getFirstActiveChildPos();
 
@@ -116,8 +116,9 @@ public class ContextBlockExpression extends BlockExpression {
             if (relPos != PosInProgram.TOP) {
                 start = relPos.get(relPos.depth() - 1);
                 if (relPos.depth() > 1) {
-                    firstActiveStatement = (ProgramPrefix) PosInProgram.getProgramAt(relPos.up(),
-                        firstActiveStatement);
+                    firstActiveStatement =
+                        (PossibleProgramPrefix) PosInProgram.getProgramAt(relPos.up(),
+                            firstActiveStatement);
                 }
             }
             newSource = new SourceData(firstActiveStatement, start, services);
@@ -143,7 +144,7 @@ public class ContextBlockExpression extends BlockExpression {
      * position
      */
     private MatchConditions makeContextInfoComplete(MatchConditions matchCond, SourceData newSource,
-            ProgramPrefix prefix, int pos, PosInProgram relPos, RustyProgramElement src,
+            PossibleProgramPrefix prefix, int pos, PosInProgram relPos, RustyProgramElement src,
             Services services) {
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
@@ -169,10 +170,11 @@ public class ContextBlockExpression extends BlockExpression {
      *        prefix.getPrefixElementAt(pos);
      * @return the PosInProgram of the first element, which is not part of the prefix
      */
-    private PosInProgram matchPrefixEnd(final ProgramPrefix prefix, int pos, PosInProgram relPos) {
+    private PosInProgram matchPrefixEnd(final PossibleProgramPrefix prefix, int pos,
+            PosInProgram relPos) {
         PosInProgram prefixEnd = PosInProgram.TOP;
         if (prefix != null) {
-            ProgramPrefix currentPrefix = prefix;
+            PossibleProgramPrefix currentPrefix = prefix;
             int i = 0;
             while (i <= pos) {
                 final IntIterator it = currentPrefix.getFirstActiveChildPos().iterator();
@@ -195,8 +197,8 @@ public class ContextBlockExpression extends BlockExpression {
         return prefixEnd;
     }
 
-    private static ProgramPrefix getPrefixElementAt(ProgramPrefix prefix, int i) {
-        ProgramPrefix current = prefix;
+    private static PossibleProgramPrefix getPrefixElementAt(PossibleProgramPrefix prefix, int i) {
+        PossibleProgramPrefix current = prefix;
         for (int pos = 0; pos < i; pos++) {
             current = current.getNextPrefixElement();
         }

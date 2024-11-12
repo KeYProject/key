@@ -12,7 +12,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.logic.PosInOccurrence;
-import org.key_project.rusty.logic.ProgramPrefix;
+import org.key_project.rusty.logic.PossibleProgramPrefix;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -354,11 +354,10 @@ public class TacletIndex {
             HashMap<Object, ImmutableList<NoPosTacletApp>> map, RustyProgramElement pe,
             PrefixOccurrences prefixOccurrences) {
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
-        if (pe instanceof ProgramPrefix) {
+        if (pe instanceof PossibleProgramPrefix pre && pre.isPrefix()) {
             int next = prefixOccurrences.occurred(pe);
-            var nt = pe;
-            if (next < nt.getChildCount()) {
-                return getRustyTacletList(map, (RustyProgramElement) nt.getChild(next),
+            if (next < pe.getChildCount()) {
+                return getRustyTacletList(map, (RustyProgramElement) pe.getChild(next),
                     prefixOccurrences);
             }
         } else {

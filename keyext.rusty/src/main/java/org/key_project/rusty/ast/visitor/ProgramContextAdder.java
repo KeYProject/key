@@ -8,6 +8,8 @@ import java.rmi.UnexpectedException;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.expr.ContextBlockExpression;
+import org.key_project.rusty.ast.expr.Expr;
+import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.logic.IntIterator;
 import org.key_project.rusty.logic.PosInProgram;
@@ -54,6 +56,8 @@ public class ProgramContextAdder {
             body = wrap(next, putIn, prefixPos, suffix);
             if (context instanceof BlockExpression be) {
                 return createBlockExprWrapper(be, body);
+            } else if (context instanceof ExpressionStatement es) {
+                return createExpressionStatementWrapper(es, body);
             } else {
                 throw new RuntimeException(
                     new UnexpectedException("Unexpected block type: " + context.getClass()));
@@ -128,5 +132,13 @@ public class ProgramContextAdder {
         }
 
         return new BlockExpression(body, ((BlockExpression) wrapper).getValue());
+    }
+
+    private ExpressionStatement createExpressionStatementWrapper(ExpressionStatement wrapper,
+            RustyProgramElement replacement) {
+        return new ExpressionStatement(
+            replacement instanceof BlockExpression be && be.getChildCount() == 1
+                    && be.getValue() != null ? be.getValue() : (Expr) replacement,
+            wrapper.hasSemi());
     }
 }

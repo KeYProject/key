@@ -15,14 +15,14 @@ import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.PosInProgram;
-import org.key_project.rusty.logic.ProgramPrefix;
+import org.key_project.rusty.logic.PossibleProgramPrefix;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBranch {
+public class BlockExpression implements Expr, PossibleProgramPrefix, ThenBranch, ElseBranch {
     protected final ImmutableList<Statement> statements;
     protected final Expr value;
     private final int prefixLength;
@@ -31,14 +31,14 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
         this.statements = statements;
         this.value = value;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-        prefixLength = info.getLength();
+        prefixLength = info.length();
     }
 
     public BlockExpression(ExtList children) {
         statements = ImmutableList.of(children.collect(Statement.class));
         value = children.get(Expr.class);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-        prefixLength = info.getLength();
+        prefixLength = info.length();
     }
 
     @Override
@@ -110,27 +110,31 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
         v.performActionOnBlockExpression(this);
     }
 
-
     @Override
-    public boolean hasNextPrefixElement() {
-        return getChildCount() != 0 && getChild(0) instanceof ProgramPrefix;
+    public boolean isPrefix() {
+        return getChildCount() != 0;
     }
 
     @Override
-    public ProgramPrefix getNextPrefixElement() {
+    public boolean hasNextPrefixElement() {
+        return getChildCount() != 0 && getChild(0) instanceof PossibleProgramPrefix;
+    }
+
+    @Override
+    public PossibleProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) getChild(0);
+            return (PossibleProgramPrefix) getChild(0);
         }
         throw new IndexOutOfBoundsException("No next prefix element " + this);
     }
 
     @Override
-    public ProgramPrefix getLastPrefixElement() {
+    public PossibleProgramPrefix getLastPrefixElement() {
         return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : this;
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
         return computePrefixElements(this);
     }
 
@@ -145,9 +149,9 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
     }
 
     /** computes the prefix elements for the given array of statment block */
-    public static ImmutableArray<ProgramPrefix> computePrefixElements(
-            ProgramPrefix current) {
-        final ArrayList<ProgramPrefix> prefix = new ArrayList<>();
+    public static ImmutableArray<PossibleProgramPrefix> computePrefixElements(
+            PossibleProgramPrefix current) {
+        final ArrayList<PossibleProgramPrefix> prefix = new ArrayList<>();
         prefix.add(current);
 
         while (current.hasNextPrefixElement()) {
