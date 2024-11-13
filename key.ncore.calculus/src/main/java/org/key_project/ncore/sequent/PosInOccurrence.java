@@ -13,6 +13,10 @@ public class PosInOccurrence {
             seq.numberInAntec(formulaNumber));
     }
 
+    // saves 8 bytes (due to alignment issues) per instance if we use a
+    // short here instead of an int
+    private final short hashCode;
+
     /**
      * the constrained formula the pos in occurrence describes
      */
@@ -36,6 +40,7 @@ public class PosInOccurrence {
         this.inAntec = inAntec;
         this.sequentFormula = sequentFormula;
         this.posInTerm = posInTerm;
+        this.hashCode = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
     }
 
     /**
@@ -165,6 +170,11 @@ public class PosInOccurrence {
             return posInTerm.equals(cmp.posInTerm);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
     }
 
     /**
