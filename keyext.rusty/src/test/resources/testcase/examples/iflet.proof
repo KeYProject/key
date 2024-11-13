@@ -7,7 +7,7 @@
 \problem {
     \<{
         let n: u32 = 1u32;
-        if let 1u32..10u32 = n {
+        if let 1..10 = n {
             a = n;
         } else {
             a = 0;
