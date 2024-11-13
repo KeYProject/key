@@ -4,12 +4,9 @@
 package de.uka.ilkd.key.rule;
 
 
-import org.key_project.logic.Namespace;
-import org.key_project.logic.op.Function;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -28,14 +25,4 @@ public interface RuleApp
      * corresponding formula) of this rule application
      */
     PosInOccurrence posInOccurrence();
-
-    /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
-     *
-     * TODO: better name
-     *
-     * @param goal the Goal where to apply the rule
-     */
-    void execute(Namespace<? super @NonNull Function> fns);
 }

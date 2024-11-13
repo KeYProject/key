@@ -615,6 +615,8 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
          */
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
+        ruleApp.execute(localNamespaces.functions());
+        addAppliedRuleApp(ruleApp);
         try {
             goalList = ruleApp.rule().getExecutor().apply(this, ruleApp);
         } catch (RuleAbortException rae) {

@@ -72,7 +72,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * @return list of new created goals
      */
     @Override
-    public void execute(Namespace<? super @NonNull Function> fns) {
+    public <F extends Function> void execute(Namespace<@NonNull F> fns) {
 
     }
 

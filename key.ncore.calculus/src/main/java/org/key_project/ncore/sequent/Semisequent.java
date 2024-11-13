@@ -408,7 +408,7 @@ public abstract class Semisequent<SF extends SequentFormula> implements Iterable
      *         place idx
      */
     public SemisequentChangeInfo<SF> replace(int idx, SF sequentFormula) {
-        return insertFirst(sequentFormula);
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), null);
     }
 
     /**

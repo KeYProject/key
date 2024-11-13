@@ -325,7 +325,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return list of new created goals
      */
     @Override
-    public void execute(Namespace<? super @NonNull Function> fns) {
+    public <F extends Function> void execute(Namespace<@NonNull F> fns) {
         if (!complete()) {
             throw new IllegalStateException(
                 "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
@@ -690,7 +690,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     }
 
 
-    public void registerSkolemConstants(Namespace<? super @NonNull Function> fns) {
+    private <F extends Function> void registerSkolemConstants(Namespace<@NonNull F> fns) {
         final SVInstantiations insts = instantiations();
         final Iterator<SchemaVariable> svIt = insts.svIterator();
         while (svIt.hasNext()) {
@@ -701,7 +701,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
                 if (fns.lookup(inst.op().name()) == null) {
-                    fns.addSafely((Function) inst.op());
+                    fns.addSafely((F) inst.op());
                 }
             }
         }
