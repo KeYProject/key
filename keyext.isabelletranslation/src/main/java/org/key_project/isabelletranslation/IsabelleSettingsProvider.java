@@ -18,7 +18,7 @@ import de.uka.ilkd.key.settings.Configuration;
 public class IsabelleSettingsProvider extends SettingsPanel implements SettingsProvider {
     private static final String INFO_TIMEOUT_FIELD =
         """
-                Timeout for the external solvers in seconds. Fractions of a second are allowed. Example: 6.5
+                Timeout for the external solvers in seconds.
                 """;
     private static final String infoTranslationPathPanel =
         """
@@ -27,6 +27,7 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     private static final String infoIsabellePathPanel =
         """
                 Specify the absolute path of the Isabelle folder.
+                Currently supports Isabelle2024-RC1.
                 """;
 
     /**
@@ -63,7 +64,7 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
 
     @Override
     public String getDescription() {
-        return "Isabelle translation";
+        return "Isabelle Translation";
     }
 
     @Override
@@ -77,13 +78,13 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     }
 
     private JTextField createTranslationPathPanel() {
-        return addFileChooserPanel("Store translation to file:", "", infoTranslationPathPanel,
+        return addFileChooserPanel("Location for translation files:", "", infoTranslationPathPanel,
             true, e -> {
             });
     }
 
     private JTextField createIsabellePathPanel() {
-        return addFileChooserPanel("Isabelle folder:", "", infoIsabellePathPanel,
+        return addFileChooserPanel("Isabelle installation folder:", "", infoIsabellePathPanel,
             true, e -> {
             });
     }
