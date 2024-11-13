@@ -6,17 +6,15 @@ package org.key_project.isabelletranslation.gui.controller;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.*;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.PositionedIssueString;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.isabelletranslation.automation.IsabelleLauncher;
-import org.key_project.isabelletranslation.automation.IsabelleNotFoundException;
 import org.key_project.isabelletranslation.automation.IsabelleProblem;
 import org.key_project.isabelletranslation.translation.IllegalFormulaException;
 import org.key_project.isabelletranslation.translation.IsabelleTranslator;
@@ -71,19 +69,11 @@ public class TranslationAction extends MainWindowAction {
             launcher.addListener(progressDialogMediator);
             try {
                 launcher.launch(translations, settings.getTimeout(), 1);
-            } catch (IsabelleNotFoundException e) {
-                progressDialogMediator.discardEvent();
-                PositionedIssueString issueString = new PositionedIssueString(e.getMessage());
-                IssueDialog issueDialog =
-                    new IssueDialog(mainWindow, "Launch failed!", Set.of(issueString), true);
-                issueDialog.setVisible(true);
             } catch (IOException e) {
-                // Couldn't write files
+                // Thrown when Isabelle was not found or translation files could not be written
                 progressDialogMediator.discardEvent();
-                PositionedIssueString issueString = new PositionedIssueString(e.getMessage());
-                IssueDialog issueDialog =
-                    new IssueDialog(mainWindow, "Launch failed!", Set.of(issueString), true);
-                issueDialog.setVisible(true);
+                JOptionPane.showMessageDialog(mainWindow, e.getMessage(), "Launch failed!",
+                    JOptionPane.ERROR_MESSAGE);
             }
         }, "IsabelleLauncherThread");
         thread.start();
