@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Collection;
 
-import org.key_project.ncore.sequent.SemisequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -59,8 +58,8 @@ public class Semisequent extends org.key_project.ncore.sequent.Semisequent<Seque
 
     @Override
     protected boolean equalsModRenaming(SequentFormula sf1, SequentFormula sf2) {
-        return RENAMING_TERM_PROPERTY.equalsModThisProperty((Term) sf1.formula(),
-            (Term) sf2.formula());
+        return RENAMING_TERM_PROPERTY.equalsModThisProperty(sf1.formula(),
+            sf2.formula());
     }
 
     @Override
@@ -78,6 +77,47 @@ public class Semisequent extends org.key_project.ncore.sequent.Semisequent<Seque
     public SemisequentChangeInfo insert(int idx, SequentFormula sequentFormula) {
         return (SemisequentChangeInfo) super.insert(idx, sequentFormula);
     }
+
+    @Override
+    public SemisequentChangeInfo insertLast(ImmutableList<SequentFormula> insertions) {
+        return (SemisequentChangeInfo) super.insertLast(insertions);
+    }
+
+    @Override
+    public SemisequentChangeInfo insertLast(SequentFormula sequentFormula) {
+        return (SemisequentChangeInfo) super.insertLast(sequentFormula);
+    }
+
+    @Override
+    public SemisequentChangeInfo replace(int idx, SequentFormula sequentFormula) {
+        return (SemisequentChangeInfo) super.replace(idx, sequentFormula);
+    }
+
+    @Override
+    public SemisequentChangeInfo replace(int idx, ImmutableList<SequentFormula> replacements) {
+        return (SemisequentChangeInfo) super.replace(idx, replacements);
+    }
+
+    @Override
+    public SemisequentChangeInfo remove(int idx) {
+        return (SemisequentChangeInfo) super.remove(idx);
+    }
+
+    /**
+     * Create a new Semisequent from an ordered collection of formulas (possibly empty).
+     * The provided collection must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the
+     * sequent by subsequently inserting all formulas.
+     *
+     * @param seqList list of sequent formulas
+     */
+    public static Semisequent create(Collection<SequentFormula> seqList) {
+        if (seqList.isEmpty()) {
+            return EMPTY_SEMISEQUENT;
+        }
+        return new Semisequent(seqList);
+    }
+
 
     // inner class used to represent an empty semisequent
     private static class Empty extends Semisequent {

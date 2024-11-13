@@ -190,7 +190,7 @@ public final class QueryAxiom extends ClassAxiom {
             final Term ifFormula = tb.exactInstance(kjt.getSort(), tb.var(selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
             final Semisequent ifSemiSeq =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
+                (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
             ifSeq = Sequent.createAnteSequent(ifSemiSeq);
         }
 
@@ -219,7 +219,7 @@ public final class QueryAxiom extends ClassAxiom {
             tb.apply(update, tb.prog(Modality.JavaModalityKind.BOX, jb, post), null);
         final SequentFormula addedCf = new SequentFormula(addedFormula);
         final Semisequent addedSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
+            (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
         final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
 
         // build taclet

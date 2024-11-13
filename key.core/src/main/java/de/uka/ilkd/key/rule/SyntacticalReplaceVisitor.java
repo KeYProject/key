@@ -43,7 +43,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     /** the termbuilder used to construct terms */
     protected final TermBuilder tb;
     private Term computedResult = null;
-    protected final org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence;
+    protected final PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
     protected final RuleApp ruleApp;
@@ -76,7 +76,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
     private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             SVInstantiations svInst, Goal goal,
             Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
@@ -108,7 +108,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
     protected SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Services services,
             Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
@@ -139,7 +139,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param ruleApp the rule application
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             SVInstantiations svInst, Goal goal,
             Rule rule, RuleApp ruleApp) {
         this(termLabelState, labelHint, applicationPosInOccurrence, svInst, goal, rule, ruleApp,

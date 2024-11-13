@@ -15,7 +15,7 @@ import java.util.ListIterator;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -23,6 +23,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
+import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -195,7 +196,8 @@ public class Node implements Iterable<Node> {
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
-            SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
+            SequentChangeInfo<SequentFormula> oldSeqChangeInfo =
+                this.nodeInfo.getSequentChangeInfo();
             this.nodeInfo = new NodeInfo(this);
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
         } else {

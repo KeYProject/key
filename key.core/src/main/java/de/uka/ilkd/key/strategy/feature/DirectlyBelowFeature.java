@@ -34,7 +34,7 @@ public abstract class DirectlyBelowFeature extends BinaryFeature {
         if (pos.isTopLevel()) {
             return false;
         }
-        if (!isBadSymbol(pos.up().subTerm().op())) {
+        if (!isBadSymbol((Operator) pos.up().subTerm().op())) {
             return false;
         }
         return index == -1 || index == pos.getIndex();

@@ -8,6 +8,7 @@ import java.util.List;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 public interface IBuiltInRuleApp extends RuleApp {
@@ -38,10 +39,10 @@ public interface IBuiltInRuleApp extends RuleApp {
      */
     boolean isSufficientlyComplete();
 
-    ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts();
+    ImmutableList<PosInOccurrence> ifInsts();
 
     IBuiltInRuleApp setIfInsts(
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> ifInsts);
+            ImmutableList<PosInOccurrence> ifInsts);
 
     IBuiltInRuleApp replacePos(PosInOccurrence newPos);
 }

@@ -29,7 +29,7 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
     }
 
     @Override
-    final protected boolean filter(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    final protected boolean filter(RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         if (app instanceof TacletApp) {

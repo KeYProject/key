@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -23,13 +22,13 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static org.key_project.util.Strings.formatAsList;
@@ -943,23 +942,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         }
     }
 
-    /**
-     * applies the given rule application to the specified goal
-     *
-     * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
-     * @param tacletApp the rule application that is executed.
-     * @return List of the goals created by the rule which have to be proved. If this is a
-     *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
-     *         goal that should be closed (with the constraint this taclet is applied under).
-     */
-    @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp tacletApp) {
-        return getExecutor().apply(goal, tacletApp);
-    }
-
-    public TacletExecutor<? extends Taclet> getExecutor() {
-        return executor;
+    public TacletExecutor<?> getExecutor() {
+        return (TacletExecutor<? extends Taclet>) executor;
     }
 
     public abstract Taclet setName(String s);

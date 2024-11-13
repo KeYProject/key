@@ -63,13 +63,13 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
     @Override
     protected Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 
     @Override
     protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
-            org.key_project.ncore.sequent.PosInOccurrence pio,
+            PosInOccurrence pio,
             Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
         return !"andLeft".equals(ruleName)
@@ -86,7 +86,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
 
         if (proof == null) {
             return false;
@@ -128,7 +128,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp,
-                org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
@@ -147,7 +147,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             return true;
         }

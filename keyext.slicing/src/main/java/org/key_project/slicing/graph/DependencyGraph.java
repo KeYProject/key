@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -350,7 +351,8 @@ public class DependencyGraph {
         }
         while (true) {
             TrackedFormula formula =
-                new TrackedFormula(pio.sequentFormula(), locationGuess, pio.isInAntec(),
+                new TrackedFormula((SequentFormula) pio.sequentFormula(), locationGuess,
+                    pio.isInAntec(),
                     proof.getServices());
             if (containsNode(formula)) {
                 return formula;

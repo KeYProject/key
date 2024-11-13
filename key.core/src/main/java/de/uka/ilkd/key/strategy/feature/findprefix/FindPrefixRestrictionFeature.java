@@ -39,7 +39,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.checker = checker;
         }
 
-        public final boolean check(org.key_project.ncore.sequent.PosInOccurrence pio) {
+        public final boolean check(PosInOccurrence pio) {
             return checker.check(pio);
         }
     }
@@ -59,8 +59,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.modifier = modifier;
         }
 
-        org.key_project.ncore.sequent.PosInOccurrence modifyPosistion(
-                org.key_project.ncore.sequent.PosInOccurrence pos) {
+        PosInOccurrence modifyPosistion(
+                PosInOccurrence pos) {
             return modifier.modifyPosistion(pos);
         }
     }
@@ -109,7 +109,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
@@ -130,7 +130,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * @param pos the PosInOccurrence to be checked.
      * @return true, if all PrefixCheckers return true
      */
-    private boolean checkPrefix(org.key_project.ncore.sequent.PosInOccurrence pos) {
+    private boolean checkPrefix(PosInOccurrence pos) {
         // iterate through the prefix and let the prefix checkers do their work
         for (PrefixChecker prefixChecker : prefixCheckers) {
             if (!prefixChecker.check(pos)) {

@@ -54,7 +54,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new RemovePostStrategy(proof);
     }
 
@@ -81,7 +81,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp,
-                org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
@@ -98,7 +98,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             String name = app.rule().name().toString();
             if (!name.equals("hide_right")) {

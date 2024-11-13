@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.jspecify.annotations.NonNull;

@@ -63,7 +63,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-            org.key_project.ncore.sequent.PosInOccurrence modalityPIO,
+            PosInOccurrence modalityPIO,
             IProgramVariable programVariable,
             Term additionalCondition) {
         this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
@@ -79,7 +79,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-            org.key_project.ncore.sequent.PosInOccurrence modalityPIO, ExecutionValue parentValue,
+            PosInOccurrence modalityPIO, ExecutionValue parentValue,
             IProgramVariable programVariable, Term additionalCondition) {
         super(parentNode.getSettings(), proofNode, programVariable, parentValue, null,
             additionalCondition, modalityPIO);

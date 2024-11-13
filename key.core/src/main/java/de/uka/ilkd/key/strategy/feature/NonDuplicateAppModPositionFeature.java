@@ -21,10 +21,10 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
     @Override
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            org.key_project.ncore.sequent.PosInOccurrence newPio,
+            PosInOccurrence newPio,
             PosInOccurrence oldPio) {
-        final Term newFocus = newPio.subTerm();
-        final Term oldFocus = oldPio.subTerm();
+        final Term newFocus = (Term) newPio.subTerm();
+        final Term oldFocus = (Term) oldPio.subTerm();
         if (!newFocus.equalsModProperty(oldFocus, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             return false;
         }

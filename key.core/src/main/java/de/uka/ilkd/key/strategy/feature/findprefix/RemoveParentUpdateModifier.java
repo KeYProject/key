@@ -19,7 +19,7 @@ public class RemoveParentUpdateModifier implements Modifier {
 
 
     @Override
-    public org.key_project.ncore.sequent.PosInOccurrence modifyPosistion(PosInOccurrence pos) {
+    public PosInOccurrence modifyPosistion(PosInOccurrence pos) {
         if (!pos.isTopLevel() && pos.up().subTerm().op() instanceof UpdateApplication) {
             return modifyPosistion(pos.up());
         } else {

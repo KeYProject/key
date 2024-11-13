@@ -28,6 +28,9 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.DoNothingCaret;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.FormulaChangeInfo;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -210,7 +213,7 @@ public abstract class SequentView extends JEditorPane {
         String text = "";
 
         if (pis != null && !pis.isSequent()) {
-            Term term = pis.getPosInOccurrence().subTerm();
+            var term = pis.getPosInOccurrence().subTerm();
             text +=
                 "<b>Operator:</b> " + term.op().getClass().getSimpleName() + " (" + term.op() + ")";
             text += "<br><b>Sort</b>: " + term.sort();
@@ -825,10 +828,10 @@ public abstract class SequentView extends JEditorPane {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
                 }
-                ImmutableList<FormulaChangeInfo> modified =
+                ImmutableList<FormulaChangeInfo<SequentFormula>> modified =
                     node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
-                for (FormulaChangeInfo fci : modified) {
-                    org.key_project.ncore.sequent.PosInOccurrence positionOfMod =
+                for (FormulaChangeInfo<SequentFormula> fci : modified) {
+                    PosInOccurrence positionOfMod =
                         fci.positionOfModification();
                     pio_age_list.add(new PIO_age(positionOfMod, age));
                     for (PIO_age pair : pio_age_list) {
@@ -898,7 +901,7 @@ public abstract class SequentView extends JEditorPane {
                 if (!pair.active || pair.get_age() > max_age) {
                     continue;
                 }
-                org.key_project.ncore.sequent.PosInOccurrence pio = pair.get_pio();
+                PosInOccurrence pio = pair.get_pio();
                 Color color = computeColorForAge(max_age, pair.get_age());
                 ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
                 if (pfp != null) {
@@ -1039,16 +1042,16 @@ public abstract class SequentView extends JEditorPane {
      * @author jschiffl
      */
     static class PIO_age {
-        org.key_project.ncore.sequent.PosInOccurrence pio;
+        PosInOccurrence pio;
         final int age;
         boolean active = true;
 
-        public PIO_age(org.key_project.ncore.sequent.PosInOccurrence pio, int age) {
+        public PIO_age(PosInOccurrence pio, int age) {
             this.pio = pio;
             this.age = age;
         }
 
-        public org.key_project.ncore.sequent.PosInOccurrence get_pio() {
+        public PosInOccurrence get_pio() {
             return pio;
         }
 
@@ -1056,7 +1059,7 @@ public abstract class SequentView extends JEditorPane {
             return age;
         }
 
-        public void set_pio(org.key_project.ncore.sequent.PosInOccurrence pio) {
+        public void set_pio(PosInOccurrence pio) {
             this.pio = pio;
 
         }

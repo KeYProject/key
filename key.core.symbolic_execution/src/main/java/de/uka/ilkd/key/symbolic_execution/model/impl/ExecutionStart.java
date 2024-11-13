@@ -98,7 +98,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      */
     @Override
     public SourceElement getActiveStatement() {
-        Term modalityTerm = getModalityPIO().subTerm();
+        Term modalityTerm = (Term) getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);
     }

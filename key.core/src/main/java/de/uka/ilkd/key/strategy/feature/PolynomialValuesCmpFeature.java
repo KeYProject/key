@@ -94,7 +94,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         };
     }
 
-    protected boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         return compare(getPolynomial(left, leftCoeff, app, pos, goal, mState),
             getPolynomial(right, rightCoeff, app, pos, goal, mState));

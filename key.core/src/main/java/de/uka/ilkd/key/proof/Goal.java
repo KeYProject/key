@@ -11,6 +11,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -30,10 +32,10 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.key_project.logic.PosInTerm;
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.ncore.sequent.PosInOccurrence;
-import org.key_project.ncore.sequent.Sequent;
 import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -227,7 +229,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
      */
-    private void fireSequentChanged(SequentChangeInfo sci) {
+    private void fireSequentChanged(SequentChangeInfo<SequentFormula> sci) {
         var time = System.nanoTime();
         getFormulaTagManager().sequentChanged(this, sci);
         var time1 = System.nanoTime();
@@ -314,7 +316,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      *
      * @return the Sequent to be proved
      */
-    public Sequent sequent() {
+    public @NonNull Sequent sequent() {
         return node().sequent();
     }
 
@@ -614,7 +616,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
         try {
-            goalList = ruleApp.rule().apply(this, ruleApp);
+            goalList = ruleApp.rule().getExecutor().apply(this, ruleApp);
         } catch (RuleAbortException rae) {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);

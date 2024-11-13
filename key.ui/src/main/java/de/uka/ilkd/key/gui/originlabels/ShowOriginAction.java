@@ -13,6 +13,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
+import org.key_project.ncore.sequent.PosInOccurrence;
+
 /**
  * Opens a {@link OriginTermLabelVisualizer} for the selected term.
  *

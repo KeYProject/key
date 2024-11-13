@@ -166,7 +166,7 @@ public class NodeInfo {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
-            Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+            Term t = TermBuilder.goBelowUpdates((Term) pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();
@@ -424,11 +424,11 @@ public class NodeInfo {
         return notes;
     }
 
-    public SequentChangeInfo getSequentChangeInfo() {
+    public SequentChangeInfo<SequentFormula> getSequentChangeInfo() {
         return sequentChangeInfo;
     }
 
-    public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
+    public void setSequentChangeInfo(SequentChangeInfo<SequentFormula> sequentChangeInfo) {
         this.sequentChangeInfo = sequentChangeInfo;
     }
 

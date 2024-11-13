@@ -25,6 +25,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.ncore.sequent.PIOPathIterator;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -63,8 +65,8 @@ public class QueryExpand implements BuiltInRule {
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
-        final org.key_project.ncore.sequent.PosInOccurrence pio = ruleApp.posInOccurrence();
-        final Term query = pio.subTerm();
+        final PosInOccurrence pio = ruleApp.posInOccurrence();
+        final Term query = (Term) pio.subTerm();
 
         // new goal
         ImmutableList<Goal> newGoal = goal.split(1);
@@ -609,10 +611,10 @@ public class QueryExpand implements BuiltInRule {
      * is useful for <code>QueryExpandCost</cost>.
      */
     @Override
-    public boolean isApplicable(Goal goal, org.key_project.ncore.sequent.PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         if (pio != null && pio.subTerm().op() instanceof IProgramMethod
                 && pio.subTerm().freeVars().isEmpty()) {
-            final Term pmTerm = pio.subTerm();
+            final var pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
             if (pm.isModel()) {
                 return false;
@@ -627,12 +629,12 @@ public class QueryExpand implements BuiltInRule {
                             && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
-                    Term focus = it.getSubTerm();
+                    var focus = it.getSubTerm();
                     if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
                         return false;
                     }
                 }
-                storeTimeOfQuery(pio.subTerm(), goal);
+                storeTimeOfQuery((Term) pio.subTerm(), goal);
                 return true;
             }
         }

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -71,7 +72,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, org.key_project.ncore.sequent.PosInOccurrence posInOcc,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
             ProverTaskListener listener)
             throws InterruptedException {
         this.uic = uic;
@@ -80,7 +81,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     @Override
     protected Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
@@ -182,7 +183,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             if (!modalityCache.hasModality(goal.node().sequent())) {
                 return false;
@@ -197,7 +198,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             }
 
             if (pio != null) {
-                JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive(pio.subTerm());
+                JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive((Term) pio.subTerm());
                 SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
 
                 if (!(theJavaBlock.program() instanceof StatementBlock)

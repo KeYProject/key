@@ -1472,7 +1472,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
+        public PosInOccurrence getModalityPIO() {
             return null;
         }
 
@@ -2416,7 +2416,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
+        public PosInOccurrence getModalityPIO() {
             return null;
         }
     }
@@ -2851,7 +2851,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
+        public PosInOccurrence getModalityPIO() {
             return null;
         }
     }
@@ -2977,7 +2977,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public org.key_project.ncore.sequent.PosInOccurrence getModalityPIO() {
+        public PosInOccurrence getModalityPIO() {
             return null;
         }
 

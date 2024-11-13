@@ -22,13 +22,13 @@ public abstract class FilterStrategy implements Strategy {
     }
 
     @Override
-    public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return delegate.isApprovedApp(app, pio, goal);
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         if (!isApprovedApp(app, pio, goal)) {

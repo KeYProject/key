@@ -37,7 +37,7 @@ public class JoinIsApplicable {
      *         applicable).
      */
     public List<ProspectivePartner> isApplicable(Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence pio) {
+            PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return new LinkedList<>();
         }
@@ -52,7 +52,7 @@ public class JoinIsApplicable {
      * @return The list of possible join partners.
      */
     public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
-            org.key_project.ncore.sequent.PosInOccurrence pio) {
+            PosInOccurrence pio) {
         assert !pio.isInAntec();
         List<ProspectivePartner> partners = new LinkedList<>();
 
@@ -78,7 +78,7 @@ public class JoinIsApplicable {
      * @return A ProspectivePartner object if the given goals may be joined or null otherwise.
      */
     private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio, Goal g2) {
-        Term referenceFormula = pio.subTerm();
+        Term referenceFormula = (Term) pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();
         TermBuilder tb = g1.proof().getServices().getTermBuilder();
@@ -101,7 +101,8 @@ public class JoinIsApplicable {
 
             }
             if (formula.equalsModProperty(referenceFormula, RENAMING_TERM_PROPERTY)) {
-                return new ProspectivePartner(referenceFormula, g1.node(), pio.sequentFormula(),
+                return new ProspectivePartner(referenceFormula, g1.node(),
+                    (SequentFormula) pio.sequentFormula(),
                     update1, g2.node(), sf, update2);
             }
         }

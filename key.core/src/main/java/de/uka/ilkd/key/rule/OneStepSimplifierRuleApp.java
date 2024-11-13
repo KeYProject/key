@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
@@ -46,7 +47,7 @@ public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
      * @param assumeInsts available formulas for \assume instantiations
      */
     public void restrictAssumeInsts(
-            ImmutableList<org.key_project.ncore.sequent.PosInOccurrence> assumeInsts) {
+            ImmutableList<PosInOccurrence> assumeInsts) {
         this.restrictedIfInsts = true;
         setIfInsts(assumeInsts);
     }

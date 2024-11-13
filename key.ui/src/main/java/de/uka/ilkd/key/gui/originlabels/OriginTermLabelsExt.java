@@ -108,8 +108,13 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
         PosInOccurrence pio = pos.getPosInOccurrence();
 
-        OriginTermLabel label =
-            pio == null ? null : (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
+        OriginTermLabel label;
+        if (pio == null) {
+            label = null;
+        } else {
+            var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();
+            label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        }
 
         if (label != null && !label.getSubtermOrigins().isEmpty()) {
             result += "<b>Origin of (former) sub-terms:</b><br>" + label.getSubtermOrigins()

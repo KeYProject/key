@@ -59,9 +59,9 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
             SourceElement firstElement = assignment.getChildAt(0);
             if (firstElement instanceof FieldReference) {
                 PosInOccurrence pio = ruleApp.posInOccurrence();
-                Term term = pio.subTerm();
+                var t = pio.subTerm();
                 getProof().getServices().getTermBuilder();
-                term = TermBuilder.goBelowUpdates(term);
+                Term term = TermBuilder.goBelowUpdates(t);
                 if (((FieldReference) firstElement).getProgramVariable().name().toString()
                         .equals(fullFieldName) && isModification && hitcountExceeded(node)) {
                     return super.isBreakpointHit(activeStatement, ruleApp, proof, node);

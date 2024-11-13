@@ -79,7 +79,7 @@ public class QueryExpandCost implements Feature {
             MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        final Term t = pos.subTerm();
+        final Term t = (Term) pos.subTerm();
 
         long cost = baseCost;
 
@@ -172,16 +172,16 @@ public class QueryExpandCost implements Feature {
      * @return The number of repetitive rule applications.
      */
     protected int queryExpandAlreadyAppliedAtPos(RuleApp app,
-            org.key_project.ncore.sequent.PosInOccurrence pos, Goal goal) {
+            PosInOccurrence pos, Goal goal) {
         int count = 0;
         ImmutableList<RuleApp> appliedRuleApps = goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
             for (RuleApp appliedRuleApp : appliedRuleApps) {
-                final org.key_project.ncore.sequent.PosInOccurrence pio =
+                final PosInOccurrence pio =
                     appliedRuleApp.posInOccurrence();
                 if (pio != null) {
-                    final Term oldterm = pio.subTerm();
-                    final Term curterm = pos.subTerm();
+                    final Term oldterm = (Term) pio.subTerm();
+                    final Term curterm = (Term) pos.subTerm();
                     if (appliedRuleApp.rule().equals(QueryExpand.INSTANCE)
                             && oldterm.equalsModProperty(curterm,
                                 IRRELEVANT_TERM_LABELS_PROPERTY)) {

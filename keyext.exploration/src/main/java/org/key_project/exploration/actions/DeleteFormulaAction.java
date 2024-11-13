@@ -48,7 +48,7 @@ public class DeleteFormulaAction extends ExplorationAction {
         if (pio == null) {
             return;
         }
-        Term term = pio.subTerm();
+        Term term = (Term) pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
         ProofExplorationService service = ProofExplorationService.get(getMediator());
         service.soundHide(g, pio, term);

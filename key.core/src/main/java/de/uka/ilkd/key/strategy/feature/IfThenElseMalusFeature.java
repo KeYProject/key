@@ -4,14 +4,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.key_project.ncore.sequent.PIOPathIterator;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.LRUCache;
 
@@ -35,7 +34,7 @@ public class IfThenElseMalusFeature implements Feature {
         final ServiceCaches caches = goal.proof().getServices().getCaches();
 
         RuleAppCost resInt;
-        final LRUCache<org.key_project.ncore.sequent.PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
+        final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
             caches.getIfThenElseMalusCache();
         synchronized (ifThenElseMalusCache) {
             resInt = ifThenElseMalusCache.get(pos);
@@ -54,7 +53,7 @@ public class IfThenElseMalusFeature implements Feature {
                 break;
             }
 
-            final Term t = it.getSubTerm();
+            final var t = it.getSubTerm();
             if (t.op() instanceof IfThenElse) {
                 res = ind != 0 ? res + 1 : res - 1;
             }

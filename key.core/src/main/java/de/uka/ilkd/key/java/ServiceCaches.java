@@ -89,7 +89,7 @@ public class ServiceCaches {
      */
     private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<>(1000);
 
-    private final LRUCache<org.key_project.ncore.sequent.PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
+    private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
         new LRUCache<>(1000);
 
     private final LRUCache<Operator, Integer> introductionTimeCache =
@@ -135,7 +135,7 @@ public class ServiceCaches {
         new LRUCache<>(5000);
 
     /** Cache used by the exhaustive macro */
-    private final Map<Node, org.key_project.ncore.sequent.PosInOccurrence> exhaustiveMacroCache =
+    private final Map<Node, PosInOccurrence> exhaustiveMacroCache =
         new WeakHashMap<>();
 
     /** Cache used by the ifinstantiator */
@@ -166,7 +166,7 @@ public class ServiceCaches {
         return betaCandidates;
     }
 
-    public final LRUCache<org.key_project.ncore.sequent.PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
+    public final LRUCache<PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
         return ifThenElseMalusCache;
     }
 

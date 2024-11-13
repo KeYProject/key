@@ -5,9 +5,7 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -80,7 +78,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, org.key_project.ncore.sequent.PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             return computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE &&
             // Assumptions are normally not considered by the cost
@@ -98,7 +96,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp app,
-                org.key_project.ncore.sequent.PosInOccurrence pio, Goal goal,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
 
             Rule rule = app.rule();
@@ -116,9 +114,9 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
             // apply OSS to <inv>() calls.
             if (rule instanceof OneStepSimplifier) {
-                Term target = pio.subTerm();
+                var target = pio.subTerm();
                 if (target.op() instanceof UpdateApplication) {
-                    Operator updatedOp = target.sub(1).op();
+                    var updatedOp = target.sub(1).op();
                     if (updatedOp instanceof ObserverFunction) {
                         return NumberRuleAppCost.getZeroCost();
                     }
@@ -143,7 +141,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-            org.key_project.ncore.sequent.PosInOccurrence posInOcc) {
+            PosInOccurrence posInOcc) {
         return new AutoPilotStrategy(proof);
     }
 }

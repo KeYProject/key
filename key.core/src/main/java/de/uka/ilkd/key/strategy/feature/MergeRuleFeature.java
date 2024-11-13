@@ -32,7 +32,7 @@ public class MergeRuleFeature implements Feature {
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
-        final Term t = pos.subTerm();
+        final Term t = (Term) pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {
             return TopRuleAppCost.INSTANCE;
         }

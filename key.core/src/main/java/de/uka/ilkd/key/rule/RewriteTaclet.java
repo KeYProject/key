@@ -19,6 +19,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.logic.Name;
+import org.key_project.ncore.sequent.PIOPathIterator;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -57,7 +59,7 @@ public class RewriteTaclet extends FindTaclet {
 
     /**
      * If the surrounding formula has been decomposed completely, the find-term will NOT appear on
-     * the ANTEcedent. The formula {@code wellformed(h)} in {@code==> wellformed(h)} or in
+     * the ANTEcedent. The formula {@code wellformed(h)} in {@code ==> wellformed(h)} or in
      * {@code wellformed(h) ->
      * (inv(h) = inv(h2)) ==>} or in {@code \if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>}
      * has
@@ -165,7 +167,8 @@ public class RewriteTaclet extends FindTaclet {
      * @return the new instantiations with the additional updates, or <code>null</code>, if program
      *         modalities appear above <code>p_pos</code>
      */
-    public MatchConditions checkPrefix(org.key_project.ncore.sequent.PosInOccurrence p_pos,
+    public MatchConditions checkPrefix(
+            PosInOccurrence p_pos,
             MatchConditions p_mc) {
         int polarity = p_pos.isInAntec() ? -1 : 1; // init polarity
         SVInstantiations svi = p_mc.getInstantiations();
@@ -173,10 +176,9 @@ public class RewriteTaclet extends FindTaclet {
         assert p_pos.posInTerm() != null;
 
         PIOPathIterator it = p_pos.iterator();
-        Operator op;
         while (it.next() != -1) {
-            final Term t = it.getSubTerm();
-            op = t.op();
+            final Term t = (Term) it.getSubTerm();
+            var op = t.op();
             if (op instanceof Transformer) {
                 return null;
             } else if (op instanceof UpdateApplication

@@ -22,7 +22,7 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
     /**
      * The position to apply the macro on.
      */
-    private final org.key_project.ncore.sequent.PosInOccurrence pio;
+    private final PosInOccurrence pio;
 
     public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, PosInOccurrence pio,
             Proof proof) {

@@ -42,7 +42,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         return new ClausesSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, org.key_project.ncore.sequent.PosInOccurrence pos,
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);

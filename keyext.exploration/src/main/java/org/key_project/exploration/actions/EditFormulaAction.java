@@ -49,8 +49,8 @@ public class EditFormulaAction extends ExplorationAction {
 
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
-        Term term = pio.subTerm();
-        SequentFormula sf = pio.sequentFormula();
+        Term term = (Term) pio.subTerm();
+        SequentFormula sf = (SequentFormula) pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
         Term newTerm = promptForTerm(mainWindow, term);
 

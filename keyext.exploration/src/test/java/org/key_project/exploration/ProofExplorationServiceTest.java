@@ -14,6 +14,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.AfterEach;
@@ -148,7 +150,7 @@ public class ProofExplorationServiceTest {
         ImmutableList<Goal> goals = currentProof.openGoals();
         assertSame(1, goals.size(), "Prerequisite for test");
         Sequent sequent = goals.head().node().sequent();
-        org.key_project.ncore.sequent.PosInOccurrence pio =
+        PosInOccurrence pio =
             new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
         expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0).formula(),
             change);

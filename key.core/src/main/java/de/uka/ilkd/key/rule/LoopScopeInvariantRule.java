@@ -126,7 +126,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             return false;
         }
 
-        final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
+        final Term progPost = splitUpdates((Term) pio.subTerm(), goal.proof().getServices()).second;
         final var kind = ((Modality) progPost.op()).<Modality.JavaModalityKind>kind();
 
         return !InfFlowCheckInfo.isInfFlow(goal) && !WellDefinednessCheck.isOn() // TODO: Remove

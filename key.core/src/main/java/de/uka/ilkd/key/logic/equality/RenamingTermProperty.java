@@ -6,10 +6,10 @@ package de.uka.ilkd.key.logic.equality;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;

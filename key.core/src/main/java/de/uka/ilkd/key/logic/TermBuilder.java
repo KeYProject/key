@@ -30,6 +30,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
@@ -2141,11 +2142,12 @@ public class TermBuilder {
     /**
      * Removes leading updates from the passed term.
      */
-    public static Term goBelowUpdates(Term term) {
+    public static Term goBelowUpdates(org.key_project.logic.Term term) {
+        var t = (Term) term;
         while (term.op() instanceof UpdateApplication) {
-            term = UpdateApplication.getTarget(term);
+            term = UpdateApplication.getTarget(t);
         }
-        return term;
+        return t;
     }
 
     /**

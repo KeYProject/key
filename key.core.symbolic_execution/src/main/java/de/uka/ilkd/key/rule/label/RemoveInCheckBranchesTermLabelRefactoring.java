@@ -69,7 +69,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            org.key_project.ncore.sequent.PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         if (goal != null) {

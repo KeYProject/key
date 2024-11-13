@@ -46,7 +46,7 @@ public class ForEachCP implements Feature {
     }
 
     public RuleAppCost computeCost(final RuleApp app,
-            final org.key_project.ncore.sequent.PosInOccurrence pos, final Goal goal,
+            final PosInOccurrence pos, final Goal goal,
             MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
@@ -100,7 +100,7 @@ public class ForEachCP implements Feature {
             }
         }
 
-        private final org.key_project.ncore.sequent.PosInOccurrence pos;
+        private final PosInOccurrence pos;
         private final RuleApp app;
         private final Goal goal;
         private final MutableState mState;
