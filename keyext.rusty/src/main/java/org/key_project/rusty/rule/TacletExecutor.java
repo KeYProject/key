@@ -8,6 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.ncore.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
@@ -18,7 +19,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class TacletExecutor<T extends Taclet> extends
-        org.key_project.ncore.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T> {
+        org.key_project.ncore.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T, SequentFormula> {
     public TacletExecutor(T taclet) {
         super(taclet);
     }
@@ -149,5 +150,10 @@ public abstract class TacletExecutor<T extends Taclet> extends
             @NonNull RuleApp ruleApp, LogicServices services) {
         return syntacticalReplace(term, applicationPosInOccurrence, (MatchConditions) mc, goal,
             ruleApp, (Services) services);
+    }
+
+    @Override
+    protected SequentFormula createSequentFormula(Term form) {
+        return new SequentFormula(form);
     }
 }

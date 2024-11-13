@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.key_project.ncore.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -32,14 +33,14 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
         var tacletApp = (TacletApp) ruleApp;
         MatchConditions mc = tacletApp.matchConditions();
 
-        ImmutableList<SequentChangeInfo> newSequentsForGoals =
+        ImmutableList<SequentChangeInfo<SequentFormula>> newSequentsForGoals =
             checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
         var it = taclet.goalTemplates().iterator();
         Iterator<Goal> goalIt = newGoals.iterator();
-        Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
+        Iterator<SequentChangeInfo<SequentFormula>> newSequentsIt = newSequentsForGoals.iterator();
 
         final var services = goal.getOverlayServices();
         while (it.hasNext()) {

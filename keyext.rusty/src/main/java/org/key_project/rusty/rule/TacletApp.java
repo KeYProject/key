@@ -670,8 +670,8 @@ public abstract class TacletApp implements RuleApp {
     private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
         ImmutableList<SequentFormula> res = ImmutableSLList.nil();
 
-        for (SequentFormula p_s : p_ss) {
-            res = res.prepend(p_s);
+        for (var p_s : p_ss) {
+            res = res.prepend((SequentFormula) p_s);
         }
 
         return res;

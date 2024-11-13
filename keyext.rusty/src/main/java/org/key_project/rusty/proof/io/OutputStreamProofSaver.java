@@ -324,7 +324,8 @@ public class OutputStreamProofSaver {
         if (pos == null) {
             return "";
         }
-        return " (formula \"" + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
+        return " (formula \""
+            + seq.formulaNumberInSequent(pos.isInAntec(), (SequentFormula) pos.sequentFormula())
             + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
