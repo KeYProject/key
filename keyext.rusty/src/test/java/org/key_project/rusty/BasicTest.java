@@ -92,7 +92,7 @@ public class BasicTest {
         System.out.println(proof.openGoals().head().sequent());
         assertEquals(TacletForTests.parseTerm("{i:=2}\\<{i}\\>(i=2)"),
             proof.openGoals().head().sequent().succedent().getFirst().formula());
-        applyRule("emptyModality",
+        applyRule("emptyModalityValue",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1), false),
             proof);
@@ -172,13 +172,6 @@ public class BasicTest {
         System.out.println(proof.openGoals().get(1).sequent());
 
         // Sub goal 1
-        applyRule("emptyBlock",
-            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel().down(1), false),
-            proof);
-        assertEquals(2, proof.openGoals().size());
-        System.out.println("After emptyBlock:\n" + proof.openGoals().head().sequent());
-        System.out.println(proof.openGoals().get(1).sequent());
         applyRule("assignment",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1), false),
@@ -324,7 +317,7 @@ public class BasicTest {
         Semisequent antec = parseTermForSemisequent("");
         Semisequent succ =
             parseTermForSemisequent(
-                "\\<{ let n: u32 = 1u32; if let 1u32..10u32 = n { n } 1u32 }\\>true");
+                "\\<{ let n: u32 = 1u32; if let 1u32..10u32 = n { n } else { 1 }; }\\>true");
         Sequent s = Sequent.createSequent(antec, succ);
         var proof = new Proof(new Name("IfLet"), s, TacletForTests.initConfig());
         applyRule("letIdentPatAssign",
@@ -352,7 +345,7 @@ public class BasicTest {
             throw new RuntimeException(e);
         }
 
-        applyRule("ifLetExclusive",
+        applyRule("ifLetExclusiveElse",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1), false),
             proof);
@@ -377,7 +370,7 @@ public class BasicTest {
         Semisequent antec = parseTermForSemisequent("");
         Semisequent succ =
             parseTermForSemisequent(
-                "\\<{ if 1u32 < 3u32 { 1u32 } 1u32 }\\>true");
+                "\\<{ if 1u32 < 3u32 { 1u32; } }\\>true");
         Sequent s = Sequent.createSequent(antec, succ);
         var proof = new Proof(new Name("Test children"), s, TacletForTests.initConfig());
         applyRule("ifUnfold",

@@ -5,8 +5,9 @@
   let n: u32 = 1u32;
   if let 1u32..10u32 = n {
     n
-  }
-  1u32
+  } else {
+    1
+  };
 }\> true
 }
 
@@ -15,6 +16,6 @@
 (rule "letIdentPatAssign" (formula "1"))
 (rule "letIdentPat" (formula "1"))
 (rule "assignment" (formula "1"))
- (opengoal "==>  {n:=Z(1(#))}    \\<{      if let 1u32..10u32 = n {        n      };      1u32    }\\> true")
+ (opengoal "==>  {n:=Z(1(#))}    \\<{      if let 1u32..10u32 = n {        n      } else {        1      };    }\\> true")
 )
 }
