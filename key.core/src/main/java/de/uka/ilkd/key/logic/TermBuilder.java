@@ -2144,8 +2144,8 @@ public class TermBuilder {
      */
     public static Term goBelowUpdates(org.key_project.logic.Term term) {
         var t = (Term) term;
-        while (term.op() instanceof UpdateApplication) {
-            term = UpdateApplication.getTarget(t);
+        while (t.op() instanceof UpdateApplication) {
+            t = UpdateApplication.getTarget(t);
         }
         return t;
     }

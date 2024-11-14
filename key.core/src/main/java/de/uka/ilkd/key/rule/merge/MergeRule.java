@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -642,9 +641,9 @@ public class MergeRule implements BuiltInRule {
         }
 
         // Term after update must have the form "phi" or "\<{...}\> phi" or
-        // "\[{...}\]", where phi must not contain a Java block.
-        if (termAfterUpdate.op() instanceof Modality mod
-                && !mod.program().equals(JavaBlock.EMPTY_JAVABLOCK)) {
+        // "\[{...}\] phi", where phi must not contain a Java block.
+        if (termAfterUpdate.op() instanceof Modality
+                && termAfterUpdate.sub(0).op() instanceof Modality) {
             return false;
         } else if (termAfterUpdate.op() instanceof UpdateApplication) {
             return false;
