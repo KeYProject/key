@@ -79,6 +79,16 @@ public class Semisequent extends org.key_project.ncore.sequent.Semisequent<Seque
     }
 
     @Override
+    public SemisequentChangeInfo insertFirst(ImmutableList<SequentFormula> insertions) {
+        return (SemisequentChangeInfo) super.insertFirst(insertions);
+    }
+
+    @Override
+    public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
+        return (SemisequentChangeInfo) super.insertFirst(sequentFormula);
+    }
+
+    @Override
     public SemisequentChangeInfo insertLast(ImmutableList<SequentFormula> insertions) {
         return (SemisequentChangeInfo) super.insertLast(insertions);
     }
@@ -123,6 +133,143 @@ public class Semisequent extends org.key_project.ncore.sequent.Semisequent<Seque
     private static class Empty extends Semisequent {
         private Empty() {
             super();
+        }
+
+        /**
+         * inserts the element always at index 0 ignores the first argument
+         *
+         * @param idx int encoding the place the element has to be put
+         * @param sequentFormula {@link SequentFormula} to be inserted
+         * @return semisequent change information object with new semisequent with sequentFormula at
+         *         place idx
+         */
+        @Override
+        public SemisequentChangeInfo insert(int idx, SequentFormula sequentFormula) {
+            return insertFirst(sequentFormula);
+        }
+
+        /**
+         * inserts the element at index 0
+         *
+         * @param sequentFormula {@link SequentFormula} to be inserted
+         * @return semisequent change information object with new semisequent with sequentFormula at
+         *         place idx
+         */
+        @Override
+        public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
+            final SemisequentChangeInfo sci = new SemisequentChangeInfo(
+                ImmutableSLList.<SequentFormula>nil().prepend(sequentFormula));
+            sci.addedFormula(0, sequentFormula);
+            return sci;
+        }
+
+        /**
+         * inserts the element at the end of the semisequent
+         *
+         * @param sequentFormula {@link SequentFormula} to be inserted
+         * @return semisequent change information object with new semisequent with sequentFormula at
+         *         place idx
+         */
+        @Override
+        public SemisequentChangeInfo insertLast(SequentFormula sequentFormula) {
+            return insertFirst(sequentFormula);
+        }
+
+        /**
+         * is this a semisequent that contains no formulas
+         *
+         * @return true if the semisequent contains no formulas
+         */
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        /**
+         * replaces the element at place idx with sequentFormula
+         *
+         * @param idx an int specifying the index of the element that has to be replaced
+         * @param sequentFormula the {@link SequentFormula} replacing the old element at index idx
+         * @return semisequent change information object with new semisequent with sequentFormula at
+         *         place idx
+         */
+        @Override
+        public SemisequentChangeInfo replace(int idx, SequentFormula sequentFormula) {
+            return insertFirst(sequentFormula);
+        }
+
+        /** @return int counting the elements of this semisequent */
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        /**
+         * removes an element
+         *
+         * @param idx int being the index of the element that has to be removed
+         * @return semisequent change information object with an empty semisequent as result
+         */
+        @Override
+        public SemisequentChangeInfo remove(int idx) {
+            return new SemisequentChangeInfo(ImmutableSLList.nil());
+        }
+
+        /**
+         * returns index of a {@link SequentFormula}
+         *
+         * @param sequentFormula the {@link SequentFormula} the index want to be determined
+         * @return index of sequentFormula
+         */
+        @Override
+        public int indexOf(SequentFormula sequentFormula) {
+            return -1;
+        }
+
+        /**
+         * gets the element at a specific index
+         *
+         * @param idx int representing the index of the element we want to have
+         * @return {@link SequentFormula} found at index idx
+         */
+        @Override
+        public SequentFormula get(int idx) {
+            return null;
+        }
+
+        /**
+         * @return the first SequentFormula of this Semisequent
+         */
+        @Override
+        public SequentFormula getFirst() {
+            return null;
+        }
+
+        /**
+         * checks if a {@link SequentFormula} is in this Semisequent
+         *
+         * @param sequentFormula the {@link SequentFormula} to look for
+         * @return true iff. sequentFormula has been found in this Semisequent
+         */
+        @Override
+        public boolean contains(SequentFormula sequentFormula) {
+            return false;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o == this;
+        }
+
+        @Override
+        public int hashCode() {
+            return 34567;
+        }
+
+        /** @return String representation of this Semisequent */
+        @Override
+        public String toString() {
+            return "[]";
         }
     }
 }
