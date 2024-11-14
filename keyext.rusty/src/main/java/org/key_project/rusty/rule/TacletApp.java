@@ -220,13 +220,10 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
-     *
-     * @return list of new created goals
+     * @inheritDoc
      */
     @Override
-    public void execute(Namespace<? super @NonNull Function> localFunctionNamespace) {
+    public <F extends Function> void execute(Namespace<@NonNull F> localFunctionNamespace) {
         if (!complete()) {
             throw new IllegalStateException(
                 "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
@@ -388,7 +385,7 @@ public abstract class TacletApp implements RuleApp {
         return calculateNonInstantiatedSV();
     }
 
-    public void registerSkolemConstants(Namespace<? super @NonNull Function> functions) {
+    public <F extends Function> void registerSkolemConstants(Namespace<@NonNull F> functions) {
         final SVInstantiations insts = instantiations();
         final Iterator<SchemaVariable> svIt = insts.svIterator();
         while (svIt.hasNext()) {
@@ -399,7 +396,8 @@ public abstract class TacletApp implements RuleApp {
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
                 if (functions.lookup(inst.op().name()) == null) {
-                    functions.addSafely((Function) inst.op());
+                    // noinspection unchecked
+                    functions.addSafely((F) inst.op());
                 }
             }
         }

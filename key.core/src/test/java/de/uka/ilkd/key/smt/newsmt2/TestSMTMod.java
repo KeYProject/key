@@ -52,7 +52,7 @@ public class TestSMTMod {
      * thus satisfying the definition of Euclidean modulo
      * Tests for Z3 and CVC4
      *
-     * @throws ProblemLoaderException Occured Exception during load of problem file
+     * @throws ProblemLoaderException Occurred Exception during load of problem file
      */
     @Test
     public void testModSpec() throws ProblemLoaderException {

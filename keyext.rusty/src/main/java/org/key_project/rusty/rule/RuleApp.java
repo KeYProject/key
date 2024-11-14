@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.key_project.logic.Namespace;
-import org.key_project.logic.op.Function;
 import org.key_project.ncore.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.NonNull;
 
 
 public interface RuleApp extends org.key_project.ncore.rules.RuleApp {
@@ -22,15 +19,6 @@ public interface RuleApp extends org.key_project.ncore.rules.RuleApp {
      * corresponding formula) of this rule application
      */
     PosInOccurrence posInOccurrence();
-
-    /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
-     *
-     * @return list of new created goals
-     */
-    @Override
-    void execute(Namespace<? super @NonNull Function> fns);
 
     /**
      * returns true if all variables are instantiated
