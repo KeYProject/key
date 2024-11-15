@@ -10,11 +10,18 @@ import java.util.LinkedHashMap;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.expr.BinaryExpression;
+import org.key_project.rusty.ast.expr.LiteralExpression;
+import org.key_project.rusty.ldt.LDT;
 import org.key_project.rusty.ldt.LDTs;
 import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Counter;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.init.Profile;
+import org.key_project.rusty.proof.mgt.SpecificationRepository;
 
 public class Services implements LogicServices {
     /**
@@ -32,6 +39,10 @@ public class Services implements LogicServices {
     private Profile profile;
 
     private final ServiceCaches caches;
+    /**
+     * specification repository
+     */
+    private SpecificationRepository specRepos;
 
     /**
      * variable namer for inner renaming
@@ -46,6 +57,7 @@ public class Services implements LogicServices {
     public Services() {
         this.tf = new TermFactory();
         this.tb = new TermBuilder(tf, this);
+        this.specRepos = new SpecificationRepository(this);
         this.caches = new ServiceCaches();
         counters = new LinkedHashMap<>();
         mRefManager = new RefSortManager(this);
@@ -68,6 +80,7 @@ public class Services implements LogicServices {
         this.counters = services.counters;
         this.mRefManager = services.mRefManager;
         this.caches = services.caches;
+        this.specRepos = services.specRepos;
         rustInfo = services.rustInfo;
     }
 
@@ -169,5 +182,63 @@ public class Services implements LogicServices {
 
     public ServiceCaches getCaches() {
         return caches;
+    }
+
+    public SpecificationRepository getSpecificationRepository() {
+        return specRepos;
+    }
+
+    public Term convertToLogicElement(RustyProgramElement pe) {
+        return convertToLogicElement(pe, this);
+    }
+
+    public static Term convertToLogicElement(RustyProgramElement pe, Services services) {
+        var tb = services.getTermBuilder();
+        if (pe instanceof ProgramVariable pv) {
+            return tb.var(pv);
+        }
+        if (pe instanceof LiteralExpression lit) {
+            return convertLiteralExpression(lit, services);
+        }
+        if (pe instanceof BinaryExpression ale) {
+            return convertBinaryExpression(ale, services);
+        }
+        throw new IllegalArgumentException(
+            "Unknown or not convertible ProgramElement " + pe + " of type "
+                + pe.getClass());
+    }
+
+    public static Term convertBinaryExpression(BinaryExpression ale,
+            Services services) {
+        var tb = services.getTermBuilder();
+        final var subs = new Term[] { convertToLogicElement(ale.left(), services),
+            convertToLogicElement(ale.right(), services) };
+
+        var op = ale.op();
+        var responsibleLDT = getResponsibleLDT(op, subs, services);
+        if (responsibleLDT != null) {
+            return tb.func(responsibleLDT.getFunctionFor(op, services), subs);
+        }
+        throw new IllegalArgumentException(
+            "could not handle" + " this operator: " + op);
+    }
+
+    public static LDT getResponsibleLDT(BinaryExpression.Operator op, Term[] subs,
+            Services services) {
+        for (LDT ldt : services.getLDTs()) {
+            if (ldt.isResponsible(op, subs, services)) {
+                return ldt;
+            }
+        }
+        return null;
+    }
+
+    public static Term convertLiteralExpression(LiteralExpression lit, Services services) {
+        LDT ldt = services.getLDTs().get(lit.getLDTName());
+        if (ldt != null) {
+            return ldt.translateLiteral(lit, services);
+        } else {
+            return null;
+        }
     }
 }

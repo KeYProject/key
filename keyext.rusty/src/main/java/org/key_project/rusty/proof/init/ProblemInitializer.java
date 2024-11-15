@@ -4,11 +4,11 @@
 package org.key_project.rusty.proof.init;
 
 
-
 import java.io.IOException;
 import java.util.*;
 
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.proof.ProofAggregate;
@@ -87,42 +87,22 @@ public final class ProblemInitializer {
 
         // configureTermLabelSupport(initConfig);
 
-        // TODO change this to read .rs file
-        /*
-         * // read Java
-         * readJava(envInput, initConfig);
-         *
-         * // register function and predicate symbols defined by Java program
-         * final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-         * final Namespace<JFunction> functions =
-         * initConfig.getServices().getNamespaces().functions();
-         * final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
-         * assert heapLDT != null;
-         * if (javaInfo != null) {
-         * for (KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-         * final Type type = kjt.getJavaType();
-         * if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
-         * for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
-         * final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-         * if (pv instanceof LocationVariable) {
-         * heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-         * initConfig.getServices());
-         * }
-         * }
-         * }
-         * for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-         * if (pm == null) {
-         * continue; // weigl 2021-11-10
-         * }
-         * if (!(pm.isVoid() || pm.isConstructor())) {
-         * functions.add(pm);
-         * }
-         * }
-         * }
-         * } else {
-         * throw new ProofInputException("Problem initialization without JavaInfo!");
-         * }
-         */
+        // read Java
+        readRust(envInput, initConfig);
+
+        // register function and predicate symbols defined by Java program
+        final var rustInfo = initConfig.getServices().getRustInfo();
+        final Namespace<@NonNull Function> functions =
+            initConfig.getServices().getNamespaces().functions();
+        if (rustInfo != null) {
+            // TODO: Declare fields (how?)
+            for (var fn : rustInfo.getAllFunctions()) {
+                functions.add(fn);
+            }
+        } else {
+            throw new ProofInputException("Problem initialization without JavaInfo!");
+        }
+
 
         // read envInput
         readEnvInput(envInput, initConfig);
@@ -266,6 +246,7 @@ public final class ProblemInitializer {
 
     // Why does it say here that it removes schema variables when it just removes variables?
     // And with symbols are only functions meant?
+
     /**
      * Removes all schema variables, all generic sorts and all sort-depending symbols for a generic
      * sort out of the namespaces. Helper for readEnvInput().

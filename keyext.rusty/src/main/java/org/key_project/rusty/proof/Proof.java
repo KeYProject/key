@@ -15,6 +15,7 @@ import org.key_project.rusty.logic.Semisequent;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.proof.init.InitConfig;
+import org.key_project.rusty.proof.mgt.ProofCorrectnessMgt;
 import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -61,6 +62,11 @@ public class Proof implements ProofObject<Goal>, Named {
     private String problemHeader = "";
 
     /**
+     * the environment of the proof with specs and java model
+     */
+    private ProofCorrectnessMgt localMgt;
+
+    /**
      * constructs a new empty proof with name
      */
     private Proof(Name name, InitConfig initConfig) {
@@ -72,6 +78,8 @@ public class Proof implements ProofObject<Goal>, Named {
             // if no settings have been assigned yet, take default settings
             initConfig.setSettings(new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
         }
+
+        localMgt = new ProofCorrectnessMgt(this);
 
         final Services services = this.initConfig.getServices();
         services.setProof(this);
@@ -280,6 +288,10 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     public boolean closed() {
         return root.isClosed() && openGoals.isEmpty();
+    }
+
+    public ProofCorrectnessMgt mgt() {
+        return localMgt;
     }
 
     /**

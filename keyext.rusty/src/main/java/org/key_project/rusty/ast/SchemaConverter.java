@@ -16,7 +16,6 @@ import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
 import org.key_project.rusty.ast.fn.FunctionParam;
 import org.key_project.rusty.ast.fn.FunctionParamPattern;
-import org.key_project.rusty.ast.fn.SelfParam;
 import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
@@ -134,7 +133,26 @@ public class SchemaConverter {
         BlockExpression body =
             convertBlockExpr(
                 ctx.blockExpr());
-        return new Function(name,
+        var self = ctx.functionParams() == null ? null : ctx.functionParams().selfParam();
+        var kind = Function.ImplicitSelfKind.None;
+        if (self != null) {
+            if (self.shorthandSelf() != null) {
+                if (self.shorthandSelf().AND() != null) {
+                    if (self.shorthandSelf().KW_MUT() != null) {
+                        kind = Function.ImplicitSelfKind.RefMut;
+                    } else {
+                        kind = Function.ImplicitSelfKind.RefImm;
+                    }
+                } else {
+                    if (self.shorthandSelf().KW_MUT() != null) {
+                        kind = Function.ImplicitSelfKind.Mut;
+                    } else {
+                        kind = Function.ImplicitSelfKind.Imm;
+                    }
+                }
+            }
+        }
+        return new Function(name, kind,
             params,
             returnType,
             body);
@@ -940,35 +958,20 @@ public class SchemaConverter {
         if (ctx == null)
             return new ImmutableArray<>();
         List<FunctionParam> params = new LinkedList<>();
-        if (ctx.selfParam() != null) {
-            params.add(convertSelfParam(ctx.selfParam()));
-        }
         for (var param : ctx.functionParam()) {
             params.add(convertFunctionParamPattern(param.functionParamPattern()));
         }
         return new ImmutableArray<>(params);
     }
 
-    private SelfParam convertSelfParam(
-            org.key_project.rusty.parsing.RustySchemaParser.SelfParamContext ctx) {
-        if (ctx.shorthandSelf() != null) {
-            var shortSelf = ctx.shorthandSelf();
-            return new SelfParam(shortSelf.AND() != null, shortSelf.KW_MUT() != null, null);
-        } else {
-            var self = ctx.typedSelf();
-            return new SelfParam(/* TODO */ false, self.KW_MUT() != null,
-                convertRustType(self.type_()));
-        }
-    }
-
     private FunctionParamPattern convertFunctionParamPattern(
             org.key_project.rusty.parsing.RustySchemaParser.FunctionParamPatternContext ctx) {
         RustType type = convertRustType(ctx.type_());
-        declaredType = new KeYRustyType(type.getSort(services));
+        declaredType = services.getRustInfo().getKeYRustyType(type.type());
         inDeclarationMode = !inContextFunction;
         Pattern pat = convertPattern(ctx.pattern());
         inDeclarationMode = false;
-        FunctionParamPattern param = new FunctionParamPattern(pat, type);
+        FunctionParamPattern param = new FunctionParamPattern(pat, type, declaredType);
         variables.put(declaredVariable.name().toString(), param);
         programVariables.put(param, declaredVariable);
         declaredVariable = null;

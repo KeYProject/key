@@ -3,23 +3,28 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.ast.abstraction.*;
+import org.key_project.rusty.ast.fn.Function;
+import org.key_project.rusty.logic.op.ProgramFunction;
 
 import org.jspecify.annotations.NonNull;
 
 public final class RustInfo {
     private Map<Type, KeYRustyType> type2KRTCache;
+    private Set<KeYRustyType> allTypes = new LinkedHashSet<>();
+    private Set<ProgramFunction> allFunctions = new HashSet<>();
+    private Map<Function, ProgramFunction> fnToProgFn;
     private Services services;
 
     public RustInfo(Services services) {
         this.services = services;
         type2KRTCache = new HashMap<>();
+        fnToProgFn = new HashMap<>();
     }
 
     public KeYRustyType getKeYRustyType(String name) {
@@ -83,5 +88,41 @@ public final class RustInfo {
         }
 
         return result;
+    }
+
+    public void registerType(Type type) {
+        registerType(getKeYRustyType(type));
+    }
+
+    public void registerType(KeYRustyType type) {
+        allTypes.add(type);
+    }
+
+    public void registerFunction(Function function) {
+        if (!allFunctions.contains(function)) {
+            var pf = fnToProgFn.computeIfAbsent(function,
+                (fn) -> new ProgramFunction(fn, getKeYRustyType(fn.returnType().type())));
+            allFunctions.add(pf);
+        }
+    }
+
+    /**
+     * returns all known KeYRustyTypes of the current program type model
+     *
+     * @return all known KeYRustyTypes of the current program type model
+     */
+    public Set<KeYRustyType> getAllKeYJavaTypes() {
+        final Set<KeYRustyType> result = new LinkedHashSet<>();
+        for (final var ty : allTypes) {
+            var krt = getKeYRustyType(ty);
+            if (krt != null) {
+                result.add(krt);
+            }
+        }
+        return result;
+    }
+
+    public Set<ProgramFunction> getAllFunctions() {
+        return allFunctions;
     }
 }

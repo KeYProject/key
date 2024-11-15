@@ -4,6 +4,7 @@
 package org.key_project.rusty.ast.fn;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ast.visitor.Visitor;
@@ -11,7 +12,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 
 //spotless:off
-public record FunctionParamPattern(Pattern pattern, RustType type) implements FunctionParam {
+public record FunctionParamPattern(Pattern pattern, RustType type, KeYRustyType keYRustyType) implements FunctionParam {
     @Override
     public int getChildCount() {
         return 1;
@@ -36,6 +37,11 @@ public record FunctionParamPattern(Pattern pattern, RustType type) implements Fu
     @Override
     public void visit(Visitor v) {
         throw new RuntimeException("Shouldn't be called");
+    }
+
+    @Override
+    public KeYRustyType getKeYRustyType() {
+        return keYRustyType;
     }
 }
 //spotless:on

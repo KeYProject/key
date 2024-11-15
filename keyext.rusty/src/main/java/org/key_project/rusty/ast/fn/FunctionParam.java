@@ -5,6 +5,8 @@ package org.key_project.rusty.ast.fn;
 
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.VariableDeclaration;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 
 public interface FunctionParam extends RustyProgramElement, VariableDeclaration {
+    KeYRustyType getKeYRustyType();
 }

@@ -16,16 +16,19 @@ import org.key_project.rusty.ast.ty.TupleRustType;
 import org.key_project.util.collection.ImmutableArray;
 
 public class TupleType implements Type {
-    public static final TupleType UNIT = getInstance(new ArrayList<>());
+    public static final TupleType UNIT = new TupleType(new ArrayList<>());
     private static Map<List<Type>, TupleType> TYPES = null;
 
     private List<Type> types;
 
-    public TupleType(List<Type> types) {
+    private TupleType(List<Type> types) {
         this.types = types;
     }
 
     public static TupleType getInstance(List<Type> types) {
+        if (types.isEmpty()) {
+            return UNIT;
+        }
         if (TYPES == null) {
             TYPES = new HashMap<>();
         }
@@ -50,5 +53,18 @@ public class TupleType implements Type {
     public RustType toRustType(Services services) {
         return new TupleRustType(
             new ImmutableArray<>(types.stream().map(t -> t.toRustType(services)).toList()));
+    }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        sb.append("(");
+        for (int i = 0; i < types.size(); i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(types.get(i).toString());
+        }
+        return sb.append(")").toString();
     }
 }

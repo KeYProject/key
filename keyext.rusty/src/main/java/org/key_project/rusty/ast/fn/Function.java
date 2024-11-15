@@ -13,12 +13,20 @@ import org.key_project.rusty.ast.Item;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.ty.RustType;
 import org.key_project.rusty.ast.visitor.Visitor;
+import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
-public record Function(Name name, org.key_project.util.collection.ImmutableArray<FunctionParam> params,
+// spotless:off
+public record Function(Name name, ImplicitSelfKind selfKind, ImmutableArray<FunctionParam> params,
                        RustType returnType, BlockExpression body) implements Item, Named {
+    public enum ImplicitSelfKind {
+        Imm,
+        Mut,
+        RefImm,
+        RefMut,
+        None,
+    }
 
     @Override
     public int getChildCount() {

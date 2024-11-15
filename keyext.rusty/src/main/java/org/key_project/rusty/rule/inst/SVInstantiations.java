@@ -18,7 +18,7 @@ import org.key_project.rusty.logic.op.sv.SchemaVariableFactory;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.util.collection.*;
 
-import static org.key_project.rusty.rule.match.instructions.MatchProgramSVInstruction.convertToLogicElement;
+import static org.key_project.rusty.Services.convertToLogicElement;
 
 public class SVInstantiations {
     /** the empty instantiation */

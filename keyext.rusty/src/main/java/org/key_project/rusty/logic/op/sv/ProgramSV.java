@@ -21,8 +21,6 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-import static org.key_project.rusty.rule.match.instructions.MatchProgramSVInstruction.convertToLogicElement;
-
 public final class ProgramSV extends OperatorSV
         implements SyntaxElement, UpdateableOperator, ProgramConstruct {
     private final boolean isListSV;
@@ -143,7 +141,7 @@ public final class ProgramSV extends OperatorSV
         if (foundInst != null) {
             final Object newInst;
             if (foundInst instanceof Term) {
-                newInst = convertToLogicElement(pe, services);
+                newInst = services.convertToLogicElement(pe);
             } else {
                 newInst = pe;
             }

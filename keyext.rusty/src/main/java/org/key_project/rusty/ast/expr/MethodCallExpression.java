@@ -3,17 +3,30 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.expr;
 
+import java.util.Objects;
+
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.PathExprSegment;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
+import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
-public record MethodCallExpression(Expr callee, org.key_project.rusty.ast.PathExprSegment method,
-                                   ImmutableArray<Expr> params) implements Expr {
+public final class MethodCallExpression implements Call {
+    private final Expr callee;
+    private final PathExprSegment method;
+    private final ImmutableArray<Expr> params;
+
+    public MethodCallExpression(Expr callee, PathExprSegment method,
+            ImmutableArray<Expr> params) {
+        this.callee = callee;
+        this.method = method;
+        this.params = params;
+    }
+
     @Override
     public void visit(Visitor v) {
         v.performActionOnMethodCall(this);
@@ -55,5 +68,39 @@ public record MethodCallExpression(Expr callee, org.key_project.rusty.ast.PathEx
     public Type type(Services services) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public ProgramFunction function(Services services) {
+        return null;
+    }
+
+    public Expr callee() {
+        return callee;
+    }
+
+    public PathExprSegment method() {
+        return method;
+    }
+
+    public ImmutableArray<Expr> params() {
+        return params;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || obj.getClass() != this.getClass())
+            return false;
+        var that = (MethodCallExpression) obj;
+        return Objects.equals(this.callee, that.callee) &&
+                Objects.equals(this.method, that.method) &&
+                Objects.equals(this.params, that.params);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(callee, method, params);
+    }
+
 }
-//spotless:on

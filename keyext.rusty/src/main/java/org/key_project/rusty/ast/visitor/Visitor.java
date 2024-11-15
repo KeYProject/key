@@ -5,7 +5,6 @@ package org.key_project.rusty.ast.visitor;
 
 import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.expr.*;
-import org.key_project.rusty.ast.fn.SelfParam;
 import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
@@ -14,6 +13,7 @@ import org.key_project.rusty.ast.ty.PrimitiveRustType;
 import org.key_project.rusty.ast.ty.ReferenceRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.ast.ty.TypeOf;
+import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
@@ -88,8 +88,6 @@ public interface Visitor {
 
     void performActionOnClosureExpression(ClosureExpression x);
 
-    void performActionOnSelfParam(SelfParam x);
-
     void performActionOnEnumVariantStruct(EnumVariantStruct x);
 
     void performActionOnInfiniteLoop(InfiniteLoopExpression x);
@@ -139,4 +137,6 @@ public interface Visitor {
     void performActionOnLetExpression(LetExpression x);
 
     void performActionOnTypeOf(TypeOf x);
+
+    void performActionOnProgramFunction(ProgramFunction x);
 }

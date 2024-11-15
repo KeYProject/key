@@ -116,17 +116,22 @@ public class HirConverter {
         for (int i = 0; i < paramLength; i++) {
             var ty = fn.sig().decl().inputs()[i];
             var pat = fn.body().params()[i].pat();
-            params.add(new FunctionParamPattern(convertPat(pat, isCtxFn), convertHirTy(ty)));
+            RustType type = convertHirTy(ty);
+            params.add(new FunctionParamPattern(convertPat(pat, isCtxFn), type,
+                services.getRustInfo().getKeYRustyType(type.type())));
         }
         var retTy = convertFnRetTy(fn.sig().decl().output());
         var body = (BlockExpression) convertExpr(fn.body().value());
-        return new Function(name, new ImmutableArray<>(params), retTy, body);
+        Function function = new Function(name, Function.ImplicitSelfKind.None,
+            new ImmutableArray<>(params), retTy, body);
+        services.getRustInfo().registerFunction(function);
+        return function;
     }
 
     private RustType convertFnRetTy(FnRetTy retTy) {
         return switch (retTy) {
-            case FnRetTy.DefaultReturn x -> TupleRustType.UNIT;
-            case FnRetTy.Return r -> convertHirTy(r.ty());
+            case FnRetTy.DefaultReturn ignored -> TupleRustType.UNIT;
+            case FnRetTy.Return(var ty) -> convertHirTy(ty);
             default -> throw new IllegalArgumentException("Unknown return type: " + retTy);
         };
     }
@@ -385,8 +390,8 @@ public class HirConverter {
     }
 
     private Type convertTy(Ty ty) {
-        return switch (ty) {
-            case Ty.Bool b -> PrimitiveType.BOOL;
+        Type type = switch (ty) {
+            case Ty.Bool ignored -> PrimitiveType.BOOL;
             case Ty.Int(var i) -> switch (i) {
                 case Isize -> PrimitiveType.ISIZE;
                 case I8 -> PrimitiveType.I8;
@@ -407,5 +412,7 @@ public class HirConverter {
             case Ty.Tuple(var ts) -> TupleType.getInstance(Arrays.stream(ts).map(this::convertTy).toList());
             default -> throw new IllegalArgumentException("Unknown ty: " + ty);
         };
+        services.getRustInfo().registerType(type);
+        return type;
     }
 }

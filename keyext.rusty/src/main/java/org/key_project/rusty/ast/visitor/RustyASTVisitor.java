@@ -7,7 +7,6 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
-import org.key_project.rusty.ast.fn.SelfParam;
 import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
@@ -16,6 +15,7 @@ import org.key_project.rusty.ast.ty.PrimitiveRustType;
 import org.key_project.rusty.ast.ty.ReferenceRustType;
 import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.ast.ty.TypeOf;
+import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -195,11 +195,6 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     }
 
     @Override
-    public void performActionOnSelfParam(SelfParam x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnTupleExpression(TupleExpression x) {
         doDefaultAction(x);
     }
@@ -346,6 +341,11 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnTypeOf(TypeOf x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnProgramFunction(ProgramFunction x) {
         doDefaultAction(x);
     }
 }

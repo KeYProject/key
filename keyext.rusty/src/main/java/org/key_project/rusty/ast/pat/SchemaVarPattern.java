@@ -15,8 +15,6 @@ import org.key_project.rusty.rule.inst.SVInstantiations;
 
 import org.jspecify.annotations.NonNull;
 
-import static org.key_project.rusty.rule.match.instructions.MatchProgramSVInstruction.convertToLogicElement;
-
 //spotless:off
 public record SchemaVarPattern(boolean reference, boolean mut, OperatorSV operatorSV) implements Pattern {
     @Override
@@ -57,7 +55,7 @@ public record SchemaVarPattern(boolean reference, boolean mut, OperatorSV operat
         if (foundInst != null) {
             final Object newInst;
             if (foundInst instanceof Term) {
-                newInst = convertToLogicElement(pe, services);
+                newInst = services.convertToLogicElement(pe);
             } else {
                 newInst = pe;
             }
