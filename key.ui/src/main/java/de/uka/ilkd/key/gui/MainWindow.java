@@ -164,6 +164,8 @@ public final class MainWindow extends JFrame {
         new ToggleSequentViewTooltipAction(this);
     private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
         new ToggleSourceViewTooltipAction(this);
+    private final ToggleProofTreeTooltipAction toogleProofTreeTooltipAction =
+        new ToggleProofTreeTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     private boolean frozen = false;
     /**
@@ -930,6 +932,7 @@ public final class MainWindow extends JFrame {
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
         view.add(new JCheckBoxMenuItem(toggleSequentViewTooltipAction));
         view.add(new JCheckBoxMenuItem(toggleSourceViewTooltipAction));
+        view.add(new JCheckBoxMenuItem(toogleProofTreeTooltipAction));
 
         view.addSeparator();
         {
@@ -1015,7 +1018,9 @@ public final class MainWindow extends JFrame {
         }
         proof.addSeparator();
         proof.add(new ShowUsedContractsAction(this, selected));
-        proof.add(new ShowActiveTactletOptionsAction(this, selected));
+        // We merge the old window to view the active taclet options with the window for all active
+        // settings
+        // proof.add(new ShowActiveTactletOptionsAction(this, showActiveSettingsAction));
         proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this, selected));
         proof.add(new ShowKnownTypesAction(this, selected));
@@ -1027,7 +1032,8 @@ public final class MainWindow extends JFrame {
         options.setMnemonic(KeyEvent.VK_O);
 
         options.add(SettingsManager.getActionShowSettings(this));
-        options.add(new TacletOptionsAction(this));
+        // remove since taclet options should only be set through the general settings dialog
+        // options.add(new TacletOptionsAction(this));
         options.add(new SMTOptionsAction(this));
         // options.add(setupSpeclangMenu()); // legacy since only JML supported
         options.addSeparator();
@@ -1038,7 +1044,6 @@ public final class MainWindow extends JFrame {
         options.add(new JCheckBoxMenuItem(new EnsureSourceConsistencyToggleAction(this)));
 
         return options;
-
     }
 
     private JMenu createHelpMenu() {
@@ -1223,7 +1228,7 @@ public final class MainWindow extends JFrame {
         }
 
         Runnable sequentUpdater = () -> {
-            mainFrame.setContent(newSequentView);
+            mainFrame.setSequentView(newSequentView);
             // always does printSequent if on the event thread
             sequentViewSearchBar.setSequentView(newSequentView);
         };
@@ -1252,6 +1257,15 @@ public final class MainWindow extends JFrame {
      */
     public void scrollTo(int y) {
         mainFrame.scrollTo(y);
+    }
+
+    /**
+     * Get the main frame for access to the sequent view
+     *
+     * @return the container for this main window.
+     */
+    public MainFrame getMainFrame() {
+        return mainFrame;
     }
 
     void displayResults(String message) {
@@ -1444,6 +1458,11 @@ public final class MainWindow extends JFrame {
 
     public boolean isShowTacletInfo() {
         return mainFrame.isShowTacletInfo();
+    }
+
+    public void setShowProofTreeTooltip(Object source) {
+        toogleProofTreeTooltipAction
+                .actionPerformed(new ActionEvent(proofTreeView, ActionEvent.ACTION_PERFORMED, ""));
     }
 
     public AutoModeAction getAutoModeAction() {
