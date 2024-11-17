@@ -19,6 +19,8 @@ jobs:
           java-version: 21
           distribution: 'corretto'
           cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4.1.0
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3.3.2
         with:
@@ -34,6 +36,6 @@ jobs:
           java-version: '21'
           cache: 'gradle'
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3.3.2
+        uses: gradle/gradle-build-action@v4.1.0
         with:
           arguments: --continue spotlessCheck

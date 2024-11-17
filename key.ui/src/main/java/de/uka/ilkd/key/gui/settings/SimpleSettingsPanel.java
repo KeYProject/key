@@ -190,6 +190,20 @@ public class SimpleSettingsPanel extends JPanel {
         return infoButton;
     }
 
+    public static JLabel createHelpTextLabel(String s) {
+        if (s == null || s.isEmpty()) {
+            s = "";
+        }
+        if (s.contains("\n")) {
+            s = s.substring(0, s.indexOf('\n'));
+        }
+
+        JLabel infoButton = new JLabel(s);
+        infoButton.setFont(infoButton.getFont().deriveFont(10f));
+        infoButton.setBackground(Color.orange);
+        return infoButton;
+    }
+
     public static JButton createHelpButton(Runnable callback) {
         var infoButton =
             new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));

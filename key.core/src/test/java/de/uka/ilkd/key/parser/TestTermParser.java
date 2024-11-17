@@ -260,6 +260,9 @@ public class TestTermParser extends AbstractTestTermParser {
                 + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
         assertTrue(t3.equalsModProperty(t4, RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming");
+        assertEquals(t3.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            t4.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equalModRenaming");
     }
 
     @Test

@@ -78,6 +78,7 @@ public class SettingsDialog extends JDialog {
     private List<Exception> apply() {
         List<Exception> exc = new LinkedList<>();
         apply(providers, exc);
+
         return exc;
     }
 

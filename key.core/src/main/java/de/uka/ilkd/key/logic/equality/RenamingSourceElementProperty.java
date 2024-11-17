@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
@@ -100,13 +102,54 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         return hasNext1 == hasNext2;
     }
 
+    // TODO: hashCodeModThisProperty currently does not take a NameAbstractionTable as an argument.
+    // This is because the current implementation of hashCodeModThisProperty is not parameterized
+    // with a vararg. Variables occurring in multiple formulas and JavaBlocks are considered in
+    // isolation as a newly created NameAbstractionTable that does not contain entries from previous
+    // JavaBlocks is used. This could possibly lead to more collisions but if this is a concern, the
+    // method can be changed to also take a generic vararg. That way, the NameAbstractionTable can
+    // be passed to the method and hash codes can take previous usage of variables into account.
     @Override
     public int hashCodeModThisProperty(SourceElement sourceElement) {
-        throw new UnsupportedOperationException(
-            "Hashing of SourceElements modulo renaming not yet implemented!");
+        /*
+         * Currently, the best approach seems to be to walk through the SourceElement with a
+         * SyntaxElementCursor and sum up hash codes.
+         */
+
+        NameAbstractionMap absMap = new NameAbstractionMap();
+
+        int hashCode = 1;
+        SyntaxElementCursor c = sourceElement.getCursor();
+        SyntaxElement next;
+
+        do {
+            // First node can never be null as cursor is initialized with 'this'
+            next = c.getCurrentNode();
+            // Handle special cases so that hashCodeModThisProperty follows equalsModThisProperty
+            if (next instanceof LabeledStatement ls) {
+                hashCode = 31 * hashCode + ls.getChildCount();
+                absMap.add(ls);
+            } else if (next instanceof VariableSpecification vs) {
+                hashCode = 31 * hashCode + vs.getChildCount();
+                hashCode =
+                    31 * hashCode + 17 * ((vs.getType() == null) ? 0 : vs.getType().hashCode())
+                            + vs.getDimensions();
+                absMap.add(vs);
+            } else if (next instanceof ProgramVariable || next instanceof ProgramElementName) {
+                hashCode = 31 * hashCode + absMap.getAbstractName((SourceElement) next);
+            } else if (next instanceof JavaNonTerminalProgramElement jnte) {
+                hashCode = 31 * hashCode + jnte.getChildCount();
+            } else {
+                // In the standard case, we just use the default hashCode implementation
+                hashCode = 31 * hashCode + next.hashCode();
+            }
+            // walk to the next nodes in the tree
+        } while (c.goToNext());
+
+        return hashCode;
     }
 
-    /* --------------------- Helper methods for special cases ---------------------- */
+    /*------------- Helper methods for special cases in equalsModThisProperty --------------*/
     /**
      * Handles the standard case of comparing two {@link SyntaxElement}s modulo renaming.
      *
@@ -252,5 +295,46 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     }
 
 
-    /* ------------------ End of helper methods for special cases ------------------ */
+    /* ---------- End of helper methods for special cases in equalsModThisProperty ---------- */
+
+    /**
+     * A helper class to map {@link SourceElement}s to an abstract name.
+     * <p>
+     * As names are abstracted from in this property, we need to give named elements abstract names
+     * for them to be used in the hash code. This approach is similar to
+     * {@link NameAbstractionTable}, where we collect elements with names in the order they are
+     * declared. Each element is associated with the number of previously added elements, which is
+     * then used as the abstract name.
+     */
+    private static class NameAbstractionMap {
+        /**
+         * The map that associates {@link SourceElement}s with their abstract names.
+         */
+        private final Map<SourceElement, Integer> map = new HashMap<>();
+
+        /**
+         * Adds a {@link SourceElement} to the map.
+         *
+         * @param element the {@link SourceElement} to be added
+         */
+        public void add(SourceElement element) {
+            map.put(element, map.size());
+        }
+
+        /**
+         * Returns the abstract name of a {@link SourceElement} or {@code -1} if the element is not
+         * in the map.
+         * <p>
+         * A common case for a look-up of an element that is not in the map, is a built-in datatype,
+         * e.g., the {@link ProgramElementName} {@code int}.
+         *
+         * @param element the {@link SourceElement} whose abstract name should be returned
+         * @return the abstract name of the {@link SourceElement} or {@code -1} if the element is
+         *         not in the map
+         */
+        public int getAbstractName(SourceElement element) {
+            final Integer result = map.get(element);
+            return result != null ? result : -1;
+        }
+    }
 }

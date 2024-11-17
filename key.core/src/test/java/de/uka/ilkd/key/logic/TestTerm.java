@@ -116,10 +116,16 @@ public class TestTerm {
         assertTrue(
             match1.sub(0).equalsModProperty(match2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming (0).");
+        assertEquals(match1.sub(0).hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            match2.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal. (0)");
         assertTrue(
             match1.sub(0).equalsModProperty(match1.sub(1),
                 RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming (1).");
+        assertEquals(match1.sub(0).hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            match1.sub(1).hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal. (1)");
         Term match3 = TacletForTests.parseTerm("\\<{ int j = 0; }\\>true ");
         assertNotEquals(match1, match3, "Terms should not be equal.");
 
@@ -131,14 +137,23 @@ public class TestTerm {
         Term match2 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
         assertTrue(match1.equalsModProperty(match2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming.");
+        assertEquals(match1.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            match2.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming. (0)");
         Term match3 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match4 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int j = 0; } } }\\>true");
         assertTrue(match3.equalsModProperty(match4, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming.");
+        assertEquals(match3.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            match4.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming. (1)");
         Term match5 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         Term match6 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
         assertTrue(match5.equalsModProperty(match6, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms should be equalModRenaming.");
+        assertEquals(match5.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            match6.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming. (2)");
     }
 
     @Test
@@ -152,6 +167,9 @@ public class TestTerm {
 
         assertTrue(quant1.equalsModProperty(quant2, RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Terms " + quant1 + " and " + quant2 + " should be equal mod renaming");
+        assertEquals(quant1.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            quant2.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
 
     }
 

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.equality;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.util.EqualityUtils;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -82,9 +83,29 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
         return true;
     }
 
+    /**
+     * Computes the hash code of {@code term} while ignoring irrelevant labels.
+     *
+     * @param term the term to compute the hash code for
+     * @return the hash code
+     */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        throw new UnsupportedOperationException(
-            "Hashing of terms modulo irrelevant term labels not yet implemented!");
+        int hashcode = 5;
+        hashcode = hashcode * 17 + term.op().hashCode();
+        hashcode = hashcode * 17 + EqualityUtils
+                .hashCodeModPropertyOfIterable(IRRELEVANT_TERM_LABELS_PROPERTY, term.subs());
+        hashcode = hashcode * 17 + term.boundVars().hashCode();
+        hashcode = hashcode * 17 + term.javaBlock().hashCode();
+
+        final ImmutableArray<TermLabel> labels = term.getLabels();
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            final TermLabel currentLabel = labels.get(i);
+            if (currentLabel.isProofRelevant()) {
+                hashcode += 7 * currentLabel.hashCode();
+            }
+        }
+
+        return hashcode;
     }
 }
