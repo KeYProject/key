@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Return zero only if the value of one (left) polynomial always will be (less or equal) or (less)

@@ -18,7 +18,7 @@ import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 import org.key_project.logic.op.Function;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 

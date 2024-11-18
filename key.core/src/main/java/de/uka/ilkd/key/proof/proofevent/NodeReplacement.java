@@ -12,9 +12,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.ncore.sequent.FormulaChangeInfo;
-import org.key_project.ncore.sequent.PosInOccurrence;
-import org.key_project.ncore.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.FormulaChangeInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 
-import org.key_project.ncore.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

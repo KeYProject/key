@@ -17,8 +17,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * future versions it can be enhanced to do other simplifications. A sequent and so a semisequent
  * has to be immutable.
  */
-public class Semisequent extends org.key_project.ncore.sequent.Semisequent {
-
+public class Semisequent extends org.key_project.prover.sequent.Semisequent<SequentFormula> {
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
 

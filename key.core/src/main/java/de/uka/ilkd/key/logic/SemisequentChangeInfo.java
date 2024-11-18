@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableList;
  * semisequents.
  */
 public class SemisequentChangeInfo
-        extends org.key_project.ncore.sequent.SemisequentChangeInfo<SequentFormula> {
+        extends org.key_project.prover.sequent.SemisequentChangeInfo<SequentFormula> {
     public SemisequentChangeInfo() {
         super();
     }

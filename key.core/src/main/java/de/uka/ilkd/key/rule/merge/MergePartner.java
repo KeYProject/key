@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.merge;
 
 import de.uka.ilkd.key.proof.Goal;
 
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * A {@link MergePartner} consists of a {@link Goal} and a {@link PosInOccurrence}; the

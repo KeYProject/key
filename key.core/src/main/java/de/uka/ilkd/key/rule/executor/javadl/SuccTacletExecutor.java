@@ -16,8 +16,8 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import org.key_project.ncore.sequent.PosInOccurrence;
-import org.key_project.ncore.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentChangeInfo;
 
 public class SuccTacletExecutor<TacletKind extends SuccTaclet>
         extends FindTacletExecutor<TacletKind> {

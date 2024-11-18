@@ -17,7 +17,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**

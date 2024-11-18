@@ -11,8 +11,8 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
-import org.key_project.ncore.sequent.PIOPathIterator;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * This feature checks that an equation is not applied to itself. This means that the focus of the
