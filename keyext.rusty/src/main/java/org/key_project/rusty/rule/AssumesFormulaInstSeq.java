@@ -5,9 +5,9 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PosInTerm;
-import org.key_project.ncore.rules.AssumesFormulaInstantiation;
-import org.key_project.ncore.sequent.PosInOccurrence;
-import org.key_project.ncore.sequent.SequentFormula;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.Semisequent;
 import org.key_project.rusty.logic.Sequent;

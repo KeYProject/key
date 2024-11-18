@@ -4,7 +4,7 @@
 package org.key_project.rusty.proof.io;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.ncore.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.SequentFormula;
 

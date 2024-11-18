@@ -5,8 +5,8 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
-import org.key_project.ncore.proof.ProofGoal;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class TacletExecutor<T extends Taclet> extends
-        org.key_project.ncore.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T, SequentFormula> {
+        org.key_project.prover.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T, SequentFormula> {
     public TacletExecutor(T taclet) {
         super(taclet);
     }
@@ -37,7 +37,7 @@ public abstract class TacletExecutor<T extends Taclet> extends
 
     @Override
     public <Goal extends @NonNull ProofGoal<Goal>> ImmutableList<Goal> apply(
-            ProofGoal<@NonNull Goal> goal, org.key_project.ncore.rules.RuleApp ruleApp) {
+            ProofGoal<@NonNull Goal> goal, org.key_project.prover.rules.RuleApp ruleApp) {
         // TODO @ DD
         return (ImmutableList<Goal>) apply((org.key_project.rusty.proof.Goal) goal,
             (RuleApp) ruleApp);
@@ -54,9 +54,9 @@ public abstract class TacletExecutor<T extends Taclet> extends
      *        schemavariables
      */
     @Override
-    protected void applyAddrule(ImmutableList<? extends org.key_project.ncore.rules.Taclet> rules,
+    protected void applyAddrule(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules,
             @NonNull Goal goal, LogicServices p_services,
-            org.key_project.ncore.rules.MatchConditions p_matchCond) {
+            org.key_project.prover.rules.MatchConditions p_matchCond) {
         var services = (Services) p_services;
         var matchCond = (MatchConditions) p_matchCond;
         for (var rule : rules) {
@@ -133,7 +133,7 @@ public abstract class TacletExecutor<T extends Taclet> extends
     }
 
     @Override
-    protected Term applyContextUpdate(org.key_project.ncore.rules.inst.SVInstantiations p_svInst,
+    protected Term applyContextUpdate(org.key_project.prover.rules.inst.SVInstantiations p_svInst,
             Term formula, @NonNull Goal goal) {
         var svInst = (SVInstantiations) p_svInst;
         if (svInst.getUpdateContext().isEmpty()) {
@@ -146,7 +146,7 @@ public abstract class TacletExecutor<T extends Taclet> extends
 
     @Override
     protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
-            org.key_project.ncore.rules.MatchConditions mc, @NonNull Goal goal,
+            org.key_project.prover.rules.MatchConditions mc, @NonNull Goal goal,
             @NonNull RuleApp ruleApp, LogicServices services) {
         return syntacticalReplace(term, applicationPosInOccurrence, (MatchConditions) mc, goal,
             ruleApp, (Services) services);

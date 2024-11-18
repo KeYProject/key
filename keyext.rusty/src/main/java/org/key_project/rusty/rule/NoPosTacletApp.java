@@ -6,8 +6,8 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.ncore.rules.AssumesFormulaInstantiation;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.inst.SVInstantiations;

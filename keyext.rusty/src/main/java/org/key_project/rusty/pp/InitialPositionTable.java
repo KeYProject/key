@@ -4,7 +4,7 @@
 package org.key_project.rusty.pp;
 
 import org.key_project.logic.IntIterator;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;

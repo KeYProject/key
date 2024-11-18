@@ -11,7 +11,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.exploration.ProofExplorationService;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Action for the user to visually delete formulas from the sequent (using hide)

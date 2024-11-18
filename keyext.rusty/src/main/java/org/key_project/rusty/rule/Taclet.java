@@ -7,7 +7,7 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.ncore.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 
 public abstract class Taclet extends
-        org.key_project.ncore.rules.Taclet implements Rule {
+        org.key_project.prover.rules.Taclet implements Rule {
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
@@ -30,12 +30,12 @@ public abstract class Taclet extends
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
-    protected Taclet(Name name, org.key_project.ncore.rules.TacletApplPart applPart,
-            ImmutableList<? extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-            org.key_project.ncore.rules.TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+    protected Taclet(Name name, org.key_project.prover.rules.TacletApplPart applPart,
+            ImmutableList<? extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            org.key_project.prover.rules.TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             boolean surviveSmbExec,
-            ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, attrs, prefixMap, surviveSmbExec, tacletAnnotations);
     }
 
@@ -55,9 +55,9 @@ public abstract class Taclet extends
      */
     protected Taclet(Name name, TacletApplPart applPart,
             ImmutableList<? extends TacletGoalTemplate> goalTemplates,
-            org.key_project.ncore.rules.TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
-            ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
+            org.key_project.prover.rules.TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, prefixMap, false,
             tacletAnnotations);
     }

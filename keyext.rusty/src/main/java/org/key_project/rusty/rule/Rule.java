@@ -6,7 +6,7 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Named;
 
 public interface Rule
-        extends org.key_project.ncore.rules.Rule, Named {
+        extends org.key_project.prover.rules.Rule, Named {
     /**
      * returns the display name of the rule
      */

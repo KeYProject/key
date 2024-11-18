@@ -13,7 +13,7 @@ import org.key_project.logic.Term;
  * class by providing a way to add additional annotations or to cache local information about the
  * formula.
  */
-public class SequentFormula extends org.key_project.ncore.sequent.SequentFormula {
+public class SequentFormula extends org.key_project.prover.sequent.SequentFormula {
     /**
      * creates a new SequentFormula
      *

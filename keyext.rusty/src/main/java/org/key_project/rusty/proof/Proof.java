@@ -8,7 +8,7 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
-import org.key_project.ncore.proof.ProofObject;
+import org.key_project.prover.proof.ProofObject;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.Semisequent;

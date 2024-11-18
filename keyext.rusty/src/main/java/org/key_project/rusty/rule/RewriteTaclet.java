@@ -6,9 +6,9 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
-import org.key_project.ncore.rules.TacletApplPart;
-import org.key_project.ncore.sequent.PIOPathIterator;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.logic.op.IfThenElse;
 import org.key_project.rusty.logic.op.Junctor;
 import org.key_project.rusty.logic.op.Modality;
@@ -113,21 +113,21 @@ public class RewriteTaclet extends FindTaclet {
      *        for location check)
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<? extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-            org.key_project.ncore.rules.TacletAttributes attrs, Term find,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+            ImmutableList<? extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            org.key_project.prover.rules.TacletAttributes attrs, Term find,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction,
-            ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, attrs, find, prefixMap,
             p_applicationRestriction, false, tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<? extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-            org.key_project.ncore.rules.TacletAttributes attrs, Term find,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap,
+            ImmutableList<? extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            org.key_project.prover.rules.TacletAttributes attrs, Term find,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction, boolean surviveSymbExec,
-            ImmutableSet<org.key_project.ncore.rules.TacletAnnotation> tacletAnnotations) {
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, attrs, find, prefixMap,
             surviveSymbExec, tacletAnnotations);
         applicationRestriction = p_applicationRestriction;
@@ -199,8 +199,8 @@ public class RewriteTaclet extends FindTaclet {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
-        final org.key_project.ncore.rules.TacletAttributes attrs =
-            new org.key_project.ncore.rules.TacletAttributes(displayName(), null);
+        final org.key_project.prover.rules.TacletAttributes attrs =
+            new org.key_project.prover.rules.TacletAttributes(displayName(), null);
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
             prefixMap, applicationRestriction, tacletAnnotations);

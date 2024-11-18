@@ -9,7 +9,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
-public class Sequent extends org.key_project.ncore.sequent.Sequent<SequentFormula> {
+public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormula> {
     public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
 
     /**
@@ -88,7 +88,7 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent<SequentFormul
      */
     @Override
     protected Sequent composeSequent(boolean antec,
-            org.key_project.ncore.sequent.Semisequent<SequentFormula> semiSeq) {
+            org.key_project.prover.sequent.Semisequent<SequentFormula> semiSeq) {
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent().isEmpty()) {
                 return EMPTY_SEQUENT;

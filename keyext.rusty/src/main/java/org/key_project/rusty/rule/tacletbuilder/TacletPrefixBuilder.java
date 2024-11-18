@@ -7,7 +7,7 @@ package org.key_project.rusty.rule.tacletbuilder;
 import java.util.Iterator;
 
 import org.key_project.logic.Term;
-import org.key_project.ncore.rules.NotFreeIn;
+import org.key_project.prover.rules.NotFreeIn;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.*;
@@ -24,7 +24,7 @@ public class TacletPrefixBuilder {
         0;
     private final TacletBuilder<? extends Taclet> tacletBuilder;
 
-    protected ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> prefixMap =
+    protected ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap =
         DefaultImmutableMap.nilMap();
 
     public TacletPrefixBuilder(TacletBuilder<? extends Taclet> tacletBuilder) {
@@ -207,7 +207,7 @@ public class TacletPrefixBuilder {
         }
     }
 
-    public ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.ncore.rules.TacletPrefix> getPrefixMap() {
+    public ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> getPrefixMap() {
         considerContext();
         return prefixMap;
     }

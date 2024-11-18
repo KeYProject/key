@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
-import org.key_project.ncore.proof.ProofGoal;
-import org.key_project.ncore.rules.RuleAbortException;
-import org.key_project.ncore.sequent.SequentChangeInfo;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.Sequent;

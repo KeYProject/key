@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.key_project.ncore.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.util.collection.ImmutableList;
 
 public class IfMatchResult {

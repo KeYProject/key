@@ -5,7 +5,7 @@ package org.key_project.rusty.rule.tacletbuilder;
 
 
 import org.key_project.logic.Term;
-import org.key_project.ncore.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.rule.SuccTaclet;
 

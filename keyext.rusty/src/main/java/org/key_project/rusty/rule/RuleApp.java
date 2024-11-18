@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 
-public interface RuleApp extends org.key_project.ncore.rules.RuleApp {
+public interface RuleApp extends org.key_project.prover.rules.RuleApp {
     /**
      * returns the rule of this rule application
      */

@@ -28,9 +28,9 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import org.key_project.ncore.proof.ProofGoal;
-import org.key_project.ncore.sequent.PosInOccurrence;
-import org.key_project.ncore.sequent.SequentChangeInfo;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -61,7 +61,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
     @Override
     public <Goal extends @NonNull ProofGoal<Goal>> ImmutableList<Goal> apply(
-            ProofGoal<@NonNull Goal> goal, org.key_project.ncore.rules.RuleApp ruleApp) {
+            ProofGoal<@NonNull Goal> goal, org.key_project.prover.rules.RuleApp ruleApp) {
         // TODO @ DD
         return (ImmutableList<Goal>) apply((de.uka.ilkd.key.proof.Goal) goal,
             (RuleApp) ruleApp);

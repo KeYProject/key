@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
  * in subclasses
  */
 public class TacletGoalTemplate
-        extends org.key_project.ncore.rules.tacletbuilder.TacletGoalTemplate {
+        extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate {
     /**
      * creates new Goaldescription
      *

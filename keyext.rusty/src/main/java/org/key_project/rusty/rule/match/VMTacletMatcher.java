@@ -10,9 +10,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.ncore.rules.AssumesFormulaInstantiation;
-import org.key_project.ncore.rules.AssumesMatchResult;
-import org.key_project.ncore.rules.NotFreeIn;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.AssumesMatchResult;
+import org.key_project.prover.rules.NotFreeIn;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.Sequent;
@@ -211,7 +211,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas =
             ImmutableSLList.nil();
-        ImmutableList<org.key_project.ncore.rules.MatchConditions> resMC = ImmutableSLList.nil();
+        ImmutableList<org.key_project.prover.rules.MatchConditions> resMC = ImmutableSLList.nil();
 
         final boolean updateContextPresent =
             !matchCond.getInstantiations().getUpdateContext().isEmpty();
@@ -280,7 +280,7 @@ public class VMTacletMatcher implements TacletMatcher {
         final var anteIterator = assumesSequent.antecedent().iterator();
         final var succIterator = assumesSequent.succedent().iterator();
 
-        ImmutableList<org.key_project.ncore.rules.MatchConditions> newMC;
+        ImmutableList<org.key_project.prover.rules.MatchConditions> newMC;
 
         for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ

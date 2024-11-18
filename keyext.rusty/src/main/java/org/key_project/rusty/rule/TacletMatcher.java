@@ -6,14 +6,14 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
-import org.key_project.ncore.rules.AssumesFormulaInstantiation;
-import org.key_project.ncore.rules.AssumesMatchResult;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.AssumesMatchResult;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 
-public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher {
+public interface TacletMatcher extends org.key_project.prover.rules.TacletMatcher {
     /**
      * matches the given term against the taclet's find term if the taclet has no find term or the
      * match is unsuccessful <code>null</code>
@@ -35,7 +35,7 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
 
     @Override
     default MatchConditions matchFind(Term term,
-            org.key_project.ncore.rules.MatchConditions matchCond, LogicServices services) {
+            org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
         return matchFind(term, (MatchConditions) matchCond, (Services) services);
     }
 
@@ -56,7 +56,7 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
     @Override
     default MatchConditions checkVariableConditions(org.key_project.logic.op.sv.SchemaVariable var,
             SyntaxElement instantiationCandidate,
-            org.key_project.ncore.rules.MatchConditions matchCond, LogicServices services) {
+            org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
         return checkVariableConditions((SchemaVariable) var, instantiationCandidate,
             (MatchConditions) matchCond, (Services) services);
     }
@@ -76,7 +76,7 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
 
     @Override
     default MatchConditions checkConditions(
-            org.key_project.ncore.rules.MatchConditions matchConditions, LogicServices services) {
+            org.key_project.prover.rules.MatchConditions matchConditions, LogicServices services) {
         return checkConditions((MatchConditions) matchConditions, (Services) services);
     }
 
@@ -101,7 +101,7 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
 
     default AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
             Term template,
-            org.key_project.ncore.rules.MatchConditions matchCond, LogicServices services) {
+            org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
         return matchAssumes(toMatch, template, (MatchConditions) matchCond, (Services) services);
     }
 
@@ -119,7 +119,7 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
             MatchConditions matchCond, Services services);
 
     default MatchConditions matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
-            org.key_project.ncore.rules.MatchConditions matchCond, LogicServices services) {
+            org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
         return matchAssumes(toMatch, (MatchConditions) matchCond, (Services) services);
     }
 
@@ -127,7 +127,7 @@ public interface TacletMatcher extends org.key_project.ncore.rules.TacletMatcher
             Services services);
 
     default MatchConditions matchSV(org.key_project.logic.op.sv.SchemaVariable sv, Term term,
-            org.key_project.ncore.rules.MatchConditions matchConditions,
+            org.key_project.prover.rules.MatchConditions matchConditions,
             LogicServices services) {
         return matchSV((SchemaVariable) sv, term, (MatchConditions) matchConditions,
             (Services) services);

@@ -10,7 +10,7 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
  * @param prefixLength  the prefix of the taclet
  * @param context used by rewrite taclets to mark the context
  */
-public record TacletPrefix(int prefixLength, boolean context) implements org.key_project.ncore.rules.TacletPrefix {
+public record TacletPrefix(int prefixLength, boolean context) implements org.key_project.prover.rules.TacletPrefix {
     /**
      * creates the prefix
      *
