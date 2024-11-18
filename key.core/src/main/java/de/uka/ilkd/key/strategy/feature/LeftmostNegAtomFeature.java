@@ -10,8 +10,8 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
-import org.key_project.ncore.sequent.PIOPathIterator;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Feature that returns zero if there is no atom with negative polarity on a common d-path and on

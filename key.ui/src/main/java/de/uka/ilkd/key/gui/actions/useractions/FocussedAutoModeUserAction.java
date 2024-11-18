@@ -6,7 +6,7 @@ package de.uka.ilkd.key.gui.actions.useractions;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * User action for "Apply rules automatically here" (i.e. focussed auto mode).

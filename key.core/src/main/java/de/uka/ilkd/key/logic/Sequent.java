@@ -10,8 +10,8 @@ import java.util.Set;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.sequent.PosInOccurrence;
-import org.key_project.ncore.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,9 +26,8 @@ import org.jspecify.annotations.NonNull;
  * {@link Sequent#createSuccSequent} or by inserting formulas directly into
  * {@link Sequent#EMPTY_SEQUENT}.
  */
-public class Sequent extends org.key_project.ncore.sequent.Sequent {
-
-    public static final Sequent EMPTY_SEQUENT = new NILSequent();
+public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormula> {
+    public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
 
     /**
      * creates a new Sequent with empty succedent
@@ -109,10 +108,9 @@ public class Sequent extends org.key_project.ncore.sequent.Sequent {
      * @param p_semiSeq the {@link Semisequent} to use
      * @return the resulting sequent
      */
-    private Sequent composeSequent(boolean antec,
-            org.key_project.ncore.sequent.Semisequent semiSeq) {
-        final var antecedent = antecedent();
-        final var succedent = succedent();
+    protected Sequent composeSequent(boolean antec,
+            org.key_project.prover.sequent.Semisequent<SequentFormula> p_semiSeq) {
+        final var semiSeq = (Semisequent) p_semiSeq;
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent().isEmpty()) {
                 return EMPTY_SEQUENT;

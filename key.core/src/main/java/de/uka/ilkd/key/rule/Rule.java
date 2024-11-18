@@ -10,5 +10,5 @@ import org.key_project.logic.HasOrigin;
 /**
  * This interface has to be implemented by all classes that want to act as a rule in the calculus.
  */
-public interface Rule extends org.key_project.ncore.rules.Rule, HasOrigin {
+public interface Rule extends org.key_project.prover.rules.Rule, HasOrigin {
 }

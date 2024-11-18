@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.TermServices;
 
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**

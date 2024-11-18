@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 
@@ -13,7 +13,7 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * rule application with specific information how and where the rule has to be applied
  */
 public interface RuleApp
-        extends org.key_project.ncore.rules.RuleApp, EqualsModProofIrrelevancy {
+        extends org.key_project.prover.rules.RuleApp, EqualsModProofIrrelevancy {
 
     /**
      * returns the rule of this rule application

@@ -1,1 +1,0 @@
-package org.key_project.ncore.rules;

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Named;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy

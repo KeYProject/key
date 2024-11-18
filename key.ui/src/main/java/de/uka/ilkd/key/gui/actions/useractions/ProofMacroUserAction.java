@@ -7,7 +7,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * User action to apply a proof macro.

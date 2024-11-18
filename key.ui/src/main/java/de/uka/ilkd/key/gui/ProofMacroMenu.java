@@ -15,7 +15,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;

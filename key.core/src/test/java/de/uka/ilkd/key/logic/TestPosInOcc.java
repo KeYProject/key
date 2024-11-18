@@ -12,8 +12,8 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
-import org.key_project.ncore.sequent.PIOPathIterator;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

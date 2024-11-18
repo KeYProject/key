@@ -21,7 +21,7 @@ import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRE
  * class by providing a way to add additional annotations or to cache local information about the
  * formula.
  */
-public class SequentFormula extends org.key_project.ncore.sequent.SequentFormula
+public class SequentFormula extends org.key_project.prover.sequent.SequentFormula
         implements EqualsModProofIrrelevancy {
 
     /**

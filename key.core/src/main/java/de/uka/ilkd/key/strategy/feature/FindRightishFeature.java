@@ -11,8 +11,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
-import org.key_project.ncore.sequent.PIOPathIterator;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Walking from the root of a formula down to the focus of a rule application, count how often we

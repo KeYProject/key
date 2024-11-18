@@ -9,7 +9,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Projection for computing a subterm of a given term. The position of the subterm within the

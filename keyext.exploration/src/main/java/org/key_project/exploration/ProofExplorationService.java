@@ -16,7 +16,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
