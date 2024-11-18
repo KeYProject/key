@@ -8,7 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -17,15 +17,15 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
+
 /**
  * The rule application that is used when a goal is closed by means of an external solver. So far it
  * stores the rule that that has been used and a title containing some information for the user.
  */
-public class SMTRuleApp extends AbstractBuiltInRuleApp {
-
+public class SMTRuleApp extends AbstractExternalSolverRuleApp {
     public static final SMTRule RULE = new SMTRule();
-    private final String title;
-    private final String successfulSolverName;
 
     /**
      * Create a new rule app without ifInsts (will be null).
@@ -38,12 +38,10 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         this(rule, pio, null, successfulSolverName);
     }
 
-    SMTRuleApp(SMTRule rule, PosInOccurrence pio,
+    SMTRuleApp(ExternalSolverRule rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> unsatCore,
             String successfulSolverName) {
-        super(rule, pio, unsatCore);
-        this.title = "SMT: " + successfulSolverName;
-        this.successfulSolverName = successfulSolverName;
+        super(rule, pio, unsatCore, successfulSolverName, "SMT: " + successfulSolverName);
     }
 
     @Override
@@ -51,27 +49,15 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         return new SMTRuleApp(RULE, newPos, ifInsts, successfulSolverName);
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getSuccessfulSolverName() {
-        return successfulSolverName;
-    }
-
     @Override
     public BuiltInRule rule() {
         return RULE;
     }
 
-    @Override
-    public String displayName() {
-        return title;
-    }
-
-    public static class SMTRule implements BuiltInRule {
+    public static class SMTRule implements ExternalSolverRule {
         public static final Name name = new Name("SMTRule");
 
+        @Override
         public SMTRuleApp createApp(String successfulSolverName) {
             return new SMTRuleApp(this, null, successfulSolverName);
         }
@@ -83,6 +69,7 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
          * @param unsatCore formulas required to prove the result
          * @return rule application instance
          */
+        @Override
         public SMTRuleApp createApp(String successfulSolverName,
                 ImmutableList<PosInOccurrence> unsatCore) {
             return new SMTRuleApp(this, null, unsatCore, successfulSolverName);
@@ -93,13 +80,6 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
             return new SMTRuleApp(this, null, "");
         }
 
-
-        @Override
-        public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-            return false;
-        }
-
-
         /**
          * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
          * with the same sequent as the given one.
@@ -109,6 +89,7 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
          * @return a list with an identical goal as the given <tt>goal</tt>
          */
         @Override
+        @NonNull
         public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
                 goal.proof().getInitConfig().registerRule(RULE, () -> false);
@@ -117,15 +98,11 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         }
 
         @Override
-        public boolean isApplicableOnSubTerms() {
-            return false;
-        }
-
-        @Override
         public String displayName() {
             return "SMT";
         }
 
+        @Override
         public String toString() {
             return displayName();
         }
@@ -137,13 +114,13 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
 
     }
 
+    @Override
     public SMTRuleApp setTitle(String title) {
         return new SMTRuleApp(RULE, pio, ifInsts, title);
     }
 
     @Override
-    public SMTRuleApp setIfInsts(
-            ImmutableList<PosInOccurrence> ifInsts) {
+    public SMTRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
