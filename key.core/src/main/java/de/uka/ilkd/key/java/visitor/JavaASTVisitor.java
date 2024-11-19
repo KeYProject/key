@@ -11,9 +11,11 @@ import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.literal.EmptyMSetLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.expression.operator.mst.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -190,6 +192,8 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
+
+
     @Override
     public void performActionOnIntersect(Intersect x) {
         doDefaultAction(x);
@@ -239,6 +243,30 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     public void performActionOnSeqPut(SeqPut x) {
         doDefaultAction(x);
     }
+
+    @Override
+    public void performActionOnEmptyMSetLiteral(EmptyMSetLiteral x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetUnion(MSetUnion x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetIntersect(MSetIntersect x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetSum(MSetSum x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetDiff(MSetDiff x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetSingle(MSetSingle x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetMul(MSetMul x) { doDefaultAction(x); }
+
+    @Override
+    public void performActionOnMSetCard(MSetCard x) { doDefaultAction(x); }
 
     @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
