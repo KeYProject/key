@@ -7,17 +7,15 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.MSetLDT;
 
 import org.key_project.logic.Name;
 
+public non-sealed class EmptyMSetLiteral extends Literal {
+    public static final EmptyMSetLiteral INSTANCE = new EmptyMSetLiteral();
 
-
-public non-sealed class EmptySeqLiteral extends Literal {
-
-    public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
-
-    private EmptySeqLiteral() {}
+    private EmptyMSetLiteral() {
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -30,15 +28,16 @@ public non-sealed class EmptySeqLiteral extends Literal {
     }
 
     public void visit(Visitor v) {
-        v.performActionOnEmptySeqLiteral(this);
+        v.performActionOnEmptyMSetLiteral(this);
     }
 
+
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_MSET);
     }
 
     @Override
     public Name getLDTName() {
-        return SeqLDT.NAME;
+        return MSetLDT.NAME;
     }
 }

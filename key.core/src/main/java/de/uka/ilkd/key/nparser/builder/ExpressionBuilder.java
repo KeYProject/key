@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This visitor creates expression from {@link de.uka.ilkd.key.nparser.KeyAst.Term}. You should use
- * the facade {@link de.uka.ilkd.key.nparser.KeyIO#parseExpression(String)} for term parsing.
+ * the facade {@link de.uka.ilkd.key.nparser.KeyIO#parseExpression(String)} for JTerm parsing.
  *
  * @author weigl
  */
@@ -64,7 +64,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExpressionBuilder.class);
 
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE =
-        "Expecting select term before '@', not: ";
+        "Expecting select JTerm before '@', not: ";
 
     /**
      * The current abbreviation used for resolving "@name" terms.
@@ -175,9 +175,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         return "n/a";
     }
 
-    private static boolean isSelectTerm(JTerm term) {
-        return term.op() instanceof ParametricFunctionInstance pfi
-                && pfi.getBase().name().toString().equals("select") && term.arity() == 3;
+    private static boolean isSelectTerm(JTerm JTerm) {
+        return JTerm.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase().name().toString().equals("select") && JTerm.arity() == 3;
     }
 
     @Override
@@ -264,7 +264,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             t = binaryTerm(ctx, Junctor.AND, t, accept(c));
         }
         return t;
-        // Term termR = accept(ctx.b);
+        // JTerm termR = accept(ctx.b);
         // return binaryTerm(ctx, Junctor.AND, termL, termR);
     }
 
@@ -427,10 +427,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         // "mod" :
         // "div").collect(Collectors.toList());
 
-        JTerm term = accept(ctx.a);
-        var sort = term.sort();
+        JTerm JTerm = accept(ctx.a);
+        var sort = JTerm.sort();
         if (sort == null) {
-            semanticError(ctx, "No sort for term '%s'", term);
+            semanticError(ctx, "No sort for JTerm '%s'", JTerm);
         }
 
         var ldt = services.getTypeConverter().getLDTFor(sort);
@@ -449,9 +449,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opName,
                     sort);
             }
-            term = binaryTerm(ctx, ctx.b.get(i), op, term, termL.get(i));
+            JTerm = binaryTerm(ctx, ctx.b.get(i), op, JTerm, termL.get(i));
         }
-        return term;
+        return JTerm;
     }
 
     protected JTerm capsulateTf(ParserRuleContext ctx, Supplier<JTerm> termSupplier) {
@@ -459,8 +459,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /**
-     * Builds a term and, on failure, raises a {@link BuildingException} that <em>describes</em> the
-     * whole term {@code ctx} but is <em>located</em> at {@code locationCtx} (e.g. the offending
+     * Builds a JTerm and, on failure, raises a {@link BuildingException} that <em>describes</em>
+     * the
+     * whole JTerm {@code ctx} but is <em>located</em> at {@code locationCtx} (e.g. the offending
      * operand of a binary operation rather than the whole expression).
      */
     protected JTerm capsulateTf(ParserRuleContext ctx, ParserRuleContext locationCtx,
@@ -469,11 +470,11 @@ public class ExpressionBuilder extends DefaultBuilder {
             return termSupplier.get();
         } catch (TermCreationException e) {
             // Surface the actual reason (usually an arity or sort/type mismatch) instead of the
-            // generic "Could not build term". The TermCreationException message lists the expected
+            // generic "Could not build JTerm". The TermCreationException message lists the expected
             // and actual argument sorts, including the sort hashes - these are kept on purpose:
             // they let one distinguish two different sort objects that share the same name.
             String reason = e.getMessage() == null ? "" : "\n" + e.getMessage();
-            String msg = String.format("Could not type-check term '%s'.%s", ctx.getText(), reason);
+            String msg = String.format("Could not type-check JTerm '%s'.%s", ctx.getText(), reason);
             Token at = locationCtx != null ? locationCtx.start : (ctx != null ? ctx.start : null);
             throw new BuildingException(at, null, msg, e);
         }
@@ -514,7 +515,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     // }
 
     /*
-     * @Override public Term
+     * @Override public JTerm
      * visitStatic_attribute_suffix(JavaKeYParser.Static_attribute_suffixContext
      * ctx) { Operator v = null; String attributeName =
      * accept(ctx.staticAttributeOrQueryReference()); String className; if
@@ -954,16 +955,17 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /*
-     * private Term createStaticAttributeOrMethod(JavaQuery jq, JavaKeYParser.AccesstermContext ctx)
+     * private JTerm createStaticAttributeOrMethod(JavaQuery jq, JavaKeYParser.AccesstermContext
+     * ctx)
      * {
      * final var kjt = jq.kjt; String mn = jq.attributeNames; if (jq.maybeAttr != null) {
      * ProgramVariable maybeAttr = getJavaInfo().getAttribute(mn, kjt); if (maybeAttr != null) { var
      * op = getAttributeInPrefixSort(kjt.getSort(), mn); return createAttributeTerm(null, op, ctx);
      * } } else { var suffix = ctx.atom_suffix(ctx.atom_suffix().size() - 1); for (IProgramMethod pm
      * : getJavaInfo().getAllProgramMethods(kjt)) { if (pm != null && pm.isStatic() &&
-     * pm.name().toString().equals(kjt.getFullName() + "::" + mn)) { List<Term> arguments =
-     * mapOf(suffix.attribute_or_query_suffix().result.args.argument()); Term[] args =
-     * arguments.toArray(new Term[0]); return getJavaInfo().getStaticProgramMethodTerm(mn, args,
+     * pm.name().toString().equals(kjt.getFullName() + "::" + mn)) { List<JTerm> arguments =
+     * mapOf(suffix.attribute_or_query_suffix().result.args.argument()); JTerm[] args =
+     * arguments.toArray(new JTerm[0]); return getJavaInfo().getStaticProgramMethodTerm(mn, args,
      * kjt.getFullName()); } } } assert false; return null; }
      */
 
@@ -1015,10 +1017,10 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitBracket_access_indexrange(
             JavaKeYParser.Bracket_access_indexrangeContext ctx) {
-        // | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET
+        // | JTerm LBRACKET indexTerm=JTerm (DOTRANGE rangeTo=JTerm)? RBRACKET
         // #bracket_access_indexrange
-        JTerm term = pop();
-        boolean sequenceAccess = term.sort().name().toString().equalsIgnoreCase("seq");
+        JTerm JTerm = pop();
+        boolean sequenceAccess = JTerm.sort().name().toString().equalsIgnoreCase("seq");
         // boolean heapUpdate = reference.sort().name().toString().equalsIgnoreCase("Heap");
 
         if (sequenceAccess) {
@@ -1029,10 +1031,10 @@ public class ExpressionBuilder extends DefaultBuilder {
             assert indexTerm != null;
             if (!isIntTerm(indexTerm)) {
                 semanticError(ctx,
-                    "Expecting term of sort %s as index of sequence %s, but found: %s",
-                    IntegerLDT.NAME, term, indexTerm);
+                    "Expecting JTerm of sort %s as index of sequence %s, but found: %s",
+                    IntegerLDT.NAME, JTerm, indexTerm);
             }
-            return getServices().getTermBuilder().seqGet(JavaDLTheory.ANY, term, indexTerm);
+            return getServices().getTermBuilder().seqGet(JavaDLTheory.ANY, JTerm, indexTerm);
         }
 
         if (ctx.rangeTo != null) {
@@ -1060,7 +1062,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         JTerm indexTerm = accept(ctx.indexTerm);
-        return capsulateTf(ctx, () -> getServices().getTermBuilder().dotArr(term, indexTerm));
+        return capsulateTf(ctx, () -> getServices().getTermBuilder().dotArr(JTerm, indexTerm));
     }
 
     @Override
@@ -1134,7 +1136,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public JTerm visitIfThenElseTerm(JavaKeYParser.IfThenElseTermContext ctx) {
         JTerm condF = (JTerm) ctx.condF.accept(this);
         if (condF.sort() != JavaDLTheory.FORMULA) {
-            semanticError(ctx, "Condition of an \\if-then-else term has to be a formula.");
+            semanticError(ctx, "Condition of an \\if-then-else JTerm has to be a formula.");
         }
         JTerm thenT = (JTerm) ctx.thenT.accept(this);
         JTerm elseT = (JTerm) ctx.elseT.accept(this);
@@ -1149,7 +1151,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<QuantifiableVariable> exVars = accept(ctx.bound_variables());
         JTerm condF = accept(ctx.condF);
         if (condF.sort() != JavaDLTheory.FORMULA) {
-            semanticError(ctx, "Condition of an \\ifEx-then-else term has to be a formula.");
+            semanticError(ctx, "Condition of an \\ifEx-then-else JTerm has to be a formula.");
         }
 
         JTerm thenT = accept(ctx.thenT);
@@ -1325,7 +1327,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * Handles "[sort]::a.name.or.something.else"
      *
      * @param ctx
-     * @return a Term or an operator, depending on the referenced object.
+     * @return a JTerm or an operator, depending on the referenced object.
      */
     @Override
     public Object visitFuncpred_name(JavaKeYParser.Funcpred_nameContext ctx) {
@@ -1666,7 +1668,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         for (QuantifiableVariable qv : args[i].freeVars()) {
                             if (boundVars.contains(qv)) {
                                 semanticError(ctx,
-                                    "Building function term " + op
+                                    "Building function JTerm " + op
                                         + " with bound variables failed: " + "Variable " + qv
                                         + " must not occur free in subterm " + args[i]);
                             }
@@ -1674,7 +1676,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     }
                 }
                 ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
-                // create term
+                // create JTerm
                 JTerm[] finalArgs1 = args;
                 current = capsulateTf(ctx,
                     () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null));
@@ -1773,7 +1775,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /*
-     * private Term makeBinaryTerm(String opName, Term a, Term a1) { LDT ldt =
+     * private JTerm makeBinaryTerm(String opName, JTerm a, JTerm a1) { LDT ldt =
      * services.getTypeConverter().getLDTFor(a.sort()); if (ldt != null) { Function op =
      * ldt.getFunctionFor(opName, services); if (op == null) {
      * semanticError("Cannot resolve symbol '" + opName + "' for sort " + a.sort()); } else { a =
@@ -1856,13 +1858,17 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
     }
 
-    protected boolean isHeapTerm(JTerm term) {
-        return term != null
-                && term.sort() == getServices().getTypeConverter().getHeapLDT().targetSort();
+    protected boolean isHeapTerm(JTerm JTerm) {
+        return JTerm != null
+                && JTerm.sort() == getServices().getTypeConverter().getHeapLDT().targetSort();
     }
 
     private boolean isSequenceTerm(JTerm reference) {
         return reference != null && reference.sort().name().equals(SeqLDT.NAME);
+    }
+
+    private boolean inMultisetTerm(JTerm reference) {
+        return reference != null && reference.sort().name().equals(MSetLDT.NAME);
     }
 
     private boolean isIntTerm(JTerm reference) {
@@ -1888,54 +1894,54 @@ public class ExpressionBuilder extends DefaultBuilder {
      * Guard for {@link #replaceHeap0(JTerm, JTerm, ParserRuleContext)} to protect the double
      * application of {@code @heap}.
      */
-    private JTerm replaceHeap(JTerm term, JTerm heap, ParserRuleContext ctx) {
-        if (explicitHeap.contains(term)) {
-            return term;
+    private JTerm replaceHeap(JTerm JTerm, JTerm heap, ParserRuleContext ctx) {
+        if (explicitHeap.contains(JTerm)) {
+            return JTerm;
         }
-        JTerm t = replaceHeap0(term, heap, ctx);
+        JTerm t = replaceHeap0(JTerm, heap, ctx);
         markHeapAsExplicit(t);
         return t;
     }
 
-    private JTerm replaceHeap0(JTerm term, JTerm heap, ParserRuleContext ctx) {
-        if (isSelectTerm(term)) {
-            if (!isImplicitHeap(term.sub(0))) {
+    private JTerm replaceHeap0(JTerm JTerm, JTerm heap, ParserRuleContext ctx) {
+        if (isSelectTerm(JTerm)) {
+            if (!isImplicitHeap(JTerm.sub(0))) {
                 // semanticError(null, "Expecting program variable heap as first argument of: %s",
-                // term);
-                return term;
+                // JTerm);
+                return JTerm;
             }
-            JTerm[] params = { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
+            JTerm[] params = { heap, replaceHeap(JTerm.sub(1), heap, ctx), JTerm.sub(2) };
             return capsulateTf(ctx,
-                () -> getServices().getTermFactory().createTerm(term.op(), params));
-        } else if (term.op() instanceof ObserverFunction) {
-            if (!isImplicitHeap(term.sub(0))) {
+                () -> getServices().getTermFactory().createTerm(JTerm.op(), params));
+        } else if (JTerm.op() instanceof ObserverFunction) {
+            if (!isImplicitHeap(JTerm.sub(0))) {
                 semanticError(null, "Expecting program variable heap as first argument of: %s",
-                    term);
+                    JTerm);
             }
 
-            JTerm[] params = new JTerm[term.arity()];
+            JTerm[] params = new JTerm[JTerm.arity()];
             params[0] = heap;
-            params[1] = replaceHeap(term.sub(1), heap, ctx);
+            params[1] = replaceHeap(JTerm.sub(1), heap, ctx);
             for (int i = 2; i < params.length; i++) {
-                params[i] = term.sub(i);
+                params[i] = JTerm.sub(i);
             }
 
             return capsulateTf(ctx,
-                () -> getServices().getTermFactory().createTerm(term.op(), params));
+                () -> getServices().getTermFactory().createTerm(JTerm.op(), params));
 
         }
-        return term;
+        return JTerm;
     }
 
     /**
      * Replace standard heap by another heap in an observer function.
      */
-    protected JTerm heapSelectionSuffix(JTerm term, JTerm heap, ParserRuleContext ctx) {
+    protected JTerm heapSelectionSuffix(JTerm JTerm, JTerm heap, ParserRuleContext ctx) {
         if (!isHeapTerm(heap)) {
-            semanticError(null, "Expecting term of type Heap but sort is %s for term %s",
-                heap.sort(), term);
+            semanticError(null, "Expecting JTerm of type Heap but sort is %s for JTerm %s",
+                heap.sort(), JTerm);
         }
-        JTerm result = replaceHeap(term, heap, ctx);
+        JTerm result = replaceHeap(JTerm, heap, ctx);
         return result;
     }
 
