@@ -549,9 +549,6 @@ public class EqualityConstraint implements Constraint {
         // MV cycles are impossible if the orders of MV pairs are
         // correct
 
-        if (!t.isRigid()) {
-            return Constraint.TOP;
-        }
 
         // metavariable instantiations must not contain free variables
         if (!t.freeVars().isEmpty() ||

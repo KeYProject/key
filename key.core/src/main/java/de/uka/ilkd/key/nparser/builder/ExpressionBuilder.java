@@ -14,10 +14,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -1696,6 +1693,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         return reference != null && reference.sort().name().equals(SeqLDT.NAME);
     }
 
+    private boolean inMultisetTerm(Term reference){
+        return reference != null && reference.sort().name().equals(MSetLDT.NAME);
+    }
     private boolean isIntTerm(Term reference) {
         return reference.sort().name().equals(IntegerLDT.NAME);
     }

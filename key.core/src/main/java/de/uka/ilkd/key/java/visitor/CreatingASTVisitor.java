@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.expression.operator.mst.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -1472,6 +1473,91 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
+
+        public void performActionOnMSetUnion(MSetUnion x) {
+
+            DefaultAction def = new DefaultAction(x) {
+                @Override
+                ProgramElement createNewElement(ExtList changeList) {
+
+                    return new MSetUnion(changeList);
+                }
+
+            };
+
+                def.doAction(x);
+
+        }
+
+    @Override
+    public void performActionOnMSetIntersect(MSetIntersect x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new MSetIntersect(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnMSetSum(MSetSum x){
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new MSetSum(changeList);
+            }
+        };
+        def.doAction(x);
+
+    }
+
+    @Override
+    public void performActionOnMSetDiff(MSetDiff x){
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new MSetDiff(changeList);
+            }
+        };
+        def.doAction(x);
+
+
+    }
+    @Override
+    public void performActionOnMSetSingle(MSetSingle x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new MSetSingle(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnMSetCard(MSetCard x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new MSetCard(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnMSetMul(MSetMul x){
+
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+               return new MSetMul(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
 
     @Override
     public void performActionOnDLEmbeddedExpression(final DLEmbeddedExpression x) {

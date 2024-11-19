@@ -266,6 +266,7 @@ MAP_UPDATE:  '\\map_update';  //KeY extension, not official JML
 MAX: '\\max';
 E_MEASURED_BY: '\\measured_by' -> type(MEASURED_BY);
 MIN: '\\min';
+MSET: '\\mset';  //KeY extension, not official JML
 NEWELEMSFRESH: '\\new_elems_fresh';  //KeY extension, not official JML
 NEW_OBJECTS: '\\new_objects';  //KeY extension, not official JML
 NONNULLELEMENTS: '\\nonnullelements';
