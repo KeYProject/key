@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
 import de.uka.ilkd.key.java.Services;
@@ -8,18 +5,14 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.ldt.SeqLDT;
-
+import de.uka.ilkd.key.ldt.MSetLDT;
 import org.key_project.logic.Name;
 
+public class EmptyMSetLiteral extends Literal {
 
+   public static final EmptyMSetLiteral INSTANCE = new EmptyMSetLiteral();
 
-public class EmptySeqLiteral extends Literal {
-
-    public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
-
-    private EmptySeqLiteral() {}
-
+    private EmptyMSetLiteral() {}
     @Override
     public boolean equals(Object o) {
         return o == this;
@@ -31,15 +24,16 @@ public class EmptySeqLiteral extends Literal {
     }
 
     public void visit(Visitor v) {
-        v.performActionOnEmptySeqLiteral(this);
+        v.performActionOnEmptyMSetLiteral(this);
     }
 
+
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_MSET);
     }
 
     @Override
     public Name getLDTName() {
-        return SeqLDT.NAME;
+        return MSetLDT.NAME;
     }
 }

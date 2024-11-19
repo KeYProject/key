@@ -870,6 +870,33 @@ public final class JmlTermFactory {
         return new SLExpression(resultTerm, seqtype);
     }
 
+  /*
+   public SLExpression createMSet(SLExpression a, SLExpression b, SLExpression t,
+
+                                     KeYJavaType declsType, ImmutableList<? extends QuantifiableVariable> declVars) {
+        if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
+                || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
+            throw exc.createException0(
+                    "multiset definition variable must be of type int or \\bigint");
+        } else if (declVars.size() != 1) {
+            throw exc.createException0("multiset definition must declare exactly one variable");
+        }
+        QuantifiableVariable qv = declVars.head();
+        Term tt = t.getTerm();
+        if (tt.sort() == JavaDLTheory.FORMULA) {
+            // bugfix (CS): t.getTerm() delivers a formula instead of a
+            // boolean term; obviously the original boolean terms are
+            // converted to formulas somewhere else; however, we need
+            // boolean terms instead of formulas here
+            tt = tb.convertToBoolean(t.getTerm());
+        }
+        Term resultTerm = tb.mset(qv, a.getTerm(), b.getTerm(), tt);
+        final KeYJavaType msettype = services.getJavaInfo().getPrimitiveKeYJavaType("\\mset");
+        return new SLExpression(resultTerm, msettype);
+    }
+   */
+
+
     public SLExpression createUnionF(boolean nullable,
             Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars, Term expr, Term guard) {
         final JavaInfo javaInfo = services.getJavaInfo();

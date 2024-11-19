@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
+import de.uka.ilkd.key.java.recoderext.mst.EmptyMSetLiteral;
 import de.uka.ilkd.key.util.Debug;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -81,6 +82,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                 case "\\TYPE" -> new DLEmbeddedExpression("any::ssort", Collections.emptyList());
                 case "\\free" -> new DLEmbeddedExpression("atom", Collections.emptyList());
                 case "\\map" -> EmptyMapLiteral.INSTANCE;
+                case "\\mset" -> EmptyMSetLiteral.INSTANCE;
                 default -> {
                     if (type.getName().startsWith("\\dl_")) {
                         // The default value of a type is resolved later, then we know the Sort of the

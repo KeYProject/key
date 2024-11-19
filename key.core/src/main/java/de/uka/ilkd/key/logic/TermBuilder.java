@@ -2040,6 +2040,10 @@ public class TermBuilder {
         return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
     }
 
+    public Term msetEmpty() {
+        return func(services.getTypeConverter().getMSetLDT().getMsetEmpty());
+    }
+
     public Term seqSingleton(Term x) {
         return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), x);
     }
@@ -2162,6 +2166,11 @@ public class TermBuilder {
     public Term seqDef(QuantifiableVariable qv, Term a, Term b, Term t) {
         return func(services.getTypeConverter().getSeqLDT().getSeqDef(), new Term[] { a, b, t },
             new ImmutableArray<>(qv));
+    }
+
+    public Term mset(QuantifiableVariable qv, Term a, Term b, Term t) {
+        return func(services.getTypeConverter().getMSetLDT().getMset(), new Term[] { a, b, t },
+                new ImmutableArray<>(qv));
     }
 
     public Term values() {
