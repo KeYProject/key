@@ -9,13 +9,17 @@ plugins {
 
 description "Verification server interface via JSON-RPC"
 
+application {
+    mainClass.set("org.keyproject.key.api.StartServer")
+}
+
 dependencies {
     api(project(":key.core"))
     api(project(":key.ui"))
 
-    api("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.21.1")
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:0.21.1")
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:0.21.1")
+    api("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.23.1")
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:0.23.1")
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:0.23.1")
     implementation("org.eclipse.jetty.websocket:websocket-javax-server:10.0.16")
     implementation("info.picocli:picocli:4.7.5")
 

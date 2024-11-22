@@ -149,7 +149,7 @@ public class StartServer implements Runnable {
 
 
     public static void configureJson(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeHierarchyAdapter(Object.class, new GenericSerializer());
+        // gsonBuilder.registerTypeHierarchyAdapter(Object.class, new GenericSerializer());
         gsonBuilder.registerTypeAdapter(File.class, new KeyAdapter.FileTypeAdapter());
         gsonBuilder.registerTypeAdapter(Throwable.class, new KeyAdapter.ThrowableAdapter());
     }
@@ -160,7 +160,7 @@ public class StartServer implements Runnable {
         var launcherBuilder = new Launcher.Builder<ClientApi>()
                 .setOutput(out)
                 .setInput(in)
-                .traceMessages(new PrintWriter(System.err))
+                // .traceMessages(new PrintWriter(System.err))
                 .validateMessages(true);
 
         launcherBuilder.configureGson(StartServer::configureJson);

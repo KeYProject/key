@@ -75,9 +75,9 @@ public class DocGen implements Supplier<String> {
                 out.format("Server.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
             case Metamodel.ClientRequest sr ->
                 out.format("Client.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
-            case Metamodel.ServerNotification _ ->
+            case Metamodel.ServerNotification ignored ->
                 out.format("Server.%s( %s ) **async**%n", endpoint.name(), a);
-            case Metamodel.ClientNotification _ ->
+            case Metamodel.ClientNotification ignored ->
                 out.format("Client.%s( %s ) **async**%n", endpoint.name(), a);
             default -> {
             }
