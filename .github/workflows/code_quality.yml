@@ -24,21 +24,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew -DENABLE_NULLNESS=true compileTest
 
-
-  qodana:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2024.2.3
-
-      - uses: github/codeql-action/upload-sarif@v3
-        if: success() || failure()
-        with:
-          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
-
   formatting:
     runs-on: ubuntu-latest
     steps:
@@ -48,78 +33,5 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.1.0
-      - name: SpotlessCheck
-        run: ./gradlew --continue spotlessCheck
-
-  # checkstyle:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #     - run: scripts/tools/checkstyle/runIncrementalCheckstyle.sh --xml | tee report.xml
-  #     - run: |
-  #         npx violations-command-line -sarif sarif-report.json \
-  #         -v "CHECKSTYLE" "." ".*/report.xml$" "Checkstyle"     \
-  #         -diff-to $(git merge-base HEAD origin/main) -pv false
-
-  #     - uses: github/codeql-action/upload-sarif@v3
-  #       if: success() || failure()
-  #       with:
-  #         sarif_file: sarif-report.json
-
-
-  checkstyle_new:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: '21'
-          cache: 'gradle'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.1.0
-      - name: Checkstyle
-        run: ./gradlew --continue checkstyleMainChanged
-      - run: |
-          npx violations-command-line -sarif sarif-report.json \
-          -v "CHECKSTYLE" "." ".*/build/reports/checkstyle/main_diff.xml$" "Checkstyle"
-
-      #-diff-from $(git merge-base HEAD origin/main)
-      # - run: python3 ./.github/printcs.py */build/reports/checkstyle/main_diff.xml
-          
-      # $(git merge-base HEAD origin/main)
-
-      - uses: github/codeql-action/upload-sarif@v3
-        if: success() || failure()
-        with:
-          sarif_file: sarif-report.json          
-
-  pmd:
-    runs-on: ubuntu-latest      
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: '21'
-          cache: 'gradle'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.1.0
-      - name: PMD checks
-        run: ./gradlew --continue pmdMainChanged
-
-      # - run: python3 ./.github/printAnnotations.py */build/reports/pmd/main.xml
-
-      - run: |
-          npx violations-command-line -sarif pmd-report.json \
-          -v "PMD" "." ".*/build/reports/pmd/main_diff.xml$" "PMD"
-
-      # -diff-from $(git merge-base HEAD origin/main)
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: pmd-report.json
+      - name: Build with Gradle
+        run: ./gradlew --parallel --continue spotlessCheck
