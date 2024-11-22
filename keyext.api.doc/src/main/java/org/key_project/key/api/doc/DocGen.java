@@ -1,6 +1,12 @@
-package org.key_project.key.api.doc;/* This file is part of KeY - https://key-project.org
+/* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
+package org.key_project.key.api.doc;/*
+                                     * This file is part of KeY - https://key-project.org
+                                     * KeY is licensed under the GNU General Public License Version
+                                     * 2
+                                     * SPDX-License-Identifier: GPL-2.0-only
+                                     */
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -67,8 +73,8 @@ public class DocGen implements Supplier<String> {
         switch (endpoint) {
             case Metamodel.ServerRequest sr -> out.format("Server.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
             case Metamodel.ClientRequest sr -> out.format("Client.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
-            case Metamodel.ServerNotification _ -> out.format("Server.%s( %s ) **async**%n", endpoint.name(), a);
-            case Metamodel.ClientNotification _ -> out.format("Client.%s( %s ) **async**%n", endpoint.name(), a);
+            case Metamodel.ServerNotification ignored -> out.format("Server.%s( %s ) **async**%n", endpoint.name(), a);
+            case Metamodel.ClientNotification ignored -> out.format("Client.%s( %s ) **async**%n", endpoint.name(), a);
             default -> {
             }
         }
@@ -88,9 +94,9 @@ public class DocGen implements Supplier<String> {
                     }
                     ```
                     """.formatted(type.name(),
-                    ot.fields().stream().sorted(Comparator.comparing(Metamodel.Field::name))
-                            .map(it -> "\t%s : %s".formatted(it.name(), it.type()))
-                            .collect(Collectors.joining("\n"))));
+                ot.fields().stream().sorted(Comparator.comparing(Metamodel.Field::name))
+                        .map(it -> "\t%s : %s".formatted(it.name(), it.type()))
+                        .collect(Collectors.joining("\n"))));
         }
 
         if (type instanceof Metamodel.EnumType et) {

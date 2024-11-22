@@ -1,30 +1,12 @@
-package org.key_project.key.api.doc;/* This file is part of KeY - https://key-project.org
+/* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-
-import com.github.javaparser.ParseProblemException;
-import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.comments.Comment;
-import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
-import com.github.javaparser.javadoc.Javadoc;
-import com.github.javaparser.javadoc.description.JavadocDescription;
-import com.github.javaparser.utils.SourceRoot;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializer;
-import de.uka.ilkd.key.proof.Proof;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
-import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
-import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-import org.keyproject.key.api.remoteapi.KeyApi;
-import org.keyproject.key.api.remoteclient.ClientApi;
-import picocli.CommandLine;
-import picocli.CommandLine.Option;
+package org.key_project.key.api.doc;/*
+                                     * This file is part of KeY - https://key-project.org
+                                     * KeY is licensed under the GNU General Public License Version
+                                     * 2
+                                     * SPDX-License-Identifier: GPL-2.0-only
+                                     */
 
 import java.io.File;
 import java.io.IOException;
@@ -38,15 +20,40 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import de.uka.ilkd.key.proof.Proof;
+
+import com.github.javaparser.ParseProblemException;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
+import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.javadoc.description.JavadocDescription;
+import com.github.javaparser.utils.SourceRoot;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
+import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
+import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.keyproject.key.api.remoteapi.KeyApi;
+import org.keyproject.key.api.remoteclient.ClientApi;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
+
 /**
  * @author Alexander Weigl
  * @version 1 (14.10.23)
  */
 @NullMarked
 @CommandLine.Command(name = "gendoc",
-        mixinStandardHelpOptions = true,
-        version = "gendoc 1.0",
-        description = "Generates the documentation for key.api")
+    mixinStandardHelpOptions = true,
+    version = "gendoc 1.0",
+    description = "Generates the documentation for key.api")
 public class ExtractMetaData implements Callable<Integer> {
     private final List<Metamodel.Endpoint> endpoints = new LinkedList<>();
     private final List<Metamodel.Type> types = new LinkedList<>();
@@ -54,10 +61,10 @@ public class ExtractMetaData implements Callable<Integer> {
     private SourceRoot sourceRoot = new SourceRoot(Paths.get("."));
 
 
-    @Option(names = {"-s", "--source"}, description = "Source folder for getting JavaDoc")
+    @Option(names = { "-s", "--source" }, description = "Source folder for getting JavaDoc")
     private @Nullable Path source = Paths.get("keyext.api", "src", "main", "java");
 
-    @Option(names = {"-o", "--output"}, description = "Output folder")
+    @Option(names = { "-o", "--output" }, description = "Output folder")
     private Path output = Paths.get("out");
 
     public static void main(String[] args) {
@@ -108,17 +115,19 @@ public class ExtractMetaData implements Callable<Integer> {
     private static Gson getGson() {
         return new GsonBuilder()
                 .setPrettyPrinting()
-                .registerTypeAdapter(Type.class, (JsonSerializer<Metamodel.Type>) (src, typeOfSrc, context) -> {
-                    JsonObject json = (JsonObject) context.serialize(src);
-                    json.addProperty("kind", src.kind());
-                    return json;
-                })
+                .registerTypeAdapter(Type.class,
+                    (JsonSerializer<Metamodel.Type>) (src, typeOfSrc, context) -> {
+                        JsonObject json = (JsonObject) context.serialize(src);
+                        json.addProperty("kind", src.kind());
+                        return json;
+                    })
                 .create();
     }
 
     private void addServerEndpoint(Method method) {
         var jsonSegment = method.getDeclaringClass().getAnnotation(JsonSegment.class);
-        if (jsonSegment == null) return;
+        if (jsonSegment == null)
+            return;
         var segment = jsonSegment.value();
 
         var req = method.getAnnotation(JsonRequest.class);
@@ -221,8 +230,8 @@ public class ExtractMetaData implements Callable<Integer> {
         final var documentation = findDocumentation(type);
         if (type.isEnum())
             return new Metamodel.EnumType(type.getSimpleName(),
-                    Arrays.stream(type.getEnumConstants()).map(Object::toString).toList(),
-                    documentation);
+                Arrays.stream(type.getEnumConstants()).map(Object::toString).toList(),
+                documentation);
 
 
         var obj = new Metamodel.ObjectType(type.getSimpleName(), new ArrayList<>(), documentation);
@@ -242,7 +251,8 @@ public class ExtractMetaData implements Callable<Integer> {
 
     private Optional<TypeDeclaration<?>> findCompilationUnit(Class<?> type) {
         try {
-            return sourceRoot.parse(type.getPackageName(), type.getSimpleName() + ".java").getPrimaryType();
+            return sourceRoot.parse(type.getPackageName(), type.getSimpleName() + ".java")
+                    .getPrimaryType();
         } catch (ParseProblemException e) {
             return Optional.empty();
         }
@@ -277,7 +287,7 @@ public class ExtractMetaData implements Callable<Integer> {
     }
 
     private static String callMethodName(String method, String segment, @Nullable String userValue,
-                                         boolean useSegment) {
+            boolean useSegment) {
         if (!useSegment) {
             if (userValue == null || userValue.isBlank()) {
                 return method;
@@ -298,7 +308,7 @@ public class ExtractMetaData implements Callable<Integer> {
             return getOrFindType(c);
         if (genericReturnType instanceof ParameterizedType pt) {
             if (Objects.equals(pt.getRawType().getTypeName(),
-                    CompletableFuture.class.getTypeName())) {
+                CompletableFuture.class.getTypeName())) {
                 return getOrFindType(pt.getActualTypeArguments()[0]);
             }
             if (Objects.equals(pt.getRawType().getTypeName(), List.class.getTypeName())) {

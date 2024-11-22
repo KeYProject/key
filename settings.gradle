@@ -14,9 +14,13 @@ include 'keyext.ui.testgen'
 include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
+include 'keyext.caching'
+
 include 'keyext.api'
 include 'keyext.api.doc'
-include 'keyext.caching'
+include 'keyext.client.java'
+
+
 
 // ENABLE NULLNESS here or on the CLI
 // This flag is activated to enable the checker framework.

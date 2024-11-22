@@ -1,6 +1,13 @@
-package org.key_project.key.api.doc;/* This file is part of KeY - https://key-project.org
+/* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
+package org.key_project.key.api.doc;/*
+                                     * This file is part of KeY - https://key-project.org
+                                     * KeY is licensed under the GNU General Public License Version
+                                     * 2
+                                     * SPDX-License-Identifier: GPL-2.0-only
+                                     */
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Comparator;
@@ -57,7 +64,7 @@ public abstract class PythonGenerator implements Supplier<String> {
         if (t instanceof Metamodel.BuiltinType bt) {
             return switch (bt) {
             case INT, LONG -> "int";
-                case STRING -> "str";
+            case STRING -> "str";
             case BOOL -> "bool";
             case DOUBLE -> "float";
             };

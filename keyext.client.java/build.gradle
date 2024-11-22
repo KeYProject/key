@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainClass = 'edu.kit.iti.formal.keyextclientjava.HelloApplication'
+}
+
+javafx {
+    version = '21.0.5'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+dependencies {
+    implementation('org.controlsfx:controlsfx:11.2.1')
+    implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1')
+    implementation('org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1')
+    implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
+    implementation('com.google.code.gson:gson:2.11.0')
+}
+
+test {
+    useJUnitPlatform()
+}
