@@ -34,11 +34,11 @@ import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
 import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 
-import org.key_project.dockingframes.common.common.action.CAction;
-import org.key_project.dockingframes.common.common.action.CDropDownButton;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CDropDownButton;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;

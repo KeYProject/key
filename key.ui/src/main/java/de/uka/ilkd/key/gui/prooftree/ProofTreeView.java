@@ -40,9 +40,9 @@ import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
 import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.ui.util.ThreadUtilities;
 
-import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.util.collection.ImmutableList;
 
+import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

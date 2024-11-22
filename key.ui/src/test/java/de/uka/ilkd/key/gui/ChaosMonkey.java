@@ -22,8 +22,7 @@ import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.ui.core.Main;
 import de.uka.ilkd.key.ui.util.SwingUtil;
 
-import org.key_project.dockingframes.core.gui.dock.dockable.AbstractDockable;
-
+import bibliothek.gui.dock.dockable.AbstractDockable;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

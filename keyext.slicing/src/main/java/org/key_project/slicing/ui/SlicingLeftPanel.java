@@ -35,7 +35,6 @@ import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
 import de.uka.ilkd.key.ui.core.KeYSelectionListener;
 import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 
-import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
@@ -44,6 +43,7 @@ import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 
+import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

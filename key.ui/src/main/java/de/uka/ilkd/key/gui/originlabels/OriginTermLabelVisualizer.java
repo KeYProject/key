@@ -31,10 +31,11 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
-import org.key_project.dockingframes.common.common.DefaultSingleCDockable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 
 /**

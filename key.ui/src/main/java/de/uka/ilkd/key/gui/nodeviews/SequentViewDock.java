@@ -16,9 +16,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.ui.core.KeYSelectionModel;
 
-import org.key_project.dockingframes.common.common.CLocation;
-import org.key_project.dockingframes.common.common.DefaultMultipleCDockable;
-import org.key_project.dockingframes.common.common.NullMultipleCDockableFactory;
+import bibliothek.gui.dock.common.CLocation;
+import bibliothek.gui.dock.common.DefaultMultipleCDockable;
+import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
 
 
 /**
