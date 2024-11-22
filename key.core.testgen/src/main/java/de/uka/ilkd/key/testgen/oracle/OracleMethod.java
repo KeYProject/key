@@ -5,9 +5,15 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import java.util.List;
 
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
-
 import org.key_project.logic.sort.Sort;
+
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
+import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.testgen.Constants.TAB;
 
 public class OracleMethod {
 
@@ -17,17 +23,16 @@ public class OracleMethod {
 
     private final String body;
 
+    @Nullable
     private Sort returnType;
 
     public OracleMethod(String methodName, List<OracleVariable> args, String body) {
-        super();
         this.methodName = methodName;
         this.args = args;
         this.body = body;
     }
 
     public OracleMethod(String methodName, List<OracleVariable> args, String body, Sort sort) {
-        super();
         this.methodName = methodName;
         this.args = args;
         this.body = body;
@@ -46,9 +51,25 @@ public class OracleMethod {
         return body;
     }
 
+    public MethodSpec build() {
+        TypeName retType = TypeName.BOOLEAN;
+        if (returnType != null) {
+            retType = ClassName.get("", returnType.name().toString());
+        }
+
+        Iterable<ParameterSpec> params = args.stream().map(
+            it -> ParameterSpec.builder(ClassName.get("", it.sort().name().toString()),
+                it.name()).build()).toList();
+
+        var m = MethodSpec.methodBuilder(methodName)
+                .returns(retType)
+                .addParameters(params)
+                .addStatement(body);
+        return m.build();
+    }
+
     @Override
     public String toString() {
-        String tab = TestCaseGenerator.TAB;
         StringBuilder argString = new StringBuilder();
 
         for (OracleVariable var : args) {
@@ -62,8 +83,8 @@ public class OracleMethod {
         if (returnType != null) {
             retType = returnType.name().toString();
         }
-        return tab + "public " + retType + " " + methodName + "(" + argString + "){\n" + tab + tab
-            + body + "\n" + tab + "}";
+        return "%spublic %s %s(%s){\n%s%s%s\n%s}".formatted(TAB, retType, methodName, argString,
+            TAB, TAB, body, TAB);
 
     }
 }

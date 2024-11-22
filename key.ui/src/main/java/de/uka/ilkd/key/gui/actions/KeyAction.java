@@ -10,6 +10,8 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
 /**
@@ -63,11 +65,11 @@ public abstract class KeyAction extends AbstractAction {
         return (String) getValue(NAME);
     }
 
-    protected void setName(String name) {
+    protected void setName(@UnknownInitialization KeyAction this, String name) {
         putValue(NAME, name);
     }
 
-    protected void setAcceleratorLetter(int letter) {
+    protected void setAcceleratorLetter(@UnknownInitialization KeyAction this, int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }
 
@@ -87,7 +89,7 @@ public abstract class KeyAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    protected void lookupAcceleratorKey() {
+    protected void lookupAcceleratorKey(@UnknownInitialization KeyAction this) {
         KeyStrokeManager.lookupAndOverride(this);
     }
 
@@ -99,11 +101,11 @@ public abstract class KeyAction extends AbstractAction {
         return (String) getValue(Action.SHORT_DESCRIPTION);
     }
 
-    protected void setTooltip(String toolTip) {
+    protected void setTooltip(@UnknownInitialization KeyAction this, String toolTip) {
         putValue(Action.SHORT_DESCRIPTION, toolTip);
     }
 
-    protected void setIcon(Icon icon) {
+    protected void setIcon(@UnknownInitialization KeyAction this, Icon icon) {
         putValue(SMALL_ICON, icon);
     }
 
@@ -139,7 +141,7 @@ public abstract class KeyAction extends AbstractAction {
         return (String) getValue(PATH);
     }
 
-    protected void setMenuPath(String path) {
+    protected void setMenuPath(@UnknownInitialization KeyAction this, String path) {
         putValue(PATH, path);
     }
 
