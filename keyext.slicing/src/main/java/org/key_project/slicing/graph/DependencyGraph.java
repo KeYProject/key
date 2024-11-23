@@ -129,6 +129,7 @@ public class DependencyGraph {
     public record Edge(Node fromNode, GraphNode toNode, AnnotatedEdge annotation) {}
 
     /**
+     * Returns the incoming edges of the given node.
      * @param node a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
@@ -153,6 +154,8 @@ public class DependencyGraph {
     }
 
     /**
+     * Returns the outgoing edges of the given node.
+     *
      * @param node a graph node
      * @return the outgoing (graph edges, graph targets) of that node
      */
