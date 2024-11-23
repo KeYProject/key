@@ -134,6 +134,12 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
         return false;
     }
 
+    /**
+     *
+     * @param result
+     * @param conditions
+     * @param node
+     */
     public record ResultsAndCondition(Term result, Set<Term> conditions, Node node) {
     }
 }
