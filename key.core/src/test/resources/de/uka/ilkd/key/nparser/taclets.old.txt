@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Wed Jun 26 12:45:30 CEST 2024
+# Date: Tue Aug 06 18:14:22 CEST 2024
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -3733,7 +3733,7 @@ compound_assignment_3_mixed {
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
-== compound_assignment_3_nonsimple (compound_assignment) =========================================
+== compound_assignment_3_nonsimple (assignment_and) =========================================
 compound_assignment_3_nonsimple {
 \find(#allmodal ((modal operator))|{{ ..
   #lhs = #exBool0 && #nseBool1;
@@ -3743,7 +3743,7 @@ compound_assignment_3_nonsimple {
   else #lhs = #nseBool1;
 ... }}| (post)) 
 \heuristics(split_if, simplify_expression)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == compound_assignment_3_simple (assignment_and) =========================================
 compound_assignment_3_simple {
@@ -3768,7 +3768,7 @@ compound_assignment_4_nonsimple {
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
-== compound_assignment_4_simple (assignment_and) =========================================
+== compound_assignment_4_simple (bitwise_and) =========================================
 compound_assignment_4_simple {
 \find(#allmodal ((modal operator))|{{ ..
   #lhs = #seBool0 & #seBool1;
@@ -3790,7 +3790,7 @@ compound_assignment_5_mixed {
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
-== compound_assignment_5_nonsimple (compound_assignment) =========================================
+== compound_assignment_5_nonsimple (assignment_or) =========================================
 compound_assignment_5_nonsimple {
 \find(#allmodal ((modal operator))|{{ ..
   #lhs = #exBool0 || #nseBool1;
@@ -3800,7 +3800,7 @@ compound_assignment_5_nonsimple {
   else #lhs = #nseBool1;
 ... }}| (post)) 
 \heuristics(split_if, simplify_expression)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == compound_assignment_5_simple (assignment_or) =========================================
 compound_assignment_5_simple {
@@ -3825,7 +3825,7 @@ compound_assignment_6_nonsimple {
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
-== compound_assignment_6_simple (assignment_or) =========================================
+== compound_assignment_6_simple (bitwise_or) =========================================
 compound_assignment_6_simple {
 \find(#allmodal ((modal operator))|{{ ..
   #lhs = #seBool0 | #seBool1;
@@ -5032,17 +5032,17 @@ condition {
   }
 ... }}| (post)) 
 \heuristics(split_if, simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == condition_not_simple (condition) =========================================
 condition_not_simple {
 \find(#allmodal ((modal operator))|{{ ..
-  #lhs = #nse ? #se1 : #se2;
+  #lhs = #nse ? #e1 : #e2;
 ... }}| (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
-  #lhs = #v0 ? #se1 : #se2;
+  #lhs = #v0 ? #e1 : #e2;
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -9922,7 +9922,7 @@ if {
   #s0
 ... }}| (post),#allmodal(post))) 
 
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElse (ifElse) =========================================
 ifElse {
@@ -9936,7 +9936,7 @@ ifElse {
   #s1
 ... }}| (post))) 
 
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseFalse (ifElseFalse) =========================================
 ifElseFalse {
@@ -9949,7 +9949,7 @@ ifElseFalse {
   #s1
 ... }}| (post)]) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseSkipElse (ifElseSkipElse) =========================================
 ifElseSkipElse {
@@ -9963,7 +9963,7 @@ ifElseSkipElse {
   #s0
 ... }}| (post)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseSkipElseConditionInBlock (ifElseSkipElse) =========================================
 ifElseSkipElseConditionInBlock {
@@ -9981,7 +9981,7 @@ ifElseSkipElseConditionInBlock {
   #s0
 ... }}| (post)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseSkipThen (ifElseSkipThen) =========================================
 ifElseSkipThen {
@@ -9995,7 +9995,7 @@ ifElseSkipThen {
   #s1
 ... }}| (post)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseSkipThenConditionInBlock (ifElseSkipThen) =========================================
 ifElseSkipThenConditionInBlock {
@@ -10013,7 +10013,7 @@ ifElseSkipThenConditionInBlock {
   #s1
 ... }}| (post)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseSplit (ifElseSplit) =========================================
 ifElseSplit {
@@ -10028,7 +10028,7 @@ ifElseSplit {
   #s0
 ... }}| (post)]) 
 \heuristics(split_if)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseSplitLeft (ifElseSplitLeft) =========================================
 ifElseSplitLeft {
@@ -10043,7 +10043,7 @@ ifElseSplitLeft {
   #s0
 ... }}| (post)]==>[]) 
 \heuristics(split_if)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseTrue (ifElseTrue) =========================================
 ifElseTrue {
@@ -10056,7 +10056,7 @@ ifElseTrue {
   #s0
 ... }}| (post)]) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifElseUnfold (ifElseUnfold) =========================================
 ifElseUnfold {
@@ -10087,7 +10087,7 @@ ifEnterThen {
   #s0
 ... }}| (post)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifEnterThenConditionInBlock (ifEnterThen) =========================================
 ifEnterThenConditionInBlock {
@@ -10104,7 +10104,7 @@ ifEnterThenConditionInBlock {
   #s0
 ... }}| (post)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifEqualsInteger (ifEqualsInteger) =========================================
 ifEqualsInteger {
@@ -10281,7 +10281,7 @@ ifFalse {
 ... }}| (post))
 \replacewith([]==>[#allmodal(post)]) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifSkipThen (ifSkipThen) =========================================
 ifSkipThen {
@@ -10293,7 +10293,7 @@ ifSkipThen {
   #loc = false;
 ... }}| (post)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifSkipThenConditionInBlock (ifSkipThen) =========================================
 ifSkipThenConditionInBlock {
@@ -10309,7 +10309,7 @@ ifSkipThenConditionInBlock {
   }
 ... }}| (post)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifSplit (ifElseSplit) =========================================
 ifSplit {
@@ -10321,7 +10321,7 @@ ifSplit {
   #s0
 ... }}| (post)]) 
 \heuristics(split_if)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifSplitLeft (ifSplitLeft) =========================================
 ifSplitLeft {
@@ -10333,7 +10333,7 @@ ifSplitLeft {
   #s0
 ... }}| (post)]==>[]) 
 \heuristics(split_if)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifTrue (ifTrue) =========================================
 ifTrue {
@@ -10345,7 +10345,7 @@ ifTrue {
   #s0
 ... }}| (post)]) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == ifUnfold (ifElseUnfold) =========================================
 ifUnfold {
@@ -17142,7 +17142,7 @@ switch {
   switch-to-if(#sw)
 ... }}| (post)) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == switch_brackets (switch_brackets) =========================================
 switch_brackets {
@@ -17857,7 +17857,7 @@ tryCatchFinallyThrow {
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == tryCatchThrow (tryCatchThrow) =========================================
 tryCatchThrow {
@@ -17885,7 +17885,7 @@ tryCatchThrow {
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == tryEmpty (tryEmpty) =========================================
 tryEmpty {
@@ -18015,7 +18015,7 @@ tryFinallyThrow {
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == tryMultipleCatchThrow (tryCatchThrow) =========================================
 tryMultipleCatchThrow {
@@ -18051,7 +18051,7 @@ tryMultipleCatchThrow {
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & tracing:off)}
 -----------------------------------------------------
 == tryReturn (tryReturn) =========================================
 tryReturn {
