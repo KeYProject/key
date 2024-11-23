@@ -221,17 +221,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                if (problemLoader.hasProofScript()) {
-                    ProofScriptEntry scriptAndLoc;
-                    try {
-                        scriptAndLoc = problemLoader.readProofScript();
-                        ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                            scriptAndLoc.script(), scriptAndLoc.location());
-                        psw.init();
-                        psw.execute();
-                    } catch (ProofInputException e) {
-                        LOGGER.warn("Failed to load proof", e);
-                    }
+                ProofScriptEntry scriptAndLoc = problemLoader.readProofScript();
+                if (scriptAndLoc != null) {
+                    ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
+                        scriptAndLoc.script(), scriptAndLoc.location());
+                    psw.init();
+                    psw.execute();
                 } else if (macroChosen()) {
                     applyMacro();
                 }

@@ -110,9 +110,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
             DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
-            cond = distFormAndRightSidesForITEUpd.first();
-            ifForm = distFormAndRightSidesForITEUpd.second();
-            elseForm = distFormAndRightSidesForITEUpd.third();
+            cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            elseForm = distFormAndRightSidesForITEUpd.elseTerm();
         } else {
             cond = distinguishingFormula;
             ifForm = ifTerm;
@@ -131,8 +131,10 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * <code>{ v := \if (c1) \then (t1) \else (t2) }</code>, where c1 is the path condition of
      * state1. However, the method also tries an optimization: The path condition c2 of state2 could
      * be used if it is shorter than c1. Moreover, equal parts of c1 and c2 could be omitted, since
-     * the condition shall only distinguish between the states. The first element of the triple is
-     * the discriminating condition, the second and third elements are the respective parts for the
+     * the condition shall only distinguish between the states. The distinguishingFormula element of
+     * the triple is
+     * the discriminating condition, the ifTerm and elseTerm elements are the respective parts for
+     * the
      * if and else branch.
      *
      * @param v Variable to return the update for.
@@ -140,10 +142,14 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * @param state2 Second state to evaluate.
      * @param services The services object.
      * @return Input to construct an elementary update like
-     *         <code>{ v := \if (first) \then (second) \else (third) }</code>, where first, second
-     *         and third are the respective components of the returned triple. The fourth component
-     *         indicates whether the path condition of the first (fourth component = false) or the
-     *         second (fourth component = true) state was used as a basis for the condition (first
+     *         <code>{ v := \if (distinguishingFormula) \then (ifTerm) \else (elseTerm) }</code>,
+     *         where distinguishingFormula, ifTerm
+     *         and elseTerm are the respective components of the returned triple. The sideCommuted
+     *         component
+     *         indicates whether the path condition of the distinguishingFormula (sideCommuted
+     *         component = false) or the
+     *         ifTerm (sideCommuted component = true) state was used as a basis for the condition
+     *         (distinguishingFormula
      *         component).
      */
     static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
@@ -168,13 +174,16 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     /**
-     * Creates the input for an if-then-else update. The elements of the resulting quadruple can be
+     * Creates the input for an if-then-else update. The elements of the resulting
+     * {@link DistanceFormRightSide} can be
      * used to construct an elementary update corresponding to
      * <code>{ v := \if (c1) \then (ifTerm) \else (elseTerm) }</code>, where c1 is the path
      * condition of state1. However, the method also tries an optimization: The path condition c2 of
      * state2 could be used if it is shorter than c1. Moreover, equal parts of c1 and c2 could be
-     * omitted, since the condition shall only distinguish between the states. The first element of
-     * the triple is the discriminating condition, the second and third elements are the respective
+     * omitted, since the condition shall only distinguish between the states. The
+     * distinguishingFormula element of
+     * the triple is the discriminating condition, the ifTerm and elseTerm elements are the
+     * respective
      * parts for the if and else branch.
      *
      * @param state1 First state to evaluate.
@@ -183,10 +192,14 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * @param elseTerm The else term.
      * @param services The services object.
      * @return Input to construct an elementary update like
-     *         <code>{ v := \if (first) \then (second) \else (third) }</code>, where first, second
-     *         and third are the respective components of the returned triple. The fourth component
-     *         indicates whether the path condition of the first (fourth component = false) or the
-     *         second (fourth component = true) state was used as a basis for the condition (first
+     *         <code>{ v := \if (distinguishingFormula) \then (ifTerm) \else (elseTerm) }</code>,
+     *         where distinguishingFormula, ifTerm
+     *         and elseTerm are the respective components of the returned triple. The sideCommuted
+     *         component
+     *         indicates whether the path condition of the distinguishingFormula (sideCommuted
+     *         component = false) or the
+     *         ifTerm (sideCommuted component = true) state was used as a basis for the condition
+     *         (distinguishingFormula
      *         component).
      */
     static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
@@ -255,6 +268,26 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         return DISPLAY_NAME;
     }
 
-    public record DistanceFormRightSide(Term first, Term second, Term third, boolean fourth) {
+    /**
+     * Represents the distance between formulas for an if-then-else update.
+     * Input to construct an elementary update like
+     * <code>{ v := \if (distinguishingFormula) \then (ifTerm) \else (elseTerm) }</code>, where
+     * distinguishingFormula, ifTerm
+     * and elseTerm are the respective components of the returned triple. The sideCommuted component
+     * indicates whether the path condition of the distinguishingFormula (sideCommuted component =
+     * false) or the
+     * ifTerm (sideCommuted component = true) state was used as a basis for the condition
+     * (distinguishingFormula
+     * component).
+     *
+     * @param distinguishingFormula a formula
+     * @param ifTerm a term
+     * @param elseTerm a term
+     * @param sideCommuted true if ifTerm and elseTerm have been swapped.
+     * @see #createDistFormAndRightSidesForITEUpd(SymbolicExecutionState, SymbolicExecutionState,
+     *      Term, Term, Services)
+     */
+    public record DistanceFormRightSide(Term distinguishingFormula, Term ifTerm, Term elseTerm,
+            boolean sideCommuted) {
     }
 }

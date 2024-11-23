@@ -83,7 +83,14 @@ public class ProofDifference {
         return current;
     }
 
-    public record QueueEntry(int idxLeft, int idxRight, int distance) {}
+    /**
+     * Entry in the search queue.
+     *
+     * @param idxLeft index of the left candidate
+     * @param idxRight index of the right candidate
+     * @param distance measure of difference between candidates
+     */
+    private record QueueEntry(int idxLeft, int idxRight, int distance) {}
 
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
@@ -102,7 +109,7 @@ public class ProofDifference {
         while (!queue.isEmpty()) {
             QueueEntry t = queue.poll();
             /*
-             * if(t.third>=THRESHOLD) { break; }
+             * if(t.elseTerm>=THRESHOLD) { break; }
              */
             if (!matchedLeft[t.idxLeft] && !matchedRight[t.idxRight]) {
                 String l = left.get(t.idxLeft);

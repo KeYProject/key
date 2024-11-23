@@ -111,7 +111,7 @@ public class IntermediateProofReplayer {
     private final LinkedList<Pair<Node, NodeIntermediate>> queue =
         new LinkedList<>();
 
-    public record PartnerNode(Node first, PosInOccurrence second, NodeIntermediate third) {}
+    private record PartnerNode(Node first, PosInOccurrence second, NodeIntermediate third) {}
 
     /** Maps join node IDs to previously seen join partners */
     private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();

@@ -404,7 +404,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         existingPredefs[0] = "Defaults";
 
         int i = 1;
-        for (StrategySettingsDefinition.StategySettingEntry furtherDefault : DEFINITION
+        for (StrategySettingsDefinition.StrategySettingEntry furtherDefault : DEFINITION
                 .getFurtherDefaults()) {
             existingPredefs[i] = furtherDefault.name();
             i++;

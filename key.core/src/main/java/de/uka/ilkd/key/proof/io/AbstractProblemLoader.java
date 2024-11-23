@@ -260,7 +260,6 @@ public abstract class AbstractProblemLoader {
      *
      * @param callbackProofLoaded optional callback, called when the proof is loaded but not yet
      *        replayed
-     *
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
@@ -659,20 +658,22 @@ public abstract class AbstractProblemLoader {
         return false;
     }
 
-    public @Nullable ProofScriptEntry readProofScript() throws ProofInputException {
-        KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-        return kupf.readProofScript();
+    /**
+     * same as {@link #getProofScript()}
+     */
+    public @Nullable ProofScriptEntry readProofScript() {
+        return getProofScript();
     }
 
-    public @Nullable ProofScriptEntry getProofScript() throws ProblemLoaderException {
+    /**
+     * Returns a {@link ProofScriptEntry} if {@code \proofscript} is given with the problem.
+     */
+    public @Nullable ProofScriptEntry getProofScript() {
         if (!hasProofScript()) {
             return null;
         }
-        try {
-            return readProofScript();
-        } catch (ProofInputException e) {
-            throw new ProblemLoaderException(this, e);
-        }
+        KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+        return kupf.readProofScript();
     }
 
     private ReplayResult replayProof(Proof proof) {

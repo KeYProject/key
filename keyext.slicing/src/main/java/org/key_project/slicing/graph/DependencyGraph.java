@@ -130,6 +130,7 @@ public class DependencyGraph {
 
     /**
      * Returns the incoming edges of the given node.
+     *
      * @param node a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
