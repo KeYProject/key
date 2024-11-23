@@ -303,6 +303,8 @@ public class JmlIO {
      * <p>
      * Note (weigl): No label is currently attached.
      *
+     * @param ctx a context
+     * @return {@link #translateDependencyContract(ParserRuleContext)}
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
     public TranslatedDependencyContract translateDependencyContract(LabeledParserRuleContext ctx) {

@@ -62,16 +62,15 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
  * Base for implementing merge rules. Extend this class, implement method mergeValuesInStates(...)
  * and register in class JavaProfile.
  * <p>
- *
+ * <p>
  * The rule is applicable if the chosen subterm has the form { x := v || ... } PHI and there are
  * potential merge candidates.
  * <p>
- *
+ * <p>
  * Any rule application returned will be incomplete; completion is handled by
  * de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion.
  *
  * @author Dominic Scheurer
- *
  * @see MergeRuleUtils
  * @see MergeTotalWeakening
  * @see MergeByIfThenElse
@@ -95,7 +94,7 @@ public class MergeRule implements BuiltInRule {
     /**
      * Thresholds the maximum depth of right sides in updates for which an equivalence proof is
      * started.
-     *
+     * <p>
      * We skip the check for equal valuation of this variable if the depth threshold is exceeded by
      * one of the right sides. Experiments show a very big time overhead from a depth of about 8-10
      * on, or sometimes even earlier.
@@ -186,10 +185,10 @@ public class MergeRule implements BuiltInRule {
             MergeStateEntry mergeResult =
                 mergeStates(mergeRule, mergedState, state, thisSEState.programCounter(),
                     mergeRuleApp.getDistinguishingFormula(), services);
-            newNames.addAll(mergeResult.second);
-            sideConditionsToProve.addAll(mergeResult.third);
+            newNames.addAll(mergeResult.newIntroducedNames);
+            sideConditionsToProve.addAll(mergeResult.sideConditionsToProve);
 
-            mergedState = mergeResult.first;
+            mergedState = mergeResult.newSymbolicState;
             mergedState.setCorrespondingNode(newGoal.node());
         }
 
@@ -378,7 +377,7 @@ public class MergeRule implements BuiltInRule {
 
             if (proofClosed) {
 
-                // Arbitrary choice: Take value of first state if
+                // Arbitrary choice: Take value of distinguishingFormula state if
                 // this does not equal the program variable itself
                 if (!rightSide1.equals(tb.var(v))) {
                     newElementaryUpdates =
@@ -451,14 +450,14 @@ public class MergeRule implements BuiltInRule {
      * Merges two heaps in a zip-like procedure. The fallback is an if-then-else construct that is
      * tried to be shifted as far inwards as possible.
      * <p>
-     *
+     * <p>
      * Override this method for specialized heap merge procedures.
      *
      * @param heapVar The heap variable for which the values should be merged.
-     * @param heap1 The first heap term.
-     * @param heap2 The second heap term.
-     * @param state1 SE state for the first heap term.
-     * @param state2 SE state for the second heap term
+     * @param heap1 The distinguishingFormula heap term.
+     * @param heap2 The ifTerm heap term.
+     * @param state1 SE state for the distinguishingFormula heap term.
+     * @param state2 SE state for the ifTerm heap term
      * @param services The services object.
      * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
      *        automatic generation).
@@ -715,6 +714,17 @@ public class MergeRule implements BuiltInRule {
         void signalProgress(int progress);
     }
 
-    public record MergeStateEntry(SymbolicExecutionState first, LinkedHashSet<Name> second,
-            LinkedHashSet<Term> third) {}
+    /**
+     * Represents the result for merging to states.
+     *
+     * @param newSymbolicState the new state
+     * @param newIntroducedNames newly introduced names
+     * @param sideConditionsToProve side condition required for merging
+     * @see #mergeStates(MergeProcedure, SymbolicExecutionState, SymbolicExecutionState, Term, Term,
+     *      Services)
+     */
+    public record MergeStateEntry(SymbolicExecutionState newSymbolicState,
+            LinkedHashSet<Name> newIntroducedNames,
+            LinkedHashSet<Term> sideConditionsToProve) {
+    }
 }

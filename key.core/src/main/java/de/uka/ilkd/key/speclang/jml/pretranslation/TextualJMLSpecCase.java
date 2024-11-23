@@ -204,6 +204,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addClause(REQUIRES, label);
     }
 
+    /**
+     * An abbreviation is a short-name for a term. Currently unused during the JML translation.
+     * A relict from older days ({@link #getAbbreviations()}.
+     *
+     * @param typeName name of the type
+     * @param abbrevName the short-representation of the term
+     * @param abbreviatedTerm the term to be abbreviated.
+     */
     public record Abbreviation(LabeledParserRuleContext typeName,
             LabeledParserRuleContext abbrevName,
             LabeledParserRuleContext abbreviatedTerm) {}

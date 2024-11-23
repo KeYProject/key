@@ -85,6 +85,16 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return settings;
         }
 
+        /**
+         * Returns the a {@link ProofScriptEntry} from the underlying AST if an {@code \proofscript}
+         * entry is present.
+         * The {@code url} is used as the source of input and might be later used for error message,
+         * or including
+         * other files.
+         *
+         * @param url location pointing to the source of the AST
+         * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
+         */
         public @Nullable ProofScriptEntry findProofScript(URI url) {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();

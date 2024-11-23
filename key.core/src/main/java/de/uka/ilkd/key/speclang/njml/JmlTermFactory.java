@@ -1029,6 +1029,15 @@ public final class JmlTermFactory {
         return new Pair<>((IObserverFunction) lhs.getTerm().op(), t);
     }
 
+    /**
+     * Translates the dependency clause ({@code accessible rhs := mby \measured_by mby}) into a
+     * dependency contract.
+     *
+     * @param lhs left-hand side of the clause
+     * @param rhs right-hand side of the clause
+     * @param mby measured by term, can be omitted
+     * @return {@link TranslatedDependencyContract}
+     */
     public TranslatedDependencyContract depends(SLExpression lhs, Term rhs, SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 

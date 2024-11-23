@@ -1232,7 +1232,8 @@ public class JMLSpecFactory {
 
         // translateToTerm expression
         var dep = new JmlIO(services).context(context).translateDependencyContract(originalDep);
-        return cf.dep(kjt, targetHeap, dep, dep.first().isStatic() ? null : context.selfVar());
+        return cf.dep(kjt, targetHeap, dep,
+            dep.observerFunction().isStatic() ? null : context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {

@@ -25,18 +25,6 @@ import org.jspecify.annotations.Nullable;
 public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition, Term programCounter,
                                                 @Nullable Node correspondingNode) {
     /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     * @param programCounter The program counter: Formula with non-empty Java block and post
-     *        condition as only sub term.
-     */
-    public SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition, Term programCounter) {
-        this(symbolicState, pathCondition, programCounter, null);
-    }
-
-
-
-    /**
      * @return The symbolic state.
      */
     public Term getSymbolicState() {

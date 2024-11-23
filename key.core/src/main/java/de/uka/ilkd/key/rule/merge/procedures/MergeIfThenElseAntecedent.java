@@ -106,10 +106,10 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
                 MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
                     elseTerm, services);
 
-            final Term cond = distFormAndRightSidesForITEUpd.first();
-            final Term ifForm = distFormAndRightSidesForITEUpd.second();
-            final Term elseForm = distFormAndRightSidesForITEUpd.third();
-            final boolean isSwapped = distFormAndRightSidesForITEUpd.fourth();
+            final Term cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            final Term ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            final Term elseForm = distFormAndRightSidesForITEUpd.elseTerm();
+            final boolean isSwapped = distFormAndRightSidesForITEUpd.sideCommuted();
 
             final Term varEqualsIfForm = tb.equals(constrained, ifForm);
             final Term varEqualsElseForm = tb.equals(constrained, elseForm);

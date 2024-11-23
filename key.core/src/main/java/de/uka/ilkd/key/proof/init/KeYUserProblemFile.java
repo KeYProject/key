@@ -172,10 +172,21 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
 
+    /**
+     * True iff a {@link ProofScriptEntry} is present
+     *
+     * @see #readProofScript()
+     */
     public boolean hasProofScript() {
         return readProofScript() != null;
     }
 
+    /**
+     * Returns the {@link ProofScriptEntry} in this resource
+     *
+     * @return {@link ProofScriptEntry} if present otherwise null
+     * @see KeyAst.File#findProofScript(URI)
+     */
     public @Nullable ProofScriptEntry readProofScript() {
         URI url = getInitialFile().toURI();
         return getParseContext().findProofScript(url);
